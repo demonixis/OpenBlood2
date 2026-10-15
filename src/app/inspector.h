@@ -21,6 +21,10 @@ namespace OpenBlood2
         ObjectId trigger_selection{}, trigger_request{};
         std::string trigger_command;
         bool grant_key_request = false;
+        bool select_lights = false;
+        ObjectId light_selection{}, light_request{};
+        std::string light_command;
+        void draw_lights(GameSession&, ObjectSelection&);
         bool select_keyframes = false;
         ObjectId keyframe_selection{};
         void draw_keyframes(GameSession&, ObjectSelection&);

@@ -538,7 +538,7 @@ namespace
         CHECK(game.world.version == 56);
         CHECK(game.world.objects.size() == 580);
         CHECK(game.world.models.size() == 116);
-        CHECK(game.objects.snapshot().size() == 155);
+        CHECK(game.objects.snapshot().size() == 167);
         CHECK(game.world.models[0].points.size() == 4996);
         CHECK(game.world.models[0].polygons.size() == 3367);
         CHECK(game.resources.find(game.world_path)->overrides == 1);

@@ -1,0 +1,149 @@
+{
+  "date": "2026-10-16",
+  "status": "M2 incomplete; original dynamic point-light rules and evaluated client state, world illumination unavailable",
+  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/ClientLightFX.cpp",
+      "target": "src/game/original/ClientLightFX.cpp",
+      "source_line_ranges": [
+        [
+          153,
+          213
+        ],
+        [
+          223,
+          261
+        ],
+        [
+          275,
+          279
+        ],
+        [
+          290,
+          356
+        ],
+        [
+          368,
+          621
+        ]
+      ],
+      "selection": "Selected constructor, aggregate/callback order, world/string properties, postprop flags, randomized initial scheduling, lifetime, color/phase conversion, case-sensitive prefix triggers, damage/death and SFX descriptor fields. Owned strings/typed publication replace message/string ABI. Restore/cache/save/load omitted; checked finite bounds and invalid-wave rejection are explicit adaptations.",
+      "source_sha256": "223065f6c0cf2ea61fcd8a8c8025a96ba207f236e0b752e3308e65ef44bea860",
+      "target_sha256": "b41a1561e40ee988c28d51928bb81e24c3028d9a3c0d60bc3a0ea7b41362fbfb"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ClientLightFX.cpp",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          24,
+          140
+        ]
+      ],
+      "selection": "Original base properties, CClientSFX ancestry and all thirteen waveform/compatibility presets; shared destructable schema uses existing selected aggregate contract.",
+      "source_sha256": "223065f6c0cf2ea61fcd8a8c8025a96ba207f236e0b752e3308e65ef44bea860",
+      "target_sha256": "dd6a35f0cc9a84f2f6dc3f80c3757a9afef77a17c9f39355a115a13926966bfe"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ClientLightFX.h",
+      "target": "src/game/original/ClientLightFX.h",
+      "source_line_ranges": [
+        [
+          18,
+          146
+        ]
+      ],
+      "selection": "Original class, aggregate and thirteen subclasses, selected state and callbacks with value ownership; save/load/cache declarations omitted.",
+      "source_sha256": "95cfbaf5286c1413baaf3f2d452aad9e0a53b3e0281a334c3e0a68be1473821c",
+      "target_sha256": "a936aea20049eaf359415ae8f4e99589e94800076a0e94c532423e09c34fbaed"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ClientSFX.cpp",
+      "target": "src/game/original/ClientSFX.h",
+      "source_line_ranges": [
+        [
+          25,
+          50
+        ]
+      ],
+      "selection": "Original constructor and PRECREATE FORCECLIENTUPDATE hook; ClientLightFX retains its explicit B2BaseClass forwarding, bypassing this hook.",
+      "source_sha256": "6e3731e0371a886cb02a22ba7aa5145f67b47080ed74805150d09206d41b6d54",
+      "target_sha256": "4f3d387f6593d974c6c0fe8e4d17a8035451fbf83eedaf0bec4e5c0858b35904"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/LightFX.cpp",
+      "target": "src/game/original/LightFX.cpp",
+      "source_line_ranges": [
+        [
+          32,
+          155
+        ],
+        [
+          168,
+          284
+        ],
+        [
+          299,
+          325
+        ],
+        [
+          369,
+          402
+        ]
+      ],
+      "selection": "Original wave tables/formulas, descriptor initialization, initial evaluation, position following, ON/OFF visibility/radius/color rules and clamping. Negative phases wrap safely before table access. Owned checked source-bound state replaces legacy client OT_LIGHT allocation, not a world illumination implementation. PlayRampSound has no calls in this path and is not fabricated.",
+      "source_sha256": "ad0e75b3f16882b0a1b4fb65ddbfe11b2d8bce0ea84a60bb0c362e936ed887e5",
+      "target_sha256": "8c259862304808bfb93ad422f28dc0a0f53552a12a64b898265374146a1a4e03"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/LightFX.h",
+      "target": "src/game/original/LightFX.h",
+      "source_line_ranges": [
+        [
+          44,
+          142
+        ]
+      ],
+      "selection": "Selected CLightFX interface and state; omit unused timing/hitpoint fields, generic CSpecialFX inheritance and sound/client object handles. Existing server light descriptor is owned by value.",
+      "source_sha256": "bdeae16d078380ee9286d931081da640196290dd56c07f03a38dbf9e4f5d4297",
+      "target_sha256": "81cb362819bbaaa2b1a8f39386df237acb746037a79d068202271ee62c194069"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/LightFX.h",
+      "target": "src/game/light_messages.h",
+      "source_line_ranges": [
+        [
+          18,
+          36
+        ]
+      ],
+      "selection": "Original LIGHTCREATESTRUCT field meanings represented as owned typed LightSettings/LightWave, retaining separate flags and sound names.",
+      "source_sha256": "bdeae16d078380ee9286d931081da640196290dd56c07f03a38dbf9e4f5d4297",
+      "target_sha256": "d2eac4713d701daf12dc6ec683b77931111be3512593d9e1fa4f5bd2e1c64297"
+    },
+    {
+      "source": "sources/blood2/Shared/ClientServerShared.h",
+      "target": "src/game/light_messages.h",
+      "source_line_ranges": [
+        [
+          50,
+          63
+        ]
+      ],
+      "selection": "Original wave identifiers NONE through SEARCH, values 0 through 11.",
+      "source_sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
+      "target_sha256": "d2eac4713d701daf12dc6ec683b77931111be3512593d9e1fa4f5bd2e1c64297"
+    }
+  ],
+  "adaptations": [
+    "Owned typed descriptors and source-bound evaluated CLightFX registry replace SFX packets/client object allocation; no generic SFX or GPU world-illumination success is claimed",
+    "Checked finite values, wave 0..11, flags 0xf8, owned names up to 100 bytes, one publication per live derived source, maximum 4096 lights; restore rejects",
+    "Safe negative-phase modulo wrapping fixes undefined original negative table indexing; source sample tables/thresholds otherwise preserved",
+    "Portable local seeded minstd_rand jitter resets on world unload; not the retail CRT/global stream",
+    "Preserve constructor vs world defaults, B2BaseClass callback bypass, asymmetric clamps, color /511, absolute-time phases, prefix commands and OFF/ON lifetime/NONE-radius quirks",
+    "Existing CDestructable damage/death/spawn contracts reused; pending source invalidates lookup before deferred destruction and paired keyframe links remain safe",
+    "UI-independent state, honest waveform/color/placement inspection and GPU smoke; source ramp sound names retained, unused PlayRampSound not invented",
+    "Exactly twelve GlowingLight entries increase SubwayA creation/runtime count assertions; no unsupported service, parser bound or startup gate relaxed"
+  ]
+}

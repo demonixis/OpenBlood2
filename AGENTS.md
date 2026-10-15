@@ -124,3 +124,14 @@ audio and CinematicTrigger remain explicitly unavailable. SubwayA has 148 create
 source entries, 7 SelfTriggers, 372 editor-only and 60 unported; nine Keys are consumed
 on the first update (155/158 initial instances before/after player, 146/149 afterwards).
 M2 remains open; these counts do not imply completed cinematic/gameplay services.
+
+The latest [dynamic light evidence](../Documentation/Implementation/M2_LIGHTS.md) connects original ClientLightFX/GlowingLight
+and client CLightFX waveform evaluation. Read [light contracts](docs/LIGHT_CONTRACTS.md) before
+extending lights, SFX publication or their damage/lifetime. Preserve source command
+prefixes, scheduling/NONE-wave quirks, color /511, absolute phase and deferred
+source-bound lifetime. Client records and inspector overlays are real evaluated
+state; world illumination/shadows/fog and audio remain unavailable. DirLight spots
+and the implicit main light are separate. SubwayA now has 160 created source entries,
+7 SelfTriggers, 372 editor-only and 48 unported (167/170 initial runtime instances,
+158/161 after consuming nine Keys). The earlier missing GlowingLight statement is
+superseded for this subset; M2 remains open.

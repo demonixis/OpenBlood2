@@ -342,3 +342,14 @@ record the target-offset removal fix, bounded discovery and reentrant command gu
 The typed engine interpolation/motion helpers and UI are new implementation code.
 Sound/BPrint requests, world/container movers, CinematicTrigger and full M2 remain
 unimplemented; these diagnostics are not successful audio/physics service stubs.
+
+## M2 dynamic lights
+
+[Source selections](M2_LIGHT_SOURCES.json) record ClientLightFX callbacks/properties,
+CClientSFX ancestry, all thirteen presets and original client CLightFX wave tables,
+conversion and update rules. Owned typed records replace SFX packet/client object
+allocation. [Contracts](LIGHT_CONTRACTS.md) identify safe negative-phase wrapping,
+bounded descriptors, local portable jitter and retained source quirks. Registry,
+UI/placement plots and test harnesses are new project code. No world-lighting,
+shadow/fog, audio or generic SFX-manager service is claimed. Earlier omissions of
+GlowingLight are superseded only for this selected server/client subset.

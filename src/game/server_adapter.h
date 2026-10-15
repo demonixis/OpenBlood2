@@ -4,9 +4,11 @@
 #include "engine/objects.h"
 #include "engine/string_resources.h"
 #include "game/original/BloodShells.h"
+#include "game/original/LightFX.h"
 #include "game/session.h"
 #include <array>
 #include <optional>
+#include <random>
 #include <unordered_set>
 
 struct StringHandle
@@ -70,6 +72,8 @@ namespace OpenBlood2
             spawn_reports.clear();
             pickup_reports.clear();
             camera_effects.clear();
+            light_effects.clear();
+            random_.seed(1);
             variables_.erase("GAME_WORLDNAME");
             client_strings = {};
             client_strings_error.clear();
@@ -94,6 +98,12 @@ namespace OpenBlood2
         StringResources client_strings;
         std::string client_strings_error;
         bool client_strings_attempted = false;
+        std::vector<CLightFX> light_effects;
+        bool RandomFloat(float, float, float&) override;
+        bool PublishLightEffect(HOBJECT, const LightSettings&) override;
+        void RemoveLightEffect(HOBJECT) override;
+        const CLightFX* GetLightEffect(HOBJECT) const;
+        bool advance_lights();
         std::vector<CameraView> camera_effects;
         bool PublishCameraEffect(HOBJECT, const CameraSettings&) override;
         void RemoveCameraEffect(HOBJECT) override;
@@ -161,6 +171,7 @@ namespace OpenBlood2
         DVector gravity{0, -2000, 0};
 
       private:
+        std::minstd_rand random_{1};
         double world_time_origin_ = 0;
         struct String
         {

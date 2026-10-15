@@ -2,6 +2,7 @@
 #include "game/original/B2BaseClass.h"
 #include "game/original/CameraObj.h"
 #include "game/original/CameraSpot.h"
+#include "game/original/ClientLightFX.h"
 #include "game/original/Door.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Key.h"
@@ -84,6 +85,100 @@ namespace OpenBlood2
                                    {"BaseKeyName", std::string{}},
                                    {"StartActive", false},
                                    {"Looping", false}}};
+        const ClassInfo client_sfx{"CClientSFX", &b2base, construct<CClientSFX>, {}};
+        const ClassInfo client_light{"ClientLightFX", &client_sfx, construct<ClientLightFX>, []
+                                     {
+                                         std::vector<PropertySpec> p{{"HitPoints", 1.0f},
+                                                                     {"LightSwitch", true},
+                                                                     {"LifeTime", 0.0f},
+                                                                     {"Color", DVector{255, 255, 255}},
+                                                                     {"IntensityMin", .5f},
+                                                                     {"IntensityMax", 1.0f},
+                                                                     {"IntensityWaveform", std::int32_t(0)},
+                                                                     {"IntensityFreq", 4.0f},
+                                                                     {"IntensityPhase", 0.0f},
+                                                                     {"RadiusMin", 200.0f},
+                                                                     {"RadiusMax", 500.0f},
+                                                                     {"RadiusWaveform", std::int32_t(0)},
+                                                                     {"RadiusFreq", 4.0f},
+                                                                     {"RadiusPhase", 0.0f},
+                                                                     {"TriggerDestroyOnly", false},
+                                                                     {"CanDamage", true},
+                                                                     {"SpawnObjectVel", DVector{}}};
+                                         for (auto name : {"RampUpSound", "RampDownSound", "DamageTriggerTarget",
+                                                           "DamageTriggerMessage", "DeathTriggerTarget",
+                                                           "DeathTriggerMessage", "SpawnObject"})
+                                             p.push_back({name, std::string{}});
+                                         for (auto name : {"CastShadowsFlag", "SolidLightFlag", "OnlyLightWorldFlag",
+                                                           "DontLightBackfacingFlag", "FogLightFlag"})
+                                             p.push_back({name, false});
+                                         return p;
+                                     }()};
+        const ClassInfo light_SquareWaveLightFX{
+            "SquareWaveLightFX",
+            &client_light,
+            construct<SquareWaveLightFX>,
+            {{"IntensityWaveform", std::int32_t(1)}, {"RadiusWaveform", std::int32_t(1)}}};
+        const ClassInfo light_SawWaveLightFX{
+            "SawWaveLightFX",
+            &client_light,
+            construct<SawWaveLightFX>,
+            {{"IntensityWaveform", std::int32_t(2)}, {"RadiusWaveform", std::int32_t(2)}}};
+        const ClassInfo light_RampUpWaveLightFX{
+            "RampUpWaveLightFX",
+            &client_light,
+            construct<RampUpWaveLightFX>,
+            {{"IntensityWaveform", std::int32_t(3)}, {"RadiusWaveform", std::int32_t(3)}}};
+        const ClassInfo light_RampDownWaveLightFX{
+            "RampDownWaveLightFX",
+            &client_light,
+            construct<RampDownWaveLightFX>,
+            {{"IntensityWaveform", std::int32_t(4)}, {"RadiusWaveform", std::int32_t(4)}}};
+        const ClassInfo light_SineWaveLightFX{
+            "SineWaveLightFX",
+            &client_light,
+            construct<SineWaveLightFX>,
+            {{"IntensityWaveform", std::int32_t(5)}, {"RadiusWaveform", std::int32_t(5)}}};
+        const ClassInfo light_Flicker1WaveLightFX{
+            "Flicker1WaveLightFX",
+            &client_light,
+            construct<Flicker1WaveLightFX>,
+            {{"IntensityWaveform", std::int32_t(6)}, {"RadiusWaveform", std::int32_t(6)}}};
+        const ClassInfo light_Flicker2WaveLightFX{
+            "Flicker2WaveLightFX",
+            &client_light,
+            construct<Flicker2WaveLightFX>,
+            {{"IntensityWaveform", std::int32_t(7)}, {"RadiusWaveform", std::int32_t(7)}}};
+        const ClassInfo light_Flicker3WaveLightFX{
+            "Flicker3WaveLightFX",
+            &client_light,
+            construct<Flicker3WaveLightFX>,
+            {{"IntensityWaveform", std::int32_t(8)}, {"RadiusWaveform", std::int32_t(8)}}};
+        const ClassInfo light_Flicker4WaveLightFX{
+            "Flicker4WaveLightFX",
+            &client_light,
+            construct<Flicker4WaveLightFX>,
+            {{"IntensityWaveform", std::int32_t(9)}, {"RadiusWaveform", std::int32_t(9)}}};
+        const ClassInfo light_StrobeWaveLightFX{
+            "StrobeWaveLightFX",
+            &client_light,
+            construct<StrobeWaveLightFX>,
+            {{"IntensityWaveform", std::int32_t(10)}, {"RadiusWaveform", std::int32_t(10)}}};
+        const ClassInfo light_SearchWaveLightFX{
+            "SearchWaveLightFX",
+            &client_light,
+            construct<SearchWaveLightFX>,
+            {{"IntensityWaveform", std::int32_t(11)}, {"RadiusWaveform", std::int32_t(11)}}};
+        const ClassInfo light_FlickerLight{
+            "FlickerLight",
+            &client_light,
+            construct<FlickerLight>,
+            {{"IntensityWaveform", std::int32_t(7)}, {"RadiusWaveform", std::int32_t(7)}}};
+        const ClassInfo light_GlowingLight{
+            "GlowingLight",
+            &client_light,
+            construct<GlowingLight>,
+            {{"IntensityWaveform", std::int32_t(5)}, {"RadiusWaveform", std::int32_t(5)}}};
         const ClassInfo start{"StartPoint", &base, construct<StartPoint>, {}};
         const ClassInfo game_start{"GameStartPoint",
                                    &start,
@@ -414,13 +509,21 @@ namespace OpenBlood2
     bool register_original_classes(Objects& objects)
     {
         return objects.register_class(base) && objects.register_class(b2base) && objects.register_class(camera) &&
-               objects.register_class(camera_object) && objects.register_class(keyframer) &&
-               objects.register_class(key) && objects.register_class(start) && objects.register_class(game_start) &&
-               objects.register_class(path) && objects.register_class(world_properties) &&
-               objects.register_class(smell) && objects.register_class(character) && objects.register_class(player) &&
-               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
-               objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
-               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
+               objects.register_class(client_sfx) && objects.register_class(client_light) &&
+               objects.register_class(light_SquareWaveLightFX) && objects.register_class(light_SawWaveLightFX) &&
+               objects.register_class(light_RampUpWaveLightFX) && objects.register_class(light_RampDownWaveLightFX) &&
+               objects.register_class(light_SineWaveLightFX) && objects.register_class(light_Flicker1WaveLightFX) &&
+               objects.register_class(light_Flicker2WaveLightFX) && objects.register_class(light_Flicker3WaveLightFX) &&
+               objects.register_class(light_Flicker4WaveLightFX) && objects.register_class(light_StrobeWaveLightFX) &&
+               objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
+               objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
+               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
+               objects.register_class(game_start) && objects.register_class(path) &&
+               objects.register_class(world_properties) && objects.register_class(smell) &&
+               objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
+               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
+               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
+               objects.register_class(freefall) && objects.register_class(trigger) &&
                objects.register_class(key_pickup) && objects.register_class(pickup) &&
                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
                objects.register_class(health_base) && objects.register_class(armor_base) &&

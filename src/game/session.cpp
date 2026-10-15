@@ -376,6 +376,7 @@ namespace OpenBlood2
         if (seconds > 0)
             ok = server.damage_containers() && ok;
         ok = objects.finish_frame() && ok;
+        ok = server.advance_lights() && ok;
         if (ok && preview_model && preview_playing &&
             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
             preview_playing = false;

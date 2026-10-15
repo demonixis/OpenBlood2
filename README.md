@@ -26,7 +26,7 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
 ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
 ```
 
-The default world is `01_SubwayA`. Its patched DAT supplies 580 source objects and 116 BSP models. **144 source instances** run (`GameStartPoint`, `Key`, `PathPoint`, `WorldProperties`, `Conveyor`, `Damage`, `Door`, `Trigger`, `CDestructableBrush`, `ObjectivesTrigger`, `CameraObj`), plus **7 door-owned SelfTriggers** (151 runtime instances before player entry); 372 entries are original preprocessor-only objects and **64 required runtime objects remain unported**. Every source entry remains inspectable.
+The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **160 source entries** create, including original KeyFramer and twelve GlowingLight objects, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **48 unported runtime entries**, zero failed. Runtime counts before/after player entry are **167/170**, then **158/161** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_LIGHTS.md) records these counts; earlier increment sections below are historical snapshots.
 
 The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
 
@@ -47,6 +47,7 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
 | `--inspect-player` | Headless original shell/player entry inspection, with explicit gameplay blockers |
 | `--player-smoke` | GPU Session panel, hidden player updates, unload/re-entry checks |
 | `--weapons-smoke` | GPU Beretta/knife firing while hidden, unload/re-entry; capture at frame 181 |
+| `--lights-smoke` | GPU original dynamic-light state/KeyFramer placement while hidden, Lights inspection and reload |
 | `--cameras-smoke` | GPU original camera tracking, client view/player gates while hidden, inspection and reload |
 | `--objectives-smoke` | GPU original objective delivery and localized client text while hidden, inspection and reload |
 | `--pickups-smoke` | GPU original ammo collection while hidden, Ward inspection and reload |
@@ -110,7 +111,7 @@ The Pickups tab inspects all supported ammo/health/armor objects, including hidd
 
 ## Mission objectives continuation
 
-[Latest evidence](../Documentation/Implementation/M2_OBJECTIVES.md) and
+[Increment evidence](../Documentation/Implementation/M2_OBJECTIVES.md) and
 [contracts](docs/OBJECTIVES_CONTRACTS.md) cover original ObjectivesTrigger,
 typed client broadcasts and bounded PE resource-string lookup from external
 cres.dll. The Objectives tab shows source objects, delivery/resolution state and
@@ -119,18 +120,18 @@ UI/reload check. Original HUD and audio are pending; M2 remains incomplete.
 
 ## Scripted camera continuation
 
-[Latest evidence](../Documentation/Implementation/M2_CAMERAS.md) and
+[Increment evidence](../Documentation/Implementation/M2_CAMERAS.md) and
 [contracts](docs/CAMERA_CONTRACTS.md) cover original CameraObj activation/tracking,
 typed client camera selection and player movement/USE/fire restrictions. Cameras
 shows both source and published listener flags, target/pose, timers and player
 restrictions; diagnostic ON/OFF/LINK controls use original messages. Run
 `./build/debug/blood2 --cameras-smoke` for hidden-UI and reload checks. The selected
 view, visibility and audio listener are inspection data/requests; cinematic world
-rendering, KeyFramer/CinematicTrigger and audio remain pending. Latest SubwayA
+rendering, KeyFramer/CinematicTrigger and audio remained pending at this snapshot. Its SubwayA
 accounting is 144 source instances + 7 SelfTriggers, 154 with player/owned models,
 372 editor-only entries, 64 unported and zero failed. M2 is still open.
 
-Latest: [original keyframed paths](../Documentation/Implementation/M2_KEYFRAMERS.md)
+Earlier increment: [original keyframed paths](../Documentation/Implementation/M2_KEYFRAMERS.md)
 connect KeyFramer/KeyData, camera motion and owned consumed keys. The Keyframes tab
 shows copied timelines, target transforms/results and unresolved script/sound
 requests. Run `./build/debug/blood2 --keyframes-smoke` for hidden-UI/reload checks.
@@ -139,3 +140,15 @@ SubwayA has 148 created source entries + 7 SelfTriggers, 372 editor-only, 60 unp
 zero failed. Nine Keys disappear after copying: live counts are 155 before player
 entry, 158 after entry, then 146/149 after initialization. World/container path
 motion, CinematicTrigger, sound and full M2 acceptance remain pending.
+
+## Original dynamic lights
+
+[Latest evidence](../Documentation/Implementation/M2_LIGHTS.md) and
+[contracts](docs/LIGHT_CONTRACTS.md) cover ClientLightFX, thirteen original presets
+and client CLightFX waves. Lights exposes hidden/off sources, lifecycle/damage,
+parameters/plots, evaluated color/radius/position, an XZ placement overlay and
+queued ON/OFF/TOGGLE/KILL. Twelve authored SubwayA GlowingLight objects now follow
+the original sublight KeyFramer. `./build/debug/blood2 --lights-smoke` checks them
+while UI is hidden and after reload. The computed point-light state does not yet
+illuminate the world; shadows/fog, general SFX/audio, DirLight spots and the implicit
+main light remain pending. M2 stays incomplete.

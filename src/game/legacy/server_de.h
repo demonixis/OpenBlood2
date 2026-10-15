@@ -4,6 +4,7 @@
 #include "game/camera_messages.h"
 #include "game/container_messages.h"
 #include "game/key_messages.h"
+#include "game/light_messages.h"
 #include "game/mover_messages.h"
 #include "game/pickup_messages.h"
 #include "game/player_messages.h"
@@ -58,6 +59,9 @@ class ServerDE : public CSBase
     // raw C++ pointer whose lifetime can outlive its object.
     virtual HOBJECT GetClientUserData(HCLIENT) = 0;
     virtual DRESULT SetClientUserData(HCLIENT, HOBJECT) = 0;
+    virtual bool RandomFloat(float, float, float&) = 0;
+    virtual bool PublishLightEffect(HOBJECT, const OpenBlood2::LightSettings&) = 0;
+    virtual void RemoveLightEffect(HOBJECT) = 0;
     virtual bool PublishCameraEffect(HOBJECT, const OpenBlood2::CameraSettings&) = 0;
     virtual void RemoveCameraEffect(HOBJECT) = 0;
     virtual OpenBlood2::CameraView GetCameraView() = 0;

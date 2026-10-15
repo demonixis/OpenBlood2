@@ -2,6 +2,7 @@
 #include "build_info.h"
 #include "engine/container.h"
 #include "engine/world_model.h"
+#include "game/original/ClientLightFX.h"
 #include "game/original/Door.h"
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
@@ -77,6 +78,22 @@ namespace OpenBlood2
 
     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
     {
+        if (light_request)
+        {
+            if (const auto* r = game.objects.get(light_request);
+                r && r->life == Life::Alive && dynamic_cast<const ClientLightFX*>(r->game.get()))
+            {
+                auto text = game.server.CreateString(light_command.c_str());
+                auto message = game.server.StartMessageToObject(r->game.get(), r->handle, 1000);
+                if (message)
+                {
+                    game.server.WriteToMessageHString(message, text);
+                    game.server.EndMessage(message);
+                }
+                game.server.FreeString(text);
+            }
+            light_request = {};
+        }
         if (camera_request)
         {
             if (const auto* r = game.objects.get(camera_request);
@@ -512,6 +529,12 @@ namespace OpenBlood2
                 {
                     select_triggers = false;
                     draw_triggers(game, selection);
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("Lights", nullptr, select_lights ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_lights = false;
+                    draw_lights(game, selection);
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Keyframes", nullptr, select_keyframes ? ImGuiTabItemFlags_SetSelected : 0))
