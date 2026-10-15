@@ -1,6 +1,7 @@
 #pragma once
 #include "basedefs_de.h"
 #include "game/brush_messages.h"
+#include "game/camera_messages.h"
 #include "game/container_messages.h"
 #include "game/key_messages.h"
 #include "game/mover_messages.h"
@@ -57,6 +58,11 @@ class ServerDE : public CSBase
     // raw C++ pointer whose lifetime can outlive its object.
     virtual HOBJECT GetClientUserData(HCLIENT) = 0;
     virtual DRESULT SetClientUserData(HCLIENT, HOBJECT) = 0;
+    virtual bool PublishCameraEffect(HOBJECT, const OpenBlood2::CameraSettings&) = 0;
+    virtual void RemoveCameraEffect(HOBJECT) = 0;
+    virtual OpenBlood2::CameraView GetCameraView() = 0;
+    virtual DRESULT AlignRotation(DRotation&, DVector forward) = 0; // Selected world-Y-up caller.
+    virtual DDWORD GetObjectUserFlags(HOBJECT) = 0;
     virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
     virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;
     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;

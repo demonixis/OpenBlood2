@@ -132,3 +132,8 @@ The six reference repositories, commercial content and dependency pins are
 unchanged. The later-generation LithTech motion implementation was consulted
 as context, not imported as Blood II engine code. Only Linux has been exercised;
 the retail executable has not been run for movement-feel comparison.
+
+[Camera contracts](CAMERA_CONTRACTS.md) add original CameraObj movement permission.
+A blocking camera clears commands but gravity/environment still use the same
+single body integration. Private gameplay tests await SubwayA's natural two-camera
+intro before issuing their movement sequence; normal entry retains that intro.

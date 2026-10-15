@@ -321,3 +321,13 @@ legacy message/HSTRING storage. The portable PE string reader is new engine code
 based on Microsoft documentation, with no prototype dependency or native DLL
 execution. [Contracts](OBJECTIVES_CONTRACTS.md) distinguish resource resolution,
 source sound requests and pending original HUD/audio. Previous ledgers stay historical.
+
+## M2 scripted cameras
+
+[Source selections](M2_CAMERA_SOURCES.json) record CameraObj callbacks/properties,
+CameraFX metadata, the client external-camera selection/visibility/movement branches
+and the server weapon movement guard. [Contracts](CAMERA_CONTRACTS.md) distinguish
+source rules from typed descriptors, checked lifetime, look-direction math and
+stable client selection. Cinematic rendering and audio remain presentation requests;
+KeyFramer/CinematicTrigger and full M2 acceptance are not implemented by this port.
+Earlier ledgers remain historical; no dependency pin or reference tree changed.

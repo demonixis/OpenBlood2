@@ -56,6 +56,10 @@ class CBloodClientShell
     bool m_bInWorld = false, m_bFirstWorld = true, m_bFirstUpdate = true;
     HOBJECT player = nullptr;
     DVector position{}, camera_position{};
+    OpenBlood2::CameraView view;
+    DVector listener_position{};
+    bool player_visible = false, weapons_visible = true;
+    bool UpdateCameraSelection();
     OpenBlood2::PlayerRotation rotation;
     OpenBlood2::PlayerPhysics physics;
     OpenBlood2::PlayerStats stats;

@@ -111,7 +111,7 @@ object inspector also detaches the local client on the next step.
 | Character animation commands | ABC playback and real callback delivery; unhandled character commands retained for inspection, not silently executed |
 | Player movement | Original MoveMgr dry-land movement, crouch and body animation selection connected; shared local body replaces prediction/leash. Containers/platforms, full movement states and AI membership remain pending |
 | Model flags | STAIRSTEP uses the bounded replacement stair solver; ANIMTRANSITION still does not implement blending |
-| Client camera | Position plus original Caleb eye offset is inspectable; original camera effects and renderer are not ported |
+| Client camera | Player eye plus selected original CameraObj view/gates are inspectable; see [camera contracts](CAMERA_CONTRACTS.md). Cinematic rendering/audio remain pending |
 | View weapons | Selected original client animation/firing paths, actual ABC resources, diagnostic input; see weapon contracts |
 | Voice, HUD/menu, autosave, sound playback | Absent; no successful service stubs |
 

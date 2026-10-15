@@ -9,7 +9,8 @@ enum class FireResult
     Dry,
     Invalid,
     Unavailable,
-    DeliveryFailed
+    DeliveryFailed,
+    Blocked
 };
 struct WeaponShot
 {

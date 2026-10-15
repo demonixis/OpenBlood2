@@ -104,3 +104,12 @@ owned bounded queue and explicit unresolved state. The PE reader executes no cod
 ambiguous languages and malformed resources fail. SubwayA now has 142 created
 source entries, 7 owned SelfTriggers, 372 editor-only and 66 unported. HUD/audio,
 transitions and complete M2 acceptance remain pending.
+
+The latest [camera evidence](../Documentation/Implementation/M2_CAMERAS.md) connects original CameraObj activation,
+tracking and typed client camera selection, including movement/USE/fire gates.
+Read [camera contracts](docs/CAMERA_CONTRACTS.md) before extending camera modes, cinematics or
+player restrictions. Preserve source/client listener differences, strict timeout,
+unlink scheduling and already-started FIRE_KEY handling. Presentation/listener
+requests are not cinematic rendering/audio. SubwayA now has 144 created source
+entries, 7 owned SelfTriggers, 372 editor-only and 64 unported entries. KeyFramer,
+CinematicTrigger, transitions and the actual M2 gate remain open.

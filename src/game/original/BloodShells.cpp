@@ -142,6 +142,10 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client)
     m_bFirstWorld = true;
     position = {};
     camera_position = {};
+    view = {};
+    listener_position = {};
+    player_visible = false;
+    weapons_visible = true;
     rotation = {};
     physics = {};
     stats = {};
@@ -168,6 +172,10 @@ void CBloodClientShell::OnExitWorld()
     m_bFirstUpdate = true;
     position = {};
     camera_position = {};
+    view = {};
+    listener_position = {};
+    player_visible = false;
+    weapons_visible = true;
     rotation = {};
     physics = {};
     stats = {};
@@ -245,15 +253,22 @@ bool CBloodClientShell::Update()
         return false;
     camera_position = position;
     camera_position.y += owner->eye_level;
+    if (!UpdateCameraSelection())
+        return false;
     m_bFirstUpdate = false;
     return true;
 }
 bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds, std::string& error)
 {
     auto* owner = server.Player(client_);
-    if (!owner || !owner->ApplyDoorPush() ||
-        !move_mgr.Update(server, movement_input, rotation.yaw, seconds, !owner->m_damage.IsDead(),
-                         weapon_input.primary || weapon_input.alternate, rotation.pitch))
+    if (!owner || !UpdateCameraSelection())
+        return false;
+    if (owner->camera_movement_blocked && !owner->m_damage.IsDead() &&
+        !server.OnMessage(client_, OpenBlood2::PlayerControls{{}, false, rotation.yaw}))
+        return false;
+    if (!owner->ApplyDoorPush() || !move_mgr.Update(server, movement_input, rotation.yaw, seconds,
+                                                    !owner->m_damage.IsDead() && !owner->camera_movement_blocked,
+                                                    weapon_input.primary || weapon_input.alternate, rotation.pitch))
     {
         error = "Original MoveMgr step failed (invalid association, movement message or collision)";
         if (owner && !owner->locomotion_error.empty())
@@ -305,8 +320,33 @@ bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server, double seconds,
 {
     const float cp = std::cos(rotation.pitch);
     const DVector forward{std::sin(rotation.yaw) * cp, -std::sin(rotation.pitch), std::cos(rotation.yaw) * cp};
+    auto input = weapon_input;
+    if (const auto* owner = server.Player(client_); owner && owner->camera_movement_blocked)
+        input.primary = input.alternate = false;
     for (auto& weapon : weapons)
-        if (!weapon.Update(server_, server, client_, weapon_input, camera_position, forward, seconds, error))
+        if (!weapon.Update(server_, server, client_, input, camera_position, forward, seconds, error))
             return false;
+    return true;
+}
+
+bool CBloodClientShell::UpdateCameraSelection()
+{
+    auto* owner = dynamic_cast<CPlayerObj*>(server_.HandleToObject(player));
+    if (!owner || server_.GetClientUserData(client_) != player)
+        return false;
+    view = server_.GetCameraView();
+    owner->camera_movement_blocked = view.object && !view.settings.player_movement;
+    player_visible = view.object && !view.settings.hide_player;
+    weapons_visible = !view.object;
+    if (!view.object)
+    {
+        view.position = camera_position;
+        view.rotation.m_Vec = {}; // Build the same player pitch/yaw orientation.
+        const float cp = std::cos(rotation.pitch);
+        const DVector forward{std::sin(rotation.yaw) * cp, -std::sin(rotation.pitch), std::cos(rotation.yaw) * cp};
+        if (server_.AlignRotation(view.rotation, forward) != DE_OK)
+            return false;
+    }
+    listener_position = view.object && view.settings.listener ? view.position : position;
     return true;
 }

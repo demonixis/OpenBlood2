@@ -1,6 +1,7 @@
 #include "app/movement_controls.h"
 #include "brush_smoke.h"
 #include "build_info.h"
+#include "camera_smoke.h"
 #include "engine/capture.h"
 #include "engine/config.h"
 #include "engine/runtime.h"
@@ -99,6 +100,12 @@ namespace
                     spdlog::error("Player entry: {}", error);
                     return 6;
                 }
+                if ((options.weapons_smoke || options.movement_smoke || options.interaction_smoke) &&
+                    !OpenBlood2::finish_camera_intro_for_smoke(game))
+                {
+                    spdlog::error("Authored intro camera did not release player control");
+                    return 4;
+                }
                 selection.id = game.objects.get(game.client_shell.player)->id;
             }
         }
@@ -158,6 +165,14 @@ namespace
                 return 4;
             selection.id = smoke_pickup;
         }
+        OpenBlood2::ObjectId smoke_camera{};
+        bool camera_hidden = false;
+        if (options.cameras_smoke)
+        {
+            if (!OpenBlood2::prepare_camera_smoke(game, smoke_camera))
+                return 4;
+            selection.id = smoke_camera;
+        }
         bool interaction_hidden = false;
         const auto original_selection = selection.id;
         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
@@ -171,13 +186,14 @@ namespace
             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
                                    !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke &&
-                                   !options.pickups_smoke && !options.objectives_smoke;
+                                   !options.pickups_smoke && !options.objectives_smoke && !options.cameras_smoke;
         inspector.select_weapons = options.weapons_smoke;
         inspector.select_movement = options.movement_smoke;
         inspector.select_containers = options.containers_smoke;
         inspector.select_brushes = options.brushes_smoke;
         inspector.select_pickups = options.pickups_smoke;
         inspector.select_objectives = options.objectives_smoke;
+        inspector.select_cameras = options.cameras_smoke;
         inspector.brush_selection = smoke_body;
         inspector.select_doors = options.doors_smoke || options.interaction_smoke;
         inspector.keyboard_movement = options.interaction_smoke;
@@ -279,12 +295,19 @@ namespace
             controls.enabled = inspector.keyboard_movement;
             text_editing = inspector_visible && ImGui::GetIO().WantTextInput;
 #endif
+            if (frames == reload_frame + 1 &&
+                (options.weapons_smoke || options.movement_smoke || options.interaction_smoke) &&
+                !OpenBlood2::finish_camera_intro_for_smoke(game))
+                return 4;
             if (options.interaction_smoke && frames == reload_frame + 1)
                 if (!OpenBlood2::prepare_interaction_smoke(game, smoke_door))
                     return 4;
             if (options.brushes_smoke && frames == reload_frame + 1)
                 if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
                     return 4;
+            if (options.cameras_smoke && frames == reload_frame + 1 &&
+                !OpenBlood2::prepare_camera_smoke(game, smoke_camera))
+                return 4;
             if (options.objectives_smoke && frames == reload_frame + 1 && !OpenBlood2::objective_smoke(game))
                 return 4;
             if (options.pickups_smoke && frames == reload_frame + 1)
@@ -407,7 +430,7 @@ namespace
                 frames >= (extended_smoke ? 180u
                            : (options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
                               options.interaction_smoke || options.brushes_smoke || options.pickups_smoke ||
-                              options.objectives_smoke)
+                              options.objectives_smoke || options.cameras_smoke)
                                ? 14u
                                : 2u) &&
                 !captured && !options.capture_file.empty();
@@ -554,6 +577,8 @@ namespace
                     use.key.down = frames == hide_frame;
                     event_ok = SDL_PushEvent(&use);
                 }
+                if (options.cameras_smoke && frames == show_frame - 1)
+                    camera_hidden = OpenBlood2::check_camera_smoke(game, smoke_camera);
                 if (options.objectives_smoke && frames == show_frame - 1)
                     objective_hidden = OpenBlood2::objective_smoke(game);
                 if (options.pickups_smoke && frames == show_frame - 1)
@@ -679,6 +704,7 @@ namespace
                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+                (options.cameras_smoke && (!camera_hidden || !OpenBlood2::check_camera_smoke(game, smoke_camera))) ||
                 (options.objectives_smoke && !objective_hidden) || (options.pickups_smoke && !pickup_hidden) ||
                 (options.interaction_smoke && !interaction_hidden) || (options.brushes_smoke && !brush_hidden) ||
                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
@@ -701,6 +727,9 @@ namespace
             if (options.world_smoke)
                 spdlog::info("World smoke passed: unload/reload, original instance/string counts restored, "
                              "collision/model resources restored, preview animation advanced while hidden");
+            if (options.cameras_smoke)
+                spdlog::info("CAMERAS smoke: original camera tracks player while UI hidden; selected view, movement "
+                             "gate and reload checked");
             if (options.objectives_smoke)
                 spdlog::info("OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
                              "unload/reload checked");
@@ -776,6 +805,8 @@ int main(int argc, char** argv)
                      "  --brushes-smoke GPU original rotating brush inspection\n"
                      "  --interaction-smoke GPU original USE and rotating door inspection\n"
                      "  --pickups-smoke   GPU original ammo pickup, hidden collection and reload\n"
+                     "  --objectives-smoke GPU original objectives and localized text, hidden delivery/reload\n"
+                     "  --cameras-smoke     GPU original camera tracking, player gates and reload\n"
                      "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
                      "  --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload\n"

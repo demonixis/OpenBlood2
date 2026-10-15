@@ -77,6 +77,22 @@ namespace OpenBlood2
 
     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
     {
+        if (camera_request)
+        {
+            if (const auto* r = game.objects.get(camera_request);
+                r && r->life == Life::Alive && r->type->name == "CameraObj")
+            {
+                auto text = game.server.CreateString(camera_command.c_str());
+                auto message = game.server.StartMessageToObject(nullptr, r->handle, 1000);
+                if (message)
+                {
+                    game.server.WriteToMessageHString(message, text);
+                    game.server.EndMessage(message);
+                }
+                game.server.FreeString(text);
+            }
+            camera_request = {};
+        }
         if (trigger_request)
         {
             auto* r = game.objects.get(trigger_request);
@@ -496,6 +512,12 @@ namespace OpenBlood2
                 {
                     select_triggers = false;
                     draw_triggers(game, selection);
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("Cameras", nullptr, select_cameras ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_cameras = false;
+                    draw_cameras(game, selection);
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Objectives", nullptr, select_objectives ? ImGuiTabItemFlags_SetSelected : 0))

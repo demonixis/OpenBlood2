@@ -87,6 +87,7 @@ resolution from retail resources, stale selection and unload/reload; a diagnosti
 rearm allows this check if the authored objective already fired at player spawn.
 The same simulation runs in the inspector-free build.
 
-Campaign transitions/ExitTrigger, CameraObj/KeyFramer/cinematics, remaining actors
+CameraObj is extended by [camera contracts](CAMERA_CONTRACTS.md). Campaign
+transitions/ExitTrigger, KeyFramer/cinematics, remaining actors
 and effects, audio playback, original HUD, saves and full M2 acceptance remain
 open. No retail executable behavior comparison or non-Linux/XR validation is claimed.

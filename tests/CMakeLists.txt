@@ -126,7 +126,9 @@ foreach(case IN ITEMS walking jumping collisions world_collision support boundar
 endforeach()
 if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME movement.private COMMAND movement_tests private "${BLOOD2_TEST_DATA_DIR}")
-    set_tests_properties(movement.private PROPERTIES LABELS "headless;movement;private" TIMEOUT 30)
+    # Three reload cycles now also simulate the original 12-second intro at 60 Hz
+    # (2,160 additional ticks). Retain all movement assertions and a finite ASan budget.
+    set_tests_properties(movement.private PROPERTIES LABELS "headless;movement;private" TIMEOUT 60)
     if(BLOOD2_GPU_TESTS)
         add_test(NAME gpu.movement COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
             --data-dir "${BLOOD2_TEST_DATA_DIR}" --movement-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/movement.png")
@@ -294,4 +296,22 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
     add_test(NAME gpu.objectives COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
         --data-dir "${BLOOD2_TEST_DATA_DIR}" --objectives-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/objectives.png")
     set_tests_properties(gpu.objectives PROPERTIES LABELS "private;gpu;objectives" TIMEOUT 30 RUN_SERIAL TRUE)
+endif()
+
+add_executable(camera_tests camera_tests.cpp)
+target_link_libraries(camera_tests PRIVATE blood2_game)
+blood2_project_options(camera_tests)
+foreach(case IN ITEMS defaults timing links selection player validation)
+    add_test(NAME cameras.${case} COMMAND camera_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/camera-fixtures/${case}")
+    set_tests_properties(cameras.${case} PROPERTIES LABELS "headless;cameras" TIMEOUT 30)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME cameras.catalog COMMAND camera_tests catalog "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(cameras.catalog PROPERTIES LABELS "headless;private;cameras" TIMEOUT 60)
+endif()
+
+if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+    add_test(NAME gpu.cameras COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+        --data-dir "${BLOOD2_TEST_DATA_DIR}" --cameras-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/cameras.png")
+    set_tests_properties(gpu.cameras PROPERTIES LABELS "private;gpu;cameras" TIMEOUT 30 RUN_SERIAL TRUE)
 endif()

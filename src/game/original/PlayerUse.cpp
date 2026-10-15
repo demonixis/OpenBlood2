@@ -9,7 +9,7 @@ using namespace OpenBlood2;
 // Dead multiplayer respawn / slow-death rescue are outside the accepted session.
 bool CPlayerObj::OnCommandUse()
 {
-    if (!g_pServerDE->IsObjectAlive(m_hObject) || movement_blocked)
+    if (!g_pServerDE->IsObjectAlive(m_hObject) || movement_blocked || camera_movement_blocked)
         return false;
     ++use_commands;
     use_hit = {};

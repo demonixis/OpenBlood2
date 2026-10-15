@@ -69,6 +69,8 @@ namespace OpenBlood2
             explosion_effects.clear();
             spawn_reports.clear();
             pickup_reports.clear();
+            camera_effects.clear();
+            variables_.erase("GAME_WORLDNAME");
             client_strings = {};
             client_strings_error.clear();
             client_strings_attempted = false;
@@ -92,6 +94,12 @@ namespace OpenBlood2
         StringResources client_strings;
         std::string client_strings_error;
         bool client_strings_attempted = false;
+        std::vector<CameraView> camera_effects;
+        bool PublishCameraEffect(HOBJECT, const CameraSettings&) override;
+        void RemoveCameraEffect(HOBJECT) override;
+        CameraView GetCameraView() override;
+        DRESULT AlignRotation(DRotation&, DVector) override;
+        DDWORD GetObjectUserFlags(HOBJECT) override;
         DRESULT SendObjectives(const MissionObjectives&) override;
         bool GetClientResourceString(std::uint32_t, std::string&) override;
         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;

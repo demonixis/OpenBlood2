@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-15",
+  "status": "M2 incomplete; original scripted cameras and typed view/player gates",
+  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/CameraObj.cpp",
+      "target": "src/game/original/CameraObj.cpp",
+      "source_line_ranges": [
+        [
+          43,
+          159
+        ],
+        [
+          178,
+          337
+        ],
+        [
+          347,
+          353
+        ],
+        [
+          412,
+          605
+        ]
+      ],
+      "selection": "Original defaults, callbacks, flags/DebugCutScene model, property reads, published listener workaround, Setup, tracking, strict timeout, source list selection and ON/OFF/LINK. Typed publication and look service replace SDK calls. Retarget cleanup and stale/self checks are deliberate lifetime fixes. Restore and unused DisplayRay remain omitted.",
+      "source_sha256": "5255f0d0efe9ba67b081f5ea8684d8ed60cf94c8f23caaad8c186c21718756ec",
+      "target_sha256": "e0644e11d55292bbd807a9d79d9ac4ff0e3ae195424212e7cc3bc37b71f02b29"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/CameraObj.cpp",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          24,
+          32
+        ]
+      ],
+      "selection": "Original CameraObj property defaults, B2BaseClass ancestry and TypeActionMode=false.",
+      "source_sha256": "5255f0d0efe9ba67b081f5ea8684d8ed60cf94c8f23caaad8c186c21718756ec",
+      "target_sha256": "cc38634d42f054d2c11e68683891bfbbfc2e78801d26bed577750ec0ecc4d1eb"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/CameraObj.h",
+      "target": "src/game/original/CameraObj.h",
+      "source_line_ranges": [
+        [
+          21,
+          73
+        ]
+      ],
+      "selection": "Original camera class/state/list/link names, typed callback overrides and inspection diagnostics; no serialization or unused ray object.",
+      "source_sha256": "de6b95abcc5507fdbd64f59a63b29019c3dbdfe011b77e3d52fe145aff68b8fc",
+      "target_sha256": "9e308e8224af1533c281ab01ae57e825461e2490ae0ff1013b6ab5423c5a5f37"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/CameraFX.h",
+      "target": "src/game/camera_messages.h",
+      "source_line_ranges": [
+        [
+          18,
+          72
+        ]
+      ],
+      "selection": "Selected persistent camera type, movement, hide-player and listener metadata as owned typed values; no generic SFX manager or packet ABI.",
+      "source_sha256": "5d76c3c1d1aec31baca9620b59f2b9c1c7fcc36b9af14993a0d18c57d13a5be8",
+      "target_sha256": "d683e187e237b02886e86cea525d781150279c3e94831825d102e5ead4e0e054"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "target": "src/game/original/BloodShells.cpp",
+      "source_line_ranges": [
+        [
+          2250,
+          2295
+        ],
+        [
+          3271,
+          3297
+        ],
+        [
+          5432,
+          5444
+        ],
+        [
+          6738,
+          6793
+        ],
+        [
+          8919,
+          8969
+        ]
+      ],
+      "selection": "Selected first-active camera, player/view-weapon visibility, movement/fire gate and external pose/listener branches. Presentation requests remain inspection data, not rendering/audio; stable descriptor order replaces SFX slot allocation. Player body eye and external view are separate.",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "target_sha256": "d52d2a50c735be9f9cfc7512e373079db810e0514a3eda79d2c3d373a8023653"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "target": "src/game/original/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          4070,
+          4072
+        ],
+        [
+          6875,
+          6922
+        ]
+      ],
+      "selection": "Original movement permission gates server weapon fire, including already-started FIRE_KEY. Separate camera gate preserves prior movement reasons; typed Blocked acknowledgement consumes no ammo.",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target_sha256": "2d3995a509aef34703105555cd5bf7c44c6ee91398cf8557bef9686b302f079d"
+    }
+  ],
+  "adaptations": [
+    "Owned typed persistent CameraSettings descriptors, max 4096, checked handles and explicit publication failure; no network/DLL ABI",
+    "Client stable creation order vs original SFX slots; source server list and client selection remain distinct; pending handles skipped",
+    "Original world listener workaround after slash/case normalization; source property stays intact; world variable reset owned by adapter",
+    "Target replacement breaks old link; stale/self link rejected; narrow world-Y-up direction math rejects coincident/nonfinite input",
+    "Type 0-2 and finite abs(ActiveTime)<=1000000 checked; restore explicitly unsupported",
+    "Camera restrictions reach original MoveMgr, USE and late weapon FIRE_KEY; one body integration; external view does not change player shot origin",
+    "Viewport, player/weapon visibility and listener are inspectable requests; cinematic rendering/audio, server interest updates, KeyFramer/CinematicTrigger and other modes pending"
+  ]
+}

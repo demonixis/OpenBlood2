@@ -21,6 +21,11 @@ namespace OpenBlood2
         ObjectId trigger_selection{}, trigger_request{};
         std::string trigger_command;
         bool grant_key_request = false;
+        bool select_cameras = false;
+        ObjectId camera_selection{}, camera_request{};
+        char camera_link_name[96]{};
+        std::string camera_command;
+        void draw_cameras(GameSession&, ObjectSelection&);
         bool select_objectives = false;
         ObjectId objective_selection{};
         void draw_objectives(GameSession&, ObjectSelection&);

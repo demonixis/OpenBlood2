@@ -67,7 +67,7 @@ class CPlayerObj : public CBaseCharacter
     std::string locomotion_clip, locomotion_requested_clip, locomotion_error;
     std::uint64_t animation_changes = 0, blocked_resizes = 0;
     bool OnCommandUse();
-    bool movement_blocked = false;
+    bool movement_blocked = false, camera_movement_blocked = false;
     bool door_push_pending = false;
     DVector door_push_velocity{};
     std::uint64_t door_pushes = 0;

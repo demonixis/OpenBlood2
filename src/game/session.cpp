@@ -60,6 +60,7 @@ namespace OpenBlood2
         server.trace_enabled = true;
         world = std::move(next);
         world_path = request.filename;
+        server.SetGameConVar("GAME_WORLDNAME", world_path.c_str());
         server_shell.PreStartWorld();
         if (resources.find("models/characters/caleb.abc"))
             models.load("models/characters/caleb.abc", preview_model, preview_error);

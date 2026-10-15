@@ -1,4 +1,5 @@
 #include "app/movement_controls.h"
+#include "camera_fixture.h"
 #include "player_fixture.h"
 #include <cmath>
 #include <functional>
@@ -367,6 +368,7 @@ namespace
         for (int cycle = 0; cycle < 3; ++cycle)
         {
             CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error));
+            CHECK(test_camera::complete_subway_intro(game));
             auto& client = game.client_shell;
             CHECK(steps(game, 20));
             const auto initial = client.position;

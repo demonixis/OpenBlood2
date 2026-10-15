@@ -401,6 +401,8 @@ FireResult CPlayerObj::HandleWeaponFireMessage(const OpenBlood2::WeaponFire& req
     if (!m_hClient || !attributes_received || m_damage.IsDead() ||
         GetServerDE()->GetClientUserData(m_hClient) != m_hObject)
         return FireResult::Invalid;
+    if (movement_blocked || camera_movement_blocked)
+        return FireResult::Blocked;
     const auto result = m_InventoryMgr.FireCurrentWeapon(request);
     if (result == FireResult::Fired || result == FireResult::DeliveryFailed)
         UpdateStats();

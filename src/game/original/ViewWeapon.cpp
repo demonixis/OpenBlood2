@@ -88,7 +88,7 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
             sound_indexed = resources_->find(pending_sound) != nullptr;
             return true;
         }
-        if (result == FireResult::Dry)
+        if (result == FireResult::Dry || result == FireResult::Blocked)
             return true;
         error = "Original weapon fire rejected or damage delivery failed";
         return false;

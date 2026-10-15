@@ -120,3 +120,8 @@ collision, attachments, hand models, skins, muzzle light rendering, decals,
 tracers, shell ejection and audio playback remain pending. Sound paths and whether
 they are indexed are exposed as requests, never reported as played sounds. These
 limits and the remaining 190 required SubwayA instances keep M2's exit gate open.
+
+[Camera contracts](CAMERA_CONTRACTS.md) extend input and late FIRE_KEY gating.
+The selected weapon path retains the player body eye as its origin; the external
+CameraObj view is separate. Blocked is an acknowledged no-shot result, with no
+ammo consumption. View-weapon visibility is a presentation request.

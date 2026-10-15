@@ -1,4 +1,5 @@
 #include "app/movement_controls.h"
+#include "camera_fixture.h"
 #include "player_fixture.h"
 #include <cmath>
 #include <functional>
@@ -321,6 +322,7 @@ namespace
         std::string error;
         CHECK(game.resources.mount_game(config, error));
         CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error));
+        CHECK(test_camera::complete_subway_intro(game));
         auto& c = game.client_shell;
         auto* r = game.objects.get(c.player);
         for (const auto& clip : r->model->animations)

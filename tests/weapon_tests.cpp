@@ -1,3 +1,4 @@
+#include "camera_fixture.h"
 #include "game/server_adapter.h"
 #include "player_fixture.h"
 #include <cmath>
@@ -308,6 +309,7 @@ namespace
         for (int cycle = 0; cycle < 3; ++cycle)
         {
             CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error));
+            CHECK(test_camera::complete_subway_intro(game));
             auto& client = game.client_shell;
             auto& inv = game.server_shell.Player(game.local_client)->m_InventoryMgr;
             for (int slot : {1, 0})
