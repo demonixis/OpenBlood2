@@ -31,6 +31,8 @@ namespace OpenBlood2
     {
         std::uint32_t surface = 0;
         std::vector<std::uint16_t> points;
+        // v56 base ring size; sentinel for generated geometry. Extras remain in points.
+        std::uint16_t base_points = UINT16_MAX;
     };
     struct WorldModel
     {

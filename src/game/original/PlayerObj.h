@@ -10,7 +10,7 @@
 // Selective source port of the entry/lifetime portions of PlayerObj,
 // BaseCharacter, Destructable and InventoryMgr. See PLAYER_CONTRACTS.md and
 // M2_PLAYER_SOURCES.json. Inventory/vector weapons are selected separately;
-// dry-land locomotion is selected separately; containers and complete combat remain outside this port.
+// locomotion and containers are selected separately; complete combat remains outside this port.
 class CDestructable : public Aggregate
 {
   public:
@@ -76,6 +76,9 @@ class CPlayerObj : public CBaseCharacter
     void ValidateAttributes();
     FireResult HandleWeaponFireMessage(const OpenBlood2::WeaponFire&);
     bool HandlePlayerPositionMessage(const OpenBlood2::PlayerMove&);
+    OpenBlood2::ContainerState containers;
+    bool UpdateContainerState();
+    bool UpdateAirLevel(float seconds);
     bool UpdateAnim(const OpenBlood2::PlayerControls&);
     enum class MoveState
     {

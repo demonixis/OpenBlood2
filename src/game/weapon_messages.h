@@ -13,7 +13,11 @@ namespace OpenBlood2
     enum class DamageType : DBYTE
     {
         Normal = 0,
-        Melee = 4
+        Melee = 4,
+        Suffocate = 6,
+        Death = 7,
+        FreeFall = 8,
+        Acid = 14
     };
     struct Damage
     {

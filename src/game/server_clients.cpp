@@ -121,7 +121,7 @@ namespace OpenBlood2
     {
         trace_service("SetObjectRotation");
         auto* r = objects_.get(h);
-        if (!r || !rotation || !physics_vector(rotation->m_Vec) || !std::isfinite(rotation->m_Spin))
+        if (!r || r->container || !rotation || !physics_vector(rotation->m_Vec) || !std::isfinite(rotation->m_Spin))
             return DE_INVALIDPARAMS;
         const auto& v = rotation->m_Vec;
         const float norm = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z + rotation->m_Spin * rotation->m_Spin);

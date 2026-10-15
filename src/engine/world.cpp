@@ -100,7 +100,7 @@ namespace OpenBlood2
                 out.textures.push_back(names.cstring(1024));
             if (!names.good() || names.remaining())
                 return false;
-            std::vector<unsigned> sizes;
+            std::vector<std::pair<unsigned, unsigned>> sizes;
             if (polygons > r.remaining() / 2)
                 return false;
             for (std::uint32_t i = 0; i < polygons; ++i)
@@ -108,7 +108,7 @@ namespace OpenBlood2
                 const unsigned base = r.u8(), extra = r.u8(), count = base + extra;
                 if (count < 3 || count > 510)
                     return false;
-                sizes.push_back(count);
+                sizes.emplace_back(base, count);
             }
             for (std::uint32_t i = 0; i < leaves && r.good(); ++i)
             {
@@ -160,7 +160,7 @@ namespace OpenBlood2
                 out.surfaces.push_back(s);
             }
             std::size_t total_vertices = 0;
-            for (auto count : sizes)
+            for (auto [base, count] : sizes)
             {
                 if (!r.good())
                     return false;
@@ -169,6 +169,7 @@ namespace OpenBlood2
                     return false;
                 r.skip(12);
                 Polygon p;
+                p.base_points = static_cast<std::uint16_t>(base);
                 p.surface = r.u32();
                 if (!r.require(p.surface < surfaces))
                     return false;

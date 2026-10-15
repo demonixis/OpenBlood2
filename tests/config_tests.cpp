@@ -42,6 +42,11 @@ namespace
             const std::array<std::string_view, 2> args{"--frames", value};
             CHECK(!parse_options(args, options, error));
         }
+        const std::array<std::string_view, 3> container_args{"--containers-smoke", "--world", "02_CityHub"};
+        CHECK(parse_options(container_args, options, error));
+        CHECK(options.containers_smoke && options.player_smoke && options.world_smoke && options.world == "02_CityHub");
+        const std::array<std::string_view, 2> both_scenarios{"--containers-smoke", "--movement-smoke"};
+        CHECK(!parse_options(both_scenarios, options, error));
         const std::array<std::string_view, 1> missing{"--data-dir"};
         CHECK(!parse_options(missing, options, error));
         const std::array<std::string_view, 1> unknown{"--typo"};

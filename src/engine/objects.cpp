@@ -1,4 +1,5 @@
 #include "engine/objects.h"
+#include "engine/container.h"
 #include "engine/model_store.h"
 #include <algorithm>
 #include <charconv>
@@ -355,6 +356,34 @@ namespace OpenBlood2
             return nullptr;
         }
         object->state = state; // Consume AFTER all derived/base/aggregate precreate mutations.
+        if (state.m_ObjectType == OT_CONTAINER)
+        {
+            const WorldModel* model = nullptr;
+            std::string error;
+            if (world)
+                for (const auto& candidate : world->models)
+                    if (!CaseLess{}(candidate.name, state.m_Filename) && !CaseLess{}(state.m_Filename, candidate.name))
+                    {
+                        if (model)
+                        {
+                            error = "Ambiguous named container model";
+                            break;
+                        }
+                        model = &candidate;
+                    }
+            auto shape = std::make_shared<ContainerShape>();
+            if (!model || !error.empty() || !shape->build(*model, state.m_Rotation, error))
+            {
+                contexts_.pop_back();
+                remove(handle);
+                fail(ObjectError::Unsupported,
+                     std::string(state.m_Name) + ": " + (error.empty() ? "Missing named container model" : error));
+                return nullptr;
+            }
+            object->state.m_Pos = shape->origin;
+            object->dimensions = vector_scale(vector_subtract(shape->max, shape->min), .5f);
+            object->container = std::move(shape);
+        }
         if (state.m_ObjectType == OT_MODEL && state.m_Filename[0])
         {
             if (models)

@@ -4,6 +4,7 @@
 #include "game/original/Key.h"
 #include "game/original/PathPoint.h"
 #include "game/original/SmellHint.h"
+#include "game/original/VolumeBrush.h"
 #include "game/original/WorldProperties.h"
 #include "game/server_adapter.h"
 
@@ -104,6 +105,66 @@ namespace OpenBlood2
              {"PanSkyScaleZ", 10.0f},
              {"Gravity", DVector{0, -2000, 0}},
              {"SoftSky", std::string("textures\\environmentmaps\\clouds\\clouds"), true, 499}}};
+        const ClassInfo volume{"VolumeBrush",
+                               &b2base,
+                               construct<VolumeBrush>,
+                               {{"Visible", false},
+                                {"Viscosity", 0.0f},
+                                {"Hidden", false},
+                                {"ShowSurface", true},
+                                {"SpriteSurfaceName", std::string{}},
+                                {"FogEnable", false},
+                                {"FogFarZ", 300.0f},
+                                {"FogNearZ", -100.0f},
+                                {"FogColor", DVector{}},
+                                {"XScaleMin", 15.0f},
+                                {"XScaleMax", 25.0f},
+                                {"YScaleMin", 15.0f},
+                                {"YScaleMax", 25.0f},
+                                {"XScaleDuration", 60.0f},
+                                {"YScaleDuration", 60.0f},
+                                {"SurfaceHeight", 2.0f},
+                                {"SurfaceAlpha", .7f},
+                                {"SurfaceColor1", DVector{255, 255, 255}},
+                                {"SurfaceColor2", DVector{255, 255, 255}},
+                                {"Code", std::int32_t(CC_NOTHING)},
+                                {"Current", DVector{}},
+                                {"Damage", 0.0f},
+                                {"DamageType", std::int32_t(0)},
+                                {"NumSurfacePolies", std::int32_t(160)},
+                                {"Locked", false},
+                                {"UnlockKeyRemove", false},
+                                {"UnlockKeyName", std::string{}}}};
+        const ClassInfo water{"Water",
+                              &volume,
+                              construct<Water>,
+                              {{"Viscosity", .5f},
+                               {"Code", std::int32_t(CC_WATER)},
+                               {"DamageType", std::int32_t(6)},
+                               {"SpriteSurfaceName", std::string("Sprites\\WaterBlue.spr")}}};
+        const ClassInfo blood{"Blood",
+                              &volume,
+                              construct<Blood>,
+                              {{"Viscosity", .8f},
+                               {"Code", std::int32_t(CC_BLOOD)},
+                               {"DamageType", std::int32_t(6)},
+                               {"SpriteSurfaceName", std::string("Sprites\\WaterBlood.spr")}}};
+        const ClassInfo acid{"Acid",
+                             &volume,
+                             construct<Acid>,
+                             {{"Viscosity", .5f},
+                              {"Code", std::int32_t(CC_ACID)},
+                              {"SpriteSurfaceName", std::string("Sprites\\WaterAcid.spr")}}};
+        const ClassInfo ladder{"Ladder",
+                               &volume,
+                               construct<Ladder>,
+                               {{"Code", std::int32_t(CC_LADDER)},
+                                {"ShowSurface", false},
+                                {"SurfaceHeight", 0.0f},
+                                {"SurfaceColor1", DVector{}},
+                                {"SurfaceColor2", DVector{}},
+                                {"XScaleDuration", 10.0f},
+                                {"YScaleDuration", 10.0f}}};
         const ClassInfo camera{"CameraSpot", &b2base, construct<CameraSpot>, {}};
         const ClassInfo key{"Key",
                             &b2base,
@@ -121,7 +182,9 @@ namespace OpenBlood2
         return objects.register_class(base) && objects.register_class(b2base) && objects.register_class(camera) &&
                objects.register_class(key) && objects.register_class(start) && objects.register_class(game_start) &&
                objects.register_class(path) && objects.register_class(world_properties) &&
-               objects.register_class(smell) && objects.register_class(character) && objects.register_class(player);
+               objects.register_class(smell) && objects.register_class(character) && objects.register_class(player) &&
+               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
+               objects.register_class(acid) && objects.register_class(ladder);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

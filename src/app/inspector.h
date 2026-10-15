@@ -16,6 +16,9 @@ namespace OpenBlood2
         bool select_models = false;
         bool select_session = false;
         bool select_movement = false, keyboard_movement = false;
+        bool select_containers = false;
+        ObjectId container_selection{}, container_toggle_request{};
+        std::optional<DVector> player_position_request;
         std::optional<MovementInput> movement_input_request;
         bool select_weapons = false, add_beretta_request = false, add_ammo_request = false;
         int weapon_slot_request = -1;
@@ -36,6 +39,7 @@ namespace OpenBlood2
         void draw_session(GameSession&, ObjectSelection&);
         void draw_weapons(GameSession&, ObjectSelection&);
         void draw_movement(GameSession&, ObjectSelection&);
+        void draw_containers(GameSession&, ObjectSelection&);
 
         explicit Inspector(Runtime& value) : runtime(value) {}
         ~Inspector();

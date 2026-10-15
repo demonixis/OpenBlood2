@@ -1,0 +1,223 @@
+{
+  "date": "2026-10-15",
+  "status": "M2 incomplete; selective original containers, liquids, ladders and air integrated",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/VolumeBrush.cpp",
+      "target": "src/game/original/VolumeBrush.cpp",
+      "source_line_ranges": [
+        [
+          31,
+          112
+        ],
+        [
+          147,
+          217
+        ],
+        [
+          272,
+          434
+        ],
+        [
+          560,
+          681
+        ]
+      ],
+      "selection": "Registration/defaults, named container creation, flags, hidden triggers, viscosity/current/liquid gravity and periodic damage; pending surfaces/fog/keys remain explicit",
+      "kind": "selective original game port",
+      "source_sha256": "ef2392f8e42f9f8185e94d0712a91c96c3a1dc89f5615ef00ff4f31bcfb6a94f",
+      "target_sha256": "4e20bbef3657fb83004ff0465f1cd583d8af8351bc7835e6442017fa186c2941"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/VolumeBrushTypes.cpp",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          51,
+          135
+        ]
+      ],
+      "selection": "Water/Blood/Acid/Ladder defaults and Ladder override",
+      "kind": "selective original game port",
+      "source_sha256": "f38190b88a30be71b587d0758093b85f4d0102631edb5eb7564cc91f7efa3021",
+      "target_sha256": "02fcbbeac820524d4d78ad51c6e24bb809136811b170442a0ab2a5c9b4f0d323"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/VolumeBrushTypes.h",
+      "target": "src/game/original/VolumeBrush.h",
+      "source_line_ranges": [
+        [
+          18,
+          45
+        ]
+      ],
+      "selection": "Selected original class hierarchy; no broad volume-family import",
+      "kind": "selective original game port",
+      "source_sha256": "8971e136d2e6fb1d0fefe1189646abdbc0bcef13b052aea8227596912743b140",
+      "target_sha256": "18fdea0015016a6c326db6b8b634a34b74a3dfc3098fa7b06dcc86e86c29db20"
+    },
+    {
+      "source": "sources/blood2/Shared/ContainerCodes.h",
+      "target": "src/game/container_messages.h",
+      "source_line_ranges": [
+        [
+          15,
+          64
+        ]
+      ],
+      "selection": "Original numeric codes, liquid/free-movement predicates; typed owned local contents/physics records replace packets",
+      "kind": "selective original game port",
+      "source_sha256": "e06bd4c2b5a9a4b32c1883f9e3f59bb1ffe419d7eb4232a2a3f6570c400fce64",
+      "target_sha256": "3929138d2acc7d8ae983c06b64544754030250ec03524fb775d1e1fc8494b9dd"
+    },
+    {
+      "source": "sources/blood2/Shared/SharedMovement.h",
+      "target": "src/game/container_messages.h",
+      "source_line_ranges": [
+        [
+          1,
+          12
+        ]
+      ],
+      "selection": "Four tracked body containers",
+      "kind": "selective original game port",
+      "source_sha256": "4ed6d695f6d060fb1e821f7cb65687dbabcc1b305c995bb6b2611adfc54198c6",
+      "target_sha256": "3929138d2acc7d8ae983c06b64544754030250ec03524fb775d1e1fc8494b9dd"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MoveMgr.cpp",
+      "target": "src/game/original/MoveMgr.cpp",
+      "source_line_ranges": [
+        [
+          212,
+          345
+        ],
+        [
+          458,
+          640
+        ],
+        [
+          830,
+          1000
+        ]
+      ],
+      "selection": "Liquid/ladder damping, gravity, current, speed/pitch, surface transition, swim jump and vertical controls, fitted into existing shared-body substep integration",
+      "kind": "selective original game port",
+      "source_sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a",
+      "target_sha256": "16466eb092b277ee81fdca8c1ac6f613fa88f07bea8029aa69f6fbec12203981"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MoveMgr.h",
+      "target": "src/game/original/MoveMgr.h",
+      "source_line_ranges": [
+        [
+          1,
+          186
+        ]
+      ],
+      "selection": "Selected liquid/ladder/surface state and default speed members",
+      "kind": "selective original game port",
+      "source_sha256": "09678b4656b08ff5290cb12229bfd42946a84f18b938a8b78acff01bcc495cbc",
+      "target_sha256": "189054306bbffd1fb4b50badf326d828637c5009bb3fb6199a5751e248439e16"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "target": "src/game/original/PlayerContainers.cpp",
+      "source_line_ranges": [
+        [
+          5924,
+          5990
+        ],
+        [
+          6316,
+          6414
+        ]
+      ],
+      "selection": "Head-based air depletion/recovery/suffocation and body container snapshots; typed queries replace compressed messages",
+      "kind": "selective original game port",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target_sha256": "78286d7ad4655607da9f6978c06653a4c9aa3f7eb95b2caaade44654e18383f2"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "target": "src/game/server_containers.cpp",
+      "source_line_ranges": [
+        [
+          5825,
+          5877
+        ]
+      ],
+      "selection": "First head point-container and hidden visibility behavior; rendering effects explicitly pending",
+      "kind": "selected original query policy in new service",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "target_sha256": "1f017ce80c3ca5508a1bdf9f5d17caf7d87c0544ed8afdc95ee1735682a843a2"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "target": "src/game/original/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          405,
+          434
+        ],
+        [
+          567,
+          587
+        ]
+      ],
+      "selection": "Resistance, instant-death condition and suffocation armor bypass",
+      "kind": "selective original game port",
+      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "target_sha256": "eb7f7f73d9cff07b3e5652e90d2155fa6c090b6536e63bf31577d107bd01ecfc"
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "target": "src/game/weapon_messages.h",
+      "source_line_ranges": [
+        [
+          376,
+          392
+        ]
+      ],
+      "selection": "Selected original damage values",
+      "kind": "selective original game port",
+      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "target_sha256": "4bb9d9e9f325a0b806c60d7214d1dcdc742d354d1558a808d3b037f30969dbfb"
+    },
+    {
+      "source": "sources/lithtech/runtime/server/src/server_extradata.cpp",
+      "target": "src/engine/objects.cpp",
+      "source_line_ranges": [
+        [
+          234,
+          263
+        ]
+      ],
+      "selection": "Later engine evidence: named world-model initialization uses WorldTranslation rather than authored object Pos",
+      "kind": "reference only; no engine import",
+      "source_sha256": "fc31aff280f38aebb61e659d450535a0149534a8668b296fabf4449f56d54ad5",
+      "target_sha256": "6cbd8afd9dcffe40b1bedafd8b81134a4de88d16424a38ac1eb551aa1cdf86f0"
+    },
+    {
+      "source": "sources/lithtech/runtime/shared/src/geomroutines.cpp",
+      "target": "src/engine/container.cpp",
+      "source_line_ranges": [
+        [
+          234,
+          264
+        ]
+      ],
+      "selection": "Later engine evidence: rotation around WorldTranslation; v56 placement separately checked against local asset geometry",
+      "kind": "reference only; new closed-shell implementation",
+      "source_sha256": "6e613e26d9be3d8a91f66bcea93e4a531816fa0abcd6d5a1a00d7f73ac9ddf20",
+      "target_sha256": "743316b9457c2ef2b4c80338482a7fd8c6b49b87e6c0235bb5be22c09f037a34"
+    }
+  ],
+  "engine_adaptations": [
+    "Bounded closed polygon shells, base/extra ring metadata, T-junction closure, topology welding and convex/non-convex queries",
+    "Static checked shape ownership, separate body/head snapshots, stable slot order, immediate hidden-state refresh",
+    "Single player integration; generic physics substep effects and once-per-frame damage phase; capped player air time and clamped recovery",
+    "Dear ImGui volume/property/state inspection; pending rendering/FX and specialized classes remain explicit"
+  ]
+}

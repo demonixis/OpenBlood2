@@ -119,6 +119,12 @@ namespace OpenBlood2
                 options.player_smoke = true;
                 options.movement_smoke = true;
             }
+            else if (arg == "--containers-smoke")
+            {
+                options.world_smoke = true;
+                options.player_smoke = true;
+                options.containers_smoke = true;
+            }
             else if (arg == "--player-smoke")
             {
                 options.world_smoke = true;
@@ -176,7 +182,7 @@ namespace OpenBlood2
             error = "Choose one GPU smoke mode";
             return false;
         }
-        if (options.weapons_smoke && options.movement_smoke)
+        if (int(options.weapons_smoke) + int(options.movement_smoke) + int(options.containers_smoke) > 1)
         {
             error = "Choose one player smoke scenario";
             return false;

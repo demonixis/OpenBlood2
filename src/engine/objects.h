@@ -14,6 +14,8 @@
 namespace OpenBlood2
 {
     class ModelStore;
+    class ContainerShape;
+    struct World;
 
     struct CaseLess
     {
@@ -95,6 +97,7 @@ namespace OpenBlood2
         bool grounded = false;
         bool client_movement = false; // Local MoveMgr owns integration while associated.
         std::shared_ptr<const Model> model;
+        std::shared_ptr<const ContainerShape> container;
         AnimationTrack animation;
         std::string model_error;
         DDWORD user_flags = 0;
@@ -107,6 +110,7 @@ namespace OpenBlood2
     class Objects
     {
       public:
+        const World* world = nullptr;
         ModelStore* models = nullptr; // Optional decoded resources, attached before creation.
         Objects() = default;
         ~Objects();

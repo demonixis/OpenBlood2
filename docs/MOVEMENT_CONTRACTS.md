@@ -1,5 +1,10 @@
 # Original MoveMgr Boundary
 
+> Extended by [CONTAINER_CONTRACTS.md](CONTAINER_CONTRACTS.md): selected original
+> liquids/ladders and head/body queries are now connected. Earlier pending
+> container statements describe the dry-land increment.
+
+
 The initial continuation executes the standing, dry-land branches of the original
 `CMoveMgr`, through the local shells and `CPlayerObj`. It adds walking, running,
 digital strafing, jump/release behavior, gravity and collision inspection.

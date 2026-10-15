@@ -33,8 +33,8 @@ namespace OpenBlood2
     {
         trace_service("ResizeObject");
         auto* r = objects_.get(h);
-        if (!r || r->life != Life::Alive || !physics_vector(dimensions) || dimensions.x <= 0 || dimensions.y <= 0 ||
-            dimensions.z <= 0 || !physics_vector(r->state.m_Pos) || moving_)
+        if (!r || r->life != Life::Alive || r->container || !physics_vector(dimensions) || dimensions.x <= 0 ||
+            dimensions.y <= 0 || dimensions.z <= 0 || !physics_vector(r->state.m_Pos) || moving_)
             return ResizeResult::Invalid;
         if (!collision || !collision_ready)
             return ResizeResult::Unavailable;
@@ -99,7 +99,7 @@ namespace OpenBlood2
             auto& a = active();
             a.trace_service("TeleportObject");
             auto* r = a.objects_.get(h);
-            if (!r || r->life != Life::Alive || !position || !physics_vector(*position))
+            if (!r || r->life != Life::Alive || r->container || !position || !physics_vector(*position))
                 return DE_INVALIDPARAMS;
             r->state.m_Pos = *position;
             r->grounded = false;
@@ -124,7 +124,7 @@ namespace OpenBlood2
     {
         trace_service("SetVelocity");
         auto* r = objects_.get(h);
-        if (!r || !v || !physics_vector(*v))
+        if (!r || r->container || !v || !physics_vector(*v))
             return DE_INVALIDPARAMS;
         r->velocity = *v;
         return DE_OK;
@@ -144,7 +144,7 @@ namespace OpenBlood2
     {
         trace_service("SetAcceleration");
         auto* r = objects_.get(h);
-        if (!r || !v || !physics_vector(*v))
+        if (!r || r->container || !v || !physics_vector(*v))
             return DE_INVALIDPARAMS;
         r->acceleration = *v;
         return DE_OK;
@@ -249,7 +249,7 @@ namespace OpenBlood2
             for (auto id : ids)
             {
                 const auto* other = objects_.get(id);
-                if (!other || other->handle == h || other->life != Life::Alive ||
+                if (!other || other->handle == h || other->life != Life::Alive || other->container ||
                     !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
                     continue;
                 CollisionHit hit;
@@ -330,10 +330,14 @@ namespace OpenBlood2
         for (auto id : ids)
         {
             auto* r = objects_.get(id);
-            if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE || r->client_movement)
+            if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE || r->client_movement || r->container ||
+                (r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
                 continue;
+            ContainerState containers;
+            if (!GetContainers(r->handle, r->state.m_Pos, containers))
+                return false;
             if (!(r->state.m_Flags & FLAG_GRAVITY) && vector_dot(r->velocity, r->velocity) == 0 &&
-                vector_dot(r->acceleration, r->acceleration) == 0)
+                vector_dot(r->acceleration, r->acceleration) == 0 && !containers.total)
                 continue;
             if (seconds > 0.5)
                 return objects_.fail(ObjectError::InvalidTime, "Physics catch-up exceeds 0.5 seconds");
@@ -341,8 +345,15 @@ namespace OpenBlood2
             const auto dt = static_cast<float>(seconds / steps);
             for (unsigned i = 0; i < steps && r->life == Life::Alive; ++i)
             {
-                auto acceleration = r->acceleration;
-                if (r->state.m_Flags & FLAG_GRAVITY)
+                ContainerPhysics physics{
+                    r->handle, r->velocity, r->acceleration, dt, (r->state.m_Flags & FLAG_GRAVITY) != 0, false, false};
+                if (!affect_containers(r->handle, physics))
+                    return false;
+                if (r->life != Life::Alive)
+                    break;
+                r->velocity = physics.velocity;
+                auto acceleration = physics.acceleration;
+                if (physics.gravity)
                     acceleration = vector_add(acceleration, gravity);
                 r->velocity = vector_add(r->velocity, vector_scale(acceleration, dt));
                 auto destination = vector_add(r->state.m_Pos, vector_scale(r->velocity, dt));

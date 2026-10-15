@@ -145,7 +145,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client)
     physics = {};
     stats = {};
     messages = updates = 0;
-    blocker = "Locomotion/weapon inspection: containers, moving platforms, full combat, audio and "
+    blocker = "Locomotion/weapon inspection: specialized containers/FX, moving platforms, full combat, audio and "
               "autosave remain unported";
     return true;
 }
@@ -222,7 +222,7 @@ bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds
 {
     auto* owner = server.Player(client_);
     if (!owner || !move_mgr.Update(server, movement_input, rotation.yaw, seconds, !owner->m_damage.IsDead(),
-                                   weapon_input.primary || weapon_input.alternate))
+                                   weapon_input.primary || weapon_input.alternate, rotation.pitch))
     {
         error = "Original MoveMgr step failed (invalid association, movement message or collision)";
         if (owner && !owner->locomotion_error.empty())

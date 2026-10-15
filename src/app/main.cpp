@@ -104,9 +104,11 @@ namespace
 #if BLOOD2_INSPECTOR
         OpenBlood2::Inspector inspector(runtime);
         inspector.select_models = options.world_smoke && !options.player_smoke;
-        inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke;
+        inspector.select_session =
+            options.player_smoke && !options.weapons_smoke && !options.movement_smoke && !options.containers_smoke;
         inspector.select_weapons = options.weapons_smoke;
         inspector.select_movement = options.movement_smoke;
+        inspector.select_containers = options.containers_smoke;
         if (!inspector.initialize(error))
         {
             spdlog::error("{}", error);
@@ -137,6 +139,8 @@ namespace
         unsigned forward_frames = 0, jump_frames = 0, crouch_frames = 0, run_frames = 0;
         bool crouched_hidden = false, stood_after_crouch = false, locomotion_pose = false;
         bool saw_walk = false, saw_run = false, saw_jump = false;
+        bool liquid_hidden = false;
+        float initial_air = 100;
         const bool extended_smoke = options.weapons_smoke || options.movement_smoke;
         const unsigned hide_frame = extended_smoke ? 40 : 4, show_frame = extended_smoke ? 160 : 8;
         const unsigned unload_frame = extended_smoke ? 210 : 16, reload_frame = extended_smoke ? 220 : 18,
@@ -227,6 +231,22 @@ namespace
                 }
                 game.client_shell.weapon_input = {frames < 120, frames >= 120, false};
             }
+            if (options.containers_smoke && frames == 2)
+            {
+                auto* player = game.server_shell.Player(game.local_client);
+                DVector position{0, 80, 0};
+                if (!player || game.server.TeleportObject(player->m_hObject, &position) != DE_OK ||
+                    !player->TeleportClientToServerPos() || !game.pump_player_messages(error) ||
+                    !player->UpdateContainerState() || player->containers.head.code != CC_WATER)
+                {
+                    spdlog::error("Container smoke requires CityHub canal geometry");
+                    return 6;
+                }
+                initial_air = player->m_fAirLevel;
+#if BLOOD2_INSPECTOR
+                inspector.container_selection = game.objects.get(player->containers.head.object)->id;
+#endif
+            }
             if (!game.step(delta))
             {
                 spdlog::error("Object simulation step failed");
@@ -287,8 +307,11 @@ namespace
                 return 3;
             }
             OpenBlood2::Capture capture;
-            const bool capture_frame =
-                swapchain && frames >= (extended_smoke ? 180u : 2u) && !captured && !options.capture_file.empty();
+            const bool capture_frame = swapchain &&
+                                       frames >= (extended_smoke             ? 180u
+                                                  : options.containers_smoke ? 14u
+                                                                             : 2u) &&
+                                       !captured && !options.capture_file.empty();
             if (capture_frame &&
                 !capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
                                     height))
@@ -402,6 +425,13 @@ namespace
                                      game.client_shell.move_mgr.m_bOnGround, forward_frames, jump_frames);
                     }
                 }
+                if (options.containers_smoke && frames == show_frame)
+                {
+                    const auto* player = game.server_shell.Player(game.local_client);
+                    liquid_hidden =
+                        player && player->m_fAirLevel < initial_air && player->containers.head.code == CC_WATER &&
+                        game.client_shell.move_mgr.m_bBodyInLiquid && !game.client_shell.move_mgr.m_bUseGravity;
+                }
                 if (options.world_smoke && frames == hide_frame)
                     hidden_model_time = game.preview_animation.time;
                 if (options.world_smoke && frames == show_frame)
@@ -492,6 +522,7 @@ namespace
             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
                 !selection_cleared ||
                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                (options.containers_smoke && !liquid_hidden) ||
                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
                 (options.movement_smoke &&
                  (!movement_hidden || !movement_jumped || !movement_landed || !game.client_shell.move_mgr.ready() ||
@@ -518,6 +549,9 @@ namespace
             if (options.movement_smoke)
                 spdlog::info("Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, "
                              "unload/re-entry");
+            if (options.containers_smoke)
+                spdlog::info("Container smoke passed: CityHub canal, underwater MoveMgr/air while hidden, volume "
+                             "inspector, unload/re-entry");
             if (options.player_smoke)
                 spdlog::info(
                     "Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry");
@@ -563,6 +597,7 @@ int main(int argc, char** argv)
                      "  --world-smoke       GPU lifecycle with real world unload/reload assertions\n"
                      "  --player-smoke      GPU shell/player entry, hidden updates and unload/re-entry\n"
                      "  --weapons-smoke     GPU Beretta/knife firing, hidden simulation and reload\n"
+                     "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
                      "  --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload\n"
                      "  --help              Show this help\n";
         return 0;

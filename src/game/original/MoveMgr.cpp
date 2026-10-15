@@ -1,4 +1,4 @@
-// Original dry-land movement/control branches, adapted to typed local services.
+// Original movement/control/container branches, adapted to typed local services.
 // Source attribution and deliberate differences: docs/M2_MOVEMENT_SOURCES.json.
 #include "MoveMgr.h"
 #include "BloodShells.h"
@@ -72,6 +72,10 @@ bool CMoveMgr::OnServerForcePos(const PlayerPosition& value)
     m_ClientMoveCode = value.move_code;
     positioned_ = true;
     m_bLastJumpCommand = false;
+    containers = {};
+    m_eLastContainerCode = CC_NOTHING;
+    m_bBodyInLiquid = m_bBodyOnLadder = m_bSwimmingOnSurface = m_bCanSwimJump = m_bSwimmingJump = false;
+    m_bUseGravity = true;
     UpdateOnGround();
     return true;
 }
@@ -107,24 +111,89 @@ void CMoveMgr::UpdateOnGround()
         body.velocity = {0, -magnitude(body.velocity), 0};
     }
 }
-void CMoveMgr::UpdateMotion(float yaw)
+void CMoveMgr::UpdateInLiquid(const ContainerInfo& info)
+{
+    if (info.hidden || (!IsLiquid(containers.head.code) && m_bOnGround))
+        return;
+    m_bBodyInLiquid = true;
+    const auto speed = magnitude(body.velocity);
+    if (speed > 1)
+        body.velocity = vector_scale(body.velocity, std::max(0.0f, speed - m_FrameTime * m_fSwimVel) / speed);
+    m_bUseGravity = false;
+    if (m_bSwimmingOnSurface)
+    {
+        const bool moving = vector_dot(body.acceleration, body.acceleration) > .0001f ||
+                            vector_dot(body.velocity, body.velocity) > .0001f;
+        if (moving && (body.velocity.y > 0 || body.acceleration.y > 0))
+            body.velocity.y = body.acceleration.y = 0;
+        else if (!moving)
+            body.acceleration.y += info.gravity;
+    }
+    else
+        body.acceleration.y += info.gravity;
+}
+void CMoveMgr::UpdateOnLadder(const ContainerInfo& info)
+{
+    if (info.hidden)
+        return;
+    m_bBodyOnLadder = true;
+    const auto speed = magnitude(body.velocity);
+    if (speed > 1)
+        body.velocity = vector_scale(body.velocity, std::max(0.0f, speed - m_FrameTime * (m_fLadderVel / .2f)) / speed);
+    m_bUseGravity = false;
+}
+void CMoveMgr::UpdateMotion(float yaw, float pitch)
 {
     body.acceleration = {};
+    m_bUseGravity = true;
+    m_bBodyInLiquid = m_bBodyOnLadder = false;
+    bool did_liquid = false, did_ladder = false;
+    for (std::size_t i = 0; i < containers.count; ++i)
+    {
+        const auto& info = containers.body[i];
+        if (IsLiquid(info.code) && !did_liquid)
+        {
+            UpdateInLiquid(info);
+            did_liquid = true;
+        }
+        else if (info.code == CC_LADDER && !did_ladder)
+        {
+            UpdateOnLadder(info);
+            did_ladder = true;
+        }
+        if (!info.hidden)
+            body.velocity = vector_add(body.velocity, vector_scale(info.current, m_FrameTime));
+    }
+    const bool head_liquid = IsLiquid(containers.head.code), in_liquid = head_liquid || m_bBodyInLiquid;
+    const bool free_movement = head_liquid || m_bBodyOnLadder;
     UpdateOnGround();
-    const auto max_velocity = physics.move_speed * ((m_dwControlFlags & run) ? 1.5f : 1.0f) *
-                              (((m_dwControlFlags & crouch) || m_bForcedCrouch) ? 0.5f : 1.0f);
-    const auto max_acceleration = max_velocity * drag;
-    // Source flattened/normalized camera axes: looking up/down never changes
-    // walking speed. Digital diagonals retain the original sqrt(2) allowance.
-    const DVector front{std::sin(yaw), 0, std::cos(yaw)}, right{std::cos(yaw), 0, -std::sin(yaw)};
-    const float forward_accel =
+    m_fSwimVel = (m_dwControlFlags & run) ? 175.0f : 87.5f;
+    m_fLadderVel = (m_dwControlFlags & run) ? 400.0f : 200.0f;
+    const auto land_velocity = physics.move_speed * ((m_dwControlFlags & run) ? 1.5f : 1.0f) *
+                               ((((m_dwControlFlags & crouch) || m_bForcedCrouch) && !free_movement) ? .5f : 1.0f);
+    const auto max_velocity = m_bBodyInLiquid ? m_fSwimVel : m_bBodyOnLadder ? m_fLadderVel : land_velocity;
+    const auto max_acceleration = max_velocity * drag * (m_bBodyOnLadder ? .5f : 1.0f);
+    if (!m_bBodyInLiquid)
+        m_bSwimmingJump = false;
+    const auto speed = magnitude(body.velocity);
+    const auto cap3 = m_bBodyOnLadder ? m_fLadderVel : m_fSwimVel;
+    if ((m_bBodyOnLadder || (m_bBodyInLiquid && (head_liquid || !m_bOnGround))) && speed > cap3)
+    {
+        body.velocity = vector_scale(body.velocity, cap3 / speed);
+        if (!m_bBodyOnLadder && m_bSwimmingJump)
+            body.velocity.y = physics.jump_speed * .75f;
+    }
+    const float cp = (free_movement || in_liquid) ? std::cos(pitch) : 1.0f;
+    const DVector front{std::sin(yaw) * cp, (free_movement || in_liquid) ? -std::sin(pitch) : 0.0f, std::cos(yaw) * cp};
+    const DVector right{std::cos(yaw), 0, -std::sin(yaw)};
+    const auto forward_accel =
         ((m_dwControlFlags & forward) ? max_acceleration : 0) - ((m_dwControlFlags & backward) ? max_acceleration : 0);
-    const float strafe_accel = ((m_dwControlFlags & strafe_right) ? max_acceleration : 0) -
-                               ((m_dwControlFlags & strafe_left) ? max_acceleration : 0);
+    const auto strafe_accel = ((m_dwControlFlags & strafe_right) ? max_acceleration : 0) -
+                              ((m_dwControlFlags & strafe_left) ? max_acceleration : 0);
     body.acceleration = vector_add(body.acceleration,
                                    vector_add(vector_scale(front, forward_accel), vector_scale(right, strafe_accel)));
     bool steep = false;
-    if (m_bOnGround)
+    if (m_bOnGround && !free_movement)
     {
         if (body.ground_normal.z + body.ground_normal.x > body.ground_normal.y)
         {
@@ -134,26 +203,60 @@ void CMoveMgr::UpdateMotion(float yaw)
         else
             TiltVectorToPlane(body.acceleration, body.ground_normal);
     }
+    if (IsLiquid(m_eLastContainerCode) && !head_liquid && !m_bOnGround && !m_bBodyOnLadder)
+        m_bSwimmingOnSurface = true;
+    else if (head_liquid)
+    {
+        m_bSwimmingOnSurface = false;
+        m_bCanSwimJump = true;
+    }
     m_bFalling = !m_bOnGround;
     if (m_dwControlFlags & jump)
     {
-        if (!m_bLastJumpCommand && m_bOnGround && !steep)
+        if (free_movement)
+            body.acceleration.y += max_acceleration;
+        else if (!m_bLastJumpCommand)
         {
-            body.velocity.y += physics.jump_speed * (m_bForcedCrouch ? 0.75f : 1.0f);
-            m_bLastJumpCommand = true;
-            m_bOnGround = false;
-            ++jumps;
+            if (m_bBodyInLiquid && !head_liquid)
+            {
+                if (m_bCanSwimJump)
+                {
+                    m_bSwimmingJump = true;
+                    m_bCanSwimJump = false;
+                }
+                else if (m_bOnGround)
+                    m_bSwimmingJump = true;
+                if (m_bSwimmingJump)
+                {
+                    body.velocity.y += physics.jump_speed * .75f;
+                    m_bLastJumpCommand = true;
+                    m_bOnGround = false;
+                    m_bSwimmingOnSurface = false;
+                    ++jumps;
+                }
+            }
+            else if (m_bOnGround && !steep)
+            {
+                body.velocity.y += physics.jump_speed * (m_bForcedCrouch ? .75f : 1.0f);
+                m_bLastJumpCommand = true;
+                m_bOnGround = false;
+                ++jumps;
+            }
         }
     }
     else
         m_bLastJumpCommand = false;
-    auto air_velocity = body.velocity;
-    if (!m_bOnGround)
-        air_velocity.y = air_velocity.y >= 0 ? 0 : std::max(air_velocity.y / 2, -25.0f);
-    if (vector_dot(air_velocity, air_velocity) > 0.01f)
-        body.acceleration = vector_add(body.acceleration, vector_scale(air_velocity, -drag));
-    const float horizontal = std::hypot(body.velocity.x, body.velocity.z);
-    const float cap = max_velocity * std::sqrt(2.0f);
+    if ((m_dwControlFlags & crouch) && (in_liquid || free_movement) && !m_bOnGround)
+        body.acceleration.y -= max_acceleration;
+    if (!m_bBodyInLiquid && !m_bBodyOnLadder)
+    {
+        auto air_velocity = body.velocity;
+        if (!m_bOnGround)
+            air_velocity.y = air_velocity.y >= 0 ? 0 : std::max(air_velocity.y / 2, -25.0f);
+        if (vector_dot(air_velocity, air_velocity) > .01f)
+            body.acceleration = vector_add(body.acceleration, vector_scale(air_velocity, -drag));
+    }
+    const auto horizontal = std::hypot(body.velocity.x, body.velocity.z), cap = max_velocity * std::sqrt(2.0f);
     if (horizontal > cap)
     {
         body.velocity.x *= cap / horizontal;
@@ -161,6 +264,7 @@ void CMoveMgr::UpdateMotion(float yaw)
     }
     if (m_bLastJumpCommand && body.velocity.y > 0 && body.acceleration.y > 0)
         body.acceleration.y = 0;
+    m_eLastContainerCode = containers.head.code;
 }
 PlayerMove CMoveMgr::WritePositionInfo(DVector destination, DVector velocity) const
 {
@@ -175,7 +279,7 @@ bool CMoveMgr::MoveLocalSolidObject(CBloodServerShell& shell)
     // integrator sleep that horizontal residue instead of creeping forever.
     if (std::hypot(body.velocity.x, body.velocity.z) < 0.1f && body.acceleration.x == 0 && body.acceleration.z == 0)
         body.velocity.x = body.velocity.z = 0;
-    auto gravity = physics.gravity;
+    auto gravity = m_bUseGravity ? physics.gravity : DVector{};
     if (m_bOnGround && vector_dot(gravity, body.ground_normal) < 0)
         gravity = vector_scale(body.ground_normal, vector_dot(gravity, body.ground_normal));
     // Supported walkable slopes constrain gravity to the contact normal.
@@ -198,15 +302,15 @@ bool CMoveMgr::MoveLocalSolidObject(CBloodServerShell& shell)
     return true;
 }
 bool CMoveMgr::Update(CBloodServerShell& shell, const MovementInput& input, float yaw, double seconds, bool can_move,
-                      bool firing)
+                      bool firing, float pitch)
 {
     if (!ready() || !std::isfinite(seconds) || seconds < 0 || seconds > 60 || !std::isfinite(yaw) ||
-        server_->GetClientUserData(client_) != object_)
+        !std::isfinite(pitch) || server_->GetClientUserData(client_) != object_)
         return false;
     UpdateControlFlags(input, can_move);
     if (can_move && !shell.OnMessage(client_, PlayerControls{input, firing, yaw}))
         return false;
-    const auto* player = shell.Player(client_);
+    auto* player = shell.Player(client_);
     if (!player)
         return false;
     m_bForcedCrouch = player->crouched;
@@ -222,10 +326,16 @@ bool CMoveMgr::Update(CBloodServerShell& shell, const MovementInput& input, floa
     {
         if (!server_->GetMovementState(object_, body))
             return false;
-        UpdateMotion(yaw);
+        if (!player->UpdateContainerState())
+            return false;
+        containers = player->containers;
+        UpdateMotion(yaw, pitch);
         if (!MoveLocalSolidObject(shell))
             return false;
         ++substeps;
     }
+    if (!player->UpdateAirLevel(static_cast<float>(duration)))
+        return false;
+    containers = player->containers;
     return true;
 }

@@ -50,7 +50,9 @@ namespace OpenBlood2
         if (m->id != damage_message || !m->bytes.empty() || m->damage || !attacker || attacker->life != Life::Alive ||
             m->sender != value.attacker || !physics_vector(value.position) || !physics_vector(value.direction) ||
             !std::isfinite(value.amount) || value.amount < 0 || value.amount > 1e6f ||
-            (value.type != DamageType::Normal && value.type != DamageType::Melee))
+            (value.type != DamageType::Normal && value.type != DamageType::Melee &&
+             value.type != DamageType::Suffocate && value.type != DamageType::Death &&
+             value.type != DamageType::FreeFall && value.type != DamageType::Acid))
         {
             m->bad = true;
             return DE_INVALIDPARAMS;

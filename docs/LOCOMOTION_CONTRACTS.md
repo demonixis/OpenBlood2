@@ -1,5 +1,10 @@
 # Player Locomotion Boundary
 
+> Extended by [CONTAINER_CONTRACTS.md](CONTAINER_CONTRACTS.md): selected original
+> liquids/ladders and head/body queries are now connected. Earlier pending
+> container statements describe the dry-land increment.
+
+
 This extends [MOVEMENT_CONTRACTS.md](MOVEMENT_CONTRACTS.md). The local shared
 CPlayerObj now selects original locomotion clips, resizes against collision,
 crouches, and uses grounded stair stepping. M2 remains incomplete. Source ranges

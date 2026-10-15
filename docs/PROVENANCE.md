@@ -205,3 +205,15 @@ Runtime C++ namespaces are now `OpenBlood2`; original global SDK/game
 classes keep their source names. The user's `.clang-format` and `.editorconfig`
 are versioned. Formatting changes are isolated in commit `9ac915d`; the previous
 M2 implementation was checkpointed in `007d5ca` before this continuation.
+
+## M2 Container Continuation
+
+[M2_CONTAINER_SOURCES.json](M2_CONTAINER_SOURCES.json) records selective imports
+from VolumeBrush/VolumeBrushTypes, ContainerCodes, MoveMgr, PlayerObj's container
+and air branches, and Destructable's suffocation/death conditions. The original
+base/aggregate chain remains intact. [CONTAINER_CONTRACTS.md](CONTAINER_CONTRACTS.md)
+separates these rules from new closed-shell geometry, typed local queries, slot
+ordering and bounded substep timing. Later LithTech informs only world-model
+pivot/placement, not compatible BSP parsing. Original DAT base/extra counts are
+now retained separately. No prototype engine or dependency was imported.
+Earlier ledgers and patches remain historical evidence, not current file hashes.

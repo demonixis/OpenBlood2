@@ -324,6 +324,7 @@ namespace
         CHECK(w.models.size() == 1);
         const auto& m = w.models[0];
         CHECK(m.points.size() == 3);
+        CHECK(m.polygons[0].base_points == 3);
         CHECK(m.points[1].x == 10);
         CHECK(m.polygons[0].points == std::vector<std::uint16_t>({0, 1, 2}));
         CHECK(m.planes[0].normal.y == 1);

@@ -1,6 +1,8 @@
 #include "app/inspector.h"
 #include "build_info.h"
+#include "engine/container.h"
 #include "game/original/Key.h"
+#include "game/original/VolumeBrush.h"
 
 #include <algorithm>
 #include <cmath>
@@ -69,6 +71,54 @@ namespace OpenBlood2
 
     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
     {
+        if (container_toggle_request)
+        {
+            if (auto* record = game.objects.get(container_toggle_request);
+                record && record->container && record->life == Life::Alive)
+            {
+                auto text = game.server.CreateString("TOGGLE");
+                auto message = game.server.StartMessageToObject(nullptr, record->handle, 1000);
+                if (message)
+                {
+                    game.server.WriteToMessageHString(message, text);
+                    game.server.EndMessage(message);
+                }
+                game.server.FreeString(text);
+            }
+            container_toggle_request = {};
+        }
+        if (player_position_request)
+        {
+            world_error.clear();
+            auto* player = game.server_shell.Player(game.local_client);
+            if (player)
+            {
+                DVector destination = *player_position_request, dimensions;
+                game.server.GetObjectDims(player->m_hObject, &dimensions);
+                CollisionHit hit;
+                const auto query = game.collision.sweep(destination, destination, dimensions, hit);
+                bool clear = query == CollisionQuery::Miss;
+                for (auto id : game.objects.snapshot())
+                {
+                    const auto* other = game.objects.get(id);
+                    if (!other || other->life != Life::Alive || other->handle == player->m_hObject ||
+                        !(other->state.m_Flags & FLAG_SOLID))
+                        continue;
+                    if (sweep_box(destination, destination, dimensions, other->state.m_Pos, other->dimensions, hit) !=
+                        CollisionQuery::Miss)
+                        clear = false;
+                }
+                if (clear && game.server.TeleportObject(player->m_hObject, &destination) == DE_OK)
+                {
+                    player->TeleportClientToServerPos();
+                    game.pump_player_messages(world_error);
+                    player->UpdateContainerState();
+                }
+                else
+                    world_error = "Inspection teleport rejected: invalid position or occupied player body";
+            }
+            player_position_request.reset();
+        }
         if (unload_request)
         {
             if (!game.world_path.empty())
@@ -381,6 +431,12 @@ namespace OpenBlood2
                 {
                     select_movement = false;
                     draw_movement(game, selection);
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("Containers", nullptr, select_containers ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_containers = false;
+                    draw_containers(game, selection);
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
@@ -851,9 +907,9 @@ namespace OpenBlood2
         draw->PopClipRect();
         ImGui::EndTable();
         if (ImGui::CollapsingHeader("Movement limitations"))
-            ImGui::TextWrapped(
-                "Dry-land locomotion subset. Stair solver is a replacement, not retail parity. Liquids, ladders, "
-                "moving platforms, injury/death transitions, audio and fall damage remain pending.");
+            ImGui::TextWrapped("Locomotion subset. Container details are in Containers. Stair solver is a replacement, "
+                               "not retail parity. "
+                               "Moving platforms, injury/death transitions, audio and fall damage remain pending.");
     }
     void Inspector::draw_models(GameSession& game)
     {
@@ -1171,5 +1227,141 @@ namespace OpenBlood2
                         ImGui::Text("  %u: %s", key.time, key.text.c_str());
             }
         ImGui::EndTable();
+    }
+} // namespace OpenBlood2
+
+namespace OpenBlood2
+{
+    void Inspector::draw_containers(GameSession& game, ObjectSelection& selection)
+    {
+        auto* player = game.server_shell.Player(game.local_client);
+        ImGui::TextUnformatted("Original volumes / liquid and ladder movement");
+        if (!world_error.empty())
+            ImGui::TextWrapped("%s", world_error.c_str());
+        ImGui::TextWrapped(
+            "Space: up/jump | Ctrl: down/crouch | Shift: faster | Arrows: look. Hidden volumes stay listed.");
+        if (player)
+        {
+            const auto& state = player->containers;
+            const auto& move = game.client_shell.move_mgr;
+            ImGui::Checkbox("Keyboard movement (F2)", &keyboard_movement);
+            ImGui::SameLine();
+            ImGui::Text("Air %.1f / 100 | head code %u", player->m_fAirLevel, unsigned(state.head.code));
+            ImGui::Text("Body %zu / %zu tracked | liquid %s | ladder %s | global gravity %s", state.count, state.total,
+                        move.m_bBodyInLiquid ? "yes" : "no", move.m_bBodyOnLadder ? "yes" : "no",
+                        move.m_bUseGravity ? "yes" : "no");
+            ImGui::Text("Surface swim %s | swim jump %s | speed %.0f / ladder %.0f",
+                        move.m_bSwimmingOnSurface ? "yes" : "no", move.m_bSwimmingJump ? "yes" : "no", move.m_fSwimVel,
+                        move.m_fLadderVel);
+            if (ImGui::CollapsingHeader("Membership / player position"))
+            {
+                for (std::size_t i = 0; i < state.count; ++i)
+                    if (const auto* r = game.objects.get(state.body[i].object))
+                        ImGui::TextDisabled("Body[%zu] %s / code %u / %s", i, r->state.m_Name,
+                                            unsigned(state.body[i].code), state.body[i].hidden ? "hidden" : "active");
+                auto position = game.client_shell.position;
+                float coordinates[]{position.x, position.y, position.z};
+                if (ImGui::InputFloat3("Inspect player position", coordinates, "%.1f",
+                                       ImGuiInputTextFlags_EnterReturnsTrue))
+                    player_position_request = DVector{coordinates[0], coordinates[1], coordinates[2]};
+            }
+        }
+        else if (ImGui::Button("Enter original player"))
+            enter_player_request = true;
+        if (!ImGui::BeginTable("Volumes", 2, ImGuiTableFlags_Resizable))
+            return;
+        ImGui::TableNextColumn();
+        unsigned count = 0;
+        for (auto id : game.objects.snapshot())
+        {
+            const auto* r = game.objects.get(id);
+            if (!r || !r->container || r->life != Life::Alive)
+                continue;
+            const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get());
+            if (!brush)
+                continue;
+            if (!game.objects.get(container_selection))
+                container_selection = id;
+            ++count;
+            ImGui::PushID(static_cast<int>(id.slot));
+            const std::string label =
+                std::string(r->state.m_Name) + " / " + r->type->name + (brush->info.hidden ? " [hidden]" : "");
+            if (ImGui::Selectable(label.c_str(), container_selection == id))
+            {
+                container_selection = id;
+                selection.id = id;
+            }
+            ImGui::PopID();
+        }
+        if (!count)
+            ImGui::TextWrapped("No live supported containers in this world. CityHub contains water and ladders. Failed "
+                               "and missing classes remain listed in World.");
+        const auto* r = game.objects.get(container_selection);
+        const auto* brush = r ? dynamic_cast<const VolumeBrush*>(r->game.get()) : nullptr;
+        if (r && brush && r->container)
+        {
+            const auto& shape = *r->container;
+            ImGui::TextUnformatted("Volume + player body / front (+Y up)");
+            const auto origin = ImGui::GetCursorScreenPos();
+            const ImVec2 size{std::max(160.0f, ImGui::GetContentRegionAvail().x), 100};
+            ImGui::InvisibleButton("Container geometry", size);
+            const ImVec2 end{origin.x + size.x, origin.y + size.y};
+            auto* draw = ImGui::GetWindowDrawList();
+            draw->AddRectFilled(origin, end, IM_COL32(12, 17, 23, 255));
+            draw->PushClipRect(origin, end, true);
+            const auto mid = vector_scale(vector_add(shape.min, shape.max), .5f);
+            const auto scale = std::min((size.x - 20) / std::max(1.0f, shape.max.x - shape.min.x),
+                                        (size.y - 20) / std::max(1.0f, shape.max.y - shape.min.y));
+            auto project = [&](DVector p)
+            {
+                return ImVec2{origin.x + size.x * .5f + (p.x - mid.x) * scale,
+                              origin.y + size.y * .5f - (p.y - mid.y) * scale};
+            };
+            const auto color = brush->info.hidden              ? IM_COL32(130, 130, 130, 150)
+                               : brush->info.code == CC_LADDER ? IM_COL32(255, 190, 80, 190)
+                                                               : IM_COL32(80, 180, 255, 190);
+            for (const auto& triangle : shape.triangles)
+                for (unsigned i = 0; i < 3; ++i)
+                    draw->AddLine(project(triangle[i]), project(triangle[(i + 1) % 3]), color);
+            if (player)
+            {
+                const auto* body = game.objects.get(player->m_hObject);
+                const auto p = body->state.m_Pos, d = body->dimensions;
+                draw->AddRect(project({p.x - d.x, p.y + d.y, p.z}), project({p.x + d.x, p.y - d.y, p.z}),
+                              IM_COL32_WHITE);
+                draw->AddCircleFilled(project({p.x, p.y + player->eye_level, p.z}), 3, IM_COL32(140, 255, 160, 255));
+            }
+            draw->PopClipRect();
+        }
+        ImGui::TableNextColumn();
+        if (r && brush && r->container)
+        {
+            const auto& shape = *r->container;
+            ImGui::Text("%s | code %u | %s", r->state.m_Name, unsigned(brush->info.code),
+                        brush->info.hidden ? "hidden" : "active");
+            if (ImGui::Button("Trigger ON / OFF"))
+                container_toggle_request = r->id;
+            ImGui::SameLine();
+            if (ImGui::Button("Inspect properties"))
+                selection.id = r->id;
+            ImGui::Text("Current %.1f %.1f %.1f", brush->info.current.x, brush->info.current.y, brush->info.current.z);
+            ImGui::Text("Gravity %.0f | viscosity %.2f", brush->info.gravity, brush->info.viscosity);
+            ImGui::Text("Damage %.1f / type %u", brush->damage, unsigned(brush->damage_type));
+            ImGui::Text("%zu triangles | %s closed shell", shape.triangles.size(),
+                        shape.convex ? "convex" : "nonconvex");
+            ImGui::Text("Fog %s | near %.0f / far %.0f", brush->fog ? "requested" : "off", brush->fog_near,
+                        brush->fog_far);
+            ImGui::Text("Surface %s | height %.1f | alpha %.2f", brush->show_surface ? "requested" : "off",
+                        brush->surface_height, brush->surface_alpha);
+            if (brush->locked)
+                ImGui::TextWrapped("Key lock pending: %s (remove key %s)", brush->unlock_key.c_str(),
+                                   brush->remove_key ? "yes" : "no");
+        }
+        ImGui::EndTable();
+        if (ImGui::CollapsingHeader("Container limits / pending effects"))
+            ImGui::TextWrapped("Static closed DAT shells; four body containers in stable object order. PolyGrid liquid "
+                               "surfaces, underwater fog/audio/color effects, key handshakes, conveyors, crane "
+                               "controls, minefields and moving volume transforms are not implemented. Queries and "
+                               "movement use the real shell, not its bounding box.");
     }
 } // namespace OpenBlood2

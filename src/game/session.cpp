@@ -86,7 +86,7 @@ namespace OpenBlood2
                 for (const auto& p : source.properties)
                     props.emplace(p.name, p.value);
                 auto h = objects.create(type, {}, Creation::World, props);
-                if (const auto* r = objects.get(h))
+                if (const auto* r = objects.get(h); r && r->life == Life::Alive)
                 {
                     entry.object = r->id;
                     entry.state = EntryState::Created;
@@ -128,14 +128,15 @@ namespace OpenBlood2
             for (const auto& path : model.textures)
                 use(path, "BSP texture");
         for (const auto& source : world.objects)
-            for (auto key : {"Filename", "Skin", "SoundName"})
+            for (auto key : {"Filename", "Skin", "SoundName", "SpriteSurfaceName"})
                 if (const auto* p = source.find(key))
                     if (const auto* path = std::get_if<std::string>(p))
                         use(*path, key);
         for (auto id : objects.snapshot())
         {
             const auto& r = *objects.get(id);
-            use(r.state.m_Filename, "Original object model");
+            if (!r.container)
+                use(r.state.m_Filename, "Original object model");
             use(r.state.m_SkinName, "Original object skin");
         }
         for (const auto& [path, purpose] : requested)
@@ -295,7 +296,8 @@ namespace OpenBlood2
             std::count_if(entries.begin(), entries.end(), [](const auto& e)
                           { return e.state == EntryState::Unsupported || e.state == EntryState::Failed; });
         error = "RunWorld blocked: " + std::to_string(missing) +
-                " uninstantiated required objects; other weapons, pickups, stairs/containers, full combat reactions, "
+                " uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat "
+                "reactions, "
                 "audio, autosave and moving world-model collision remain unported";
         if (!entry_error.empty())
             error += "; player entry: " + entry_error;
@@ -366,6 +368,8 @@ namespace OpenBlood2
                 }
             }
         }
+        if (seconds > 0)
+            ok = server.damage_containers() && ok;
         ok = objects.finish_frame() && ok;
         if (ok && preview_model && preview_playing &&
             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))

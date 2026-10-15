@@ -1,5 +1,6 @@
 #pragma once
 #include "basedefs_de.h"
+#include "game/container_messages.h"
 #include "game/player_messages.h"
 #include "game/weapon_messages.h"
 
@@ -24,6 +25,7 @@ class CSBase
 class ServerDE : public CSBase
 {
   public:
+    virtual bool GetContainers(HOBJECT, DVector head, OpenBlood2::ContainerState&) = 0;
     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
     virtual OpenBlood2::SegmentResult IntersectSegment(DVector from, DVector to, HOBJECT ignore,

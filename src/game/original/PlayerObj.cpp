@@ -180,6 +180,7 @@ bool CPlayerObj::Respawn()
     crouch_requested = forced_crouch = false;
     eye_level = crouched ? 12.0f : 36.0f;
     m_fAirLevel = 100;
+    containers = {};
     for (DBYTE i = 1; i <= 12; ++i)
         m_InventoryMgr.SetAmmoCount(i, 0);
     m_InventoryMgr.SetAmmoCount(1, 50);
@@ -440,7 +441,12 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
         if (!m_bGodMode && !m_bDead)
         {
             auto amount = damage.amount * m_fResistance;
-            if (m_fArmorPoints > 0)
+            if (damage.type == OpenBlood2::DamageType::Death)
+            {
+                m_fArmorPoints = 0;
+                amount = m_fHitPoints;
+            }
+            if (m_fArmorPoints > 0 && damage.type != OpenBlood2::DamageType::Suffocate)
             {
                 const auto ratio = m_fArmorPoints <= 25    ? .3f
                                    : m_fArmorPoints <= 50  ? .5f
