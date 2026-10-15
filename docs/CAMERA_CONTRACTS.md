@@ -66,6 +66,7 @@ weapon path. Remote-camera firing never substitutes the camera's position for
 the player's shot origin. Viewport type, player visibility, weapon visibility
 and listener position are explicit **presentation requests**; the cinematic world
 renderer, letterbox/FOV presentation and audio listener are not implemented.
+The later [cinematic/audio continuation](CINEMATIC_CONTRACTS.md) implements the bounded audio listener path; cinematic rendering remains unavailable.
 Type 1 requests the source letterbox (top/bottom one-sixth); types 0/2 follow the
 source fullscreen branch. A non-listener view requests the default player-body
 listener position. Other camera modes/gadgets and third-person/death views remain
@@ -109,3 +110,9 @@ executable comparison, additional-platform or XR validation is claimed.
 The later [keyframe continuation](KEYFRAMER_CONTRACTS.md) supersedes the blanket
 KeyFramer omission above for camera/ordinary-object paths. CinematicTrigger,
 keyframed world/container motion, rendering/audio and the full M2 gate remain open.
+
+Later [light](LIGHT_CONTRACTS.md), [translating world-path](WORLDPATH_CONTRACTS.md)
+and [cinematic/audio](CINEMATIC_CONTRACTS.md) continuations supersede the blanket
+omissions above for their bounded subsets. CinematicTrigger now uses real WAV
+voices and dry SDL output; KeyData sound requests, reverb, angular/container paths,
+general audio/rendering and complete M2 acceptance still remain unavailable.

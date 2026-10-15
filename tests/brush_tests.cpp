@@ -393,9 +393,9 @@ namespace
         std::map<EntryState, unsigned> entries;
         for (const auto& e : g.entries)
             ++entries[e.state];
-        CHECK(entries[EntryState::Created] == 160 && entries[EntryState::EditorOnly] == 372 &&
-              entries[EntryState::Unsupported] == 48 && entries[EntryState::Failed] == 0 &&
-              g.objects.snapshot().size() == 167);
+        CHECK(entries[EntryState::Created] == 164 && entries[EntryState::EditorOnly] == 372 &&
+              entries[EntryState::Unsupported] == 44 && entries[EntryState::Failed] == 0 &&
+              g.objects.snapshot().size() == 171);
         std::cout << "Subway instances=" << g.objects.snapshot().size() << "\n";
         for (auto [state, n] : entries)
             std::cout << "state=" << int(state) << " count=" << n << '\n';

@@ -125,6 +125,8 @@ namespace OpenBlood2
                 options.player_smoke = true;
                 options.containers_smoke = true;
             }
+            else if (arg == "--cinematics-smoke")
+                options.world_smoke = options.player_smoke = options.cinematics_smoke = true;
             else if (arg == "--lights-smoke")
             {
                 options.world_smoke = options.player_smoke = options.lights_smoke = true;
@@ -226,7 +228,8 @@ namespace OpenBlood2
         if (int(options.weapons_smoke) + int(options.movement_smoke) + int(options.containers_smoke) +
                 int(options.doors_smoke) + int(options.triggers_smoke) + int(options.interaction_smoke) +
                 int(options.brushes_smoke) + int(options.pickups_smoke) + int(options.objectives_smoke) +
-                int(options.cameras_smoke) + int(options.keyframes_smoke) + int(options.lights_smoke) >
+                int(options.cameras_smoke) + int(options.keyframes_smoke) + int(options.lights_smoke) +
+                int(options.cinematics_smoke) >
             1)
         {
             error = "Choose one player smoke scenario";

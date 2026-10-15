@@ -350,7 +350,13 @@ namespace OpenBlood2
         const bool was_tracing = server.trace_enabled;
         server.trace_enabled = true;
         server_shell.Update(static_cast<float>(seconds));
-        bool ok = objects.advance(seconds) && server.advance_physics(seconds) && server.advance_models(seconds);
+        const auto listener = client_shell.listener_position;
+        const auto listener_rotation =
+            client_shell.view.object && client_shell.view.settings.listener
+                ? client_shell.view.rotation
+                : rotation_from_euler({client_shell.rotation.pitch, client_shell.rotation.yaw, 0});
+        bool ok = server.advance_audio(seconds, listener, listener_rotation) && objects.advance(seconds) &&
+                  server.advance_physics(seconds) && server.advance_models(seconds);
         if (local_client)
         {
             if (!server.GetClientUserData(local_client))

@@ -145,3 +145,14 @@ this is replacement physics, not verified retail parity. Angular paths, dynamic
 world bodies and containers remain unavailable. Class counts stay 160 created,
 372 editor-only and 48 unported. Earlier blanket world-path omissions are superseded
 only for this translation subset; M2 stays open.
+
+The latest [cinematic evidence](../Documentation/Implementation/M2_CINEMATICS.md) connects original CinematicTrigger with
+real bounded WAV decoding, typed voice completion and dry SDL playback. Read
+[cinematic contracts](docs/CINEMATIC_CONTRACTS.md). Preserve any-payload rearming without reset,
+message-before-sound order, missing-file retry, checked speaker/owner lifetime and
+sample-count clocks independent of UI. Terminal odd-data padding exceptions are
+bounded; three missing catalog references remain failures. Reverb is requested but
+not rendered. General sound emitters/music and complete M2 acceptance remain open.
+SubwayA now has 164 created source entries, 7 SelfTriggers, 372 editor-only and
+44 unported (171/174 runtime before/after player, 162/165 after consuming nine Keys).
+Earlier CinematicTrigger/audio omissions are superseded only for this subset.

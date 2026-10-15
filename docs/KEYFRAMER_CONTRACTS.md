@@ -111,3 +111,9 @@ CinematicTrigger, GlowingLight, Gideon/AI, keyframed world/container physics, so
 world transitions, attachment/rendering coverage, persistence and remaining required
 classes/services keep M2 open. No retail executable, other-platform or XR parity is
 claimed. Existing SDL/dependency pins and commercial assets are unchanged.
+
+Later [light](LIGHT_CONTRACTS.md), [translating world-path](WORLDPATH_CONTRACTS.md)
+and [cinematic/audio](CINEMATIC_CONTRACTS.md) continuations supersede the blanket
+omissions above for their bounded subsets. CinematicTrigger now uses real WAV
+voices and dry SDL output; KeyData sound requests, reverb, angular/container paths,
+general audio/rendering and complete M2 acceptance still remain unavailable.

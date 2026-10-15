@@ -291,7 +291,7 @@ namespace
         CHECK(worlds == 57 && entries == 61 && created == 61 && rejected == 0);
         CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
         CHECK(CameraObj::m_dwNumCameras == 2 && g.server.camera_effects.size() == 2 &&
-              g.objects.snapshot().size() == 170);
+              g.objects.snapshot().size() == 174);
         CHECK(test_camera::complete_subway_intro(g));
         for (auto id : g.objects.snapshot())
             if (auto* r = g.objects.get(id); r && dynamic_cast<CameraObj*>(r->game.get()))

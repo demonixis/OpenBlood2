@@ -31,6 +31,11 @@ namespace OpenBlood2
     class ServerAdapter final : public ServerDE
     {
       public:
+        AudioMixer audio;
+        SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
+        bool IsSoundDone(SoundId, bool&) override;
+        bool KillSound(SoundId) override;
+        bool advance_audio(double, DVector, DRotation);
         explicit ServerAdapter(Objects& objects);
         ~ServerAdapter() override;
         ServerAdapter(const ServerAdapter&) = delete;
@@ -65,6 +70,7 @@ namespace OpenBlood2
         }
         void reset_world_time()
         {
+            audio.clear();
             world_time_origin_ = objects_.time();
             brush_destructions.clear();
             debris_effects.clear();

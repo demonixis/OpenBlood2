@@ -541,6 +541,7 @@ namespace OpenBlood2
     std::vector<ObjectId> Objects::snapshot() const
     {
         std::vector<ObjectId> ids;
+        ids.reserve(slots_.size()); // One bounded allocation for hot-path snapshots, preserving slot order.
         for (const auto& slot : slots_)
             if (slot.object)
                 ids.push_back(slot.object->id);

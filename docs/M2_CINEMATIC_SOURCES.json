@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "193862806f45efa1aef996a1328aee7718148e8d",
+  "status": "M2 incomplete; selected original CinematicTrigger with real bounded WAV voices",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/CinematicTrigger.cpp",
+      "source_line_ranges": [
+        [
+          23,
+          455
+        ]
+      ],
+      "source_sha256": "9cdfcc8740afae0dbb0ab3b9ffcc9d770df72234a090a157c6d893d1867a05af",
+      "purpose": "Original ten-cue properties, callback chain, trigger scheduling, message-before-sound order, completion polling, local/attached selection and named-speaker fallback. Save/load and precache callbacks are excluded."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/CinematicTrigger.h",
+      "source_line_ranges": [
+        [
+          1,
+          54
+        ]
+      ],
+      "source_sha256": "9cfb6cdd89fc2058b836ceca1695bda1263e5d44285758a9e2a105cf7a331b39",
+      "purpose": "Original class shape, ten messages and owned sound lifetime."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/server_de.h",
+      "source_line_ranges": [
+        [
+          562,
+          596
+        ]
+      ],
+      "source_sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "purpose": "Sound playback, completion and release contract; direct typed implementation replaces the old function-pointer/handle ABI."
+    }
+  ],
+  "ports": [
+    "src/game/original/CinematicTrigger.h",
+    "src/game/original/CinematicTrigger.cpp"
+  ],
+  "adaptations": [
+    "Value-owned cue strings and typed monotonic sound IDs instead of pointer-like sound ABI",
+    "Relinquish named-object list on successful speaker lookup (original early return leaks it)",
+    "Reject nonfinite/negative/over-limit delays and restore creation; preserve original any-payload trigger, missing-file retry and empty-cue termination",
+    "Check owner after synchronous cue message; destruction and speaker removal are handle-checked/deferred",
+    "SDL pinned decoder plus bounded RIFF preflight, cache, dry stereo mixer, spatial attenuation, output and diagnostics are new engine code; not recovered retail audio"
+  ],
+  "retail_quirks": [
+    "39 cue occurrences exclude terminal odd PCM data padding from RIFF size",
+    "One cue occurrence omits the terminal odd data padding entirely; full payload is present"
+  ],
+  "unsupported": [
+    "Reverb, occlusion, Doppler, general Sound/RandomSoundFX and other caller audio",
+    "Save/restore, music/codecs outside PCM8/16 and MS/IMA ADPCM",
+    "Complete M2 original session acceptance"
+  ],
+  "engine_performance": "Objects::snapshot reserves slot-count capacity once, preserving snapshot membership/order/lifetime. The expanded private weapon scenario exceeded the unchanged 90 s ASan limit twice; this allocation-only correction passed the same test in 84.16 s before full regression."
+}

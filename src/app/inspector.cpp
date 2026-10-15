@@ -78,6 +78,22 @@ namespace OpenBlood2
 
     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
     {
+        if (cinematic_request)
+        {
+            if (const auto* r = game.objects.get(cinematic_request);
+                r && r->life == Life::Alive && r->type->name == "CinematicTrigger")
+            {
+                auto text = game.server.CreateString("TRIGGER");
+                auto message = game.server.StartMessageToObject(nullptr, r->handle, 1000);
+                if (message)
+                {
+                    game.server.WriteToMessageHString(message, text);
+                    game.server.EndMessage(message);
+                }
+                game.server.FreeString(text);
+            }
+            cinematic_request = {};
+        }
         if (keyframe_request)
         {
             if (const auto* r = game.objects.get(keyframe_request);
@@ -551,6 +567,12 @@ namespace OpenBlood2
                 {
                     select_lights = false;
                     draw_lights(game, selection);
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("Cinematics", nullptr, select_cinematics ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_cinematics = false;
+                    draw_cinematics(game, selection);
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Keyframes", nullptr, select_keyframes ? ImGuiTabItemFlags_SetSelected : 0))

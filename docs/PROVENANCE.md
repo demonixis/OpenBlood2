@@ -364,3 +364,12 @@ pusher/rider service. The observed two train blocks and all-or-nothing rejection
 are replacement physics, not claimed retail behavior. Earlier blanket world-path
 omissions are superseded only for static translation; no dependency or reference
 repository changed.
+
+## M2 cinematic cue audio
+
+[Original source selections](M2_CINEMATIC_SOURCES.json) identify the CinematicTrigger
+properties/callbacks/sequencer and legacy sound lifetime contract. [Cinematic
+contracts](CINEMATIC_CONTRACTS.md) separate original timing/messages from owned
+strings, checked IDs, a source list-leak fix, malformed-data validation and new
+bounded SDL decoding/dry mixing/output. No prototype audio backend or dependency
+was imported. Missing audio remains failure; reverb is explicitly unavailable.

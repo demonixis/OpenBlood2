@@ -1,5 +1,6 @@
 #pragma once
 #include "basedefs_de.h"
+#include "engine/audio.h"
 #include "game/brush_messages.h"
 #include "game/camera_messages.h"
 #include "game/container_messages.h"
@@ -31,6 +32,10 @@ class CSBase
 class ServerDE : public CSBase
 {
   public:
+    virtual OpenBlood2::SoundId PlayCinematicSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
+    virtual bool IsSoundDone(OpenBlood2::SoundId, bool&) = 0;
+    virtual bool KillSound(OpenBlood2::SoundId) = 0;
+
     virtual bool IsObjectAlive(HOBJECT) = 0;
     virtual bool ValidateSpawnObject(std::string_view) = 0;
     virtual void RecordSpawn(const OpenBlood2::SpawnReport&) = 0;
