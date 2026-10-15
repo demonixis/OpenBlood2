@@ -31,6 +31,7 @@ extern char g_szVarGameType[];
 class B2BaseClass : public BaseClass
 {
   public:
+    bool filtered = false; // Inspection evidence: removed by the original difficulty/game-type rules.
     B2BaseClass();
     B2BaseClass(DBYTE nType);
     virtual ~B2BaseClass() {}

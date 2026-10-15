@@ -33,6 +33,9 @@ namespace OpenBlood2
         ServerAdapter(const ServerAdapter&) = delete;
         ServerAdapter& operator=(const ServerAdapter&) = delete;
         bool bind();
+        bool IsObjectAlive(HOBJECT) override;
+        DRESULT WriteKeyMessage(HMESSAGEWRITE, const KeyMessage&) override;
+        bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
         MoverResult MoveWorldModel(HOBJECT, DVector destination) override;
         bool GetContainers(HOBJECT, DVector head, ContainerState&) override;
         bool damage_containers();
@@ -130,6 +133,7 @@ namespace OpenBlood2
             HOBJECT sender = nullptr, receiver = nullptr;
             DDWORD id = 0;
             std::optional<Damage> damage;
+            std::optional<KeyMessage> key;
         };
         Objects& objects_;
         bool bound_ = false;

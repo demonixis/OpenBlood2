@@ -3,8 +3,10 @@
 #include "game/original/Door.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Key.h"
+#include "game/original/KeyPickup.h"
 #include "game/original/PathPoint.h"
 #include "game/original/SmellHint.h"
+#include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
 #include "game/original/WorldProperties.h"
 #include "game/server_adapter.h"
@@ -166,6 +168,58 @@ namespace OpenBlood2
                                 {"SurfaceColor2", DVector{}},
                                 {"XScaleDuration", 10.0f},
                                 {"YScaleDuration", 10.0f}}};
+        const ClassInfo key_pickup{"KeyPickup",
+                                   &b2base,
+                                   construct<KeyPickup>,
+                                   {{"ObjectName", std::string("SuperKey")},
+                                    {"ResourceNum", std::int32_t(0)},
+                                    {"IconFile", std::string("key.pcx")},
+                                    {"HiIconFile", std::string("key_h.pcx")},
+                                    {"ModelFile", std::string("models/powerups/key.abc")},
+                                    {"ModelSkin", std::string("skins/powerups/key.dtx")},
+                                    {"UseCount", std::int32_t(1)},
+                                    {"PickupTriggerTarget", std::string{}},
+                                    {"PickupTriggerMessage", std::string{}}}};
+        const ClassInfo trigger{
+            "Trigger", &b2base, construct<Trigger>, []
+            {
+                std::vector<PropertySpec> properties{{"Dims", DVector{}},
+                                                     {"ResetTime", 0.0f},
+                                                     {"ActivationSound", std::string{}},
+                                                     {"SoundRadius", 200.0f},
+                                                     {"TouchActivate", true},
+                                                     {"PlayerActivate", true},
+                                                     {"AIActivate", true},
+                                                     {"ObjectActivate", false},
+                                                     {"TriggerRelayActivate", true},
+                                                     {"NamedObjectActivate", false},
+                                                     {"ActivationObjectName", std::string{}},
+                                                     {"ActivationCount", std::int32_t(1)},
+                                                     {"Locked", false},
+                                                     {"LockedSound", std::string{}},
+                                                     {"UnlockedSound", std::string{}},
+                                                     {"UnlockKeyName", std::string("Key")},
+                                                     {"LockedMsg", std::string{}, false},
+                                                     {"UnlockedMsg", std::string{}, false},
+                                                     {"AdditionalTargets", std::int32_t(0), false}};
+                for (unsigned i = 1; i <= 10; ++i)
+                {
+                    auto n = std::to_string(i);
+                    properties.push_back({"TargetName" + n, std::string{}, true, MAX_GP_STRING_LEN});
+                    properties.push_back({"MessageName" + n, std::string{}, true, MAX_GP_STRING_LEN});
+                    properties.push_back({i == 1 ? "MessageDelay" : "MessageDelay" + n, 0.0f});
+                }
+                return properties;
+            }()};
+        const ClassInfo big_trigger{"BigTrigger", &trigger, construct<BigTrigger>, {}};
+        const ClassInfo toggle_trigger{"ToggleTrigger", &trigger, construct<ToggleTrigger>, []
+                                       {
+                                           std::vector<PropertySpec> properties{{"StartOn", false}};
+                                           for (unsigned i = 1; i <= 10; ++i)
+                                               properties.push_back(
+                                                   {"OffMessageName" + std::to_string(i), std::string{}});
+                                           return properties;
+                                       }()};
         const ClassInfo door{"Door",
                              &b2base,
                              construct<Door>,
@@ -256,7 +310,9 @@ namespace OpenBlood2
                objects.register_class(smell) && objects.register_class(character) && objects.register_class(player) &&
                objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
                objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
-               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(door);
+               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
+               objects.register_class(key_pickup) && objects.register_class(big_trigger) &&
+               objects.register_class(toggle_trigger) && objects.register_class(door);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

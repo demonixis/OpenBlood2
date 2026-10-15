@@ -53,9 +53,10 @@ namespace OpenBlood2
         if (!m)
             return DE_INVALIDPARAMS;
         auto* attacker = objects_.get(value.attacker);
-        if (m->id != damage_message || !m->bytes.empty() || m->damage || !attacker || attacker->life != Life::Alive ||
-            m->sender != value.attacker || !physics_vector(value.position) || !physics_vector(value.direction) ||
-            !std::isfinite(value.amount) || value.amount < 0 || value.amount > 1e6f ||
+        if (m->id != damage_message || !m->bytes.empty() || m->damage || m->key || !attacker ||
+            attacker->life != Life::Alive || m->sender != value.attacker || !physics_vector(value.position) ||
+            !physics_vector(value.direction) || !std::isfinite(value.amount) || value.amount < 0 ||
+            value.amount > 1e6f ||
             (value.type != DamageType::Normal && value.type != DamageType::Melee &&
              value.type != DamageType::Suffocate && value.type != DamageType::Death &&
              value.type != DamageType::FreeFall && value.type != DamageType::Blind && value.type != DamageType::Slow &&

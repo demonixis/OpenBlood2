@@ -28,7 +28,7 @@ Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentatio
   shape validation, DAT base-ring metadata, head/body separation and four body
   records. Static containers reject unsupported transforms; removal invalidates
   queries immediately. Player motion must not receive generic volume integration
-  a second time. Keep pending effects, keys, AI and specialized volumes visible.
+  a second time. Keep pending effects, AI and specialized volumes visible; keys are extended by the trigger contracts below.
 
 - Read [docs/SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md)
   for Conveyor/Damage/FreeFall and level-entry volume damage protection. Preserve
@@ -40,5 +40,12 @@ Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentatio
   door triggers or collision. Translating Door is a selective original port;
   its atomic pusher/rider solver is replacement engine code. Preserve checked
   named geometry, actual bounds centers, atomic blocking, one shared player
-  integration and deferred touch removal. SelfTrigger/key relay, rotation,
-  crushing, audio/portals and the complete M2 gate remain explicitly pending.
+  integration and deferred touch removal. Rotation, crushing, audio/portals and the complete M2 gate remain explicitly pending.
+
+- Read [docs/TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending
+  Trigger/BigTrigger/ToggleTrigger, door SelfTriggers or key inventory/pickups.
+  Preserve the original active-command guard, player-only lock query, consuming
+  key uses, named-filter order, delayed-toggle behavior and typed message ownership.
+  SelfTriggers are owned, stationary children; pending parents cannot activate them.
+  Player USE ray/input, generic pickups, audio/localized feedback and save/restore
+  remain pending. Keep source-entry counts distinct from generated runtime children.

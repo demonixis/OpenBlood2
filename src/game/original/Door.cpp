@@ -1,4 +1,5 @@
 #include "Door.h"
+#include "Trigger.h"
 #include "engine/collision.h"
 #include <algorithm>
 #include <cmath>
@@ -105,6 +106,55 @@ void Door::StartSound(const std::string& sound, bool loop)
     if (!sound.empty())
         ++sound_requests;
 }
+Door::~Door()
+{
+    if (trigger)
+        g_pServerDE->RemoveObject(trigger);
+}
+void Door::SetTriggerActive(bool value)
+{
+    if (g_pServerDE->IsObjectAlive(trigger))
+        if (auto* t = dynamic_cast<Trigger*>(g_pServerDE->HandleToObject(trigger)))
+            t->SetActive(value);
+}
+bool Door::SpawnTrigger()
+{
+    if (trigger)
+        return true;
+    ObjectCreateStruct create;
+    g_pServerDE->GetObjectPos(m_hObject, &create.m_Pos);
+    auto* t = dynamic_cast<Trigger*>(g_pServerDE->CreateObject(g_pServerDE->GetClass("Trigger"), &create));
+    if (!t)
+        return false;
+    trigger = t->m_hObject;
+    if (g_pServerDE->CreateInterObjectLink(m_hObject, trigger) != DE_OK)
+        return false;
+    auto dimensions = trigger_dims;
+    if (dimensions.x == 0 && dimensions.y == 0 && dimensions.z == 0)
+    {
+        g_pServerDE->GetObjectDims(m_hObject, &dimensions);
+        dimensions = vector_add(dimensions, {1, 1, 1});
+    }
+    g_pServerDE->SetObjectDims(trigger, &dimensions);
+    t->dims = dimensions;
+    t->owner_door = m_hObject;
+    t->SetActive(true);
+    const auto* name = g_pServerDE->GetObjectName(m_hObject);
+    t->slots[0].target = name ? name : "";
+    t->slots[0].message = "TRIGGER";
+    t->touch_activate = touch_activate;
+    t->player_activate = player_activate;
+    t->ai_activate = ai_activate;
+    t->object_activate = object_activate;
+    t->relay_activate = relay_activate;
+    t->named_activate = named_activate;
+    t->activation_name = activation_name;
+    t->locked = locked;
+    t->locked_sound = locked_sound;
+    t->unlocked_sound = unlocked_sound;
+    t->key_name = key_name;
+    return true;
+}
 void Door::SetOpen(bool sound)
 {
     if (sound)
@@ -122,12 +172,14 @@ void Door::SetClosed(bool sound)
     g_pServerDE->SetNextUpdate(m_hObject, 0);
     state = Closed;
     portal_open = false;
+    SetTriggerActive(true);
 }
 void Door::SetOpening()
 {
     g_pServerDE->SetNextUpdate(m_hObject, open_delay);
     started_moving = false;
     state = Opening;
+    SetTriggerActive(false);
 }
 void Door::SetClosing()
 {
@@ -172,11 +224,16 @@ DDWORD Door::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         // Save payloads are not implemented; do not instantiate fake restores.
         return accepted && reason != 3 && data && ReadProp(*static_cast<ObjectCreateStruct*>(data));
     }
+    if (message == MID_LINKBROKEN && data == trigger)
+    {
+        g_pServerDE->RemoveObject(trigger);
+        trigger = nullptr;
+    }
     if (message == MID_INITIALUPDATE)
     {
         g_pServerDE->GetObjectPos(m_hObject, &closed_pos);
         open_pos = vector_add(closed_pos, vector_scale(move_dir, move_dist));
-        if (!physics_vector(open_pos))
+        if (!physics_vector(open_pos) || (self_trigger && !SpawnTrigger()))
             g_pServerDE->RemoveObject(m_hObject);
         else if (start_open)
         {
@@ -238,8 +295,16 @@ DDWORD Door::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
                 if (state == Open || state == Opening)
                     SetClosing();
             }
-            else if (command == "LOCK" || command == "UNLOCK")
-                pending_command = command; // Original forwards to its child Trigger, not a door lock.
+            else if ((command == "LOCK" || command == "UNLOCK") && g_pServerDE->IsObjectAlive(trigger))
+            {
+                auto relay = g_pServerDE->StartMessageToObject(
+                    g_pServerDE->IsObjectAlive(sender) ? g_pServerDE->HandleToObject(sender) : nullptr, trigger, 1000);
+                if (relay)
+                {
+                    g_pServerDE->WriteToMessageHString(relay, text);
+                    g_pServerDE->EndMessage(relay);
+                }
+            }
             g_pServerDE->FreeString(text);
         }
     }

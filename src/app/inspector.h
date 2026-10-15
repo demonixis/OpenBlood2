@@ -17,6 +17,10 @@ namespace OpenBlood2
         bool select_session = false;
         bool select_movement = false, keyboard_movement = false;
         bool select_containers = false;
+        bool select_triggers = false;
+        ObjectId trigger_selection{}, trigger_request{};
+        std::string trigger_command;
+        bool grant_key_request = false;
         bool select_doors = false;
         ObjectId door_selection{}, door_trigger_request{};
         bool door_close_request = false;
@@ -43,6 +47,7 @@ namespace OpenBlood2
         void draw_weapons(GameSession&, ObjectSelection&);
         void draw_movement(GameSession&, ObjectSelection&);
         void draw_containers(GameSession&, ObjectSelection&);
+        void draw_triggers(GameSession&, ObjectSelection&);
         void draw_doors(GameSession&, ObjectSelection&);
 
         explicit Inspector(Runtime& value) : runtime(value) {}

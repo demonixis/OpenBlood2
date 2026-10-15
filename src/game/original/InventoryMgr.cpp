@@ -183,3 +183,30 @@ void CInventoryMgr::ClearWeapons()
     requested_weapons = {};
     ++revision;
 }
+
+InventoryResult CInventoryMgr::AddKey(const OpenBlood2::KeyItem& item)
+{
+    if (item.name.empty() || item.display_name.empty() || item.icon.empty() || item.highlighted_icon.empty() ||
+        !item.uses)
+        return InventoryResult::Invalid;
+    for (const auto& key : keys)
+        if (OpenBlood2::same_name(item.name, key.name))
+            return InventoryResult::AlreadyHave;
+    if (keys.size() == 256)
+        return InventoryResult::Full;
+    keys.push_back(item);
+    ++revision;
+    return InventoryResult::Ok;
+}
+InventoryResult CInventoryMgr::QueryKey(std::string_view name)
+{
+    for (auto it = keys.begin(); it != keys.end(); ++it)
+        if (OpenBlood2::same_name(name, it->name))
+        {
+            if (--it->uses == 0)
+                keys.erase(it);
+            ++revision;
+            return InventoryResult::Ok;
+        }
+    return InventoryResult::NotAvailable;
+}

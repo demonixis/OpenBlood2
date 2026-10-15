@@ -538,13 +538,13 @@ namespace
         CHECK(game.world.version == 56);
         CHECK(game.world.objects.size() == 580);
         CHECK(game.world.models.size() == 116);
-        CHECK(game.objects.snapshot().size() == 30);
+        CHECK(game.objects.snapshot().size() == 45);
         CHECK(game.world.models[0].points.size() == 4996);
         CHECK(game.world.models[0].polygons.size() == 3367);
         CHECK(game.resources.find(game.world_path)->overrides == 1);
         CHECK(game.entries[0].state == EntryState::Created);
         CHECK(game.step(.016));
-        CHECK(game.server.service_calls["SetObjectDims"] == 7);
+        CHECK(game.server.service_calls["SetObjectDims"] == 29);
         CHECK(game.server.service_calls["GetPropGeneric"] > 0);
         for (const auto& [name, count] : game.server.service_calls)
             std::cout << "Service " << name << ": " << count << '\n';

@@ -15,6 +15,28 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
         ++protected_volume_hits;
         return 0;
     }
+    if (!m_bDead && !m_damage.IsDead() &&
+        (message == OpenBlood2::key_query_message || message == OpenBlood2::key_pickup_message))
+    {
+        OpenBlood2::KeyMessage key;
+        if (server->ReadKeyMessage(read, key))
+        {
+            const auto result = message == OpenBlood2::key_query_message ? m_InventoryMgr.QueryKey(key.item.name)
+                                                                         : m_InventoryMgr.AddKey(key.item);
+            key.have = result == InventoryResult::Ok;
+            auto reply = (message == OpenBlood2::key_query_message || key.have)
+                             ? server->StartMessageToObject(this, sender,
+                                                            message == OpenBlood2::key_query_message
+                                                                ? OpenBlood2::key_response_message
+                                                                : OpenBlood2::picked_up_message)
+                             : nullptr;
+            if (reply)
+            {
+                server->WriteKeyMessage(reply, key);
+                server->EndMessage(reply);
+            }
+        }
+    }
     return CBaseCharacter::ObjectMessageFn(sender, message, read);
 }
 

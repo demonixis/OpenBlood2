@@ -4,6 +4,8 @@
 #include "engine/world_model.h"
 #include "game/original/Door.h"
 #include "game/original/Key.h"
+#include "game/original/KeyPickup.h"
+#include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
 
 #include <algorithm>
@@ -73,6 +75,27 @@ namespace OpenBlood2
 
     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
     {
+        if (trigger_request)
+        {
+            auto* r = game.objects.get(trigger_request);
+            auto* t = r && r->life == Life::Alive ? dynamic_cast<Trigger*>(r->game.get()) : nullptr;
+            auto* player = game.server_shell.Player(game.local_client);
+            if (t && grant_key_request && player && !t->key_name.empty())
+                player->m_InventoryMgr.AddKey({t->key_name, t->key_name, "key.pcx", "key_h.pcx", 1});
+            else if (t)
+            {
+                auto text = game.server.CreateString(trigger_command.c_str());
+                auto msg = game.server.StartMessageToObject(player, r->handle, 1000);
+                if (msg)
+                {
+                    game.server.WriteToMessageHString(msg, text);
+                    game.server.EndMessage(msg);
+                }
+                game.server.FreeString(text);
+            }
+            trigger_request = {};
+            grant_key_request = false;
+        }
         if (door_trigger_request)
         {
             if (const auto* record = game.objects.get(door_trigger_request);
@@ -448,6 +471,12 @@ namespace OpenBlood2
                 {
                     select_movement = false;
                     draw_movement(game, selection);
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("Triggers", nullptr, select_triggers ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_triggers = false;
+                    draw_triggers(game, selection);
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Doors", nullptr, select_doors ? ImGuiTabItemFlags_SetSelected : 0))
@@ -1493,19 +1522,157 @@ namespace OpenBlood2
                         d->remains_open ? "yes" : "no", d->start_open ? "yes" : "no");
             ImGui::Text("FireThrough %s | triggers %llu", d->fire_through ? "yes" : "no",
                         static_cast<unsigned long long>(d->triggers));
-            ImGui::TextWrapped("SelfTrigger: %s. Trigger spawning and key/LOCK relay pending.",
-                               d->self_trigger ? "requested, unavailable" : "off");
+            const auto* child = game.objects.get(d->trigger);
+            const auto* trigger =
+                child && child->life == Life::Alive ? dynamic_cast<const Trigger*>(child->game.get()) : nullptr;
+            ImGui::Text("SelfTrigger: %s", trigger           ? (trigger->active ? "active" : "inactive")
+                                           : d->self_trigger ? "missing"
+                                                             : "off");
+            if (trigger)
+            {
+                ImGui::Text("%s | key: %s", trigger->locked ? "locked" : "unlocked", trigger->key_name.c_str());
+                if (ImGui::Button("Inspect SelfTrigger"))
+                {
+                    trigger_selection = child->id;
+                    select_triggers = true;
+                }
+            }
             ImGui::TextWrapped("Audio request: %s (%s, not played)", d->last_sound.c_str(),
                                d->sound_loop ? "loop" : "once");
             ImGui::TextWrapped("Portal: %s / requested %s (visibility pending)", d->portal.c_str(),
                                d->portal_open ? "open" : "closed");
-            if (!d->pending_command.empty())
-                ImGui::Text("Unimplemented relay: %s", d->pending_command.c_str());
         }
         else
             ImGui::TextUnformatted("No supported live Door selected.");
         ImGui::EndTable();
-        ImGui::TextWrapped("Translation only. Rotating doors, crushing damage, chained pushers, self triggers, "
+        ImGui::TextWrapped("Translation only. Rotating doors, crushing damage, chained pushers, "
                            "audio, portals and save/restore remain pending. M2 is not complete.");
+    }
+} // namespace OpenBlood2
+
+namespace OpenBlood2
+{
+    void Inspector::draw_triggers(GameSession& game, ObjectSelection& selection)
+    {
+        ImGui::TextWrapped("Original Trigger / BigTrigger / ToggleTrigger. Hidden sensors and door-owned SelfTriggers; "
+                           "source failures remain in World.");
+        if (!ImGui::BeginTable("Trigger inspection", 2, ImGuiTableFlags_Resizable))
+            return;
+        ImGui::TableSetupColumn("Objects", ImGuiTableColumnFlags_WidthFixed, 230);
+        ImGui::TableSetupColumn("Properties");
+        ImGui::TableNextColumn();
+        ImGui::BeginChild("Trigger list", ImVec2(0, 265));
+        for (auto id : game.objects.snapshot())
+        {
+            auto* r = game.objects.get(id);
+            auto* t = r && r->life == Life::Alive ? dynamic_cast<Trigger*>(r->game.get()) : nullptr;
+            if (!t)
+                continue;
+            if (!game.objects.get(trigger_selection))
+                trigger_selection = id;
+            auto* owner = game.objects.get(t->owner_door);
+            std::string label = owner ? std::string(owner->state.m_Name) + " [SelfTrigger]" : r->state.m_Name;
+            label += t->active ? "" : " [inactive]";
+            ImGui::PushID(static_cast<int>(id.slot));
+            if (ImGui::Selectable(label.c_str(), id == trigger_selection))
+                trigger_selection = selection.id = id;
+            ImGui::PopID();
+        }
+        ImGui::EndChild();
+        if (const auto* p = game.server_shell.Player(game.local_client))
+        {
+            ImGui::Text("Player keys: %zu", p->m_InventoryMgr.keys.size());
+            for (const auto& k : p->m_InventoryMgr.keys)
+                ImGui::BulletText("%s: %u uses", k.name.c_str(), unsigned(k.uses));
+        }
+        else
+            ImGui::TextUnformatted("Enter player in Session to test access.");
+        ImGui::TableNextColumn();
+        auto* r = game.objects.get(trigger_selection);
+        auto* t = r && r->life == Life::Alive ? dynamic_cast<Trigger*>(r->game.get()) : nullptr;
+        if (t)
+        {
+            ImGui::Text("%s #%u | %s | %s", r->type->name.c_str(), r->id.slot, t->active ? "active" : "inactive",
+                        t->locked ? "locked" : "unlocked");
+            ImGui::Text("Position %.1f %.1f %.1f | half dims %.1f %.1f %.1f", r->state.m_Pos.x, r->state.m_Pos.y,
+                        r->state.m_Pos.z, r->dimensions.x, r->dimensions.y, r->dimensions.z);
+            ImGui::Text("Touch %d | Player %d | AI %d | Object %d | Relay %d", t->touch_activate, t->player_activate,
+                        t->ai_activate, t->object_activate, t->relay_activate);
+            ImGui::Text("Named filter %d: %s", t->named_activate, t->activation_name.c_str());
+            ImGui::Text("Count %llu / %u | fired %llu | rejected %llu", (unsigned long long)t->current_activation,
+                        t->activation_count, (unsigned long long)t->activations, (unsigned long long)t->rejected);
+            ImGui::Text("Reset %.3f s | timer %s", t->reset_time, r->scheduled ? "scheduled" : "off");
+            ImGui::Text("Key %s | queries %llu", t->key_name.c_str(), (unsigned long long)t->key_queries);
+            if (auto* toggle = dynamic_cast<ToggleTrigger*>(t))
+                ImGui::Text("Toggle state: %s", toggle->on ? "on" : "off");
+            const auto* sender = game.objects.get(t->last_sender);
+            ImGui::Text("Last sender: %s | command: %s",
+                        sender && sender->life == Life::Alive ? sender->state.m_Name : "none / removed",
+                        t->last_command.c_str());
+            for (const auto* command : {"TRIGGER", "RESET", "LOCK", "UNLOCK"})
+            {
+                if (ImGui::Button(command))
+                {
+                    trigger_request = r->id;
+                    trigger_command = command;
+                }
+                ImGui::SameLine();
+            }
+            ImGui::NewLine();
+            if (ImGui::Button("Debug: grant one matching key"))
+            {
+                trigger_request = r->id;
+                grant_key_request = true;
+            }
+            ImGui::TextWrapped("Commands retain original filters. Inactive triggers ignore RESET/LOCK/UNLOCK too. Key "
+                               "queries consume a use. Debug grant bypasses pickup.");
+            if (ImGui::BeginTable("Targets", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+            {
+                for (const auto* h : {"Slot", "Target / matched", "Message / off", "Delay / pending", "Sends"})
+                    ImGui::TableSetupColumn(h);
+                ImGui::TableHeadersRow();
+                for (unsigned i = 0; i < t->slots.size(); ++i)
+                {
+                    const auto& s = t->slots[i];
+                    if (s.target.empty() && s.message.empty() && s.off_message.empty() && !s.delay)
+                        continue;
+                    unsigned matches = 0;
+                    for (auto id : game.objects.snapshot())
+                        if (auto* o = game.objects.get(id); o && o->life == Life::Alive && s.target == o->state.m_Name)
+                            ++matches;
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%u", i + 1);
+                    ImGui::TableNextColumn();
+                    ImGui::TextWrapped("%s / %u", s.target.c_str(), matches);
+                    ImGui::TableNextColumn();
+                    ImGui::TextWrapped("%s / %s", s.message.c_str(), s.off_message.c_str());
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%.3f / %s", s.delay, s.pending ? "yes" : "no");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%llu", (unsigned long long)s.sent);
+                }
+                ImGui::EndTable();
+            }
+            ImGui::TextWrapped("Last sound request: %s (not played)", t->last_sound.c_str());
+        }
+        else
+            ImGui::TextUnformatted("No live Trigger selected.");
+        ImGui::EndTable();
+        if (ImGui::CollapsingHeader("World key pickups"))
+            for (auto id : game.objects.snapshot())
+            {
+                auto* r = game.objects.get(id);
+                auto* k = r && r->life == Life::Alive ? dynamic_cast<KeyPickup*>(r->game.get()) : nullptr;
+                if (!k)
+                    continue;
+                ImGui::TextWrapped("%s: %s (%u uses), model %s, resource #%d; %s", r->state.m_Name,
+                                   k->item.name.c_str(), unsigned(k->item.uses), r->model ? "loaded" : "missing",
+                                   k->resource_id, k->error.c_str());
+                ImGui::TextWrapped("Pickup target: %s / %s | icons %s / %s", k->pickup_target.c_str(),
+                                   k->pickup_command.c_str(), k->item.icon.c_str(), k->item.highlighted_icon.c_str());
+            }
+        ImGui::TextWrapped("Audio, localized key names, generic pickups, save/restore and the complete playable "
+                           "session remain pending.");
     }
 } // namespace OpenBlood2

@@ -3,6 +3,7 @@
 #include "Weapon.h"
 #include <array>
 #include <memory>
+#include <vector>
 
 enum class InventoryResult
 {
@@ -17,6 +18,9 @@ class CInventoryMgr : public Aggregate
 {
   public:
     ~CInventoryMgr() override;
+    InventoryResult AddKey(const OpenBlood2::KeyItem&);
+    InventoryResult QueryKey(std::string_view);
+    std::vector<OpenBlood2::KeyItem> keys;
     bool Init(HOBJECT, HCLIENT);
     void SetClient(HCLIENT client)
     {

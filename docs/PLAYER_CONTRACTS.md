@@ -1,5 +1,9 @@
 # Original Player Entry Boundary
 
+> Key inventory, pickup and query messages are extended by
+> [TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md); prior key/pickup omissions below
+> describe their earlier increment. General item/combat coverage remains pending.
+
 This is a **selective port of original single-player entry and lifetime code**,
 not the complete original shells, CPlayerObj, CBaseCharacter, InventoryMgr or
 Destructable. Their accepted entry branches now execute in the new project.

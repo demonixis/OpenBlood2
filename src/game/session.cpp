@@ -91,6 +91,12 @@ namespace OpenBlood2
                     entry.object = r->id;
                     entry.state = EntryState::Created;
                 }
+                else if (r && dynamic_cast<const B2BaseClass*>(r->game.get()) &&
+                         static_cast<const B2BaseClass*>(r->game.get())->filtered)
+                {
+                    entry.state = EntryState::Filtered;
+                    entry.detail = "Removed by original initial-update difficulty/game-type rules";
+                }
                 else if (objects.error() == ObjectError::Rejected)
                 {
                     entry.state = EntryState::Filtered;
@@ -299,7 +305,7 @@ namespace OpenBlood2
         error = "RunWorld blocked: " + std::to_string(missing) +
                 " uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat "
                 "reactions, "
-                "audio, autosave, Trigger/key relay and rotating world-model collision remain unported";
+                "audio, autosave, rotating world-model collision remain unported";
         if (!entry_error.empty())
             error += "; player entry: " + entry_error;
         if (trace.empty() || trace.back() != error)

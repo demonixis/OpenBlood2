@@ -194,8 +194,11 @@ namespace OpenBlood2
         {
             auto end = vector_add(position, remaining);
             CollisionHit nearest;
-            auto query = (r->state.m_Flags & FLAG_SOLID) ? sweep_scene(h, position, end, r->dimensions, nearest, ids)
-                                                         : CollisionQuery::Miss;
+            auto query = (r->state.m_Flags & FLAG_SOLID)
+                             ? sweep_scene(h, position, end, r->dimensions, nearest, ids)
+                             : ((r->state.m_Flags & FLAG_GRAVITY) && !(r->state.m_Flags & FLAG_GOTHRUWORLD)
+                                    ? collision->sweep(position, end, r->dimensions, nearest)
+                                    : CollisionQuery::Miss);
             if (query == CollisionQuery::Invalid)
             {
                 moving_ = false;

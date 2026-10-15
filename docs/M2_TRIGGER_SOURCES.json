@@ -1,0 +1,313 @@
+{
+  "date": "2026-10-15",
+  "status": "M2 incomplete; original triggers, SelfTrigger, key query/consumption and selected KeyPickup connected",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/Trigger.cpp",
+      "target": "src/game/original/Trigger.cpp",
+      "source_line_ranges": [
+        [
+          194,
+          234
+        ],
+        [
+          296,
+          1040
+        ],
+        [
+          1145,
+          1305
+        ]
+      ],
+      "selection": "Properties, counts, filters, immediate/delayed activation, command/key response and toggle rules; owned strings, unsigned counters, nonpositive reset adaptation, stronger recursion guard; no save/load or audio playback",
+      "kind": "selective original game port",
+      "source_sha256": "373658121f86b4d792eeb986a0e093291af3e1205b831385f142cf2ea445198c",
+      "target_sha256": "dd585f83a2e40948e507265f1858e9b7248b77072c064ba21afa0bc32ec13e81"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Trigger.h",
+      "target": "src/game/original/Trigger.h",
+      "source_line_ranges": [
+        [
+          1,
+          118
+        ]
+      ],
+      "selection": "Selected Trigger state and class declarations; BigTrigger/ToggleTrigger declaration shape from Trigger.cpp; checked owner/sender tokens and diagnostics",
+      "kind": "selective original game port",
+      "source_sha256": "e89313b9c389f5f1e5873ebb7f4ebc34a1029b98a636b0344f3154a658e85646",
+      "target_sha256": "169c73de293d5df2dae9278789a2907f4eae8167298c6e56aef08103a022a59e"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Trigger.cpp",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          131,
+          183
+        ],
+        [
+          1145,
+          1163
+        ]
+      ],
+      "selection": "Trigger, BigTrigger and ToggleTrigger registration defaults; GenericProp message capacity retained",
+      "kind": "selective original game port",
+      "source_sha256": "373658121f86b4d792eeb986a0e093291af3e1205b831385f142cf2ea445198c",
+      "target_sha256": "564acfbda58f742b61348cf52dafa640c5291e2386b05fd96dcdcdae21ade1fa"
+    },
+    {
+      "source": "sources/blood2/AppHeaders/server_de.h",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          113,
+          120
+        ]
+      ],
+      "selection": "Original MAX_GP_STRING_LEN=200 for Trigger target/message properties",
+      "kind": "selective original game port",
+      "source_sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "target_sha256": "564acfbda58f742b61348cf52dafa640c5291e2386b05fd96dcdcdae21ade1fa"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Door.cpp",
+      "target": "src/game/original/Door.cpp",
+      "source_line_ranges": [
+        [
+          485,
+          540
+        ],
+        [
+          631,
+          645
+        ],
+        [
+          715,
+          728
+        ],
+        [
+          886,
+          894
+        ]
+      ],
+      "selection": "SpawnTrigger setup, default dimensions and initial location; active-state changes and lock relay; explicit owned child/link cleanup added",
+      "kind": "selective original game port",
+      "source_sha256": "d96ba29e12f1892008725e02ad02c9a9c314d86db85d7bb7cdc2a7823b3961e0",
+      "target_sha256": "5f19b0f1c665f4562bc285c6996383f7857ecbf0f170e0188fea92566e332a03"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "target": "src/game/original/InventoryMgr.cpp",
+      "source_line_ranges": [
+        [
+          2023,
+          2066
+        ],
+        [
+          2112,
+          2149
+        ]
+      ],
+      "selection": "AddKey duplicate/count rules and consuming QueryKey; vector replaces intrusive generic item list; 256-key bound",
+      "kind": "selective original game port",
+      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "target_sha256": "3c44ac0d15d2f6f0d8d443bb80801a02c0ae76a818fb74fd58ea124f3de6bce6"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameInvItems.h",
+      "target": "src/game/key_messages.h",
+      "source_line_ranges": [
+        [
+          142,
+          172
+        ]
+      ],
+      "selection": "CInvKey owned key name/display/icon/count data; copied into plain owned KeyItem rather than importing the general inventory hierarchy",
+      "kind": "selective original game port",
+      "source_sha256": "592488eb133230295961290bc2bfd621429c6ccc11df1de010ba7ccaa0bd7aac",
+      "target_sha256": "c57ac262390743b2c53ed1fb6cb5cf6daba9bdc8016267c8fcae5ce16bc61bd4"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "target": "src/game/original/PlayerContainers.cpp",
+      "source_line_ranges": [
+        [
+          4388,
+          4421
+        ]
+      ],
+      "selection": "Player query/pickup handlers; owned typed payloads and real-player reply sender; preserve base/aggregate dispatch and dead-player rejection",
+      "kind": "selective original game port",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target_sha256": "0b2017603140bb17f946f2792c3f0abe3b83e9c7b8cf37a3bcb073c582409518"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "target": "src/game/original/PlayerContainers.cpp",
+      "source_line_ranges": [
+        [
+          2398,
+          2413
+        ],
+        [
+          2491,
+          2503
+        ]
+      ],
+      "selection": "Picked-up success and key-query response; correct aggregate-to-BaseClass cast to actual owner and use typed acknowledgment",
+      "kind": "selective original game port",
+      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "target_sha256": "0b2017603140bb17f946f2792c3f0abe3b83e9c7b8cf37a3bcb073c582409518"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
+      "target": "src/game/original/KeyPickup.cpp",
+      "source_line_ranges": [
+        [
+          331,
+          468
+        ]
+      ],
+      "selection": "KeyPickup properties, assets, UseCount clamp and pickup message; ResourceNum preserved with explicit untranslated display fallback",
+      "kind": "selective original game port",
+      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
+      "target_sha256": "1ea9cab7d8fb7d192fbd7cee1cb6499822996ba4c15f33c2d3dfe608e14f9ceb"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PickupObject.cpp",
+      "target": "src/game/original/KeyPickup.cpp",
+      "source_line_ranges": [
+        [
+          267,
+          275
+        ],
+        [
+          365,
+          410
+        ],
+        [
+          462,
+          502
+        ]
+      ],
+      "selection": "Selected flags, initial model dimensions and display-name setup, successful pickup hide/target/removal; only single-player, no generic pickup/respawn framework",
+      "kind": "selective original game port",
+      "source_sha256": "25e0388f983ec0c9e01b6deb8432f411271159a224d582e12300c10863b979da",
+      "target_sha256": "1ea9cab7d8fb7d192fbd7cee1cb6499822996ba4c15f33c2d3dfe608e14f9ceb"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          331,
+          339
+        ]
+      ],
+      "selection": "KeyPickup property defaults and selected PickupObject target fields",
+      "kind": "selective original game port",
+      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
+      "target_sha256": "564acfbda58f742b61348cf52dafa640c5291e2386b05fd96dcdcdae21ade1fa"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/B2BaseClass.cpp",
+      "target": "src/game/original/B2BaseClass.cpp",
+      "source_line_ranges": [
+        [
+          43,
+          70
+        ],
+        [
+          162,
+          225
+        ]
+      ],
+      "selection": "Original difficulty/game-type filter retained; add an inspection marker when it removes during initial update",
+      "kind": "selective original game port",
+      "source_sha256": "bad14ecb54c1b62d82fa66265ba0819fa845ccd9db583e329329c60a86b05ccc",
+      "target_sha256": "33dac9707236deb4f2aeb579e0c1bd2a543d3763258e4e9c47f729c2e3a54ea0"
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "target": "src/game/key_messages.h",
+      "source_line_ranges": [
+        [
+          175,
+          177
+        ]
+      ],
+      "selection": "Key message numeric IDs; see named declarations in original SharedDefs",
+      "kind": "original numeric constants",
+      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "target_sha256": "c57ac262390743b2c53ed1fb6cb5cf6daba9bdc8016267c8fcae5ce16bc61bd4"
+    },
+    {
+      "source": "sources/blood2/AppHeaders/generic_msg_de.h",
+      "target": "src/game/key_messages.h",
+      "source_line_ranges": [
+        [
+          46,
+          49
+        ]
+      ],
+      "selection": "MID_PICKEDUP=1005; selected single-player typed success replaces float respawn packet",
+      "kind": "original numeric constants",
+      "source_sha256": "5231003078a5cf58400cebf261efb84132f3733507d336c33d4fae81b015a5f2",
+      "target_sha256": "c57ac262390743b2c53ed1fb6cb5cf6daba9bdc8016267c8fcae5ce16bc61bd4"
+    },
+    {
+      "source": "sources/lithtech/runtime/server/src/serverobj.h",
+      "target": "src/game/original/Trigger.cpp",
+      "source_line_ranges": [
+        [
+          50,
+          60
+        ]
+      ],
+      "selection": "Later-generation explicit nonpositive-next-update documentation informs the Trigger-only reset adapter; not proof of retail Blood II behavior",
+      "kind": "cross-generation engine reference, not imported",
+      "source_sha256": "d8004f66b7a5ab21a9db58e431c80cb1018efef3eb942c645255fbea28d5cfc7",
+      "target_sha256": "dd585f83a2e40948e507265f1858e9b7248b77072c064ba21afa0bc32ec13e81"
+    },
+    {
+      "source": "sources/lithtech/runtime/server/src/s_object.cpp",
+      "target": "src/game/original/Trigger.cpp",
+      "source_line_ranges": [
+        [
+          312,
+          322
+        ]
+      ],
+      "selection": "Later-generation scheduler checks next-update >0; no general scheduler change",
+      "kind": "cross-generation engine reference, not imported",
+      "source_sha256": "32777bcf2a221ae7c6c8cc6890a102f33120b75f2eb3f60ec7578d54f4b65d68",
+      "target_sha256": "dd585f83a2e40948e507265f1858e9b7248b77072c064ba21afa0bc32ec13e81"
+    },
+    {
+      "source": "sources/blood2/AppHeaders/basetypes_de.h",
+      "target": "src/game/server_physics.cpp",
+      "source_line_ranges": [
+        [
+          334,
+          355
+        ]
+      ],
+      "selection": "Original SOLID/GRAVITY/GOTHRUWORLD meanings inform primary-world stopping for nonsolid gravity pickups",
+      "kind": "original engine contract reference",
+      "source_sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
+      "target_sha256": "029087ab89d6c81a72329fabe8d292106d0cc248cabf11951ca2f7688683e9e7"
+    }
+  ],
+  "engine_adaptations": [
+    "Owned typed key payloads retain original IDs without packet ABI; no aggregate-as-object cast",
+    "Door owns stationary Trigger child with checked links and deferred teardown; pending owner cannot activate child",
+    "Reentry guard extends to toggle and delayed batches; pending-removal sends stop",
+    "Nonpositive Trigger ResetTime disables the timer; later engine evidence, not verified retail parity",
+    "Single-player KeyPickup merges required PickupObject branches; localized names remain explicit fallback metadata",
+    "Transported solid bodies sweep nonsolid sensors after accepted atomic translation",
+    "Nonsolid gravity objects stop on primary world unless GOTHRUWORLD; broader nonsolid physics remains pending",
+    "B2BaseClass records original initial-update filtering for truthful source-entry accounting"
+  ]
+}

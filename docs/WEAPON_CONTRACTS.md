@@ -1,5 +1,9 @@
 # Original Inventory and Vector Weapon Boundary
 
+> Key inventory, pickup and query messages are extended by
+> [TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md); prior key/pickup omissions below
+> describe their earlier increment. General item/combat coverage remains pending.
+
 This M2 continuation ports selected original `CInventoryMgr`, `CWeapon`, server
 `CBeretta`/`CMelee`, client `CViewWeapon` and client melee animation branches.
 It supports the Beretta and Caleb's Chosen Knife. It does not claim a complete

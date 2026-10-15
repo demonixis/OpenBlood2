@@ -236,3 +236,20 @@ Weapon fire-through branch. [DOOR_CONTRACTS.md](DOOR_CONTRACTS.md) distinguishes
 these game rules from the new atomic translation/pusher service and geometry
 binding. Trigger spawning, sound, portal visibility and rotating doors are not
 claimed implemented. No prototype codebase or dependency was imported.
+
+## M2 Trigger and Key Continuation
+
+[M2_TRIGGER_SOURCES.json](M2_TRIGGER_SOURCES.json) records Trigger/BigTrigger/
+ToggleTrigger properties, filters, counters, delays, messages and toggles; Door
+SpawnTrigger, child state changes and lock relay; InventoryMgr/CInvKey key rules;
+CPlayerObj key request/reply branches; and selected KeyPickup/PickupObject rules.
+Owned strings/records and typed key messages replace legacy storage and packet
+ABI. The original aggregate-to-BaseClass reply cast is corrected to the player.
+B2BaseClass filtering gains a diagnostic marker, without changing the filter.
+
+[TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md) documents the stronger recursion and
+child-lifetime guards, nonpositive trigger reset adaptation, explicit localized
+name fallback, collision extension and remaining USE/feedback/persistence limits.
+Later LithTech timer documentation informs the ResetTime<=0 convention; it is not
+claimed to establish retail Blood II engine parity. Earlier ledgers stay historical.
+No prototype dependency, reference source or commercial asset was imported.

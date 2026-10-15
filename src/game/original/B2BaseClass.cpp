@@ -54,7 +54,10 @@ DDWORD B2BaseClass::EngineMessageFn(DDWORD messageID, void* pData, DFLOAT fData)
             {
                 DBOOL bResult = InitialUpdate();
                 if (!bResult)
+                {
+                    filtered = true;
                     g_pServerDE->RemoveObject(m_hObject);
+                }
             }
         }
         break;

@@ -547,7 +547,7 @@ namespace OpenBlood2
         auto* m = writable(h);
         if (!m)
             return DE_INVALIDPARAMS;
-        if (m->damage)
+        if (m->damage || m->key)
         {
             m->bad = true;
             return DE_INVALIDPARAMS;
@@ -582,7 +582,8 @@ namespace OpenBlood2
             m->bad = true;
             return DE_ERROR;
         }
-        WriteToMessageDWord(h, static_cast<DDWORD>(text.size()));
+        if (WriteToMessageDWord(h, static_cast<DDWORD>(text.size())) != DE_OK)
+            return DE_INVALIDPARAMS;
         m->bytes.insert(m->bytes.end(), text.begin(), text.end());
         return DE_OK;
     }

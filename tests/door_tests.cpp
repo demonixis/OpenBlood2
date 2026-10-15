@@ -82,7 +82,7 @@ namespace
         CHECK(d->state == Door::Closing);
         CHECK(trigger(g, h, "TRIGGER"));
         CHECK(d->state == Door::Opening);
-        CHECK(trigger(g, h, "LOCK") && d->pending_command == "LOCK");
+        CHECK(trigger(g, h, "LOCK") && !d->trigger); // No child: source command is a no-op.
         CHECK(g.server.string_count() == 1 && g.server.message_count() == 0);
         CHECK(std::abs(Door::GetWaveValue(100, .5f, 1) - 110) < .001f);
         CHECK(std::abs(Door::GetWaveValue(100, 0, 2) - 110) < .001f);
@@ -119,7 +119,7 @@ namespace
         CHECK(g.objects.finish_frame());
         CHECK(!g.objects.create(g.objects.find_class("Door"), {}, Creation::World, {{"Name", std::string("missing")}}));
         CHECK(g.objects.finish_frame());
-        CHECK(g.objects.snapshot().size() == 1);
+        CHECK(g.objects.snapshot().size() == 2); // Door and its owned SelfTrigger.
         CHECK(g.objects.clear());
         h = door(g, {{"WaitTime", -1.0f}, {"TriggerClosed", false}});
         CHECK(h && trigger(g, h, "TRIGGER") && steps(g, 60));

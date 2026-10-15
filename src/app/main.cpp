@@ -5,6 +5,7 @@
 #include "engine/runtime.h"
 #include "game/original/Door.h"
 #include "game/server_adapter.h"
+#include "trigger_smoke.h"
 
 #include <SDL3/SDL_main.h>
 #include <cmath>
@@ -97,7 +98,8 @@ namespace
                 selection.id = game.objects.get(game.client_shell.player)->id;
             }
         }
-        OpenBlood2::ObjectId smoke_door{};
+        OpenBlood2::ObjectId smoke_door{}, smoke_trigger{};
+        bool key_unlocked_hidden = false;
         DVector hidden_door_position{};
         bool door_moved_hidden = false;
         if (options.doors_smoke)
@@ -121,6 +123,15 @@ namespace
             if (!smoke_door)
                 return 4;
         }
+        if (options.triggers_smoke)
+        {
+            if (!OpenBlood2::prepare_trigger_smoke(game, smoke_door, smoke_trigger))
+            {
+                spdlog::error("Trigger smoke preparation failed");
+                return 4;
+            }
+            selection.id = smoke_trigger;
+        }
         const auto original_selection = selection.id;
         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
         bool selection_cleared = false, world_unloaded = false;
@@ -130,12 +141,14 @@ namespace
 #if BLOOD2_INSPECTOR
         OpenBlood2::Inspector inspector(runtime);
         inspector.select_models = options.world_smoke && !options.player_smoke && !options.doors_smoke;
-        inspector.select_session =
-            options.player_smoke && !options.weapons_smoke && !options.movement_smoke && !options.containers_smoke;
+        inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
+                                   !options.containers_smoke && !options.triggers_smoke;
         inspector.select_weapons = options.weapons_smoke;
         inspector.select_movement = options.movement_smoke;
         inspector.select_containers = options.containers_smoke;
         inspector.select_doors = options.doors_smoke;
+        inspector.select_triggers = options.triggers_smoke;
+        inspector.trigger_selection = smoke_trigger;
         inspector.door_selection = smoke_door;
         if (!inspector.initialize(error))
         {
@@ -342,11 +355,12 @@ namespace
                 return 3;
             }
             OpenBlood2::Capture capture;
-            const bool capture_frame = swapchain &&
-                                       frames >= (extended_smoke                                      ? 180u
-                                                  : (options.containers_smoke || options.doors_smoke) ? 14u
-                                                                                                      : 2u) &&
-                                       !captured && !options.capture_file.empty();
+            const bool capture_frame =
+                swapchain &&
+                frames >= (extended_smoke                                                                ? 180u
+                           : (options.containers_smoke || options.doors_smoke || options.triggers_smoke) ? 14u
+                                                                                                         : 2u) &&
+                !captured && !options.capture_file.empty();
             if (capture_frame &&
                 !capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
                                     height))
@@ -460,9 +474,13 @@ namespace
                                      game.client_shell.move_mgr.m_bOnGround, forward_frames, jump_frames);
                     }
                 }
-                if (options.doors_smoke && frames == hide_frame)
+                if ((options.doors_smoke || options.triggers_smoke) && frames == hide_frame)
+                {
                     hidden_door_position = game.objects.get(smoke_door)->state.m_Pos;
-                if (options.doors_smoke && frames == show_frame)
+                    if (options.triggers_smoke)
+                        key_unlocked_hidden = OpenBlood2::activate_trigger_smoke(game, smoke_trigger);
+                }
+                if ((options.doors_smoke || options.triggers_smoke) && frames == show_frame)
                 {
                     const auto delta =
                         OpenBlood2::vector_subtract(game.objects.get(smoke_door)->state.m_Pos, hidden_door_position);
@@ -572,6 +590,7 @@ namespace
                 !selection_cleared ||
                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
                 (options.movement_smoke &&
                  (!movement_hidden || !movement_jumped || !movement_landed || !game.client_shell.move_mgr.ready() ||
@@ -598,6 +617,9 @@ namespace
             if (options.movement_smoke)
                 spdlog::info("Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, "
                              "unload/re-entry");
+            if (options.triggers_smoke)
+                spdlog::info("Trigger smoke passed: missing-key denial, real key pickup, consumption/unlock while "
+                             "hidden, door motion, inspector, reload");
             if (options.doors_smoke)
                 spdlog::info(
                     "Door smoke passed: original trigger, translation while hidden, inspection, unload/reload");
@@ -650,6 +672,7 @@ int main(int argc, char** argv)
                      "  --player-smoke      GPU shell/player entry, hidden updates and unload/re-entry\n"
                      "  --weapons-smoke     GPU Beretta/knife firing, hidden simulation and reload\n"
                      "  --doors-smoke       GPU original sliding door inspection\n"
+                     "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
                      "  --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload\n"
                      "  --help              Show this help\n";

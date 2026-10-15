@@ -21,7 +21,7 @@ namespace OpenBlood2
         struct Push
         {
             ObjectRecord* body;
-            DVector position;
+            DVector position, origin;
             bool rider;
         };
         std::vector<Push> pushes;
@@ -84,7 +84,7 @@ namespace OpenBlood2
                 if (result == CollisionQuery::Invalid ||
                     (result == CollisionQuery::Hit && (obstruction.start_solid || obstruction.fraction < 1 - 1e-6)))
                     return blocked(result == CollisionQuery::Hit ? obstruction.object : body->handle);
-                pushes.push_back({body, end, rider});
+                pushes.push_back({body, end, body->state.m_Pos, rider});
             }
         }
         moving_ = true;
@@ -115,6 +115,28 @@ namespace OpenBlood2
             if (mover->life == Life::Alive && body.life == Life::Alive && (body.state.m_Flags & FLAG_TOUCH_NOTIFY))
                 objects_.engine_message(body.handle, MID_TOUCHNOTIFY, handle);
         }
+        // Sensors crossed by transported bodies are queried on the accepted
+        // path, after all positions commit. No callbacks on a blocked plan.
+        for (const auto& push : pushes)
+            for (auto id : ids)
+            {
+                auto* sensor = objects_.get(id);
+                auto& body = *push.body;
+                if (body.life != Life::Alive)
+                    break;
+                if (!sensor || sensor->life != Life::Alive || sensor->handle == body.handle || sensor->container ||
+                    sensor->world_model || (sensor->state.m_Flags & FLAG_SOLID) ||
+                    !(sensor->state.m_Flags & FLAG_TOUCH_NOTIFY))
+                    continue;
+                CollisionHit hit;
+                if (sweep_object(*sensor, push.origin, push.position, body.dimensions, hit) == CollisionQuery::Hit)
+                {
+                    if (body.state.m_Flags & FLAG_TOUCH_NOTIFY)
+                        objects_.engine_message(body.handle, MID_TOUCHNOTIFY, sensor->handle);
+                    if (body.life == Life::Alive && sensor->life == Life::Alive)
+                        objects_.engine_message(sensor->handle, MID_TOUCHNOTIFY, body.handle);
+                }
+            }
         moving_ = false;
         return MoverResult::Moved;
     }

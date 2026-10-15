@@ -1,5 +1,9 @@
 # Sliding doors and translating world models
 
+> Extended by [TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md): SelfTrigger ownership,
+> key relay and transported-body sensor contacts are now connected. Earlier
+> pending statements below describe the sliding-door increment.
+
 This extends [MODEL_AND_COLLISION_CONTRACTS.md](MODEL_AND_COLLISION_CONTRACTS.md)
 and [MOVEMENT_CONTRACTS.md](MOVEMENT_CONTRACTS.md). It does not close M2.
 See [M2_DOOR_SOURCES.json](M2_DOOR_SOURCES.json) for source selections and
