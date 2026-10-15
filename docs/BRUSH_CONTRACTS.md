@@ -1,5 +1,9 @@
 # Rotating and destructible world-model brushes
 
+> Extended by [EXPLOSION_CONTRACTS.md](EXPLOSION_CONTRACTS.md): original CDebris requests and explosive
+> brush area damage are now connected. Earlier omissions/counts below are historical;
+> WorldModelDebris, pushable brushes, client FX/audio and the full M2 gate remain open.
+
 This extends [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md) and
 [WEAPON_CONTRACTS.md](WEAPON_CONTRACTS.md). M2 remains open. See
 [source selections](M2_BRUSH_SOURCES.json) and

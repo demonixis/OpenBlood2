@@ -143,7 +143,6 @@ namespace
         CHECK(test_player::setup(g, root, false));
         CHECK(!brush(g, {{"Pushable", true}}));
         CHECK(!brush(g, {{"Gravity", true}}));
-        CHECK(!brush(g, {{"Exploding", true}}));
         CHECK(!brush(g, {{"SpawnObject", std::string("Enemy")}}));
         CHECK(!brush(g, {{"YAxisRevTime", 1e-40f}}));
         CHECK(!brush(g, {{"Rotation", rotation_from_euler({0, .4f, 0})}}));
@@ -248,7 +247,7 @@ namespace
         CHECK(g.resources.mount_game(Config{root, "private"}, error));
         struct Count
         {
-            unsigned created = 0, rejected = 0, filtered = 0, moved = 0;
+            unsigned created = 0, rejected = 0, filtered = 0, moved = 0, explosive = 0, detonated = 0;
         };
         std::map<std::string, Count> counts;
         std::map<std::string, unsigned> failures;
@@ -304,8 +303,6 @@ namespace
                             };
                             if (enabled("Pushable") || enabled("Gravity"))
                                 kind = "pushable/gravity";
-                            else if (enabled("Exploding"))
-                                kind = "exploding";
                             else if (props.contains("SpawnObject") &&
                                      !std::get<std::string>(props.at("SpawnObject")).empty())
                                 kind = "spawn";
@@ -328,7 +325,26 @@ namespace
                     for (int i = 0; i < 4; ++i)
                         CHECK(g.step(.02));
                     count.moved += r->mover_moves > 0;
-                    CHECK(g.objects.remove(h));
+                    auto& brush = destruct(g, h);
+                    if (brush.debris.exploding)
+                    {
+                        ++count.explosive;
+                        CHECK(brush.debris.explosion_damage == 100 && brush.debris.explosion_radius == 200);
+                        const std::string name = r->state.m_Name;
+                        const bool removes = brush.destructable && brush.m_damage.can_damage;
+                        CHECK(command(g, h, "KILL") && g.step(.002));
+                        if (removes)
+                        {
+                            ++count.detonated;
+                            CHECK(!g.objects.get(h) && !g.server.explosion_effects.empty());
+                            const auto& effect = g.server.explosion_effects.back();
+                            CHECK(effect.source == name && effect.targets.delivered == 1 && !effect.targets.cancelled);
+                        }
+                        else
+                            CHECK(g.objects.remove(h));
+                    }
+                    else
+                        CHECK(g.objects.remove(h));
                 }
                 CHECK(g.objects.finish_frame() && g.objects.snapshot().empty() &&
                       CDestructable::m_dwNumDestructables == 0);
@@ -336,13 +352,14 @@ namespace
         }
         for (const auto& [name, c] : counts)
             std::cout << name << " created=" << c.created << " rejected=" << c.rejected << " filtered=" << c.filtered
-                      << " moved=" << c.moved << '\n';
+                      << " moved=" << c.moved << " explosive=" << c.explosive << " detonated=" << c.detonated << '\n';
         for (const auto& [name, n] : failures)
             std::cout << name << "=" << n << '\n';
         CHECK(unreadable == 1 && counts["RotatingBrush"].created == 98 && counts["RotatingBrush"].rejected == 38 &&
               counts["RotatingBrush"].moved == 98 && counts["RotatingBrush"].filtered == 0 &&
-              counts["CDestructableBrush"].created == 2115 && counts["CDestructableBrush"].rejected == 340 &&
-              counts["CDestructableBrush"].filtered == 0);
+              counts["CDestructableBrush"].created == 2162 && counts["CDestructableBrush"].rejected == 293 &&
+              counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 47 &&
+              counts["CDestructableBrush"].detonated == 47);
         CHECK(g.request_world("01_SubwayA", error));
         std::map<EntryState, unsigned> entries;
         for (const auto& e : g.entries)

@@ -1738,8 +1738,18 @@ namespace OpenBlood2
 {
     void Inspector::draw_brushes(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextWrapped("Original CDestructableBrush / RotatingBrush. Commands are queued to the simulation. "
-                           "Failed source entries and authored debris properties remain in World.");
+        ImGui::TextWrapped(
+            "Original CDestructableBrush / RotatingBrush. Commands are queued to the simulation. "
+            "Failed source entries and authored properties remain in World. CDebris requests are inspectable below.");
+        ImGui::Text("Explosion requests: %zu | debris requests: %zu (FX/audio pending)",
+                    game.server.explosion_effects.size(), game.server.debris_effects.size());
+        if (!game.server.explosion_effects.empty())
+        {
+            const auto& event = game.server.explosion_effects.back();
+            ImGui::Text("Last: %s | damage %.0f / radius %.0f | delivered %u/%u%s", event.source.c_str(), event.damage,
+                        event.radius, event.targets.delivered, event.targets.candidates,
+                        event.targets.cancelled ? " [cancelled]" : "");
+        }
         if (!ImGui::BeginTable("Brush inspection", 2, ImGuiTableFlags_Resizable))
             return;
         ImGui::TableSetupColumn("Objects", ImGuiTableColumnFlags_WidthFixed, 240);
@@ -1827,6 +1837,29 @@ namespace OpenBlood2
                         b->m_damage.trigger_only ? "yes" : "no");
             ImGui::Text("Collision %s | FireThrough %s", b->box_physics ? "box" : "polygon",
                         b->fire_through ? "yes" : "no");
+            ImGui::Text("Surface %u (authored %u) | debris amount %u / scale %.2f", b->GetSurfaceType(), b->surface,
+                        unsigned(b->debris.amount), b->debris.scale);
+            ImGui::Text("Exploding %s | effective damage 100 / radius 200", b->debris.exploding ? "yes" : "no");
+            if (ImGui::TreeNode("Debris properties / resource status"))
+            {
+                for (unsigned i = 0; i < CDebris::names.size(); ++i)
+                    ImGui::Text("%s: %s", CDebris::names[i], b->debris.materials[i] ? "yes" : "no");
+                auto resource = [&](const char* label, const std::string& path)
+                {
+                    ImGui::TextWrapped("%s: %s (%s)", label, path.c_str(),
+                                       path.empty()                ? "not authored"
+                                       : game.resources.find(path) ? "indexed, not loaded"
+                                                                   : "MISSING");
+                };
+                resource("Model", b->debris.model);
+                resource("Texture", b->debris.texture);
+                resource("Sound", b->debris.sound);
+                ImGui::TextWrapped(
+                    "Custom flag: %s. Resources enable custom FX independently. Original ReadProp "
+                    "ignores authored ExplodeDamage / DamageRadius; effective values above are preserved.",
+                    b->debris.custom ? "yes" : "no");
+                ImGui::TreePop();
+            }
             if (ImGui::Button("KILL (diagnostic)"))
             {
                 brush_request = r->id;
@@ -1836,9 +1869,45 @@ namespace OpenBlood2
         else
             ImGui::TextUnformatted("No live brush selected.");
         ImGui::EndTable();
-        ImGui::TextWrapped(
-            "Debris FX/fragments, pushable brushes, explosions, SpawnObject and save/restore are pending. "
-            "Rotation uses replacement engine collision; M2 remains open.");
+        ImGui::TextWrapped("Explosion damage is active. Debris/FX rendering, sound, world fragments, pushable brushes, "
+                           "SpawnObject and save/restore are pending. "
+                           "Rotation uses replacement engine collision; M2 remains open.");
+        if (ImGui::CollapsingHeader("Explosions: damage executed / FX and audio pending",
+                                    ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            for (const auto& event : game.server.explosion_effects)
+            {
+                ImGui::Text("%s: damage %.0f / radius %.0f | messages %u/%u%s", event.source.c_str(), event.damage,
+                            event.radius, event.targets.delivered, event.targets.candidates,
+                            event.targets.cancelled ? " [cancelled]" : "");
+                ImGui::PushID(&event);
+                if (ImGui::TreeNode("Request details"))
+                {
+                    ImGui::Text("Origin %.1f %.1f %.1f | type %u | in radius %u", event.position.x, event.position.y,
+                                event.position.z, event.type, event.targets.in_radius);
+                    ImGui::TextWrapped("Sound %s (%s; playback pending)", event.sound.c_str(),
+                                       game.resources.find(event.sound) ? "indexed" : "MISSING");
+                    ImGui::TextUnformatted("Delivered messages include protected/dead receivers; no visibility test.");
+                    ImGui::TreePop();
+                }
+                ImGui::PopID();
+            }
+        }
+        if (ImGui::TreeNode("Debris FX requests (latest 64; not rendered)"))
+        {
+            for (const auto& event : game.server.debris_effects)
+            {
+                ImGui::Text("%s: flags 0x%x / amount %u / scale %.2f", event.source.c_str(), event.flags,
+                            unsigned(event.amount), event.scale);
+                ImGui::Text("Velocity %.1f %.1f %.1f | dims %.1f %.1f %.1f", event.velocity.x, event.velocity.y,
+                            event.velocity.z, event.dimensions.x, event.dimensions.y, event.dimensions.z);
+                for (const auto* path : {&event.model, &event.texture, &event.sound})
+                    if (!path->empty())
+                        ImGui::TextWrapped("%s (%s)", path->c_str(),
+                                           game.resources.find(*path) ? "indexed, not loaded" : "MISSING");
+            }
+            ImGui::TreePop();
+        }
         if (ImGui::TreeNode("Destruction requests (not rendered)"))
         {
             for (const auto& event : game.server.brush_destructions)

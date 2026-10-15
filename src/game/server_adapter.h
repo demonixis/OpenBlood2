@@ -35,6 +35,10 @@ namespace OpenBlood2
         bool bind();
         bool IsObjectAlive(HOBJECT) override;
         void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE) override;
+        void RecordDebrisEffect(const DebrisEffect&) override;
+        void RecordExplosionEffect(const ExplosionEffect&) override;
+        std::vector<DebrisEffect> debris_effects;
+        std::vector<ExplosionEffect> explosion_effects;
         std::vector<BrushDestruction> brush_destructions; // Latest 32, reset on unload.
         DRESULT WriteKeyMessage(HMESSAGEWRITE, const KeyMessage&) override;
         bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
@@ -51,6 +55,8 @@ namespace OpenBlood2
         {
             world_time_origin_ = objects_.time();
             brush_destructions.clear();
+            debris_effects.clear();
+            explosion_effects.clear();
         }
         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
         bool GetMovementState(HOBJECT, MovementState&) override;

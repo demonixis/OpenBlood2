@@ -75,7 +75,7 @@ namespace OpenBlood2
             attacker->life != Life::Alive || m->sender != value.attacker || !physics_vector(value.position) ||
             !physics_vector(value.direction) || !std::isfinite(value.amount) || value.amount < 0 ||
             value.amount > 1e6f ||
-            (value.type != DamageType::Normal && value.type != DamageType::Melee &&
+            (value.type != DamageType::Normal && value.type != DamageType::Melee && value.type != DamageType::Explode &&
              value.type != DamageType::Suffocate && value.type != DamageType::Death &&
              value.type != DamageType::FreeFall && value.type != DamageType::Blind && value.type != DamageType::Slow &&
              value.type != DamageType::Acid))

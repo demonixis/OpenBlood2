@@ -30,6 +30,8 @@ class ServerDE : public CSBase
   public:
     virtual bool IsObjectAlive(HOBJECT) = 0;
     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
+    virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
+    virtual void RecordExplosionEffect(const OpenBlood2::ExplosionEffect&) = 0;
     virtual DRESULT WriteKeyMessage(HMESSAGEWRITE, const OpenBlood2::KeyMessage&) = 0;
     virtual bool ReadKeyMessage(HMESSAGEREAD, OpenBlood2::KeyMessage&) = 0;
     virtual OpenBlood2::MoverResult MoveWorldModel(HOBJECT, DVector destination) = 0;

@@ -2,7 +2,7 @@
 #include "game/original/RotatingBrush.h"
 namespace OpenBlood2
 {
-    bool prepare_brush_smoke(GameSession& g, ObjectId& id)
+    bool prepare_brush_smoke(GameSession& g, ObjectId& id, ObjectId& explosion)
     {
         WorldModel model;
         model.name = "brush_smoke_platform";
@@ -51,6 +51,27 @@ namespace OpenBlood2
         if (!rider)
             return false;
         g.server.SetObjectDims(rider, &dims);
+        const auto base = g.world.models.back();
+        for (unsigned i = 0; i < 2; ++i)
+        {
+            auto fragment = base;
+            const DVector offset{1000.0f + 100.0f * i, 0, 0};
+            fragment.name = "explosion_smoke_" + std::to_string(i);
+            fragment.translation = vector_add(fragment.translation, offset);
+            for (auto& point : fragment.points)
+                point = vector_add(point, offset);
+            for (auto& plane : fragment.planes)
+                plane.distance += vector_dot(plane.normal, offset);
+            const auto name = fragment.name;
+            g.world.models.push_back(std::move(fragment));
+            auto source = g.objects.create(
+                g.objects.find_class("CDestructableBrush"), {}, Creation::World,
+                {{"Name", name}, {"HitPoints", 50.0f}, {"Exploding", true}, {"Stone", true}, {"Metal", true}});
+            if (!source)
+                return false;
+            if (i == 0)
+                explosion = g.objects.get(source)->id;
+        }
         return true;
     }
     bool command_brush_smoke(GameSession& g, ObjectId id, const char* text)
@@ -70,6 +91,10 @@ namespace OpenBlood2
     {
         const auto* r = g.objects.get(id);
         const auto* b = r ? dynamic_cast<const RotatingBrush*>(r->game.get()) : nullptr;
-        return b && b->rotating.angles.y > 0 && r->mover_moves > 0 && r->mover_riders > 0;
+        return b && b->rotating.angles.y > 0 && r->mover_moves > 0 && r->mover_riders > 0 &&
+               g.server.explosion_effects.size() == 2 && g.server.debris_effects.size() == 4 &&
+               g.server.explosion_effects[0].source == "explosion_smoke_0" &&
+               g.server.explosion_effects[1].source == "explosion_smoke_1" &&
+               !g.server.explosion_effects[0].targets.cancelled && !g.server.explosion_effects[1].targets.cancelled;
     }
 } // namespace OpenBlood2

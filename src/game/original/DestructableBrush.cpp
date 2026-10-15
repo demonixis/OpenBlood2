@@ -1,10 +1,11 @@
-// Selected original brush lifecycle. Debris/FX and pushable-body physics remain unavailable.
+// Selected original brush lifecycle. Client FX and pushable-body physics remain unavailable.
 #include "DestructableBrush.h"
 #include "engine/collision.h"
 #include <cmath>
 CDestructableBrush::CDestructableBrush() : B2BaseClass(OT_WORLDMODEL)
 {
     AddAggregate(&m_damage);
+    AddAggregate(&debris);
 }
 DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
@@ -12,7 +13,7 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
     if (message == MID_PRECREATE)
     {
         const auto accepted = B2BaseClass::EngineMessageFn(message, data, reason);
-        if (!accepted || !data || reason == 3)
+        if (!accepted || !data || reason == 3 || !debris.valid)
             return 0;
         auto& create = *static_cast<ObjectCreateStruct*>(data);
         if (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP)
@@ -37,13 +38,9 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
                     return 0;
                 surface = static_cast<unsigned>(prop.m_Long);
             }
-            if (reason == PRECREATE_WORLDFILE && server->GetPropGeneric("Amount", &prop) == DE_OK)
-                debris_amount = static_cast<DBYTE>(prop.m_Long); // Original byte conversion.
-            bool exploding = false;
-            boolean("Exploding", exploding);
             server->GetPropGeneric("SpawnObject", &prop);
             // Do not create objects whose omitted branches change gameplay.
-            if (pushable || (create.m_Flags & FLAG_GRAVITY) || exploding || prop.m_String[0])
+            if (pushable || (create.m_Flags & FLAG_GRAVITY) || prop.m_String[0])
                 return 0;
         }
         if (create.m_Flags & FLAG_GRAVITY)
@@ -60,7 +57,7 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
     }
     if (message == MID_INITIALUPDATE)
     {
-        if (!m_damage.Init(m_hObject))
+        if (!m_damage.Init(m_hObject) || !debris.Init(m_hObject))
             return 0;
         m_damage.SetHitPoints(hit_points);
         m_damage.m_fMass = mass;
@@ -70,7 +67,8 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
     if (message == MID_UPDATE && destructable && m_damage.IsDead())
     {
         server->RecordBrushDestruction(m_hObject, m_damage.last_damage.direction, m_damage.m_fLastDamageAmount,
-                                       debris_amount);
+                                       debris.amount);
+        debris.Create(m_damage.last_damage.direction, m_damage.m_fLastDamageAmount);
         server->RemoveObject(m_hObject);
     }
     return B2BaseClass::EngineMessageFn(message, data, reason);

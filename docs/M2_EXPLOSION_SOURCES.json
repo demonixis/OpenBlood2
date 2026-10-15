@@ -1,0 +1,182 @@
+{
+  "date": "2026-10-15",
+  "status": "M2 incomplete; original explosive brush damage and debris inspection requests",
+  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/Debris.cpp",
+      "target": "src/game/original/Debris.cpp",
+      "source_line_ranges": [
+        [
+          29,
+          58
+        ],
+        [
+          105,
+          146
+        ],
+        [
+          158,
+          234
+        ],
+        [
+          246,
+          290
+        ],
+        [
+          302,
+          451
+        ]
+      ],
+      "selection": "Original constructor defaults, world/string reads, surface precedence, material requests, damage-dependent velocity and AddExplosion. Owned strings and copied inspection records replace HSTRING/client effects/audio; zero normalization receives a finite guard. ReadProp intentionally leaves ExplodeDamage and DamageRadius unread. Save/restore omitted.",
+      "source_sha256": "65cd8053b79a6ae5c9107d8997fb4a157debc1427afb2c5ba26acc7bbf60575b",
+      "target_sha256": "e4847302b767964cb65443e37e3ff0ac0114a7b6cb7078ea1971c2f16b371e2a"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Debris.h",
+      "target": "src/game/original/Debris.h",
+      "source_line_ranges": [
+        [
+          18,
+          90
+        ]
+      ],
+      "selection": "Owned aggregate state and original material/default declarations; arrays preserve emission order. No WorldModelDebris import.",
+      "source_sha256": "b6a8806d27622d462206b0871c0cc212763d2687a1001ef13441e9f7976e8725",
+      "target_sha256": "83c97a8941ef218ae4b40b2d6c6c8984c10d41c0e897886ae5cb3268895e4b76"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ClientGibFX.cpp",
+      "target": "src/game/original/Debris.cpp",
+      "source_line_ranges": [
+        [
+          98,
+          124
+        ]
+      ],
+      "selection": "Original active SetupClientGibFX mutates the input velocity by negating it per material. Typed owned requests preserve position, vector, dimensions, flags, scale, byte count and custom resources; no wire compression, rendering or gib simulation.",
+      "source_sha256": "df9438b10d31a49c787dde9a1f3795e11fc436dd37c34799ffa30de519f305ba",
+      "target_sha256": "e4847302b767964cb65443e37e3ff0ac0114a7b6cb7078ea1971c2f16b371e2a"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "target": "src/game/original/radius_damage.cpp",
+      "source_line_ranges": [
+        [
+          501,
+          514
+        ],
+        [
+          534,
+          589
+        ]
+      ],
+      "selection": "Original CDestructable-list radius rule, squared mean dimensions, full damage below squared half-radius, squared falloff, boundary zero-damage message, and area flag. Add checked handle snapshot in source list order, live source/target guards, finite limits and delivery/cancellation report; no ray/activity/solid filter.",
+      "source_sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "target_sha256": "11c34134ca0ae5ecbc69c9c6f37f1b7c22dd6b381db9bd878b0dc0742e203e99"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectUtilities.h",
+      "target": "src/game/original/radius_damage.h",
+      "source_line_ranges": [
+        [
+          178,
+          180
+        ]
+      ],
+      "selection": "Typed local radius helper signature and explicit report; supported CDebris caller requires sender and responsible object to match.",
+      "source_sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
+      "target_sha256": "271f0486fa363c0f1eefe06a805d8d33aa301066d6bd6b104696c5f7ad30809b"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
+      "target": "src/game/original/DestructableBrush.cpp",
+      "source_line_ranges": [
+        [
+          47,
+          62
+        ],
+        [
+          173,
+          218
+        ]
+      ],
+      "selection": "Attach/bind CDebris, call Create before deferred brush removal, preserve aggregate dispatch. Remove Exploding rejection while retaining unsupported pushable/gravity and SpawnObject rejection.",
+      "source_sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
+      "target_sha256": "5d7ed0cd8454dec77958edb54436cfbc192ef2e26debd805e75bda10e9769e4b"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
+      "target": "src/game/original/DestructableBrush.h",
+      "source_line_ranges": [
+        [
+          364,
+          374
+        ]
+      ],
+      "selection": "Authored surface takes precedence; otherwise use first selected debris material. Do not rewrite authored surface user flags.",
+      "source_sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
+      "target_sha256": "22522e1f04b6c656e6ac94550f442d13f9b8ecaa42e147d448c589278bc3ba1c"
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "target": "src/game/original/Debris.h",
+      "source_line_ranges": [
+        [
+          502,
+          519
+        ]
+      ],
+      "selection": "Original numeric material surface IDs used by surface fallback and client effect flags.",
+      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "target_sha256": "83c97a8941ef218ae4b40b2d6c6c8984c10d41c0e897886ae5cb3268895e4b76"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ClientGibFX.h",
+      "target": "src/game/original/Debris.cpp",
+      "source_line_ranges": [
+        [
+          19,
+          24
+        ]
+      ],
+      "selection": "SIZE_SMALL and TYPEFLAG_CUSTOM constants; resources enable custom flag independently from authored Custom boolean.",
+      "source_sha256": "8bb51d7318ee13c3746f860c1f76d81c7c737c46a4033e3c6212657cd82f47bb",
+      "target_sha256": "e4847302b767964cb65443e37e3ff0ac0114a7b6cb7078ea1971c2f16b371e2a"
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "target": "src/game/weapon_messages.h",
+      "source_line_ranges": [
+        [
+          378,
+          395
+        ]
+      ],
+      "selection": "Explode base type 5; separate typed area_effect boolean for flag 16 instead of mixing flags into enum values. Existing selected damage semantics remain bounded.",
+      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "target_sha256": "e2b72ed1a64663a3be0d0773e5b765edbb2bd34d9c1213c9b0e6b79dc03b70e0"
+    },
+    {
+      "source": "sources/blood2/Shared/SFXMsgIds.h",
+      "target": "src/game/brush_messages.h",
+      "source_line_ranges": [
+        [
+          132,
+          132
+        ]
+      ],
+      "selection": "EXP_GRENADE numeric effect ID retained as pending-client-effect metadata.",
+      "source_sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f",
+      "target_sha256": "e8acf207fc7f1699a6533061b0959a067d0703b1209ef8ebe79e5fa12de7434d"
+    }
+  ],
+  "adaptations": [
+    "Copied bounded effect metadata is not an FX renderer, fragment simulation or audio queue",
+    "Source effective explosion damage/radius remain 100/200 despite authored overrides",
+    "Original multi-material request velocity alternates signs; singular normalization returns finite zero",
+    "Radius target handles snapshot original list order; skip pending targets, exclude newly spawned targets and cancel if source is removed",
+    "Typed Explode plus separate area flag; checked sender matches responsible source for the supported brush caller",
+    "WorldModelDebris, pushable/gravity brushes, SpawnObject, impulses, other explosion classes and full gameplay remain pending"
+  ]
+}

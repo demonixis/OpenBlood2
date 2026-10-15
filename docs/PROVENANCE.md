@@ -277,3 +277,14 @@ a bounded diagnostic records removal requests without claiming FX playback.
 [Contracts](BRUSH_CONTRACTS.md) distinguish source timing from the existing
 replacement rotation solver and explain the supporting later-engine reference.
 No reference source, prototype dependency or commercial content was modified.
+
+## M2 explosive brush and debris-request continuation
+
+[Source selections](M2_EXPLOSION_SOURCES.json) record original CDebris properties,
+material order, velocity and explosion branches, SetupClientGibFX's repeated
+in-place negation, and ObjectUtilities' squared-distance area damage. Owned
+inspection records replace unimplemented client FX/audio; they do not simulate
+fragments. [Contracts](EXPLOSION_CONTRACTS.md) document fixed effective damage/
+radius despite unused authored properties, snapshot/liveness guards and deferred
+chains. Earlier source ledgers remain historical. WorldModelDebris, pushable
+brushes, impulses, SpawnObject and full gameplay remain pending.

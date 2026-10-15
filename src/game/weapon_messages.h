@@ -14,6 +14,7 @@ namespace OpenBlood2
     {
         Normal = 0,
         Melee = 4,
+        Explode = 5,
         Suffocate = 6,
         Death = 7,
         FreeFall = 8,
@@ -27,6 +28,7 @@ namespace OpenBlood2
         float amount = 0;
         DamageType type = DamageType::Normal;
         HOBJECT attacker = nullptr;
+        bool area_effect = false; // Source DAMAGE_FLAG_AREAEFFECT, separate from the base type.
     };
     inline constexpr DDWORD damage_message = 1001; // Source AppHeaders/generic_msg_de.h MID_DAMAGE.
     struct SegmentHit

@@ -68,3 +68,13 @@ are not FX. Pushable/gravity, explosive and SpawnObject brushes reject creation.
 SubwayA now has 141 created source entries, 7 owned SelfTriggers, 372 editor-only
 and 67 unported entries. Precreate rejection is a failure, not difficulty
 filtering. Other movers and complete gameplay remain pending; M2 is open.
+
+The latest [explosion evidence](../Documentation/Implementation/M2_EXPLOSIONS.md) connects original CDebris
+properties/requests and explosive brush area damage. Read
+[explosion contracts](docs/EXPLOSION_CONTRACTS.md) before extending debris, explosions or
+radius damage. Preserve source squared-distance falloff, no visibility filter,
+fixed effective 100 damage / 200 radius, multi-material velocity sign alternation,
+checked snapshot order and deferred chain/removal. Reports count deliveries,
+not health changes. FX/audio records are not rendered or played. WorldModelDebris,
+pushable/gravity brushes, SpawnObject and full gameplay remain pending. The earlier
+brush paragraph's Exploding rejection/CDebris omission is superseded; M2 stays open.
