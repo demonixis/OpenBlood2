@@ -125,6 +125,10 @@ namespace OpenBlood2
                 options.player_smoke = true;
                 options.containers_smoke = true;
             }
+            else if (arg == "--pickups-smoke")
+            {
+                options.world_smoke = options.player_smoke = options.pickups_smoke = true;
+            }
             else if (arg == "--brushes-smoke")
             {
                 options.world_smoke = options.brushes_smoke = true;
@@ -201,7 +205,7 @@ namespace OpenBlood2
         }
         if (int(options.weapons_smoke) + int(options.movement_smoke) + int(options.containers_smoke) +
                 int(options.doors_smoke) + int(options.triggers_smoke) + int(options.interaction_smoke) +
-                int(options.brushes_smoke) >
+                int(options.brushes_smoke) + int(options.pickups_smoke) >
             1)
         {
             error = "Choose one player smoke scenario";

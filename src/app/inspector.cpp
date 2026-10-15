@@ -498,6 +498,12 @@ namespace OpenBlood2
                     draw_triggers(game, selection);
                     ImGui::EndTabItem();
                 }
+                if (ImGui::BeginTabItem("Pickups", nullptr, select_pickups ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_pickups = false;
+                    draw_pickups(game, selection);
+                    ImGui::EndTabItem();
+                }
                 if (ImGui::BeginTabItem("Brushes", nullptr, select_brushes ? ImGuiTabItemFlags_SetSelected : 0))
                 {
                     select_brushes = false;
@@ -1894,7 +1900,7 @@ namespace OpenBlood2
             ImGui::TextUnformatted("No live brush selected.");
         ImGui::EndTable();
         ImGui::TextWrapped("Explosion damage is active. Debris/FX rendering, sound, world fragments, polygon dynamics, "
-                           "SpawnObject and save/restore are pending. "
+                           "Other SpawnObject classes and save/restore are pending. "
                            "Rotation uses replacement engine collision; M2 remains open.");
         if (ImGui::CollapsingHeader("Explosions: damage executed / FX and audio pending",
                                     ImGuiTreeNodeFlags_DefaultOpen))

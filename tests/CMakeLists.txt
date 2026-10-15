@@ -259,3 +259,21 @@ foreach(case IN ITEMS properties gravity friction impulses pushing player riders
     add_test(NAME pushables.${case} COMMAND pushable_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/pushable-fixtures/${case}")
     set_tests_properties(pushables.${case} PROPERTIES LABELS "headless;pushables" TIMEOUT 30)
 endforeach()
+
+add_executable(pickup_tests pickup_tests.cpp)
+target_link_libraries(pickup_tests PRIVATE blood2_game)
+blood2_project_options(pickup_tests)
+foreach(case IN ITEMS defaults ammunition statistics protocol contact spawning rejection callbacks resources)
+    add_test(NAME pickups.${case} COMMAND pickup_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/pickup-fixtures/${case}")
+    set_tests_properties(pickups.${case} PROPERTIES LABELS "headless;pickups" TIMEOUT 30)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME pickups.catalog COMMAND pickup_tests catalog "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(pickups.catalog PROPERTIES LABELS "headless;private;pickups" TIMEOUT 90)
+endif()
+
+if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+    add_test(NAME gpu.pickups COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+        --data-dir "${BLOOD2_TEST_DATA_DIR}" --pickups-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/pickups.png")
+    set_tests_properties(gpu.pickups PROPERTIES LABELS "private;gpu;pickups" TIMEOUT 30 RUN_SERIAL TRUE)
+endif()

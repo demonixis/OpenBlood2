@@ -1,3 +1,4 @@
+#include "game/original/AmmoPickups.h"
 #include "game/original/B2BaseClass.h"
 #include "game/original/CameraSpot.h"
 #include "game/original/Door.h"
@@ -5,6 +6,7 @@
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
 #include "game/original/PathPoint.h"
+#include "game/original/PowerupPickups.h"
 #include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
 #include "game/original/SmellHint.h"
@@ -170,6 +172,26 @@ namespace OpenBlood2
                                 {"SurfaceColor2", DVector{}},
                                 {"XScaleDuration", 10.0f},
                                 {"YScaleDuration", 10.0f}}};
+        const ClassInfo pickup{"PickupObject",
+                               &b2base,
+                               construct<PickupObject>,
+                               {{"PickupTriggerTarget", std::string{}}, {"PickupTriggerMessage", std::string{}}}};
+        const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}};
+        const ClassInfo powerup_pickup{"PowerupPickup", &pickup, construct<PowerupPickup>, {}};
+        const ClassInfo health_base{"HealthBase", &powerup_pickup, construct<HealthBase>, {}};
+        const ClassInfo armor_base{"ArmorBase", &powerup_pickup, construct<ArmorBase>, {}};
+        const ClassInfo bullet_ammo{"BulletAmmoPU", &ammo_pickup, construct<BulletAmmoPU>, {}};
+        const ClassInfo shell_ammo{"ShellAmmoPU", &ammo_pickup, construct<ShellAmmoPU>, {}};
+        const ClassInfo bmg_ammo{"BMGAmmoPU", &ammo_pickup, construct<BMGAmmoPU>, {}};
+        const ClassInfo flare_ammo{"FlareAmmoPU", &ammo_pickup, construct<FlareAmmoPU>, {}};
+        const ClassInfo diebugdie_ammo{"DieBugDieAmmoPU", &ammo_pickup, construct<DieBugDieAmmoPU>, {}};
+        const ClassInfo howitzer_ammo{"HowitzerAmmoPU", &ammo_pickup, construct<HowitzerAmmoPU>, {}};
+        const ClassInfo fuel_ammo{"FuelAmmoPU", &ammo_pickup, construct<FuelAmmoPU>, {}};
+        const ClassInfo battery_ammo{"BatteryAmmoPU", &ammo_pickup, construct<BatteryAmmoPU>, {}};
+        const ClassInfo health_pickup{"HealthPU", &health_base, construct<HealthPU>, {}};
+        const ClassInfo megahealth_pickup{"MegaHealthPU", &health_base, construct<MegaHealthPU>, {}};
+        const ClassInfo ward_pickup{"WardPU", &armor_base, construct<WardPU>, {}};
+        const ClassInfo necroward_pickup{"NecroWardPU", &armor_base, construct<NecroWardPU>, {}};
         const ClassInfo key_pickup{"KeyPickup",
                                    &b2base,
                                    construct<KeyPickup>,
@@ -367,10 +389,18 @@ namespace OpenBlood2
                objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
                objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
                objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
-               objects.register_class(key_pickup) && objects.register_class(big_trigger) &&
-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
-               objects.register_class(rotating_brush);
+               objects.register_class(key_pickup) && objects.register_class(pickup) &&
+               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+               objects.register_class(health_base) && objects.register_class(armor_base) &&
+               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
+               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
+               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
+               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
+               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
+               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
+               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+               objects.register_class(door) && objects.register_class(rotating_door) &&
+               objects.register_class(destructable_brush) && objects.register_class(rotating_brush);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

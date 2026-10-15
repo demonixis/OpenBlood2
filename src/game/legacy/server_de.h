@@ -4,6 +4,7 @@
 #include "game/container_messages.h"
 #include "game/key_messages.h"
 #include "game/mover_messages.h"
+#include "game/pickup_messages.h"
 #include "game/player_messages.h"
 #include "game/weapon_messages.h"
 
@@ -29,6 +30,11 @@ class ServerDE : public CSBase
 {
   public:
     virtual bool IsObjectAlive(HOBJECT) = 0;
+    virtual bool ValidateSpawnObject(std::string_view) = 0;
+    virtual void RecordSpawn(const OpenBlood2::SpawnReport&) = 0;
+    virtual void RecordPickup(HOBJECT, const OpenBlood2::PickupMessage&, std::string_view sound) = 0;
+    virtual DRESULT WritePickupMessage(HMESSAGEWRITE, const OpenBlood2::PickupMessage&) = 0;
+    virtual bool ReadPickupMessage(HMESSAGEREAD, OpenBlood2::PickupMessage&) = 0;
     virtual bool ConfigureWorldBody(HOBJECT, const OpenBlood2::WorldBodyProperties&) = 0;
     virtual bool SetBlockingPriority(HOBJECT, DBYTE) = 0;
     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;

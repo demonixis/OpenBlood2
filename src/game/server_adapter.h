@@ -34,6 +34,13 @@ namespace OpenBlood2
         ServerAdapter& operator=(const ServerAdapter&) = delete;
         bool bind();
         bool IsObjectAlive(HOBJECT) override;
+        bool ValidateSpawnObject(std::string_view) override;
+        void RecordSpawn(const SpawnReport&) override;
+        void RecordPickup(HOBJECT, const PickupMessage&, std::string_view) override;
+        DRESULT WritePickupMessage(HMESSAGEWRITE, const PickupMessage&) override;
+        bool ReadPickupMessage(HMESSAGEREAD, PickupMessage&) override;
+        std::vector<SpawnReport> spawn_reports;
+        std::vector<PickupReport> pickup_reports;
         bool ConfigureWorldBody(HOBJECT, const WorldBodyProperties&) override;
         bool SetBlockingPriority(HOBJECT, DBYTE) override;
         void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE) override;
@@ -59,6 +66,8 @@ namespace OpenBlood2
             brush_destructions.clear();
             debris_effects.clear();
             explosion_effects.clear();
+            spawn_reports.clear();
+            pickup_reports.clear();
         }
         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
@@ -147,6 +156,7 @@ namespace OpenBlood2
             DDWORD id = 0;
             std::optional<Damage> damage;
             std::optional<KeyMessage> key;
+            std::optional<PickupMessage> pickup;
         };
         Objects& objects_;
         bool bound_ = false;

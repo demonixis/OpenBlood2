@@ -21,9 +21,9 @@ namespace OpenBlood2
         if (!m->routed ||
             (m->id != key_pickup_message && m->id != key_query_message && m->id != key_response_message &&
              m->id != picked_up_message) ||
-            !m->bytes.empty() || m->damage || m->key || !IsObjectAlive(m->sender) || !valid(value.item.name) ||
-            value.item.name.empty() || !valid(value.item.display_name) || !valid(value.item.icon) ||
-            !valid(value.item.highlighted_icon))
+            !m->bytes.empty() || m->damage || m->key || m->pickup || !IsObjectAlive(m->sender) ||
+            !valid(value.item.name) || value.item.name.empty() || !valid(value.item.display_name) ||
+            !valid(value.item.icon) || !valid(value.item.highlighted_icon))
         {
             m->bad = true;
             return DE_INVALIDPARAMS;

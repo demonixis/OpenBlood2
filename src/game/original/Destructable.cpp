@@ -2,6 +2,7 @@
 #include "Destructable.h"
 #include "engine/collision.h"
 #include "engine/objects.h"
+#include "spawn_object.h"
 #include "trigger_helpers.h"
 #include <algorithm>
 #include <cmath>
@@ -84,6 +85,11 @@ DDWORD CDestructable::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* d
         text("DamageTriggerMessage", damage_message);
         text("DeathTriggerTarget", death_target);
         text("DeathTriggerMessage", death_message);
+        text("SpawnObject", spawn_object);
+        if (server->GetPropGeneric("SpawnObjectVel", &prop) == DE_OK)
+            spawn_velocity = prop.m_Vec;
+        spawn_valid = spawn_object.empty() ||
+                      (server->ValidateSpawnObject(spawn_object) && OpenBlood2::physics_vector(spawn_velocity));
         if (server->GetPropGeneric("CanDamage", &prop) == DE_OK)
             can_damage = prop.m_Bool != 0;
         if (server->GetPropGeneric("TriggerDestroyOnly", &prop) == DE_OK)
@@ -171,7 +177,7 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
             {
                 m_bDead = DTRUE;
                 m_fHitPoints = 0;
-                SendTrigger(death_target, death_message);
+                HandleDestruction();
             }
             if (BaseClass::GetServerDE()->IsObjectAlive(m_hObject))
                 SendTrigger(damage_target, damage_message);
@@ -179,4 +185,67 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
         }
     }
     return Aggregate::ObjectMessageFn(owner, sender, message, read);
+}
+
+void CDestructable::HandleDestruction()
+{
+    auto* server = BaseClass::GetServerDE();
+    OpenBlood2::SpawnReport report;
+    if (!spawn_object.empty())
+    {
+        auto name = server->GetObjectName(m_hObject);
+        report.source = name ? name : "";
+        report.request = spawn_object;
+        report.velocity = spawn_velocity;
+    }
+    SendTrigger(death_target, death_message);
+    if (spawn_object.empty())
+        return;
+    DRotation rotation;
+    if (!server->IsObjectAlive(m_hObject))
+        report.outcome = "Cancelled: source removed by death trigger";
+    else
+    {
+        server->GetObjectPos(m_hObject, &report.position);
+        if (server->GetObjectRotation(m_hObject, &rotation) != DE_OK)
+            report.outcome = "Failed: source rotation unavailable";
+        else
+        {
+            report.child = SpawnObject(spawn_object, report.position, rotation, spawn_velocity);
+            report.outcome = report.child ? "Created" : "Failed: object creation or velocity";
+        }
+    }
+    server->RecordSpawn(report);
+}
+namespace
+{
+    bool add_stat(float& value, float cap, float amount)
+    {
+        if (!std::isfinite(amount) || amount < 0 || amount > 1e6f || value >= cap)
+            return false;
+        value = std::min(value + amount, cap);
+        return true;
+    }
+} // namespace
+bool CDestructable::Heal(float amount)
+{
+    if (!add_stat(m_fHitPoints, m_fMaxHitPoints, amount))
+        return false;
+    m_bDead = DFALSE;
+    return true;
+}
+bool CDestructable::MegaHeal(float amount)
+{
+    if (!add_stat(m_fHitPoints, m_fMaxMegaHitPoints, amount))
+        return false;
+    m_bDead = DFALSE;
+    return true;
+}
+bool CDestructable::AddWard(float amount)
+{
+    return add_stat(m_fArmorPoints, m_fMaxArmorPoints, amount);
+}
+bool CDestructable::AddNecroWard(float amount)
+{
+    return add_stat(m_fArmorPoints, m_fMaxNecroArmorPoints, amount);
 }

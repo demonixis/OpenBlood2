@@ -1,5 +1,8 @@
 # Original brush explosions and debris requests
 
+> Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
+> pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
+
 > Extended by [PUSHABLE_CONTRACTS.md](PUSHABLE_CONTRACTS.md): selected Pushable/Gravity brushes and
 > brush damage impulses now work with bounded box physics. Omissions and counts
 > below describe the earlier stage; polygon dynamics and full M2 remain open.

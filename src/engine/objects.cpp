@@ -415,19 +415,19 @@ namespace OpenBlood2
         contexts_.pop_back();
         return handle;
     }
-    HOBJECT Objects::create_props(HCLASS type, ObjectCreateStruct state, std::string_view input)
+    bool Objects::parse_properties(HCLASS type, std::string_view input, Properties& props)
     {
         if (!knows(type))
         {
             fail(ObjectError::UnknownClass, "CreateObjectProps: unknown class");
-            return nullptr;
+            return false;
         }
         if (input.size() > 16384)
         {
             fail(ObjectError::Limit, "Property string exceeds 16 KiB");
-            return nullptr;
+            return false;
         }
-        Properties props;
+        props.clear();
         std::size_t cursor = 0;
         auto whitespace = [&]
         {
@@ -435,10 +435,10 @@ namespace OpenBlood2
                    (input[cursor] == ' ' || input[cursor] == '\t' || input[cursor] == '\n' || input[cursor] == '\r'))
                 ++cursor;
         };
-        auto invalid = [&]() -> HOBJECT
+        auto invalid = [&]() -> bool
         {
             fail(ObjectError::InvalidProperty, "Invalid property string near offset " + std::to_string(cursor));
-            return nullptr;
+            return false;
         };
         while (true)
         {
@@ -496,6 +496,20 @@ namespace OpenBlood2
             if (cursor < input.size())
                 ++cursor;
         }
+        return true;
+    }
+    HOBJECT Objects::create_props(HCLASS type, ObjectCreateStruct state, std::string_view input)
+    {
+        Properties props;
+        if (!parse_properties(type, input, props))
+            return nullptr;
+        // String properties override the supplied transform only when authored.
+        if (spec(type, "Pos"))
+            props.try_emplace("Pos", state.m_Pos);
+        if (spec(type, "Rotation"))
+            props.try_emplace("Rotation", state.m_Rotation);
+        if (state.m_Name[0] && spec(type, "Name"))
+            props.try_emplace("Name", std::string(state.m_Name));
         return create(type, state, Creation::String, props);
     }
     ObjectRecord* Objects::get(ObjectId id)

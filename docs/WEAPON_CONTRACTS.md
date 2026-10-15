@@ -1,5 +1,8 @@
 # Original Inventory and Vector Weapon Boundary
 
+> Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
+> pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
+
 > Extended by [BRUSH_CONTRACTS.md](BRUSH_CONTRACTS.md): RotatingBrush and
 > selected destructible brushes are connected. Earlier omissions/counts below
 > describe their previous increments; the full M2 gate remains open.

@@ -1,0 +1,89 @@
+#include "game/server_adapter.h"
+#include <cmath>
+namespace OpenBlood2
+{
+    bool split_spawn(std::string_view input, std::string& type, std::string& props)
+    {
+        type.clear();
+        props.clear();
+        if (input.empty() || input.size() > 100 || input.find('\0') != input.npos)
+            return false;
+        auto first = input.find_first_not_of(' ');
+        if (first == input.npos)
+            return false;
+        input.remove_prefix(first);
+        auto end = input.find(' ');
+        type = input.substr(0, end);
+        if (end != input.npos)
+            props = input.substr(end + 1);
+        return true;
+    }
+    bool ServerAdapter::ValidateSpawnObject(std::string_view input)
+    {
+        trace_service("ValidateSpawnObject");
+        std::string type, props;
+        if (!split_spawn(input, type, props))
+            return false;
+        bool supported = false;
+        for (auto name :
+             {"BulletAmmoPU", "ShellAmmoPU", "BMGAmmoPU", "FlareAmmoPU", "DieBugDieAmmoPU", "HowitzerAmmoPU",
+              "FuelAmmoPU", "BatteryAmmoPU", "HealthPU", "MegaHealthPU", "WardPU", "NecroWardPU"})
+            supported |= same_name(type, name);
+        Properties parsed;
+        return supported && objects_.parse_properties(objects_.find_class(type), props, parsed);
+    }
+    void ServerAdapter::RecordSpawn(const SpawnReport& report)
+    {
+        trace_service("RecordSpawn");
+        if (spawn_reports.size() == 32)
+            spawn_reports.erase(spawn_reports.begin());
+        spawn_reports.push_back(report);
+        if (auto* r = objects_.get(report.child); r && !r->model_error.empty())
+            spawn_reports.back().outcome += ": " + r->model_error;
+    }
+    void ServerAdapter::RecordPickup(HOBJECT h, const PickupMessage& value, std::string_view sound)
+    {
+        trace_service("RecordPickup");
+        auto* r = objects_.get(h);
+        if (!r)
+            return;
+        if (pickup_reports.size() == 32)
+            pickup_reports.erase(pickup_reports.begin());
+        pickup_reports.push_back({r->state.m_Name, r->type->name, std::string(sound), value});
+    }
+    DRESULT ServerAdapter::WritePickupMessage(HMESSAGEWRITE h, const PickupMessage& value)
+    {
+        trace_service("WritePickupMessage");
+        auto* m = writable(h);
+        if (!m)
+            return DE_INVALIDPARAMS;
+        const auto limit = value.kind == PickupKind::Ammo ? 8 : 4;
+        const auto request = value.kind == PickupKind::Ammo ? add_ammo_message : add_powerup_message;
+        if (!m->routed || (value.kind != PickupKind::Ammo && value.kind != PickupKind::Powerup) ||
+            (m->id != request && m->id != picked_up_message) || !m->bytes.empty() || m->damage || m->key || m->pickup ||
+            !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit || !std::isfinite(value.amount) ||
+            value.amount < 0 || value.amount > 1e6f)
+        {
+            m->bad = true;
+            return DE_INVALIDPARAMS;
+        }
+        m->pickup = value;
+        return DE_OK;
+    }
+    bool ServerAdapter::ReadPickupMessage(HMESSAGEREAD h, PickupMessage& value)
+    {
+        trace_service("ReadPickupMessage");
+        value = {};
+        auto it = messages_.find(h);
+        if (it == messages_.end())
+            return false;
+        auto& m = it->second;
+        if (!m.borrowed || m.bad || !m.pickup || !IsObjectAlive(m.sender))
+        {
+            m.bad = true;
+            return false;
+        }
+        value = *m.pickup;
+        return true;
+    }
+} // namespace OpenBlood2

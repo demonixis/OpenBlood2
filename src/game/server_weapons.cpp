@@ -71,7 +71,7 @@ namespace OpenBlood2
         if (!m)
             return DE_INVALIDPARAMS;
         auto* attacker = objects_.get(value.attacker);
-        if (m->id != damage_message || !m->bytes.empty() || m->damage || m->key || !attacker ||
+        if (m->id != damage_message || !m->bytes.empty() || m->damage || m->key || m->pickup || !attacker ||
             attacker->life != Life::Alive || m->sender != value.attacker || !physics_vector(value.position) ||
             !physics_vector(value.direction) || !std::isfinite(value.amount) || value.amount < 0 ||
             value.amount > 1e6f ||

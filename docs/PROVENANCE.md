@@ -299,3 +299,15 @@ conservative rider/pushing limits. Later LithTech motion is an architectural
 reference only. The preceding pushable/impulse omissions are superseded for this
 bounded brush subset; dynamic polygon bodies, player impulses, SpawnObject,
 WorldModelDebris and the full M2 gate remain open.
+
+## M2 pickup and destruction-spawn continuation
+
+[Source selections](M2_PICKUP_SOURCES.json) record selected PickupObject, AmmoPickup,
+PowerupPickup and concrete constructors, player message branches, CDestructable
+stat/HandleDestruction rules and the global Spawner.cpp helper. The general Spawner
+class is not imported. [Contracts](PICKUP_CONTRACTS.md) explain typed in-process
+messages, bounded non-mutating parsing, checked acknowledgement and removal,
+resource failure behavior and the intentionally omitted multiplayer/FX branches.
+Earlier ledgers remain historical; their blanket SpawnObject/general-pickup
+omissions are superseded only for the twelve supported leaf classes. No prototype
+dependency, reference modification or commercial asset was introduced.

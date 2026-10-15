@@ -248,10 +248,10 @@ namespace
         struct Count
         {
             unsigned created = 0, rejected = 0, filtered = 0, moved = 0, explosive = 0, detonated = 0, dynamic = 0,
-                     blocked = 0;
+                     blocked = 0, spawned = 0;
         };
         std::map<std::string, Count> counts;
-        std::map<std::string, unsigned> failures;
+        std::map<std::string, unsigned> failures, spawns;
         unsigned unreadable = 0;
         for (const auto& [path, resource] : g.resources.index())
         {
@@ -275,6 +275,8 @@ namespace
                 Properties props;
                 for (const auto& p : source.properties)
                     props.emplace(p.name, p.value);
+                if (props.contains("SpawnObject") && !std::get<std::string>(props.at("SpawnObject")).empty())
+                    ++spawns[std::get<std::string>(props.at("SpawnObject"))];
                 auto h = g.objects.create(g.objects.find_class(source.class_name), {}, Creation::World, props);
                 auto* r = g.objects.get(h);
                 auto& count = counts[source.class_name];
@@ -351,6 +353,22 @@ namespace
                         else
                             CHECK(g.objects.remove(h));
                     }
+                    else if (!brush.m_damage.spawn_object.empty())
+                    {
+                        CHECK(command(g, h, "KILL"));
+                        if (brush.m_damage.can_damage)
+                        {
+                            CHECK(!g.server.spawn_reports.empty());
+                            auto child = g.server.spawn_reports.back().child;
+                            CHECK(child && g.objects.get(child)->model);
+                            CHECK(g.objects.get(child)->velocity.x == brush.m_damage.spawn_velocity.x &&
+                                  g.objects.get(child)->velocity.y == brush.m_damage.spawn_velocity.y &&
+                                  g.objects.get(child)->velocity.z == brush.m_damage.spawn_velocity.z);
+                            ++count.spawned;
+                            CHECK(g.objects.remove(child));
+                        }
+                        CHECK(g.objects.remove(h));
+                    }
                     else
                         CHECK(g.objects.remove(h));
                 }
@@ -361,14 +379,16 @@ namespace
         for (const auto& [name, c] : counts)
             std::cout << name << " created=" << c.created << " rejected=" << c.rejected << " filtered=" << c.filtered
                       << " moved=" << c.moved << " explosive=" << c.explosive << " detonated=" << c.detonated
-                      << " dynamic=" << c.dynamic << " blocked=" << c.blocked << '\n';
+                      << " dynamic=" << c.dynamic << " blocked=" << c.blocked << " spawned=" << c.spawned << '\n';
+        for (const auto& [name, n] : spawns)
+            std::cout << "SpawnObject " << name << "=" << n << '\n';
         for (const auto& [name, n] : failures)
             std::cout << name << "=" << n << '\n';
         CHECK(unreadable == 1 && counts["RotatingBrush"].created == 98 && counts["RotatingBrush"].rejected == 38 &&
               counts["RotatingBrush"].moved == 98 && counts["RotatingBrush"].filtered == 0 &&
-              counts["CDestructableBrush"].created == 2237 && counts["CDestructableBrush"].rejected == 218 &&
+              counts["CDestructableBrush"].created == 2295 && counts["CDestructableBrush"].rejected == 160 &&
               counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 50 &&
-              counts["CDestructableBrush"].detonated == 50);
+              counts["CDestructableBrush"].detonated == 50 && counts["CDestructableBrush"].spawned == 58);
         CHECK(g.request_world("01_SubwayA", error));
         std::map<EntryState, unsigned> entries;
         for (const auto& e : g.entries)

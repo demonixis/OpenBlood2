@@ -64,7 +64,7 @@ namespace test_player
         return {offset, static_cast<unsigned>(records.b.size())};
     }
     inline bool setup(GameSession& game, const std::filesystem::path& root, bool with_start = true,
-                      bool weapon_assets = true)
+                      bool weapon_assets = true, bool pickup_assets = false)
     {
         FIXTURE_CHECK(game.initialize());
         Directory dir;
@@ -76,6 +76,15 @@ namespace test_player
         if (weapon_assets)
             for (auto path : {"c_beretta_pv_t.dtx", "c_knife_pv_t.dtx"})
                 dir.children["skins"].children["weapons"].files[path] = {1, 2, 3};
+        if (pickup_assets)
+            for (auto name :
+                 {"bulletammo_pu", "shellammo_pu", "bmgammo_pu", "flareammo_pu", "diebugdieammo_pu", "howitzerammo_pu",
+                  "fuelammo_pu", "batteryammo_pu", "health_pu", "megahealth_pu", "ward_pu", "necroward_pu"})
+            {
+                dir.children["models"].children["powerups"].files[std::string(name) + ".abc"] =
+                    test_model::abc(false, true).b;
+                dir.children["skins"].children["powerups"].files[std::string(name) + ".dtx"] = {1, 2, 3};
+            }
         Writer w;
         w.b.resize(168);
         w.b[0] = w.b[62] = w.b[124] = 13;

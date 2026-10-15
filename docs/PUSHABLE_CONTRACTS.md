@@ -1,5 +1,8 @@
 # Original pushable brushes and bounded box physics
 
+> Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
+> pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
+
 This extends [brush](BRUSH_CONTRACTS.md), [explosion](EXPLOSION_CONTRACTS.md)
 and [movement](MOVEMENT_CONTRACTS.md) contracts. M2 remains incomplete. Read the
 [source ledger](M2_PUSHABLE_SOURCES.json) and

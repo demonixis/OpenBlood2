@@ -38,9 +38,8 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
                     return 0;
                 surface = static_cast<unsigned>(prop.m_Long);
             }
-            server->GetPropGeneric("SpawnObject", &prop);
-            // Do not create objects whose omitted branches change gameplay.
-            if (prop.m_String[0])
+            // Reject unsupported spawn rules before admitting this brush.
+            if (!m_damage.spawn_valid)
                 return 0;
         }
 

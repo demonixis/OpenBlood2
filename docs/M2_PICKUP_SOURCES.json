@@ -1,0 +1,251 @@
+{
+  "date": "2026-10-15",
+  "status": "M2 incomplete; twelve original SP pickups and selected destruction SpawnObject",
+  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/PickupObject.cpp",
+      "target": "src/game/original/PickupObject.cpp",
+      "source_line_ranges": [
+        [
+          30,
+          72
+        ],
+        [
+          115,
+          218
+        ],
+        [
+          231,
+          388
+        ],
+        [
+          469,
+          503
+        ],
+        [
+          536,
+          557
+        ]
+      ],
+      "selection": "Selected single-player precreate/initial update, resource naming, flags/dimensions, world ground placement, non-bouncing SpawnItem and successful collection. Typed ack requires the current live player toucher and equal payload; named trigger precedes deferred removal so checked sender stays live. FX, localized strings, multiplayer/respawn and bouncing omitted; missing models disable touch/gravity with diagnostics.",
+      "source_sha256": "25e0388f983ec0c9e01b6deb8432f411271159a224d582e12300c10863b979da",
+      "target_sha256": "38dc81b817b00e8e254ec16840f4109e8cb0fd799373b4e48f2a84a4adc54509"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PickupObject.h",
+      "target": "src/game/original/PickupObject.h",
+      "source_line_ranges": [
+        [
+          20,
+          111
+        ]
+      ],
+      "selection": "Selected base ancestry and state, adapted to owned strings, fixed-width typed kind/type/amount and inspectable counters. Original-global class preserved; no replica of legacy packet memory layout.",
+      "source_sha256": "0fe5cf15943ebd87f0e367a5dee181721b5db29d6c7eee1f9874f46549dcb056",
+      "target_sha256": "98bd30fed6fd84eacc3db3dcf4b033ce478decb37716f55e71d463307cb7ef25"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AmmoPickups.cpp",
+      "target": "src/game/original/AmmoPickups.cpp",
+      "source_line_ranges": [
+        [
+          27,
+          259
+        ]
+      ],
+      "selection": "Active original ammo classes, constructor amounts/resources and static list registration. Shared selected ObjectTouch implementation is in PickupObject.cpp, dispatched by typed Ammo kind. Commented ManaAmmoPU remains unregistered; multiplayer scaling/respawn omitted.",
+      "source_sha256": "3ea2f1ba0b90298563b5a97c451e4e1d60e0b10fdd666320944edb23afa50696",
+      "target_sha256": "b1e1d7b6a3e235d828abe3566c28d5e95dddeac347a5c7a0030b533003cd9c30"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AmmoPickups.h",
+      "target": "src/game/original/AmmoPickups.h",
+      "source_line_ranges": [
+        [
+          16,
+          117
+        ]
+      ],
+      "selection": "Selected constructors/list ownership and eight active concrete classes; destructor unlink retained in AmmoPickups.cpp.",
+      "source_sha256": "c34daeb1228cad71438218097c36706c91529daed487bf2629a4253df8bd41d6",
+      "target_sha256": "a8fbde0e4cbb9c7a13ec561fc042decd4fb2fc621813036ec5b9038015dcafec"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PowerupPickups.cpp",
+      "target": "src/game/original/PowerupPickups.cpp",
+      "source_line_ranges": [
+        [
+          26,
+          47
+        ],
+        [
+          63,
+          120
+        ],
+        [
+          131,
+          143
+        ],
+        [
+          158,
+          237
+        ]
+      ],
+      "selection": "PowerupPickup/HealthBase/ArmorBase ancestry and four concrete SP health/armor constructors. Shared ObjectTouch selected in PickupObject.cpp; timed bonuses and multiplayer branches excluded.",
+      "source_sha256": "0e0d2190ea3785e7287309c0ccfe109c688a9c14b9b12779c4c5c50642f0d80c",
+      "target_sha256": "5c01bdc161bb07a25879e1a0fab557201297801298ff7d451c33df6de292cd07"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PowerupPickups.h",
+      "target": "src/game/original/PowerupPickups.h",
+      "source_line_ranges": [
+        [
+          18,
+          80
+        ]
+      ],
+      "selection": "Selected ancestry, PowerupPickup rotate request and concrete health/armor declarations; rotation is inspectable metadata/user bit 4, not rendered FX; no timed bonuses.",
+      "source_sha256": "868eeafc937d421bae5a210729d996e28fa4f95e32d2afa9ed5391b5d5364cff",
+      "target_sha256": "d6f1039219fb314f3b84183b8ab7f3083f3e3f622baad30ecc2ead204be23a7e"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "target": "src/game/original/PlayerContainers.cpp",
+      "source_line_ranges": [
+        [
+          3670,
+          3693
+        ],
+        [
+          3737,
+          3738
+        ],
+        [
+          4305,
+          4331
+        ]
+      ],
+      "selection": "Selected ammo and four powerup message branches, dead-player gate and successful MID_PICKEDUP. Extra aggregate-dead guard closes the pre-update death window. Owned typed replies use actual player sender.",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target_sha256": "1bbc80d5a2f818a30f6542305d65b6daf80720772045546dc41703a632d3e780"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "target": "src/game/original/Destructable.cpp",
+      "source_line_ranges": [
+        [
+          279,
+          282
+        ],
+        [
+          936,
+          958
+        ],
+        [
+          987,
+          1048
+        ],
+        [
+          1078,
+          1112
+        ]
+      ],
+      "selection": "Spawn property/velocity read, death-trigger before spawn, Heal/MegaHeal/AddWard/AddNecroWard caps. Spawn cancellation for pending source and finite inputs are explicit adaptations. Slow-death multiplayer and unused death-hit-point metadata remain omitted.",
+      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "target_sha256": "9f8ce27453c4cc1eedebde03e40a6167af4e3494afc048572e3456bb5ec14819"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.h",
+      "target": "src/game/original/Destructable.h",
+      "source_line_ranges": [
+        [
+          33,
+          34
+        ]
+      ],
+      "selection": "Source SpawnObject string and SpawnObjectVel vector properties; owned current fields replace HSTRING storage. Registration already carried these properties.",
+      "source_sha256": "00e289d9cca1594035c8f20d0d45a076009c765e2767ce545f22f16d33bfea45",
+      "target_sha256": "0676e43f82fedf5537bd8026172fd698255dba0128271fbf2875253a4dbd05bb"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Spawner.cpp",
+      "target": "src/game/original/spawn_object.cpp",
+      "source_line_ranges": [
+        [
+          274,
+          310
+        ]
+      ],
+      "selection": "Only the global class-plus-properties helper: inherit transform, CreateObjectProps, velocity after initial update. Non-mutating bounded split and supported-class preflight replace strtok. Checked failure removes child. General Spawner class is not imported.",
+      "source_sha256": "648cbcc568316ae9a99817afba1a9dd89fd15838ab61a377dc6e1d53881e77cb",
+      "target_sha256": "9ee4d44d02b7cf52ab8a6a5d91ef78e68d443fe5931b04f757325c214797c71c"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "target": "src/game/original/PlayerContainers.cpp",
+      "source_line_ranges": [
+        [
+          2402,
+          2415
+        ]
+      ],
+      "selection": "Successful pickup acknowledgement selection; moved to actual CPlayerObj to avoid invalid aggregate-to-BaseClass cast. Source default-respawn -1 is represented by the selected typed single-player acknowledgement.",
+      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "target_sha256": "1bbc80d5a2f818a30f6542305d65b6daf80720772045546dc41703a632d3e780"
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "target": "src/game/original/AmmoPickups.cpp",
+      "source_line_ranges": [
+        [
+          280,
+          293
+        ],
+        [
+          318,
+          327
+        ]
+      ],
+      "selection": "Original numeric ammo types and pickup amounts, not new balance values.",
+      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "target_sha256": "b1e1d7b6a3e235d828abe3566c28d5e95dddeac347a5c7a0030b533003cd9c30"
+    },
+    {
+      "source": "sources/blood2/Shared/ClientRes.h",
+      "target": "src/game/original/PowerupPickups.cpp",
+      "source_line_ranges": [
+        [
+          151,
+          154
+        ]
+      ],
+      "selection": "Original numeric health/armor resource IDs retained for inspection, with original English fallback names; resource localization is not implemented.",
+      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
+      "target_sha256": "5c01bdc161bb07a25879e1a0fab557201297801298ff7d451c33df6de292cd07"
+    },
+    {
+      "source": "sources/blood2/Shared/ClientRes.h",
+      "target": "src/game/original/AmmoPickups.cpp",
+      "source_line_ranges": [
+        [
+          159,
+          166
+        ]
+      ],
+      "selection": "Original numeric ammo resource IDs retained; display strings are fallback metadata.",
+      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
+      "target_sha256": "b1e1d7b6a3e235d828abe3566c28d5e95dddeac347a5c7a0030b533003cd9c30"
+    }
+  ],
+  "adaptations": [
+    "Typed owned local request/ack payload with current-toucher and player checks; source message IDs retained, no old packet ABI",
+    "SP only: no multiplayer multipliers/respawn, custom override, rotating/bouncing FX or general inventory/timed bonuses",
+    "Finite typed amounts, explicit missing resource diagnostics, bounded latest-32 reports and deferred destruction/list cleanup",
+    "Pickup trigger before removal to preserve checked sender lifetime, matching earlier KeyPickup adaptation",
+    "Non-mutating spawn split, twelve-leaf allowlist and typed property preflight; cancel if death trigger removes source",
+    "CreateObjectProps preserves supplied transform/name absent explicit overrides; post-initialization velocity failure rolls back child",
+    "Engine collisions/ground placement reuse current bounded replacement physics; no retail equivalence claim",
+    "KeyPickup stays on its earlier selected path; other ammo-consuming weapons, FX/audio and full M2 remain pending"
+  ]
+}

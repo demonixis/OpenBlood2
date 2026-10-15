@@ -25,6 +25,14 @@ class CDestructable : public Aggregate
         return m_bDead != 0;
     }
     void CalculateResistance(DBYTE);
+    bool Heal(float);
+    bool MegaHeal(float);
+    bool AddWard(float);
+    bool AddNecroWard(float);
+    void HandleDestruction();
+    std::string spawn_object;
+    DVector spawn_velocity{};
+    bool spawn_valid = true;
     void ApplyDamagePhysics(float, DVector);
     bool apply_damage_physics = false, last_impulse_ok = true;
     std::uint64_t damage_impulses = 0;

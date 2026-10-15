@@ -87,3 +87,11 @@ centers, one player integration, original DONTFOLLOWSTANDING, atomic rider/pushe
 commit and deferred callbacks. BoxPhysics is required; polygon dynamics, stacks,
 SpawnObject, player impulses and complete gameplay remain pending. Earlier blanket
 pushable/gravity omissions are superseded for this bounded subset; M2 stays open.
+
+The latest [pickup evidence](../Documentation/Implementation/M2_PICKUPS.md) connects
+eight original ammo pickups, four health/armor pickups and destruction SpawnObject.
+Read [pickup contracts](docs/PICKUP_CONTRACTS.md). Preserve checked typed acknowledgements,
+normal/bonus caps, dead-player guards, independent child lifetime, death-trigger
+ordering and deferred removal. Earlier blanket SpawnObject/pickup omissions are
+superseded for this subset. Remaining inventory items, timed bonuses, old TypeAction
+schemas, audio/FX and full M2 gameplay remain pending.

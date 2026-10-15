@@ -559,7 +559,7 @@ namespace OpenBlood2
         auto* m = writable(h);
         if (!m)
             return DE_INVALIDPARAMS;
-        if (m->damage || m->key)
+        if (m->damage || m->key || m->pickup)
         {
             m->bad = true;
             return DE_INVALIDPARAMS;

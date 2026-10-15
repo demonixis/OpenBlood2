@@ -68,3 +68,11 @@ requires a loaded collision index and retains explicit unsupported cases. ABC
 loading occurs between precreate and initial update; missing models remain
 explicit diagnostics on inspection instances. Model/touch callbacks use the
 existing deferred lifecycle and original BaseClass/aggregate chain.
+
+## String creation transform precedence
+
+`parse_properties` validates the existing bounded property grammar without creating
+an object. `create_props` preserves the supplied position/rotation and nonempty name
+unless the string explicitly overrides them (only for schema-declared properties).
+This is needed by the original SpawnObject helper; see [pickup contracts](PICKUP_CONTRACTS.md).
+Unknown/duplicate properties still reject; world-file creation defaults are unchanged.

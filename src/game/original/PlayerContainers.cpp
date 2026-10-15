@@ -37,6 +37,42 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
             }
         }
     }
+    if (!m_bDead && !m_damage.IsDead() &&
+        (message == OpenBlood2::add_ammo_message || message == OpenBlood2::add_powerup_message))
+    {
+        OpenBlood2::PickupMessage pickup;
+        if (server->ReadPickupMessage(read, pickup))
+        {
+            bool accepted = false;
+            if (message == OpenBlood2::add_ammo_message)
+                accepted = m_InventoryMgr.AddAmmo(pickup.type, pickup.amount) == InventoryResult::Ok;
+            else
+                switch (pickup.type)
+                {
+                    case 1:
+                        accepted = m_damage.Heal(pickup.amount);
+                        break;
+                    case 2:
+                        accepted = m_damage.MegaHeal(pickup.amount);
+                        break;
+                    case 3:
+                        accepted = m_damage.AddWard(pickup.amount);
+                        break;
+                    case 4:
+                        accepted = m_damage.AddNecroWard(pickup.amount);
+                        break;
+                }
+            if (accepted)
+            {
+                auto reply = server->StartMessageToObject(this, sender, OpenBlood2::picked_up_message);
+                if (reply)
+                {
+                    server->WritePickupMessage(reply, pickup);
+                    server->EndMessage(reply);
+                }
+            }
+        }
+    }
     return CBaseCharacter::ObjectMessageFn(sender, message, read);
 }
 
