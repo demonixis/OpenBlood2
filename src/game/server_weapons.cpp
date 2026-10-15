@@ -1,4 +1,5 @@
 #include "engine/world_model.h"
+#include "game/original/DestructableBrush.h"
 #include "game/original/Door.h"
 #include "game/server_adapter.h"
 #include <cmath>
@@ -29,7 +30,8 @@ namespace OpenBlood2
                 (objects == SegmentObjects::SolidOnly && !(record->state.m_Flags & FLAG_SOLID)))
                 continue; // Original IGNORE_NONSOLID.
             const auto* door = dynamic_cast<const Door*>(record->game.get());
-            if (fire_through && door && door->fire_through)
+            const auto* brush = dynamic_cast<const CDestructableBrush*>(record->game.get());
+            if (fire_through && ((door && door->fire_through) || (brush && brush->fire_through)))
                 continue;
             CollisionHit hit;
             const auto query = sweep_object(*record, from, to, {}, hit);
@@ -51,6 +53,16 @@ namespace OpenBlood2
             return SegmentResult::Miss;
         out = {nearest.point, nearest.normal, nearest.object, nearest.polygon, nearest.fraction};
         return SegmentResult::Hit;
+    }
+    void ServerAdapter::RecordBrushDestruction(HOBJECT handle, DVector direction, float damage, DBYTE amount)
+    {
+        trace_service("RecordBrushDestruction");
+        auto* object = objects_.get(handle);
+        if (!object || object->life != Life::Alive || !physics_vector(direction) || !std::isfinite(damage))
+            return;
+        if (brush_destructions.size() == 32)
+            brush_destructions.erase(brush_destructions.begin());
+        brush_destructions.push_back({object->state.m_Name, object->state.m_Pos, direction, damage, amount});
     }
     DRESULT ServerAdapter::WriteDamage(HMESSAGEWRITE h, const Damage& value)
     {

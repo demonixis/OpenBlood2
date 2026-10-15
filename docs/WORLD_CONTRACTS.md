@@ -1,5 +1,10 @@
 # Resource, World and Session Contracts
 
+> Extended by [BRUSH_CONTRACTS.md](BRUSH_CONTRACTS.md): RotatingBrush and
+> selected destructible brushes are connected. Earlier omissions/counts below
+> describe their previous increments; the full M2 gate remains open.
+
+
 The later [player entry contracts](PLAYER_CONTRACTS.md) supersede this increment's statements that shell/player entry is entirely absent. Complete gameplay remains blocked; earlier limits below remain unless explicitly superseded.
 
 M2 is **in progress**, with bounded resource/world inspection and a partial original-code connection. This document describes implemented behavior, not the complete roadmap exit gate.

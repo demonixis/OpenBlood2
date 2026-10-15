@@ -265,3 +265,15 @@ collision solver. No prototype engine dependency or ECS was imported. The old
 force/crush protocol, full player session and other movers remain outside this
 increment. Source angular quirks and the original direct-door USE exclusion are
 retained; original-executable behavior and other platforms remain unverified.
+
+## M2 rotating and destructible brush continuation
+
+[Source selections](M2_BRUSH_SOURCES.json) record RotatingBrush/Rotating and
+selected CDestructableBrush/CDestructable callbacks, registration and properties.
+CDestructable moved out of PlayerObj without replacing its existing player
+health/armor branch. Added named damage/death messages and KILL retain owned
+transport and deferred lifetimes. CDebris/WorldModelDebris remain unported;
+a bounded diagnostic records removal requests without claiming FX playback.
+[Contracts](BRUSH_CONTRACTS.md) distinguish source timing from the existing
+replacement rotation solver and explain the supporting later-engine reference.
+No reference source, prototype dependency or commercial content was modified.

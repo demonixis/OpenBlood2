@@ -5,6 +5,7 @@
 #include "game/original/Door.h"
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
+#include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
 #include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
@@ -96,6 +97,23 @@ namespace OpenBlood2
             }
             trigger_request = {};
             grant_key_request = false;
+        }
+        if (brush_request)
+        {
+            if (const auto* record = game.objects.get(brush_request);
+                record && record->life == Life::Alive && dynamic_cast<CDestructableBrush*>(record->game.get()))
+            {
+                auto text = game.server.CreateString(brush_command.c_str());
+                auto message = game.server.StartMessageToObject(record->game.get(), record->handle, 1000);
+                if (message)
+                {
+                    game.server.WriteToMessageHString(message, text);
+                    game.server.EndMessage(message);
+                }
+                if (text)
+                    game.server.FreeString(text);
+            }
+            brush_request = {};
         }
         if (door_trigger_request)
         {
@@ -478,6 +496,12 @@ namespace OpenBlood2
                 {
                     select_triggers = false;
                     draw_triggers(game, selection);
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("Brushes", nullptr, select_brushes ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_brushes = false;
+                    draw_brushes(game, selection);
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Doors", nullptr, select_doors ? ImGuiTabItemFlags_SetSelected : 0))
@@ -1578,7 +1602,7 @@ namespace OpenBlood2
         else
             ImGui::TextUnformatted("No supported live Door selected.");
         ImGui::EndTable();
-        ImGui::TextWrapped("Translation only. Rotating doors, crushing damage, chained pushers, "
+        ImGui::TextWrapped("Bounded translating/rotating collision. Crushing damage, chained pushers, "
                            "audio, portals and save/restore remain pending. M2 is not complete.");
     }
 } // namespace OpenBlood2
@@ -1707,5 +1731,120 @@ namespace OpenBlood2
             }
         ImGui::TextWrapped("Audio, localized key names, generic pickups, save/restore and the complete playable "
                            "session remain pending.");
+    }
+} // namespace OpenBlood2
+
+namespace OpenBlood2
+{
+    void Inspector::draw_brushes(GameSession& game, ObjectSelection& selection)
+    {
+        ImGui::TextWrapped("Original CDestructableBrush / RotatingBrush. Commands are queued to the simulation. "
+                           "Failed source entries and authored debris properties remain in World.");
+        if (!ImGui::BeginTable("Brush inspection", 2, ImGuiTableFlags_Resizable))
+            return;
+        ImGui::TableSetupColumn("Objects", ImGuiTableColumnFlags_WidthFixed, 240);
+        ImGui::TableSetupColumn("State");
+        ImGui::TableNextColumn();
+        ImGui::BeginChild("Brush list", {0, 120});
+        for (auto id : game.objects.snapshot())
+        {
+            const auto* r = game.objects.get(id);
+            if (!r || r->life != Life::Alive || !dynamic_cast<const CDestructableBrush*>(r->game.get()))
+                continue;
+            if (!game.objects.get(brush_selection))
+                brush_selection = id;
+            auto label = std::string(r->state.m_Name) + ((r->state.m_Flags & FLAG_VISIBLE) ? "" : " [hidden]") +
+                         (r->activity == OBJSTATE_ACTIVE ? "" : " [inactive]");
+            ImGui::PushID(static_cast<int>(id.slot));
+            if (ImGui::Selectable(label.c_str(), brush_selection == id))
+                brush_selection = selection.id = id;
+            ImGui::PopID();
+        }
+        ImGui::EndChild();
+        const auto* r = game.objects.get(brush_selection);
+        const auto* b = r && r->life == Life::Alive ? dynamic_cast<const CDestructableBrush*>(r->game.get()) : nullptr;
+        if (b && r->world_model)
+        {
+            const auto& shape = *r->world_model;
+            const ImVec2 size{std::max(180.0f, ImGui::GetContentRegionAvail().x), 180};
+            ImGui::TextUnformatted("Posed shell / XZ");
+            const auto canvas = ImGui::GetCursorScreenPos();
+            ImGui::InvisibleButton("Brush geometry", size);
+            auto* draw = ImGui::GetWindowDrawList();
+            draw->AddRectFilled(canvas, {canvas.x + size.x, canvas.y + size.y}, IM_COL32(12, 17, 23, 255));
+            draw->PushClipRect(canvas, {canvas.x + size.x, canvas.y + size.y}, true);
+            const auto center = vector_scale(vector_add(shape.min, shape.max), .5f);
+            const auto scale = std::min((size.x - 20) / std::max(1.0f, shape.max.x - shape.min.x),
+                                        (size.y - 20) / std::max(1.0f, shape.max.z - shape.min.z));
+            auto project = [&](DVector p)
+            {
+                return ImVec2{canvas.x + size.x * .5f + (p.x - center.x) * scale,
+                              canvas.y + size.y * .5f - (p.z - center.z) * scale};
+            };
+            for (const auto& t : shape.triangles)
+                for (unsigned i = 0; i < 3; ++i)
+                    draw->AddLine(project(t[i]), project(t[(i + 1) % 3]), IM_COL32(80, 180, 255, 220));
+            draw->AddCircleFilled(project(shape.origin), 4, IM_COL32(255, 190, 80, 255));
+            draw->PopClipRect();
+        }
+        ImGui::TableNextColumn();
+        if (b)
+        {
+            ImGui::Text("%s / %s", r->state.m_Name, r->type->name.c_str());
+            if (const auto* rotating = dynamic_cast<const RotatingBrush*>(b))
+            {
+                const auto& v = rotating->rotating;
+                constexpr const char* states[] = {"off", "normal", "spin up", "spin down"};
+                constexpr const char* results[] = {"moved", "blocked", "invalid", "unavailable"};
+                ImGui::Text("%s | last motion %s", states[v.state], results[unsigned(v.last_move)]);
+                for (auto cmd : {"ON", "OFF", "TOGGLE"})
+                {
+                    if (ImGui::Button(cmd))
+                    {
+                        brush_request = r->id;
+                        brush_command = cmd;
+                    }
+                    ImGui::SameLine();
+                }
+                ImGui::NewLine();
+                ImGui::Text("Euler rad %.3f %.3f %.3f", v.pose_angles.x, v.pose_angles.y, v.pose_angles.z);
+                ImGui::Text("Velocity rad/s %.3f %.3f %.3f", v.velocity.x, v.velocity.y, v.velocity.z);
+                ImGui::Text("Spin time left %.3f %.3f %.3f", v.time_left.x, v.time_left.y, v.time_left.z);
+                ImGui::Text("Substeps %u | moves %llu | blocks %llu", r->rotation_steps,
+                            static_cast<unsigned long long>(r->mover_moves),
+                            static_cast<unsigned long long>(r->mover_blocks));
+                ImGui::Text("Pushes %llu | riders %llu", static_cast<unsigned long long>(r->mover_pushes),
+                            static_cast<unsigned long long>(r->mover_riders));
+                const auto* blocker = game.objects.get(r->mover_blocker);
+                if (r->mover_blocks)
+                    ImGui::Text("Blocker: %s", blocker ? blocker->state.m_Name : "world / removed");
+                ImGui::TextWrapped("Sound: %s (%s; playback pending)", v.last_sound.c_str(),
+                                   v.sound_loop ? "loop" : "once");
+            }
+            ImGui::Text("HP %.1f | dead %s | CanDamage %s", b->m_damage.m_fHitPoints,
+                        b->m_damage.IsDead() ? "yes" : "no", b->m_damage.can_damage ? "yes" : "no");
+            ImGui::Text("Destructable %s | TriggerDestroyOnly %s", b->destructable ? "yes" : "no",
+                        b->m_damage.trigger_only ? "yes" : "no");
+            ImGui::Text("Collision %s | FireThrough %s", b->box_physics ? "box" : "polygon",
+                        b->fire_through ? "yes" : "no");
+            if (ImGui::Button("KILL (diagnostic)"))
+            {
+                brush_request = r->id;
+                brush_command = "KILL";
+            }
+        }
+        else
+            ImGui::TextUnformatted("No live brush selected.");
+        ImGui::EndTable();
+        ImGui::TextWrapped(
+            "Debris FX/fragments, pushable brushes, explosions, SpawnObject and save/restore are pending. "
+            "Rotation uses replacement engine collision; M2 remains open.");
+        if (ImGui::TreeNode("Destruction requests (not rendered)"))
+        {
+            for (const auto& event : game.server.brush_destructions)
+                ImGui::Text("%s: damage %.1f, authored amount %u", event.name.c_str(), event.damage,
+                            event.debris_amount);
+            ImGui::TreePop();
+        }
     }
 } // namespace OpenBlood2

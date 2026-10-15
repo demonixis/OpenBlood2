@@ -97,11 +97,6 @@ namespace OpenBlood2
                     entry.state = EntryState::Filtered;
                     entry.detail = "Removed by original initial-update difficulty/game-type rules";
                 }
-                else if (objects.error() == ObjectError::Rejected)
-                {
-                    entry.state = EntryState::Filtered;
-                    entry.detail = "Rejected by original precreate rules";
-                }
                 else
                 {
                     entry.state = EntryState::Failed;

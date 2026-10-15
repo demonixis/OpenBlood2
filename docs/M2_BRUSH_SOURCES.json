@@ -1,0 +1,237 @@
+{
+  "date": "2026-10-15",
+  "status": "M2 incomplete; original rotating/destructible brush subset connected for inspection",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/RotatingBrush.cpp",
+      "target": "src/game/original/RotatingBrush.cpp",
+      "source_line_ranges": [
+        [
+          18,
+          78
+        ]
+      ],
+      "selection": "Original parent/aggregate attachment and initial-update ordering; typed property validation added. AllowMarks defaults false.",
+      "kind": "selective original game port",
+      "source_sha256": "b264dcb59b869df08e1cf269e524cf8968499ca82899e01d51dec4210c31b734",
+      "target_sha256": "6eedaf03644998b85598d40d8742be02ad70b0a77a1905a7d3dc1c046e5482fe"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/RotatingBrush.h",
+      "target": "src/game/original/RotatingBrush.h",
+      "source_line_ranges": [
+        [
+          1,
+          34
+        ]
+      ],
+      "selection": "Original CDestructableBrush inheritance and owned Rotating aggregate; inspection-visible state.",
+      "kind": "selective original game port",
+      "source_sha256": "21422ab853c8a25ab7059679eb5e02133193279131b4b0ee9e8a08f964968e12",
+      "target_sha256": "f72161886a131844a386f45f49026a9e1d8b2522c6c96139346a51557dfbb027"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Rotating.cpp",
+      "target": "src/game/original/Rotating.cpp",
+      "source_line_ranges": [
+        [
+          31,
+          56
+        ],
+        [
+          96,
+          674
+        ]
+      ],
+      "selection": "World-only property reads, initialization, normal/off/spin-up/spin-down, per-axis ramp arithmetic, ON/OFF/TOGGLE guard order, zero-based angles and elapsed last-time integration. Owned strings, sound-request metadata, finite/zero guards and typed checked rotation replace the old engine/audio calls. No save/load.",
+      "kind": "selective original game port",
+      "source_sha256": "06159a27c104c57aa2e2d44e356533f74d6bb0aab7b19817322ea485611973f5",
+      "target_sha256": "8910f510e60719da073d36fef5342dea4526559a99a70c9d11161af2bff50a84"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Rotating.h",
+      "target": "src/game/original/Rotating.h",
+      "source_line_ranges": [
+        [
+          17,
+          101
+        ]
+      ],
+      "selection": "Original state and property defaults, velocity/sign/ramp/time fields; checked current pose stored separately from source angles.",
+      "kind": "selective original game port",
+      "source_sha256": "82f6e56990cf12c049402ca72483db5c0b978529fbc0c5afa38deebdd6959414",
+      "target_sha256": "0a796ad1bb9df76fa9f46e00723f82efb44ed2837481d1365c7f39a8e6c93b8f"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
+      "target": "src/game/original/DestructableBrush.cpp",
+      "source_line_ranges": [
+        [
+          47,
+          62
+        ],
+        [
+          91,
+          163
+        ],
+        [
+          173,
+          285
+        ]
+      ],
+      "selection": "Original brush properties, named world model, flags, damage initialization, update/death removal and base-first damage callback. Pushable/gravity, Exploding and SpawnObject explicitly reject; CDebris/WorldModelDebris remain unported. Original Amount byte conversion retained as world-only diagnostic metadata.",
+      "kind": "selective original game port",
+      "source_sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
+      "target_sha256": "bb318ff36d9a84173789358f482c6fff05b36e2ba9b7db74bd307e9c1d9b543c"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/DestructableBrush.h",
+      "target": "src/game/original/DestructableBrush.h",
+      "source_line_ranges": [
+        [
+          1,
+          53
+        ]
+      ],
+      "selection": "Selected original B2BaseClass inheritance, owned CDestructable, hit points/mass and brush flags; debris aggregate not imported.",
+      "kind": "selective original game port",
+      "source_sha256": "bb5e5d9ac30ea0a4036c75ebf85ac009e6075260caec08c865d8b4cf99fb56bf",
+      "target_sha256": "fd52f42aa1bafcc751595a7b323f167e7bfaf7c0623aa37ddba0c619efc0201f"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "target": "src/game/original/Destructable.cpp",
+      "source_line_ranges": [
+        [
+          39,
+          138
+        ],
+        [
+          152,
+          177
+        ],
+        [
+          254,
+          385
+        ],
+        [
+          395,
+          432
+        ],
+        [
+          564,
+          643
+        ],
+        [
+          682,
+          703
+        ],
+        [
+          712,
+          731
+        ],
+        [
+          936,
+          959
+        ]
+      ],
+      "selection": "Move existing player damage/list/resistance subset into a shared original file. Add property gates, per-update damage reset, KILL and named death-before-damage messages. Keep existing armor/health math; owned typed payloads, finite input, dead/reentry/live-sender guards replace unsafe message/lifetime assumptions. SpawnObject, impulses, full character reactions and metadata parity remain unimplemented.",
+      "kind": "selective original game port",
+      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "target_sha256": "2cd661f876ea121851b7a6ca3aff6bd67030fc242f694ca255fd40b85ec369d1"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.h",
+      "target": "src/game/original/Destructable.h",
+      "source_line_ranges": [
+        [
+          27,
+          96
+        ]
+      ],
+      "selection": "Shared selected aggregate state and hit-point setter, originally embedded in PlayerObj in the M2 player increment.",
+      "kind": "selective original game port",
+      "source_sha256": "00e289d9cca1594035c8f20d0d45a076009c765e2767ce545f22f16d33bfea45",
+      "target_sha256": "bf17c427bbe6ab16d2a6b3235346c88af3728c619c7875fe72d43d4b46dfc675"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          23,
+          37
+        ]
+      ],
+      "selection": "Original brush property registration/defaults in the typed inherited schema.",
+      "kind": "selective original game port",
+      "source_sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
+      "target_sha256": "8ab8924c28833b6e882a585b7f01675746482bf2e3d9c64f01c5a104b3a93d31"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Rotating.h",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          17,
+          37
+        ]
+      ],
+      "selection": "Original rotating property group/defaults; RotatingBrush AllowMarks override retained.",
+      "kind": "selective original game port",
+      "source_sha256": "82f6e56990cf12c049402ca72483db5c0b978529fbc0c5afa38deebdd6959414",
+      "target_sha256": "8ab8924c28833b6e882a585b7f01675746482bf2e3d9c64f01c5a104b3a93d31"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Debris.h",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          18,
+          37
+        ]
+      ],
+      "selection": "Authored debris properties retained for inspection; this does not import CDebris simulation or effects.",
+      "kind": "original schema only",
+      "source_sha256": "b6a8806d27622d462206b0871c0cc212763d2687a1001ef13441e9f7976e8725",
+      "target_sha256": "8ab8924c28833b6e882a585b7f01675746482bf2e3d9c64f01c5a104b3a93d31"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.h",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          27,
+          35
+        ]
+      ],
+      "selection": "Original damage/death/spawn property schema; unsupported gameplay branches reject rather than silently succeed.",
+      "kind": "selective original game port",
+      "source_sha256": "00e289d9cca1594035c8f20d0d45a076009c765e2767ce545f22f16d33bfea45",
+      "target_sha256": "8ab8924c28833b6e882a585b7f01675746482bf2e3d9c64f01c5a104b3a93d31"
+    },
+    {
+      "source": "sources/lithtech/runtime/shared/src/moveobject.cpp",
+      "target": "src/game/server_rotation.cpp",
+      "source_line_ranges": [
+        [
+          1719,
+          1861
+        ]
+      ],
+      "selection": "Later-generation RotateWorldModel rotates about current position without GOTHRUWORLD; informs extension of existing bounded solver for own-position rotation. No engine code imported; atomic blocking, subdivision and BoxPhysics remain replacement semantics.",
+      "kind": "cross-generation engine reference, not imported",
+      "source_sha256": "ab363eba59ebfd89865a1d5619ffb95a82c474c319adc8d89c921da63b2d79f9",
+      "target_sha256": "e2b99477b5269c443e488bbc63c6750801911bd44b41aeb5c94fe1c592b3af72"
+    }
+  ],
+  "adaptations": [
+    "Typed own-position angular requests retain the existing atomic replacement solver and budgets",
+    "Shared CDestructable extraction, checked KILL sender, damage reentry guard, deferred removal and copied trigger strings",
+    "Latest 32 owned destruction diagnostics; no CDebris/WorldModelDebris import, audio or FX playback",
+    "Pushable/gravity, explosive and SpawnObject brushes reject; missing/ambiguous models and old schemas remain failures",
+    "Rejected precreate is failed; only the explicit B2 difficulty/game-type marker is filtered",
+    "Generation-checked Brushes inspector and synthetic GPU platform/rider above external retail world"
+  ]
+}

@@ -1,5 +1,10 @@
 # Player USE and rotating doors
 
+> Extended by [BRUSH_CONTRACTS.md](BRUSH_CONTRACTS.md): RotatingBrush and
+> selected destructible brushes are connected. Earlier omissions/counts below
+> describe their previous increments; the full M2 gate remains open.
+
+
 This extends [TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md),
 [DOOR_CONTRACTS.md](DOOR_CONTRACTS.md) and
 [MOVEMENT_CONTRACTS.md](MOVEMENT_CONTRACTS.md). M2 remains open.

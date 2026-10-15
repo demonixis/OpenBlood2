@@ -6,50 +6,6 @@
 #include <algorithm>
 #include <cmath>
 
-DLink CDestructable::m_DestructableHead{};
-DDWORD CDestructable::m_dwNumDestructables = 0;
-CDestructable::CDestructable()
-{
-    if (m_dwNumDestructables == 0)
-        dl_TieOff(&m_DestructableHead);
-}
-CDestructable::~CDestructable()
-{
-    if (m_Link.m_pData && m_dwNumDestructables > 0)
-    {
-        dl_Remove(&m_Link);
-        --m_dwNumDestructables;
-    }
-}
-DBOOL CDestructable::Init(HOBJECT object, CInventoryMgr* inventory)
-{
-    if (!object || !BaseClass::GetServerDE())
-        return DFALSE;
-    m_hObject = object;
-    if (!m_Link.m_pData)
-    {
-        dl_Insert(&m_DestructableHead, &m_Link);
-        m_Link.m_pData = this;
-        ++m_dwNumDestructables;
-    }
-    m_pInventoryMgr = inventory;
-    return DTRUE;
-}
-void CDestructable::CalculateResistance(DBYTE value)
-{
-    if (value == 1)
-        m_fResistance = 1.20f;
-    else if (value == 2)
-        m_fResistance = 1.10f;
-    else if (value == 3)
-        m_fResistance = 1.0f;
-    else if (value == 4)
-        m_fResistance = 0.9f;
-    else if (value == 5)
-        m_fResistance = 0.8f;
-    else if (value >= 6)
-        m_fResistance = 0.7f;
-}
 CBaseCharacter::CBaseCharacter() : B2BaseClass(OT_MODEL)
 {
     AddAggregate(&m_damage);
@@ -434,52 +390,6 @@ DDWORD CPlayerObj::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
     return result;
 }
 
-// Selected ordinary normal/melee damage branch from Destructable.cpp. AI hit
-// limbs, damage impulses, powerups, triggers and death reactions are deferred.
-DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD message, HMESSAGEREAD read)
-{
-    if (message == OpenBlood2::damage_message)
-    {
-        OpenBlood2::Damage damage;
-        if (!BaseClass::GetServerDE()->ReadDamage(read, damage))
-            return 0;
-        if (!m_bGodMode && !m_bDead)
-        {
-            auto amount = damage.amount * m_fResistance;
-            if (damage.type == OpenBlood2::DamageType::Death)
-            {
-                m_fArmorPoints = 0;
-                amount = m_fHitPoints;
-            }
-            if (m_fArmorPoints > 0 && damage.type != OpenBlood2::DamageType::Suffocate)
-            {
-                const auto ratio = m_fArmorPoints <= 25    ? .3f
-                                   : m_fArmorPoints <= 50  ? .5f
-                                   : m_fArmorPoints <= 100 ? .7f
-                                   : m_fArmorPoints <= 150 ? .8f
-                                                           : .9f;
-                auto absorb = amount * ratio;
-                m_fArmorPoints -= absorb;
-                if (m_fArmorPoints < 0)
-                {
-                    absorb += m_fArmorPoints;
-                    m_fArmorPoints = 0;
-                }
-                amount -= absorb;
-            }
-            amount = std::max(amount, 0.0f);
-            m_fHitPoints -= amount;
-            m_fLastDamageAmount += amount;
-            last_damage = damage;
-            if (m_fHitPoints <= 0)
-            {
-                m_bDead = DTRUE;
-                m_fHitPoints = 0;
-            }
-        }
-    }
-    return Aggregate::ObjectMessageFn(owner, sender, message, read);
-}
 FireResult CPlayerObj::HandleWeaponFireMessage(const OpenBlood2::WeaponFire& request)
 {
     if (!m_hClient || !attributes_received || m_damage.IsDead() ||

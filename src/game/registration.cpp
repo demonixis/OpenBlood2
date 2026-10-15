@@ -5,6 +5,7 @@
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
 #include "game/original/PathPoint.h"
+#include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
 #include "game/original/SmellHint.h"
 #include "game/original/Trigger.h"
@@ -258,6 +259,53 @@ namespace OpenBlood2
                               {"ObjectActivate", false},
                               {"NamedObjectActivate", false},
                               {"Locked", false}}};
+        const ClassInfo destructable_brush{
+            "CDestructableBrush", &b2base, construct<CDestructableBrush>, []
+            {
+                std::vector<PropertySpec> p{{"Visible", true},
+                                            {"Solid", true},
+                                            {"Gravity", false},
+                                            {"DebrisStuff", std::int32_t(0), false},
+                                            {"HitPoints", 0.0f},
+                                            {"ObjectMass", 100.0f},
+                                            {"Destructable", true},
+                                            {"Pushable", false},
+                                            {"BoxPhysics", true},
+                                            {"AllowMarks", true},
+                                            {"FireThrough", false},
+                                            {"SurfaceType", std::int32_t(0)},
+                                            {"TriggerDestroyOnly", false},
+                                            {"CanDamage", true},
+                                            {"SpawnObjectVel", DVector{}},
+                                            {"Amount", std::int32_t(10)},
+                                            {"Scale", 1.0f},
+                                            {"ExplodeDamage", 100.0f},
+                                            {"DamageRadius", 200.0f}};
+                for (auto name : {"DamageTriggerTarget", "DamageTriggerMessage", "DeathTriggerTarget",
+                                  "DeathTriggerMessage", "SpawnObject", "CustomTexture", "CustomSound", "CustomModel"})
+                    p.push_back({name, std::string{}});
+                for (auto name : {"Stone", "Metal", "Wood", "Energy", "Glass", "Terrain", "Plastic", "Flesh", "Liquid",
+                                  "Exploding", "Custom"})
+                    p.push_back({name, false});
+                return p;
+            }()};
+        const ClassInfo rotating_brush{"RotatingBrush", &destructable_brush, construct<RotatingBrush>, []
+                                       {
+                                           std::vector<PropertySpec> p{{"RotatingStuff", std::int32_t(0), false},
+                                                                       {"AllowMarks", false},
+                                                                       {"StartOn", true},
+                                                                       {"SoundRadius", 1000.0f},
+                                                                       {"SpinUpSound", std::string{}},
+                                                                       {"BusySound", std::string{}},
+                                                                       {"SpinDownSound", std::string{}}};
+                                           for (auto axis : {"X", "Y", "Z"})
+                                           {
+                                               for (auto suffix : {"AxisRevTime", "AxisSpinUpTime", "AxisSpinDownTime"})
+                                                   p.push_back({std::string(axis) + suffix, 0.0f});
+                                               p.push_back({std::string(axis) + "RotateForward", true});
+                                           }
+                                           return p;
+                                       }()};
         const ClassInfo rotating_door{"RotatingDoor",
                                       &door,
                                       construct<RotatingDoor>,
@@ -321,7 +369,8 @@ namespace OpenBlood2
                objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
                objects.register_class(key_pickup) && objects.register_class(big_trigger) &&
                objects.register_class(toggle_trigger) && objects.register_class(door) &&
-               objects.register_class(rotating_door);
+               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+               objects.register_class(rotating_brush);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

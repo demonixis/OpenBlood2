@@ -1,5 +1,6 @@
 #pragma once
 #include "B2BaseClass.h"
+#include "Destructable.h"
 #include "InventoryMgr.h"
 #include "dlink.h"
 #include <array>
@@ -11,44 +12,6 @@
 // BaseCharacter, Destructable and InventoryMgr. See PLAYER_CONTRACTS.md and
 // M2_PLAYER_SOURCES.json. Inventory/vector weapons are selected separately;
 // locomotion and containers are selected separately; complete combat remains outside this port.
-class CDestructable : public Aggregate
-{
-  public:
-    CDestructable();
-    ~CDestructable() override;
-    DBOOL Init(HOBJECT, CInventoryMgr*);
-    void SetHitPoints(float hp)
-    {
-        m_fHitPoints = hp;
-        if (hp)
-            m_bDead = DFALSE;
-    }
-    void SetArmorPoints(float armor)
-    {
-        m_fArmorPoints = armor;
-    }
-    bool IsDead() const
-    {
-        return m_bDead != 0;
-    }
-    void CalculateResistance(DBYTE);
-    HOBJECT m_hObject = nullptr;
-    CInventoryMgr* m_pInventoryMgr = nullptr;
-    DLink m_Link{};
-    static DLink m_DestructableHead;
-    static DDWORD m_dwNumDestructables;
-    DBOOL m_bDead = DFALSE;
-    float m_fHitPoints = 1, m_fArmorPoints = 0, m_fMass = 1, m_fResistance = 1;
-    bool m_bGodMode = false;
-    float m_fLastDamageAmount = 0;
-    OpenBlood2::Damage last_damage;
-
-  protected:
-    DDWORD ObjectMessageFn(LPBASECLASS, HOBJECT, DDWORD, HMESSAGEREAD) override;
-
-  public:
-    float m_fMaxHitPoints = 1, m_fMaxMegaHitPoints = 1, m_fMaxArmorPoints = 1, m_fMaxNecroArmorPoints = 1;
-};
 class CBaseCharacter : public B2BaseClass
 {
   public:

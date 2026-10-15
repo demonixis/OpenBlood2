@@ -1,5 +1,10 @@
 # Original Inventory and Vector Weapon Boundary
 
+> Extended by [BRUSH_CONTRACTS.md](BRUSH_CONTRACTS.md): RotatingBrush and
+> selected destructible brushes are connected. Earlier omissions/counts below
+> describe their previous increments; the full M2 gate remains open.
+
+
 > Key inventory, pickup and query messages are extended by
 > [TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md); prior key/pickup omissions below
 > describe their earlier increment. General item/combat coverage remains pending.

@@ -57,3 +57,14 @@ Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentatio
   atomic, player push velocity consumed once and contact removal deferred.
   Conservative bounds/work limits must remain visible; this is not verified
   retail physics. Other movers, crushing and complete gameplay remain pending.
+
+The latest [brush evidence](../Documentation/Implementation/M2_BRUSHES.md) connects original RotatingBrush/Rotating
+and selected CDestructableBrush damage/removal. Read [brush contracts](docs/BRUSH_CONTRACTS.md) before extending
+rotators, shared CDestructable, brush destruction or debris. Preserve source
+zero-based initial angles, elapsed-time restart, per-axis ramps and distinct
+CanDamage/Destructable gates. Keep atomic motion, reentrant damage guards and
+deferred removal. CDebris/WorldModelDebris remain unported; diagnostic requests
+are not FX. Pushable/gravity, explosive and SpawnObject brushes reject creation.
+SubwayA now has 141 created source entries, 7 owned SelfTriggers, 372 editor-only
+and 67 unported entries. Precreate rejection is a failure, not difficulty
+filtering. Other movers and complete gameplay remain pending; M2 is open.

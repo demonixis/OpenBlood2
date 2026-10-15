@@ -34,6 +34,8 @@ namespace OpenBlood2
         ServerAdapter& operator=(const ServerAdapter&) = delete;
         bool bind();
         bool IsObjectAlive(HOBJECT) override;
+        void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE) override;
+        std::vector<BrushDestruction> brush_destructions; // Latest 32, reset on unload.
         DRESULT WriteKeyMessage(HMESSAGEWRITE, const KeyMessage&) override;
         bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
         MoverResult MoveWorldModel(HOBJECT, DVector destination) override;
@@ -48,6 +50,7 @@ namespace OpenBlood2
         void reset_world_time()
         {
             world_time_origin_ = objects_.time();
+            brush_destructions.clear();
         }
         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
         bool GetMovementState(HOBJECT, MovementState&) override;

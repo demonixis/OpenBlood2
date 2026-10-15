@@ -1,0 +1,159 @@
+// Selected shared damage/lifetime and brush trigger branches; see M2_BRUSH_SOURCES.json.
+#include "Destructable.h"
+#include "engine/objects.h"
+#include "trigger_helpers.h"
+#include <algorithm>
+DLink CDestructable::m_DestructableHead{};
+DDWORD CDestructable::m_dwNumDestructables = 0;
+CDestructable::CDestructable()
+{
+    if (m_dwNumDestructables == 0)
+        dl_TieOff(&m_DestructableHead);
+}
+CDestructable::~CDestructable()
+{
+    if (m_Link.m_pData && m_dwNumDestructables > 0)
+    {
+        dl_Remove(&m_Link);
+        --m_dwNumDestructables;
+    }
+}
+DBOOL CDestructable::Init(HOBJECT object, CInventoryMgr* inventory)
+{
+    if (!object || !BaseClass::GetServerDE())
+        return DFALSE;
+    m_hObject = object;
+    if (!m_Link.m_pData)
+    {
+        dl_Insert(&m_DestructableHead, &m_Link);
+        m_Link.m_pData = this;
+        ++m_dwNumDestructables;
+    }
+    m_pInventoryMgr = inventory;
+    return DTRUE;
+}
+void CDestructable::CalculateResistance(DBYTE value)
+{
+    if (value == 1)
+        m_fResistance = 1.20f;
+    else if (value == 2)
+        m_fResistance = 1.10f;
+    else if (value == 3)
+        m_fResistance = 1.0f;
+    else if (value == 4)
+        m_fResistance = 0.9f;
+    else if (value == 5)
+        m_fResistance = 0.8f;
+    else if (value >= 6)
+        m_fResistance = 0.7f;
+}
+
+DDWORD CDestructable::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* data, DFLOAT reason)
+{
+    if (message == MID_PRECREATE && (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP))
+    {
+        auto* server = BaseClass::GetServerDE();
+        GenericProp prop;
+        auto text = [&](const char* key, std::string& value)
+        {
+            if (server->GetPropGeneric(key, &prop) == DE_OK)
+                value = prop.m_String;
+        };
+        text("DamageTriggerTarget", damage_target);
+        text("DamageTriggerMessage", damage_message);
+        text("DeathTriggerTarget", death_target);
+        text("DeathTriggerMessage", death_message);
+        if (server->GetPropGeneric("CanDamage", &prop) == DE_OK)
+            can_damage = prop.m_Bool != 0;
+        if (server->GetPropGeneric("TriggerDestroyOnly", &prop) == DE_OK)
+            trigger_only = prop.m_Bool != 0;
+    }
+    if (message == MID_UPDATE)
+        m_fLastDamageAmount = 0; // Original per-update accumulator.
+    return Aggregate::EngineMessageFn(owner, message, data, reason);
+}
+void CDestructable::SendTrigger(const std::string& target, const std::string& message)
+{
+    auto* server = BaseClass::GetServerDE();
+    if (target.empty() || !server->IsObjectAlive(m_hObject))
+        return;
+    auto name = server->CreateString(target.c_str());
+    auto text = server->CreateString(message.c_str());
+    SendTriggerMsgToObjects(server->HandleToObject(m_hObject), name, text);
+    if (name)
+        server->FreeString(name);
+    if (text)
+        server->FreeString(text);
+}
+// Selected ordinary normal/melee damage branch from Destructable.cpp. AI hit
+// limbs, damage impulses, powerups and complete character death reactions are deferred.
+DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD message, HMESSAGEREAD read)
+{
+    if (message == 1000)
+    {
+        auto* server = BaseClass::GetServerDE();
+        auto text = server->ReadFromMessageHString(read);
+        const auto* raw = text ? server->GetStringData(text) : nullptr;
+        if (raw && !OpenBlood2::CaseLess{}(raw, "KILL") && !OpenBlood2::CaseLess{}("KILL", raw) &&
+            server->IsObjectAlive(sender) && !handling_damage)
+        {
+            auto output =
+                server->StartMessageToObject(server->HandleToObject(sender), m_hObject, OpenBlood2::damage_message);
+            OpenBlood2::Damage value{{}, {}, 1, OpenBlood2::DamageType::Death, sender};
+            if (output)
+            {
+                server->WriteDamage(output, value);
+                server->EndMessage(output);
+            }
+        }
+        if (text)
+            server->FreeString(text);
+    }
+    if (message == OpenBlood2::damage_message)
+    {
+        OpenBlood2::Damage damage;
+        if (!BaseClass::GetServerDE()->ReadDamage(read, damage))
+            return 0;
+        if (!m_bGodMode && !m_bDead && can_damage && !handling_damage &&
+            (!trigger_only || damage.type == OpenBlood2::DamageType::Death))
+        {
+            handling_damage = true;
+            auto amount = damage.amount * m_fResistance;
+            if (damage.type == OpenBlood2::DamageType::Death)
+            {
+                m_fArmorPoints = 0;
+                amount = m_fHitPoints;
+            }
+            if (m_fArmorPoints > 0 && damage.type != OpenBlood2::DamageType::Suffocate)
+            {
+                const auto ratio = m_fArmorPoints <= 25    ? .3f
+                                   : m_fArmorPoints <= 50  ? .5f
+                                   : m_fArmorPoints <= 100 ? .7f
+                                   : m_fArmorPoints <= 150 ? .8f
+                                                           : .9f;
+                auto absorb = amount * ratio;
+                m_fArmorPoints -= absorb;
+                if (m_fArmorPoints < 0)
+                {
+                    absorb += m_fArmorPoints;
+                    m_fArmorPoints = 0;
+                }
+                amount -= absorb;
+            }
+            amount = std::max(amount, 0.0f);
+            m_fHitPoints -= amount;
+            m_fLastDamageAmount += amount;
+            last_damage = damage;
+            if (m_fHitPoints <= 0)
+            {
+                m_bDead = DTRUE;
+                m_fHitPoints = 0;
+                SendTrigger(death_target, death_message);
+            }
+            if (BaseClass::GetServerDE()->IsObjectAlive(m_hObject))
+                SendTrigger(damage_target, damage_message);
+            handling_damage = false;
+        }
+    }
+    return Aggregate::ObjectMessageFn(owner, sender, message, read);
+}

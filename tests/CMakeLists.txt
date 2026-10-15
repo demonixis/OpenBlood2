@@ -107,7 +107,8 @@ foreach(case IN ITEMS inventory segments firing melee damage animation lifetime 
 endforeach()
 if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME weapons.private COMMAND weapon_tests private "${BLOOD2_TEST_DATA_DIR}")
-    set_tests_properties(weapons.private PROPERTIES LABELS "headless;weapons;private" TIMEOUT 30)
+    # Three retail reloads / 4,140 simulation frames with the expanded brush scene.
+    set_tests_properties(weapons.private PROPERTIES LABELS "headless;weapons;private" TIMEOUT 90)
 endif()
 
 if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
@@ -223,4 +224,22 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
     add_test(NAME gpu.interaction COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
         --data-dir "${BLOOD2_TEST_DATA_DIR}" --interaction-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/interaction.png")
     set_tests_properties(gpu.interaction PROPERTIES LABELS "private;gpu;interaction" TIMEOUT 30 RUN_SERIAL TRUE)
+endif()
+
+add_executable(brush_tests brush_tests.cpp)
+target_link_libraries(brush_tests PRIVATE blood2_game)
+blood2_project_options(brush_tests)
+foreach(case IN ITEMS state spin geometry limits transport destruction lifetime)
+    add_test(NAME brushes.${case} COMMAND brush_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/brush-fixtures/${case}")
+    set_tests_properties(brushes.${case} PROPERTIES LABELS "headless;brushes" TIMEOUT 30)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME brushes.catalog COMMAND brush_tests catalog "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(brushes.catalog PROPERTIES LABELS "headless;private;brushes" TIMEOUT 90)
+endif()
+
+if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+    add_test(NAME gpu.brushes COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+        --data-dir "${BLOOD2_TEST_DATA_DIR}" --brushes-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/brushes.png")
+    set_tests_properties(gpu.brushes PROPERTIES LABELS "private;gpu;brushes" TIMEOUT 30 RUN_SERIAL TRUE)
 endif()

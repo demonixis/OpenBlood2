@@ -13,7 +13,7 @@ namespace OpenBlood2
             !physics_vector(move.from_angles) || !physics_vector(move.to_angles) ||
             !physics_vector(move.original_position) || !physics_vector(move.pivot))
             return MoverResult::Invalid;
-        if (!collision_ready || !collision || !(mover->state.m_Flags & FLAG_GOTHRUWORLD))
+        if (!collision_ready || !collision)
             return MoverResult::Unavailable;
         const auto from_rotation = rotation_from_euler(move.from_angles);
         const auto alignment = std::abs(vector_dot(from_rotation.m_Vec, mover->state.m_Rotation.m_Vec) +
@@ -24,6 +24,11 @@ namespace OpenBlood2
         const auto arm = vector_subtract(move.original_position, move.pivot);
         const auto residual =
             vector_subtract(mover->state.m_Pos, vector_add(move.pivot, rotate_vector(arm, from_rotation)));
+        // Source RotateObject rotates a world model about its own position;
+        // it does not require Door's translation-only GOTHRUWORLD flag.
+        if (!(mover->state.m_Flags & FLAG_GOTHRUWORLD) &&
+            (vector_dot(arm, arm) != 0 || vector_dot(residual, residual) != 0))
+            return MoverResult::Unavailable;
         auto length = [](DVector v) { return std::sqrt(vector_dot(v, v)); };
         float radius = 0;
         const auto& base = *mover->world_model_base;

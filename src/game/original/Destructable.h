@@ -1,0 +1,48 @@
+#pragma once
+#include "cpp_aggregate_de.h"
+#include "dlink.h"
+#include "game/weapon_messages.h"
+#include <string>
+class CInventoryMgr;
+class CDestructable : public Aggregate
+{
+  public:
+    CDestructable();
+    ~CDestructable() override;
+    DBOOL Init(HOBJECT, CInventoryMgr* = nullptr);
+    void SetHitPoints(float hp)
+    {
+        m_fHitPoints = hp;
+        if (hp)
+            m_bDead = DFALSE;
+    }
+    void SetArmorPoints(float armor)
+    {
+        m_fArmorPoints = armor;
+    }
+    bool IsDead() const
+    {
+        return m_bDead != 0;
+    }
+    void CalculateResistance(DBYTE);
+    HOBJECT m_hObject = nullptr;
+    CInventoryMgr* m_pInventoryMgr = nullptr;
+    DLink m_Link{};
+    static DLink m_DestructableHead;
+    static DDWORD m_dwNumDestructables;
+    DBOOL m_bDead = DFALSE;
+    float m_fHitPoints = 1, m_fArmorPoints = 0, m_fMass = 1, m_fResistance = 1;
+    bool m_bGodMode = false;
+    float m_fLastDamageAmount = 0;
+    OpenBlood2::Damage last_damage;
+    bool can_damage = true, trigger_only = false, handling_damage = false;
+    std::string damage_target, damage_message, death_target, death_message;
+    void SendTrigger(const std::string& target, const std::string& message);
+
+  protected:
+    DDWORD EngineMessageFn(LPBASECLASS, DDWORD, void*, DFLOAT) override;
+    DDWORD ObjectMessageFn(LPBASECLASS, HOBJECT, DDWORD, HMESSAGEREAD) override;
+
+  public:
+    float m_fMaxHitPoints = 1, m_fMaxMegaHitPoints = 1, m_fMaxArmorPoints = 1, m_fMaxNecroArmorPoints = 1;
+};

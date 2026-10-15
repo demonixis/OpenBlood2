@@ -40,7 +40,9 @@ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original
     src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
 target_link_libraries(blood2_game PUBLIC engine)
 
-add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp)
+target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+    src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp)
+add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp)
 set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
 target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
