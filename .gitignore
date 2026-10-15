@@ -1,0 +1,8 @@
+/build/
+/.cache/
+/CMakeUserPresets.json
+/blood2.local.ini
+/imgui.ini
+*.rez
+*.REZ
+

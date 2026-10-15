@@ -1,0 +1,48 @@
+#pragma once
+
+#include <cstdint>
+#include <filesystem>
+#include <span>
+#include <string>
+#include <string_view>
+#include <vector>
+
+namespace blood2 {
+
+struct Options {
+    std::filesystem::path config_file = "blood2.local.ini";
+    std::filesystem::path data_dir;
+    std::filesystem::path capture_file;
+    std::uint32_t frame_limit = 0;
+    bool explicit_config = false;
+    bool help = false;
+    bool check_data = false;
+    bool inspector = true;
+    bool gpu_smoke = false;
+};
+
+struct Config {
+    std::filesystem::path data_dir;
+    std::string source;
+};
+
+struct ArchiveStatus {
+    std::string name;
+    bool required = false;
+    bool present = false;
+    std::uintmax_t bytes = 0;
+};
+
+struct DataStatus {
+    std::vector<ArchiveStatus> archives;
+    std::string readme_version;
+};
+
+std::string path_text(const std::filesystem::path& path);
+std::filesystem::path path_from_utf8(std::string_view text);
+bool parse_options(std::span<const std::string_view> args, Options& options, std::string& error);
+bool load_config(const Options& options, std::string_view environment_data_dir, Config& config, std::string& error);
+// Checks file presence/readability only. Does not parse or mount an archive.
+bool inspect_data(const Config& config, DataStatus& data, std::string& error);
+
+}

@@ -1,0 +1,133 @@
+{
+  "donor_repository": "sources/blood2",
+  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "ObjectDLL/B2BaseClass.h",
+      "source_sha256": "84111c05cfb1e60b6df2a1cc0d1ce4a55df9a44dc485c8eefd311c3936931268",
+      "target": "src/game/original/B2BaseClass.h",
+      "target_sha256": "22c12e53b50deaafd2a6cd5375992a059c0e5fc38deb7887dea83bc39a13bb0b",
+      "selection": "complete file",
+      "selected_lf_sha256": "22c12e53b50deaafd2a6cd5375992a059c0e5fc38deb7887dea83bc39a13bb0b"
+    },
+    {
+      "source": "ObjectDLL/B2BaseClass.cpp",
+      "source_sha256": "bad14ecb54c1b62d82fa66265ba0819fa845ccd9db583e329329c60a86b05ccc",
+      "target": "src/game/original/B2BaseClass.cpp",
+      "target_sha256": "82b231210d96e2a353def126f0127ca38cb909c8fd1fd1198ae307a5f89d288c",
+      "selection": "complete file",
+      "selected_lf_sha256": "0ba57de82459b0d7de97c93e53d55cb32ac05b6743efa271d8fc3c2b5944aa13"
+    },
+    {
+      "source": "ObjectDLL/CameraSpot.h",
+      "source_sha256": "95ac469ac8c217cd9363dd433fd28273db8440fb47e39a42e480476f9db0a0d6",
+      "target": "src/game/original/CameraSpot.h",
+      "target_sha256": "f97ef1418326267916e6ad1e893071276363f02d0c6c2b5302642a888a263ba3",
+      "selection": "complete file",
+      "selected_lf_sha256": "4073c04003b949d47e1c3aeda16a28ee127ecff776305aeb2755b3a02fc5bad1"
+    },
+    {
+      "source": "ObjectDLL/CameraSpot.cpp",
+      "source_sha256": "695407422c202fd62793e543dff65fc348fc137a998fb044471a14a5a3a2e678",
+      "target": "src/game/original/CameraSpot.cpp",
+      "target_sha256": "1f73494789bc5d1201e5ba4deb4d7e02d36038ee5d2e84a6efe6666b8640352d",
+      "selection": "complete file",
+      "selected_lf_sha256": "d6a1a0b8aeeef8e079b316a503f9b937d31082f3b6bd6a53c4ebea8c5c01df75"
+    },
+    {
+      "source": "ObjectDLL/Key.h",
+      "source_sha256": "a154456f4925805f85b884a1ab1d987a7b871ae5cc1b4def22e1395d6213e1c5",
+      "target": "src/game/original/Key.h",
+      "target_sha256": "918bdfe6f43a01a80c69afb57e050327b10ee2d0effc393a7035cc75529807ca",
+      "selection": "complete file",
+      "selected_lf_sha256": "918bdfe6f43a01a80c69afb57e050327b10ee2d0effc393a7035cc75529807ca"
+    },
+    {
+      "source": "ObjectDLL/Key.cpp",
+      "source_sha256": "cada0f4e93f477e5831b7d079ed1bbc0adb6aa1edcb61d9a07cb0096697e49cd",
+      "target": "src/game/original/Key.cpp",
+      "target_sha256": "4abf583d720a8d9f520873e46f910e0012a0ad69c6c43d8a503ab80a51d7523b",
+      "selection": "complete file",
+      "selected_lf_sha256": "b580c39d38d73042f4d1512da82d784224315dc5b3130bc4c29e3f25f457e7fd"
+    },
+    {
+      "source": "AppHeaders/cpp_engineobjects_de.h",
+      "source_sha256": "f4b59f4e7fb11c0704a23ab4144aa06d90b6e55c584173da2f291b22045ee10b",
+      "target": "src/game/legacy/cpp_engineobjects_de.h",
+      "target_sha256": "916529c32e971e0537329a871b2cefce16a49a7c0329126ddc219b4b6e6cbe7b",
+      "selection": "complete file",
+      "selected_lf_sha256": "18adf5371bd23cc9b92c6b4d809668dc6ec774e2e1aa0fdac4e76f7cfee7ac8c"
+    },
+    {
+      "source": "AppHeaders/cpp_aggregate_de.h",
+      "source_sha256": "ad224619b3135ad2766a55f74255d85b2df31c5f52b65186e0c089e11e8bb7bf",
+      "target": "src/game/legacy/cpp_aggregate_de.h",
+      "target_sha256": "6968a508ffc2243d28300fe28454388a9575158cabfbb8dd925737fbc3f8fda7",
+      "selection": "complete file",
+      "selected_lf_sha256": "33220229e95eda101471f748b3b71ff6c3402336dd5515a810344fb8ca22152d"
+    },
+    {
+      "source": "AppHeaders/engineobjects_de.h",
+      "source_sha256": "e55de459facec9c89db57ba6749933302dc63f2264f920e2a97958a7453f536c",
+      "target": "src/game/legacy/engineobjects_de.h",
+      "target_sha256": "dfc89c48e2daa2b216bc046407dfaff8482877e743ea1d5e4d7238c74af5dfea",
+      "selection": "complete file",
+      "selected_lf_sha256": "dfc89c48e2daa2b216bc046407dfaff8482877e743ea1d5e4d7238c74af5dfea"
+    },
+    {
+      "source": "AppHeaders/cpp_server_de.h",
+      "source_sha256": "1bfb7e130fc65220b6b5ebd4e80999868c25996df9c9072cb975f4889d214959",
+      "target": "src/game/legacy/cpp_server_de.h",
+      "target_sha256": "0ddc661ef1102d19211fbcbba3e4c786e753ffeab9cbcbed4d8477c5d763f4e3",
+      "selection": "complete file",
+      "selected_lf_sha256": "0ddc661ef1102d19211fbcbba3e4c786e753ffeab9cbcbed4d8477c5d763f4e3"
+    },
+    {
+      "source": "AppHeaders/engineobjects.c",
+      "source_sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
+      "target": "src/game/original/engineobjects.cpp",
+      "target_sha256": "9bd7d4094163e9ed778e0ed4d304b55603ebac4d8729f37a7873ea6920c683bb",
+      "selection": "bc_* function prefix before COMPILE_WITH_C",
+      "selected_lf_sha256": "870bb4e7f609898781c5feacc5c702eb010084c064580f2af96f6583c5f83a1a"
+    }
+  ],
+  "subset_declaration_and_constant_sources": [
+    {
+      "source": "AppHeaders/basedefs_de.h",
+      "sha256": "10f543764aa94339f2e48edcba384dda3cdce2d738f0be2731dcff3a1117fb72"
+    },
+    {
+      "source": "AppHeaders/basetypes_de.h",
+      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141"
+    },
+    {
+      "source": "AppHeaders/de_codes.h",
+      "sha256": "75c0fda0c3ea746ff91d05354c7d177d97bbdccb95a22b6955c51d6592f9e21e"
+    },
+    {
+      "source": "AppHeaders/serverobj_de.h",
+      "sha256": "e29c864dcac89d88076264a67196d7a6191ebacecc339e57466d19781885eeb4"
+    },
+    {
+      "source": "AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945"
+    },
+    {
+      "source": "AppHeaders/CSBase.h",
+      "sha256": "e07e05c7a94ae38c68329293ed3d45a8ad4361c805b6471aaff07ca7a597610b"
+    },
+    {
+      "source": "Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b"
+    },
+    {
+      "source": "Shared/NetDefs.h",
+      "sha256": "5e48903116b62be6d306b43400d8b663dd28e33162746a703b10d6322263fdf4"
+    },
+    {
+      "source": "ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed"
+    }
+  ],
+  "scope": "M1 source subset; no retail ABI compatibility, no prototype imports"
+}
