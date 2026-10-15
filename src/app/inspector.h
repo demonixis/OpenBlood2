@@ -21,6 +21,9 @@ namespace OpenBlood2
         ObjectId trigger_selection{}, trigger_request{};
         std::string trigger_command;
         bool grant_key_request = false;
+        bool select_objectives = false;
+        ObjectId objective_selection{};
+        void draw_objectives(GameSession&, ObjectSelection&);
         bool select_pickups = false;
         ObjectId pickup_selection{};
         void draw_pickups(GameSession&, ObjectSelection&);

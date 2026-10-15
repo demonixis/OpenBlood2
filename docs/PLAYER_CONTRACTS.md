@@ -1,5 +1,9 @@
 # Original Player Entry Boundary
 
+> Extended by [objective contracts](OBJECTIVES_CONTRACTS.md): original mission
+> objective broadcasts and external localized client strings are connected.
+> Other localization/audio/HUD and full M2 acceptance remain pending.
+
 > Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
 > are connected with bounded atomic collision. Earlier omissions below describe
 > their previous increments; the full M2 gate remains open.

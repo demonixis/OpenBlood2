@@ -74,5 +74,11 @@ namespace OpenBlood2
     {
         float health = 0, armor = 0, bullets = 0;
     };
-    using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats>;
+    struct MissionObjectives
+    {
+        std::uint32_t resource = 0;
+        std::string title, text;
+    };
+    using PlayerEvent =
+        std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats, MissionObjectives>;
 } // namespace OpenBlood2

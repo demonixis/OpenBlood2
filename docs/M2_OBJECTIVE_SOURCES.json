@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-15",
+  "status": "M2 incomplete; original mission objectives and portable external client strings",
+  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectivesTrigger.cpp",
+      "target": "src/game/original/ObjectivesTrigger.cpp",
+      "source_line_ranges": [
+        [
+          19,
+          60
+        ],
+        [
+          112,
+          141
+        ],
+        [
+          153,
+          210
+        ]
+      ],
+      "selection": "Original inherited callback chain, world/string precreate, properties and SendMessages title/text guard, broadcast then sound request. Owned strings and typed client messages replace HSTRING/packet ownership; checked bounded resource IDs and inspectable queue results. Save/load and actual sound playback remain pending.",
+      "source_sha256": "ab2cbe3aec05230e24704721cea12671be726c1fc42a207eaa08cadc09eef770",
+      "target_sha256": "7a4befd4945aca6b1aec8ffda25679b15241cf7199baf459a600d35d2c2faf69"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectivesTrigger.cpp",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          19,
+          60
+        ]
+      ],
+      "selection": "Original objective defaults and ancestry; hidden inherited target/delay defaults already supplied by Trigger. Default title/text/sound retained.",
+      "source_sha256": "ab2cbe3aec05230e24704721cea12671be726c1fc42a207eaa08cadc09eef770",
+      "target_sha256": "8637fde13a471c107d77bfca0cd654d4fdbaf16e5304c29d98898837f97f263f"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectivesTrigger.h",
+      "target": "src/game/original/ObjectivesTrigger.h",
+      "source_line_ranges": [
+        [
+          15,
+          41
+        ]
+      ],
+      "selection": "Source class ancestry and callback override, with owned mission payload and inspection counters; no serialization ABI.",
+      "source_sha256": "884e52b008766165a37810a8b2b764e78e417e29b72be1b21cc688ecc164a616",
+      "target_sha256": "b0d3f74fe2d49959eda274d5dee7b06802f6b40ff094a8a84bfc5dfca747f33f"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "target": "src/game/original/BloodShells.cpp",
+      "source_line_ranges": [
+        [
+          1719,
+          1730
+        ],
+        [
+          4479,
+          4513
+        ]
+      ],
+      "selection": "Selected world-entry objective cleanup and SMSG_OBJECTIVES single/custom branch; resource IDs override authored text, previous text replaced. Lookup is typed and reports unresolved state; original status-bar update remains pending. Exit clears state defensively.",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "target_sha256": "e5391902773b178a3d8732b518ca0146223a579238d1d244566a6903e17602b8"
+    },
+    {
+      "source": "sources/blood2/Shared/ClientRes.h",
+      "target": "src/game/original/BloodShells.cpp",
+      "source_line_ranges": [
+        [
+          747,
+          747
+        ],
+        [
+          823,
+          823
+        ]
+      ],
+      "selection": "Original numeric objective title/text base IDs 5000/6000, lookup without printf-format arguments.",
+      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
+      "target_sha256": "e5391902773b178a3d8732b518ca0146223a579238d1d244566a6903e17602b8"
+    }
+  ],
+  "adaptations": [
+    "Value-owned typed local broadcast through the existing bounded associated-client queue; no packet or old DLL ABI",
+    "Negative/overflow IDs and oversized or NUL-containing strings reject; queue failure and missing resources are visible",
+    "Portable bounded PE reader parses external cres.dll data without executing it; selected archive follows existing REZ precedence",
+    "Cached exact strings reset on unload; default language requires a unique string-table language; no silent authored-text fallback",
+    "Original sound requests counted but not played; original HUD/status bar and save/load remain pending",
+    "Inspector displays source objects and actual client state; diagnostic smoke explicitly rearms the authored trigger when needed"
+  ]
+}

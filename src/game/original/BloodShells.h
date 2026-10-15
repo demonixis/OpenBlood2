@@ -61,6 +61,10 @@ class CBloodClientShell
     OpenBlood2::PlayerStats stats;
     std::uint64_t messages = 0, updates = 0;
     std::string blocker;
+    OpenBlood2::MissionObjectives objectives;
+    std::string objectives_error;
+    std::uint64_t objective_messages = 0;
+    bool objectives_resolved = false;
 
   private:
     bool InitSinglePlayer(CBloodServerShell&);

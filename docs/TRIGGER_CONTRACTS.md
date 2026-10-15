@@ -1,5 +1,9 @@
 # Original triggers, door SelfTrigger and keys
 
+> Extended by [objective contracts](OBJECTIVES_CONTRACTS.md): original mission
+> objective broadcasts and external localized client strings are connected.
+> Other localization/audio/HUD and full M2 acceptance remain pending.
+
 > Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
 > pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
 

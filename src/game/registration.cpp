@@ -5,6 +5,7 @@
 #include "game/original/GameStartPoint.h"
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
+#include "game/original/ObjectivesTrigger.h"
 #include "game/original/PathPoint.h"
 #include "game/original/PowerupPickups.h"
 #include "game/original/RotatingBrush.h"
@@ -235,6 +236,17 @@ namespace OpenBlood2
                 }
                 return properties;
             }()};
+        const ClassInfo objectives_trigger{
+            "ObjectivesTrigger",
+            &trigger,
+            construct<ObjectivesTrigger>,
+            {{"ResourceNum", std::int32_t(0)},
+             {"TitleToDisplay", std::string("Objective #1:"), true, MAX_GP_STRING_LEN},
+             {"TextToDisplay", std::string("Use the '|' character to force a line break..."), true, MAX_GP_STRING_LEN},
+             {"Sound", std::string("Sounds\\Thunder.wav")},
+             {"TouchActivate", false},
+             {"AIActivate", false},
+             {"TriggerRelayActivate", false}}};
         const ClassInfo big_trigger{"BigTrigger", &trigger, construct<BigTrigger>, {}};
         const ClassInfo toggle_trigger{"ToggleTrigger", &trigger, construct<ToggleTrigger>, []
                                        {
@@ -398,9 +410,10 @@ namespace OpenBlood2
                objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
                objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
                objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
-               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
-               objects.register_class(door) && objects.register_class(rotating_door) &&
-               objects.register_class(destructable_brush) && objects.register_class(rotating_brush);
+               objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
+               objects.register_class(toggle_trigger) && objects.register_class(door) &&
+               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+               objects.register_class(rotating_brush);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

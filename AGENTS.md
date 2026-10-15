@@ -95,3 +95,12 @@ normal/bonus caps, dead-player guards, independent child lifetime, death-trigger
 ordering and deferred removal. Earlier blanket SpawnObject/pickup omissions are
 superseded for this subset. Remaining inventory items, timed bonuses, old TypeAction
 schemas, audio/FX and full M2 gameplay remain pending.
+
+The latest [objective evidence](../Documentation/Implementation/M2_OBJECTIVES.md) connects original ObjectivesTrigger,
+typed client delivery and external cres.dll strings. Read [objective contracts](docs/OBJECTIVES_CONTRACTS.md)
+before extending objectives, localization or client broadcasts. Preserve the
+nonempty authored-string guard, resource-ID precedence, original game-mode filter,
+owned bounded queue and explicit unresolved state. The PE reader executes no code;
+ambiguous languages and malformed resources fail. SubwayA now has 142 created
+source entries, 7 owned SelfTriggers, 372 editor-only and 66 unported. HUD/audio,
+transitions and complete M2 acceptance remain pending.

@@ -498,6 +498,12 @@ namespace OpenBlood2
                     draw_triggers(game, selection);
                     ImGui::EndTabItem();
                 }
+                if (ImGui::BeginTabItem("Objectives", nullptr, select_objectives ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_objectives = false;
+                    draw_objectives(game, selection);
+                    ImGui::EndTabItem();
+                }
                 if (ImGui::BeginTabItem("Pickups", nullptr, select_pickups ? ImGuiTabItemFlags_SetSelected : 0))
                 {
                     select_pickups = false;

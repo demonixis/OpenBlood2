@@ -2,6 +2,7 @@
 #include "engine/collision.h"
 #include "engine/model_store.h"
 #include "engine/objects.h"
+#include "engine/string_resources.h"
 #include "game/original/BloodShells.h"
 #include "game/session.h"
 #include <array>
@@ -68,6 +69,9 @@ namespace OpenBlood2
             explosion_effects.clear();
             spawn_reports.clear();
             pickup_reports.clear();
+            client_strings = {};
+            client_strings_error.clear();
+            client_strings_attempted = false;
         }
         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
@@ -84,6 +88,12 @@ namespace OpenBlood2
         }
         HOBJECT GetClientUserData(HCLIENT) override;
         DRESULT SetClientUserData(HCLIENT, HOBJECT) override;
+        const Resources* client_resources = nullptr;
+        StringResources client_strings;
+        std::string client_strings_error;
+        bool client_strings_attempted = false;
+        DRESULT SendObjectives(const MissionObjectives&) override;
+        bool GetClientResourceString(std::uint32_t, std::string&) override;
         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
         DRESULT SetModelFilenames(HOBJECT, const char*, const char*) override;
         DRESULT GetObjectDims(HOBJECT, DVector*) override;
@@ -262,6 +272,7 @@ namespace OpenBlood2
             objects.models = &models;
             objects.world = &world;
             server.collision = &collision;
+            server.client_resources = &resources;
             return server.bind() && register_original_classes(objects);
         }
         HOBJECT create_example(std::string_view class_name);

@@ -57,6 +57,8 @@ class ServerDE : public CSBase
     // raw C++ pointer whose lifetime can outlive its object.
     virtual HOBJECT GetClientUserData(HCLIENT) = 0;
     virtual DRESULT SetClientUserData(HCLIENT, HOBJECT) = 0;
+    virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
+    virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;
     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;
     virtual DRESULT SetModelFilenames(HOBJECT, const char*, const char*) = 0;
     virtual DRESULT GetObjectDims(HOBJECT, DVector*) = 0;

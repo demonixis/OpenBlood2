@@ -65,7 +65,7 @@ ctest --preset debug
 ctest --preset debug -L world
 ```
 
-There are **130 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases, 6 door/mover/collision/lifetime cases, 8 trigger/key/ownership/contact cases, 9 USE/rotation/input/transport cases, 7 brush/ramp/damage/lifetime cases and 8 debris/explosion/radius/chain/lifetime cases and 10 pushable/physics/priority/rider cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
+There are **145 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases, 6 door/mover/collision/lifetime cases, 8 trigger/key/ownership/contact cases, 9 USE/rotation/input/transport cases, 7 brush/ramp/damage/lifetime cases and 8 debris/explosion/radius/chain/lifetime cases and 10 pushable/physics/priority/rider cases, 9 pickup/spawn cases and 6 objective/resource-string cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
 
 Enable installation-specific tests and real GPU windows explicitly:
 
@@ -75,7 +75,7 @@ cmake --build --preset debug --parallel
 ctest --preset debug
 ```
 
-The configured installation adds sixteen private headless tests and eleven GPU tests, for **157 cases**. GPU captures are `build/debug/tests/gpu.png` , `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png` `doors.png`, `triggers.png`, `interaction.png` and `brushes.png`. The ignored local presets enable these options:
+The configured installation adds eighteen private headless tests and thirteen GPU tests, for **176 cases**. GPU captures are `build/debug/tests/gpu.png`, `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png`, `doors.png`, `triggers.png`, `interaction.png`, `brushes.png`, `pickups.png` and `objectives.png`. The ignored local presets enable these options:
 
 ```sh
 cmake --preset local-debug
@@ -105,3 +105,12 @@ with clang-format 23.1.3 (a development tool, not a runtime dependency). Commit
 each completed implementation run with its tests and English documentation.
 
 The Pickups tab inspects all supported ammo/health/armor objects, including hidden/inactive or missing-resource entries, player pools/caps and the latest 32 pickup/spawn reports. Audio and pickup FX remain requests/metadata, not playback.
+
+## Mission objectives continuation
+
+[Latest evidence](../Documentation/Implementation/M2_OBJECTIVES.md) and
+[contracts](docs/OBJECTIVES_CONTRACTS.md) cover original ObjectivesTrigger,
+typed client broadcasts and bounded PE resource-string lookup from external
+cres.dll. The Objectives tab shows source objects, delivery/resolution state and
+actual localized text. Use `./build/debug/blood2 --objectives-smoke` for the hidden
+UI/reload check. Original HUD and audio are pending; M2 remains incomplete.

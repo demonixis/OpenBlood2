@@ -7,6 +7,7 @@
 #include "game/original/Door.h"
 #include "game/server_adapter.h"
 #include "interaction_smoke.h"
+#include "objectives_smoke.h"
 #include "pickup_smoke.h"
 #include "trigger_smoke.h"
 
@@ -150,7 +151,7 @@ namespace
             selection.id = smoke_brush;
         }
         OpenBlood2::ObjectId smoke_pickup{};
-        bool pickup_hidden = false;
+        bool pickup_hidden = false, objective_hidden = false;
         if (options.pickups_smoke)
         {
             if (!OpenBlood2::prepare_pickup_smoke(game, smoke_pickup))
@@ -170,12 +171,13 @@ namespace
             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
                                    !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke &&
-                                   !options.pickups_smoke;
+                                   !options.pickups_smoke && !options.objectives_smoke;
         inspector.select_weapons = options.weapons_smoke;
         inspector.select_movement = options.movement_smoke;
         inspector.select_containers = options.containers_smoke;
         inspector.select_brushes = options.brushes_smoke;
         inspector.select_pickups = options.pickups_smoke;
+        inspector.select_objectives = options.objectives_smoke;
         inspector.brush_selection = smoke_body;
         inspector.select_doors = options.doors_smoke || options.interaction_smoke;
         inspector.keyboard_movement = options.interaction_smoke;
@@ -283,6 +285,8 @@ namespace
             if (options.brushes_smoke && frames == reload_frame + 1)
                 if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
                     return 4;
+            if (options.objectives_smoke && frames == reload_frame + 1 && !OpenBlood2::objective_smoke(game))
+                return 4;
             if (options.pickups_smoke && frames == reload_frame + 1)
                 if (!OpenBlood2::prepare_pickup_smoke(game, smoke_pickup))
                     return 4;
@@ -402,7 +406,8 @@ namespace
                 swapchain &&
                 frames >= (extended_smoke ? 180u
                            : (options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
-                              options.interaction_smoke || options.brushes_smoke || options.pickups_smoke)
+                              options.interaction_smoke || options.brushes_smoke || options.pickups_smoke ||
+                              options.objectives_smoke)
                                ? 14u
                                : 2u) &&
                 !captured && !options.capture_file.empty();
@@ -549,6 +554,8 @@ namespace
                     use.key.down = frames == hide_frame;
                     event_ok = SDL_PushEvent(&use);
                 }
+                if (options.objectives_smoke && frames == show_frame - 1)
+                    objective_hidden = OpenBlood2::objective_smoke(game);
                 if (options.pickups_smoke && frames == show_frame - 1)
                     pickup_hidden = OpenBlood2::collect_pickup_smoke(game, smoke_pickup);
                 if (options.brushes_smoke)
@@ -672,8 +679,8 @@ namespace
                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
-                (options.pickups_smoke && !pickup_hidden) || (options.interaction_smoke && !interaction_hidden) ||
-                (options.brushes_smoke && !brush_hidden) ||
+                (options.objectives_smoke && !objective_hidden) || (options.pickups_smoke && !pickup_hidden) ||
+                (options.interaction_smoke && !interaction_hidden) || (options.brushes_smoke && !brush_hidden) ||
                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
                 (options.movement_smoke &&
                  (!movement_hidden || !movement_jumped || !movement_landed || !game.client_shell.move_mgr.ready() ||
@@ -694,6 +701,9 @@ namespace
             if (options.world_smoke)
                 spdlog::info("World smoke passed: unload/reload, original instance/string counts restored, "
                              "collision/model resources restored, preview animation advanced while hidden");
+            if (options.objectives_smoke)
+                spdlog::info("OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
+                             "unload/reload checked");
             if (options.pickups_smoke)
                 spdlog::info("PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked");
             if (options.weapons_smoke)

@@ -3,6 +3,7 @@
 // client data / packet reads with checked handles and owned typed values.
 #include "BloodShells.h"
 #include "PathPoint.h"
+#include "game/game_settings.h"
 #include <cmath>
 
 void CBloodServerShell::PreStartWorld()
@@ -144,6 +145,10 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client)
     rotation = {};
     physics = {};
     stats = {};
+    objectives = {};
+    objectives_error.clear();
+    objective_messages = 0;
+    objectives_resolved = false;
     messages = updates = 0;
     blocker = "Locomotion/weapon inspection: remaining container/FX and mover classes, full combat, audio and "
               "autosave remain unported";
@@ -166,6 +171,10 @@ void CBloodClientShell::OnExitWorld()
     rotation = {};
     physics = {};
     stats = {};
+    objectives = {};
+    objectives_error.clear();
+    objective_messages = 0;
+    objectives_resolved = false;
     blocker.clear();
 }
 bool CBloodClientShell::InitSinglePlayer(CBloodServerShell& server)
@@ -203,6 +212,26 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     }
     else if (const auto* value = std::get_if<OpenBlood2::PlayerStats>(&event))
         stats = *value;
+    else if (const auto* value = std::get_if<OpenBlood2::MissionObjectives>(&event))
+    {
+        // SMSG_OBJECTIVES: single/custom only; resource IDs override authored strings.
+        const auto mode = server_.GetVarValueFloat(server_.GetGameConVar("GAME_GAMETYPE"));
+        if (mode == static_cast<float>(GAMETYPE_SINGLE) || mode == static_cast<float>(GAMETYPE_CUSTOM))
+        {
+            objectives = *value;
+            objectives_error.clear();
+            ++objective_messages;
+            objectives_resolved = true;
+            if (value->resource)
+            {
+                const bool title = server_.GetClientResourceString(5000 + value->resource - 1, objectives.title);
+                const bool text = server_.GetClientResourceString(6000 + value->resource - 1, objectives.text);
+                objectives_resolved = title && text;
+                if (!objectives_resolved)
+                    objectives_error = "Objective resource strings are missing or invalid";
+            }
+        }
+    }
     return true;
 }
 bool CBloodClientShell::Update()

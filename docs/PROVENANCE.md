@@ -311,3 +311,13 @@ resource failure behavior and the intentionally omitted multiplayer/FX branches.
 Earlier ledgers remain historical; their blanket SpawnObject/general-pickup
 omissions are superseded only for the twelve supported leaf classes. No prototype
 dependency, reference modification or commercial asset was introduced.
+
+## M2 mission objectives
+
+[Source selections](M2_OBJECTIVE_SOURCES.json) record ObjectivesTrigger properties,
+precreate/SendMessages and the original client SMSG_OBJECTIVES branch and ID bases.
+Owned strings, typed local delivery, checked queue failures and bounded IDs replace
+legacy message/HSTRING storage. The portable PE string reader is new engine code
+based on Microsoft documentation, with no prototype dependency or native DLL
+execution. [Contracts](OBJECTIVES_CONTRACTS.md) distinguish resource resolution,
+source sound requests and pending original HUD/audio. Previous ledgers stay historical.
