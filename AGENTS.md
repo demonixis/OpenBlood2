@@ -78,3 +78,12 @@ checked snapshot order and deferred chain/removal. Reports count deliveries,
 not health changes. FX/audio records are not rendered or played. WorldModelDebris,
 pushable/gravity brushes, SpawnObject and full gameplay remain pending. The earlier
 brush paragraph's Exploding rejection/CDebris omission is superseded; M2 stays open.
+
+The latest [pushable evidence](../Documentation/Implementation/M2_PUSHABLES.md) connects selected original
+CDestructableBrush Pushable/Gravity, mass/friction, brush damage impulses and
+CPlayerObj ground/air priorities. Read [pushable contracts](docs/PUSHABLE_CONTRACTS.md) before
+extending dynamic world bodies, pushing or damage physics. Preserve actual bounds
+centers, one player integration, original DONTFOLLOWSTANDING, atomic rider/pusher
+commit and deferred callbacks. BoxPhysics is required; polygon dynamics, stacks,
+SpawnObject, player impulses and complete gameplay remain pending. Earlier blanket
+pushable/gravity omissions are superseded for this bounded subset; M2 stays open.

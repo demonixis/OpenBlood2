@@ -1,0 +1,131 @@
+{
+  "date": "2026-10-15",
+  "status": "M2 incomplete; selected original pushable/gravity brushes with replacement box physics",
+  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
+      "target": "src/game/original/DestructableBrush.cpp",
+      "source_line_ranges": [
+        [
+          147,
+          163
+        ],
+        [
+          173,
+          240
+        ]
+      ],
+      "selection": "Original Pushable flags/marks, gravity, damage physics enablement, priorities and MOVEABLE bit. Typed ConfigureWorldBody replaces SetObjectMass/SetFrictionCoefficient/SetForceIgnoreLimit for the bounded box subset. Polygon dynamics, simultaneous rotation and SpawnObject reject; retain source B2BaseClass DONTFOLLOWSTANDING.",
+      "source_sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
+      "target_sha256": "de098edfa5d9741632a825955290033a68c526d27bb95b3a02f910db1e1bb4ea"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "target": "src/game/original/Destructable.cpp",
+      "source_line_ranges": [
+        [
+          367,
+          384
+        ],
+        [
+          535,
+          562
+        ],
+        [
+          888,
+          925
+        ]
+      ],
+      "selection": "Selected ApplyDamagePhysics direction threshold, normalization, mass fallback and damage*2500/mass vector addition after resistance and before armor. Checked service returns expose rejected velocity; trapped characters and player accumulated impulse transport remain omitted. Mass/friction setup is selected into DestructableBrush initial update, preserving its unclamped-member formula.",
+      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "target_sha256": "b6a3fc544077f4b7ee686f71b1896bb70b37a200e1345ecb272f7be3d4e7b5fc"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PhysicalAttributes.h",
+      "target": "src/game/original/DestructableBrush.cpp",
+      "source_line_ranges": [
+        [
+          15,
+          30
+        ]
+      ],
+      "selection": "Original min/max friction 5/15 and pushable/nonpushable priority 40/100. Mass is bounded locally to finite [0,1000000]; no invented collision force. Same constants define the 2500 damage multiplier and player priority 50/40 in their respective original ports.",
+      "source_sha256": "bb58c0afd5e3175a9007063a64fbe31089a1a595851c61e3bfee7a19f72dda55",
+      "target_sha256": "de098edfa5d9741632a825955290033a68c526d27bb95b3a02f910db1e1bb4ea"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "target": "src/game/original/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          676,
+          677
+        ],
+        [
+          907,
+          917
+        ]
+      ],
+      "selection": "Initial priority 50 and supported/airborne priorities 50/40. Typed local movement uses fresh support and submitted velocity before the single shared MoveObject; retail client ground-bit and networking behavior are not recreated.",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target_sha256": "7e313a519020d110144f3c311486ad88f0b90a85460d6aac3f2e352a407db754"
+    },
+    {
+      "source": "sources/blood2/Shared/ClientServerShared.h",
+      "target": "src/game/original/DestructableBrush.cpp",
+      "source_line_ranges": [
+        [
+          20,
+          20
+        ]
+      ],
+      "selection": "USRFLG_MOVEABLE bit 4 for Pushable brushes; does not itself implement save or replication.",
+      "source_sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
+      "target_sha256": "de098edfa5d9741632a825955290033a68c526d27bb95b3a02f910db1e1bb4ea"
+    }
+  ],
+  "reference_only": [
+    {
+      "source": "sources/blood2/ObjectDLL/B2BaseClass.cpp",
+      "source_line_ranges": [
+        [
+          237,
+          240
+        ]
+      ],
+      "source_sha256": "bad14ecb54c1b62d82fa66265ba0819fa845ccd9db583e329329c60a86b05ccc",
+      "note": "Existing original DONTFOLLOWSTANDING behavior remains intact; brushes are not silently made riders."
+    },
+    {
+      "source": "sources/lithtech/runtime/shared/src/motion.cpp",
+      "source_line_ranges": [
+        [
+          35,
+          210
+        ]
+      ],
+      "source_sha256": "12b96fbd22063640ab665a8953f94d2157a1a65d75eccb3ba40b33ef1d7d4476",
+      "note": "Later-generation reference for ground friction, low-velocity sleep, gravity and analytic displacement. New engine implementation, no file/function import or assertion of Blood II retail parity."
+    },
+    {
+      "source": "sources/lithtech/runtime/shared/src/moveobject.cpp",
+      "source_line_ranges": [
+        [
+          645,
+          690
+        ]
+      ],
+      "source_sha256": "ab363eba59ebfd89865a1d5619ffb95a82c474c319adc8d89c921da63b2d79f9",
+      "note": "Later-generation blocking-priority/push reference only. New bounded atomic single-box/rider solver, no imported engine machinery."
+    }
+  ],
+  "adaptations": [
+    "Typed one-time dynamic body configuration, checked handles, actual bounds centers and finite service limits",
+    "New analytic box integration and drag, max 1/120 second steps, 0.5 second catch-up; original MoveMgr integrates player once",
+    "Four slide legs, 64 ordinary riders, atomic validation/commit, conservative horizontal single-box push and deferred contacts",
+    "Source DONTFOLLOWSTANDING retained; no rigid stacks/chains, crushing, penetration recovery or rotation plus gravity",
+    "Existing liquid/conveyor rules and one-per-frame environmental damage use actual body center",
+    "Inspector metadata is separate from gameplay; dynamic polygons, SpawnObject, player impulses, WorldModelDebris and full M2 gate remain open"
+  ]
+}

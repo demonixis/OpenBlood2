@@ -1,5 +1,9 @@
 # Rotating and destructible world-model brushes
 
+> Extended by [PUSHABLE_CONTRACTS.md](PUSHABLE_CONTRACTS.md): selected Pushable/Gravity brushes and
+> brush damage impulses now work with bounded box physics. Omissions and counts
+> below describe the earlier stage; polygon dynamics and full M2 remain open.
+
 > Extended by [EXPLOSION_CONTRACTS.md](EXPLOSION_CONTRACTS.md): original CDebris requests and explosive
 > brush area damage are now connected. Earlier omissions/counts below are historical;
 > WorldModelDebris, pushable brushes, client FX/audio and the full M2 gate remain open.

@@ -9,5 +9,7 @@ DDWORD RotatingBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
     if (message == MID_INITIALUPDATE)
         rotating.Init(m_hObject);
     const auto accepted = CDestructableBrush::EngineMessageFn(message, data, reason);
-    return message == MID_PRECREATE ? accepted && rotating.valid : accepted;
+    if (message == MID_PRECREATE)
+        return accepted && rotating.valid && data && !(static_cast<ObjectCreateStruct*>(data)->m_Flags & FLAG_GRAVITY);
+    return accepted;
 }

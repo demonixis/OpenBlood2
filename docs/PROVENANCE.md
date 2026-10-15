@@ -288,3 +288,14 @@ fragments. [Contracts](EXPLOSION_CONTRACTS.md) document fixed effective damage/
 radius despite unused authored properties, snapshot/liveness guards and deferred
 chains. Earlier source ledgers remain historical. WorldModelDebris, pushable
 brushes, impulses, SpawnObject and full gameplay remain pending.
+
+## M2 pushable/gravity brush continuation
+
+[Source selections](M2_PUSHABLE_SOURCES.json) connect CDestructableBrush's pushable
+flags/priorities, CDestructable mass/friction and damage impulse rules, and
+CPlayerObj ground/air priorities. [Contracts](PUSHABLE_CONTRACTS.md) distinguish
+these original rules from the replacement box integrator, atomic movement and
+conservative rider/pushing limits. Later LithTech motion is an architectural
+reference only. The preceding pushable/impulse omissions are superseded for this
+bounded brush subset; dynamic polygon bodies, player impulses, SpawnObject,
+WorldModelDebris and the full M2 gate remain open.

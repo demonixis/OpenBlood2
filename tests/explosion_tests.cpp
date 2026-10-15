@@ -127,7 +127,7 @@ namespace
         CHECK(!runtime);
         CHECK(!brush(g, {}, {{"Scale", std::numeric_limits<float>::infinity()}}));
         CHECK(!brush(g, {}, {{"Scale", 1e7f}}));
-        CHECK(!brush(g, {}, {{"Pushable", true}, {"Exploding", true}}));
+        CHECK(!brush(g, {}, {{"Pushable", true}, {"BoxPhysics", false}, {"Exploding", true}}));
         CHECK(!brush(g, {}, {{"SpawnObject", std::string("Enemy")}, {"Exploding", true}}));
         CHECK(g.unload_world() && CDestructable::m_dwNumDestructables == 0 && g.server.string_count() == 0);
         return true;

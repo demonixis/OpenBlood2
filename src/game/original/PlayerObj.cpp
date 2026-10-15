@@ -63,7 +63,8 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
         return DFALSE;
     }
     // InitialUpdate precedes SetClient, as in the original engine.
-    if (!m_InventoryMgr.Init(m_hObject, m_hClient) || !m_damage.Init(m_hObject, &m_InventoryMgr))
+    if (!m_InventoryMgr.Init(m_hObject, m_hClient) || !m_damage.Init(m_hObject, &m_InventoryMgr) ||
+        !server->SetBlockingPriority(m_hObject, 50))
         return DFALSE;
     m_bFirstUpdate = DTRUE;
     m_InventoryMgr.SetAmmoCount(1, 50);
@@ -321,7 +322,12 @@ bool CPlayerObj::HandlePlayerPositionMessage(const OpenBlood2::PlayerMove& move)
         return false;
     auto velocity = move.velocity, acceleration = move.acceleration, position = move.position;
     if (server->SetVelocity(m_hObject, &velocity) != DE_OK ||
-        server->SetAcceleration(m_hObject, &acceleration) != DE_OK || server->MoveObject(m_hObject, &position) != DE_OK)
+        server->SetAcceleration(m_hObject, &acceleration) != DE_OK)
+        return false;
+    OpenBlood2::MovementState before;
+    if (!server->GetMovementState(m_hObject, before) ||
+        !server->SetBlockingPriority(m_hObject, before.standing ? 50 : 40) ||
+        server->MoveObject(m_hObject, &position) != DE_OK)
         return false;
     OpenBlood2::MovementState state;
     if (!server->GetMovementState(m_hObject, state))

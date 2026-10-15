@@ -251,3 +251,11 @@ foreach(case IN ITEMS properties requests radius chain gates lifetime limits pla
     add_test(NAME explosions.${case} COMMAND explosion_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/explosion-fixtures/${case}")
     set_tests_properties(explosions.${case} PROPERTIES LABELS "headless;explosions" TIMEOUT 30)
 endforeach()
+
+add_executable(pushable_tests pushable_tests.cpp)
+target_link_libraries(pushable_tests PRIVATE blood2_game)
+blood2_project_options(pushable_tests)
+foreach(case IN ITEMS properties gravity friction impulses pushing player riders contacts collision containers)
+    add_test(NAME pushables.${case} COMMAND pushable_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/pushable-fixtures/${case}")
+    set_tests_properties(pushables.${case} PROPERTIES LABELS "headless;pushables" TIMEOUT 30)
+endforeach()

@@ -2,6 +2,7 @@
 
 #include "engine/model.h"
 #include "game/legacy/cpp_engineobjects_de.h"
+#include "game/mover_messages.h"
 #include <map>
 #include <memory>
 #include <span>
@@ -95,6 +96,11 @@ namespace OpenBlood2
         std::uint32_t contact_polygon = UINT32_MAX;
         HOBJECT contact_object = nullptr;
         bool grounded = false;
+        bool world_body = false;
+        WorldBodyProperties body_properties;
+        DBYTE blocking_priority = 0;
+        std::uint64_t body_steps = 0, body_pushes = 0;
+        MoverResult body_result = MoverResult::Moved;
         bool client_movement = false; // Local MoveMgr owns integration while associated.
         std::shared_ptr<const Model> model;
         std::shared_ptr<const ContainerShape> container;

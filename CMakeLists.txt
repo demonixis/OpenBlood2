@@ -42,7 +42,7 @@ target_link_libraries(blood2_game PUBLIC engine)
 
 target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
-    src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp)
+    src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
 add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp)
 set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
 target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")

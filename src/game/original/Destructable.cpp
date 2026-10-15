@@ -1,8 +1,10 @@
 // Selected shared damage/lifetime and brush trigger branches; see M2_BRUSH_SOURCES.json.
 #include "Destructable.h"
+#include "engine/collision.h"
 #include "engine/objects.h"
 #include "trigger_helpers.h"
 #include <algorithm>
+#include <cmath>
 DLink CDestructable::m_DestructableHead{};
 DDWORD CDestructable::m_dwNumDestructables = 0;
 CDestructable::CDestructable()
@@ -48,6 +50,25 @@ void CDestructable::CalculateResistance(DBYTE value)
         m_fResistance = 0.7f;
 }
 
+void CDestructable::ApplyDamagePhysics(float damage, DVector direction)
+{
+    using namespace OpenBlood2;
+    auto* server = BaseClass::GetServerDE();
+    const auto squared = vector_dot(direction, direction);
+    if (!server || !server->IsObjectAlive(m_hObject) || squared < .01f)
+        return;
+    if (m_fMass <= 0)
+        m_fMass = 1;
+    last_impulse = vector_scale(direction, (damage * 2500 / m_fMass) / std::sqrt(squared));
+    DVector velocity{};
+    last_impulse_ok = server->GetVelocity(m_hObject, &velocity) == DE_OK;
+    if (last_impulse_ok)
+    {
+        velocity = vector_add(velocity, last_impulse);
+        last_impulse_ok = server->SetVelocity(m_hObject, &velocity) == DE_OK;
+    }
+    damage_impulses += last_impulse_ok;
+}
 DDWORD CDestructable::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* data, DFLOAT reason)
 {
     if (message == MID_PRECREATE && (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP))
@@ -86,7 +107,7 @@ void CDestructable::SendTrigger(const std::string& target, const std::string& me
         server->FreeString(text);
 }
 // Selected ordinary normal/melee damage branch from Destructable.cpp. AI hit
-// limbs, damage impulses, powerups and complete character death reactions are deferred.
+// limbs, player damage impulses, powerups and complete character death reactions are deferred.
 DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD message, HMESSAGEREAD read)
 {
     if (message == 1000)
@@ -124,6 +145,8 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
                 m_fArmorPoints = 0;
                 amount = m_fHitPoints;
             }
+            if (apply_damage_physics && damage.type != OpenBlood2::DamageType::Death)
+                ApplyDamagePhysics(amount, damage.direction);
             if (m_fArmorPoints > 0 && damage.type != OpenBlood2::DamageType::Suffocate)
             {
                 const auto ratio = m_fArmorPoints <= 25    ? .3f

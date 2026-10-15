@@ -34,6 +34,8 @@ namespace OpenBlood2
         ServerAdapter& operator=(const ServerAdapter&) = delete;
         bool bind();
         bool IsObjectAlive(HOBJECT) override;
+        bool ConfigureWorldBody(HOBJECT, const WorldBodyProperties&) override;
+        bool SetBlockingPriority(HOBJECT, DBYTE) override;
         void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE) override;
         void RecordDebrisEffect(const DebrisEffect&) override;
         void RecordExplosionEffect(const ExplosionEffect&) override;
@@ -162,6 +164,29 @@ namespace OpenBlood2
         CollisionQuery sweep_scene(HOBJECT, DVector, DVector, DVector, CollisionHit&, const std::vector<ObjectId>&,
                                    HOBJECT ignore_extra = nullptr);
         bool affect_containers(HOBJECT, ContainerPhysics&);
+        struct BodyPath
+        {
+            DVector from{}, to{};
+        };
+        struct BodyRider
+        {
+            ObjectRecord* body;
+            DVector origin{};
+        };
+        struct BodyPlan
+        {
+            ObjectRecord* body = nullptr;
+            HOBJECT initiator = nullptr;
+            DVector origin{}, destination{}, velocity{};
+            std::vector<BodyPath> paths;
+            std::vector<BodyRider> riders;
+            CollisionHit contact;
+            bool blocked = false;
+        };
+        MoverResult plan_world_body(ObjectRecord&, DVector, const std::vector<ObjectId>&, HOBJECT, BodyPlan&);
+        void commit_world_body(const BodyPlan&);
+        void dispatch_world_body(const BodyPlan&, const std::vector<ObjectId>&);
+        DRESULT move_world_body(ObjectRecord&, DVector);
         bool moving_ = false;
         bool models_advancing_ = false, physics_advancing_ = false;
         std::vector<std::unique_ptr<StringHandle>> string_tokens_;

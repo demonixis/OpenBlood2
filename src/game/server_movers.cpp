@@ -10,6 +10,8 @@ namespace OpenBlood2
         auto* mover = objects_.get(handle);
         if (!mover || mover->life != Life::Alive || !mover->world_model || !physics_vector(destination) || moving_)
             return MoverResult::Invalid;
+        if (mover->world_body)
+            return MoverResult::Unavailable; // Dynamic bodies use collision-clipped MoveObject.
         if (!collision_ready || !collision)
             return MoverResult::Unavailable;
         const auto delta = vector_subtract(destination, mover->state.m_Pos);

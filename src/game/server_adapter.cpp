@@ -102,6 +102,18 @@ namespace OpenBlood2
                     active().objects_.fail(ObjectError::Unsupported, "Container solid/gravity flags are unsupported");
                     return;
                 }
+                if (r->world_body && (!(flags & FLAG_BOXPHYSICS) || (flags & FLAG_GOTHRUWORLD)))
+                {
+                    active().objects_.fail(ObjectError::Unsupported,
+                                           "Dynamic world body requires BoxPhysics without GOTHRUWORLD");
+                    return;
+                }
+                if (r->world_model && !r->world_body && ((flags ^ r->state.m_Flags) & FLAG_GRAVITY))
+                {
+                    active().objects_.fail(ObjectError::Unsupported,
+                                           "Static world model cannot acquire dynamic gravity");
+                    return;
+                }
                 r->state.m_Flags = flags;
             }
         };

@@ -140,11 +140,11 @@ namespace
                 return 4;
             selection.id = smoke_door;
         }
-        OpenBlood2::ObjectId smoke_brush{}, smoke_explosion{};
+        OpenBlood2::ObjectId smoke_brush{}, smoke_explosion{}, smoke_body{};
         bool brush_hidden = false;
         if (options.brushes_smoke)
         {
-            if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion))
+            if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
                 return 4;
             selection.id = smoke_brush;
         }
@@ -165,7 +165,7 @@ namespace
         inspector.select_movement = options.movement_smoke;
         inspector.select_containers = options.containers_smoke;
         inspector.select_brushes = options.brushes_smoke;
-        inspector.brush_selection = smoke_brush;
+        inspector.brush_selection = smoke_body;
         inspector.select_doors = options.doors_smoke || options.interaction_smoke;
         inspector.keyboard_movement = options.interaction_smoke;
         inspector.select_triggers = options.triggers_smoke;
@@ -270,7 +270,7 @@ namespace
                 if (!OpenBlood2::prepare_interaction_smoke(game, smoke_door))
                     return 4;
             if (options.brushes_smoke && frames == reload_frame + 1)
-                if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion))
+                if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
                     return 4;
             game.client_shell.use_down = controls.sample_use(text_editing);
             auto keyboard = controls.sample(text_editing);
@@ -544,7 +544,7 @@ namespace
                             return 4;
                     if (frames == show_frame)
                     {
-                        brush_hidden = OpenBlood2::check_brush_smoke(game, smoke_brush);
+                        brush_hidden = OpenBlood2::check_brush_smoke(game, smoke_brush, smoke_body);
                         if (!OpenBlood2::command_brush_smoke(game, smoke_brush, "OFF"))
                             return 4;
                     }
@@ -685,7 +685,7 @@ namespace
                              "unload/re-entry");
             if (options.brushes_smoke)
                 spdlog::info("Brush smoke passed: original ON/OFF ramps, hidden rotation/rider transport and explosive "
-                             "chain, inspection, reload");
+                             "chain, dynamic box gravity/impulse, inspection, reload");
             if (options.interaction_smoke)
                 spdlog::info("Interaction smoke passed: SDL E press edge, USE key denial/unlock, rotation while "
                              "hidden, inspection, reload");

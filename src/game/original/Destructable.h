@@ -25,6 +25,10 @@ class CDestructable : public Aggregate
         return m_bDead != 0;
     }
     void CalculateResistance(DBYTE);
+    void ApplyDamagePhysics(float, DVector);
+    bool apply_damage_physics = false, last_impulse_ok = true;
+    std::uint64_t damage_impulses = 0;
+    DVector last_impulse{};
     HOBJECT m_hObject = nullptr;
     CInventoryMgr* m_pInventoryMgr = nullptr;
     DLink m_Link{};

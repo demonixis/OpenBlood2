@@ -9,7 +9,7 @@ namespace OpenBlood2
     {
         trace_service("RotateWorldModel");
         auto* mover = objects_.get(handle);
-        if (!mover || mover->life != Life::Alive || !mover->world_model_base || moving_ ||
+        if (!mover || mover->life != Life::Alive || !mover->world_model_base || mover->world_body || moving_ ||
             !physics_vector(move.from_angles) || !physics_vector(move.to_angles) ||
             !physics_vector(move.original_position) || !physics_vector(move.pivot))
             return MoverResult::Invalid;

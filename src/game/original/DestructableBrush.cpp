@@ -1,4 +1,4 @@
-// Selected original brush lifecycle. Client FX and pushable-body physics remain unavailable.
+// Selected original brush lifecycle; bounded BoxPhysics body services support Pushable/Gravity.
 #include "DestructableBrush.h"
 #include "engine/collision.h"
 #include <cmath>
@@ -40,11 +40,10 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
             }
             server->GetPropGeneric("SpawnObject", &prop);
             // Do not create objects whose omitted branches change gameplay.
-            if (pushable || (create.m_Flags & FLAG_GRAVITY) || prop.m_String[0])
+            if (prop.m_String[0])
                 return 0;
         }
-        if (create.m_Flags & FLAG_GRAVITY)
-            return 0;
+
         if (!std::isfinite(hit_points) || !std::isfinite(mass) || std::abs(hit_points) > 1e6f || mass < 0 ||
             mass > 1e6f)
             return 0;
@@ -53,6 +52,14 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
         create.m_Flags |= FLAG_FULLPOSITIONRES | FLAG_MODELGOURAUDSHADE;
         if (box_physics)
             create.m_Flags |= FLAG_BOXPHYSICS;
+        if (pushable)
+        {
+            allow_marks = false;
+            create.m_Flags |= FLAG_GRAVITY;
+        }
+        if ((create.m_Flags & FLAG_GRAVITY) &&
+            (!(create.m_Flags & FLAG_BOXPHYSICS) || (create.m_Flags & FLAG_GOTHRUWORLD)))
+            return 0; // Polygon dynamics / world bypass are not this body solver.
         return 1;
     }
     if (message == MID_INITIALUPDATE)
@@ -61,8 +68,20 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
             return 0;
         m_damage.SetHitPoints(hit_points);
         m_damage.m_fMass = mass;
+        m_damage.apply_damage_physics = pushable;
+        server->SetBlockingPriority(m_hObject, pushable ? 40 : 100);
+        if (server->GetObjectFlags(m_hObject) & FLAG_GRAVITY)
+        {
+            // Source SetMass clamps its local parameter, but uses the unclamped
+            // member in this formula. Preserve friction above mass 500 too.
+            if (!server->ConfigureWorldBody(m_hObject, {mass, 5 + mass * 10 / 500, pushable}))
+            {
+                server->RemoveObject(m_hObject);
+                return 0;
+            }
+        }
         server->SetNextUpdate(m_hObject, 0);
-        server->SetObjectUserFlags(m_hObject, (1u << 3) | (surface << 24));
+        server->SetObjectUserFlags(m_hObject, (1u << 3) | (pushable ? (1u << 4) : 0) | (surface << 24));
     }
     if (message == MID_UPDATE && destructable && m_damage.IsDead())
     {

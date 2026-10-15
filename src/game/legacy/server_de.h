@@ -29,6 +29,8 @@ class ServerDE : public CSBase
 {
   public:
     virtual bool IsObjectAlive(HOBJECT) = 0;
+    virtual bool ConfigureWorldBody(HOBJECT, const OpenBlood2::WorldBodyProperties&) = 0;
+    virtual bool SetBlockingPriority(HOBJECT, DBYTE) = 0;
     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
     virtual void RecordExplosionEffect(const OpenBlood2::ExplosionEffect&) = 0;

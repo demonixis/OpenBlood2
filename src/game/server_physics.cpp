@@ -78,10 +78,11 @@ namespace OpenBlood2
         // sliding along a wall or walking off a ledge. World support has a polygon
         // identity, not a fabricated HOBJECT. Motion away from the support plane
         // is airborne; positive Y alone can also mean walking uphill.
-        auto to = state.position;
+        const auto center = object_bounds_center(*r);
+        auto to = center;
         to.y -= 0.02f;
         CollisionHit nearest;
-        const auto query = sweep_scene(h, state.position, to, state.dimensions, nearest, objects_.snapshot());
+        const auto query = sweep_scene(h, center, to, state.dimensions, nearest, objects_.snapshot());
         if (query == CollisionQuery::Invalid)
             return false;
         const bool found = query == CollisionQuery::Hit;
@@ -128,7 +129,8 @@ namespace OpenBlood2
     {
         trace_service("SetVelocity");
         auto* r = objects_.get(h);
-        if (!r || (r->container || r->world_model) || !v || !physics_vector(*v))
+        if (!r || r->life != Life::Alive || r->container || (r->world_model && !r->world_body) || !v ||
+            !physics_vector(*v))
             return DE_INVALIDPARAMS;
         r->velocity = *v;
         return DE_OK;
@@ -148,7 +150,8 @@ namespace OpenBlood2
     {
         trace_service("SetAcceleration");
         auto* r = objects_.get(h);
-        if (!r || (r->container || r->world_model) || !v || !physics_vector(*v))
+        if (!r || r->life != Life::Alive || r->container || (r->world_model && !r->world_body) || !v ||
+            !physics_vector(*v))
             return DE_INVALIDPARAMS;
         r->acceleration = *v;
         return DE_OK;
@@ -168,6 +171,8 @@ namespace OpenBlood2
             objects_.fail(ObjectError::Busy, "Recursive MoveObject during contact dispatch");
             return DE_ERROR;
         }
+        if (r->world_body)
+            return move_world_body(*r, *destination);
         if (r->world_model)
             return MoveWorldModel(h, *destination) == MoverResult::Moved ? DE_OK : DE_ERROR;
         if (r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL)
@@ -184,6 +189,7 @@ namespace OpenBlood2
             if (const auto* o = objects_.get(target))
                 touched.emplace(o->id.slot, target);
         };
+        BodyPlan pushed;
         auto position = r->state.m_Pos, remaining = vector_subtract(*destination, position);
         r->grounded = false;
         r->contact_normal = {};
@@ -205,6 +211,54 @@ namespace OpenBlood2
                 return DE_ERROR;
             }
             const bool found = query == CollisionQuery::Hit;
+            auto* obstacle = found ? objects_.get(nearest.object) : nullptr;
+            if (found && !nearest.start_solid && std::abs(nearest.normal.y) < .01f && obstacle &&
+                obstacle->world_body && obstacle->body_properties.pushable &&
+                r->blocking_priority > obstacle->blocking_priority)
+            {
+                const auto into = vector_dot(remaining, nearest.normal);
+                const auto push = vector_scale(nearest.normal, into * float(1 - nearest.fraction) - .002f);
+                CollisionHit clearance;
+                auto actor_end = end;
+                auto clear = sweep_scene(h, position, actor_end, r->dimensions, clearance, ids, obstacle->handle);
+                MovementState flat_support;
+                const bool flatten = clear == CollisionQuery::Hit && !clearance.start_solid &&
+                                     clearance.normal.y > .99999f && actor_end.y < position.y &&
+                                     GetMovementState(h, flat_support) && flat_support.standing &&
+                                     flat_support.ground_normal.y > .99999f;
+                if (flatten)
+                {
+                    // Gravity may reach the floor just after the side contact.
+                    // Revalidate the complete horizontal path before pushing;
+                    // otherwise successive grounded commands stick at the box.
+                    actor_end.y = position.y;
+                    clear = sweep_scene(h, position, actor_end, r->dimensions, clearance, ids, obstacle->handle);
+                }
+                const auto planned =
+                    clear == CollisionQuery::Miss
+                        ? plan_world_body(*obstacle, vector_add(obstacle->state.m_Pos, push), ids, h, pushed)
+                        : MoverResult::Unavailable;
+                if (into < 0 && clear == CollisionQuery::Miss && planned == MoverResult::Moved &&
+                    vector_dot(vector_subtract(pushed.destination, vector_add(obstacle->state.m_Pos, push)),
+                               vector_subtract(pushed.destination, vector_add(obstacle->state.m_Pos, push))) < 1e-8f)
+                {
+                    touch(obstacle->handle);
+                    for (auto id : ids)
+                    {
+                        const auto* other = objects_.get(id);
+                        CollisionHit hit;
+                        if (other && other->life == Life::Alive && other->handle != h && !other->container &&
+                            ((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY) &&
+                            sweep_object(*other, position, actor_end, r->dimensions, hit) == CollisionQuery::Hit)
+                            touch(other->handle);
+                    }
+                    if (flatten)
+                        r->velocity.y = 0;
+                    position = actor_end;
+                    break;
+                }
+                pushed = {};
+            }
             // FLAG_STAIRSTEP is original. This bounded three-sweep solver is new;
             // the default half-height rule is evidenced by later LithTech code.
             // Probe paths never dispatch speculative contacts.
@@ -291,6 +345,12 @@ namespace OpenBlood2
                 break;
         }
         r->state.m_Pos = position;
+        if (pushed.body)
+        {
+            commit_world_body(pushed);
+            ++pushed.body->body_pushes;
+            dispatch_world_body(pushed, ids);
+        }
         for (const auto& contact : touched)
         {
             auto other = contact.second;
@@ -299,7 +359,7 @@ namespace OpenBlood2
                 break;
             if (!target || target->life != Life::Alive)
                 continue;
-            // Force is not invented: a mass/impulse solver has not been connected.
+            // Touch remains a typed object identity; no collision force is fabricated.
             if (r->state.m_Flags & FLAG_TOUCH_NOTIFY)
                 objects_.engine_message(h, MID_TOUCHNOTIFY, other);
             if (r->life == Life::Alive && target->life == Life::Alive && (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
@@ -335,12 +395,12 @@ namespace OpenBlood2
         for (auto id : ids)
         {
             auto* r = objects_.get(id);
-            if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE || r->client_movement ||
-                (r->container || r->world_model) ||
-                (r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
+            if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE || r->client_movement || r->container ||
+                (r->world_model && !r->world_body) ||
+                (!r->world_body && r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
                 continue;
             ContainerState containers;
-            if (!GetContainers(r->handle, r->state.m_Pos, containers))
+            if (!GetContainers(r->handle, object_bounds_center(*r), containers))
                 return false;
             if (!(r->state.m_Flags & FLAG_GRAVITY) && vector_dot(r->velocity, r->velocity) == 0 &&
                 vector_dot(r->acceleration, r->acceleration) == 0 && !containers.total)
@@ -361,8 +421,42 @@ namespace OpenBlood2
                 auto acceleration = physics.acceleration;
                 if (physics.gravity)
                     acceleration = vector_add(acceleration, gravity);
-                r->velocity = vector_add(r->velocity, vector_scale(acceleration, dt));
-                auto destination = vector_add(r->state.m_Pos, vector_scale(r->velocity, dt));
+                DVector displacement;
+                if (r->world_body)
+                {
+                    ++r->body_steps;
+                    MovementState support;
+                    const bool resting = physics.gravity && GetMovementState(r->handle, support) && support.standing &&
+                                         support.ground_normal.y >= .5f;
+                    if (resting && vector_dot(acceleration, support.ground_normal) < 0)
+                        acceleration = vector_subtract(
+                            acceleration,
+                            vector_scale(support.ground_normal, vector_dot(acceleration, support.ground_normal)));
+                    if (resting && r->body_properties.friction > 0)
+                    {
+                        const auto k = r->body_properties.friction;
+                        const auto decay = std::exp(-k * dt);
+                        const auto terminal = vector_scale(acceleration, 1 / k);
+                        displacement =
+                            vector_add(vector_scale(terminal, dt),
+                                       vector_scale(vector_subtract(r->velocity, terminal), (1 - decay) / k));
+                        r->velocity = vector_add(terminal, vector_scale(vector_subtract(r->velocity, terminal), decay));
+                        if (vector_dot(r->velocity, r->velocity) < .1f && vector_dot(acceleration, acceleration) < .1f)
+                            r->velocity = {};
+                    }
+                    else
+                    {
+                        displacement =
+                            vector_add(vector_scale(r->velocity, dt), vector_scale(acceleration, .5f * dt * dt));
+                        r->velocity = vector_add(r->velocity, vector_scale(acceleration, dt));
+                    }
+                }
+                else
+                {
+                    r->velocity = vector_add(r->velocity, vector_scale(acceleration, dt));
+                    displacement = vector_scale(r->velocity, dt);
+                }
+                auto destination = vector_add(r->state.m_Pos, displacement);
                 if (MoveObject(r->handle, &destination) != DE_OK)
                     return false;
             }

@@ -1,5 +1,9 @@
 # Original brush explosions and debris requests
 
+> Extended by [PUSHABLE_CONTRACTS.md](PUSHABLE_CONTRACTS.md): selected Pushable/Gravity brushes and
+> brush damage impulses now work with bounded box physics. Omissions and counts
+> below describe the earlier stage; polygon dynamics and full M2 remain open.
+
 This extends [BRUSH_CONTRACTS.md](BRUSH_CONTRACTS.md) and the selected
 [damage transport](WEAPON_CONTRACTS.md). M2 remains incomplete. Read the
 [source ledger](M2_EXPLOSION_SOURCES.json) and

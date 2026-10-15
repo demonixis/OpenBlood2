@@ -247,7 +247,8 @@ namespace
         CHECK(g.resources.mount_game(Config{root, "private"}, error));
         struct Count
         {
-            unsigned created = 0, rejected = 0, filtered = 0, moved = 0, explosive = 0, detonated = 0;
+            unsigned created = 0, rejected = 0, filtered = 0, moved = 0, explosive = 0, detonated = 0, dynamic = 0,
+                     blocked = 0;
         };
         std::map<std::string, Count> counts;
         std::map<std::string, unsigned> failures;
@@ -301,11 +302,14 @@ namespace
                                 auto it = props.find(key);
                                 return it != props.end() && std::get<bool>(it->second);
                             };
-                            if (enabled("Pushable") || enabled("Gravity"))
-                                kind = "pushable/gravity";
-                            else if (props.contains("SpawnObject") &&
-                                     !std::get<std::string>(props.at("SpawnObject")).empty())
+                            if (props.contains("SpawnObject") &&
+                                !std::get<std::string>(props.at("SpawnObject")).empty())
                                 kind = "spawn";
+                            else if (enabled("Pushable") || enabled("Gravity"))
+                            {
+                                CHECK(!enabled("BoxPhysics"));
+                                kind = "polygon dynamics";
+                            }
                             else
                                 CHECK(false);
                         }
@@ -325,6 +329,10 @@ namespace
                     for (int i = 0; i < 4; ++i)
                         CHECK(g.step(.02));
                     count.moved += r->mover_moves > 0;
+                    count.dynamic += r->world_body;
+                    count.blocked += r->world_body && r->mover_blocks > 0;
+                    if (r->world_body)
+                        CHECK(r->body_steps > 0 && (r->state.m_Flags & FLAG_BOXPHYSICS));
                     auto& brush = destruct(g, h);
                     if (brush.debris.exploding)
                     {
@@ -352,14 +360,15 @@ namespace
         }
         for (const auto& [name, c] : counts)
             std::cout << name << " created=" << c.created << " rejected=" << c.rejected << " filtered=" << c.filtered
-                      << " moved=" << c.moved << " explosive=" << c.explosive << " detonated=" << c.detonated << '\n';
+                      << " moved=" << c.moved << " explosive=" << c.explosive << " detonated=" << c.detonated
+                      << " dynamic=" << c.dynamic << " blocked=" << c.blocked << '\n';
         for (const auto& [name, n] : failures)
             std::cout << name << "=" << n << '\n';
         CHECK(unreadable == 1 && counts["RotatingBrush"].created == 98 && counts["RotatingBrush"].rejected == 38 &&
               counts["RotatingBrush"].moved == 98 && counts["RotatingBrush"].filtered == 0 &&
-              counts["CDestructableBrush"].created == 2162 && counts["CDestructableBrush"].rejected == 293 &&
-              counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 47 &&
-              counts["CDestructableBrush"].detonated == 47);
+              counts["CDestructableBrush"].created == 2237 && counts["CDestructableBrush"].rejected == 218 &&
+              counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 50 &&
+              counts["CDestructableBrush"].detonated == 50);
         CHECK(g.request_world("01_SubwayA", error));
         std::map<EntryState, unsigned> entries;
         for (const auto& e : g.entries)

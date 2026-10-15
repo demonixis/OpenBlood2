@@ -1831,6 +1831,30 @@ namespace OpenBlood2
                 ImGui::TextWrapped("Sound: %s (%s; playback pending)", v.last_sound.c_str(),
                                    v.sound_loop ? "loop" : "once");
             }
+            if (r->world_body)
+            {
+                constexpr const char* results[] = {"moved", "blocked", "invalid", "unavailable"};
+                ImGui::Text("Dynamic box | pushable %s | priority %u", b->pushable ? "yes" : "no",
+                            unsigned(r->blocking_priority));
+                ImGui::Text("Mass %.1f | friction %.3f | gravity %s", r->body_properties.mass,
+                            r->body_properties.friction, r->state.m_Flags & FLAG_GRAVITY ? "yes" : "no");
+                ImGui::Text("Position %.2f %.2f %.2f", r->state.m_Pos.x, r->state.m_Pos.y, r->state.m_Pos.z);
+                ImGui::Text("Velocity %.2f %.2f %.2f", r->velocity.x, r->velocity.y, r->velocity.z);
+                ImGui::Text("Acceleration %.2f %.2f %.2f", r->acceleration.x, r->acceleration.y, r->acceleration.z);
+                MovementState support;
+                const bool supported = game.server.GetMovementState(r->handle, support) && support.standing;
+                ImGui::Text("Standing %s | last move %s | steps %llu", supported ? "yes" : "no",
+                            results[unsigned(r->body_result)], static_cast<unsigned long long>(r->body_steps));
+                ImGui::Text(
+                    "Player pushes %llu | riders %llu | blocks %llu", static_cast<unsigned long long>(r->body_pushes),
+                    static_cast<unsigned long long>(r->mover_riders), static_cast<unsigned long long>(r->mover_blocks));
+                const auto* blocker = game.objects.get(r->mover_blocker);
+                ImGui::Text("Blocker: %s", blocker ? blocker->state.m_Name : "world / none / removed");
+                ImGui::Text("Damage impulses %llu | last %s (%.1f %.1f %.1f)",
+                            static_cast<unsigned long long>(b->m_damage.damage_impulses),
+                            b->m_damage.last_impulse_ok ? "accepted" : "rejected", b->m_damage.last_impulse.x,
+                            b->m_damage.last_impulse.y, b->m_damage.last_impulse.z);
+            }
             ImGui::Text("HP %.1f | dead %s | CanDamage %s", b->m_damage.m_fHitPoints,
                         b->m_damage.IsDead() ? "yes" : "no", b->m_damage.can_damage ? "yes" : "no");
             ImGui::Text("Destructable %s | TriggerDestroyOnly %s", b->destructable ? "yes" : "no",
@@ -1869,7 +1893,7 @@ namespace OpenBlood2
         else
             ImGui::TextUnformatted("No live brush selected.");
         ImGui::EndTable();
-        ImGui::TextWrapped("Explosion damage is active. Debris/FX rendering, sound, world fragments, pushable brushes, "
+        ImGui::TextWrapped("Explosion damage is active. Debris/FX rendering, sound, world fragments, polygon dynamics, "
                            "SpawnObject and save/restore are pending. "
                            "Rotation uses replacement engine collision; M2 remains open.");
         if (ImGui::CollapsingHeader("Explosions: damage executed / FX and audio pending",
