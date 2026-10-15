@@ -5,235 +5,332 @@
 #include <fstream>
 #include <system_error>
 
-namespace blood2 {
-namespace fs = std::filesystem;
-namespace {
+namespace OpenBlood2
+{
+    namespace fs = std::filesystem;
+    namespace
+    {
 
-std::string_view trim(std::string_view value) {
-    const auto first = value.find_first_not_of(" \t\r\n");
-    if (first == std::string_view::npos) return {};
-    return value.substr(first, value.find_last_not_of(" \t\r\n") - first + 1);
-}
-
-std::string ascii_lower(std::string value) {
-    for (auto& c : value) if (c >= 'A' && c <= 'Z') c = static_cast<char>(c + ('a' - 'A'));
-    return value;
-}
-
-bool read_config(const fs::path& path, fs::path& data_dir, std::string& error) {
-    std::error_code ec;
-    const auto bytes = fs::file_size(path, ec);
-    if (ec || bytes > 65536) {
-        error = "Cannot read configuration (maximum 64 KiB): " + path_text(path);
-        return false;
-    }
-    std::ifstream file(path);
-    if (!file) {
-        error = "Cannot open configuration: " + path_text(path);
-        return false;
-    }
-    bool seen_data = false;
-    std::string line;
-    unsigned line_number = 0;
-    while (std::getline(file, line)) {
-        ++line_number;
-        const auto text = trim(line);
-        if (text.empty() || text.front() == '#') continue;
-        const auto equals = text.find('=');
-        if (equals == std::string_view::npos || trim(text.substr(0, equals)) != "data_dir" || seen_data) {
-            error = "Unknown, malformed or duplicate configuration key at line " + std::to_string(line_number);
-            return false;
+        std::string_view trim(std::string_view value)
+        {
+            const auto first = value.find_first_not_of(" \t\r\n");
+            if (first == std::string_view::npos)
+                return {};
+            return value.substr(first, value.find_last_not_of(" \t\r\n") - first + 1);
         }
-        auto value = trim(text.substr(equals + 1));
-        if (value.size() >= 2 && value.front() == '"' && value.back() == '"') {
-            value = value.substr(1, value.size() - 2);
+
+        std::string ascii_lower(std::string value)
+        {
+            for (auto& c : value)
+                if (c >= 'A' && c <= 'Z')
+                    c = static_cast<char>(c + ('a' - 'A'));
+            return value;
         }
-        if (value.empty() || value.find('"') != std::string_view::npos) {
-            error = "Invalid data_dir at line " + std::to_string(line_number);
-            return false;
-        }
-        data_dir = path_from_utf8(value);
-        seen_data = true;
-    }
-    if (file.bad()) {
-        error = "Failed while reading configuration: " + path_text(path);
-        return false;
-    }
-    return true;
-}
 
-}
-
-std::string path_text(const fs::path& path) {
-    const auto text = path.generic_u8string();
-    return {text.begin(), text.end()};
-}
-
-fs::path path_from_utf8(std::string_view text) {
-    return fs::path(std::u8string(text.begin(), text.end()));
-}
-
-bool parse_options(std::span<const std::string_view> args, Options& options, std::string& error) {
-    options = {};
-    error.clear();
-    for (std::size_t i = 0; i < args.size(); ++i) {
-        const auto arg = args[i];
-        if (arg == "--help" || arg == "-h") options.help = true;
-        else if (arg == "--inspect-world") options.inspect_world = true;
-        else if (arg == "--inspect-player") { options.inspect_world = true; options.inspect_player = true; }
-        else if (arg == "--weapons-smoke") { options.world_smoke=true; options.player_smoke=true; options.weapons_smoke=true; }
-        else if (arg == "--movement-smoke") { options.world_smoke=true; options.player_smoke=true; options.movement_smoke=true; }
-        else if (arg == "--player-smoke") { options.world_smoke = true; options.player_smoke = true; }
-        else if (arg == "--start-game") options.start_game = true;
-        else if (arg == "--check-data") options.check_data = true;
-        else if (arg == "--no-inspector") options.inspector = false;
-        else if (arg == "--world-smoke") options.world_smoke = true;
-        else if (arg == "--gpu-smoke") options.gpu_smoke = true;
-        else if (arg == "--data-dir" || arg == "--config" || arg == "--frames" || arg == "--capture" || arg == "--world") {
-            if (++i == args.size() || args[i].empty() || args[i].starts_with("--")) {
-                error = "Missing value for " + std::string(arg);
+        bool read_config(const fs::path& path, fs::path& data_dir, std::string& error)
+        {
+            std::error_code ec;
+            const auto bytes = fs::file_size(path, ec);
+            if (ec || bytes > 65536)
+            {
+                error = "Cannot read configuration (maximum 64 KiB): " + path_text(path);
                 return false;
             }
-            if (arg == "--world") options.world = args[i];
-            else if (arg == "--data-dir") options.data_dir = path_from_utf8(args[i]);
-            else if (arg == "--capture") options.capture_file = path_from_utf8(args[i]);
-            else if (arg == "--config") {
-                options.config_file = path_from_utf8(args[i]);
-                options.explicit_config = true;
-            } else {
-                const auto value = args[i];
-                const auto result = std::from_chars(value.data(), value.data() + value.size(), options.frame_limit);
-                if (result.ec != std::errc{} || result.ptr != value.data() + value.size() ||
-                    options.frame_limit == 0 || options.frame_limit > 1000000) {
-                    error = "--frames requires an integer from 1 to 1000000";
+            std::ifstream file(path);
+            if (!file)
+            {
+                error = "Cannot open configuration: " + path_text(path);
+                return false;
+            }
+            bool seen_data = false;
+            std::string line;
+            unsigned line_number = 0;
+            while (std::getline(file, line))
+            {
+                ++line_number;
+                const auto text = trim(line);
+                if (text.empty() || text.front() == '#')
+                    continue;
+                const auto equals = text.find('=');
+                if (equals == std::string_view::npos || trim(text.substr(0, equals)) != "data_dir" || seen_data)
+                {
+                    error = "Unknown, malformed or duplicate configuration key at line " + std::to_string(line_number);
                     return false;
                 }
+                auto value = trim(text.substr(equals + 1));
+                if (value.size() >= 2 && value.front() == '"' && value.back() == '"')
+                {
+                    value = value.substr(1, value.size() - 2);
+                }
+                if (value.empty() || value.find('"') != std::string_view::npos)
+                {
+                    error = "Invalid data_dir at line " + std::to_string(line_number);
+                    return false;
+                }
+                data_dir = path_from_utf8(value);
+                seen_data = true;
             }
-        } else {
-            error = "Unknown option: " + std::string(arg);
+            if (file.bad())
+            {
+                error = "Failed while reading configuration: " + path_text(path);
+                return false;
+            }
+            return true;
+        }
+
+    } // namespace
+
+    std::string path_text(const fs::path& path)
+    {
+        const auto text = path.generic_u8string();
+        return {text.begin(), text.end()};
+    }
+
+    fs::path path_from_utf8(std::string_view text)
+    {
+        return fs::path(std::u8string(text.begin(), text.end()));
+    }
+
+    bool parse_options(std::span<const std::string_view> args, Options& options, std::string& error)
+    {
+        options = {};
+        error.clear();
+        for (std::size_t i = 0; i < args.size(); ++i)
+        {
+            const auto arg = args[i];
+            if (arg == "--help" || arg == "-h")
+                options.help = true;
+            else if (arg == "--inspect-world")
+                options.inspect_world = true;
+            else if (arg == "--inspect-player")
+            {
+                options.inspect_world = true;
+                options.inspect_player = true;
+            }
+            else if (arg == "--weapons-smoke")
+            {
+                options.world_smoke = true;
+                options.player_smoke = true;
+                options.weapons_smoke = true;
+            }
+            else if (arg == "--movement-smoke")
+            {
+                options.world_smoke = true;
+                options.player_smoke = true;
+                options.movement_smoke = true;
+            }
+            else if (arg == "--player-smoke")
+            {
+                options.world_smoke = true;
+                options.player_smoke = true;
+            }
+            else if (arg == "--start-game")
+                options.start_game = true;
+            else if (arg == "--check-data")
+                options.check_data = true;
+            else if (arg == "--no-inspector")
+                options.inspector = false;
+            else if (arg == "--world-smoke")
+                options.world_smoke = true;
+            else if (arg == "--gpu-smoke")
+                options.gpu_smoke = true;
+            else if (arg == "--data-dir" || arg == "--config" || arg == "--frames" || arg == "--capture" ||
+                     arg == "--world")
+            {
+                if (++i == args.size() || args[i].empty() || args[i].starts_with("--"))
+                {
+                    error = "Missing value for " + std::string(arg);
+                    return false;
+                }
+                if (arg == "--world")
+                    options.world = args[i];
+                else if (arg == "--data-dir")
+                    options.data_dir = path_from_utf8(args[i]);
+                else if (arg == "--capture")
+                    options.capture_file = path_from_utf8(args[i]);
+                else if (arg == "--config")
+                {
+                    options.config_file = path_from_utf8(args[i]);
+                    options.explicit_config = true;
+                }
+                else
+                {
+                    const auto value = args[i];
+                    const auto result = std::from_chars(value.data(), value.data() + value.size(), options.frame_limit);
+                    if (result.ec != std::errc{} || result.ptr != value.data() + value.size() ||
+                        options.frame_limit == 0 || options.frame_limit > 1000000)
+                    {
+                        error = "--frames requires an integer from 1 to 1000000";
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                error = "Unknown option: " + std::string(arg);
+                return false;
+            }
+        }
+        if (options.world_smoke && options.gpu_smoke)
+        {
+            error = "Choose one GPU smoke mode";
             return false;
         }
-    }
-    if (options.world_smoke && options.gpu_smoke) { error = "Choose one GPU smoke mode"; return false; }
-    if (options.weapons_smoke && options.movement_smoke) { error="Choose one player smoke scenario"; return false; }
-    if ((options.inspect_world && options.start_game) || ((options.inspect_world || options.start_game) &&
-        (options.check_data || options.gpu_smoke || options.world_smoke || !options.capture_file.empty() || options.frame_limit))) {
-        error = "--inspect-world and --start-game are separate headless modes"; return false;
-    }
-    if ((options.gpu_smoke || options.world_smoke) && options.frame_limit != 0) {
-        error = "--gpu-smoke controls its own frame count; omit --frames";
-        return false;
-    }
-    if ((options.gpu_smoke || options.world_smoke) && options.check_data) {
-        error = "--gpu-smoke and --check-data are separate execution modes";
-        return false;
-    }
-    if (options.check_data && !options.capture_file.empty()) {
-        error = "--capture requires a graphical run; omit --check-data";
-        return false;
-    }
-    if (!options.capture_file.empty() && options.frame_limit != 0 && options.frame_limit < 3) {
-        error = "--capture needs at least 3 frames for UI layout; increase --frames";
-        return false;
-    }
-    return true;
-}
-
-bool load_config(const Options& options, std::string_view environment_data_dir, Config& config, std::string& error) {
-    config = {};
-    error.clear();
-    std::error_code ec;
-    const bool exists = fs::exists(options.config_file, ec);
-    if (ec || (options.explicit_config && !exists)) {
-        error = "Configuration not found or inaccessible: " + path_text(options.config_file);
-        return false;
-    }
-    if (exists) {
-        if (!read_config(options.config_file, config.data_dir, error)) return false;
-        if (!config.data_dir.empty() && config.data_dir.is_relative()) {
-            config.data_dir = options.config_file.parent_path() / config.data_dir;
+        if (options.weapons_smoke && options.movement_smoke)
+        {
+            error = "Choose one player smoke scenario";
+            return false;
         }
-        config.source = path_text(options.config_file);
-    }
-    if (!environment_data_dir.empty()) {
-        config.data_dir = path_from_utf8(environment_data_dir);
-        config.source = "BLOOD2_DATA_DIR";
-    }
-    if (!options.data_dir.empty()) {
-        config.data_dir = options.data_dir;
-        config.source = "--data-dir";
-    }
-    if (config.data_dir.empty()) {
-        error = "No Blood II data directory. Set --data-dir, BLOOD2_DATA_DIR or data_dir in blood2.local.ini.";
-        return false;
-    }
-    config.data_dir = fs::absolute(config.data_dir, ec).lexically_normal();
-    if (ec) {
-        error = "Cannot resolve data directory: " + ec.message();
-        return false;
-    }
-    return true;
-}
-
-bool inspect_data(const Config& config, DataStatus& data, std::string& error) {
-    data = {};
-    error.clear();
-    data.archives = {{"BLOOD2.REZ", true}, {"SOUND.REZ"}, {"BLOOD2P.REZ"}, {"BLOOD2P2.REZ"}, {"BLOOD2NM.REZ"}};
-    std::error_code ec;
-    if (!fs::is_directory(config.data_dir, ec) || ec) {
-        error = "Blood II data directory not found or inaccessible: " + path_text(config.data_dir);
-        return false;
-    }
-    fs::path readme;
-    fs::directory_iterator it(config.data_dir, ec);
-    if (ec) {
-        error = "Cannot enumerate data directory: " + ec.message();
-        return false;
-    }
-    for (const fs::directory_iterator end; it != end; it.increment(ec)) {
-        if (ec) break;
-        const auto lower = ascii_lower(path_text(it->path().filename()));
-        if (lower == "readme.txt") readme = it->path();
-        for (auto& archive : data.archives) {
-            if (lower != ascii_lower(archive.name)) continue;
-            if (archive.present) {
-                error = "Ambiguous archive names differing only in case: " + archive.name;
-                return false;
-            }
-            if (!it->is_regular_file(ec) || ec) {
-                error = "Archive is not a readable regular file: " + path_text(it->path());
-                return false;
-            }
-            archive.bytes = it->file_size(ec);
-            std::ifstream probe(it->path(), std::ios::binary);
-            if (ec || archive.bytes == 0 || !probe) {
-                error = "Archive is empty or unreadable: " + path_text(it->path());
-                return false;
-            }
-            archive.present = true;
+        if ((options.inspect_world && options.start_game) ||
+            ((options.inspect_world || options.start_game) &&
+             (options.check_data || options.gpu_smoke || options.world_smoke || !options.capture_file.empty() ||
+              options.frame_limit)))
+        {
+            error = "--inspect-world and --start-game are separate headless modes";
+            return false;
         }
-    }
-    if (ec) {
-        error = "Failed enumerating data directory: " + ec.message();
-        return false;
-    }
-    if (!data.archives.front().present) {
-        error = "Required archive BLOOD2.REZ is missing from " + path_text(config.data_dir);
-        return false;
-    }
-    // Version is informational: the readme is not proof of the executable version.
-    if (!readme.empty()) {
-        std::ifstream file(readme, std::ios::binary);
-        std::string prefix(4096, '\0');
-        file.read(prefix.data(), static_cast<std::streamsize>(prefix.size()));
-        prefix.resize(static_cast<std::size_t>(file.gcount()));
-        const auto pos = prefix.find("Blood II: The Chosen Version");
-        if (pos != std::string::npos) {
-            const auto end = prefix.find_first_of("\r\n", pos);
-            data.readme_version = prefix.substr(pos, std::min<std::size_t>(end - pos, 120));
+        if ((options.gpu_smoke || options.world_smoke) && options.frame_limit != 0)
+        {
+            error = "--gpu-smoke controls its own frame count; omit --frames";
+            return false;
         }
+        if ((options.gpu_smoke || options.world_smoke) && options.check_data)
+        {
+            error = "--gpu-smoke and --check-data are separate execution modes";
+            return false;
+        }
+        if (options.check_data && !options.capture_file.empty())
+        {
+            error = "--capture requires a graphical run; omit --check-data";
+            return false;
+        }
+        if (!options.capture_file.empty() && options.frame_limit != 0 && options.frame_limit < 3)
+        {
+            error = "--capture needs at least 3 frames for UI layout; increase --frames";
+            return false;
+        }
+        return true;
     }
-    return true;
-}
 
-}
+    bool load_config(const Options& options, std::string_view environment_data_dir, Config& config, std::string& error)
+    {
+        config = {};
+        error.clear();
+        std::error_code ec;
+        const bool exists = fs::exists(options.config_file, ec);
+        if (ec || (options.explicit_config && !exists))
+        {
+            error = "Configuration not found or inaccessible: " + path_text(options.config_file);
+            return false;
+        }
+        if (exists)
+        {
+            if (!read_config(options.config_file, config.data_dir, error))
+                return false;
+            if (!config.data_dir.empty() && config.data_dir.is_relative())
+            {
+                config.data_dir = options.config_file.parent_path() / config.data_dir;
+            }
+            config.source = path_text(options.config_file);
+        }
+        if (!environment_data_dir.empty())
+        {
+            config.data_dir = path_from_utf8(environment_data_dir);
+            config.source = "BLOOD2_DATA_DIR";
+        }
+        if (!options.data_dir.empty())
+        {
+            config.data_dir = options.data_dir;
+            config.source = "--data-dir";
+        }
+        if (config.data_dir.empty())
+        {
+            error = "No Blood II data directory. Set --data-dir, BLOOD2_DATA_DIR or data_dir in blood2.local.ini.";
+            return false;
+        }
+        config.data_dir = fs::absolute(config.data_dir, ec).lexically_normal();
+        if (ec)
+        {
+            error = "Cannot resolve data directory: " + ec.message();
+            return false;
+        }
+        return true;
+    }
+
+    bool inspect_data(const Config& config, DataStatus& data, std::string& error)
+    {
+        data = {};
+        error.clear();
+        data.archives = {{"BLOOD2.REZ", true}, {"SOUND.REZ"}, {"BLOOD2P.REZ"}, {"BLOOD2P2.REZ"}, {"BLOOD2NM.REZ"}};
+        std::error_code ec;
+        if (!fs::is_directory(config.data_dir, ec) || ec)
+        {
+            error = "Blood II data directory not found or inaccessible: " + path_text(config.data_dir);
+            return false;
+        }
+        fs::path readme;
+        fs::directory_iterator it(config.data_dir, ec);
+        if (ec)
+        {
+            error = "Cannot enumerate data directory: " + ec.message();
+            return false;
+        }
+        for (const fs::directory_iterator end; it != end; it.increment(ec))
+        {
+            if (ec)
+                break;
+            const auto lower = ascii_lower(path_text(it->path().filename()));
+            if (lower == "readme.txt")
+                readme = it->path();
+            for (auto& archive : data.archives)
+            {
+                if (lower != ascii_lower(archive.name))
+                    continue;
+                if (archive.present)
+                {
+                    error = "Ambiguous archive names differing only in case: " + archive.name;
+                    return false;
+                }
+                if (!it->is_regular_file(ec) || ec)
+                {
+                    error = "Archive is not a readable regular file: " + path_text(it->path());
+                    return false;
+                }
+                archive.bytes = it->file_size(ec);
+                std::ifstream probe(it->path(), std::ios::binary);
+                if (ec || archive.bytes == 0 || !probe)
+                {
+                    error = "Archive is empty or unreadable: " + path_text(it->path());
+                    return false;
+                }
+                archive.present = true;
+            }
+        }
+        if (ec)
+        {
+            error = "Failed enumerating data directory: " + ec.message();
+            return false;
+        }
+        if (!data.archives.front().present)
+        {
+            error = "Required archive BLOOD2.REZ is missing from " + path_text(config.data_dir);
+            return false;
+        }
+        // Version is informational: the readme is not proof of the executable version.
+        if (!readme.empty())
+        {
+            std::ifstream file(readme, std::ios::binary);
+            std::string prefix(4096, '\0');
+            file.read(prefix.data(), static_cast<std::streamsize>(prefix.size()));
+            prefix.resize(static_cast<std::size_t>(file.gcount()));
+            const auto pos = prefix.find("Blood II: The Chosen Version");
+            if (pos != std::string::npos)
+            {
+                const auto end = prefix.find_first_of("\r\n", pos);
+                data.readme_version = prefix.substr(pos, std::min<std::size_t>(end - pos, 120));
+            }
+        }
+        return true;
+    }
+
+} // namespace OpenBlood2

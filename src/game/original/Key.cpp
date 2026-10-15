@@ -11,10 +11,7 @@
 #include "Key.h"
 #include "cpp_server_de.h"
 
-
 // Class registration and defaults: game/registration.cpp.
-
-
 
 // ----------------------------------------------------------------------- //
 //
@@ -26,15 +23,14 @@
 
 Key::Key() : B2BaseClass(OT_NORMAL)
 {
-	m_fTimeStamp		= 0.0f;
-	m_fSoundRadius		= 0.0f;
-	m_bLoopSound		= DFALSE;
-	m_hstrSoundName		= NULL;
-	m_hstrMessageTarget = NULL;
-	m_hstrMessageName	= NULL;
-	m_hstrBPrintMessage = NULL;
+    m_fTimeStamp = 0.0f;
+    m_fSoundRadius = 0.0f;
+    m_bLoopSound = DFALSE;
+    m_hstrSoundName = NULL;
+    m_hstrMessageTarget = NULL;
+    m_hstrMessageName = NULL;
+    m_hstrBPrintMessage = NULL;
 }
-
 
 // ----------------------------------------------------------------------- //
 //
@@ -46,16 +42,19 @@ Key::Key() : B2BaseClass(OT_NORMAL)
 
 Key::~Key()
 {
-	CServerDE* pServerDE = GetServerDE();
-	if (pServerDE)
-	{
-		if (m_hstrSoundName) pServerDE->FreeString (m_hstrSoundName);
-		if (m_hstrMessageTarget) pServerDE->FreeString (m_hstrMessageTarget);
-		if (m_hstrMessageName) pServerDE->FreeString (m_hstrMessageName);
-		if (m_hstrBPrintMessage) pServerDE->FreeString (m_hstrBPrintMessage);
-	}
+    CServerDE* pServerDE = GetServerDE();
+    if (pServerDE)
+    {
+        if (m_hstrSoundName)
+            pServerDE->FreeString(m_hstrSoundName);
+        if (m_hstrMessageTarget)
+            pServerDE->FreeString(m_hstrMessageTarget);
+        if (m_hstrMessageName)
+            pServerDE->FreeString(m_hstrMessageName);
+        if (m_hstrBPrintMessage)
+            pServerDE->FreeString(m_hstrBPrintMessage);
+    }
 }
-
 
 // ----------------------------------------------------------------------- //
 //
@@ -65,29 +64,29 @@ Key::~Key()
 //
 // ----------------------------------------------------------------------- //
 
-DDWORD Key::EngineMessageFn(DDWORD messageID, void *pData, DFLOAT fData)
+DDWORD Key::EngineMessageFn(DDWORD messageID, void* pData, DFLOAT fData)
 {
-	switch(messageID)
-	{
-		case MID_PRECREATE:
-		{
-			if (fData == 1.0f)
-				ReadProp((ObjectCreateStruct*)pData);
-			break;
-		}
+    switch (messageID)
+    {
+        case MID_PRECREATE:
+        {
+            if (fData == 1.0f)
+                ReadProp((ObjectCreateStruct*)pData);
+            break;
+        }
 
-		case MID_INITIALUPDATE:
-		{
-			InitialUpdate((DVector *)pData);
-			break;
-		}
+        case MID_INITIALUPDATE:
+        {
+            InitialUpdate((DVector*)pData);
+            break;
+        }
 
-		default : break;
-	}
+        default:
+            break;
+    }
 
-	return B2BaseClass::EngineMessageFn(messageID, pData, fData);
+    return B2BaseClass::EngineMessageFn(messageID, pData, fData);
 }
-
 
 // ----------------------------------------------------------------------- //
 //
@@ -97,34 +96,39 @@ DDWORD Key::EngineMessageFn(DDWORD messageID, void *pData, DFLOAT fData)
 //
 // ----------------------------------------------------------------------- //
 
-DBOOL Key::ReadProp(ObjectCreateStruct *pStruct)
+DBOOL Key::ReadProp(ObjectCreateStruct* pStruct)
 {
-	CServerDE* pServerDE = GetServerDE();
-	if (!pServerDE || !pStruct) return DFALSE;
+    CServerDE* pServerDE = GetServerDE();
+    if (!pServerDE || !pStruct)
+        return DFALSE;
 
-	char buf[MAX_CS_FILENAME_LEN];
+    char buf[MAX_CS_FILENAME_LEN];
 
-	buf[0] = '\0';
-	pServerDE->GetPropString("SoundName", buf, MAX_CS_FILENAME_LEN);
-	if (buf[0]) m_hstrSoundName = pServerDE->CreateString(buf);
+    buf[0] = '\0';
+    pServerDE->GetPropString("SoundName", buf, MAX_CS_FILENAME_LEN);
+    if (buf[0])
+        m_hstrSoundName = pServerDE->CreateString(buf);
 
-	buf[0] = '\0';
-	pServerDE->GetPropString("MessageTarget", buf, MAX_CS_FILENAME_LEN);
-	if (buf[0]) m_hstrMessageTarget = pServerDE->CreateString(buf);
+    buf[0] = '\0';
+    pServerDE->GetPropString("MessageTarget", buf, MAX_CS_FILENAME_LEN);
+    if (buf[0])
+        m_hstrMessageTarget = pServerDE->CreateString(buf);
 
-	buf[0] = '\0';
-	pServerDE->GetPropString("MessageName", buf, MAX_CS_FILENAME_LEN);
-	if (buf[0]) m_hstrMessageName = pServerDE->CreateString(buf);
+    buf[0] = '\0';
+    pServerDE->GetPropString("MessageName", buf, MAX_CS_FILENAME_LEN);
+    if (buf[0])
+        m_hstrMessageName = pServerDE->CreateString(buf);
 
-	buf[0] = '\0';
-	pServerDE->GetPropString("BPrintMessage", buf, MAX_CS_FILENAME_LEN);
-	if (buf[0]) m_hstrBPrintMessage = pServerDE->CreateString(buf);
+    buf[0] = '\0';
+    pServerDE->GetPropString("BPrintMessage", buf, MAX_CS_FILENAME_LEN);
+    if (buf[0])
+        m_hstrBPrintMessage = pServerDE->CreateString(buf);
 
-	pServerDE->GetPropReal("TimeStamp", &m_fTimeStamp);
-	pServerDE->GetPropReal("SoundRadius", &m_fSoundRadius);
-	pServerDE->GetPropBool("LoopSound", &m_bLoopSound);
+    pServerDE->GetPropReal("TimeStamp", &m_fTimeStamp);
+    pServerDE->GetPropReal("SoundRadius", &m_fSoundRadius);
+    pServerDE->GetPropBool("LoopSound", &m_bLoopSound);
 
-	return DTRUE;
+    return DTRUE;
 }
 
 // ----------------------------------------------------------------------- //
@@ -137,10 +141,11 @@ DBOOL Key::ReadProp(ObjectCreateStruct *pStruct)
 
 DBOOL Key::InitialUpdate(DVector*)
 {
-	CServerDE* pServerDE = GetServerDE();
-	if (!pServerDE) return DFALSE;
+    CServerDE* pServerDE = GetServerDE();
+    if (!pServerDE)
+        return DFALSE;
 
-	pServerDE->SetNextUpdate (m_hObject, 0.0f);
+    pServerDE->SetNextUpdate(m_hObject, 0.0f);
 
-	return DTRUE;
+    return DTRUE;
 }

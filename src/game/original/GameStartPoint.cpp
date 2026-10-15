@@ -13,9 +13,7 @@
 #include "game/original/trigger_helpers.h"
 #include <cstring>
 
-
 // Registration is in game/registration.cpp.
-
 
 // ----------------------------------------------------------------------- //
 //
@@ -26,15 +24,14 @@
 // ----------------------------------------------------------------------- //
 
 GameStartPoint::GameStartPoint() : StartPoint()
-{ 
-	m_bMultiplayer			= DFALSE; 
-	m_hstrName				= DNULL;
-	VEC_INIT(m_vPitchYawRoll);
-	m_hstrTriggerTarget		= DNULL;
-	m_hstrTriggerMessage	= DNULL;
-	m_nTeamID               = 0;
+{
+    m_bMultiplayer = DFALSE;
+    m_hstrName = DNULL;
+    VEC_INIT(m_vPitchYawRoll);
+    m_hstrTriggerTarget = DNULL;
+    m_hstrTriggerMessage = DNULL;
+    m_nTeamID = 0;
 }
-
 
 // ----------------------------------------------------------------------- //
 //
@@ -45,24 +42,24 @@ GameStartPoint::GameStartPoint() : StartPoint()
 // ----------------------------------------------------------------------- //
 
 GameStartPoint::~GameStartPoint()
-{ 
-	CServerDE* pServerDE = GetServerDE();
-	if (!pServerDE) return;
+{
+    CServerDE* pServerDE = GetServerDE();
+    if (!pServerDE)
+        return;
 
-	if (m_hstrName)
-	{
-		pServerDE->FreeString(m_hstrName);
-	}
-	if (m_hstrTriggerTarget)
-	{
-		pServerDE->FreeString(m_hstrTriggerTarget);
-	}
-	if (m_hstrTriggerMessage)
-	{
-		pServerDE->FreeString(m_hstrTriggerMessage);
-	}
+    if (m_hstrName)
+    {
+        pServerDE->FreeString(m_hstrName);
+    }
+    if (m_hstrTriggerTarget)
+    {
+        pServerDE->FreeString(m_hstrTriggerTarget);
+    }
+    if (m_hstrTriggerMessage)
+    {
+        pServerDE->FreeString(m_hstrTriggerMessage);
+    }
 }
-
 
 // ----------------------------------------------------------------------- //
 //
@@ -72,31 +69,31 @@ GameStartPoint::~GameStartPoint()
 //
 // ----------------------------------------------------------------------- //
 
-DDWORD GameStartPoint::EngineMessageFn(DDWORD messageID, void *pData, DFLOAT fData)
+DDWORD GameStartPoint::EngineMessageFn(DDWORD messageID, void* pData, DFLOAT fData)
 {
-	switch(messageID)
-	{
-		case MID_PRECREATE:
-		{
-			DDWORD dwRetVal = StartPoint::EngineMessageFn(messageID, pData, fData);
-			if (fData == 1.0f)
-				ReadProp();
-			
-			ObjectCreateStruct *pStruct = (ObjectCreateStruct*)pData;
-			// change the name so it's easy to find later
-			if (pStruct)
-			{
-				SAFE_STRCPY(pStruct->m_Name, "Blood2StartPoint");
-			}
-			return dwRetVal;
-		}
+    switch (messageID)
+    {
+        case MID_PRECREATE:
+        {
+            DDWORD dwRetVal = StartPoint::EngineMessageFn(messageID, pData, fData);
+            if (fData == 1.0f)
+                ReadProp();
 
-		default : break;
-	}
+            ObjectCreateStruct* pStruct = (ObjectCreateStruct*)pData;
+            // change the name so it's easy to find later
+            if (pStruct)
+            {
+                SAFE_STRCPY(pStruct->m_Name, "Blood2StartPoint");
+            }
+            return dwRetVal;
+        }
 
-	return StartPoint::EngineMessageFn(messageID, pData, fData);
+        default:
+            break;
+    }
+
+    return StartPoint::EngineMessageFn(messageID, pData, fData);
 }
-
 
 // ----------------------------------------------------------------------- //
 //
@@ -108,49 +105,49 @@ DDWORD GameStartPoint::EngineMessageFn(DDWORD messageID, void *pData, DFLOAT fDa
 
 DBOOL GameStartPoint::ReadProp()
 {
-	CServerDE* pServerDE = GetServerDE();
-	if (!pServerDE) return DFALSE;
+    CServerDE* pServerDE = GetServerDE();
+    if (!pServerDE)
+        return DFALSE;
 
-	GenericProp genProp;
+    GenericProp genProp;
 
-	if (pServerDE->GetPropGeneric("Multiplayer", &genProp) == DE_OK)
-		m_bMultiplayer = genProp.m_Bool;
+    if (pServerDE->GetPropGeneric("Multiplayer", &genProp) == DE_OK)
+        m_bMultiplayer = genProp.m_Bool;
 
-	if (pServerDE->GetPropGeneric("Name", &genProp) == DE_OK)
-	{
-		if (genProp.m_String[0])
-			 m_hstrName = pServerDE->CreateString(genProp.m_String);
-	}
+    if (pServerDE->GetPropGeneric("Name", &genProp) == DE_OK)
+    {
+        if (genProp.m_String[0])
+            m_hstrName = pServerDE->CreateString(genProp.m_String);
+    }
 
-	if (g_pServerDE->GetPropGeneric("TeamID", &genProp) == DE_OK)
-	{
-		m_nTeamID = (int)genProp.m_Long;
-	}
+    if (g_pServerDE->GetPropGeneric("TeamID", &genProp) == DE_OK)
+    {
+        m_nTeamID = (int)genProp.m_Long;
+    }
 
-	DRotation rRot;
-	ROT_INIT(rRot);
+    DRotation rRot;
+    ROT_INIT(rRot);
 
-	if (pServerDE->GetPropGeneric("Rotation", &genProp) == DE_OK)
-	{
-		m_vPitchYawRoll.x = genProp.m_Vec.x;
-		m_vPitchYawRoll.y = genProp.m_Vec.y;
-		m_vPitchYawRoll.z = genProp.m_Vec.z;
-	}
+    if (pServerDE->GetPropGeneric("Rotation", &genProp) == DE_OK)
+    {
+        m_vPitchYawRoll.x = genProp.m_Vec.x;
+        m_vPitchYawRoll.y = genProp.m_Vec.y;
+        m_vPitchYawRoll.z = genProp.m_Vec.z;
+    }
 
-	if (pServerDE->GetPropGeneric("TriggerTarget", &genProp) == DE_OK)
-	{
-		if (genProp.m_String[0])
-			 m_hstrTriggerTarget = pServerDE->CreateString(genProp.m_String);
-	}
+    if (pServerDE->GetPropGeneric("TriggerTarget", &genProp) == DE_OK)
+    {
+        if (genProp.m_String[0])
+            m_hstrTriggerTarget = pServerDE->CreateString(genProp.m_String);
+    }
 
-	if (pServerDE->GetPropGeneric("TriggerMessage", &genProp) == DE_OK)
-	{
-		if (genProp.m_String[0])
-			 m_hstrTriggerMessage = pServerDE->CreateString(genProp.m_String);
-	}
-	return DTRUE;
+    if (pServerDE->GetPropGeneric("TriggerMessage", &genProp) == DE_OK)
+    {
+        if (genProp.m_String[0])
+            m_hstrTriggerMessage = pServerDE->CreateString(genProp.m_String);
+    }
+    return DTRUE;
 }
-
 
 // ----------------------------------------------------------------------- //
 //
@@ -162,8 +159,8 @@ DBOOL GameStartPoint::ReadProp()
 
 void GameStartPoint::SendTrigger()
 {
-	if (!m_hstrTriggerTarget || !m_hstrTriggerMessage || !g_pServerDE)
-		return;
+    if (!m_hstrTriggerTarget || !m_hstrTriggerMessage || !g_pServerDE)
+        return;
 
-	SendTriggerMsgToObjects(this, m_hstrTriggerTarget, m_hstrTriggerMessage);
+    SendTriggerMsgToObjects(this, m_hstrTriggerTarget, m_hstrTriggerMessage);
 }

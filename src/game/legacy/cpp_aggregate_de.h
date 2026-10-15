@@ -12,56 +12,60 @@
 
 class Aggregate
 {
-	public :
+  public:
+    // Very important that these data members are EXACTLY the same as
+    // the C version of this class (Aggregate_t)...
+    Aggregate* m_pNextAggregate;
 
-		// Very important that these data members are EXACTLY the same as
-		// the C version of this class (Aggregate_t)...
-		Aggregate	*m_pNextAggregate;
+    // Hook functions for the aggregate..
+    AggregateEngineMessageFn m_EngineMessageFn;
+    AggregateObjectMessageFn m_ObjectMessageFn;
 
-		// Hook functions for the aggregate..
-		AggregateEngineMessageFn m_EngineMessageFn;
-		AggregateObjectMessageFn m_ObjectMessageFn;
-	
+    Aggregate() : m_pNextAggregate(nullptr)
+    {
+        m_EngineMessageFn = _EngineMessageFn;
+        m_ObjectMessageFn = _ObjectMessageFn;
+    }
+    virtual ~Aggregate() {}
 
-		Aggregate() : m_pNextAggregate(nullptr)
-		{
-			m_EngineMessageFn = _EngineMessageFn;
-			m_ObjectMessageFn = _ObjectMessageFn;
-		}
-		virtual ~Aggregate() {}
+  protected:
+    virtual DDWORD EngineMessageFn(LPBASECLASS, DDWORD, void*, DFLOAT)
+    {
+        return 1;
+    }
+    virtual DDWORD ObjectMessageFn(LPBASECLASS, HOBJECT, DDWORD, HMESSAGEREAD)
+    {
+        return 1;
+    }
 
-
-	protected :
-
-		virtual DDWORD EngineMessageFn(LPBASECLASS, DDWORD, void *, DFLOAT) { return 1; }
-		virtual DDWORD ObjectMessageFn(LPBASECLASS, HOBJECT, DDWORD, HMESSAGEREAD) { return 1; }
-	
-	private :
-
-		static DDWORD _EngineMessageFn(LPBASECLASS pObject, LPAGGREGATE pAggregate, DDWORD messageID, void *pData, DFLOAT lData);
-		static DDWORD _ObjectMessageFn(LPBASECLASS pObject, LPAGGREGATE pAggregate, HOBJECT hSender, DDWORD messageID, HMESSAGEREAD hRead);
+  private:
+    static DDWORD _EngineMessageFn(LPBASECLASS pObject, LPAGGREGATE pAggregate, DDWORD messageID, void* pData,
+                                   DFLOAT lData);
+    static DDWORD _ObjectMessageFn(LPBASECLASS pObject, LPAGGREGATE pAggregate, HOBJECT hSender, DDWORD messageID,
+                                   HMESSAGEREAD hRead);
 };
 
-
 // Inlines...
-inline DDWORD Aggregate::_EngineMessageFn(LPBASECLASS pObject, LPAGGREGATE pAggregate, DDWORD messageID, void *pData, DFLOAT lData)
+inline DDWORD Aggregate::_EngineMessageFn(LPBASECLASS pObject, LPAGGREGATE pAggregate, DDWORD messageID, void* pData,
+                                          DFLOAT lData)
 {
-	if (pAggregate)
-	{
-		return pAggregate->EngineMessageFn(pObject, messageID, pData, lData);
-	}
+    if (pAggregate)
+    {
+        return pAggregate->EngineMessageFn(pObject, messageID, pData, lData);
+    }
 
-	return 0;
-}
-		
-inline DDWORD Aggregate::_ObjectMessageFn(LPBASECLASS pObject, LPAGGREGATE pAggregate, HOBJECT hSender, DDWORD messageID, HMESSAGEREAD hRead)
-{
-	if (pAggregate)
-	{
-		return pAggregate->ObjectMessageFn(pObject, hSender, messageID, hRead);
-	}
-
-	return 0;
+    return 0;
 }
 
-#endif  // __CPP_AGGREGATE_DE__
+inline DDWORD Aggregate::_ObjectMessageFn(LPBASECLASS pObject, LPAGGREGATE pAggregate, HOBJECT hSender,
+                                          DDWORD messageID, HMESSAGEREAD hRead)
+{
+    if (pAggregate)
+    {
+        return pAggregate->ObjectMessageFn(pObject, hSender, messageID, hRead);
+    }
+
+    return 0;
+}
+
+#endif // __CPP_AGGREGATE_DE__

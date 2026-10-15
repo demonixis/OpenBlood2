@@ -1,9 +1,9 @@
 #pragma once
 
-namespace blood2::build {
-inline constexpr const char* version = "@PROJECT_VERSION@";
-inline constexpr const char* sdl_revision = "@BLOOD2_SDL_REVISION@";
-inline constexpr const char* imgui_revision = "@BLOOD2_IMGUI_REVISION@";
-inline constexpr const char* spdlog_revision = "@BLOOD2_SPDLOG_REVISION@";
-}
-
+namespace OpenBlood2::build
+{
+    inline constexpr const char* version = "@PROJECT_VERSION@";
+    inline constexpr const char* sdl_revision = "@BLOOD2_SDL_REVISION@";
+    inline constexpr const char* imgui_revision = "@BLOOD2_IMGUI_REVISION@";
+    inline constexpr const char* spdlog_revision = "@BLOOD2_SPDLOG_REVISION@";
+} // namespace OpenBlood2::build

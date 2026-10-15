@@ -8,11 +8,10 @@
 //
 // ----------------------------------------------------------------------- //
 
-#include <stdio.h>
 #include "CameraSpot.h"
+#include <stdio.h>
 
 // Class registration and defaults: game/registration.cpp.
-
 
 void BPrint(char*);
 
@@ -24,10 +23,7 @@ void BPrint(char*);
 //
 // ----------------------------------------------------------------------- //
 
-CameraSpot::CameraSpot() : B2BaseClass(OT_NORMAL)
-{
-}
-
+CameraSpot::CameraSpot() : B2BaseClass(OT_NORMAL) {}
 
 // ----------------------------------------------------------------------- //
 //
@@ -37,9 +33,7 @@ CameraSpot::CameraSpot() : B2BaseClass(OT_NORMAL)
 //
 // ----------------------------------------------------------------------- //
 
-CameraSpot::~CameraSpot()
-{
-}
+CameraSpot::~CameraSpot() {}
 
 // ----------------------------------------------------------------------- //
 //
@@ -49,58 +43,57 @@ CameraSpot::~CameraSpot()
 //
 // ----------------------------------------------------------------------- //
 
-DDWORD CameraSpot::EngineMessageFn(DDWORD messageID, void *pData, DFLOAT fData)
+DDWORD CameraSpot::EngineMessageFn(DDWORD messageID, void* pData, DFLOAT fData)
 {
-	switch(messageID)
-	{
-/*
-		case MID_UPDATE:
-		{
-			if (!Update((DVector *)pData) )
-            {
-            	CServerDE* pServerDE = GetServerDE();
-            	if (!pServerDE) break;
+    switch (messageID)
+    {
+            /*
+                    case MID_UPDATE:
+                    {
+                        if (!Update((DVector *)pData) )
+                        {
+                            CServerDE* pServerDE = GetServerDE();
+                            if (!pServerDE) break;
 
-            	pServerDE->RemoveObject(m_hObject);		
-            }
-		}
-		break;
+                            pServerDE->RemoveObject(m_hObject);
+                        }
+                    }
+                    break;
 
-		case MID_TOUCHNOTIFY:
-		{
-			ObjectTouch((HOBJECT)pData);
-		}
-		break;
-*/
+                    case MID_TOUCHNOTIFY:
+                    {
+                        ObjectTouch((HOBJECT)pData);
+                    }
+                    break;
+            */
 
-		case MID_PRECREATE:
-		{
-			DDWORD dwRet = B2BaseClass::EngineMessageFn(messageID, pData, fData);
+        case MID_PRECREATE:
+        {
+            DDWORD dwRet = B2BaseClass::EngineMessageFn(messageID, pData, fData);
 
-			PostPropRead((ObjectCreateStruct*)pData);
+            PostPropRead((ObjectCreateStruct*)pData);
 
-			return dwRet;
-		}
+            return dwRet;
+        }
         break;
 
+            //		case MID_READPROP:
+            //		{
+            //			ReadProp((ReadPropInfo*)pData);
+            //		}
+            //		break;
 
-//		case MID_READPROP:
-//		{
-//			ReadProp((ReadPropInfo*)pData);
-//		}
-//		break;
+        case MID_INITIALUPDATE:
+        {
+            InitialUpdate((DVector*)pData);
+        }
+        break;
 
-		case MID_INITIALUPDATE:
-		{
-			InitialUpdate((DVector *)pData);
-		}
-		break;
+        default:
+            break;
+    }
 
-		default : break;
-	}
-
-
-	return B2BaseClass::EngineMessageFn(messageID, pData, fData);
+    return B2BaseClass::EngineMessageFn(messageID, pData, fData);
 }
 
 // ----------------------------------------------------------------------- //
@@ -111,32 +104,31 @@ DDWORD CameraSpot::EngineMessageFn(DDWORD messageID, void *pData, DFLOAT fData)
 //
 // ----------------------------------------------------------------------- //
 
-void CameraSpot::PostPropRead(ObjectCreateStruct *pStruct)
+void CameraSpot::PostPropRead(ObjectCreateStruct* pStruct)
 {
-	if (!pStruct) return;
+    if (!pStruct)
+        return;
 
-//	char* pFilename = "Models\\CameraSpot.abc";
-//	char* pSkin = "Skins\\CameraSpot.dtx";
-//	_mbscpy((unsigned char*)pStruct->m_Filename, (const unsigned char*)pFilename);
-//	_mbscpy((unsigned char*)pStruct->m_SkinName, (const unsigned char*)pSkin);
-    
+    //	char* pFilename = "Models\\CameraSpot.abc";
+    //	char* pSkin = "Skins\\CameraSpot.dtx";
+    //	_mbscpy((unsigned char*)pStruct->m_Filename, (const unsigned char*)pFilename);
+    //	_mbscpy((unsigned char*)pStruct->m_SkinName, (const unsigned char*)pSkin);
+
     // Set the Update!
-	pStruct->m_NextUpdate = 0.001f;
+    pStruct->m_NextUpdate = 0.001f;
 
+    // Check if debug is turned ON
 
-// Check if debug is turned ON
+    //    if ( _mbsncmp((const unsigned char*)pStruct->m_Name,(const unsigned char*)"SMELL",5) == 0)
+    //    {
+    //	    pStruct->m_Flags = FLAG_TOUCH_NOTIFY;
+    //    }
+    //    else
+    //    {
+    //	    pStruct->m_Flags = FLAG_VISIBLE | FLAG_TOUCH_NOTIFY;
+    //    }
 
-//    if ( _mbsncmp((const unsigned char*)pStruct->m_Name,(const unsigned char*)"SMELL",5) == 0)
-//    {
-//	    pStruct->m_Flags = FLAG_TOUCH_NOTIFY;	
-//    }
-//    else
-//    {
-//	    pStruct->m_Flags = FLAG_VISIBLE | FLAG_TOUCH_NOTIFY;	
-//    }
-
-//    pStruct->m_Flags = FLAG_VISIBLE | FLAG_TOUCH_NOTIFY;	
-
+    //    pStruct->m_Flags = FLAG_VISIBLE | FLAG_TOUCH_NOTIFY;
 }
 
 // ----------------------------------------------------------------------- //
@@ -146,15 +138,16 @@ void CameraSpot::PostPropRead(ObjectCreateStruct *pStruct)
 //	PURPOSE:	Set property value
 //
 // ----------------------------------------------------------------------- //
-//DBOOL CameraSpot::ReadProp(ReadPropInfo *pInfo)
+// DBOOL CameraSpot::ReadProp(ReadPropInfo *pInfo)
 //{
 //	CServerDE* pServerDE = GetServerDE();
 //	if (!pServerDE) return DFALSE;
 //	if (!pInfo) return DFALSE;
 //
-//    DBOOL bRet = DTRUE;  
+//    DBOOL bRet = DTRUE;
 
-//	if(_mbscmp((const unsigned char*)pInfo->m_pPropName, (const unsigned char*)"Action")==0 && pInfo->m_PropType == PT_STRING)
+//	if(_mbscmp((const unsigned char*)pInfo->m_pPropName, (const unsigned char*)"Action")==0 && pInfo->m_PropType ==
+//PT_STRING)
 //	{
 //		m_hstrAction = pServerDE->CreateString((char*)pInfo->m_pData);
 //	}
@@ -166,7 +159,6 @@ void CameraSpot::PostPropRead(ObjectCreateStruct *pStruct)
 //	return bRet;
 //}
 
-
 // ----------------------------------------------------------------------- //
 //
 //	ROUTINE:	CameraSpot::ObjectTouch
@@ -175,16 +167,16 @@ void CameraSpot::PostPropRead(ObjectCreateStruct *pStruct)
 //
 // ----------------------------------------------------------------------- //
 
-void CameraSpot::ObjectTouch (HOBJECT)
+void CameraSpot::ObjectTouch(HOBJECT)
 {
-	CServerDE* pServerDE = GetServerDE();
-	if (!pServerDE) return;
+    CServerDE* pServerDE = GetServerDE();
+    if (!pServerDE)
+        return;
 
-//    char buf[80];
-//    sprintf(buf, "CameraSpot =%s", pServerDE->GetObjectName(m_hObject));
-//	BPrint(buf);
+    //    char buf[80];
+    //    sprintf(buf, "CameraSpot =%s", pServerDE->GetObjectName(m_hObject));
+    //	BPrint(buf);
 }
-
 
 // ----------------------------------------------------------------------- //
 //
@@ -194,19 +186,20 @@ void CameraSpot::ObjectTouch (HOBJECT)
 //
 // ----------------------------------------------------------------------- //
 
-DBOOL CameraSpot::InitialUpdate(DVector *)
+DBOOL CameraSpot::InitialUpdate(DVector*)
 {
-	CServerDE* pServerDE = GetServerDE();
-	if (!pServerDE) return DFALSE;
+    CServerDE* pServerDE = GetServerDE();
+    if (!pServerDE)
+        return DFALSE;
 
-//	m_bActive = DTRUE;
-	pServerDE->SetNextUpdate(m_hObject, 0.0f);
+    //	m_bActive = DTRUE;
+    pServerDE->SetNextUpdate(m_hObject, 0.0f);
 
-//	DVector vDims;
-//	VEC_SET(vDims, 20, 20, 20);
-//	pServerDE->SetObjectDims(m_hObject, &vDims);
+    //	DVector vDims;
+    //	VEC_SET(vDims, 20, 20, 20);
+    //	pServerDE->SetObjectDims(m_hObject, &vDims);
 
-	return DTRUE;
+    return DTRUE;
 }
 
 /*
@@ -220,12 +213,12 @@ DBOOL CameraSpot::InitialUpdate(DVector *)
 
 DBOOL CameraSpot::Update(DVector *)
 {
-	CServerDE* pServerDE = GetServerDE();
-	if (!pServerDE) return DFALSE;
+    CServerDE* pServerDE = GetServerDE();
+    if (!pServerDE) return DFALSE;
 
-   	pServerDE->SetNextUpdate(m_hObject, 0.01f);
-    
-	return DTRUE;
+    pServerDE->SetNextUpdate(m_hObject, 0.01f);
+
+    return DTRUE;
 }
 
 */

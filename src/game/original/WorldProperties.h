@@ -2,13 +2,9 @@
 #include "B2BaseClass.h"
 class WorldProperties : public B2BaseClass
 {
-	public:
+  public:
+    ~WorldProperties();
 
-	~WorldProperties( );
-
-	protected :
-
-		DDWORD EngineMessageFn(DDWORD messageID, void *pData, DFLOAT lData) override;
+  protected:
+    DDWORD EngineMessageFn(DDWORD messageID, void* pData, DFLOAT lData) override;
 };
-
-

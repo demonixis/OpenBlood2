@@ -11,33 +11,29 @@
 #ifndef __CAMERASPOT_H__
 #define __CAMERASPOT_H__
 
+#include "B2BaseClass.h"
 #include "cpp_engineobjects_de.h"
 #include "cpp_server_de.h"
-#include "B2BaseClass.h"
 
 class CameraSpot : public B2BaseClass
 {
-	public :
+  public:
+    CameraSpot();
+    ~CameraSpot();
 
-		CameraSpot();
-		~CameraSpot();
+  protected:
+    virtual DDWORD EngineMessageFn(DDWORD messageID, void* pData, DFLOAT fData);
+    //		DBOOL m_bActive;
 
-	protected :
+  private:
+    void ObjectTouch(HOBJECT hObj);
 
-		virtual DDWORD EngineMessageFn(DDWORD messageID, void *pData, DFLOAT fData);
-//		DBOOL m_bActive;   
+    DBOOL InitialUpdate(DVector* pMovement);
+    //		DBOOL Update(DVector *pMovement);
+    //		DBOOL ReadProp(ReadPropInfo *pInfo);
+    void PostPropRead(ObjectCreateStruct* pStruct);
 
-	private :
-
-		void ObjectTouch(HOBJECT hObj);
-
-		DBOOL InitialUpdate(DVector *pMovement);
-//		DBOOL Update(DVector *pMovement);
-//		DBOOL ReadProp(ReadPropInfo *pInfo);
-		void  PostPropRead(ObjectCreateStruct *pStruct);
-
-    public:
-        
+  public:
 };
 
 #endif // __CAMERASPOT_H__

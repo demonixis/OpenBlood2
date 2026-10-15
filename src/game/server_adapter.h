@@ -1,153 +1,202 @@
 #pragma once
-#include "engine/objects.h"
-#include "game/session.h"
-#include "engine/model_store.h"
 #include "engine/collision.h"
+#include "engine/model_store.h"
+#include "engine/objects.h"
 #include "game/original/BloodShells.h"
+#include "game/session.h"
 #include <array>
-#include <unordered_set>
 #include <optional>
+#include <unordered_set>
 
-struct StringHandle {};
-struct LMessage {};
-struct ConsoleVariable { std::string text; };
-struct ClientHandle {};
+struct StringHandle
+{
+};
+struct LMessage
+{
+};
+struct ConsoleVariable
+{
+    std::string text;
+};
+struct ClientHandle
+{
+};
 
-namespace blood2 {
+namespace OpenBlood2
+{
 
-class ServerAdapter final : public ServerDE {
-public:
-    explicit ServerAdapter(Objects& objects);
-    ~ServerAdapter() override;
-    ServerAdapter(const ServerAdapter&) = delete;
-    ServerAdapter& operator=(const ServerAdapter&) = delete;
-    bool bind();
-    bool GetMovementState(HOBJECT, MovementState&) override;
-    SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&) override;
-    DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
-    bool ReadDamage(HMESSAGEREAD, Damage&) override;
-    HCLIENT connect_client();
-    bool disconnect_client(HCLIENT);
-    bool take_client_events(HCLIENT, std::vector<PlayerEvent>&);
-    std::size_t client_count() const { return clients_.size(); }
-    HOBJECT GetClientUserData(HCLIENT) override;
-    DRESULT SetClientUserData(HCLIENT, HOBJECT) override;
-    DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
-    DRESULT SetModelFilenames(HOBJECT, const char*, const char*) override;
-    DRESULT GetObjectDims(HOBJECT, DVector*) override;
-    DRESULT SetObjectRotation(HOBJECT, const DRotation*) override;
-    DRESULT MoveObjectToGround(HOBJECT) override;
-    DBOOL CompareStringsUpper(HSTRING, HSTRING) override;
-    void unbind();
-    void set_game_settings(unsigned difficulty, unsigned game_type);
-    std::map<std::string, std::uint64_t> service_calls;
-    bool trace_enabled = false;
-    void trace_service(const char* name) { if (trace_enabled) ++service_calls[name]; }
-    std::size_t string_count() const { return strings_.size(); }
-    std::size_t message_count() const { return messages_.size(); }
-    std::size_t list_count() const { return lists_.size(); }
+    class ServerAdapter final : public ServerDE
+    {
+      public:
+        explicit ServerAdapter(Objects& objects);
+        ~ServerAdapter() override;
+        ServerAdapter(const ServerAdapter&) = delete;
+        ServerAdapter& operator=(const ServerAdapter&) = delete;
+        bool bind();
+        bool GetMovementState(HOBJECT, MovementState&) override;
+        SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&) override;
+        DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
+        bool ReadDamage(HMESSAGEREAD, Damage&) override;
+        HCLIENT connect_client();
+        bool disconnect_client(HCLIENT);
+        bool take_client_events(HCLIENT, std::vector<PlayerEvent>&);
+        std::size_t client_count() const
+        {
+            return clients_.size();
+        }
+        HOBJECT GetClientUserData(HCLIENT) override;
+        DRESULT SetClientUserData(HCLIENT, HOBJECT) override;
+        DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
+        DRESULT SetModelFilenames(HOBJECT, const char*, const char*) override;
+        DRESULT GetObjectDims(HOBJECT, DVector*) override;
+        DRESULT SetObjectRotation(HOBJECT, const DRotation*) override;
+        DRESULT MoveObjectToGround(HOBJECT) override;
+        DBOOL CompareStringsUpper(HSTRING, HSTRING) override;
+        void unbind();
+        void set_game_settings(unsigned difficulty, unsigned game_type);
+        std::map<std::string, std::uint64_t> service_calls;
+        bool trace_enabled = false;
+        void trace_service(const char* name)
+        {
+            if (trace_enabled)
+                ++service_calls[name];
+        }
+        std::size_t string_count() const
+        {
+            return strings_.size();
+        }
+        std::size_t message_count() const
+        {
+            return messages_.size();
+        }
+        std::size_t list_count() const
+        {
+            return lists_.size();
+        }
 
-    HMESSAGEWRITE StartHMessageWrite() override;
-    DRESULT WriteToMessageDWord(HMESSAGEWRITE, DDWORD) override;
-    DRESULT WriteToMessageHString(HMESSAGEWRITE, HSTRING) override;
-    DDWORD ReadFromMessageDWord(HMESSAGEREAD) override;
-    HSTRING ReadFromMessageHString(HMESSAGEREAD) override;
-    void EndHMessageWrite(HMESSAGEWRITE) override;
-    void EndHMessageRead(HMESSAGEREAD) override;
-    void ResetRead(HMESSAGEREAD) override;
-    HMESSAGEWRITE StartMessageToObject(LPBASECLASS, HOBJECT, DDWORD) override;
-    DRESULT EndMessage(HMESSAGEWRITE) override;
-    DRESULT MoveObject(HOBJECT, DVector*) override;
-    DRESULT GetModelAnimUserDims(HOBJECT, DVector*, HMODELANIM) override;
-    DRESULT SetGlobalForce(DVector*) override;
-    DRESULT GetGlobalForce(DVector*) override;
-    DRESULT GetVelocity(HOBJECT, DVector*) override;
-    DRESULT SetVelocity(HOBJECT, DVector*) override;
-    DRESULT GetAcceleration(HOBJECT, DVector*) override;
-    DRESULT SetAcceleration(HOBJECT, DVector*) override;
-    bool advance_physics(double seconds);
-    CollisionWorld* collision = nullptr;
-    bool collision_ready = false;
-    bool advance_models(double seconds);
-    const auto& variables() const { return variables_; }
-    DVector gravity{0,-2000,0};
+        HMESSAGEWRITE StartHMessageWrite() override;
+        DRESULT WriteToMessageDWord(HMESSAGEWRITE, DDWORD) override;
+        DRESULT WriteToMessageHString(HMESSAGEWRITE, HSTRING) override;
+        DDWORD ReadFromMessageDWord(HMESSAGEREAD) override;
+        HSTRING ReadFromMessageHString(HMESSAGEREAD) override;
+        void EndHMessageWrite(HMESSAGEWRITE) override;
+        void EndHMessageRead(HMESSAGEREAD) override;
+        void ResetRead(HMESSAGEREAD) override;
+        HMESSAGEWRITE StartMessageToObject(LPBASECLASS, HOBJECT, DDWORD) override;
+        DRESULT EndMessage(HMESSAGEWRITE) override;
+        DRESULT MoveObject(HOBJECT, DVector*) override;
+        DRESULT GetModelAnimUserDims(HOBJECT, DVector*, HMODELANIM) override;
+        DRESULT SetGlobalForce(DVector*) override;
+        DRESULT GetGlobalForce(DVector*) override;
+        DRESULT GetVelocity(HOBJECT, DVector*) override;
+        DRESULT SetVelocity(HOBJECT, DVector*) override;
+        DRESULT GetAcceleration(HOBJECT, DVector*) override;
+        DRESULT SetAcceleration(HOBJECT, DVector*) override;
+        bool advance_physics(double seconds);
+        CollisionWorld* collision = nullptr;
+        bool collision_ready = false;
+        bool advance_models(double seconds);
+        const auto& variables() const
+        {
+            return variables_;
+        }
+        DVector gravity{0, -2000, 0};
 
-private:
-    struct String { std::string text; unsigned references = 1; };
-    struct Message {
-        std::vector<std::uint8_t> bytes;
-        std::size_t cursor = 0;
-        bool bad = false, routed = false, borrowed = false;
-        HOBJECT sender = nullptr, receiver = nullptr;
-        DDWORD id = 0;
-        std::optional<Damage> damage;
+      private:
+        struct String
+        {
+            std::string text;
+            unsigned references = 1;
+        };
+        struct Message
+        {
+            std::vector<std::uint8_t> bytes;
+            std::size_t cursor = 0;
+            bool bad = false, routed = false, borrowed = false;
+            HOBJECT sender = nullptr, receiver = nullptr;
+            DDWORD id = 0;
+            std::optional<Damage> damage;
+        };
+        Objects& objects_;
+        bool bound_ = false;
+        struct Client
+        {
+            HOBJECT player = nullptr;
+            std::vector<PlayerEvent> events;
+        };
+        std::vector<std::unique_ptr<ClientHandle>> client_tokens_;
+        std::unordered_map<HCLIENT, Client> clients_;
+        std::map<std::string, ConsoleVariable, CaseLess> variables_{{"GAME_DIFFICULTY", {"1"}},
+                                                                    {"GAME_GAMETYPE", {"0"}}};
+        void initialize_model_services();
+        void initialize_physics_services();
+        bool moving_ = false;
+        bool models_advancing_ = false, physics_advancing_ = false;
+        std::vector<std::unique_ptr<StringHandle>> string_tokens_;
+        std::unordered_map<HSTRING, String> strings_;
+        std::vector<std::unique_ptr<LMessage>> message_tokens_;
+        std::unordered_map<HMESSAGEWRITE, Message> messages_;
+        std::vector<std::unique_ptr<ObjectList>> list_tokens_;
+        std::unordered_set<ObjectList*> lists_;
+        static ServerAdapter* active_;
+        static ServerAdapter& active();
+        HSTRING make_string(const char* text);
+        HSTRING copy_string(HSTRING);
+        void free_string(HSTRING);
+        char* string_data(HSTRING);
+        ObjectList* make_list();
+        ObjectLink* add_to_list(ObjectList*, HOBJECT);
+        void remove_from_list(ObjectList*, HOBJECT);
+        void release_list(ObjectList*);
+        Message* writable(HMESSAGEWRITE);
+        Message* readable(HMESSAGEREAD, std::size_t bytes);
+        DRESULT unsupported(const char* service);
     };
-    Objects& objects_;
-    bool bound_ = false;
-    struct Client { HOBJECT player = nullptr; std::vector<PlayerEvent> events; };
-    std::vector<std::unique_ptr<ClientHandle>> client_tokens_;
-    std::unordered_map<HCLIENT, Client> clients_;
-    std::map<std::string,ConsoleVariable,CaseLess> variables_{{"GAME_DIFFICULTY",{"1"}},{"GAME_GAMETYPE",{"0"}}};
-    void initialize_model_services();
-    void initialize_physics_services();
-    bool moving_ = false;
-    bool models_advancing_ = false, physics_advancing_ = false;
-    std::vector<std::unique_ptr<StringHandle>> string_tokens_;
-    std::unordered_map<HSTRING, String> strings_;
-    std::vector<std::unique_ptr<LMessage>> message_tokens_;
-    std::unordered_map<HMESSAGEWRITE, Message> messages_;
-    std::vector<std::unique_ptr<ObjectList>> list_tokens_;
-    std::unordered_set<ObjectList*> lists_;
-    static ServerAdapter* active_;
-    static ServerAdapter& active();
-    HSTRING make_string(const char* text);
-    HSTRING copy_string(HSTRING);
-    void free_string(HSTRING);
-    char* string_data(HSTRING);
-    ObjectList* make_list();
-    ObjectLink* add_to_list(ObjectList*, HOBJECT);
-    void remove_from_list(ObjectList*, HOBJECT);
-    void release_list(ObjectList*);
-    Message* writable(HMESSAGEWRITE);
-    Message* readable(HMESSAGEREAD, std::size_t bytes);
-    DRESULT unsupported(const char* service);
-};
 
-bool register_original_classes(Objects& objects);
-class GameSession {
-public:
-    Resources resources;
-    ModelStore models{resources};
-    CollisionWorld collision;
-    Objects objects;
-    ServerAdapter server{objects};
-    CBloodServerShell server_shell{server};
-    CBloodClientShell client_shell{server};
-    HCLIENT local_client = nullptr;
-    World world;
-    std::vector<WorldEntry> entries;
-    std::vector<ResourceUse> resource_uses;
-    std::vector<std::string> trace;
-    std::string world_path;
-    // Inspection resource, not a CPlayerObj or a replacement player controller.
-    std::shared_ptr<const Model> preview_model;
-    AnimationTrack preview_animation;
-    std::string preview_error;
-    std::vector<std::uint32_t> preview_events;
-    bool preview_playing = true;
-    SessionState state = SessionState::Empty;
-    ~GameSession() { unload_world(); }
-    bool load_world(const WorldMessage& message, std::string& error);
-    bool request_world(std::string_view name, std::string& error);
-    bool run_world(std::string& error);
-    bool enter_player(std::string& error);
-    bool select_weapon(DBYTE slot,std::string& error);
-    bool leave_player();
-    bool pump_player_messages(std::string& error);
-    bool unload_world();
-    bool step(double seconds);
-    bool initialize() { objects.models = &models; server.collision = &collision; return server.bind() && register_original_classes(objects); }
-    HOBJECT create_example(std::string_view class_name);
-};
+    bool register_original_classes(Objects& objects);
+    class GameSession
+    {
+      public:
+        Resources resources;
+        ModelStore models{resources};
+        CollisionWorld collision;
+        Objects objects;
+        ServerAdapter server{objects};
+        CBloodServerShell server_shell{server};
+        CBloodClientShell client_shell{server};
+        HCLIENT local_client = nullptr;
+        World world;
+        std::vector<WorldEntry> entries;
+        std::vector<ResourceUse> resource_uses;
+        std::vector<std::string> trace;
+        std::string world_path;
+        // Inspection resource, not a CPlayerObj or a replacement player controller.
+        std::shared_ptr<const Model> preview_model;
+        AnimationTrack preview_animation;
+        std::string preview_error;
+        std::vector<std::uint32_t> preview_events;
+        bool preview_playing = true;
+        SessionState state = SessionState::Empty;
+        ~GameSession()
+        {
+            unload_world();
+        }
+        bool load_world(const WorldMessage& message, std::string& error);
+        bool request_world(std::string_view name, std::string& error);
+        bool run_world(std::string& error);
+        bool enter_player(std::string& error);
+        bool select_weapon(DBYTE slot, std::string& error);
+        bool leave_player();
+        bool pump_player_messages(std::string& error);
+        bool unload_world();
+        bool step(double seconds);
+        bool initialize()
+        {
+            objects.models = &models;
+            server.collision = &collision;
+            return server.bind() && register_original_classes(objects);
+        }
+        HOBJECT create_example(std::string_view class_name);
+    };
 
-}
+} // namespace OpenBlood2

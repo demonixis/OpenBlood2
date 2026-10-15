@@ -7,8 +7,9 @@
 // implementation/tests as original callers arrive. Absent services fail to
 // compile; the explicitly deferred services below return DE_ERROR + diagnostics.
 // Read-only input strings are const; fixed-width integers replace Windows long.
-class CSBase {
-public:
+class CSBase
+{
+  public:
     virtual ~CSBase() = default;
     virtual HMESSAGEWRITE StartHMessageWrite() = 0;
     virtual DRESULT WriteToMessageDWord(HMESSAGEWRITE, DDWORD) = 0;
@@ -20,17 +21,19 @@ public:
     virtual void ResetRead(HMESSAGEREAD) = 0;
 };
 
-class ServerDE : public CSBase {
-public:
-    virtual bool GetMovementState(HOBJECT, blood2::MovementState&) = 0;
-    virtual blood2::SegmentResult IntersectSegment(DVector from, DVector to, HOBJECT ignore, blood2::SegmentHit&) = 0;
-    virtual DRESULT WriteDamage(HMESSAGEWRITE, const blood2::Damage&) = 0;
-    virtual bool ReadDamage(HMESSAGEREAD, blood2::Damage&) = 0;
+class ServerDE : public CSBase
+{
+  public:
+    virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
+    virtual OpenBlood2::SegmentResult IntersectSegment(DVector from, DVector to, HOBJECT ignore,
+                                                       OpenBlood2::SegmentHit&) = 0;
+    virtual DRESULT WriteDamage(HMESSAGEWRITE, const OpenBlood2::Damage&) = 0;
+    virtual bool ReadDamage(HMESSAGEREAD, OpenBlood2::Damage&) = 0;
     // Source adaptation: client association is a checked object handle, never a
     // raw C++ pointer whose lifetime can outlive its object.
     virtual HOBJECT GetClientUserData(HCLIENT) = 0;
     virtual DRESULT SetClientUserData(HCLIENT, HOBJECT) = 0;
-    virtual DRESULT SendToClient(HCLIENT, const blood2::PlayerEvent&) = 0;
+    virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;
     virtual DRESULT SetModelFilenames(HOBJECT, const char*, const char*) = 0;
     virtual DRESULT GetObjectDims(HOBJECT, DVector*) = 0;
     virtual DRESULT SetObjectRotation(HOBJECT, const DRotation*) = 0;

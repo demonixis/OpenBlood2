@@ -6,56 +6,57 @@ inline constexpr DDWORD MID_TRIGGER = 1000;
 
 inline void SendTriggerMsgToObject(LPBASECLASS pSender, HOBJECT hObj, DBOOL bRemoveObject, HSTRING hMsg)
 {
-	if (!g_pServerDE) return;
+    if (!g_pServerDE)
+        return;
 
-	if (bRemoveObject)
-	{
-		g_pServerDE->SetObjectUserFlags(hObj, 0);	// Quick hack to fix airship door load/saves
-		g_pServerDE->RemoveObject(hObj);
-	}
-	else
-	{
-		HMESSAGEWRITE hMessage;
+    if (bRemoveObject)
+    {
+        g_pServerDE->SetObjectUserFlags(hObj, 0); // Quick hack to fix airship door load/saves
+        g_pServerDE->RemoveObject(hObj);
+    }
+    else
+    {
+        HMESSAGEWRITE hMessage;
 
-		hMessage = g_pServerDE->StartMessageToObject(pSender, hObj, MID_TRIGGER);
-		g_pServerDE->WriteToMessageHString(hMessage, hMsg);
-		g_pServerDE->EndMessage(hMessage);
-	}
+        hMessage = g_pServerDE->StartMessageToObject(pSender, hObj, MID_TRIGGER);
+        g_pServerDE->WriteToMessageHString(hMessage, hMsg);
+        g_pServerDE->EndMessage(hMessage);
+    }
 }
-
 
 void SendTriggerMsgToObjects(LPBASECLASS pSender, HSTRING hName, HSTRING hMsg)
 {
-	if (!g_pServerDE) return;
+    if (!g_pServerDE)
+        return;
 
-	DBOOL bRemoveObject = DFALSE;
+    DBOOL bRemoveObject = DFALSE;
 
-	char* pMsg  = g_pServerDE->GetStringData(hMsg);
-	char* pName = g_pServerDE->GetStringData(hName);
+    char* pMsg = g_pServerDE->GetStringData(hMsg);
+    char* pName = g_pServerDE->GetStringData(hName);
 
-	if (!pMsg || !pName || !pName[0]) return;
+    if (!pMsg || !pName || !pName[0])
+        return;
 
-	// See if it's a remove trigger
-	if (!blood2::CaseLess{}(pMsg, "REMOVE") && !blood2::CaseLess{}("REMOVE", pMsg))
-	{
-		bRemoveObject = DTRUE;
-	}
+    // See if it's a remove trigger
+    if (!OpenBlood2::CaseLess{}(pMsg, "REMOVE") && !OpenBlood2::CaseLess{}("REMOVE", pMsg))
+    {
+        bRemoveObject = DTRUE;
+    }
 
-	ObjectList*	pList = g_pServerDE->FindNamedObjects(pName);
-	if (!pList) return;
+    ObjectList* pList = g_pServerDE->FindNamedObjects(pName);
+    if (!pList)
+        return;
 
-	ObjectLink* pLink = pList->m_pFirstLink;
-	while(pLink)
-	{
-		if (pLink)
-		{
-			SendTriggerMsgToObject(pSender, pLink->m_hObject, bRemoveObject, hMsg);
-		}
+    ObjectLink* pLink = pList->m_pFirstLink;
+    while (pLink)
+    {
+        if (pLink)
+        {
+            SendTriggerMsgToObject(pSender, pLink->m_hObject, bRemoveObject, hMsg);
+        }
 
-		pLink = pLink->m_pNext;
-	}
-	
-	g_pServerDE->RelinquishList(pList);
+        pLink = pLink->m_pNext;
+    }
+
+    g_pServerDE->RelinquishList(pList);
 }
-
-

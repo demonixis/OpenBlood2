@@ -11,40 +11,41 @@
 #ifndef __PATHPOINT_H__
 #define __PATHPOINT_H__
 
+#include "B2BaseClass.h"
 #include "cpp_engineobjects_de.h"
 #include "cpp_server_de.h"
-#include "B2BaseClass.h"
-
 
 class PathPoint : public B2BaseClass
 {
-	public :
+  public:
+    PathPoint();
+    ~PathPoint();
 
-		PathPoint();
-		~PathPoint();
+    DFLOAT m_fStartTime = 0; // PathPoint was started at this time (for Smells)
+    HSTRING GetActionTarget()
+    {
+        return m_hstrActionTarget;
+    }
+    HSTRING GetActionMessage()
+    {
+        return m_hstrActionMessage;
+    }
+    char sConnectName[128]{}; // Next Connection...
 
-        DFLOAT m_fStartTime = 0;                // PathPoint was started at this time (for Smells)
-		HSTRING	GetActionTarget()	 { return m_hstrActionTarget; }
-		HSTRING	GetActionMessage()	 { return m_hstrActionMessage; }
-        char   sConnectName[128]{};           // Next Connection...
-        
-        
-	protected :
+  protected:
+    virtual DDWORD EngineMessageFn(DDWORD messageID, void* pData, DFLOAT lData);
+    DBOOL m_bActive;
 
-		virtual DDWORD EngineMessageFn(DDWORD messageID, void *pData, DFLOAT lData);
-		DBOOL m_bActive;   
+  private:
+    void ObjectTouch(HOBJECT hObj);
 
-	private :
+    DBOOL InitialUpdate(DVector* pMovement);
+    DBOOL Update(DVector* pMovement);
+    DBOOL ReadProp(ObjectCreateStruct* pStruct);
+    void PostPropRead(ObjectCreateStruct* pStruct);
 
-		void ObjectTouch(HOBJECT hObj);
-
-		DBOOL InitialUpdate(DVector *pMovement);
-		DBOOL Update(DVector *pMovement);
-		DBOOL ReadProp(ObjectCreateStruct *pStruct);
-		void  PostPropRead(ObjectCreateStruct *pStruct);
-
-        HSTRING m_hstrActionTarget;               // Action (optional) AI script command
-        HSTRING m_hstrActionMessage;              // Action (optional) message
+    HSTRING m_hstrActionTarget;  // Action (optional) AI script command
+    HSTRING m_hstrActionMessage; // Action (optional) message
 };
 
 #endif // __PATHPOINT_H__

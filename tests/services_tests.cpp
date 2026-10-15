@@ -1,163 +1,416 @@
-#include "model_fixture.h"
-#include "game/server_adapter.h"
 #include "game/original/SmellHint.h"
 #include "game/original/WorldProperties.h"
+#include "game/server_adapter.h"
+#include "model_fixture.h"
 #include <bit>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <limits>
 #include <random>
-#include <fstream>
 
-using namespace blood2;
-#define CHECK(x) do { if (!(x)) { std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n"; return false; } } while (false)
-namespace {
-using test_model::Writer;
-using test_model::abc;
-bool model_reader() {
-    Model m;std::string error;CHECK(read_model(abc().b,m,error));CHECK(m.nodes.size()==2 && m.nodes[1].parent==0);
-    CHECK(m.vertices.size()==3 && m.faces[0].vertices[2]==2);CHECK(m.faces[0].uv[1][0]==1);
-    CHECK(animation_index(m,"walk")==0 && animation_index(m,"missing")==no_animation);
-    std::vector<NodePose> pose;CHECK(sample_pose(m,0,25,pose));CHECK(std::abs(pose[1].position.x-5)<.0001 && pose[1].position.y==2);
-    std::vector<DVector> vertices;CHECK(sample_vertices(m,0,25,vertices));
-    CHECK(vertices[2].x==8 && vertices[2].y==4 && vertices[2].z==6);
-    CHECK(sample_pose(m,0,1000,pose));CHECK(pose[1].position.x==20);
-    CHECK(!sample_pose(m,no_animation,0,pose) && pose.empty());
-    return true;
-}
-bool model_rejection() {
-    auto bytes=abc().b;Model m;std::string error;
-    for(std::size_t i=0;i<bytes.size();++i) { CHECK(!read_model(std::span(bytes).first(i),m,error));CHECK(m.animations.empty()); }
-    auto bad=bytes;bad[8]=0;CHECK(!read_model(bad,m,error)); // Header section link into its own header.
-    std::mt19937 random(79);
-    for (unsigned i=0;i<1500;++i) {bad=bytes;bad[random()%bad.size()]^=static_cast<std::uint8_t>(1u<<(random()%8));read_model(bad,m,error);}
-    return true;
-}
-bool animation_events() {
-    Model m;std::string error;CHECK(read_model(abc().b,m,error));AnimationTrack track;std::vector<std::uint32_t> events;
-    CHECK(advance_animation(m,track,.25,events,error));CHECK((events==std::vector<std::uint32_t>{0,1,2,0,1,2,0,1}));CHECK(track.time==50);
-    track.reset();track.looping=false;CHECK(advance_animation(m,track,.5,events,error));CHECK((events==std::vector<std::uint32_t>{0,1,2}));CHECK(track.done);
-    CHECK(advance_animation(m,track,1,events,error) && events.empty());
-    track.animation=1;track.looping=true;track.reset();CHECK(advance_animation(m,track,1,events,error));CHECK(events.size()==1 && track.done);
-    CHECK(advance_animation(m,track,0,events,error) && events.empty());
-    track.animation=0;track.reset();CHECK(advance_animation(m,track,.1,events,error));CHECK((events==std::vector<std::uint32_t>{0,1,2,0}));
-    CHECK(advance_animation(m,track,0,events,error) && events.empty());
-    auto before=track;events={42};CHECK(!advance_animation(m,track,-1,events,error));CHECK(track.time==before.time && events[0]==42);
-    m.animations[0].duration=1;for(auto& k:m.animations[0].keys)k.time=0;
-    CHECK(!advance_animation(m,track,60,events,error));CHECK(track.time==before.time && events[0]==42);
-    return true;
-}
-std::function<void(BaseClass&,DDWORD,void*)> callback;
-struct Probe:BaseClass {
-    DDWORD EngineMessageFn(DDWORD message,void* data,float reason) override { if(callback)callback(*this,message,data); return BaseClass::EngineMessageFn(message,data,reason); }
-};
-std::unique_ptr<BaseClass> make_probe(){return std::make_unique<Probe>();}
-ClassInfo probe_class{"ServiceProbe",nullptr,make_probe,{}};
-HOBJECT probe(GameSession& game) { return game.objects.create(&probe_class); }
-bool setup(GameSession& game) { callback={};return game.initialize() && game.objects.register_class(probe_class); }
-bool model_callbacks() {
-    GameSession game;CHECK(setup(game));Model m;std::string error;CHECK(read_model(abc().b,m,error));
-    auto h=probe(game);auto* r=game.objects.get(h);r->model=std::make_shared<Model>(std::move(m));r->state.m_Flags=FLAG_MODELKEYS;
-    std::vector<std::string> seen; bool reentrant_rejected=false;
-    callback=[&](BaseClass&,DDWORD message,void* data) { if(message==MID_MODELSTRINGKEY) {
-        auto& args=*static_cast<ArgList*>(data);seen.emplace_back(args.argv[0]);if(seen.back()=="SOUND")seen.emplace_back(args.argv[1]);
-        reentrant_rejected=!game.unload_world() && !game.step(.01) && !game.server.advance_models(.01) && !game.server.advance_physics(.01) && game.objects.get(h)==r;
-    } };
-    CHECK(game.step(.05));CHECK(reentrant_rejected);CHECK((seen==std::vector<std::string>{"START","SOUND","left step","FOOT"}));
-    auto revision=r->animation.revision;game.server.SetModelAnimation(h,0);CHECK(revision==r->animation.revision);
-    game.server.SetModelLooping(h,DFALSE);CHECK(game.step(.05));CHECK(game.server.GetModelPlaybackState(h)==MS_PLAYDONE);
-    CHECK(game.server.GetAnimIndex(h,"walk")==0);DVector dims;CHECK(game.server.GetModelAnimUserDims(h,&dims,0)==DE_OK && dims.y==2);
-    CHECK(game.server.GetModelAnimUserDims(h,&dims,9)!=DE_OK && dims.y==0);
-    CHECK(game.server.ResetModelAnimation(h)==DE_OK);seen.clear();
-    callback=[&](BaseClass&,DDWORD message,void* data) { if(message==MID_MODELSTRINGKEY) {seen.emplace_back(static_cast<ArgList*>(data)->argv[0]);game.server.SetModelAnimation(h,1);} };
-    CHECK(game.step(.1));CHECK(seen.size()==1 && seen[0]=="START");
-    game.server.SetModelAnimation(h,0);seen.clear();
-    callback=[&](BaseClass&,DDWORD message,void*) { if(message==MID_MODELSTRINGKEY) {seen.emplace_back("removed");game.objects.remove(h);} };
-    CHECK(game.step(.1));CHECK(!game.objects.get(h) && seen.size()==1);
-    callback={};return true;
-}
-WorldModel floor_model() {
-    WorldModel w;w.points={{-100,0,-100},{100,0,-100},{100,0,100},{-100,0,100}};
-    w.surfaces.resize(1);w.surfaces[0].flags=1;w.polygons={{0,{0,1,2,3}}};return w;
-}
-bool collision_queries() {
-    CollisionWorld world;std::string error;CHECK(world.build(floor_model(),error));CHECK(world.triangles()==2);
-    CollisionHit hit;CHECK(world.sweep({0,10,0},{0,-10,0},{1,2,1},hit)==CollisionQuery::Hit);CHECK(std::abs(hit.fraction-.4)<1e-5 && hit.normal.y==1);
-    CHECK(world.sweep({0,10,0},{0,-100000,0},{},hit)==CollisionQuery::Hit); // Exact shared diagonal; no crack.
-    CHECK(world.sweep({0,2,0},{20,2,0},{1,2,1},hit)==CollisionQuery::Miss);
-    CHECK(world.sweep({0,2,0},{0,5,0},{1,2,1},hit)==CollisionQuery::Miss);
-    CHECK(world.sweep({0,1,0},{0,-1,0},{1,2,1},hit)==CollisionQuery::Hit && hit.start_solid);
-    CHECK(world.sweep({200,10,0},{200,-10,0},{1,2,1},hit)==CollisionQuery::Miss);
-    CHECK(world.sweep({0,10,0},{0,-10,0},{-1,2,1},hit)==CollisionQuery::Invalid);
-    CHECK(sweep_box({-20,0,0},{20,0,0},{1,1,1},{0,0,0},{1,1,1},hit)==CollisionQuery::Hit);CHECK(std::abs(hit.fraction-.45)<1e-5 && hit.normal.x==-1);
-    CHECK(sweep_box({0,0,0},{1,0,0},{1,1,1},{0,0,0},{1,1,1},hit)==CollisionQuery::Hit && hit.start_solid);
-    auto w=floor_model();w.surfaces[0].flags=0;CHECK(world.build(w,error));CHECK(world.triangles()==0);
-    w.surfaces[0].flags=1;w.polygons[0].points[0]=100;CHECK(!world.build(w,error) && world.triangles()==0);
-    return true;
-}
-bool movement_contacts() {
-    GameSession game;CHECK(setup(game));std::string error;CHECK(game.collision.build(floor_model(),error));game.server.collision_ready=true;
-    auto h=probe(game);auto* r=game.objects.get(h);r->dimensions={1,2,1};r->state.m_Pos={0,10,0};r->state.m_Flags=FLAG_SOLID|FLAG_GRAVITY;
-    CHECK(game.step(.1));CHECK(r->grounded && std::abs(r->state.m_Pos.y-2.001f)<.002f && r->velocity.y==0);
-    auto destination=DVector{20,-2,0};CHECK(game.server.MoveObject(h,&destination)==DE_OK);CHECK(r->state.m_Pos.x>19.99 && r->state.m_Pos.y>2);
-    auto sensor=probe(game);auto* s=game.objects.get(sensor);s->state.m_Pos={30,2,0};s->dimensions={1,4,4};s->state.m_Flags=FLAG_TOUCH_NOTIFY;
-    int touches=0;callback=[&](BaseClass& o,DDWORD msg,void* data){if(msg==MID_TOUCHNOTIFY) {++touches;if(o.m_hObject==sensor && data==h)game.objects.remove(sensor);}};
-    destination={40,2.001f,0};CHECK(game.server.MoveObject(h,&destination)==DE_OK);CHECK(touches==1 && game.objects.get(sensor)->life==Life::Pending);
-    CHECK(game.objects.finish_frame() && !game.objects.get(sensor));
-    auto box=probe(game);auto* b=game.objects.get(box);b->state.m_Pos={50,2,0};b->dimensions={1,4,4};b->state.m_Flags=FLAG_SOLID;
-    destination={100,2.001f,0};CHECK(game.server.MoveObject(h,&destination)==DE_OK);CHECK(r->state.m_Pos.x<48.001f && r->contact_object==box);
-    callback={};game.unload_world();CHECK(!game.server.collision_ready);return true;
-}
-bool original_services() {
-    GameSession game;CHECK(setup(game));std::string long_music(250,'a');
-    auto h=game.objects.create(game.objects.find_class("WorldProperties"),{},Creation::World,{{"WorldName",std::string("Test map")},{"Gravity",DVector{0,-500,0}},{"AmbientList",long_music}});
-    CHECK(h && dynamic_cast<WorldProperties*>(game.objects.get(h)->game.get()));CHECK(game.objects.get(h)->activity==OBJSTATE_INACTIVE);
-    CHECK(std::string(game.server.GetVarValueString(game.server.GetGameConVar("WorldName")))=="Test map");
-    CHECK(std::string(game.server.GetVarValueString(game.server.GetGameConVar("AmbientList")))==long_music);CHECK(game.server.gravity.y==-500);
-    auto variable=game.server.GetGameConVar("FogFarZ");CHECK(game.server.GetVarValueFloat(variable)==5000);
-    game.server.SetGameConVar("FogFarZ","4200");CHECK(game.server.GetGameConVar("FogFarZ")==variable && game.server.GetVarValueFloat(variable)==4200);
-    auto smell=game.objects.create(game.objects.find_class("SmellHint"));CHECK(smell && SmellHint::m_dwNumSmells==1 && SmellHint::HandleToLink(smell));
-    CHECK(game.step(19) && game.objects.get(smell));CHECK(game.step(1) && !game.objects.get(smell) && SmellHint::m_dwNumSmells==0);
-    game.unload_world();CHECK(std::string(game.server.GetVarValueString(variable)).empty());CHECK(game.server.gravity.y==-2000);
-    smell=game.objects.create(game.objects.find_class("SmellHint"));CHECK(smell && SmellHint::m_dwNumSmells==1);game.unload_world();CHECK(SmellHint::m_dwNumSmells==0);
-    auto rejected=game.objects.create(game.objects.find_class("SmellHint"),{},Creation::World,{{"DifficultyMed",false}});CHECK(rejected);CHECK(game.objects.finish_frame() && SmellHint::m_dwNumSmells==0);
-    return true;
-}
-bool private_services(const char* root) {
-    GameSession game;CHECK(setup(game));Config config;config.data_dir=path_from_utf8(root);std::string error;
-    CHECK(game.resources.mount_game(config,error));CHECK(game.request_world("01_SubwayA",error));
-    ObjectCreateStruct state;state.m_ObjectType=OT_MODEL;legacy_copy(state.m_Filename,"Models\\Characters\\Caleb.abc");state.m_Flags=FLAG_MODELKEYS;
-    bool initialized=false;callback=[&](BaseClass& o,DDWORD message,void*) {if(message==MID_INITIALUPDATE) initialized=game.server.GetAnimIndex(o.m_hObject,"idle1")==0;};
-    auto h=game.objects.create(&probe_class,state);CHECK(h && initialized);auto* r=game.objects.get(h);CHECK(r->model && r->model_error.empty());
-    CHECK(r->model->nodes.size()==20 && r->model->animations.size()==86 && r->model->vertices.size()==784);
-    std::shared_ptr<const Model> same;CHECK(game.models.load("models/characters/caleb.abc",same,error) && same==r->model);
-    auto crawl=game.server.GetAnimIndex(h,"crawl_pistol");DVector dims;CHECK(game.server.GetModelAnimUserDims(h,&dims,crawl)==DE_OK && dims.y==28);
-    CHECK(same->nodes.back().deformed_vertices.size()==189);
-    int keys=0;callback=[&](BaseClass&,DDWORD message,void*) {if(message==MID_MODELSTRINGKEY)++keys;};
-    std::vector<NodePose> pose;
-    for(std::uint32_t i=0;i<same->animations.size();++i) {
-        game.server.SetModelAnimation(h,i);game.server.ResetModelAnimation(h);game.server.SetModelLooping(h,DFALSE);
-        CHECK(game.step(same->animations[i].duration/1000.0+.001));CHECK(game.server.GetModelPlaybackState(h)==MS_PLAYDONE);
-        CHECK(sample_pose(*same,i,same->animations[i].duration/2.0,pose) && pose.size()==20);
-        std::vector<DVector> vertices;CHECK(sample_vertices(*same,i,same->animations[i].duration/2.0,vertices));
-        for (const auto& face:same->faces) for (auto index:face.vertices) {auto p=vertices[index];CHECK(physics_vector(p));CHECK(p.x>-200 && p.x<200 && p.y>-200 && p.y<200 && p.z>-200 && p.z<200);}
+using namespace OpenBlood2;
+#define CHECK(x)                                                                                                       \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(x))                                                                                                      \
+        {                                                                                                              \
+            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
+            return false;                                                                                              \
+        }                                                                                                              \
+    } while (false)
+namespace
+{
+    using test_model::abc;
+    using test_model::Writer;
+    bool model_reader()
+    {
+        Model m;
+        std::string error;
+        CHECK(read_model(abc().b, m, error));
+        CHECK(m.nodes.size() == 2 && m.nodes[1].parent == 0);
+        CHECK(m.vertices.size() == 3 && m.faces[0].vertices[2] == 2);
+        CHECK(m.faces[0].uv[1][0] == 1);
+        CHECK(animation_index(m, "walk") == 0 && animation_index(m, "missing") == no_animation);
+        std::vector<NodePose> pose;
+        CHECK(sample_pose(m, 0, 25, pose));
+        CHECK(std::abs(pose[1].position.x - 5) < .0001 && pose[1].position.y == 2);
+        std::vector<DVector> vertices;
+        CHECK(sample_vertices(m, 0, 25, vertices));
+        CHECK(vertices[2].x == 8 && vertices[2].y == 4 && vertices[2].z == 6);
+        CHECK(sample_pose(m, 0, 1000, pose));
+        CHECK(pose[1].position.x == 20);
+        CHECK(!sample_pose(m, no_animation, 0, pose) && pose.empty());
+        return true;
     }
-    CHECK(keys>0);CHECK(game.collision.triangles()>1000);
-    DVector spawn{};
-    for (const auto& entry:game.entries) if (auto* object=game.objects.get(entry.object);object && object->type->name=="GameStartPoint") spawn=object->state.m_Pos;
-    std::cout<<"Original start point: "<<spawn.x<<","<<spawn.y<<","<<spawn.z<<"\n";
-    CollisionHit hit;auto q=game.collision.sweep(spawn,vector_add(spawn,{0,-1000,0}),{12,42,12},hit);CHECK(q==CollisionQuery::Hit);
-    CHECK(!hit.start_solid);
-    std::cout<<"Caleb: "<<same->vertices.size()<<" vertices, "<<same->nodes.size()<<" nodes, "<<same->animations.size()<<" animations; dispatched commands: "<<keys<<"\n";
-    std::cout<<"Primary world: "<<game.collision.triangles()<<" solid triangles, "<<game.collision.nodes()<<" BVH nodes; probe contact y="<<hit.point.y<<" polygon="<<hit.polygon<<"\n";
-    callback={};game.unload_world();CHECK(!game.objects.get(h) && !game.server.collision_ready);return true;
-}
-}
-int main(int argc,char** argv) {
-    if(argc<2)return 2;
-    std::string name=argv[1];bool ok=false;
-    if(name=="model_reader")ok=model_reader();else if(name=="model_rejection")ok=model_rejection();else if(name=="animation_events")ok=animation_events();
-    else if(name=="model_callbacks")ok=model_callbacks();else if(name=="collision_queries")ok=collision_queries();else if(name=="movement_contacts")ok=movement_contacts();
-    else if(name=="original_services")ok=original_services();else if(name=="private" && argc==3)ok=private_services(argv[2]);
-    callback={};return ok?0:1;
+    bool model_rejection()
+    {
+        auto bytes = abc().b;
+        Model m;
+        std::string error;
+        for (std::size_t i = 0; i < bytes.size(); ++i)
+        {
+            CHECK(!read_model(std::span(bytes).first(i), m, error));
+            CHECK(m.animations.empty());
+        }
+        auto bad = bytes;
+        bad[8] = 0;
+        CHECK(!read_model(bad, m, error)); // Header section link into its own header.
+        std::mt19937 random(79);
+        for (unsigned i = 0; i < 1500; ++i)
+        {
+            bad = bytes;
+            bad[random() % bad.size()] ^= static_cast<std::uint8_t>(1u << (random() % 8));
+            read_model(bad, m, error);
+        }
+        return true;
+    }
+    bool animation_events()
+    {
+        Model m;
+        std::string error;
+        CHECK(read_model(abc().b, m, error));
+        AnimationTrack track;
+        std::vector<std::uint32_t> events;
+        CHECK(advance_animation(m, track, .25, events, error));
+        CHECK((events == std::vector<std::uint32_t>{0, 1, 2, 0, 1, 2, 0, 1}));
+        CHECK(track.time == 50);
+        track.reset();
+        track.looping = false;
+        CHECK(advance_animation(m, track, .5, events, error));
+        CHECK((events == std::vector<std::uint32_t>{0, 1, 2}));
+        CHECK(track.done);
+        CHECK(advance_animation(m, track, 1, events, error) && events.empty());
+        track.animation = 1;
+        track.looping = true;
+        track.reset();
+        CHECK(advance_animation(m, track, 1, events, error));
+        CHECK(events.size() == 1 && track.done);
+        CHECK(advance_animation(m, track, 0, events, error) && events.empty());
+        track.animation = 0;
+        track.reset();
+        CHECK(advance_animation(m, track, .1, events, error));
+        CHECK((events == std::vector<std::uint32_t>{0, 1, 2, 0}));
+        CHECK(advance_animation(m, track, 0, events, error) && events.empty());
+        auto before = track;
+        events = {42};
+        CHECK(!advance_animation(m, track, -1, events, error));
+        CHECK(track.time == before.time && events[0] == 42);
+        m.animations[0].duration = 1;
+        for (auto& k : m.animations[0].keys)
+            k.time = 0;
+        CHECK(!advance_animation(m, track, 60, events, error));
+        CHECK(track.time == before.time && events[0] == 42);
+        return true;
+    }
+    std::function<void(BaseClass&, DDWORD, void*)> callback;
+    struct Probe : BaseClass
+    {
+        DDWORD EngineMessageFn(DDWORD message, void* data, float reason) override
+        {
+            if (callback)
+                callback(*this, message, data);
+            return BaseClass::EngineMessageFn(message, data, reason);
+        }
+    };
+    std::unique_ptr<BaseClass> make_probe()
+    {
+        return std::make_unique<Probe>();
+    }
+    ClassInfo probe_class{"ServiceProbe", nullptr, make_probe, {}};
+    HOBJECT probe(GameSession& game)
+    {
+        return game.objects.create(&probe_class);
+    }
+    bool setup(GameSession& game)
+    {
+        callback = {};
+        return game.initialize() && game.objects.register_class(probe_class);
+    }
+    bool model_callbacks()
+    {
+        GameSession game;
+        CHECK(setup(game));
+        Model m;
+        std::string error;
+        CHECK(read_model(abc().b, m, error));
+        auto h = probe(game);
+        auto* r = game.objects.get(h);
+        r->model = std::make_shared<Model>(std::move(m));
+        r->state.m_Flags = FLAG_MODELKEYS;
+        std::vector<std::string> seen;
+        bool reentrant_rejected = false;
+        callback = [&](BaseClass&, DDWORD message, void* data)
+        {
+            if (message == MID_MODELSTRINGKEY)
+            {
+                auto& args = *static_cast<ArgList*>(data);
+                seen.emplace_back(args.argv[0]);
+                if (seen.back() == "SOUND")
+                    seen.emplace_back(args.argv[1]);
+                reentrant_rejected = !game.unload_world() && !game.step(.01) && !game.server.advance_models(.01) &&
+                                     !game.server.advance_physics(.01) && game.objects.get(h) == r;
+            }
+        };
+        CHECK(game.step(.05));
+        CHECK(reentrant_rejected);
+        CHECK((seen == std::vector<std::string>{"START", "SOUND", "left step", "FOOT"}));
+        auto revision = r->animation.revision;
+        game.server.SetModelAnimation(h, 0);
+        CHECK(revision == r->animation.revision);
+        game.server.SetModelLooping(h, DFALSE);
+        CHECK(game.step(.05));
+        CHECK(game.server.GetModelPlaybackState(h) == MS_PLAYDONE);
+        CHECK(game.server.GetAnimIndex(h, "walk") == 0);
+        DVector dims;
+        CHECK(game.server.GetModelAnimUserDims(h, &dims, 0) == DE_OK && dims.y == 2);
+        CHECK(game.server.GetModelAnimUserDims(h, &dims, 9) != DE_OK && dims.y == 0);
+        CHECK(game.server.ResetModelAnimation(h) == DE_OK);
+        seen.clear();
+        callback = [&](BaseClass&, DDWORD message, void* data)
+        {
+            if (message == MID_MODELSTRINGKEY)
+            {
+                seen.emplace_back(static_cast<ArgList*>(data)->argv[0]);
+                game.server.SetModelAnimation(h, 1);
+            }
+        };
+        CHECK(game.step(.1));
+        CHECK(seen.size() == 1 && seen[0] == "START");
+        game.server.SetModelAnimation(h, 0);
+        seen.clear();
+        callback = [&](BaseClass&, DDWORD message, void*)
+        {
+            if (message == MID_MODELSTRINGKEY)
+            {
+                seen.emplace_back("removed");
+                game.objects.remove(h);
+            }
+        };
+        CHECK(game.step(.1));
+        CHECK(!game.objects.get(h) && seen.size() == 1);
+        callback = {};
+        return true;
+    }
+    WorldModel floor_model()
+    {
+        WorldModel w;
+        w.points = {{-100, 0, -100}, {100, 0, -100}, {100, 0, 100}, {-100, 0, 100}};
+        w.surfaces.resize(1);
+        w.surfaces[0].flags = 1;
+        w.polygons = {{0, {0, 1, 2, 3}}};
+        return w;
+    }
+    bool collision_queries()
+    {
+        CollisionWorld world;
+        std::string error;
+        CHECK(world.build(floor_model(), error));
+        CHECK(world.triangles() == 2);
+        CollisionHit hit;
+        CHECK(world.sweep({0, 10, 0}, {0, -10, 0}, {1, 2, 1}, hit) == CollisionQuery::Hit);
+        CHECK(std::abs(hit.fraction - .4) < 1e-5 && hit.normal.y == 1);
+        CHECK(world.sweep({0, 10, 0}, {0, -100000, 0}, {}, hit) ==
+              CollisionQuery::Hit); // Exact shared diagonal; no crack.
+        CHECK(world.sweep({0, 2, 0}, {20, 2, 0}, {1, 2, 1}, hit) == CollisionQuery::Miss);
+        CHECK(world.sweep({0, 2, 0}, {0, 5, 0}, {1, 2, 1}, hit) == CollisionQuery::Miss);
+        CHECK(world.sweep({0, 1, 0}, {0, -1, 0}, {1, 2, 1}, hit) == CollisionQuery::Hit && hit.start_solid);
+        CHECK(world.sweep({200, 10, 0}, {200, -10, 0}, {1, 2, 1}, hit) == CollisionQuery::Miss);
+        CHECK(world.sweep({0, 10, 0}, {0, -10, 0}, {-1, 2, 1}, hit) == CollisionQuery::Invalid);
+        CHECK(sweep_box({-20, 0, 0}, {20, 0, 0}, {1, 1, 1}, {0, 0, 0}, {1, 1, 1}, hit) == CollisionQuery::Hit);
+        CHECK(std::abs(hit.fraction - .45) < 1e-5 && hit.normal.x == -1);
+        CHECK(sweep_box({0, 0, 0}, {1, 0, 0}, {1, 1, 1}, {0, 0, 0}, {1, 1, 1}, hit) == CollisionQuery::Hit &&
+              hit.start_solid);
+        auto w = floor_model();
+        w.surfaces[0].flags = 0;
+        CHECK(world.build(w, error));
+        CHECK(world.triangles() == 0);
+        w.surfaces[0].flags = 1;
+        w.polygons[0].points[0] = 100;
+        CHECK(!world.build(w, error) && world.triangles() == 0);
+        return true;
+    }
+    bool movement_contacts()
+    {
+        GameSession game;
+        CHECK(setup(game));
+        std::string error;
+        CHECK(game.collision.build(floor_model(), error));
+        game.server.collision_ready = true;
+        auto h = probe(game);
+        auto* r = game.objects.get(h);
+        r->dimensions = {1, 2, 1};
+        r->state.m_Pos = {0, 10, 0};
+        r->state.m_Flags = FLAG_SOLID | FLAG_GRAVITY;
+        CHECK(game.step(.1));
+        CHECK(r->grounded && std::abs(r->state.m_Pos.y - 2.001f) < .002f && r->velocity.y == 0);
+        auto destination = DVector{20, -2, 0};
+        CHECK(game.server.MoveObject(h, &destination) == DE_OK);
+        CHECK(r->state.m_Pos.x > 19.99 && r->state.m_Pos.y > 2);
+        auto sensor = probe(game);
+        auto* s = game.objects.get(sensor);
+        s->state.m_Pos = {30, 2, 0};
+        s->dimensions = {1, 4, 4};
+        s->state.m_Flags = FLAG_TOUCH_NOTIFY;
+        int touches = 0;
+        callback = [&](BaseClass& o, DDWORD msg, void* data)
+        {
+            if (msg == MID_TOUCHNOTIFY)
+            {
+                ++touches;
+                if (o.m_hObject == sensor && data == h)
+                    game.objects.remove(sensor);
+            }
+        };
+        destination = {40, 2.001f, 0};
+        CHECK(game.server.MoveObject(h, &destination) == DE_OK);
+        CHECK(touches == 1 && game.objects.get(sensor)->life == Life::Pending);
+        CHECK(game.objects.finish_frame() && !game.objects.get(sensor));
+        auto box = probe(game);
+        auto* b = game.objects.get(box);
+        b->state.m_Pos = {50, 2, 0};
+        b->dimensions = {1, 4, 4};
+        b->state.m_Flags = FLAG_SOLID;
+        destination = {100, 2.001f, 0};
+        CHECK(game.server.MoveObject(h, &destination) == DE_OK);
+        CHECK(r->state.m_Pos.x < 48.001f && r->contact_object == box);
+        callback = {};
+        game.unload_world();
+        CHECK(!game.server.collision_ready);
+        return true;
+    }
+    bool original_services()
+    {
+        GameSession game;
+        CHECK(setup(game));
+        std::string long_music(250, 'a');
+        auto h = game.objects.create(
+            game.objects.find_class("WorldProperties"), {}, Creation::World,
+            {{"WorldName", std::string("Test map")}, {"Gravity", DVector{0, -500, 0}}, {"AmbientList", long_music}});
+        CHECK(h && dynamic_cast<WorldProperties*>(game.objects.get(h)->game.get()));
+        CHECK(game.objects.get(h)->activity == OBJSTATE_INACTIVE);
+        CHECK(std::string(game.server.GetVarValueString(game.server.GetGameConVar("WorldName"))) == "Test map");
+        CHECK(std::string(game.server.GetVarValueString(game.server.GetGameConVar("AmbientList"))) == long_music);
+        CHECK(game.server.gravity.y == -500);
+        auto variable = game.server.GetGameConVar("FogFarZ");
+        CHECK(game.server.GetVarValueFloat(variable) == 5000);
+        game.server.SetGameConVar("FogFarZ", "4200");
+        CHECK(game.server.GetGameConVar("FogFarZ") == variable && game.server.GetVarValueFloat(variable) == 4200);
+        auto smell = game.objects.create(game.objects.find_class("SmellHint"));
+        CHECK(smell && SmellHint::m_dwNumSmells == 1 && SmellHint::HandleToLink(smell));
+        CHECK(game.step(19) && game.objects.get(smell));
+        CHECK(game.step(1) && !game.objects.get(smell) && SmellHint::m_dwNumSmells == 0);
+        game.unload_world();
+        CHECK(std::string(game.server.GetVarValueString(variable)).empty());
+        CHECK(game.server.gravity.y == -2000);
+        smell = game.objects.create(game.objects.find_class("SmellHint"));
+        CHECK(smell && SmellHint::m_dwNumSmells == 1);
+        game.unload_world();
+        CHECK(SmellHint::m_dwNumSmells == 0);
+        auto rejected =
+            game.objects.create(game.objects.find_class("SmellHint"), {}, Creation::World, {{"DifficultyMed", false}});
+        CHECK(rejected);
+        CHECK(game.objects.finish_frame() && SmellHint::m_dwNumSmells == 0);
+        return true;
+    }
+    bool private_services(const char* root)
+    {
+        GameSession game;
+        CHECK(setup(game));
+        Config config;
+        config.data_dir = path_from_utf8(root);
+        std::string error;
+        CHECK(game.resources.mount_game(config, error));
+        CHECK(game.request_world("01_SubwayA", error));
+        ObjectCreateStruct state;
+        state.m_ObjectType = OT_MODEL;
+        legacy_copy(state.m_Filename, "Models\\Characters\\Caleb.abc");
+        state.m_Flags = FLAG_MODELKEYS;
+        bool initialized = false;
+        callback = [&](BaseClass& o, DDWORD message, void*)
+        {
+            if (message == MID_INITIALUPDATE)
+                initialized = game.server.GetAnimIndex(o.m_hObject, "idle1") == 0;
+        };
+        auto h = game.objects.create(&probe_class, state);
+        CHECK(h && initialized);
+        auto* r = game.objects.get(h);
+        CHECK(r->model && r->model_error.empty());
+        CHECK(r->model->nodes.size() == 20 && r->model->animations.size() == 86 && r->model->vertices.size() == 784);
+        std::shared_ptr<const Model> same;
+        CHECK(game.models.load("models/characters/caleb.abc", same, error) && same == r->model);
+        auto crawl = game.server.GetAnimIndex(h, "crawl_pistol");
+        DVector dims;
+        CHECK(game.server.GetModelAnimUserDims(h, &dims, crawl) == DE_OK && dims.y == 28);
+        CHECK(same->nodes.back().deformed_vertices.size() == 189);
+        int keys = 0;
+        callback = [&](BaseClass&, DDWORD message, void*)
+        {
+            if (message == MID_MODELSTRINGKEY)
+                ++keys;
+        };
+        std::vector<NodePose> pose;
+        for (std::uint32_t i = 0; i < same->animations.size(); ++i)
+        {
+            game.server.SetModelAnimation(h, i);
+            game.server.ResetModelAnimation(h);
+            game.server.SetModelLooping(h, DFALSE);
+            CHECK(game.step(same->animations[i].duration / 1000.0 + .001));
+            CHECK(game.server.GetModelPlaybackState(h) == MS_PLAYDONE);
+            CHECK(sample_pose(*same, i, same->animations[i].duration / 2.0, pose) && pose.size() == 20);
+            std::vector<DVector> vertices;
+            CHECK(sample_vertices(*same, i, same->animations[i].duration / 2.0, vertices));
+            for (const auto& face : same->faces)
+                for (auto index : face.vertices)
+                {
+                    auto p = vertices[index];
+                    CHECK(physics_vector(p));
+                    CHECK(p.x > -200 && p.x < 200 && p.y > -200 && p.y < 200 && p.z > -200 && p.z < 200);
+                }
+        }
+        CHECK(keys > 0);
+        CHECK(game.collision.triangles() > 1000);
+        DVector spawn{};
+        for (const auto& entry : game.entries)
+            if (auto* object = game.objects.get(entry.object); object && object->type->name == "GameStartPoint")
+                spawn = object->state.m_Pos;
+        std::cout << "Original start point: " << spawn.x << "," << spawn.y << "," << spawn.z << "\n";
+        CollisionHit hit;
+        auto q = game.collision.sweep(spawn, vector_add(spawn, {0, -1000, 0}), {12, 42, 12}, hit);
+        CHECK(q == CollisionQuery::Hit);
+        CHECK(!hit.start_solid);
+        std::cout << "Caleb: " << same->vertices.size() << " vertices, " << same->nodes.size() << " nodes, "
+                  << same->animations.size() << " animations; dispatched commands: " << keys << "\n";
+        std::cout << "Primary world: " << game.collision.triangles() << " solid triangles, " << game.collision.nodes()
+                  << " BVH nodes; probe contact y=" << hit.point.y << " polygon=" << hit.polygon << "\n";
+        callback = {};
+        game.unload_world();
+        CHECK(!game.objects.get(h) && !game.server.collision_ready);
+        return true;
+    }
+} // namespace
+int main(int argc, char** argv)
+{
+    if (argc < 2)
+        return 2;
+    std::string name = argv[1];
+    bool ok = false;
+    if (name == "model_reader")
+        ok = model_reader();
+    else if (name == "model_rejection")
+        ok = model_rejection();
+    else if (name == "animation_events")
+        ok = animation_events();
+    else if (name == "model_callbacks")
+        ok = model_callbacks();
+    else if (name == "collision_queries")
+        ok = collision_queries();
+    else if (name == "movement_contacts")
+        ok = movement_contacts();
+    else if (name == "original_services")
+        ok = original_services();
+    else if (name == "private" && argc == 3)
+        ok = private_services(argv[2]);
+    callback = {};
+    return ok ? 0 : 1;
 }
