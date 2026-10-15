@@ -105,3 +105,7 @@ application entry keeps the intro. The strict existing `16_bridge.dat` rejection
 KeyFramer, CinematicTrigger, world transitions, other required classes/services,
 rendering/audio, save/load and complete M2 acceptance remain open. No retail
 executable comparison, additional-platform or XR validation is claimed.
+
+The later [keyframe continuation](KEYFRAMER_CONTRACTS.md) supersedes the blanket
+KeyFramer omission above for camera/ordinary-object paths. CinematicTrigger,
+keyframed world/container motion, rendering/audio and the full M2 gate remain open.

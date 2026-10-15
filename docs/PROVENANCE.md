@@ -331,3 +331,14 @@ source rules from typed descriptors, checked lifetime, look-direction math and
 stable client selection. Cinematic rendering and audio remain presentation requests;
 KeyFramer/CinematicTrigger and full M2 acceptance are not implemented by this port.
 Earlier ledgers remain historical; no dependency pin or reference tree changed.
+
+## M2 KeyFramer / KeyData continuation
+
+[Selection hashes](M2_KEYFRAMER_SOURCES.json) record original ObjectDLL/KeyFramer
+and KeyData fields/callbacks/timeline/interpolation/message branches. Owned vectors
+and strings replace KEYNODE/CDynArray/HSTRING storage, preserving original component
+rotation offsets and endpoint/loop timing quirks. [Contracts](KEYFRAMER_CONTRACTS.md)
+record the target-offset removal fix, bounded discovery and reentrant command guard.
+The typed engine interpolation/motion helpers and UI are new implementation code.
+Sound/BPrint requests, world/container movers, CinematicTrigger and full M2 remain
+unimplemented; these diagnostics are not successful audio/physics service stubs.

@@ -386,10 +386,17 @@ namespace
             }
         std::cout << "SubwayA doors: " << count << " created, " << failures << " rejected\n";
         CHECK(count > 0 && failures == 0);
-        unsigned moved = 0;
+        // Freeze only the tested doors. Normal updates consume authored Key
+        // objects, so an all-object snapshot cannot be dereferenced across steps.
+        std::vector<ObjectId> doors;
         for (auto id : g.objects.snapshot())
+            if (auto* r = g.objects.get(id); r && dynamic_cast<Door*>(r->game.get()))
+                doors.push_back(id);
+        unsigned moved = 0;
+        for (auto id : doors)
         {
             auto* r = g.objects.get(id);
+            CHECK(r && r->life == Life::Alive);
             if (auto* d = dynamic_cast<Door*>(r->game.get()); d && d->move_dist > 0 && d->speed > 0)
             {
                 const auto pos = r->state.m_Pos;

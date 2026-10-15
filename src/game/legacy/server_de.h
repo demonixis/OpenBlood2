@@ -62,6 +62,8 @@ class ServerDE : public CSBase
     virtual void RemoveCameraEffect(HOBJECT) = 0;
     virtual OpenBlood2::CameraView GetCameraView() = 0;
     virtual DRESULT AlignRotation(DRotation&, DVector forward) = 0; // Selected world-Y-up caller.
+    virtual DRESULT InterpolateRotation(DRotation&, const DRotation&, const DRotation&, float) = 0;
+    virtual OpenBlood2::MoverResult MoveKeyframedObject(HOBJECT, DVector, const DRotation*) = 0;
     virtual DDWORD GetObjectUserFlags(HOBJECT) = 0;
     virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
     virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;

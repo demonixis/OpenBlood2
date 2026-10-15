@@ -96,7 +96,7 @@ namespace OpenBlood2
         ImGui::TextWrapped(
             "Client selection uses the first active camera descriptor; server listener selection follows "
             "the original camera list. Retail worlds suppress the client IsListener flag. Camera "
-            "controls are diagnostic; CinematicTrigger and KeyFramer remain pending.");
+            "controls are diagnostic; Keyframes inspects path motion. CinematicTrigger remains pending.");
         ImGui::EndTable();
     }
 } // namespace OpenBlood2

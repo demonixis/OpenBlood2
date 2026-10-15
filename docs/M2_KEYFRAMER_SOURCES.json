@@ -1,0 +1,86 @@
+{
+  "date": "2026-10-16",
+  "status": "M2 incomplete; original camera/ordinary-object keyframe paths",
+  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/KeyFramer.cpp",
+      "target": "src/game/original/KeyFramer.cpp",
+      "source_line_ranges": [
+        [
+          40,
+          300
+        ],
+        [
+          312,
+          710
+        ]
+      ],
+      "selection": "Selected original initial update, contiguous key collection, relative timestamps, target offsets, ON/OFF/TRIGGER, frame processing, one-cycle looping, no final endpoint snap, component rotation offsets and linked-camera exclusion. Bounded owned vectors replace KEYNODE/CDynArray/list lifetime; target-offset removal fix and reentrant revision guard are deliberate adaptations. Sound and BPrint are inspection requests; save/load/cache omitted. Typed motion explicitly rejects unsupported geometry/body targets.",
+      "source_sha256": "31489c8f6891fdce061548ac4903b80c90c73d94049da14698ec34a559ecbf67",
+      "target_sha256": "c08cb408d3fb776915116884f41b40c535c01064a3731aa980d32dabf7685bc0"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/KeyFramer.cpp",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          24,
+          29
+        ]
+      ],
+      "selection": "Original ObjectName/BaseKeyName/StartActive/Looping defaults and B2BaseClass ancestry.",
+      "source_sha256": "31489c8f6891fdce061548ac4903b80c90c73d94049da14698ec34a559ecbf67",
+      "target_sha256": "9021c1563974c5362d3ed44b23107725f09a8078400617c558a0691d062ec07d"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/KeyFramer.h",
+      "target": "src/game/original/KeyFramer.h",
+      "source_line_ranges": [
+        [
+          29,
+          79
+        ]
+      ],
+      "selection": "Original class callback/state/GoActive/Pause/Resume concepts with vector/string ownership and diagnostics; no linked KEYNODE, dynamic arrays, sound handles or save/load.",
+      "source_sha256": "82fd24e0f762487bd19b97733c500aec5c2966daa854bd293b4b2b03fe5e0038",
+      "target_sha256": "adf451494f8868b9771b4afec99258e37dd0961cf5d84fc74227bd16bdb465ce"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/KeyData.cpp",
+      "target": "src/game/original/KeyData.cpp",
+      "source_line_ranges": [
+        [
+          22,
+          109
+        ]
+      ],
+      "selection": "Original Copy: object pose, relative timestamp, sound radius/loop, optional sound/message/print fields, using owned strings and finite bounds. All copied source keys carry position; optional event fields replace type bits in this restore-free subset.",
+      "source_sha256": "8f0697142fdeed9598d07af420f224cd7ccd6c146e97f6eed003d6505fa4dee7",
+      "target_sha256": "0576e8d770981baf9f3b36932f93288df9ffeb2fdcad692e35c4f055145f22ab"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/KeyData.h",
+      "target": "src/game/original/KeyData.h",
+      "source_line_ranges": [
+        [
+          22,
+          41
+        ]
+      ],
+      "selection": "Selected copied key fields with value ownership; source name retained for inspection. No serialization/cache surface.",
+      "source_sha256": "89609365f826102297e0126dbfc4d83f6546521eaf825c854c234bc0ca3c66b8",
+      "target_sha256": "abe7c30ac0e8ce9a514191f5b314b2e0af53e25b316e5dbf6cf207e30de1e3d6"
+    }
+  ],
+  "adaptations": [
+    "Bounded value-owned copied keys/strings and paired target/offset records; 1024 keys, 256 targets, finite timeline/radius checks; malformed discovery consumes no keys",
+    "Preserve first returned typed name match, contiguous suffix stop, first-update timing, early ON, component quaternion offset, linked-camera rotation exclusion, overshoot discard and missing final snap",
+    "Fix parallel-offset shift after target removal; command revision stops stale reentrant update after state change/removal",
+    "New typed normalized shortest-arc slerp and checked ordinary-object movement; world/container/client-controlled bodies explicitly unavailable before mutation",
+    "Owned original trigger messages execute; missing live targets exposed; sound/BPrint requests are inspection only, not fabricated playback/presentation success",
+    "GPU smoke lifetime counts measured after one normal initialization update; original Key consumption remains observable; no equality assertion relaxed",
+    "Private Door fixture snapshots only Door identities before steps that consume Keys; no motion assertion removed; duplicate fixture obeys existing returned-list order",
+    "Save/load, CinematicTrigger, keyframed geometry, audio, cinematic rendering and full M2 remain open"
+  ]
+}

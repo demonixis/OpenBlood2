@@ -129,3 +129,13 @@ view, visibility and audio listener are inspection data/requests; cinematic worl
 rendering, KeyFramer/CinematicTrigger and audio remain pending. Latest SubwayA
 accounting is 144 source instances + 7 SelfTriggers, 154 with player/owned models,
 372 editor-only entries, 64 unported and zero failed. M2 is still open.
+
+Latest: [original keyframed paths](../Documentation/Implementation/M2_KEYFRAMERS.md)
+connect KeyFramer/KeyData, camera motion and owned consumed keys. The Keyframes tab
+shows copied timelines, target transforms/results and unresolved script/sound
+requests. Run `./build/debug/blood2 --keyframes-smoke` for hidden-UI/reload checks.
+[Contracts](docs/KEYFRAMER_CONTRACTS.md) preserve original timing/rotation quirks.
+SubwayA has 148 created source entries + 7 SelfTriggers, 372 editor-only, 60 unported,
+zero failed. Nine Keys disappear after copying: live counts are 155 before player
+entry, 158 after entry, then 146/149 after initialization. World/container path
+motion, CinematicTrigger, sound and full M2 acceptance remain pending.

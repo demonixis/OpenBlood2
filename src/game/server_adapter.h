@@ -98,6 +98,8 @@ namespace OpenBlood2
         bool PublishCameraEffect(HOBJECT, const CameraSettings&) override;
         void RemoveCameraEffect(HOBJECT) override;
         CameraView GetCameraView() override;
+        DRESULT InterpolateRotation(DRotation&, const DRotation&, const DRotation&, float) override;
+        MoverResult MoveKeyframedObject(HOBJECT, DVector, const DRotation*) override;
         DRESULT AlignRotation(DRotation&, DVector) override;
         DDWORD GetObjectUserFlags(HOBJECT) override;
         DRESULT SendObjectives(const MissionObjectives&) override;

@@ -5,6 +5,7 @@
 #include "game/original/Door.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Key.h"
+#include "game/original/KeyFramer.h"
 #include "game/original/KeyPickup.h"
 #include "game/original/ObjectivesTrigger.h"
 #include "game/original/PathPoint.h"
@@ -76,6 +77,13 @@ namespace OpenBlood2
                                        {"IsListener", true},
                                        {"HidePlayer", false},
                                        {"TypeActionMode", false}}};
+        const ClassInfo keyframer{"KeyFramer",
+                                  &b2base,
+                                  construct<KeyFramer>,
+                                  {{"ObjectName", std::string{}},
+                                   {"BaseKeyName", std::string{}},
+                                   {"StartActive", false},
+                                   {"Looping", false}}};
         const ClassInfo start{"StartPoint", &base, construct<StartPoint>, {}};
         const ClassInfo game_start{"GameStartPoint",
                                    &start,
@@ -406,13 +414,13 @@ namespace OpenBlood2
     bool register_original_classes(Objects& objects)
     {
         return objects.register_class(base) && objects.register_class(b2base) && objects.register_class(camera) &&
-               objects.register_class(camera_object) && objects.register_class(key) && objects.register_class(start) &&
-               objects.register_class(game_start) && objects.register_class(path) &&
-               objects.register_class(world_properties) && objects.register_class(smell) &&
-               objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
-               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
-               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
-               objects.register_class(freefall) && objects.register_class(trigger) &&
+               objects.register_class(camera_object) && objects.register_class(keyframer) &&
+               objects.register_class(key) && objects.register_class(start) && objects.register_class(game_start) &&
+               objects.register_class(path) && objects.register_class(world_properties) &&
+               objects.register_class(smell) && objects.register_class(character) && objects.register_class(player) &&
+               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
+               objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
+               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
                objects.register_class(key_pickup) && objects.register_class(pickup) &&
                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
                objects.register_class(health_base) && objects.register_class(armor_base) &&

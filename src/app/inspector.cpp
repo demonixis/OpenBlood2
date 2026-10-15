@@ -514,6 +514,12 @@ namespace OpenBlood2
                     draw_triggers(game, selection);
                     ImGui::EndTabItem();
                 }
+                if (ImGui::BeginTabItem("Keyframes", nullptr, select_keyframes ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_keyframes = false;
+                    draw_keyframes(game, selection);
+                    ImGui::EndTabItem();
+                }
                 if (ImGui::BeginTabItem("Cameras", nullptr, select_cameras ? ImGuiTabItemFlags_SetSelected : 0))
                 {
                     select_cameras = false;

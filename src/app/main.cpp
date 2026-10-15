@@ -8,6 +8,7 @@
 #include "game/original/Door.h"
 #include "game/server_adapter.h"
 #include "interaction_smoke.h"
+#include "keyframe_smoke.h"
 #include "objectives_smoke.h"
 #include "pickup_smoke.h"
 #include "trigger_smoke.h"
@@ -173,6 +174,18 @@ namespace
                 return 4;
             selection.id = smoke_camera;
         }
+        OpenBlood2::ObjectId smoke_keyframe{};
+        bool keyframe_hidden = false;
+        if (options.keyframes_smoke)
+        {
+            if (!OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe))
+                return 4;
+            selection.id = smoke_keyframe;
+        }
+        // Compare reload lifetime at the same phase: original controllers copy
+        // and consume their Key objects on the first normal simulation update.
+        if (options.world_smoke && !game.step(1.0 / 60))
+            return 4;
         bool interaction_hidden = false;
         const auto original_selection = selection.id;
         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
@@ -186,7 +199,8 @@ namespace
             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
                                    !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke &&
-                                   !options.pickups_smoke && !options.objectives_smoke && !options.cameras_smoke;
+                                   !options.pickups_smoke && !options.objectives_smoke && !options.cameras_smoke &&
+                                   !options.keyframes_smoke;
         inspector.select_weapons = options.weapons_smoke;
         inspector.select_movement = options.movement_smoke;
         inspector.select_containers = options.containers_smoke;
@@ -194,6 +208,8 @@ namespace
         inspector.select_pickups = options.pickups_smoke;
         inspector.select_objectives = options.objectives_smoke;
         inspector.select_cameras = options.cameras_smoke;
+        inspector.select_keyframes = options.keyframes_smoke;
+        inspector.keyframe_selection = smoke_keyframe;
         inspector.brush_selection = smoke_body;
         inspector.select_doors = options.doors_smoke || options.interaction_smoke;
         inspector.keyboard_movement = options.interaction_smoke;
@@ -305,6 +321,9 @@ namespace
             if (options.brushes_smoke && frames == reload_frame + 1)
                 if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
                     return 4;
+            if (options.keyframes_smoke && frames == reload_frame + 1 &&
+                !OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe))
+                return 4;
             if (options.cameras_smoke && frames == reload_frame + 1 &&
                 !OpenBlood2::prepare_camera_smoke(game, smoke_camera))
                 return 4;
@@ -430,7 +449,7 @@ namespace
                 frames >= (extended_smoke ? 180u
                            : (options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
                               options.interaction_smoke || options.brushes_smoke || options.pickups_smoke ||
-                              options.objectives_smoke || options.cameras_smoke)
+                              options.objectives_smoke || options.cameras_smoke || options.keyframes_smoke)
                                ? 14u
                                : 2u) &&
                 !captured && !options.capture_file.empty();
@@ -577,6 +596,8 @@ namespace
                     use.key.down = frames == hide_frame;
                     event_ok = SDL_PushEvent(&use);
                 }
+                if (options.keyframes_smoke && frames == show_frame - 1)
+                    keyframe_hidden = OpenBlood2::check_keyframe_smoke(game, smoke_keyframe);
                 if (options.cameras_smoke && frames == show_frame - 1)
                     camera_hidden = OpenBlood2::check_camera_smoke(game, smoke_camera);
                 if (options.objectives_smoke && frames == show_frame - 1)
@@ -704,6 +725,8 @@ namespace
                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+                (options.keyframes_smoke &&
+                 (!keyframe_hidden || !OpenBlood2::check_keyframe_smoke(game, smoke_keyframe))) ||
                 (options.cameras_smoke && (!camera_hidden || !OpenBlood2::check_camera_smoke(game, smoke_camera))) ||
                 (options.objectives_smoke && !objective_hidden) || (options.pickups_smoke && !pickup_hidden) ||
                 (options.interaction_smoke && !interaction_hidden) || (options.brushes_smoke && !brush_hidden) ||
@@ -727,6 +750,9 @@ namespace
             if (options.world_smoke)
                 spdlog::info("World smoke passed: unload/reload, original instance/string counts restored, "
                              "collision/model resources restored, preview animation advanced while hidden");
+            if (options.keyframes_smoke)
+                spdlog::info("KEYFRAMES smoke: authored camera path and owned key lifetime checked while UI hidden and "
+                             "after reload; missing Gideon message exposed");
             if (options.cameras_smoke)
                 spdlog::info("CAMERAS smoke: original camera tracks player while UI hidden; selected view, movement "
                              "gate and reload checked");
@@ -806,6 +832,7 @@ int main(int argc, char** argv)
                      "  --interaction-smoke GPU original USE and rotating door inspection\n"
                      "  --pickups-smoke   GPU original ammo pickup, hidden collection and reload\n"
                      "  --objectives-smoke GPU original objectives and localized text, hidden delivery/reload\n"
+                     "  --keyframes-smoke   GPU original camera key path, key lifetime and reload\n"
                      "  --cameras-smoke     GPU original camera tracking, player gates and reload\n"
                      "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"

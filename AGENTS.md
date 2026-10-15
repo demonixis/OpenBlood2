@@ -113,3 +113,14 @@ unlink scheduling and already-started FIRE_KEY handling. Presentation/listener
 requests are not cinematic rendering/audio. SubwayA now has 144 created source
 entries, 7 owned SelfTriggers, 372 editor-only and 64 unported entries. KeyFramer,
 CinematicTrigger, transitions and the actual M2 gate remain open.
+
+The latest [keyframe evidence](../Documentation/Implementation/M2_KEYFRAMERS.md) connects original KeyFramer/KeyData timelines,
+camera/ordinary-object motion and consumed-key ownership. Read [keyframe contracts](docs/KEYFRAMER_CONTRACTS.md)
+before extending scripted paths, linked-camera rotation or controller callbacks.
+Preserve first-update initialization, ignored early ON, component rotation offsets,
+loop overshoot discard and the source's missing final snap. Keep target offsets paired
+through removal and stop reentrant stale updates. World-model/container motion, key
+audio and CinematicTrigger remain explicitly unavailable. SubwayA has 148 created
+source entries, 7 SelfTriggers, 372 editor-only and 60 unported; nine Keys are consumed
+on the first update (155/158 initial instances before/after player, 146/149 afterwards).
+M2 remains open; these counts do not imply completed cinematic/gameplay services.
