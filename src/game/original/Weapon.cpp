@@ -1,5 +1,6 @@
 #include "Weapon.h"
 #include "InventoryMgr.h"
+#include "PlayerObj.h"
 #include "engine/collision.h"
 #include <cmath>
 #include <random>
@@ -50,11 +51,12 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     direction = vector_add(direction, vector_scale(up, sample(-spread.v, spread.v) / 2000));
     direction = vector_scale(direction, 1 / std::sqrt(vector_dot(direction, direction)));
     const auto range = request.alternate ? data.m_fAltRange : data.m_fRange;
-    // FireSpread -> AlignFireVector: project from Caleb's standing eye, then
+    // FireSpread -> AlignFireVector: project from Caleb's current eye, then
     // aim the muzzle at that intersection. Player input owns the muzzle origin.
     DVector eye;
     server->GetObjectPos(m_hOwner, &eye);
-    eye.y += 36;
+    const auto* player = dynamic_cast<CPlayerObj*>(server->HandleToObject(m_hOwner));
+    eye.y += player ? player->eye_level : 36;
     auto aim = vector_add(eye, vector_scale(direction, range));
     SegmentHit aim_hit;
     auto query = server->IntersectSegment(eye, aim, m_hOwner, aim_hit);

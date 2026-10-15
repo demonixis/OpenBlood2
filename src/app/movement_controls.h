@@ -25,6 +25,8 @@ namespace OpenBlood2
                 case SDL_SCANCODE_D:
                 case SDL_SCANCODE_LSHIFT:
                 case SDL_SCANCODE_RSHIFT:
+                case SDL_SCANCODE_LCTRL:
+                case SDL_SCANCODE_RCTRL:
                 case SDL_SCANCODE_SPACE:
                 case SDL_SCANCODE_LEFT:
                 case SDL_SCANCODE_RIGHT:
@@ -64,7 +66,8 @@ namespace OpenBlood2
                     keys[SDL_SCANCODE_A],
                     keys[SDL_SCANCODE_D],
                     keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT],
-                    keys[SDL_SCANCODE_SPACE]};
+                    keys[SDL_SCANCODE_SPACE],
+                    keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL]};
         }
         void look(PlayerRotation& rotation, double seconds, bool text_editing) const
         {

@@ -190,3 +190,18 @@ for context, not imported. Original animation-driven collision dimensions,
 containers, stairs and pushers are not advertised as implemented. See the
 [movement contracts](MOVEMENT_CONTRACTS.md) and
 [selected-source comparison](../../Documentation/Implementation/evidence/m2-movement-original-adaptations.patch).
+
+## M2 Locomotion Continuation
+
+[M2_LOCOMOTION_SOURCES.json](M2_LOCOMOTION_SOURCES.json) records original
+PlayerObj animation selection, Anim_Sound names/CheckAnims, MoveMgr crouch rules
+and the SDK stair flag. [LOCOMOTION_CONTRACTS.md](LOCOMOTION_CONTRACTS.md) separates
+these game rules from the new atomic shape resize and three-sweep stair solver.
+Later LithTech is evidence for the default stair-height rule only, not an engine
+import or a Blood II parity guarantee. This supersedes the previous entry's
+pending stairs/animation-dimensions statement. Earlier hash ledgers are historical.
+
+Runtime C++ namespaces are now `OpenBlood2`; original global SDK/game
+classes keep their source names. The user's `.clang-format` and `.editorconfig`
+are versioned. Formatting changes are isolated in commit `9ac915d`; the previous
+M2 implementation was checkpointed in `007d5ca` before this continuation.

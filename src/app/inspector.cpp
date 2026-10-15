@@ -704,8 +704,9 @@ namespace OpenBlood2
             selection.id = game.objects.get(player->m_hObject)->id;
         ImGui::SameLine();
         ImGui::Checkbox("Keyboard movement (F2)", &keyboard_movement);
-        ImGui::TextWrapped("WASD / ZQSD: walk | Shift: run | Space: jump | Arrows: look. F1 hides UI. Text editing and "
-                           "focus loss suspend keys.");
+        ImGui::TextWrapped(
+            "WASD / ZQSD: walk | Shift: run | Space: jump | Ctrl: crouch | Arrows: look. F1 hides UI. Text editing and "
+            "focus loss suspend keys.");
         MovementInput input;
         ImGui::Button("Forward");
         input.forward = ImGui::IsItemActive();
@@ -721,6 +722,13 @@ namespace OpenBlood2
         ImGui::SameLine();
         ImGui::Button("Jump");
         input.jump = ImGui::IsItemActive();
+        ImGui::SameLine();
+        ImGui::Button("Crouch");
+        input.crouch = ImGui::IsItemActive();
+        ImGui::SameLine();
+        ImGui::Button("Run forward");
+        if (ImGui::IsItemActive())
+            input.run = input.forward = true;
         movement_input_request = input;
         auto aim = client.rotation;
         if (ImGui::SliderAngle("Facing yaw", &aim.yaw, -180, 180))
@@ -730,23 +738,41 @@ namespace OpenBlood2
         ImGui::TableNextColumn();
         ImGui::Text("Position  %.2f  %.2f  %.2f", body.position.x, body.position.y, body.position.z);
         ImGui::Text("Velocity  %.2f  %.2f  %.2f", body.velocity.x, body.velocity.y, body.velocity.z);
-        ImGui::Text("Gravity  %.0f  %.0f  %.0f", move.physics.gravity.x, move.physics.gravity.y,
-                    move.physics.gravity.z);
-        ImGui::Text("Walk %.0f | Run %.0f | Jump %.0f", move.physics.move_speed, move.physics.move_speed * 1.5f,
-                    move.physics.jump_speed);
         ImGui::Text("Horizontal speed %.2f | grounded %s", move.m_fVelMagnitude, move.m_bOnGround ? "yes" : "no");
-        if (body.ground_polygon != UINT32_MAX)
-            ImGui::Text("World support polygon %u", body.ground_polygon);
-        else if (const auto* support = game.objects.get(body.ground_object))
-            ImGui::Text("Object support %s / %u", support->type->name.c_str(), support->id.slot);
-        else
-            ImGui::TextUnformatted("No support");
-        ImGui::Text("Jumps %llu | Landings %llu", static_cast<unsigned long long>(move.jumps),
-                    static_cast<unsigned long long>(move.landings));
-        ImGui::Text("Steps %llu | Messages %llu", static_cast<unsigned long long>(move.substeps),
-                    static_cast<unsigned long long>(player->movement_messages));
+        ImGui::Text("Crouch %s | requested %s | forced %s", player->crouched ? "yes" : "no",
+                    player->crouch_requested ? "yes" : "no", player->forced_crouch ? "yes" : "no");
+        ImGui::Text("Half-size %.0f %.0f %.0f | eye %.0f", body.dimensions.x, body.dimensions.y, body.dimensions.z,
+                    player->eye_level);
+        ImGui::Text("Stairs %llu / %llu | rise %.1f | limit %.1f", static_cast<unsigned long long>(body.stair_steps),
+                    static_cast<unsigned long long>(body.stair_attempts), body.last_step_height,
+                    body.dimensions.y * 0.5f);
+        const auto* record = game.objects.get(player->m_hObject);
+        ImGui::TextWrapped("Requested clip: %s", player->locomotion_requested_clip.c_str());
+        ImGui::TextWrapped("Clip: %s | fallback %s", player->locomotion_clip.c_str(),
+                           player->locomotion_requested_clip != player->locomotion_clip ? "yes" : "no");
+        if (record && record->model && record->animation.animation < record->model->animations.size())
+            ImGui::Text("%.1f / %u ms | loop %s | done %s", record->animation.time,
+                        record->model->animations[record->animation.animation].duration,
+                        record->animation.looping ? "yes" : "no", record->animation.done ? "yes" : "no");
+        if (!player->locomotion_error.empty())
+            ImGui::TextWrapped("%s", player->locomotion_error.c_str());
         if (ImGui::CollapsingHeader("Motion details"))
         {
+            ImGui::Text("Gravity  %.0f  %.0f  %.0f", move.physics.gravity.x, move.physics.gravity.y,
+                        move.physics.gravity.z);
+            ImGui::Text("Walk %.0f | Run %.0f | Jump %.0f", move.physics.move_speed, move.physics.move_speed * 1.5f,
+                        move.physics.jump_speed);
+            if (body.ground_polygon != UINT32_MAX)
+                ImGui::Text("World support polygon %u", body.ground_polygon);
+            else if (const auto* support = game.objects.get(body.ground_object))
+                ImGui::Text("Object support %s / %u", support->type->name.c_str(), support->id.slot);
+            else
+                ImGui::TextUnformatted("No support");
+            ImGui::Text("Jumps %llu | Landings %llu", static_cast<unsigned long long>(move.jumps),
+                        static_cast<unsigned long long>(move.landings));
+            ImGui::Text("Steps %llu | Messages %llu", static_cast<unsigned long long>(move.substeps),
+                        static_cast<unsigned long long>(player->movement_messages));
+
             ImGui::Text("Acceleration  %.1f  %.1f  %.1f", body.acceleration.x, body.acceleration.y,
                         body.acceleration.z);
             ImGui::Text("Half dimensions  %.1f  %.1f  %.1f", body.dimensions.x, body.dimensions.y, body.dimensions.z);
@@ -756,10 +782,35 @@ namespace OpenBlood2
             ImGui::Text("Step %.3f ms | discarded %.3f s", move.m_FrameTime * 1000, move.discarded_time);
         }
         ImGui::TableNextColumn();
+        ImGui::TextUnformatted("Live player ABC / local front view");
+        if (record && record->model)
+        {
+            const auto& model = *record->model;
+            std::vector<DVector> vertices;
+            const auto origin = ImGui::GetCursorScreenPos();
+            const ImVec2 size{std::max(180.0f, ImGui::GetContentRegionAvail().x), 170};
+            ImGui::InvisibleButton("Live locomotion pose", size);
+            auto* draw = ImGui::GetWindowDrawList();
+            const ImVec2 end{origin.x + size.x, origin.y + size.y};
+            draw->AddRectFilled(origin, end, IM_COL32(12, 17, 23, 255));
+            draw->PushClipRect(origin, end, true);
+            const auto scale = std::min(size.x / 150.0f, size.y / 110.0f);
+            auto project = [&](DVector p)
+            { return ImVec2{origin.x + size.x * .5f + p.x * scale, origin.y + size.y * .5f - p.y * scale}; };
+            if (sample_vertices(model, record->animation.animation, record->animation.time, vertices))
+                for (const auto& face : model.faces)
+                    for (unsigned i = 0; i < 3; ++i)
+                        draw->AddLine(project(vertices[face.vertices[i]]),
+                                      project(vertices[face.vertices[(i + 1) % 3]]), IM_COL32(126, 193, 210, 180));
+            draw->AddRect(project({-body.dimensions.x, body.dimensions.y, 0}),
+                          project({body.dimensions.x, -body.dimensions.y, 0}), IM_COL32(255, 170, 70, 255));
+            draw->AddCircleFilled(project({0, player->eye_level, 0}), 3, IM_COL32(150, 255, 170, 255));
+            draw->PopClipRect();
+        }
         ImGui::TextUnformatted("Local collision map / top view (+Z up)");
         ImGui::TextWrapped("Blue: world slice | orange: solid objects | white: player");
         const auto origin = ImGui::GetCursorScreenPos();
-        const ImVec2 size{std::max(180.0f, ImGui::GetContentRegionAvail().x), 220};
+        const ImVec2 size{std::max(180.0f, ImGui::GetContentRegionAvail().x), 100};
         ImGui::InvisibleButton("Collision map", size);
         const ImVec2 end{origin.x + size.x, origin.y + size.y}, center{origin.x + size.x / 2, origin.y + size.y / 2};
         auto* draw = ImGui::GetWindowDrawList();
@@ -800,8 +851,9 @@ namespace OpenBlood2
         draw->PopClipRect();
         ImGui::EndTable();
         if (ImGui::CollapsingHeader("Movement limitations"))
-            ImGui::TextWrapped("Standing dry-land subset. Stairs, crouch, liquids, ladders, moving platforms, body "
-                               "animation selection and fall damage remain pending.");
+            ImGui::TextWrapped(
+                "Dry-land locomotion subset. Stair solver is a replacement, not retail parity. Liquids, ladders, "
+                "moving platforms, injury/death transitions, audio and fall damage remain pending.");
     }
     void Inspector::draw_models(GameSession& game)
     {
@@ -905,8 +957,9 @@ namespace OpenBlood2
         ImGui::Text("Primary-world collision: %s / %zu triangles / %zu BVH nodes",
                     game.server.collision_ready ? "indexed" : "not loaded", game.collision.triangles(),
                     game.collision.nodes());
-        ImGui::TextWrapped("Continuous axis-aligned boxes, sliding and object touch callbacks. Moving/rotating BSP "
-                           "models, stair stepping, crush response and original player movement are not implemented.");
+        ImGui::TextWrapped(
+            "Continuous axis-aligned boxes, sliding and object touch callbacks. Moving/rotating BSP "
+            "models and crush response are not implemented. Grounded FLAG_STAIRSTEP and player locomotion are active.");
         ImGui::Text("Gravity: %.2f %.2f %.2f", game.server.gravity.x, game.server.gravity.y, game.server.gravity.z);
         if (ImGui::BeginTable("World console variables", 2,
                               ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,

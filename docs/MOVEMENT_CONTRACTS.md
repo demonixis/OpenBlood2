@@ -1,11 +1,15 @@
 # Original MoveMgr Boundary
 
-This continuation executes the standing, dry-land branches of the original
+The initial continuation executes the standing, dry-land branches of the original
 `CMoveMgr`, through the local shells and `CPlayerObj`. It adds walking, running,
 digital strafing, jump/release behavior, gravity and collision inspection.
 It does not implement the complete original controller or close M2's gameplay
 gate. See [source selections](M2_MOVEMENT_SOURCES.json) and
 [execution evidence](../../Documentation/Implementation/M2_MOVEMENT.md).
+
+The current [locomotion extension](LOCOMOTION_CONTRACTS.md) adds stairs, crouch,
+animation dimensions and original clip selection; it supersedes the former
+fixed standing-body limitation.
 
 ## Original behavior retained
 
@@ -97,7 +101,7 @@ solid object boxes and player heading. It is a diagnostic map, not game renderin
 Hold buttons supply temporary commands at frame boundaries.
 
 **F2** or the checkbox enables physical **WASD / AZERTY ZQSD**, **Shift** run,
-**Space** jump and arrow-key look. **F1** hides the inspector without stopping
+**Space** jump, **Ctrl** crouch and arrow-key look. **F1** hides the inspector without stopping
 keyboard movement. Text editing suppresses keyboard commands; focus loss clears
 pressed keys and suppresses panel movement. When keyboard movement is enabled,
 its keys are routed away from ImGui navigation (unless editing text); Space cannot
@@ -107,17 +111,11 @@ Release compiles the same movement code without ImGui.
 
 ## Deliberate incomplete branches
 
-The standing body retains the player's `(12,41,12)` half dimensions. The original
-client animation-driven `UpdatePlayerAnimation` / `ResetDims`, crouching and
-forced-crouch clearance are not ported; this avoids pretending the server's
-unported animation selector drives a second collision shape. Model playback and
-callbacks continue independently.
-
 Liquids, ladders, conveyors, spectator movement, trapped/wonky states, slow mode,
 pushers/explosion impulses, moving-world-model transforms, standing-on-platform
-following, stair stepping, friction materials, surface-type sounds, landing/fall
-damage, camera effects and character locomotion animation selection remain open.
-The `STAIRSTEP` source flag still does not provide a stair solver. Mass is not
+following, friction materials, surface-type sounds, landing/fall damage and
+camera effects remain open. Stair stepping and healthy player locomotion are
+covered by the locomotion extension. Mass is not
 an impulse implementation. Dead-player commands are suppressed, while gravity
 continues; the original full death flow remains absent.
 

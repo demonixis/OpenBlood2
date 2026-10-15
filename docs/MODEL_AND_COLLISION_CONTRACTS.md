@@ -99,7 +99,7 @@ Active objects with velocity, acceleration or gravity integrate with at most
 1/120-second substeps and a 0.5-second catch-up limit. No stationary object is
 forced into that loop. This is an initial engine service, **not verified original
 player physics**. Missing behavior includes moving/rotating world-model collision,
-stair stepping, standing-object following, depenetration, crush/impulse response,
+standing-object following, depenetration, crush/impulse response,
 containers, friction/mass, original BSP contents and legacy world-polygon handles.
 Object touch callbacks currently carry zero stopping force; world contacts are
 inspectable but are not dispatched with a fabricated world HOBJECT. Legacy
@@ -139,5 +139,13 @@ controller. Client-associated player records skip generic integration: MoveMgr
 substeps drive a single shared body through typed CPlayerObj movement messages.
 Its fresh support query distinguishes uphill motion from motion away from the
 ground plane, with real world-polygon or live object identities. Walking, jump,
-gravity, wall/ceiling sliding and stable gentle-ramp support are tested. Stairs,
-containers, moving-platform following and full retail physics parity remain open.
+gravity, wall/ceiling sliding and stable gentle-ramp support are tested. Containers, moving-platform following and full retail physics parity remain open.
+
+## Locomotion extension
+
+[LOCOMOTION_CONTRACTS.md](LOCOMOTION_CONTRACTS.md) supersedes the previous
+fixed-body/stairs limitations: original player clips now drive checked shape
+changes, and grounded FLAG_STAIRSTEP movement uses an up/forward/down sweep.
+The local GetMovementState support query and weapon IntersectSegment are also
+implemented; this does not provide every original PhysicsLT query or moving BSP
+collision. Keep source rules and replacement-solver limitations distinct.

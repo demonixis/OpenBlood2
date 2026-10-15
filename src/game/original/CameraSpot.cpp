@@ -147,7 +147,7 @@ void CameraSpot::PostPropRead(ObjectCreateStruct* pStruct)
 //    DBOOL bRet = DTRUE;
 
 //	if(_mbscmp((const unsigned char*)pInfo->m_pPropName, (const unsigned char*)"Action")==0 && pInfo->m_PropType ==
-//PT_STRING)
+// PT_STRING)
 //	{
 //		m_hstrAction = pServerDE->CreateString((char*)pInfo->m_pData);
 //	}

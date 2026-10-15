@@ -170,6 +170,15 @@ bool CPlayerObj::Respawn()
     m_damage.SetHitPoints(100);
     m_damage.SetArmorPoints(0);
     m_bDead = DFALSE;
+    move_state = MoveState::None;
+    locomotion_clip.clear();
+    locomotion_requested_clip.clear();
+    locomotion_error.clear();
+    // Entry reset may occur beneath a ceiling. Keep the accepted stance until
+    // UpdateAnim can actually grow the shared body; never advertise a tall eye
+    // and standing speed while collision still has the crouched dimensions.
+    crouch_requested = forced_crouch = false;
+    eye_level = crouched ? 12.0f : 36.0f;
     m_fAirLevel = 100;
     for (DBYTE i = 1; i <= 12; ++i)
         m_InventoryMgr.SetAmmoCount(i, 0);

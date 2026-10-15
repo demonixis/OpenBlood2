@@ -51,7 +51,7 @@ namespace test_model
             patch(at, last ? UINT32_MAX : static_cast<std::uint32_t>(b.size()));
         }
     };
-    inline Writer abc(bool weapon = false)
+    inline Writer abc(bool weapon = false, bool character = false)
     {
         Writer file, header, g, n, a, d;
         header.str("MonolithExport Model File v6");
@@ -103,11 +103,37 @@ namespace test_model
         file.section("Nodes", n);
         const char* names[] = {"static_model", "idle",     "draw",           "holster",  "start_fire",
                                "fire",         "end_fire", "start_alt_fire", "alt_fire", "end_alt_fire"};
-        a.u32(weapon ? 10 : 2);
-        for (int clip = 0; clip < (weapon ? 10 : 2); ++clip)
+        const char* character_names[] = {"idle1",
+                                         "idle2",
+                                         "walk_pistol",
+                                         "walk_knife1",
+                                         "run_pistol",
+                                         "run_knife1",
+                                         "jmp_pistol",
+                                         "jmp_knife1",
+                                         "crouch_1pistol",
+                                         "crouch_knife1",
+                                         "crawl_1pistol",
+                                         "crawl_knife1",
+                                         "strafe_right_1pistol",
+                                         "fire_stand_1pistol",
+                                         "fire_stand_knife1",
+                                         "fire_walk_1pistol",
+                                         "fire_walk_knife1",
+                                         "fire_run_1pistol",
+                                         "fire_run_knife1",
+                                         "fire_jump_1pistol",
+                                         "fire_jump_knife1",
+                                         "fire_crouch_1pistol",
+                                         "fire_crouch_knife1",
+                                         "fire_crawl_1pistol",
+                                         "fire_crawl_knife1"};
+        const int count = character ? 25 : weapon ? 10 : 2;
+        a.u32(count);
+        for (int clip = 0; clip < count; ++clip)
         {
-            const bool single = !weapon && clip;
-            a.str(weapon ? names[clip] : clip ? "static" : "walk");
+            const bool single = !weapon && !character && clip;
+            a.str(character ? character_names[clip] : weapon ? names[clip] : clip ? "static" : "walk");
             a.u32(single ? 0 : 100);
             a.vec(-10, -10, -10);
             a.vec(10, 10, 10);
@@ -150,7 +176,13 @@ namespace test_model
                     a.vec();
                 }
             }
-            d.vec(1, 2, 1);
+            if (character)
+            {
+                const std::string_view name = character_names[clip];
+                d.vec(12, name.find("crouch") != name.npos || name.find("crawl") != name.npos ? 26 : 41, 12);
+            }
+            else
+                d.vec(1, 2, 1);
         }
         file.section("Animation", a);
         file.section("AnimDims", d, true);

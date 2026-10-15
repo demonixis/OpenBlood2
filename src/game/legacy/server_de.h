@@ -24,6 +24,7 @@ class CSBase
 class ServerDE : public CSBase
 {
   public:
+    virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
     virtual OpenBlood2::SegmentResult IntersectSegment(DVector from, DVector to, HOBJECT ignore,
                                                        OpenBlood2::SegmentHit&) = 0;

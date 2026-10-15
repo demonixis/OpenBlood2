@@ -17,6 +17,7 @@ class CBloodServerShell
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerInit&);
     FireResult OnMessage(HCLIENT, const OpenBlood2::WeaponFire&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerMove&);
+    bool OnMessage(HCLIENT, const OpenBlood2::PlayerControls&);
     void Update(float);
     CPlayerObj* Player(HCLIENT);
     struct PathEntry

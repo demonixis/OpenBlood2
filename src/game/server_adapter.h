@@ -33,6 +33,7 @@ namespace OpenBlood2
         ServerAdapter(const ServerAdapter&) = delete;
         ServerAdapter& operator=(const ServerAdapter&) = delete;
         bool bind();
+        ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
         SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&) override;
         DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
@@ -130,6 +131,7 @@ namespace OpenBlood2
                                                                     {"GAME_GAMETYPE", {"0"}}};
         void initialize_model_services();
         void initialize_physics_services();
+        CollisionQuery sweep_scene(HOBJECT, DVector, DVector, DVector, CollisionHit&, const std::vector<ObjectId>&);
         bool moving_ = false;
         bool models_advancing_ = false, physics_advancing_ = false;
         std::vector<std::unique_ptr<StringHandle>> string_tokens_;

@@ -2,9 +2,9 @@
 #include "server_de.h"
 
 class CBloodServerShell;
-// Selected standing, dry-land branches of original ClientShellDLL/MoveMgr.
+// Selected dry-land branches of original ClientShellDLL/MoveMgr.
 // One checked local player body replaces the legacy client/server duplicate.
-// See MOVEMENT_CONTRACTS.md for the source selections and physics adaptations.
+// See MOVEMENT_CONTRACTS.md and LOCOMOTION_CONTRACTS.md for the source selections and physics adaptations.
 class CMoveMgr
 {
   public:
@@ -12,13 +12,15 @@ class CMoveMgr
     void Term();
     bool OnPhysicsUpdate(const OpenBlood2::PlayerPhysics&);
     bool OnServerForcePos(const OpenBlood2::PlayerPosition&);
-    bool Update(CBloodServerShell&, const OpenBlood2::MovementInput&, float yaw, double seconds, bool can_move);
+    bool Update(CBloodServerShell&, const OpenBlood2::MovementInput&, float yaw, double seconds, bool can_move,
+                bool firing = false);
     OpenBlood2::PlayerMove WritePositionInfo(DVector destination, DVector velocity) const;
     OpenBlood2::MovementState body;
     OpenBlood2::PlayerPhysics physics;
     DDWORD m_dwControlFlags = 0, m_dwLastControlFlags = 0;
     DBYTE m_ClientMoveCode = 0;
     bool m_bOnGround = false, m_bLastJumpCommand = false, m_bFalling = false;
+    bool m_bForcedCrouch = false;
     float m_fVelMagnitude = 0, m_FrameTime = 0;
     double discarded_time = 0;
     std::uint64_t updates = 0, substeps = 0, jumps = 0, landings = 0;

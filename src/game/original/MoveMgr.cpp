@@ -8,7 +8,8 @@
 
 namespace
 {
-    constexpr DDWORD run = 0x0001, jump = 0x0002, forward = 0x0008, backward = 0x0010, strafe_right = 0x0100,
+    constexpr DDWORD run = 0x0001, jump = 0x0002, crouch = 0x0004, forward = 0x0008, backward = 0x0010,
+                     strafe_right = 0x0100,
                      strafe_left = 0x0200; // Shared/SharedMovement.h
     constexpr float drag = 15.0f;          // Original g_fDragCoeff.
     DVector cross(DVector a, DVector b)
@@ -84,6 +85,8 @@ void CMoveMgr::UpdateControlFlags(const MovementInput& input, bool can_move)
         m_dwControlFlags |= run;
     if (input.jump)
         m_dwControlFlags |= jump;
+    if (input.crouch)
+        m_dwControlFlags |= crouch;
     if (input.forward)
         m_dwControlFlags |= forward;
     if (input.backward)
@@ -108,7 +111,8 @@ void CMoveMgr::UpdateMotion(float yaw)
 {
     body.acceleration = {};
     UpdateOnGround();
-    const auto max_velocity = physics.move_speed * ((m_dwControlFlags & run) ? 1.5f : 1.0f);
+    const auto max_velocity = physics.move_speed * ((m_dwControlFlags & run) ? 1.5f : 1.0f) *
+                              (((m_dwControlFlags & crouch) || m_bForcedCrouch) ? 0.5f : 1.0f);
     const auto max_acceleration = max_velocity * drag;
     // Source flattened/normalized camera axes: looking up/down never changes
     // walking speed. Digital diagonals retain the original sqrt(2) allowance.
@@ -135,7 +139,7 @@ void CMoveMgr::UpdateMotion(float yaw)
     {
         if (!m_bLastJumpCommand && m_bOnGround && !steep)
         {
-            body.velocity.y += physics.jump_speed;
+            body.velocity.y += physics.jump_speed * (m_bForcedCrouch ? 0.75f : 1.0f);
             m_bLastJumpCommand = true;
             m_bOnGround = false;
             ++jumps;
@@ -193,12 +197,19 @@ bool CMoveMgr::MoveLocalSolidObject(CBloodServerShell& shell)
     m_fVelMagnitude = std::hypot(body.velocity.x, body.velocity.z);
     return true;
 }
-bool CMoveMgr::Update(CBloodServerShell& shell, const MovementInput& input, float yaw, double seconds, bool can_move)
+bool CMoveMgr::Update(CBloodServerShell& shell, const MovementInput& input, float yaw, double seconds, bool can_move,
+                      bool firing)
 {
     if (!ready() || !std::isfinite(seconds) || seconds < 0 || seconds > 60 || !std::isfinite(yaw) ||
         server_->GetClientUserData(client_) != object_)
         return false;
     UpdateControlFlags(input, can_move);
+    if (can_move && !shell.OnMessage(client_, PlayerControls{input, firing, yaw}))
+        return false;
+    const auto* player = shell.Player(client_);
+    if (!player)
+        return false;
+    m_bForcedCrouch = player->crouched;
     ++updates;
     // Original Update caps a frame at 0.1s. Track discarded time explicitly.
     const auto duration = std::min(seconds, 0.1);

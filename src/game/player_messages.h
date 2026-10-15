@@ -30,12 +30,27 @@ namespace OpenBlood2
     // Device-independent commands; platform bindings never enter original game code.
     struct MovementInput
     {
-        bool forward = false, backward = false, left = false, right = false, run = false, jump = false;
+        bool forward = false, backward = false, left = false, right = false, run = false, jump = false, crouch = false;
+    };
+    enum class ResizeResult
+    {
+        Resized,
+        Blocked,
+        Invalid,
+        Unavailable
+    };
+    struct PlayerControls
+    {
+        MovementInput movement;
+        bool firing = false;
+        float yaw = 0;
     };
     struct MovementState
     {
         DVector position{}, velocity{}, acceleration{}, dimensions{}, ground_normal{};
         bool standing = false;
+        std::uint64_t stair_attempts = 0, stair_steps = 0;
+        float last_step_height = 0;
         HOBJECT ground_object = nullptr;
         std::uint32_t ground_polygon = UINT32_MAX;
     };

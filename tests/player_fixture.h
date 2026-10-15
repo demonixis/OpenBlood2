@@ -68,7 +68,7 @@ namespace test_player
     {
         FIXTURE_CHECK(game.initialize());
         Directory dir;
-        dir.children["models"].children["characters"].files["caleb.abc"] = test_model::abc().b;
+        dir.children["models"].children["characters"].files["caleb.abc"] = test_model::abc(false, true).b;
         dir.children["skins"].children["characters"].files["caleb1.dtx"] = {1, 2, 3}; // Indexed only, never decoded.
         if (weapon_assets)
             for (auto path : {"beretta_pv.abc", "lh_beretta_pv.abc", "c_knife_pv.abc"})

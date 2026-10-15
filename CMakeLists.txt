@@ -34,7 +34,7 @@ add_library(blood2_game STATIC
     src/game/server_adapter.cpp)
 target_sources(blood2_game PRIVATE src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
 target_sources(blood2_game PRIVATE src/game/server_physics.cpp)
-target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp)
+target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp)
 target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
 target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
     src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)

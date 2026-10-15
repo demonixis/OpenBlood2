@@ -87,6 +87,8 @@ namespace OpenBlood2
         Creation reason = Creation::Runtime;
         Life life = Life::Constructing;
         DVector dimensions{};
+        std::uint64_t stair_attempts = 0, stair_steps = 0;
+        float last_step_height = 0;
         DVector velocity{}, acceleration{}, contact_normal{};
         std::uint32_t contact_polygon = UINT32_MAX;
         HOBJECT contact_object = nullptr;

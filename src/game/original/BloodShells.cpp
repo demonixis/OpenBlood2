@@ -111,6 +111,11 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerMove& 
     auto* player = Player(client);
     return player && player->HandlePlayerPositionMessage(move);
 }
+bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerControls& input)
+{
+    auto* player = Player(client);
+    return player && player->UpdateAnim(input);
+}
 void CBloodServerShell::Update(float)
 {
     ++updates;
@@ -140,7 +145,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client)
     physics = {};
     stats = {};
     messages = updates = 0;
-    blocker = "Standing movement/weapon inspection: stairs, containers, moving platforms, full combat, audio and "
+    blocker = "Locomotion/weapon inspection: containers, moving platforms, full combat, audio and "
               "autosave remain unported";
     return true;
 }
@@ -205,18 +210,23 @@ bool CBloodClientShell::Update()
         return false;
     ++updates;
     server_.GetObjectPos(player, &position);
-    // Caleb's source standing eye level. Original camera effects remain absent.
+    const auto* owner = dynamic_cast<CPlayerObj*>(server_.HandleToObject(player));
+    if (!owner)
+        return false;
     camera_position = position;
-    camera_position.y += 36;
+    camera_position.y += owner->eye_level;
     m_bFirstUpdate = false;
     return true;
 }
 bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds, std::string& error)
 {
     auto* owner = server.Player(client_);
-    if (!owner || !move_mgr.Update(server, movement_input, rotation.yaw, seconds, !owner->m_damage.IsDead()))
+    if (!owner || !move_mgr.Update(server, movement_input, rotation.yaw, seconds, !owner->m_damage.IsDead(),
+                                   weapon_input.primary || weapon_input.alternate))
     {
         error = "Original MoveMgr step failed (invalid association, movement message or collision)";
+        if (owner && !owner->locomotion_error.empty())
+            error += ": " + owner->locomotion_error;
         return false;
     }
     return true;

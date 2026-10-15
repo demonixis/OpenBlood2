@@ -3,13 +3,14 @@
 #include "InventoryMgr.h"
 #include "dlink.h"
 #include <array>
+#include <random>
 #include <string>
 #include <vector>
 
 // Selective source port of the entry/lifetime portions of PlayerObj,
 // BaseCharacter, Destructable and InventoryMgr. See PLAYER_CONTRACTS.md and
 // M2_PLAYER_SOURCES.json. Inventory/vector weapons are selected separately;
-// containers, movement and complete combat reactions remain outside this port.
+// dry-land locomotion is selected separately; containers and complete combat remain outside this port.
 class CDestructable : public Aggregate
 {
   public:
@@ -75,6 +76,30 @@ class CPlayerObj : public CBaseCharacter
     void ValidateAttributes();
     FireResult HandleWeaponFireMessage(const OpenBlood2::WeaponFire&);
     bool HandlePlayerPositionMessage(const OpenBlood2::PlayerMove&);
+    bool UpdateAnim(const OpenBlood2::PlayerControls&);
+    enum class MoveState
+    {
+        None,
+        Idle,
+        Walk,
+        Run,
+        StrafeRight,
+        StrafeLeft,
+        Jump,
+        Crouch,
+        Crawl,
+        FireStand,
+        FireWalk,
+        FireRun,
+        FireJump,
+        FireCrouch,
+        FireCrawl
+    };
+    MoveState move_state = MoveState::None;
+    bool crouch_requested = false, crouched = false, forced_crouch = false;
+    float eye_level = 36;
+    std::string locomotion_clip, locomotion_requested_clip, locomotion_error;
+    std::uint64_t animation_changes = 0, blocked_resizes = 0;
     bool UpdateClientPhysics();
     bool UpdateStats();
     bool TeleportClientToServerPos();
@@ -104,6 +129,8 @@ class CPlayerObj : public CBaseCharacter
 
   private:
     OpenBlood2::PlayerStats last_sent_stats_{-1, -1, -1};
+    std::minstd_rand idle_random_{1};
+    float animation_start_ = 0;
     HCLIENT m_hClient = nullptr;
     HSTRING m_hstrTrigger = nullptr, m_hstrPlayerName = nullptr;
     HOBJECT initial_smell_ = nullptr;

@@ -1,0 +1,143 @@
+{
+  "date": "2026-10-15",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "later_engine_donor_commit": "0eab18289bed72879eddb648d3311075b108cf46",
+  "status": "Selective locomotion continuation; M2 remains incomplete",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "target": "src/game/original/PlayerLocomotion.cpp",
+      "source_line_ranges": [
+        [
+          70,
+          83
+        ],
+        [
+          1475,
+          1552
+        ],
+        [
+          4579,
+          4634
+        ],
+        [
+          4905,
+          5108
+        ],
+        [
+          5168,
+          5465
+        ]
+      ],
+      "selection": "Alive healthy dry-land UpdateAnim priority, IdleTime/Do*Anim loops, weapon columns, eye levels and SetAnimation clearance intent; local atomic shape adaptation and explicit ordering fixes",
+      "kind": "selective original game port",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target_sha256": "850d59e12bca54f506fcbeda0ddf5074e8cd0c395a5bdd7409e43e40c57a0e6a"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Anim_Sound.cpp",
+      "target": "src/game/original/PlayerLocomotion.cpp",
+      "source_line_ranges": [
+        [
+          46,
+          63
+        ],
+        [
+          149,
+          329
+        ],
+        [
+          425,
+          443
+        ]
+      ],
+      "selection": "Original animation name lookup and CheckAnims preceding-column fallback for pistol and knife locomotion/firing",
+      "kind": "selective original game port",
+      "source_sha256": "238744b904e32e418188bfdc2f74d970bb544f1a027fab1c2ae9dca2b2d9aa4f",
+      "target_sha256": "850d59e12bca54f506fcbeda0ddf5074e8cd0c395a5bdd7409e43e40c57a0e6a"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Anim_Sound.h",
+      "target": "src/game/original/PlayerLocomotion.cpp",
+      "source_line_ranges": [
+        [
+          33,
+          155
+        ]
+      ],
+      "selection": "Exact clip strings, including source left-strafe alias",
+      "kind": "selective original game port",
+      "source_sha256": "3e42f686a5f492bdca336efdba239d61617b366221c559c8942f6e35824ccde4",
+      "target_sha256": "850d59e12bca54f506fcbeda0ddf5074e8cd0c395a5bdd7409e43e40c57a0e6a"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MoveMgr.cpp",
+      "target": "src/game/original/MoveMgr.cpp",
+      "source_line_ranges": [
+        [
+          123,
+          203
+        ],
+        [
+          540,
+          586
+        ],
+        [
+          914,
+          960
+        ],
+        [
+          1118,
+          1193
+        ]
+      ],
+      "selection": "Crouch input, speed division, forced-crouch jump multiplier; shared player body replaces duplicate physics-model animation synchronization",
+      "kind": "selective original game port",
+      "source_sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a",
+      "target_sha256": "9da45ca42988040216b9a0ef983b32d6f72302207100828e8c94223661941944"
+    },
+    {
+      "source": "sources/blood2/Shared/SharedMovement.h",
+      "target": "src/game/original/MoveMgr.cpp",
+      "source_line_ranges": [
+        [
+          1,
+          53
+        ]
+      ],
+      "selection": "CTRLFLAG_CROUCH 0x0004 alongside the earlier movement flags",
+      "kind": "selective original game port",
+      "source_sha256": "4ed6d695f6d060fb1e821f7cb65687dbabcc1b305c995bb6b2611adfc54198c6",
+      "target_sha256": "9da45ca42988040216b9a0ef983b32d6f72302207100828e8c94223661941944"
+    },
+    {
+      "source": "sources/blood2/AppHeaders/basetypes_de.h",
+      "target": "src/game/server_physics.cpp",
+      "source_line_ranges": [
+        [
+          340,
+          355
+        ]
+      ],
+      "selection": "Original FLAG_STAIRSTEP bit; complete Blood II engine stair solver is unavailable",
+      "kind": "original API contract; new implementation",
+      "source_sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
+      "target_sha256": "8145255d062694a5f004773f95e1ee9604654c0f23b408b24bd709652be8fc11"
+    },
+    {
+      "source": "sources/lithtech/runtime/shared/src/collision.cpp",
+      "target": "src/game/server_physics.cpp",
+      "source_line_ranges": [
+        [
+          2284,
+          2327
+        ]
+      ],
+      "selection": "Later-generation evidence for a default stair height of dimensions.y*0.5; no solver import or extra 0.5 tolerance, no retail compatibility assertion",
+      "kind": "reference only; replacement up/forward/down solver",
+      "source_sha256": "9ff8fd1e49b47d56ed90c584bb6af377fd99f671d1999bd2f8adf1e1dc375944",
+      "target_sha256": "8145255d062694a5f004773f95e1ee9604654c0f23b408b24bd709652be8fc11"
+    }
+  ],
+  "adaptations_document": "LOCOMOTION_CONTRACTS.md"
+}

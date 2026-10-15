@@ -68,7 +68,7 @@ comparison use typed values. `MoveObjectToGround` follows the original downward
 ray/animation-0-dimensions/MoveObject sequence using the primary collision index
 and live solid object boxes, ignoring the subject itself. Its ray is bounded by
 the supported coordinate range. Missing ground, unsupported models or penetrating
-movement fail entry. It does not add moving BSP instances or stair stepping.
+movement fail entry. It does not add moving BSP instances. Stair stepping is now covered by the [locomotion extension](LOCOMOTION_CONTRACTS.md).
 
 All entry, exit, message pumping and world replacement happen outside object
 callbacks. Reentrant requests fail without changing the active session. Creation
@@ -97,8 +97,8 @@ object inspector also detaches the local client on the next step.
 | Destructable | Entry state plus ordinary normal/melee resistance, armor/health and dead-state calculation; full reactions, impulses, gibs and triggers remain pending |
 | BaseCharacter | Entry flag subset and original aggregate forwarding; movement aggregate, containers and special user flags remain absent |
 | Character animation commands | ABC playback and real callback delivery; unhandled character commands retained for inspection, not silently executed |
-| Player movement | Original MoveMgr standing subset connected; shared local body replaces prediction/leash, while stairs/containers/platforms, full movement states and AI membership remain pending |
-| Model flags | Source flags retained; STAIRSTEP/ANIMTRANSITION do not establish implemented stairs/blending |
+| Player movement | Original MoveMgr dry-land movement, crouch and body animation selection connected; shared local body replaces prediction/leash. Containers/platforms, full movement states and AI membership remain pending |
+| Model flags | STAIRSTEP uses the bounded replacement stair solver; ANIMTRANSITION still does not implement blending |
 | Client camera | Position plus original Caleb eye offset is inspectable; original camera effects and renderer are not ported |
 | View weapons | Selected original client animation/firing paths, actual ABC resources, diagnostic input; see weapon contracts |
 | Voice, HUD/menu, autosave, sound playback | Absent; no successful service stubs |

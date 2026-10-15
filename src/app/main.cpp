@@ -134,7 +134,9 @@ namespace
         controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
         DVector hidden_position{};
         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
-        unsigned forward_frames = 0, jump_frames = 0;
+        unsigned forward_frames = 0, jump_frames = 0, crouch_frames = 0, run_frames = 0;
+        bool crouched_hidden = false, stood_after_crouch = false, locomotion_pose = false;
+        bool saw_walk = false, saw_run = false, saw_jump = false;
         const bool extended_smoke = options.weapons_smoke || options.movement_smoke;
         const unsigned hide_frame = extended_smoke ? 40 : 4, show_frame = extended_smoke ? 160 : 8;
         const unsigned unload_frame = extended_smoke ? 210 : 16, reload_frame = extended_smoke ? 220 : 18,
@@ -205,6 +207,7 @@ namespace
             movement.right |= keyboard.right;
             movement.run |= keyboard.run;
             movement.jump |= keyboard.jump;
+            movement.crouch |= keyboard.crouch;
             if (!controls.focused && !smoke)
                 movement = {};
             controls.look(game.client_shell.rotation, delta, text_editing);
@@ -212,6 +215,8 @@ namespace
             {
                 forward_frames += movement.forward;
                 jump_frames += movement.jump;
+                crouch_frames += movement.crouch;
+                run_frames += movement.run;
             }
             if (options.weapons_smoke && game.local_client)
             {
@@ -226,6 +231,29 @@ namespace
             {
                 spdlog::error("Object simulation step failed");
                 return 4;
+            }
+            if (options.movement_smoke && game.local_client)
+            {
+                const auto* player = game.server_shell.Player(game.local_client);
+                const auto* record = player ? game.objects.get(player->m_hObject) : nullptr;
+                if (player && record)
+                {
+                    saw_walk |= player->move_state == CPlayerObj::MoveState::Walk;
+                    saw_run |= player->move_state == CPlayerObj::MoveState::Run;
+                    saw_jump |= player->move_state == CPlayerObj::MoveState::Jump;
+                    if (frames > 105 && frames < 125)
+                        crouched_hidden |= player->crouched && player->eye_level == 12;
+                    if (frames > 130 && frames < 160)
+                        stood_after_crouch |= !player->crouched && player->eye_level == 36;
+                    if (frames == 180 && record->model)
+                    {
+                        std::vector<DVector> vertices;
+                        locomotion_pose = player->crouched &&
+                                          sample_vertices(*record->model, record->animation.animation,
+                                                          record->animation.time, vertices) &&
+                                          vertices.size() == record->model->vertices.size();
+                    }
+                }
             }
             selection.refresh(game.objects);
             if (options.world_smoke && frames >= unload_frame && game.world_path.empty() &&
@@ -348,8 +376,16 @@ namespace
                         event_ok = key_event(SDL_SCANCODE_W, true) && key_event(SDL_SCANCODE_SPACE, true);
                     if (frames == 55)
                         event_ok = key_event(SDL_SCANCODE_SPACE, false);
+                    if (frames == 70)
+                        event_ok = key_event(SDL_SCANCODE_LSHIFT, true);
+                    if (frames == 90)
+                        event_ok = key_event(SDL_SCANCODE_LSHIFT, false);
                     if (frames == 100)
-                        event_ok = key_event(SDL_SCANCODE_W, false);
+                        event_ok = key_event(SDL_SCANCODE_W, false) && key_event(SDL_SCANCODE_LCTRL, true);
+                    if (frames == 125 || frames == 190)
+                        event_ok = key_event(SDL_SCANCODE_LCTRL, false);
+                    if (frames == 170)
+                        event_ok = key_event(SDL_SCANCODE_LCTRL, true);
                     if (frames == hide_frame)
                         hidden_position = game.client_shell.position;
                     if (frames == show_frame)
@@ -459,7 +495,8 @@ namespace
                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
                 (options.movement_smoke &&
                  (!movement_hidden || !movement_jumped || !movement_landed || !game.client_shell.move_mgr.ready() ||
-                  forward_frames != 55 || jump_frames != 10)) ||
+                  forward_frames != 55 || jump_frames != 10 || crouch_frames != 45 || run_frames != 20 ||
+                  !crouched_hidden || !stood_after_crouch || !locomotion_pose || !saw_walk || !saw_run || !saw_jump)) ||
                 (options.player_smoke && (!player_advanced_hidden || !game.client_shell.m_bInWorld ||
                                           !game.server_shell.Player(game.local_client))) ||
                 (options.world_smoke &&
@@ -479,7 +516,8 @@ namespace
                 spdlog::info("Weapon smoke passed: animation-key shots, bullets consumed, knife strikes, firing while "
                              "hidden, unload/re-entry");
             if (options.movement_smoke)
-                spdlog::info("Movement smoke passed: SDL commands, hidden walking/jump/landing, unload/re-entry");
+                spdlog::info("Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, "
+                             "unload/re-entry");
             if (options.player_smoke)
                 spdlog::info(
                     "Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry");
