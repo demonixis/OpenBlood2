@@ -1,6 +1,8 @@
 #include "app/inspector.h"
 #include "build_info.h"
 #include "engine/container.h"
+#include "engine/world_model.h"
+#include "game/original/Door.h"
 #include "game/original/Key.h"
 #include "game/original/VolumeBrush.h"
 
@@ -71,6 +73,22 @@ namespace OpenBlood2
 
     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
     {
+        if (door_trigger_request)
+        {
+            if (const auto* record = game.objects.get(door_trigger_request);
+                record && record->world_model && record->life == Life::Alive)
+            {
+                auto text = game.server.CreateString(door_close_request ? "TRIGGERCLOSE" : "TRIGGER");
+                auto message = game.server.StartMessageToObject(nullptr, record->handle, 1000);
+                if (message)
+                {
+                    game.server.WriteToMessageHString(message, text);
+                    game.server.EndMessage(message);
+                }
+                game.server.FreeString(text);
+            }
+            door_trigger_request = {};
+        }
         if (container_toggle_request)
         {
             if (auto* record = game.objects.get(container_toggle_request);
@@ -104,8 +122,7 @@ namespace OpenBlood2
                     if (!other || other->life != Life::Alive || other->handle == player->m_hObject ||
                         !(other->state.m_Flags & FLAG_SOLID))
                         continue;
-                    if (sweep_box(destination, destination, dimensions, other->state.m_Pos, other->dimensions, hit) !=
-                        CollisionQuery::Miss)
+                    if (sweep_object(*other, destination, destination, dimensions, hit) != CollisionQuery::Miss)
                         clear = false;
                 }
                 if (clear && game.server.TeleportObject(player->m_hObject, &destination) == DE_OK)
@@ -431,6 +448,12 @@ namespace OpenBlood2
                 {
                     select_movement = false;
                     draw_movement(game, selection);
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("Doors", nullptr, select_doors ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_doors = false;
+                    draw_doors(game, selection);
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Containers", nullptr, select_containers ? ImGuiTabItemFlags_SetSelected : 0))
@@ -894,7 +917,7 @@ namespace OpenBlood2
         for (auto id : game.objects.snapshot())
             if (const auto* r = game.objects.get(id); r && r->life == Life::Alive && (r->state.m_Flags & FLAG_SOLID))
             {
-                const auto p = r->state.m_Pos, d = r->dimensions;
+                const auto p = object_bounds_center(*r), d = r->dimensions;
                 if (std::abs(p.y - body.position.y) > d.y + body.dimensions.y)
                     continue;
                 draw->AddRect(project({p.x - d.x, p.y, p.z + d.z}), project({p.x + d.x, p.y, p.z - d.z}),
@@ -909,7 +932,8 @@ namespace OpenBlood2
         if (ImGui::CollapsingHeader("Movement limitations"))
             ImGui::TextWrapped("Locomotion subset. Container details are in Containers. Stair solver is a replacement, "
                                "not retail parity. "
-                               "Moving platforms, injury/death transitions, audio and fall damage remain pending.");
+                               "Translating platforms are supported; rotating transport, injury/death transitions, "
+                               "audio and fall damage remain pending.");
     }
     void Inspector::draw_models(GameSession& game)
     {
@@ -1374,5 +1398,114 @@ namespace OpenBlood2
                                "surfaces, underwater fog/audio/color effects, key handshakes, crane "
                                "controls, minefields and moving volume transforms are not implemented. Queries and "
                                "movement use the real shell, not its bounding box.");
+    }
+} // namespace OpenBlood2
+
+namespace OpenBlood2
+{
+    void Inspector::draw_doors(GameSession& game, ObjectSelection& selection)
+    {
+        ImGui::TextWrapped("Original sliding Door rules. Commands use original object messages; translations push "
+                           "bodies and carry standing players. Failed/unported entries remain in World.");
+        if (!ImGui::BeginTable("Doors", 2, ImGuiTableFlags_Resizable))
+            return;
+        ImGui::TableNextColumn();
+        for (auto id : game.objects.snapshot())
+        {
+            const auto* r = game.objects.get(id);
+            if (!r || r->life != Life::Alive || !dynamic_cast<const Door*>(r->game.get()))
+                continue;
+            if (!game.objects.get(door_selection))
+                door_selection = id;
+            ImGui::PushID(static_cast<int>(id.slot));
+            const auto label = std::string(r->state.m_Name) + ((r->state.m_Flags & FLAG_VISIBLE) ? "" : " [hidden]");
+            if (ImGui::Selectable(label.c_str(), door_selection == id))
+                door_selection = selection.id = id;
+            ImGui::PopID();
+        }
+        const auto* r = game.objects.get(door_selection);
+        const auto* d = r && r->life == Life::Alive ? dynamic_cast<const Door*>(r->game.get()) : nullptr;
+        if (d && r->world_model)
+        {
+            const auto& shape = *r->world_model;
+            const auto offset = vector_subtract(r->state.m_Pos, shape.origin);
+            const auto mid = vector_scale(vector_add(d->closed_pos, d->open_pos), .5f);
+            const ImVec2 size{std::max(180.0f, ImGui::GetContentRegionAvail().x), 140};
+            ImGui::TextUnformatted("Transformed shell + travel / top view (X/Z)");
+            const auto canvas = ImGui::GetCursorScreenPos();
+            ImGui::InvisibleButton("Door geometry", size);
+            auto* draw = ImGui::GetWindowDrawList();
+            draw->AddRectFilled(canvas, {canvas.x + size.x, canvas.y + size.y}, IM_COL32(12, 17, 23, 255));
+            draw->PushClipRect(canvas, {canvas.x + size.x, canvas.y + size.y}, true);
+            const float scale = std::min(
+                (size.x - 20) / std::max(1.0f, shape.max.x - shape.min.x + std::abs(d->open_pos.x - d->closed_pos.x)),
+                (size.y - 20) / std::max(1.0f, shape.max.z - shape.min.z + std::abs(d->open_pos.z - d->closed_pos.z)));
+            const auto bounds_mid = vector_scale(vector_add(shape.min, shape.max), .5f);
+            const auto view_mid = vector_add(bounds_mid, vector_subtract(mid, shape.origin));
+            auto project = [&](DVector p)
+            {
+                return ImVec2{canvas.x + size.x * .5f + (p.x - view_mid.x) * scale,
+                              canvas.y + size.y * .5f - (p.z - view_mid.z) * scale};
+            };
+            for (const auto& triangle : shape.triangles)
+                for (unsigned i = 0; i < 3; ++i)
+                    draw->AddLine(project(vector_add(triangle[i], offset)),
+                                  project(vector_add(triangle[(i + 1) % 3], offset)), IM_COL32(80, 180, 255, 190));
+            draw->AddLine(project(d->closed_pos), project(d->open_pos), IM_COL32(255, 190, 80, 255), 2);
+            draw->AddCircleFilled(project(r->state.m_Pos), 3, IM_COL32_WHITE);
+            if (const auto* player = game.objects.get(game.client_shell.player))
+                draw->AddCircleFilled(project(player->state.m_Pos), 4, IM_COL32(140, 255, 160, 255));
+            draw->PopClipRect();
+        }
+        ImGui::TableNextColumn();
+        if (d && r->world_model)
+        {
+            constexpr const char* states[] = {"invalid", "closed", "closing", "open", "opening"};
+            ImGui::Text("%s / %s", r->state.m_Name, states[d->state]);
+            if (ImGui::Button("TRIGGER"))
+            {
+                door_trigger_request = r->id;
+                door_close_request = false;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("TRIGGERCLOSE"))
+            {
+                door_trigger_request = r->id;
+                door_close_request = true;
+            }
+            ImGui::Text("Speed %.1f / close %.1f | waveform %u", d->speed, d->closing_speed, d->waveform);
+            ImGui::Text("Distance %.1f | delay %.2f | wait %.2f", d->move_dist, d->open_delay, d->wait_time);
+            ImGui::Text("Pivot %.2f %.2f %.2f", r->state.m_Pos.x, r->state.m_Pos.y, r->state.m_Pos.z);
+            ImGui::Text(
+                "Move %llu | blocked %llu | pushes %llu | rider moves %llu",
+                static_cast<unsigned long long>(r->mover_moves), static_cast<unsigned long long>(r->mover_blocks),
+                static_cast<unsigned long long>(r->mover_pushes), static_cast<unsigned long long>(r->mover_riders));
+            constexpr const char* results[] = {"moved", "blocked", "invalid", "unavailable"};
+            ImGui::Text("Last command: %s", results[static_cast<unsigned>(d->last_move)]);
+            if (r->mover_blocks)
+            {
+                const auto* blocker = game.objects.get(r->mover_blocker);
+                ImGui::Text("Last blocker: %s", blocker ? blocker->state.m_Name : "world / removed");
+            }
+            ImGui::Text("Collision: %s | %zu shell triangles", d->box_physics ? "authored box" : "polygon",
+                        r->world_model->triangles.size());
+            ImGui::Text("TriggerClosed %s | RemainsOpen %s | StartOpen %s", d->trigger_closed ? "yes" : "no",
+                        d->remains_open ? "yes" : "no", d->start_open ? "yes" : "no");
+            ImGui::Text("FireThrough %s | triggers %llu", d->fire_through ? "yes" : "no",
+                        static_cast<unsigned long long>(d->triggers));
+            ImGui::TextWrapped("SelfTrigger: %s. Trigger spawning and key/LOCK relay pending.",
+                               d->self_trigger ? "requested, unavailable" : "off");
+            ImGui::TextWrapped("Audio request: %s (%s, not played)", d->last_sound.c_str(),
+                               d->sound_loop ? "loop" : "once");
+            ImGui::TextWrapped("Portal: %s / requested %s (visibility pending)", d->portal.c_str(),
+                               d->portal_open ? "open" : "closed");
+            if (!d->pending_command.empty())
+                ImGui::Text("Unimplemented relay: %s", d->pending_command.c_str());
+        }
+        else
+            ImGui::TextUnformatted("No supported live Door selected.");
+        ImGui::EndTable();
+        ImGui::TextWrapped("Translation only. Rotating doors, crushing damage, chained pushers, self triggers, "
+                           "audio, portals and save/restore remain pending. M2 is not complete.");
     }
 } // namespace OpenBlood2

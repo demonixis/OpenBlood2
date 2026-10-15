@@ -1,9 +1,12 @@
+#include "engine/world_model.h"
+#include "game/original/Door.h"
 #include "game/server_adapter.h"
 #include <cmath>
 
 namespace OpenBlood2
 {
-    SegmentResult ServerAdapter::IntersectSegment(DVector from, DVector to, HOBJECT ignore, SegmentHit& out)
+    SegmentResult ServerAdapter::IntersectSegment(DVector from, DVector to, HOBJECT ignore, SegmentHit& out,
+                                                  bool fire_through)
     {
         trace_service("IntersectSegment");
         out = {};
@@ -24,8 +27,11 @@ namespace OpenBlood2
             if (!record || record->life != Life::Alive || record->handle == ignore ||
                 !(record->state.m_Flags & FLAG_SOLID))
                 continue; // Original IGNORE_NONSOLID.
+            const auto* door = dynamic_cast<const Door*>(record->game.get());
+            if (fire_through && door && door->fire_through)
+                continue;
             CollisionHit hit;
-            const auto query = sweep_box(from, to, {}, record->state.m_Pos, record->dimensions, hit);
+            const auto query = sweep_object(*record, from, to, {}, hit);
             if (query == CollisionQuery::Invalid)
                 return SegmentResult::Invalid;
             if (query == CollisionQuery::Hit && (!found || hit.fraction < nearest.fraction))

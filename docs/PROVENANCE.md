@@ -227,3 +227,12 @@ level clock is a typed service adaptation; the session scheduling clock is
 unchanged. [SPECIALIZED_VOLUME_CONTRACTS.md](SPECIALIZED_VOLUME_CONTRACTS.md)
 documents source quirks, authored damage identifiers and explicit map failures.
 No reference tree, dependency or prototype codebase was modified or imported.
+
+## M2 Sliding Door Continuation
+
+[M2_DOOR_SOURCES.json](M2_DOOR_SOURCES.json) records the selected Door registration,
+properties, state machine, waveform and message branches, original SDK flags and
+Weapon fire-through branch. [DOOR_CONTRACTS.md](DOOR_CONTRACTS.md) distinguishes
+these game rules from the new atomic translation/pusher service and geometry
+binding. Trigger spawning, sound, portal visibility and rotating doors are not
+claimed implemented. No prototype codebase or dependency was imported.

@@ -18,7 +18,7 @@ Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentatio
 
 - Read [docs/WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) before extending inventory, client weapon input/animation, ray fire or damage. Beretta/knife are selective original ports; preserve every FIRE_KEY event (including the two primary knife markers), owned weapon/client models and deferred hit-callback removal. Other weapons, pickups, full combat, audio/FX and muzzle/hand placement are still open. Keep typed shot/damage messages separate from legacy packet ABI; portable seeded randomness is not claimed retail-bit-identical.
 
-- Read [docs/MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) before extending original MoveMgr, player input or support queries. Client-associated players use one shared body and skip generic physics; typed movement must resolve collision exactly once. Keep source rules separate from the documented replacement integrator. Read [docs/LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for current stairs, crouch/animation dimensions, source clip fallbacks and clearance. Selected containers are covered by the contracts below; moving platforms remain pending.
+- Read [docs/MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) before extending original MoveMgr, player input or support queries. Client-associated players use one shared body and skip generic physics; typed movement must resolve collision exactly once. Keep source rules separate from the documented replacement integrator. Read [docs/LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for current stairs, crouch/animation dimensions, source clip fallbacks and clearance. Selected containers are covered by the contracts below; translating platforms are covered by the door contracts below; rotating transport remains pending.
 
 - Follow `.clang-format` and `.editorconfig`. Use `OpenBlood2` for project-owned C++ namespaces; preserve source-global SDK/game classes. Commit code and English documentation after each completed run, in their respective independent repositories.
 - Locomotion shape changes are atomic and foot-anchored. A blocked standing attempt preserves the short body and camera; this also applies to alive entry resets. Preserve original `CheckAnims` fallback and expose resolved clips. Keep the new stair solver explicitly separate from verified retail behavior.
@@ -35,3 +35,10 @@ Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentatio
   source client/server conveyor differences, one player integration, authored
   numeric damage types, and the level clock across delayed entry/reload. Keep
   ambiguous/missing model bindings explicit; never select an arbitrary model.
+
+- Read [docs/DOOR_CONTRACTS.md](docs/DOOR_CONTRACTS.md) before extending movers,
+  door triggers or collision. Translating Door is a selective original port;
+  its atomic pusher/rider solver is replacement engine code. Preserve checked
+  named geometry, actual bounds centers, atomic blocking, one shared player
+  integration and deferred touch removal. SelfTrigger/key relay, rotation,
+  crushing, audio/portals and the complete M2 gate remain explicitly pending.

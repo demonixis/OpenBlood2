@@ -1,5 +1,6 @@
 #include "game/original/B2BaseClass.h"
 #include "game/original/CameraSpot.h"
+#include "game/original/Door.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Key.h"
 #include "game/original/PathPoint.h"
@@ -165,6 +166,43 @@ namespace OpenBlood2
                                 {"SurfaceColor2", DVector{}},
                                 {"XScaleDuration", 10.0f},
                                 {"YScaleDuration", 10.0f}}};
+        const ClassInfo door{"Door",
+                             &b2base,
+                             construct<Door>,
+                             {{"Visible", true},
+                              {"Solid", true},
+                              {"Speed", 0.0f},
+                              {"MoveDist", 0.0f},
+                              {"WaitTime", 0.0f},
+                              {"OpenDelay", 0.0f},
+                              {"ClosingSpeed", 0.0f},
+                              {"MoveDir", DVector{}},
+                              {"TriggerDims", DVector{}},
+                              {"OpenBusySound", std::string{}},
+                              {"OpenStopSound", std::string{}},
+                              {"CloseBusySound", std::string{}},
+                              {"CloseStopSound", std::string{}},
+                              {"PortalName", std::string{}},
+                              {"ActivationObjectName", std::string{}},
+                              {"LockedSound", std::string{}},
+                              {"UnlockedSound", std::string{}},
+                              {"SoundRadius", 1000.0f},
+                              {"Waveform", std::int32_t(0)},
+                              {"SelfTriggerOpts", std::int32_t(0)},
+                              {"UnlockKeyName", std::string("Key")},
+                              {"BoxPhysics", true},
+                              {"PlayerActivate", true},
+                              {"AIActivate", true},
+                              {"TriggerRelayActivate", true},
+                              {"TriggerClosed", false},
+                              {"StartOpen", false},
+                              {"RemainsOpen", false},
+                              {"SelfTrigger", false},
+                              {"FireThrough", false},
+                              {"TouchActivate", false},
+                              {"ObjectActivate", false},
+                              {"NamedObjectActivate", false},
+                              {"Locked", false}}};
         const ClassInfo camera{"CameraSpot", &b2base, construct<CameraSpot>, {}};
         const ClassInfo conveyor{"Conveyor",
                                  &volume,
@@ -218,7 +256,7 @@ namespace OpenBlood2
                objects.register_class(smell) && objects.register_class(character) && objects.register_class(player) &&
                objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
                objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
-               objects.register_class(damage) && objects.register_class(freefall);
+               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(door);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

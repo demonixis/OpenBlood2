@@ -10,6 +10,7 @@ namespace OpenBlood2
         bool build(const WorldModel&, DRotation, std::string& error);
         bool contains(DVector point) const;
         bool overlaps(DVector center, DVector half) const;
+        CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit&) const;
         DVector min{}, max{}, origin{};
         bool convex = false;
         std::vector<std::array<DVector, 3>> triangles;

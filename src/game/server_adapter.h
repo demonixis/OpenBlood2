@@ -33,6 +33,7 @@ namespace OpenBlood2
         ServerAdapter(const ServerAdapter&) = delete;
         ServerAdapter& operator=(const ServerAdapter&) = delete;
         bool bind();
+        MoverResult MoveWorldModel(HOBJECT, DVector destination) override;
         bool GetContainers(HOBJECT, DVector head, ContainerState&) override;
         bool damage_containers();
         float GetWorldTime() override
@@ -46,7 +47,7 @@ namespace OpenBlood2
         }
         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
-        SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&) override;
+        SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false) override;
         DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
         bool ReadDamage(HMESSAGEREAD, Damage&) override;
         HCLIENT connect_client();
@@ -143,7 +144,8 @@ namespace OpenBlood2
                                                                     {"GAME_GAMETYPE", {"0"}}};
         void initialize_model_services();
         void initialize_physics_services();
-        CollisionQuery sweep_scene(HOBJECT, DVector, DVector, DVector, CollisionHit&, const std::vector<ObjectId>&);
+        CollisionQuery sweep_scene(HOBJECT, DVector, DVector, DVector, CollisionHit&, const std::vector<ObjectId>&,
+                                   HOBJECT ignore_extra = nullptr);
         bool affect_containers(HOBJECT, ContainerPhysics&);
         bool moving_ = false;
         bool models_advancing_ = false, physics_advancing_ = false;

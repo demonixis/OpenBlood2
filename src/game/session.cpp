@@ -128,14 +128,15 @@ namespace OpenBlood2
             for (const auto& path : model.textures)
                 use(path, "BSP texture");
         for (const auto& source : world.objects)
-            for (auto key : {"Filename", "Skin", "SoundName", "SpriteSurfaceName"})
+            for (auto key : {"Filename", "Skin", "SoundName", "SpriteSurfaceName", "OpenBusySound", "OpenStopSound",
+                             "CloseBusySound", "CloseStopSound", "LockedSound", "UnlockedSound"})
                 if (const auto* p = source.find(key))
                     if (const auto* path = std::get_if<std::string>(p))
                         use(*path, key);
         for (auto id : objects.snapshot())
         {
             const auto& r = *objects.get(id);
-            if (!r.container)
+            if (!r.container && !r.world_model)
                 use(r.state.m_Filename, "Original object model");
             use(r.state.m_SkinName, "Original object skin");
         }
@@ -298,7 +299,7 @@ namespace OpenBlood2
         error = "RunWorld blocked: " + std::to_string(missing) +
                 " uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat "
                 "reactions, "
-                "audio, autosave and moving world-model collision remain unported";
+                "audio, autosave, Trigger/key relay and rotating world-model collision remain unported";
         if (!entry_error.empty())
             error += "; player entry: " + entry_error;
         if (trace.empty() || trace.back() != error)

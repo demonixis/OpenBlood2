@@ -203,14 +203,14 @@ namespace
             auto* player = game.server_shell.Player(game.local_client);
             CHECK(player);
             CHECK(game.objects.get(player->m_hObject)->model->animations.size() == 86);
-            CHECK(game.objects.snapshot().size() == 26); // 23 world instances + player + muzzle light + scent.
+            CHECK(game.objects.snapshot().size() == 33); // 30 world instances + player + muzzle light + scent.
             CHECK(game.client_shell.position.x == -32 && game.client_shell.position.z == -3224);
             CHECK(std::abs(game.client_shell.position.y - 170) < .01f);
             for (int frame = 0; frame < 120; ++frame)
                 CHECK(game.step(1.0 / 60.0));
             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
-            CHECK(!game.run_world(error) && error.find("185 uninstantiated") != std::string::npos);
+            CHECK(!game.run_world(error) && error.find("178 uninstantiated") != std::string::npos);
             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()

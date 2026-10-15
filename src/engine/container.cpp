@@ -201,6 +201,19 @@ namespace OpenBlood2
         }
         return std::abs(angle) > 2 * std::numbers::pi;
     }
+    CollisionQuery ContainerShape::sweep(DVector from, DVector to, DVector half, CollisionHit& hit) const
+    {
+        auto result = boundary_.sweep(from, to, half, hit);
+        if (result != CollisionQuery::Invalid && contains(from))
+        {
+            hit = {};
+            hit.fraction = 0;
+            hit.point = from;
+            hit.start_solid = true;
+            return CollisionQuery::Hit;
+        }
+        return result;
+    }
     bool ContainerShape::overlaps(DVector center, DVector half) const
     {
         if (!physics_vector(center) || !physics_vector(half) || half.x < 0 || half.y < 0 || half.z < 0 ||

@@ -28,6 +28,10 @@ namespace OpenBlood2
     }
     namespace
     {
+        double precise_dot(DVector a, DVector b)
+        {
+            return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z;
+        }
         DVector cross(DVector a, DVector b)
         {
             return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
@@ -54,16 +58,21 @@ namespace OpenBlood2
                    penetration = std::numeric_limits<double>::infinity();
             bool axis(DVector axis, double low, double high)
             {
-                const double length = std::sqrt(vector_dot(axis, axis));
+                const double length = std::sqrt(precise_dot(axis, axis));
                 if (length < 1e-8)
                     return true;
-                axis = vector_scale(axis, static_cast<float>(1 / length));
+                // Use the same double projection for bounds and the moving
+                // center. Rounding only the normalized float axis can separate
+                // zero-width triangle intervals and miss rays on rotated faces.
+                const double radius = (std::abs(double(axis.x)) * half.x + std::abs(double(axis.y)) * half.y +
+                                       std::abs(double(axis.z)) * half.z) /
+                                      length;
+                const double origin = precise_dot(from, axis) / length, speed = precise_dot(delta, axis) / length;
+                axis = {float(axis.x / length), float(axis.y / length), float(axis.z / length)};
                 low /= length;
                 high /= length;
-                const double radius = std::abs(axis.x) * half.x + std::abs(axis.y) * half.y + std::abs(axis.z) * half.z;
                 low -= radius;
                 high += radius;
-                const double origin = vector_dot(from, axis), speed = vector_dot(delta, axis);
                 const double depth = std::min(origin - low, high - origin);
                 if (depth < penetration)
                 {
@@ -86,11 +95,11 @@ namespace OpenBlood2
                     normal = n;
                 }
                 leave = std::min(leave, last);
-                return enter <= leave && leave > 1e-8 && enter <= 1;
+                return enter <= leave + 1e-9 && leave > 1e-8 && enter <= 1;
             }
             bool finish(CollisionHit& hit) const
             {
-                if (enter > leave || leave <= 1e-8 || enter > 1)
+                if (enter > leave + 1e-9 || leave <= 1e-8 || enter > 1)
                     return false;
                 hit.start_solid = enter < -1e-6;
                 hit.fraction = std::max(0.0, enter);
@@ -106,7 +115,7 @@ namespace OpenBlood2
                 {vector_subtract(p[1], p[0]), vector_subtract(p[2], p[1]), vector_subtract(p[0], p[2])}};
             auto test = [&](DVector axis)
             {
-                const double a = vector_dot(axis, p[0]), b = vector_dot(axis, p[1]), c = vector_dot(axis, p[2]);
+                const double a = precise_dot(axis, p[0]), b = precise_dot(axis, p[1]), c = precise_dot(axis, p[2]);
                 return s.axis(axis, std::min({a, b, c}), std::max({a, b, c}));
             };
             for (auto axis : axes)

@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-15",
+  "status": "M2 incomplete; original sliding Door and translating world-model pusher/rider collision connected",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/Door.cpp",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          35,
+          74
+        ]
+      ],
+      "selection": "Original Door class registration and property defaults",
+      "kind": "selective original game port",
+      "source_sha256": "d96ba29e12f1892008725e02ad02c9a9c314d86db85d7bb7cdc2a7823b3961e0",
+      "target_sha256": "2ad450e357bb804c91a9d94febb74cf94a86589f7a39f5b86acb1088ac3c6f3d"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Door.h",
+      "target": "src/game/original/Door.h",
+      "source_line_ranges": [
+        [
+          1,
+          135
+        ]
+      ],
+      "selection": "Selected class/state/property declarations; typed mover result and explicit pending service requests",
+      "kind": "selective original game port",
+      "source_sha256": "1d5fdbece8133f3d9656f180eb8e0055cc082cb9fc7f2542efb1c60d61a73611",
+      "target_sha256": "ff5fed5ae2a850b71139373e2a3a16d91b9fe5e58b60a996749fdeeecf87767f"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Door.cpp",
+      "target": "src/game/original/Door.cpp",
+      "source_line_ranges": [
+        [
+          189,
+          475
+        ],
+        [
+          551,
+          923
+        ],
+        [
+          1018,
+          1042
+        ]
+      ],
+      "selection": "Properties, post-read flags, initialization, trigger/state/timer/waveform branches; owned strings and checked translation results; Trigger spawning, audio, portals and save payloads excluded",
+      "kind": "selective original game port",
+      "source_sha256": "d96ba29e12f1892008725e02ad02c9a9c314d86db85d7bb7cdc2a7823b3961e0",
+      "target_sha256": "0983277ed97abf6f57bd12d81559c4227a5572abda7b36694e5fc366b52449a4"
+    },
+    {
+      "source": "sources/blood2/AppHeaders/basetypes_de.h",
+      "target": "src/game/legacy/basedefs_de.h",
+      "source_line_ranges": [
+        [
+          334,
+          359
+        ],
+        [
+          390,
+          400
+        ]
+      ],
+      "selection": "OT_WORLDMODEL=2, FLAG_BOXPHYSICS and original GOTHRUWORLD/DONTFOLLOWSTANDING semantics",
+      "kind": "selective original game port",
+      "source_sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
+      "target_sha256": "87b818f4d630837e356a8021cebf69b48934fbcaf51204cbca39f526c61b7011"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "target": "src/game/original/Weapon.cpp",
+      "source_line_ranges": [
+        [
+          752,
+          787
+        ]
+      ],
+      "selection": "Door FireThrough branch adapted as typed fire-ray option; aim query still sees solid doors",
+      "kind": "selective original game port",
+      "source_sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "target_sha256": "da8068602bd79afd72c09470eb2e99f93b726c2e74cdb919830e9ba88927e211"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "target": "src/game/server_weapons.cpp",
+      "source_line_ranges": [
+        [
+          752,
+          787
+        ]
+      ],
+      "selection": "Typed fire-ray filter implements selected original Door FireThrough behavior",
+      "kind": "selective original game port",
+      "source_sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "target_sha256": "0a353eaa1086b884c59820aef433e7fea4b9a3b096b13008a2e972b05b35f1bf"
+    }
+  ],
+  "engine_adaptations": [
+    "Closed named DAT shell binding and translated-pivot queries, original BoxPhysics choice retained",
+    "Atomic bounded translation/pusher/rider solver, not recovered retail engine code",
+    "Typed movement results prevent false endpoint arrival when blocked",
+    "Consistent double SAT projections for rotated-face point rays",
+    "Reject unsupported restore/rotation/teleport, record SelfTrigger/audio/portal requests without fabricating services",
+    "Preserve signed authored WaitTime and ClosingSpeed arithmetic; guard zero-distance normalization"
+  ]
+}

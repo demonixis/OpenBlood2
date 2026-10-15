@@ -115,7 +115,7 @@ namespace OpenBlood2
             active().trace_service("SetObjectDims");
             auto& o = active().objects_;
             auto* r = o.get(h);
-            if (!r || r->container || !dims || !std::isfinite(dims->x) || !std::isfinite(dims->y) ||
+            if (!r || (r->container || r->world_model) || !dims || !std::isfinite(dims->x) || !std::isfinite(dims->y) ||
                 !std::isfinite(dims->z) || dims->x < 0 || dims->y < 0 || dims->z < 0)
             {
                 o.fail(ObjectError::InvalidProperty, "Invalid object dimensions");

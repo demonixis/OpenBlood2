@@ -77,7 +77,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     direction = vector_scale(direction, 1 / aim_length);
     last_shot.direction = direction;
     last_shot.end = vector_add(request.position, vector_scale(direction, range));
-    query = server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit);
+    query = server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, true);
     last_shot.collision = query;
     if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
     {

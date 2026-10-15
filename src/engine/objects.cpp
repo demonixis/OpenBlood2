@@ -356,7 +356,7 @@ namespace OpenBlood2
             return nullptr;
         }
         object->state = state; // Consume AFTER all derived/base/aggregate precreate mutations.
-        if (state.m_ObjectType == OT_CONTAINER)
+        if (state.m_ObjectType == OT_CONTAINER || state.m_ObjectType == OT_WORLDMODEL)
         {
             const WorldModel* model = nullptr;
             std::string error;
@@ -366,7 +366,8 @@ namespace OpenBlood2
                     {
                         if (model)
                         {
-                            error = "Ambiguous named container model";
+                            error = state.m_ObjectType == OT_CONTAINER ? "Ambiguous named container model"
+                                                                       : "Ambiguous named world model";
                             break;
                         }
                         model = &candidate;
@@ -377,12 +378,18 @@ namespace OpenBlood2
                 contexts_.pop_back();
                 remove(handle);
                 fail(ObjectError::Unsupported,
-                     std::string(state.m_Name) + ": " + (error.empty() ? "Missing named container model" : error));
+                     std::string(state.m_Name) + ": " +
+                         (error.empty() ? (state.m_ObjectType == OT_CONTAINER ? "Missing named container model"
+                                                                              : "Missing named world model")
+                                        : error));
                 return nullptr;
             }
             object->state.m_Pos = shape->origin;
             object->dimensions = vector_scale(vector_subtract(shape->max, shape->min), .5f);
-            object->container = std::move(shape);
+            if (state.m_ObjectType == OT_CONTAINER)
+                object->container = std::move(shape);
+            else
+                object->world_model = std::move(shape);
         }
         if (state.m_ObjectType == OT_MODEL && state.m_Filename[0])
         {
