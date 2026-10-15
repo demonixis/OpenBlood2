@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-16",
+  "status": "M2 incomplete; original KeyFramer static world-model translation through replacement collision",
+  "baseline_commit": "97e8bfbee699ec7f71956c04b9b8ebd99035455e",
+  "new_imports": [],
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/KeyFramer.cpp",
+      "source_line_ranges": [
+        [
+          541,
+          704
+        ]
+      ],
+      "source_sha256": "31489c8f6891fdce061548ac4903b80c90c73d94049da14698ec34a559ecbf67",
+      "purpose": "Existing original Update source: time progression, endpoint return, interpolation and MoveObject/RotateObject caller; no source code is changed or newly imported in this increment."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/basetypes_de.h",
+      "source_line_ranges": [
+        [
+          330,
+          358
+        ]
+      ],
+      "source_sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
+      "purpose": "Original SOLID, BOXPHYSICS, GOTHRUWORLD and DONTFOLLOWSTANDING meanings; source flags are not changed to permit the train path."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/server_de.h",
+      "source_line_ranges": [
+        [
+          688,
+          700
+        ]
+      ],
+      "source_sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "purpose": "Legacy MoveObject/TeleportObject boundary; this project supplies a typed source service rather than reproducing ABI or claiming recovered retail physics."
+    }
+  ],
+  "unchanged_original_files": {
+    "src/game/original/KeyFramer.cpp": "c08cb408d3fb776915116884f41b40c535c01064a3731aa980d32dabf7685bc0",
+    "src/game/original/KeyFramer.h": "adf451494f8868b9771b4afec99258e37dd0961cf5d84fc74227bd16bdb465ce",
+    "src/game/original/KeyData.cpp": "0576e8d770981baf9f3b36932f93288df9ffeb2fdcad692e35c4f055145f22ab",
+    "src/game/original/DestructableBrush.cpp": "c41e541af3407937b793cc1b8e5ca5d2e26815f4a8a3e9e140880923957063ee"
+  },
+  "new_engine_work": [
+    "MoveKeyframedObject accepts checked static world models only when orientation stays unchanged; rejects angular/dynamic/container requests before pose mutation",
+    "MoveWorldModel requires BoxPhysics for movers without GOTHRUWORLD and atomically rejects primary-world bounds obstructions",
+    "Existing immutable geometry, pusher/rider planning, single player body and deferred callback lifetime are reused",
+    "Keyframes inspection adds queued ON/OFF, actual bounds/blockers and diagnostic plan view; no world renderer or new dependency"
+  ],
+  "observed_difference": "All-or-nothing collision leaves the train at its previous pose at two authored turnaround attempts; original engine clipping/crushing/blocking-priority behavior is not recovered. Timeline and final no-snap behavior remain original."
+}

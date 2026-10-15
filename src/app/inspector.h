@@ -26,7 +26,8 @@ namespace OpenBlood2
         std::string light_command;
         void draw_lights(GameSession&, ObjectSelection&);
         bool select_keyframes = false;
-        ObjectId keyframe_selection{};
+        ObjectId keyframe_selection{}, keyframe_request{};
+        std::string keyframe_command;
         void draw_keyframes(GameSession&, ObjectSelection&);
         bool select_cameras = false;
         ObjectId camera_selection{}, camera_request{};

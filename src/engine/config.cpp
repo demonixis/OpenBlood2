@@ -129,6 +129,10 @@ namespace OpenBlood2
             {
                 options.world_smoke = options.player_smoke = options.lights_smoke = true;
             }
+            else if (arg == "--worldpaths-smoke")
+            {
+                options.world_smoke = options.player_smoke = options.keyframes_smoke = options.worldpaths_smoke = true;
+            }
             else if (arg == "--keyframes-smoke")
             {
                 options.world_smoke = options.player_smoke = options.keyframes_smoke = true;

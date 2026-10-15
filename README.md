@@ -26,7 +26,7 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
 ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
 ```
 
-The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **160 source entries** create, including original KeyFramer and twelve GlowingLight objects, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **48 unported runtime entries**, zero failed. Runtime counts before/after player entry are **167/170**, then **158/161** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_LIGHTS.md) records these counts; earlier increment sections below are historical snapshots.
+The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **160 source entries** create, including original KeyFramer and twelve GlowingLight objects, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **48 unported runtime entries**, zero failed. Runtime counts before/after player entry are **167/170**, then **158/161** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_WORLDPATHS.md) records these counts; earlier increment sections below are historical snapshots.
 
 The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
 
@@ -47,6 +47,7 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
 | `--inspect-player` | Headless original shell/player entry inspection, with explicit gameplay blockers |
 | `--player-smoke` | GPU Session panel, hidden player updates, unload/re-entry checks |
 | `--weapons-smoke` | GPU Beretta/knife firing while hidden, unload/re-entry; capture at frame 181 |
+| `--worldpaths-smoke` | GPU original SubwayA train translation, collision and reload with UI hidden |
 | `--lights-smoke` | GPU original dynamic-light state/KeyFramer placement while hidden, Lights inspection and reload |
 | `--cameras-smoke` | GPU original camera tracking, client view/player gates while hidden, inspection and reload |
 | `--objectives-smoke` | GPU original objective delivery and localized client text while hidden, inspection and reload |
@@ -143,7 +144,7 @@ motion, CinematicTrigger, sound and full M2 acceptance remain pending.
 
 ## Original dynamic lights
 
-[Latest evidence](../Documentation/Implementation/M2_LIGHTS.md) and
+[Light evidence](../Documentation/Implementation/M2_LIGHTS.md) and
 [contracts](docs/LIGHT_CONTRACTS.md) cover ClientLightFX, thirteen original presets
 and client CLightFX waves. Lights exposes hidden/off sources, lifecycle/damage,
 parameters/plots, evaluated color/radius/position, an XZ placement overlay and
@@ -152,3 +153,15 @@ the original sublight KeyFramer. `./build/debug/blood2 --lights-smoke` checks th
 while UI is hidden and after reload. The computed point-light state does not yet
 illuminate the world; shadows/fog, general SFX/audio, DirLight spots and the implicit
 main light remain pending. M2 stays incomplete.
+
+## Keyframed train translation
+
+[Latest evidence](../Documentation/Implementation/M2_WORLDPATHS.md) and
+[path contracts](docs/WORLDPATH_CONTRACTS.md) extend original KeyFramer to static
+BoxPhysics brushes with unchanged rotation. Primary-world obstruction and
+pusher/rider motion are atomic; original time/endpoint rules remain unchanged.
+Keyframes now exposes queued ON/OFF, brush bounds/blockers and a path/collision
+plan view. `./build/debug/blood2 --worldpaths-smoke` checks SubwayA's train while
+hidden and after reload. Two full paths record 297 moves and two primary-world
+blocks each; this is replacement physics, not verified retail train behavior.
+Angular paths, moving containers, other required classes/services and M2 remain open.

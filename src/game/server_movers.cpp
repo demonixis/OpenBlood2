@@ -33,10 +33,21 @@ namespace OpenBlood2
             mover->mover_blocker = blocker;
             return MoverResult::Blocked;
         };
-        // Door uses GOTHRUWORLD to enter its wall pocket. Other callers must
-        // explicitly opt in; no guessed world-model/world depenetration.
+        // Doors retain their source world bypass for wall pockets. Authored
+        // BoxPhysics path movers instead sweep their actual bounds against the
+        // primary world. Polygon-vs-world translation remains unavailable.
         if (!(mover->state.m_Flags & FLAG_GOTHRUWORLD))
-            return MoverResult::Unavailable;
+        {
+            if (!(mover->state.m_Flags & FLAG_BOXPHYSICS))
+                return MoverResult::Unavailable;
+            CollisionHit hit;
+            const auto center = object_bounds_center(*mover);
+            const auto query = collision->sweep(center, vector_add(center, delta), mover->dimensions, hit);
+            if (query == CollisionQuery::Invalid)
+                return MoverResult::Invalid;
+            if (query == CollisionQuery::Hit && (hit.start_solid || hit.fraction < 1 - 1e-6))
+                return blocked(nullptr); // Primary world has no object handle.
+        }
         if (mover->state.m_Flags & FLAG_SOLID)
         {
             for (auto id : ids)

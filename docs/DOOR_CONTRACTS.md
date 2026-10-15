@@ -1,5 +1,9 @@
 # Sliding doors and translating world models
 
+> The later [train path contracts](WORLDPATH_CONTRACTS.md) supersede blanket
+> world-path/without-GOTHRUWORLD omissions below for static BoxPhysics translation.
+> Angular paths and moving containers remain unavailable; M2 stays open.
+
 > Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
 > are connected with bounded atomic collision. Earlier omissions below describe
 > their previous increments; the full M2 gate remains open.

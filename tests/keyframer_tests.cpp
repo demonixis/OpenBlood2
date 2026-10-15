@@ -396,8 +396,8 @@ namespace
             CHECK(tf && tf->targets.size() == 1);
             auto original = g.objects.get(tf->targets[0].object)->state.m_Pos;
             CHECK(command(g, train, "ON") && g.step(.1) && tf->targets[0].attempts &&
-                  tf->targets[0].result == MoverResult::Unavailable);
-            CHECK(close(original, g.objects.get(tf->targets[0].object)->state.m_Pos));
+                  tf->targets[0].result == MoverResult::Moved);
+            CHECK(!close(original, g.objects.get(tf->targets[0].object)->state.m_Pos));
             CHECK(g.unload_world() && !g.server.string_count() && !g.server.list_count() && !g.server.message_count());
         }
         return true;

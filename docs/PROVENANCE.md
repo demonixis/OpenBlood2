@@ -353,3 +353,14 @@ bounded descriptors, local portable jitter and retained source quirks. Registry,
 UI/placement plots and test harnesses are new project code. No world-lighting,
 shadow/fog, audio or generic SFX-manager service is claimed. Earlier omissions of
 GlowingLight are superseded only for this selected server/client subset.
+
+## M2 translating train paths
+
+[Source/engine ledger](M2_WORLDPATH_SOURCES.json) identifies the unchanged original
+KeyFramer sequencer and SDK motion/flag contracts. No new source class or prototype
+code is imported. [Path contracts](WORLDPATH_CONTRACTS.md) document new typed
+unchanged-orientation routing and primary-world swept bounds in the existing atomic
+pusher/rider service. The observed two train blocks and all-or-nothing rejection
+are replacement physics, not claimed retail behavior. Earlier blanket world-path
+omissions are superseded only for static translation; no dependency or reference
+repository changed.

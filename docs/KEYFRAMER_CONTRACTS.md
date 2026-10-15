@@ -1,5 +1,9 @@
 # Original keyframed paths
 
+> The later [train path contracts](WORLDPATH_CONTRACTS.md) supersede blanket
+> world-path/without-GOTHRUWORLD omissions below for static BoxPhysics translation.
+> Angular paths and moving containers remain unavailable; M2 stays open.
+
 M2 remains incomplete. Read [object](OBJECT_CONTRACTS.md), [camera](CAMERA_CONTRACTS.md),
 [collision](MODEL_AND_COLLISION_CONTRACTS.md) and [interaction](INTERACTION_CONTRACTS.md)
 contracts with the [source selections](M2_KEYFRAMER_SOURCES.json) and

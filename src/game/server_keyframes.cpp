@@ -49,10 +49,28 @@ namespace OpenBlood2
         DRotation q = rotation ? *rotation : DRotation{};
         if (!record || record->life != Life::Alive || !physics_vector(position) || (rotation && !normalize(q)))
             return MoverResult::Invalid;
-        // Combined world-model rotation/translation and moving containers need an
-        // atomic geometry transaction; never move first and fail rotation afterwards.
-        if (record->container || record->world_model || record->client_movement ||
-            (record->state.m_ObjectType != OT_NORMAL && record->state.m_ObjectType != OT_MODEL))
+        if (record->container || record->client_movement)
+            return MoverResult::Unavailable;
+        if (record->world_model)
+        {
+            // A translation can reuse the atomic pusher/rider transaction. Never
+            // translate then discover an unsupported angular request afterwards.
+            auto current = record->state.m_Rotation;
+            if (!record->world_model_base || record->world_body || !normalize(current))
+                return MoverResult::Unavailable;
+            const auto difference =
+                rotation ? std::min(vector_dot(vector_subtract(current.m_Vec, q.m_Vec),
+                                               vector_subtract(current.m_Vec, q.m_Vec)) +
+                                        (current.m_Spin - q.m_Spin) * (current.m_Spin - q.m_Spin),
+                                    vector_dot(vector_add(current.m_Vec, q.m_Vec), vector_add(current.m_Vec, q.m_Vec)) +
+                                        (current.m_Spin + q.m_Spin) * (current.m_Spin + q.m_Spin))
+                         : 0;
+            if (difference > 1e-12f)
+                return MoverResult::Unavailable;
+            const auto result = MoveWorldModel(h, position);
+            return IsObjectAlive(h) ? result : MoverResult::Invalid;
+        }
+        if (record->state.m_ObjectType != OT_NORMAL && record->state.m_ObjectType != OT_MODEL)
             return MoverResult::Unavailable;
         if (!collision_ready || !collision)
             return MoverResult::Unavailable;

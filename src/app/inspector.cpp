@@ -78,6 +78,22 @@ namespace OpenBlood2
 
     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
     {
+        if (keyframe_request)
+        {
+            if (const auto* r = game.objects.get(keyframe_request);
+                r && r->life == Life::Alive && r->type->name == "KeyFramer")
+            {
+                auto text = game.server.CreateString(keyframe_command.c_str());
+                auto message = game.server.StartMessageToObject(nullptr, r->handle, 1000);
+                if (message)
+                {
+                    game.server.WriteToMessageHString(message, text);
+                    game.server.EndMessage(message);
+                }
+                game.server.FreeString(text);
+            }
+            keyframe_request = {};
+        }
         if (light_request)
         {
             if (const auto* r = game.objects.get(light_request);

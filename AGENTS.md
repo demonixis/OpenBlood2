@@ -135,3 +135,13 @@ and the implicit main light are separate. SubwayA now has 160 created source ent
 7 SelfTriggers, 372 editor-only and 48 unported (167/170 initial runtime instances,
 158/161 after consuming nine Keys). The earlier missing GlowingLight statement is
 superseded for this subset; M2 remains open.
+
+The latest [train path evidence](../Documentation/Implementation/M2_WORLDPATHS.md) extends original KeyFramer
+with translating BoxPhysics world models. Read [path contracts](docs/WORLDPATH_CONTRACTS.md).
+Keep unchanged-rotation validation before mutation, primary-world checks without
+GOTHRUWORLD, atomic pusher/rider commit, deferred contacts and single player integration.
+SubwayA's diagnostic train run records 297 moves/two primary-world blocks per cycle;
+this is replacement physics, not verified retail parity. Angular paths, dynamic
+world bodies and containers remain unavailable. Class counts stay 160 created,
+372 editor-only and 48 unported. Earlier blanket world-path omissions are superseded
+only for this translation subset; M2 stays open.

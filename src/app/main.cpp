@@ -187,7 +187,7 @@ namespace
         bool keyframe_hidden = false;
         if (options.keyframes_smoke)
         {
-            if (!OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe))
+            if (!OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe, options.worldpaths_smoke))
                 return 4;
             selection.id = smoke_keyframe;
         }
@@ -336,7 +336,7 @@ namespace
                 !OpenBlood2::prepare_light_smoke(game, smoke_light))
                 return 4;
             if (options.keyframes_smoke && frames == reload_frame + 1 &&
-                !OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe))
+                !OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe, options.worldpaths_smoke))
                 return 4;
             if (options.cameras_smoke && frames == reload_frame + 1 &&
                 !OpenBlood2::prepare_camera_smoke(game, smoke_camera))
@@ -614,7 +614,7 @@ namespace
                 if (options.lights_smoke && frames == show_frame - 1)
                     light_hidden = OpenBlood2::check_light_smoke(game, smoke_light);
                 if (options.keyframes_smoke && frames == show_frame - 1)
-                    keyframe_hidden = OpenBlood2::check_keyframe_smoke(game, smoke_keyframe);
+                    keyframe_hidden = OpenBlood2::check_keyframe_smoke(game, smoke_keyframe, options.worldpaths_smoke);
                 if (options.cameras_smoke && frames == show_frame - 1)
                     camera_hidden = OpenBlood2::check_camera_smoke(game, smoke_camera);
                 if (options.objectives_smoke && frames == show_frame - 1)
@@ -744,7 +744,8 @@ namespace
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
                 (options.lights_smoke && (!light_hidden || !OpenBlood2::check_light_smoke(game, smoke_light))) ||
                 (options.keyframes_smoke &&
-                 (!keyframe_hidden || !OpenBlood2::check_keyframe_smoke(game, smoke_keyframe))) ||
+                 (!keyframe_hidden ||
+                  !OpenBlood2::check_keyframe_smoke(game, smoke_keyframe, options.worldpaths_smoke))) ||
                 (options.cameras_smoke && (!camera_hidden || !OpenBlood2::check_camera_smoke(game, smoke_camera))) ||
                 (options.objectives_smoke && !objective_hidden) || (options.pickups_smoke && !pickup_hidden) ||
                 (options.interaction_smoke && !interaction_hidden) || (options.brushes_smoke && !brush_hidden) ||
@@ -771,7 +772,11 @@ namespace
             if (options.lights_smoke)
                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
                              "and after reload; evaluated radius/color checked; world illumination unavailable");
-            if (options.keyframes_smoke)
+            if (options.worldpaths_smoke)
+                spdlog::info(
+                    "WORLDPATHS smoke: original SubwayA train follows keys, posed collision checked while UI hidden "
+                    "and after reload; angular paths and world rendering remain unavailable");
+            else if (options.keyframes_smoke)
                 spdlog::info("KEYFRAMES smoke: authored camera path and owned key lifetime checked while UI hidden and "
                              "after reload; missing Gideon message exposed");
             if (options.cameras_smoke)
@@ -854,6 +859,7 @@ int main(int argc, char** argv)
                      "  --pickups-smoke   GPU original ammo pickup, hidden collection and reload\n"
                      "  --objectives-smoke GPU original objectives and localized text, hidden delivery/reload\n"
                      "  --lights-smoke      GPU original light state, keyframe placement and reload\n"
+                     "  --worldpaths-smoke  GPU original translating train path, collision and reload\n"
                      "  --keyframes-smoke   GPU original camera key path, key lifetime and reload\n"
                      "  --cameras-smoke     GPU original camera tracking, player gates and reload\n"
                      "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
