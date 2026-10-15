@@ -22,6 +22,10 @@ namespace OpenBlood2
     {
         float pitch = 0, yaw = 0;
     };
+    struct PlayerUse
+    {
+        PlayerRotation rotation;
+    };
     struct PlayerPosition
     {
         DVector position;

@@ -164,6 +164,8 @@ bool CPlayerObj::Respawn()
     const DDWORD flags = FLAG_VISIBLE | FLAG_MODELKEYS | FLAG_YROTATION | FLAG_ANIMTRANSITION | FLAG_TOUCH_NOTIFY |
                          FLAG_SOLID | FLAG_STAIRSTEP | FLAG_SHADOW;
     server->SetObjectFlags(m_hObject, flags);
+    door_push_pending = false;
+    door_push_velocity = {};
     DVector velocity{};
     server->SetVelocity(m_hObject, &velocity);
     server->SetAcceleration(m_hObject, &velocity);
@@ -416,6 +418,9 @@ DDWORD CPlayerObj::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
         }
         case MID_INITIALUPDATE:
             result = InitialUpdate(static_cast<int>(fData));
+            break;
+        case MID_TOUCHNOTIFY:
+            ObjectTouchDoor(static_cast<HOBJECT>(data));
             break;
         case MID_UPDATE:
             result = Update(static_cast<DVector*>(data));

@@ -38,7 +38,7 @@ class Door : public B2BaseClass
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
 
-  private:
+  protected:
     bool ReadProp(ObjectCreateStruct&);
     bool SpawnTrigger();
     void SetTriggerActive(bool);
@@ -46,6 +46,6 @@ class Door : public B2BaseClass
     void SetClosed(bool sound = true);
     void SetOpening();
     void SetClosing();
-    void Move(bool opening);
+    virtual void Move(bool opening);
     void StartSound(const std::string&, bool loop);
 };

@@ -1,5 +1,9 @@
 # Original Player Entry Boundary
 
+> Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
+> are connected with bounded atomic collision. Earlier omissions below describe
+> their previous increments; the full M2 gate remains open.
+
 > Key inventory, pickup and query messages are extended by
 > [TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md); prior key/pickup omissions below
 > describe their earlier increment. General item/combat coverage remains pending.

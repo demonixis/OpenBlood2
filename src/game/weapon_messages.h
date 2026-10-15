@@ -36,6 +36,11 @@ namespace OpenBlood2
         std::uint32_t polygon = UINT32_MAX;
         double fraction = 1;
     };
+    enum class SegmentObjects
+    {
+        SolidOnly,
+        All
+    };
     enum class SegmentResult
     {
         Invalid,

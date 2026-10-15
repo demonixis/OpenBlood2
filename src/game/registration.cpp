@@ -5,6 +5,7 @@
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
 #include "game/original/PathPoint.h"
+#include "game/original/RotatingDoor.h"
 #include "game/original/SmellHint.h"
 #include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
@@ -257,6 +258,13 @@ namespace OpenBlood2
                               {"ObjectActivate", false},
                               {"NamedObjectActivate", false},
                               {"Locked", false}}};
+        const ClassInfo rotating_door{"RotatingDoor",
+                                      &door,
+                                      construct<RotatingDoor>,
+                                      {{"RotationPoint", DVector{}},
+                                       {"RotationAngles", DVector{}},
+                                       {"BoxPhysics", false},
+                                       {"PushPlayerBack", true}}};
         const ClassInfo camera{"CameraSpot", &b2base, construct<CameraSpot>, {}};
         const ClassInfo conveyor{"Conveyor",
                                  &volume,
@@ -312,7 +320,8 @@ namespace OpenBlood2
                objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
                objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
                objects.register_class(key_pickup) && objects.register_class(big_trigger) &&
-               objects.register_class(toggle_trigger) && objects.register_class(door);
+               objects.register_class(toggle_trigger) && objects.register_class(door) &&
+               objects.register_class(rotating_door);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

@@ -25,6 +25,7 @@ namespace OpenBlood2
     {
       public:
         bool build(const WorldModel& model, std::string& error);
+        bool transform(DRotation, DVector origin, DVector destination);
         void clear()
         {
             triangles_.clear();
@@ -57,6 +58,9 @@ namespace OpenBlood2
         std::uint32_t partition(std::uint32_t begin, std::uint32_t end);
         void query(std::uint32_t node, DVector from, DVector to, DVector half, CollisionHit& hit, bool& found) const;
     };
+    DVector rotate_vector(DVector, DRotation);
+    DRotation multiply_rotation(DRotation, DRotation);
+    DRotation inverse_rotation(DRotation);
     bool physics_vector(DVector v);
     CollisionQuery sweep_box(DVector from, DVector to, DVector half, DVector center, DVector other_half,
                              CollisionHit& hit);

@@ -18,7 +18,7 @@ Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentatio
 
 - Read [docs/WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) before extending inventory, client weapon input/animation, ray fire or damage. Beretta/knife are selective original ports; preserve every FIRE_KEY event (including the two primary knife markers), owned weapon/client models and deferred hit-callback removal. Other weapons, pickups, full combat, audio/FX and muzzle/hand placement are still open. Keep typed shot/damage messages separate from legacy packet ABI; portable seeded randomness is not claimed retail-bit-identical.
 
-- Read [docs/MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) before extending original MoveMgr, player input or support queries. Client-associated players use one shared body and skip generic physics; typed movement must resolve collision exactly once. Keep source rules separate from the documented replacement integrator. Read [docs/LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for current stairs, crouch/animation dimensions, source clip fallbacks and clearance. Selected containers are covered by the contracts below; translating platforms are covered by the door contracts below; rotating transport remains pending.
+- Read [docs/MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) before extending original MoveMgr, player input or support queries. Client-associated players use one shared body and skip generic physics; typed movement must resolve collision exactly once. Keep source rules separate from the documented replacement integrator. Read [docs/LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for current stairs, crouch/animation dimensions, source clip fallbacks and clearance. Selected containers are covered by the contracts below; translating platforms are covered by the door contracts below; bounded rotating transport is covered by the interaction contracts below.
 
 - Follow `.clang-format` and `.editorconfig`. Use `OpenBlood2` for project-owned C++ namespaces; preserve source-global SDK/game classes. Commit code and English documentation after each completed run, in their respective independent repositories.
 - Locomotion shape changes are atomic and foot-anchored. A blocked standing attempt preserves the short body and camera; this also applies to alive entry resets. Preserve original `CheckAnims` fallback and expose resolved clips. Keep the new stair solver explicitly separate from verified retail behavior.
@@ -40,12 +40,20 @@ Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentatio
   door triggers or collision. Translating Door is a selective original port;
   its atomic pusher/rider solver is replacement engine code. Preserve checked
   named geometry, actual bounds centers, atomic blocking, one shared player
-  integration and deferred touch removal. Rotation, crushing, audio/portals and the complete M2 gate remain explicitly pending.
+  integration and deferred touch removal. Rotation is extended by the interaction contracts below; crushing, audio/portals and the complete M2 gate remain explicitly pending.
 
 - Read [docs/TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending
   Trigger/BigTrigger/ToggleTrigger, door SelfTriggers or key inventory/pickups.
   Preserve the original active-command guard, player-only lock query, consuming
   key uses, named-filter order, delayed-toggle behavior and typed message ownership.
   SelfTriggers are owned, stationary children; pending parents cannot activate them.
-  Player USE ray/input, generic pickups, audio/localized feedback and save/restore
-  remain pending. Keep source-entry counts distinct from generated runtime children.
+  Player USE ray/input is extended below; generic pickups, audio/localized feedback
+  and save/restore remain pending. Keep source-entry counts distinct from generated runtime children.
+
+- Read [docs/INTERACTION_CONTRACTS.md](docs/INTERACTION_CONTRACTS.md) before extending
+  player USE, rotating doors or collision. Preserve the 82-unit eye ray and
+  direct-Door exclusion, press-edge input, source double angular increment and
+  StartOpen behavior. Keep the authored shell immutable, transforms/body moves
+  atomic, player push velocity consumed once and contact removal deferred.
+  Conservative bounds/work limits must remain visible; this is not verified
+  retail physics. Other movers, crushing and complete gameplay remain pending.

@@ -5,6 +5,7 @@
 #include "game/original/Door.h"
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
+#include "game/original/RotatingDoor.h"
 #include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
 
@@ -776,6 +777,19 @@ namespace OpenBlood2
                         client.position.z, client.rotation.pitch, client.rotation.yaw);
             ImGui::Text("Camera %.3f %.3f %.3f | Animation %.1f ms", client.camera_position.x, client.camera_position.y,
                         client.camera_position.z, record->animation.time);
+            ImGui::Text("USE (E with F2 controls): %llu commands / %llu messages | door refused %s",
+                        static_cast<unsigned long long>(player->use_commands),
+                        static_cast<unsigned long long>(player->use_messages), player->use_door_refused ? "yes" : "no");
+            constexpr const char* ray_results[] = {"invalid", "miss", "hit", "unavailable"};
+            const auto* use_target = game.objects.get(player->use_hit.object);
+            ImGui::Text(
+                "Ray %s | target %s | distance %.2f / 82", ray_results[static_cast<unsigned>(player->use_result)],
+                use_target && use_target->life == Life::Alive ? use_target->state.m_Name : "world / none / removed",
+                player->use_hit.fraction * 82);
+            ImGui::Text("Eye %.2f %.2f %.2f -> %.2f %.2f %.2f", player->use_from.x, player->use_from.y,
+                        player->use_from.z, player->use_to.x, player->use_to.y, player->use_to.z);
+            ImGui::Text("Door push requests %llu | pending %s", static_cast<unsigned long long>(player->door_pushes),
+                        player->door_push_pending ? "yes" : "no");
             ImGui::Text("Health %.0f / %.0f | Armor %.0f | Bullets %.0f", player->m_damage.m_fHitPoints,
                         player->m_damage.m_fMaxHitPoints, player->m_damage.m_fArmorPoints,
                         player->m_InventoryMgr.GetAmmoCount(1));
@@ -1434,7 +1448,7 @@ namespace OpenBlood2
 {
     void Inspector::draw_doors(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextWrapped("Original sliding Door rules. Commands use original object messages; translations push "
+        ImGui::TextWrapped("Original Door / RotatingDoor rules. Commands use original object messages; movers push "
                            "bodies and carry standing players. Failed/unported entries remain in World.");
         if (!ImGui::BeginTable("Doors", 2, ImGuiTableFlags_Resizable))
             return;
@@ -1458,7 +1472,8 @@ namespace OpenBlood2
         {
             const auto& shape = *r->world_model;
             const auto offset = vector_subtract(r->state.m_Pos, shape.origin);
-            const auto mid = vector_scale(vector_add(d->closed_pos, d->open_pos), .5f);
+            const auto* rotating = dynamic_cast<const RotatingDoor*>(d);
+            const auto mid = rotating ? r->state.m_Pos : vector_scale(vector_add(d->closed_pos, d->open_pos), .5f);
             const ImVec2 size{std::max(180.0f, ImGui::GetContentRegionAvail().x), 140};
             ImGui::TextUnformatted("Transformed shell + travel / top view (X/Z)");
             const auto canvas = ImGui::GetCursorScreenPos();
@@ -1482,6 +1497,11 @@ namespace OpenBlood2
                                   project(vector_add(triangle[(i + 1) % 3], offset)), IM_COL32(80, 180, 255, 190));
             draw->AddLine(project(d->closed_pos), project(d->open_pos), IM_COL32(255, 190, 80, 255), 2);
             draw->AddCircleFilled(project(r->state.m_Pos), 3, IM_COL32_WHITE);
+            if (rotating)
+            {
+                draw->AddCircle(project(rotating->rotation_point), 5, IM_COL32(255, 100, 160, 255));
+                draw->AddLine(project(rotating->rotation_point), project(r->state.m_Pos), IM_COL32(255, 100, 160, 255));
+            }
             if (const auto* player = game.objects.get(game.client_shell.player))
                 draw->AddCircleFilled(project(player->state.m_Pos), 4, IM_COL32(140, 255, 160, 255));
             draw->PopClipRect();
@@ -1502,7 +1522,8 @@ namespace OpenBlood2
                 door_trigger_request = r->id;
                 door_close_request = true;
             }
-            ImGui::Text("Speed %.1f / close %.1f | waveform %u", d->speed, d->closing_speed, d->waveform);
+            ImGui::Text("Speed %.1f / close %.1f %s | wave %u", d->speed, d->closing_speed,
+                        dynamic_cast<const RotatingDoor*>(d) ? "rad/s" : "units/s", d->waveform);
             ImGui::Text("Distance %.1f | delay %.2f | wait %.2f", d->move_dist, d->open_delay, d->wait_time);
             ImGui::Text("Pivot %.2f %.2f %.2f", r->state.m_Pos.x, r->state.m_Pos.y, r->state.m_Pos.z);
             ImGui::Text(
@@ -1518,6 +1539,18 @@ namespace OpenBlood2
             }
             ImGui::Text("Collision: %s | %zu shell triangles", d->box_physics ? "authored box" : "polygon",
                         r->world_model->triangles.size());
+            if (const auto* rotating = dynamic_cast<const RotatingDoor*>(d))
+            {
+                ImGui::Text("Euler radians %.3f %.3f %.3f | substeps %u", rotating->angles.x, rotating->angles.y,
+                            rotating->angles.z, r->rotation_steps);
+                ImGui::Text("RotationAngles degrees %.1f %.1f %.1f", rotating->rotation_angles.x,
+                            rotating->rotation_angles.y, rotating->rotation_angles.z);
+                ImGui::Text("RotationPoint %.2f %.2f %.2f", rotating->rotation_point.x, rotating->rotation_point.y,
+                            rotating->rotation_point.z);
+                ImGui::Text("PushPlayerBack %s", rotating->push_player_back ? "yes" : "no");
+                ImGui::TextWrapped("Source CalcAngle applies two increments; rotation collision uses a bounded "
+                                   "replacement solver. Speed above is radians/s.");
+            }
             ImGui::Text("TriggerClosed %s | RemainsOpen %s | StartOpen %s", d->trigger_closed ? "yes" : "no",
                         d->remains_open ? "yes" : "no", d->start_open ? "yes" : "no");
             ImGui::Text("FireThrough %s | triggers %llu", d->fire_through ? "yes" : "no",

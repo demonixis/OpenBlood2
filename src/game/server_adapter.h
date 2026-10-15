@@ -37,6 +37,7 @@ namespace OpenBlood2
         DRESULT WriteKeyMessage(HMESSAGEWRITE, const KeyMessage&) override;
         bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
         MoverResult MoveWorldModel(HOBJECT, DVector destination) override;
+        MoverResult RotateWorldModel(HOBJECT, const RotationMove&) override;
         bool GetContainers(HOBJECT, DVector head, ContainerState&) override;
         bool damage_containers();
         float GetWorldTime() override
@@ -50,7 +51,8 @@ namespace OpenBlood2
         }
         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
-        SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false) override;
+        SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false,
+                                       SegmentObjects objects = SegmentObjects::SolidOnly) override;
         DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
         bool ReadDamage(HMESSAGEREAD, Damage&) override;
         HCLIENT connect_client();

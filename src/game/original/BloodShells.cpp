@@ -145,7 +145,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client)
     physics = {};
     stats = {};
     messages = updates = 0;
-    blocker = "Locomotion/weapon inspection: specialized containers/FX, moving platforms, full combat, audio and "
+    blocker = "Locomotion/weapon inspection: remaining container/FX and mover classes, full combat, audio and "
               "autosave remain unported";
     return true;
 }
@@ -155,6 +155,7 @@ void CBloodClientShell::OnExitWorld()
     weapon_input = {};
     move_mgr.Term();
     movement_input = {};
+    use_down = use_was_down = false;
     player = nullptr;
     client_ = nullptr;
     m_bInWorld = false;
@@ -221,8 +222,9 @@ bool CBloodClientShell::Update()
 bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds, std::string& error)
 {
     auto* owner = server.Player(client_);
-    if (!owner || !move_mgr.Update(server, movement_input, rotation.yaw, seconds, !owner->m_damage.IsDead(),
-                                   weapon_input.primary || weapon_input.alternate, rotation.pitch))
+    if (!owner || !owner->ApplyDoorPush() ||
+        !move_mgr.Update(server, movement_input, rotation.yaw, seconds, !owner->m_damage.IsDead(),
+                         weapon_input.primary || weapon_input.alternate, rotation.pitch))
     {
         error = "Original MoveMgr step failed (invalid association, movement message or collision)";
         if (owner && !owner->locomotion_error.empty())
@@ -251,6 +253,24 @@ bool CBloodClientShell::SyncWeapons(OpenBlood2::ModelStore& models, OpenBlood2::
         if (changed[i])
             weapons[i] = std::move(prepared[i]);
     return true;
+}
+bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerUse& command)
+{
+    auto* owner = Player(client);
+    if (!owner || !std::isfinite(command.rotation.pitch) || !std::isfinite(command.rotation.yaw) ||
+        std::abs(command.rotation.pitch) > 1000000 || std::abs(command.rotation.yaw) > 1000000)
+        return false;
+    owner->m_fPitch = command.rotation.pitch;
+    owner->m_fYaw = command.rotation.yaw;
+    return owner->OnCommandUse();
+}
+bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
+{
+    const bool pressed = use_down && !use_was_down;
+    use_was_down = use_down;
+    if (pressed)
+        server.OnMessage(client_, OpenBlood2::PlayerUse{rotation});
+    return true; // A blocked USE command does not terminate a valid session.
 }
 bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server, double seconds, std::string& error)
 {

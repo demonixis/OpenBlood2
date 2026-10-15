@@ -1,5 +1,9 @@
 # Original MoveMgr Boundary
 
+> Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
+> are connected with bounded atomic collision. Earlier omissions below describe
+> their previous increments; the full M2 gate remains open.
+
 > Extended by [CONTAINER_CONTRACTS.md](CONTAINER_CONTRACTS.md): selected original
 > liquids/ladders and head/body queries are now connected. Earlier pending
 > container statements describe the dry-land increment.

@@ -5,6 +5,7 @@
 #include "engine/runtime.h"
 #include "game/original/Door.h"
 #include "game/server_adapter.h"
+#include "interaction_smoke.h"
 #include "trigger_smoke.h"
 
 #include <SDL3/SDL_main.h>
@@ -132,6 +133,13 @@ namespace
             }
             selection.id = smoke_trigger;
         }
+        if (options.interaction_smoke)
+        {
+            if (!OpenBlood2::prepare_interaction_smoke(game, smoke_door))
+                return 4;
+            selection.id = smoke_door;
+        }
+        bool interaction_hidden = false;
         const auto original_selection = selection.id;
         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
         bool selection_cleared = false, world_unloaded = false;
@@ -142,11 +150,12 @@ namespace
         OpenBlood2::Inspector inspector(runtime);
         inspector.select_models = options.world_smoke && !options.player_smoke && !options.doors_smoke;
         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
-                                   !options.containers_smoke && !options.triggers_smoke;
+                                   !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke;
         inspector.select_weapons = options.weapons_smoke;
         inspector.select_movement = options.movement_smoke;
         inspector.select_containers = options.containers_smoke;
-        inspector.select_doors = options.doors_smoke;
+        inspector.select_doors = options.doors_smoke || options.interaction_smoke;
+        inspector.keyboard_movement = options.interaction_smoke;
         inspector.select_triggers = options.triggers_smoke;
         inspector.trigger_selection = smoke_trigger;
         inspector.door_selection = smoke_door;
@@ -174,6 +183,7 @@ namespace
         bool weapons_fired = false, weapon_advanced_hidden = false;
         std::uint64_t hidden_weapon_shots = 0;
         OpenBlood2::MovementControls controls;
+        controls.enabled = options.interaction_smoke;
         controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
         DVector hidden_position{};
         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
@@ -244,6 +254,10 @@ namespace
             controls.enabled = inspector.keyboard_movement;
             text_editing = inspector_visible && ImGui::GetIO().WantTextInput;
 #endif
+            if (options.interaction_smoke && frames == reload_frame + 1)
+                if (!OpenBlood2::prepare_interaction_smoke(game, smoke_door))
+                    return 4;
+            game.client_shell.use_down = controls.sample_use(text_editing);
             auto keyboard = controls.sample(text_editing);
             auto& movement = game.client_shell.movement_input;
             movement.forward |= keyboard.forward;
@@ -355,12 +369,13 @@ namespace
                 return 3;
             }
             OpenBlood2::Capture capture;
-            const bool capture_frame =
-                swapchain &&
-                frames >= (extended_smoke                                                                ? 180u
-                           : (options.containers_smoke || options.doors_smoke || options.triggers_smoke) ? 14u
-                                                                                                         : 2u) &&
-                !captured && !options.capture_file.empty();
+            const bool capture_frame = swapchain &&
+                                       frames >= (extended_smoke ? 180u
+                                                  : (options.containers_smoke || options.doors_smoke ||
+                                                     options.triggers_smoke || options.interaction_smoke)
+                                                      ? 14u
+                                                      : 2u) &&
+                                       !captured && !options.capture_file.empty();
             if (capture_frame &&
                 !capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
                                     height))
@@ -486,6 +501,26 @@ namespace
                         OpenBlood2::vector_subtract(game.objects.get(smoke_door)->state.m_Pos, hidden_door_position);
                     door_moved_hidden = OpenBlood2::vector_dot(delta, delta) > .01f;
                 }
+                if (options.interaction_smoke && (frames == hide_frame || frames == show_frame - 1))
+                {
+                    if (frames == hide_frame)
+                    {
+                        SDL_Event focus{};
+                        focus.type = SDL_EVENT_WINDOW_FOCUS_GAINED;
+                        focus.window.windowID = SDL_GetWindowID(runtime.window);
+                        if (!SDL_PushEvent(&focus))
+                            return 4;
+                    }
+                    SDL_Event use{};
+                    use.type = frames == hide_frame ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
+                    use.key.windowID = SDL_GetWindowID(runtime.window);
+                    use.key.key = SDLK_E;
+                    use.key.scancode = SDL_SCANCODE_E;
+                    use.key.down = frames == hide_frame;
+                    event_ok = SDL_PushEvent(&use);
+                }
+                if (options.interaction_smoke && frames == show_frame)
+                    interaction_hidden = OpenBlood2::check_interaction_smoke(game, smoke_door);
                 if (conveyor_smoke && frames == hide_frame)
                     hidden_position = game.client_shell.position;
                 if (options.containers_smoke && frames == show_frame)
@@ -591,6 +626,7 @@ namespace
                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+                (options.interaction_smoke && !interaction_hidden) ||
                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
                 (options.movement_smoke &&
                  (!movement_hidden || !movement_jumped || !movement_landed || !game.client_shell.move_mgr.ready() ||
@@ -617,6 +653,9 @@ namespace
             if (options.movement_smoke)
                 spdlog::info("Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, "
                              "unload/re-entry");
+            if (options.interaction_smoke)
+                spdlog::info("Interaction smoke passed: SDL E press edge, USE key denial/unlock, rotation while "
+                             "hidden, inspection, reload");
             if (options.triggers_smoke)
                 spdlog::info("Trigger smoke passed: missing-key denial, real key pickup, consumption/unlock while "
                              "hidden, door motion, inspector, reload");
@@ -672,6 +711,7 @@ int main(int argc, char** argv)
                      "  --player-smoke      GPU shell/player entry, hidden updates and unload/re-entry\n"
                      "  --weapons-smoke     GPU Beretta/knife firing, hidden simulation and reload\n"
                      "  --doors-smoke       GPU original sliding door inspection\n"
+                     "  --interaction-smoke GPU original USE and rotating door inspection\n"
                      "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
                      "  --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload\n"

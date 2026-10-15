@@ -31,12 +31,14 @@ class ServerDE : public CSBase
     virtual DRESULT WriteKeyMessage(HMESSAGEWRITE, const OpenBlood2::KeyMessage&) = 0;
     virtual bool ReadKeyMessage(HMESSAGEREAD, OpenBlood2::KeyMessage&) = 0;
     virtual OpenBlood2::MoverResult MoveWorldModel(HOBJECT, DVector destination) = 0;
+    virtual OpenBlood2::MoverResult RotateWorldModel(HOBJECT, const OpenBlood2::RotationMove&) = 0;
     virtual bool GetContainers(HOBJECT, DVector head, OpenBlood2::ContainerState&) = 0;
     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
     virtual float GetWorldTime() = 0;
-    virtual OpenBlood2::SegmentResult IntersectSegment(DVector from, DVector to, HOBJECT ignore,
-                                                       OpenBlood2::SegmentHit&, bool fire_through = false) = 0;
+    virtual OpenBlood2::SegmentResult IntersectSegment(
+        DVector from, DVector to, HOBJECT ignore, OpenBlood2::SegmentHit&, bool fire_through = false,
+        OpenBlood2::SegmentObjects objects = OpenBlood2::SegmentObjects::SolidOnly) = 0;
     virtual DRESULT WriteDamage(HMESSAGEWRITE, const OpenBlood2::Damage&) = 0;
     virtual bool ReadDamage(HMESSAGEREAD, OpenBlood2::Damage&) = 0;
     // Source adaptation: client association is a checked object handle, never a

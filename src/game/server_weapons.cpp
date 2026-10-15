@@ -6,12 +6,13 @@
 namespace OpenBlood2
 {
     SegmentResult ServerAdapter::IntersectSegment(DVector from, DVector to, HOBJECT ignore, SegmentHit& out,
-                                                  bool fire_through)
+                                                  bool fire_through, SegmentObjects objects)
     {
         trace_service("IntersectSegment");
         out = {};
         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
-        if (!physics_vector(from) || !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
+        if ((objects != SegmentObjects::SolidOnly && objects != SegmentObjects::All) || !physics_vector(from) ||
+            !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
             vector_dot(vector_subtract(to, from), vector_subtract(to, from)) < 1e-12f)
             return SegmentResult::Invalid;
         if (!collision || !collision_ready)
@@ -25,7 +26,7 @@ namespace OpenBlood2
         {
             const auto* record = objects_.get(id);
             if (!record || record->life != Life::Alive || record->handle == ignore ||
-                !(record->state.m_Flags & FLAG_SOLID))
+                (objects == SegmentObjects::SolidOnly && !(record->state.m_Flags & FLAG_SOLID)))
                 continue; // Original IGNORE_NONSOLID.
             const auto* door = dynamic_cast<const Door*>(record->game.get());
             if (fire_through && door && door->fire_through)
@@ -34,6 +35,11 @@ namespace OpenBlood2
             const auto query = sweep_object(*record, from, to, {}, hit);
             if (query == CollisionQuery::Invalid)
                 return SegmentResult::Invalid;
+            // USE follows entry-face rays: an enclosing body/sensor must not
+            // mask all interactions. Later LithTech exposes interior hits as an
+            // opt-in flag; ordinary USE does not request it.
+            if (objects == SegmentObjects::All && hit.start_solid)
+                continue;
             if (query == CollisionQuery::Hit && (!found || hit.fraction < nearest.fraction))
             {
                 nearest = hit;

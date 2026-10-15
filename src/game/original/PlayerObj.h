@@ -103,6 +103,18 @@ class CPlayerObj : public CBaseCharacter
     float eye_level = 36;
     std::string locomotion_clip, locomotion_requested_clip, locomotion_error;
     std::uint64_t animation_changes = 0, blocked_resizes = 0;
+    bool OnCommandUse();
+    bool movement_blocked = false;
+    bool door_push_pending = false;
+    DVector door_push_velocity{};
+    std::uint64_t door_pushes = 0;
+    void ObjectTouchDoor(HOBJECT);
+    bool ApplyDoorPush();
+    DVector use_from{}, use_to{};
+    OpenBlood2::SegmentHit use_hit;
+    OpenBlood2::SegmentResult use_result = OpenBlood2::SegmentResult::Miss;
+    std::uint64_t use_commands = 0, use_messages = 0;
+    bool use_door_refused = false;
     bool UpdateClientPhysics();
     bool UpdateStats();
     bool TeleportClientToServerPos();

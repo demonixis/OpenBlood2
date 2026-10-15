@@ -253,3 +253,15 @@ name fallback, collision extension and remaining USE/feedback/persistence limits
 Later LithTech timer documentation informs the ResetTime<=0 convention; it is not
 claimed to establish retail Blood II engine parity. Earlier ledgers stay historical.
 No prototype dependency, reference source or commercial asset was imported.
+
+
+## M2 original USE and rotating-door continuation
+
+[Source selections](M2_INTERACTION_SOURCES.json) identify the selective original
+RotatingDoor properties/angle/pivot/state code and PlayerObj USE/door-push branches.
+[Contracts](INTERACTION_CONTRACTS.md) distinguish source rules from typed local
+command dispatch, entry-face ray filtering and the bounded replacement rotating
+collision solver. No prototype engine dependency or ECS was imported. The old
+force/crush protocol, full player session and other movers remain outside this
+increment. Source angular quirks and the original direct-door USE exclusion are
+retained; original-executable behavior and other platforms remain unverified.

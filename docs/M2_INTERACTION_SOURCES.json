@@ -1,0 +1,148 @@
+{
+  "date": "2026-10-15",
+  "status": "M2 incomplete; original player USE and RotatingDoor connected for the bounded inspection session",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/RotatingDoor.cpp",
+      "target": "src/game/original/RotatingDoor.cpp",
+      "source_line_ranges": [
+        [
+          31,
+          89
+        ],
+        [
+          108,
+          458
+        ]
+      ],
+      "selection": "Property reads, radians conversion, initial angles/directions, opening/closing, pivot transform and duplicated CalcAngle; finite guards, zero-span guard and typed atomic transform replace engine rotate/move rollback. No save/load, force-ignore service or audio playback.",
+      "kind": "selective original game port",
+      "source_sha256": "630b6beddb500714bb9f880774f49f273bf1bdf86adb866322bc4e7ae621d28a",
+      "target_sha256": "1754e8b347b36c71a220eee159b3b4466246053a6d34c75a05244465ee60ebe0"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/RotatingDoor.h",
+      "target": "src/game/original/RotatingDoor.h",
+      "source_line_ranges": [
+        [
+          1,
+          59
+        ]
+      ],
+      "selection": "Original Door inheritance and angular/pivot/push state; shared Move(bool) dispatch replaces separate Opening/Closing overrides.",
+      "kind": "selective original game port",
+      "source_sha256": "fdcc674e39668b5e2a29fbfc8cb41095e734d44453fdfd785bfb9ca112a10bc1",
+      "target_sha256": "4ca9ecbc3fb7763ac0d09e298b580480101d274ac12867cadbf9e7e34a346f7c"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/RotatingDoor.cpp",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          20,
+          29
+        ]
+      ],
+      "selection": "RotatingDoor registration overrides and properties; inherited Door defaults retained.",
+      "kind": "selective original game port",
+      "source_sha256": "630b6beddb500714bb9f880774f49f273bf1bdf86adb866322bc4e7ae621d28a",
+      "target_sha256": "4cb8579975601b7de33f7a24e28f79acc1ff212748fa654f6cfd54f5ae781134"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Door.h",
+      "target": "src/game/original/Door.h",
+      "source_line_ranges": [
+        [
+          48,
+          64
+        ]
+      ],
+      "selection": "Expose shared protected state methods and virtual Move dispatch for selected original RotatingDoor rules.",
+      "kind": "selective original game port",
+      "source_sha256": "1d5fdbece8133f3d9656f180eb8e0055cc082cb9fc7f2542efb1c60d61a73611",
+      "target_sha256": "1a5e9667f4cf337e387f701986405fc68624e27a4b15aeb37e24bf5fc49eb437"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "target": "src/game/original/PlayerUse.cpp",
+      "source_line_ranges": [
+        [
+          283,
+          283
+        ],
+        [
+          2388,
+          2419
+        ],
+        [
+          2884,
+          2958
+        ],
+        [
+          6298,
+          6305
+        ]
+      ],
+      "selection": "Ordinary COMMAND_USE eye ray and direct-door exclusion; opening RotatingDoor body-forward -500 velocity request and once-consumed added velocity. No multiplayer respawn, slow death, creature or complete player physics.",
+      "kind": "selective original game port",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target_sha256": "ff7229fb9cd46560a91475078a8b7891b4fcffc6c2701f2d14a17ee08ecfb597"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "target": "src/game/original/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          633,
+          634
+        ]
+      ],
+      "selection": "Alive respawn clears pending door push; engine touch dispatch connects the selected original branch.",
+      "kind": "selective original game port",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target_sha256": "83df6af9158e36a2f8b6f045577388ef19755a7d5a65956ecff06acc6edee545"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "target": "src/game/original/BloodShells.cpp",
+      "source_line_ranges": [
+        [
+          533,
+          545
+        ]
+      ],
+      "selection": "Original command callback resolves the client player and forwards command-on; adaptation uses checked PlayerUse/rotation values and device-independent rising-edge input.",
+      "kind": "selective original game port",
+      "source_sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "target_sha256": "be768fef6da65f6b8e18c9e166bd73dcaacdf28d176bc405cf430f7ff044eb4d"
+    },
+    {
+      "source": "sources/lithtech/runtime/world/src/fullintersectline.cpp",
+      "target": "src/game/server_weapons.cpp",
+      "source_line_ranges": [
+        [
+          131,
+          230
+        ],
+        [
+          608,
+          650
+        ]
+      ],
+      "selection": "Later-generation non-solid query filtering and optional interior-start box hits inform the USE entry-face ray adaptation; not proof of retail Blood II engine behavior. Existing solid weapon filtering retained.",
+      "kind": "cross-generation engine reference, not imported",
+      "source_sha256": "f199f999a63986325675d9cb1bf2bdede98942e03cf0725dab937f506f6f3409",
+      "target_sha256": "76cfe88ebce166e21dfdc24d767070db0971df4fabae40cfe97f89107ab5be62"
+    }
+  ],
+  "engine_adaptations": [
+    "Typed local USE dispatch, finite angles, nearest non-solid geometry and explicit self/interior-start exclusion",
+    "Physical E press-edge binding with focus/text/disabled suppression; no SDL in game messages",
+    "Immutable authored geometry basis, current posed shell/BVH, typed angular path and atomic geometry/body commit",
+    "Conservative 0.5-unit vertex-travel subdivision, 512 steps, 262144 triangle-steps and 64 affected bodies; not retail CCD/physics",
+    "Replacement body/rider transport, bounded AABB separation, primary/other-world blocking and deferred path sensor contacts",
+    "Original player -500 body-forward request consumed once before shared MoveMgr; no force/crush service replica",
+    "Synthetic GPU hinge fixture uses existing retail player resources; no commercial content copied"
+  ]
+}

@@ -1,5 +1,9 @@
 # Original triggers, door SelfTrigger and keys
 
+> Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
+> are connected with bounded atomic collision. Earlier omissions below describe
+> their previous increments; the full M2 gate remains open.
+
 This extends [DOOR_CONTRACTS.md](DOOR_CONTRACTS.md),
 [WEAPON_CONTRACTS.md](WEAPON_CONTRACTS.md) and
 [OBJECT_CONTRACTS.md](OBJECT_CONTRACTS.md). M2 remains open.
@@ -138,7 +142,7 @@ and use the live player as sender. An explicitly labeled debug key grant bypasse
 pickup and is separate from original rules. Simulation also runs without ImGui.
 
 Inspector TRIGGER is a direct test command, not the original 82-unit player USE
-ray. The latter, ordinary interaction bindings, complete AI, rotating doors,
-audio/localized feedback, save/restore and full gameplay remain pending.
+ray, now connected alongside RotatingDoor by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md).
+Complete AI, audio/localized feedback, save/restore and full gameplay remain pending.
 Original B2BaseClass difficulty/game-type filtering now carries an inspection
 marker so initial-update removals are reported as filtered, not creation failures.

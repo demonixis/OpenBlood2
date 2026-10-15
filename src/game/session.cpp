@@ -305,7 +305,7 @@ namespace OpenBlood2
         error = "RunWorld blocked: " + std::to_string(missing) +
                 " uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat "
                 "reactions, "
-                "audio, autosave, rotating world-model collision remain unported";
+                "audio, autosave and remaining mover classes remain unported";
         if (!entry_error.empty())
             error += "; player entry: " + entry_error;
         if (trace.empty() || trace.back() != error)
@@ -362,10 +362,11 @@ namespace OpenBlood2
             else
             {
                 std::string error;
-                const bool updated =
-                    pump_player_messages(error) && client_shell.UpdateMovement(server_shell, seconds, error) &&
-                    client_shell.Update() && client_shell.SyncWeapons(models, resources, server_shell, error) &&
-                    client_shell.UpdateWeapons(server_shell, seconds, error);
+                const bool updated = pump_player_messages(error) &&
+                                     client_shell.UpdateMovement(server_shell, seconds, error) &&
+                                     client_shell.Update() && client_shell.UpdateUse(server_shell) &&
+                                     client_shell.SyncWeapons(models, resources, server_shell, error) &&
+                                     client_shell.UpdateWeapons(server_shell, seconds, error);
                 if (!server.GetClientUserData(local_client))
                     ok = leave_player() && ok;
                 else if (!updated || !pump_player_messages(error))

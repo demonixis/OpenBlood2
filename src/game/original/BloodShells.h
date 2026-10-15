@@ -18,6 +18,7 @@ class CBloodServerShell
     FireResult OnMessage(HCLIENT, const OpenBlood2::WeaponFire&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerMove&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerControls&);
+    bool OnMessage(HCLIENT, const OpenBlood2::PlayerUse&);
     void Update(float);
     CPlayerObj* Player(HCLIENT);
     struct PathEntry
@@ -44,6 +45,8 @@ class CBloodClientShell
     bool OnMessage(const OpenBlood2::PlayerEvent&, CBloodServerShell&);
     bool Update();
     bool UpdateMovement(CBloodServerShell&, double, std::string&);
+    bool UpdateUse(CBloodServerShell&);
+    bool use_down = false, use_was_down = false;
     CMoveMgr move_mgr;
     OpenBlood2::MovementInput movement_input;
     bool SyncWeapons(OpenBlood2::ModelStore&, OpenBlood2::Resources&, CBloodServerShell&, std::string&);

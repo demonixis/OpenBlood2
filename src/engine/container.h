@@ -8,6 +8,7 @@ namespace OpenBlood2
     {
       public:
         bool build(const WorldModel&, DRotation, std::string& error);
+        bool transform(DRotation, DVector destination);
         bool contains(DVector point) const;
         bool overlaps(DVector center, DVector half) const;
         CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit&) const;

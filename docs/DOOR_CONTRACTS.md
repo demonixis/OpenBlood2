@@ -1,5 +1,9 @@
 # Sliding doors and translating world models
 
+> Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
+> are connected with bounded atomic collision. Earlier omissions below describe
+> their previous increments; the full M2 gate remains open.
+
 > Extended by [TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md): SelfTrigger ownership,
 > key relay and transported-body sensor contacts are now connected. Earlier
 > pending statements below describe the sliding-door increment.

@@ -11,7 +11,7 @@ namespace OpenBlood2
     struct MovementControls
     {
         std::array<bool, SDL_SCANCODE_COUNT> keys{};
-        bool focused = false, enabled = false;
+        bool focused = false, enabled = false, use_suppressed = false;
         bool consumes(const SDL_Event& event, bool text_editing) const
         {
             if (!focused || !enabled || text_editing ||
@@ -27,6 +27,7 @@ namespace OpenBlood2
                 case SDL_SCANCODE_RSHIFT:
                 case SDL_SCANCODE_LCTRL:
                 case SDL_SCANCODE_RCTRL:
+                case SDL_SCANCODE_E:
                 case SDL_SCANCODE_SPACE:
                 case SDL_SCANCODE_LEFT:
                 case SDL_SCANCODE_RIGHT:
@@ -51,6 +52,9 @@ namespace OpenBlood2
                 if (!focused && event.type == SDL_EVENT_KEY_DOWN)
                     return;
                 const int code = event.key.scancode;
+                if (code == SDL_SCANCODE_E && event.type == SDL_EVENT_KEY_DOWN && event.key.repeat &&
+                    !keys[SDL_SCANCODE_E])
+                    return; // A held key after focus loss is not a fresh USE press.
                 if (code > SDL_SCANCODE_UNKNOWN && code < SDL_SCANCODE_COUNT)
                     keys[static_cast<unsigned>(code)] = event.type == SDL_EVENT_KEY_DOWN;
                 if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat && code == SDL_SCANCODE_F2)
@@ -68,6 +72,17 @@ namespace OpenBlood2
                     keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT],
                     keys[SDL_SCANCODE_SPACE],
                     keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL]};
+        }
+        bool sample_use(bool text_editing)
+        {
+            if (!keys[SDL_SCANCODE_E])
+                use_suppressed = false;
+            if (!focused || !enabled || text_editing)
+            {
+                use_suppressed = keys[SDL_SCANCODE_E];
+                return false;
+            }
+            return keys[SDL_SCANCODE_E] && !use_suppressed;
         }
         void look(PlayerRotation& rotation, double seconds, bool text_editing) const
         {

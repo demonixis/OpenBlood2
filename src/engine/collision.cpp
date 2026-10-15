@@ -5,6 +5,48 @@
 
 namespace OpenBlood2
 {
+    DVector rotate_vector(DVector v, DRotation q)
+    {
+        const auto cross = [](DVector a, DVector b)
+        { return DVector{a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x}; };
+        return vector_add(v, vector_scale(cross(q.m_Vec, vector_add(cross(q.m_Vec, v), vector_scale(v, q.m_Spin))), 2));
+    }
+    DRotation inverse_rotation(DRotation q)
+    {
+        return {vector_scale(q.m_Vec, -1), q.m_Spin};
+    }
+    DRotation multiply_rotation(DRotation a, DRotation b)
+    {
+        auto x = a.m_Vec, y = b.m_Vec;
+        return {vector_add(vector_add(vector_scale(y, a.m_Spin), vector_scale(x, b.m_Spin)),
+                           {x.y * y.z - x.z * y.y, x.z * y.x - x.x * y.z, x.x * y.y - x.y * y.x}),
+                a.m_Spin * b.m_Spin - vector_dot(x, y)};
+    }
+    bool CollisionWorld::transform(DRotation rotation, DVector origin, DVector destination)
+    {
+        for (auto& triangle : triangles_)
+        {
+            for (auto& point : triangle.points)
+            {
+                point = vector_add(destination, rotate_vector(vector_subtract(point, origin), rotation));
+                if (!physics_vector(point))
+                    return false;
+            }
+            triangle.min = triangle.max = triangle.points[0];
+            for (auto point : triangle.points)
+            {
+                triangle.min = {std::min(triangle.min.x, point.x), std::min(triangle.min.y, point.y),
+                                std::min(triangle.min.z, point.z)};
+                triangle.max = {std::max(triangle.max.x, point.x), std::max(triangle.max.y, point.y),
+                                std::max(triangle.max.z, point.z)};
+            }
+        }
+        nodes_.clear();
+        if (!triangles_.empty())
+            partition(0, static_cast<std::uint32_t>(triangles_.size()));
+        return true;
+    }
+
     DVector vector_add(DVector a, DVector b)
     {
         return {a.x + b.x, a.y + b.y, a.z + b.z};

@@ -22,6 +22,36 @@ namespace OpenBlood2
             return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z;
         }
     } // namespace
+    bool ContainerShape::transform(DRotation q, DVector destination)
+    {
+        if (triangles.empty() || !physics_vector(destination))
+            return false;
+        for (auto& plane : planes_)
+        {
+            const auto distance = plane.distance - vector_dot(plane.normal, origin);
+            plane.normal = rotate_vector(plane.normal, q);
+            plane.distance = distance + vector_dot(plane.normal, destination);
+        }
+        bool first = true;
+        for (auto& triangle : triangles)
+            for (auto& point : triangle)
+            {
+                point = vector_add(destination, rotate_vector(vector_subtract(point, origin), q));
+                if (!physics_vector(point))
+                    return false;
+                if (first)
+                {
+                    min = max = point;
+                    first = false;
+                }
+                min = {std::min(min.x, point.x), std::min(min.y, point.y), std::min(min.z, point.z)};
+                max = {std::max(max.x, point.x), std::max(max.y, point.y), std::max(max.z, point.z)};
+            }
+        if (!boundary_.transform(q, origin, destination))
+            return false;
+        origin = destination;
+        return true;
+    }
     bool ContainerShape::build(const WorldModel& source, DRotation rotation, std::string& error)
     {
         *this = {};

@@ -98,7 +98,11 @@ namespace OpenBlood2
         bool client_movement = false; // Local MoveMgr owns integration while associated.
         std::shared_ptr<const Model> model;
         std::shared_ptr<const ContainerShape> container;
-        // Immutable authored shell; state.Pos is its current translation pivot.
+        // Current posed shell plus immutable authored basis for drift-free rotation.
+        std::shared_ptr<const ContainerShape> world_model_base;
+        DRotation world_model_basis;
+        std::uint32_t rotation_steps = 0;
+        // state.Pos is the current translation pivot.
         std::shared_ptr<const ContainerShape> world_model;
         std::uint64_t mover_moves = 0, mover_blocks = 0, mover_pushes = 0, mover_riders = 0;
         HOBJECT mover_blocker = nullptr;

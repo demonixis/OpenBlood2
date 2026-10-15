@@ -389,7 +389,11 @@ namespace OpenBlood2
             if (state.m_ObjectType == OT_CONTAINER)
                 object->container = std::move(shape);
             else
+            {
                 object->world_model = std::move(shape);
+                object->world_model_base = object->world_model;
+                object->world_model_basis = object->state.m_Rotation;
+            }
         }
         if (state.m_ObjectType == OT_MODEL && state.m_Filename[0])
         {
