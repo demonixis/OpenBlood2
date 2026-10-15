@@ -1,4 +1,5 @@
 #include "engine/objects.h"
+#include "engine/model_store.h"
 #include <algorithm>
 #include <charconv>
 #include <cmath>
@@ -11,12 +12,13 @@ namespace {
 char lower(char c) { return c >= 'A' && c <= 'Z' ? static_cast<char>(c + 'a' - 'A') : c; }
 bool equal(std::string_view a, std::string_view b) { return !CaseLess{}(a,b) && !CaseLess{}(b,a); }
 bool finite(DVector v) { return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z); }
-bool valid(const PropertyValue& p) {
-    return std::visit([](const auto& value) {
+bool valid(const PropertyValue& p, std::size_t max_string = MAX_CS_FILENAME_LEN) {
+    return std::visit([max_string](const auto& value) {
         using T = std::decay_t<decltype(value)>;
-        if constexpr (std::is_same_v<T, std::string>) return value.size() <= MAX_CS_FILENAME_LEN && value.find('\0') == std::string::npos;
+        if constexpr (std::is_same_v<T, std::string>) return value.size() <= max_string && value.find('\0') == std::string::npos;
         else if constexpr (std::is_same_v<T, float>) return std::isfinite(value);
         else if constexpr (std::is_same_v<T, DVector>) return finite(value);
+        else if constexpr (std::is_same_v<T, EulerAngles>) return finite(value.radians);
         else if constexpr (std::is_same_v<T, DRotation>) return finite(value.m_Vec) && std::isfinite(value.m_Spin);
         else return true;
     }, p);
@@ -45,6 +47,7 @@ bool parse_value(std::string_view text, PropertyValue& value) {
             // Vector and quaternion values are quoted whitespace-separated numbers.
             std::istringstream in{std::string(text)}; in.imbue(std::locale::classic());
             if constexpr (std::is_same_v<T, DVector>) in >> out.x >> out.y >> out.z;
+            else if constexpr (std::is_same_v<T, EulerAngles>) in >> out.radians.x >> out.radians.y >> out.radians.z;
             else in >> out.m_Vec.x >> out.m_Vec.y >> out.m_Vec.z >> out.m_Spin;
             if (!in) return false;
             in >> std::ws;
@@ -58,6 +61,15 @@ bool valid_state(const ObjectCreateStruct& s) {
         finite(s.m_Rotation.m_Vec) && std::isfinite(s.m_Rotation.m_Spin) &&
         std::isfinite(s.m_NextUpdate) && s.m_NextUpdate >= 0;
 }
+}
+
+// LithTech SetupMatrixEuler uses yaw * pitch * roll. Preserve source Euler
+// values separately for GenericProp.m_Vec (GameStartPoint consumes them).
+DRotation rotation_from_euler(DVector v) {
+    const float sx = std::sin(v.x/2), cx = std::cos(v.x/2);
+    const float sy = std::sin(v.y/2), cy = std::cos(v.y/2);
+    const float sz = std::sin(v.z/2), cz = std::cos(v.z/2);
+    return {{cy*sx*cz + sy*cx*sz, sy*cx*cz - cy*sx*sz, cy*cx*sz - sy*sx*cz}, cy*cx*cz + sy*sx*sz};
 }
 
 bool CaseLess::operator()(std::string_view a, std::string_view b) const {
@@ -83,6 +95,7 @@ std::string property_text(const PropertyValue& value) {
         else {
             std::ostringstream out; out.imbue(std::locale::classic());
             if constexpr (std::is_same_v<T, DVector>) out << v.x << ' ' << v.y << ' ' << v.z;
+            else if constexpr (std::is_same_v<T, EulerAngles>) out << "Euler " << v.radians.x << ' ' << v.radians.y << ' ' << v.radians.z;
             else out << v.m_Vec.x << ' ' << v.m_Vec.y << ' ' << v.m_Vec.z << ' ' << v.m_Spin;
             return out.str();
         }
@@ -91,11 +104,13 @@ std::string property_text(const PropertyValue& value) {
 bool generic_property(const PropertyValue& value, GenericProp& out) {
     out = {};
     const std::string text = property_text(value);
+    if (text.size() > MAX_GP_STRING_LEN) return false;
     legacy_copy(out.m_String, text.c_str());
     std::visit([&](const auto& v) {
         using T = std::decay_t<decltype(v)>;
         if constexpr (std::is_same_v<T, DVector>) out.m_Vec = out.m_Color = v;
         else if constexpr (std::is_same_v<T, DRotation>) out.m_Rotation = v;
+        else if constexpr (std::is_same_v<T, EulerAngles>) { out.m_Vec = v.radians; out.m_Rotation = rotation_from_euler(v.radians); }
         else if constexpr (std::is_arithmetic_v<T>) {
             out.m_Float = static_cast<float>(v); out.m_Bool = v != 0;
             const double number = static_cast<double>(v);
@@ -154,7 +169,7 @@ HOBJECT Objects::create(HCLASS type, ObjectCreateStruct state, Creation reason, 
     defaults(type, record->properties);
     for (const auto& [name, value] : properties) {
         const auto* def = spec(type, name);
-        if (!def || def->value.index() != value.index() || !valid(value)) {
+        if (!def || (def->value.index() != value.index() && !(std::holds_alternative<DRotation>(def->value) && std::holds_alternative<EulerAngles>(value))) || !valid(value,def->max_string)) {
             fail(ObjectError::InvalidProperty, type->name + ": invalid property " + name); return nullptr;
         }
         record->properties.insert_or_assign(def->name, value);
@@ -184,6 +199,13 @@ HOBJECT Objects::create(HCLASS type, ObjectCreateStruct state, Creation reason, 
         contexts_.pop_back(); remove(handle); fail(ObjectError::Rejected, "Rejected precreate: " + type->name); return nullptr;
     }
     object->state = state; // Consume AFTER all derived/base/aggregate precreate mutations.
+    if (state.m_ObjectType == OT_MODEL && state.m_Filename[0]) {
+        if (models) models->load(state.m_Filename,object->model,object->model_error);
+        else object->model_error = "Model services are not attached";
+        // Inspection retains an original instance with an explicit missing
+        // resource diagnostic; animation APIs cannot succeed on that instance.
+        if (!object->model) object->animation.animation = no_animation;
+    }
     if (object->life != Life::Pending) {
         object->life = Life::Alive;
         set_next_update(handle, state.m_NextUpdate);
@@ -223,7 +245,9 @@ HOBJECT Objects::create_props(HCLASS type, ObjectCreateStruct state, std::string
             value = input.substr(begin, end - begin);
         }
         PropertyValue converted = definition->value;
-        if (!parse_value(value, converted)) return invalid();
+        if (std::holds_alternative<std::string>(converted)) converted = value;
+        else if (!parse_value(value, converted)) return invalid();
+        if (!valid(converted,definition->max_string)) return invalid();
         props.emplace(definition->name, std::move(converted));
         if (cursor < input.size()) ++cursor;
     }
@@ -244,6 +268,19 @@ std::vector<ObjectId> Objects::snapshot() const {
     std::vector<ObjectId> ids;
     for (const auto& slot : slots_) if (slot.object) ids.push_back(slot.object->id);
     return ids;
+}
+HOBJECT Objects::next_alive(HOBJECT previous) const {
+    std::size_t begin = 0;
+    if (previous) {
+        const auto* record = get(previous);
+        if (!record) return nullptr;
+        begin = std::size_t(record->id.slot) + 1;
+    }
+    for (auto i = begin; i < slots_.size(); ++i) {
+        const auto* record = slots_[i].object.get();
+        if (record && record->life == Life::Alive) return record->handle;
+    }
+    return nullptr;
 }
 const PropertyValue* Objects::property(std::string_view name) const {
     if (contexts_.empty()) return nullptr;
@@ -318,6 +355,12 @@ bool Objects::message(HOBJECT receiver, HOBJECT sender, DDWORD id, HMESSAGEREAD 
     if (callback_depth_ >= 128) return fail(ObjectError::Limit, "Message recursion limit");
     ++callback_depth_; BaseClass::_ObjectMsgFn(r->game.get(), sender, id, read); --callback_depth_;
     return true;
+}
+bool Objects::engine_message(HOBJECT receiver, DDWORD id, void* data, float value) {
+    auto* r = get(receiver);
+    if (!r || r->life != Life::Alive) return fail(ObjectError::InvalidHandle,"Engine event receiver is invalid or pending removal");
+    if (callback_depth_ >= 128) return fail(ObjectError::Limit,"Engine event recursion limit");
+    dispatch(*r,id,data,value); return true;
 }
 bool Objects::link(HOBJECT owner, HOBJECT target) {
     const auto* a = get(owner); const auto* b = get(target);

@@ -1,5 +1,7 @@
 #pragma once
 #include "basedefs_de.h"
+#include "game/player_messages.h"
+#include "game/weapon_messages.h"
 
 // Deliberately bounded source interface. Add reviewed declarations with their
 // implementation/tests as original callers arrive. Absent services fail to
@@ -20,6 +22,20 @@ public:
 
 class ServerDE : public CSBase {
 public:
+    virtual bool GetMovementState(HOBJECT, blood2::MovementState&) = 0;
+    virtual blood2::SegmentResult IntersectSegment(DVector from, DVector to, HOBJECT ignore, blood2::SegmentHit&) = 0;
+    virtual DRESULT WriteDamage(HMESSAGEWRITE, const blood2::Damage&) = 0;
+    virtual bool ReadDamage(HMESSAGEREAD, blood2::Damage&) = 0;
+    // Source adaptation: client association is a checked object handle, never a
+    // raw C++ pointer whose lifetime can outlive its object.
+    virtual HOBJECT GetClientUserData(HCLIENT) = 0;
+    virtual DRESULT SetClientUserData(HCLIENT, HOBJECT) = 0;
+    virtual DRESULT SendToClient(HCLIENT, const blood2::PlayerEvent&) = 0;
+    virtual DRESULT SetModelFilenames(HOBJECT, const char*, const char*) = 0;
+    virtual DRESULT GetObjectDims(HOBJECT, DVector*) = 0;
+    virtual DRESULT SetObjectRotation(HOBJECT, const DRotation*) = 0;
+    virtual DRESULT MoveObjectToGround(HOBJECT) = 0;
+    virtual DBOOL CompareStringsUpper(HSTRING, HSTRING) = 0;
     HCLASS (*GetClass)(const char*) = nullptr;
     HCLASS (*GetObjectClass)(HOBJECT) = nullptr;
     DBOOL (*IsKindOf)(HCLASS, HCLASS) = nullptr;
@@ -33,6 +49,9 @@ public:
     HOBJECT (*ObjectToHandle)(LPBASECLASS) = nullptr;
     DDWORD (*GetObjectFlags)(HOBJECT) = nullptr;
     void (*SetObjectFlags)(HOBJECT, DDWORD) = nullptr;
+    void (*SetObjectDims)(HOBJECT, DVector*) = nullptr;
+    void (*SetObjectUserFlags)(HOBJECT, DDWORD) = nullptr;
+    HOBJECT (*GetNextObject)(HOBJECT) = nullptr;
     char* (*GetObjectName)(HOBJECT) = nullptr;
     void (*GetObjectPos)(HOBJECT, DVector*) = nullptr;
     DRESULT (*GetObjectRotation)(HOBJECT, DRotation*) = nullptr;
@@ -44,6 +63,24 @@ public:
     DRESULT (*GetPropBool)(const char*, DBOOL*) = nullptr;
     HCONVAR (*GetGameConVar)(const char*) = nullptr;
     float (*GetVarValueFloat)(HCONVAR) = nullptr;
+    char* (*GetVarValueString)(HCONVAR) = nullptr;
+    void (*SetGameConVar)(const char*, const char*) = nullptr;
+    DRESULT (*GetPropVector)(const char*, DVector*) = nullptr;
+    HMODELANIM (*GetAnimIndex)(HOBJECT, const char*) = nullptr;
+    void (*SetModelAnimation)(HOBJECT, HMODELANIM) = nullptr;
+    HMODELANIM (*GetModelAnimation)(HOBJECT) = nullptr;
+    DRESULT (*ResetModelAnimation)(HOBJECT) = nullptr;
+    DDWORD (*GetModelPlaybackState)(HOBJECT) = nullptr;
+    void (*SetModelLooping)(HOBJECT, DBOOL) = nullptr;
+    DBOOL (*GetModelLooping)(HOBJECT) = nullptr;
+    virtual DRESULT GetModelAnimUserDims(HOBJECT, DVector*, HMODELANIM) = 0;
+    virtual DRESULT SetGlobalForce(DVector*) = 0;
+    virtual DRESULT GetGlobalForce(DVector*) = 0;
+    virtual DRESULT GetVelocity(HOBJECT, DVector*) = 0;
+    virtual DRESULT SetVelocity(HOBJECT, DVector*) = 0;
+    virtual DRESULT GetAcceleration(HOBJECT, DVector*) = 0;
+    virtual DRESULT SetAcceleration(HOBJECT, DVector*) = 0;
+    DRESULT (*TeleportObject)(HOBJECT, DVector*) = nullptr;
     HSTRING (*CreateString)(const char*) = nullptr;
     HSTRING (*CopyString)(HSTRING) = nullptr;
     void (*FreeString)(HSTRING) = nullptr;

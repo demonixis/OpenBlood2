@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game/legacy/cpp_engineobjects_de.h"
+#include "engine/model.h"
 #include <map>
 #include <memory>
 #include <span>
@@ -11,14 +12,17 @@
 #include <vector>
 
 namespace blood2 {
+class ModelStore;
 
 struct CaseLess {
     using is_transparent = void;
     bool operator()(std::string_view a, std::string_view b) const;
 };
-using PropertyValue = std::variant<std::string, float, bool, std::int32_t, DVector, DRotation>;
+struct EulerAngles { DVector radians; };
+DRotation rotation_from_euler(DVector radians);
+using PropertyValue = std::variant<std::string, float, bool, std::int32_t, DVector, DRotation, EulerAngles>;
 using Properties = std::map<std::string, PropertyValue, CaseLess>;
-struct PropertySpec { std::string name; PropertyValue value; bool defaulted = true; };
+struct PropertySpec { std::string name; PropertyValue value; bool defaulted = true; std::size_t max_string = MAX_CS_FILENAME_LEN; };
 struct ClassInfo {
     std::string name;
     HCLASS parent;
@@ -42,6 +46,16 @@ struct ObjectRecord {
     Properties properties;
     Creation reason = Creation::Runtime;
     Life life = Life::Constructing;
+    DVector dimensions{};
+    DVector velocity{}, acceleration{}, contact_normal{};
+    std::uint32_t contact_polygon = UINT32_MAX;
+    HOBJECT contact_object = nullptr;
+    bool grounded = false;
+    bool client_movement = false; // Local MoveMgr owns integration while associated.
+    std::shared_ptr<const Model> model;
+    AnimationTrack animation;
+    std::string model_error;
+    DDWORD user_flags = 0;
     DDWORD activity = OBJSTATE_ACTIVE;
     double due = 0;
     bool scheduled = false;
@@ -50,6 +64,7 @@ struct ObjectRecord {
 
 class Objects {
 public:
+    ModelStore* models = nullptr; // Optional decoded resources, attached before creation.
     Objects() = default;
     ~Objects();
     Objects(const Objects&) = delete;
@@ -66,13 +81,16 @@ public:
     bool advance(double seconds);
     bool finish_frame();
     bool clear();
+    bool busy() const { return callback_depth_ || advancing_ || finishing_ || clearing_; }
     bool message(HOBJECT receiver, HOBJECT sender, DDWORD id, HMESSAGEREAD read);
+    bool engine_message(HOBJECT receiver, DDWORD id, void* data, float value = 0);
     ObjectRecord* get(HOBJECT handle);
     const ObjectRecord* get(HOBJECT handle) const;
     ObjectRecord* get(ObjectId id);
     const ObjectRecord* get(ObjectId id) const;
     HOBJECT handle_of(const BaseClass* instance) const;
     std::vector<ObjectId> snapshot() const;
+    HOBJECT next_alive(HOBJECT previous) const;
     const PropertyValue* property(std::string_view name) const;
     bool link(HOBJECT owner, HOBJECT target);
     void unlink(HOBJECT owner, HOBJECT target);

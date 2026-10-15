@@ -1,5 +1,7 @@
 # M1 Object Boundary
 
+The later [player entry contracts](PLAYER_CONTRACTS.md) supersede this increment's statements that shell/player entry is entirely absent. Complete gameplay remains blocked; earlier limits below remain unless explicitly superseded.
+
 The authoritative source interface is in [src/game/legacy](../src/game/legacy/server_de.h). It is a **bounded source-level subset**, not an implementation of the entire 1998 SDK or its DLL ABI. Game and engine compile against the same `BaseClass`, callback signatures and scalar definitions. Read-only inputs use `const char*`; Windows-sized integers use fixed-width types. `ServerAdapter` is a normally constructed C++ object implementing virtual message methods and assigning compiler-checked callback thunks.
 
 The original `g_pServerDE` requires one bound session on one simulation thread. A second session is rejected. The server stays bound while original destructors run; session shutdown then clears the global. Class descriptions are immutable and must outlive the registry; the original registrations use static storage. No client shell is linked yet, so client/server symbol collisions have not been introduced.
@@ -52,3 +54,17 @@ Name "camera marker"; Pos "32 16 -64"; Visible true
 Property strings are bounded to 16 KiB; individual strings to 100 bytes; names resolve against inherited schemas. Duplicates, unknown properties, nonfinite numbers, malformed values and incomplete quotes fail creation. Vectors use three numbers and rotations use quaternion x/y/z/w, in quoted values. Backslashes are literal, preserving resource paths; embedded quotes/escape syntax and retail Euler-string compatibility are not implemented. This grammar is a tested integration contract, not a claim that all original spawn strings are already compatible. M2 must validate actual content before extending it.
 
 Original behavior is retained: `Key` reads its custom fields only on world creation, while `B2BaseClass` reads options for world and string creation. `CameraSpot` sets a 0.001-second precreate delay then disables updates during initial update. `B2BaseClass`'s original cooperative-mode `OPT_FLAG_CTF` check is left intact and recorded in provenance rather than silently repaired.
+
+## M2 Additions
+
+The original M1 contracts above remain the baseline. [World/session contracts](WORLD_CONTRACTS.md) describe the additive Euler property representation (retaining source angles), original GameStartPoint/PathPoint/trigger helpers, enumeration, stored dimensions/user flags, source-object accounting and bounded resource readers. These additions do not implement the missing collision, animation or complete original session.
+
+## M2 model and motion continuation
+
+See [MODEL_AND_COLLISION_CONTRACTS.md](MODEL_AND_COLLISION_CONTRACTS.md) for the
+implemented animation, continuous primary-world collision, motion and console
+services. `MoveObject` is no longer an unconditional unsupported service; it
+requires a loaded collision index and retains explicit unsupported cases. ABC
+loading occurs between precreate and initial update; missing models remain
+explicit diagnostics on inspection instances. Model/touch callbacks use the
+existing deferred lifecycle and original BaseClass/aggregate chain.

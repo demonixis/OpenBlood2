@@ -79,15 +79,23 @@ bool parse_options(std::span<const std::string_view> args, Options& options, std
     for (std::size_t i = 0; i < args.size(); ++i) {
         const auto arg = args[i];
         if (arg == "--help" || arg == "-h") options.help = true;
+        else if (arg == "--inspect-world") options.inspect_world = true;
+        else if (arg == "--inspect-player") { options.inspect_world = true; options.inspect_player = true; }
+        else if (arg == "--weapons-smoke") { options.world_smoke=true; options.player_smoke=true; options.weapons_smoke=true; }
+        else if (arg == "--movement-smoke") { options.world_smoke=true; options.player_smoke=true; options.movement_smoke=true; }
+        else if (arg == "--player-smoke") { options.world_smoke = true; options.player_smoke = true; }
+        else if (arg == "--start-game") options.start_game = true;
         else if (arg == "--check-data") options.check_data = true;
         else if (arg == "--no-inspector") options.inspector = false;
+        else if (arg == "--world-smoke") options.world_smoke = true;
         else if (arg == "--gpu-smoke") options.gpu_smoke = true;
-        else if (arg == "--data-dir" || arg == "--config" || arg == "--frames" || arg == "--capture") {
+        else if (arg == "--data-dir" || arg == "--config" || arg == "--frames" || arg == "--capture" || arg == "--world") {
             if (++i == args.size() || args[i].empty() || args[i].starts_with("--")) {
                 error = "Missing value for " + std::string(arg);
                 return false;
             }
-            if (arg == "--data-dir") options.data_dir = path_from_utf8(args[i]);
+            if (arg == "--world") options.world = args[i];
+            else if (arg == "--data-dir") options.data_dir = path_from_utf8(args[i]);
             else if (arg == "--capture") options.capture_file = path_from_utf8(args[i]);
             else if (arg == "--config") {
                 options.config_file = path_from_utf8(args[i]);
@@ -106,11 +114,17 @@ bool parse_options(std::span<const std::string_view> args, Options& options, std
             return false;
         }
     }
-    if (options.gpu_smoke && options.frame_limit != 0) {
+    if (options.world_smoke && options.gpu_smoke) { error = "Choose one GPU smoke mode"; return false; }
+    if (options.weapons_smoke && options.movement_smoke) { error="Choose one player smoke scenario"; return false; }
+    if ((options.inspect_world && options.start_game) || ((options.inspect_world || options.start_game) &&
+        (options.check_data || options.gpu_smoke || options.world_smoke || !options.capture_file.empty() || options.frame_limit))) {
+        error = "--inspect-world and --start-game are separate headless modes"; return false;
+    }
+    if ((options.gpu_smoke || options.world_smoke) && options.frame_limit != 0) {
         error = "--gpu-smoke controls its own frame count; omit --frames";
         return false;
     }
-    if (options.gpu_smoke && options.check_data) {
+    if ((options.gpu_smoke || options.world_smoke) && options.check_data) {
         error = "--gpu-smoke and --check-data are separate execution modes";
         return false;
     }

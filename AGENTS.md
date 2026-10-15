@@ -3,11 +3,19 @@
 Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentation/Roadmap/README.md).
 
 - This is the new implementation repository. Earlier projects are optional donors, never build dependencies.
-- Keep the three project targets small: `engine`, `blood2_game`, `blood2_app`. M1 links original `B2BaseClass`, `CameraSpot` and `Key`. Read [docs/OBJECT_CONTRACTS.md](docs/OBJECT_CONTRACTS.md) before adding classes/services; extend the typed subset and tests together.
+- Keep the three project targets small: `engine`, `blood2_game`, `blood2_app`. M1 links original `B2BaseClass`, `CameraSpot` and `Key`; M2 adds `GameStartPoint`, `PathPoint` and selected trigger/load-command code. The service continuation adds original WorldProperties/SmellHint, ABC playback/deformation and primary-world swept collision. M2 is in progress, not a working original game session. Read [docs/OBJECT_CONTRACTS.md](docs/OBJECT_CONTRACTS.md) before adding classes/services; extend the typed subset and tests together.
 - Use plain objects/functions and explicit return values. No EnTT/ECS or manual interface/vtable reconstruction.
 - Dependency revisions and archive hashes live in `cmake/Dependencies.cmake`. Resolve the latest SDL `main` when updating SDL and retain the exact SHA for repeatability.
+- Read [docs/WORLD_CONTRACTS.md](docs/WORLD_CONTRACTS.md) before extending readers or session loading. Preserve exact-path mount precedence, bounded failures and source-entry accounting. Keep opaque format sections and missing required services explicit; the M2 exit gate remains open.
+- Read [docs/MODEL_AND_COLLISION_CONTRACTS.md](docs/MODEL_AND_COLLISION_CONTRACTS.md) before extending animation/physics. The Caleb inspection preview is not CPlayerObj; do not mark full session startup complete on that basis.
 - Keep commercial resources external. Local paths belong in ignored `blood2.local.ini`/`CMakeUserPresets.json` or command-line options.
 - Build/test with the presets in README. GPU tests need a real display and must be explicitly enabled. Report headless, private-data and graphics results separately.
 - Test the inspector-free Release build when changing application/platform lifetime or UI integration. Keep inspection data truthful; detected archives are not loaded resources.
 - Record selective imports in `docs/PROVENANCE.md`; preserve original reference trees.
 - Keep the original object and aggregate callback chain intact. Never replace `SetNextUpdate` with callback-return timing or destroy an object inside its callback. Run the object contract suite and Clang sanitizers for lifetime/dispatch changes.
+
+- The [player continuation](../Documentation/Implementation/M2_PLAYER.md) connects selected original shell/CPlayerObj entry branches. Read [docs/PLAYER_CONTRACTS.md](docs/PLAYER_CONTRACTS.md) before extending them. The classes are partial source ports: preserve the documented omissions and do not describe entry inspection as complete player gameplay. Keep client association handle-checked, messages owned and bounded, and removal/rollback independent of the UI.
+
+- Read [docs/WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) before extending inventory, client weapon input/animation, ray fire or damage. Beretta/knife are selective original ports; preserve every FIRE_KEY event (including the two primary knife markers), owned weapon/client models and deferred hit-callback removal. Other weapons, pickups, full combat, audio/FX and muzzle/hand placement are still open. Keep typed shot/damage messages separate from legacy packet ABI; portable seeded randomness is not claimed retail-bit-identical.
+
+- Read [docs/MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) before extending original MoveMgr, player input or support queries. Client-associated players use one shared body and skip generic physics; typed movement must resolve collision exactly once. Keep source rules separate from the documented replacement integrator. Stairs, crouch/animation dimensions, containers and moving platforms remain pending.

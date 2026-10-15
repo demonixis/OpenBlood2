@@ -1,0 +1,112 @@
+{
+  "date": "2026-10-15",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "status": "Selective original inventory, Beretta/knife and ordinary damage paths; M2 incomplete",
+  "imports": [
+    {
+      "source": "sources/blood2/Shared/WeaponDefs.h",
+      "target": "src/game/original/WeaponDefs.h",
+      "selection": "WeaponData field schema, Spread, VectorInit, WeaponState; const strings/fixed-width integers",
+      "source_sha256": "9a16f7a9f5fe8c57be73aac97bbeb87e712725bc856b1fb110c531875fa655ca",
+      "target_sha256": "37fe8237f244e11afeef56fde020ee5c57bdb2e47bdaef437559439c7e033eb5"
+    },
+    {
+      "source": "sources/blood2/Shared/WeaponDefs.cpp",
+      "target": "src/game/original/WeaponDefs.cpp",
+      "selection": "Complete Beretta and Chosen Knife table entries",
+      "source_sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
+      "target_sha256": "6160b845e63481dba250d0efb696457df53bf558722f99ddcc281d2e554d3cb2"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "target": "src/game/original/InventoryMgr.cpp",
+      "selection": "Ammo capacity table and selected owner/muzzle, ObtainWeapon, ChangeWeaponSlot, SetAmmoCount, SetStrength, SetMagic and AddAmmo paths",
+      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "target_sha256": "158593acc307351824b9bded7b75efe9111217bef4b3c7d3d8556838a6696fa0"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.h",
+      "target": "src/game/original/InventoryMgr.h",
+      "selection": "Selected inventory declarations and inline FireCurrentWeapon dispatch",
+      "source_sha256": "a68853cfddeedae13bbf1203bc8bc791c57fbf82829771203ecdc8ffe51e0226",
+      "target_sha256": "7a7f9c777735f33e03d745100009959ec41096904b7ee6884068ceda134b20bf"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "target": "src/game/original/Weapon.cpp",
+      "selection": "Selected CheckAmmo, Fire, FireSpread, AlignFireVector, SendDamageMsg vector paths; excludes projectiles/surface reactions/audio/FX",
+      "source_sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "target_sha256": "8d48dfe9cf1f868cde8a4a20157f1a0238fd642ceef22b82c98cebe401b3ea1d"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Weapon.h",
+      "target": "src/game/original/Weapon.h",
+      "selection": "Selected weapon state, ownership and firing declarations",
+      "source_sha256": "d7bd05aaff0b51c1cb6d8c356366c91114e4099303b901697d8ecfb16f87569d",
+      "target_sha256": "487f3971c4807f758a3fb6b59a083cb435f684c2ca4404d8963948f5144cd219"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameWeapons.h",
+      "target": "src/game/original/Weapon.h",
+      "selection": "CBeretta and CMelee type/damage specialization; rendering fields are not implemented",
+      "source_sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19",
+      "target_sha256": "487f3971c4807f758a3fb6b59a083cb435f684c2ca4404d8963948f5144cd219"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
+      "target": "src/game/original/ViewWeapon.cpp",
+      "selection": "Selected Fire request, UpdateFiringState, PlayAnimation, OnModelKey and animation-name setup; owned ABC adaptation",
+      "source_sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
+      "target_sha256": "e0ecfe8a589f00407498c5fd22a8f41b563bf27a337b66797359debc5aa7038d"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/GameWeapons.cpp",
+      "target": "src/game/original/ViewWeapon.cpp",
+      "selection": "Client CMelee fire/fire2 selection while resting",
+      "source_sha256": "292753e7a91be363aa955731d552f967845c6a783dd6aeec954db59e2d2128d7",
+      "target_sha256": "e0ecfe8a589f00407498c5fd22a8f41b563bf27a337b66797359debc5aa7038d"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ViewWeapon.h",
+      "target": "src/game/original/ViewWeapon.h",
+      "selection": "Selected client view state and animation/firing declarations",
+      "source_sha256": "0fd013950bd6faafb946bb6614d5c98e5feadd87d9dea09d046ec2ef345235c1",
+      "target_sha256": "af79f726b611198aaed17b17ae4f157b393964aaf69ebd68483e89a30c54b9af"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "target": "src/game/original/PlayerObj.cpp",
+      "selection": "Initialization obtains loadout, HandleWeaponFireMessage, selected UpdateStats fields alongside prior entry subset",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target_sha256": "372449ff03ce99155ee063c7958771116681753f7f099ba067bef421d6efcc0d"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "target": "src/game/original/PlayerObj.cpp",
+      "selection": "Selected normal/melee resistance, armor, health and dead-state branch; aggregate forwarding, no AI/impulse/destruction effects",
+      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "target_sha256": "372449ff03ce99155ee063c7958771116681753f7f099ba067bef421d6efcc0d"
+    },
+    {
+      "source": "sources/blood2/AppHeaders/generic_msg_de.h",
+      "target": "src/game/weapon_messages.h",
+      "selection": "MID_DAMAGE 1001; owned Damage replaces typed packet fields",
+      "source_sha256": "5231003078a5cf58400cebf261efb84132f3733507d336c33d4fae81b015a5f2",
+      "target_sha256": "86d3c4b2088232fd06e2180ff3470ffbab3838f7467f8e332b04f0db8037d8dd"
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "target": "src/game/original/WeaponDefs.h",
+      "selection": "Beretta/melee, ammo and fire-type constants; definitions verified against source",
+      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "target_sha256": "37fe8237f244e11afeef56fde020ee5c57bdb2e47bdaef437559439c7e033eb5"
+    },
+    {
+      "source": "sources/blood2/Shared/ClientRes.h",
+      "target": "src/game/original/WeaponDefs.h",
+      "selection": "Beretta/knife resource-name IDs",
+      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
+      "target_sha256": "37fe8237f244e11afeef56fde020ee5c57bdb2e47bdaef437559439c7e033eb5"
+    }
+  ]
+}

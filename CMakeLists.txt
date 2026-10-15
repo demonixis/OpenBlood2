@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(Blood2 VERSION 0.2.0 LANGUAGES C CXX)
+project(Blood2 VERSION 0.3.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,7 +14,9 @@ include(CTest)
 include(cmake/Dependencies.cmake)
 configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
 
-add_library(engine STATIC src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp)
+add_library(engine STATIC src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+target_sources(engine PRIVATE src/engine/model.cpp src/engine/model_store.cpp)
+target_sources(engine PRIVATE src/engine/collision.cpp)
 target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
 
@@ -23,8 +25,19 @@ add_library(blood2_game STATIC
     src/game/original/B2BaseClass.cpp
     src/game/original/CameraSpot.cpp
     src/game/original/Key.cpp
+    src/game/original/GameStartPoint.cpp
+    src/game/original/PathPoint.cpp
+    src/game/original/trigger_helpers.cpp
+    src/game/original/session_load.cpp
+    src/game/session.cpp
     src/game/registration.cpp
     src/game/server_adapter.cpp)
+target_sources(blood2_game PRIVATE src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+target_sources(blood2_game PRIVATE src/game/server_physics.cpp)
+target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp)
+target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+    src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
 target_link_libraries(blood2_game PUBLIC engine)
 
 add_executable(blood2_app src/app/main.cpp)

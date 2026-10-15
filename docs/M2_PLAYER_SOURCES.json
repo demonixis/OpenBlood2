@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-15",
+  "status": "Selective original shell/player entry port; full gameplay remains blocked",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "target": "src/game/original/PlayerObj.cpp",
+      "selection": "Selected entry fields, PostPropRead, InitialUpdate, alive single-player Respawn, single-player GoToStartPoint, ValidateAttributes, initialization payload and first-update/callback branches; gameplay omissions explicit in PLAYER_CONTRACTS.md",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target_sha256": "6fcb2459ce8a8fafe6132e6bdf82e903bcc5355bbb9bdc295f10386940e26913"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.h",
+      "target": "src/game/original/PlayerObj.h",
+      "selection": "Selected player state and lifecycle declarations; initialized source fields, typed return statuses",
+      "source_sha256": "fb92d0a74b30d2a13b0589a2e4f90658a366cc2163e1fe37d446b2b50ed1da4a",
+      "target_sha256": "90fcf026d046c938962a4b99006304c497d8ee357071cacc273c4ead03cc3ca3"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/BaseCharacter.cpp",
+      "target": "src/game/original/PlayerObj.cpp",
+      "selection": "Entry ancestry, damage/inventory aggregate attachment and flag subset; no movement aggregate or command implementation",
+      "source_sha256": "0002f599c46971e006829e2c41405d872e8fbb08d8ff7590cadd50d91e14aa95",
+      "target_sha256": "6fcb2459ce8a8fafe6132e6bdf82e903bcc5355bbb9bdc295f10386940e26913"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "target": "src/game/original/PlayerObj.cpp",
+      "selection": "Intrusive-list initialization/destruction and CalculateResistance only",
+      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "target_sha256": "6fcb2459ce8a8fafe6132e6bdf82e903bcc5355bbb9bdc295f10386940e26913"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.h",
+      "target": "src/game/original/PlayerObj.h",
+      "selection": "Entry health/armor/maxima/mass fields and setters only; no damage processor",
+      "source_sha256": "00e289d9cca1594035c8f20d0d45a076009c765e2767ce545f22f16d33bfea45",
+      "target_sha256": "90fcf026d046c938962a4b99006304c497d8ee357071cacc273c4ead03cc3ca3"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "target": "src/game/original/PlayerObj.cpp",
+      "selection": "Init muzzle-light branch, Term ownership, SetAmmoCount storage and link handling; no weapons/items",
+      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "target_sha256": "6fcb2459ce8a8fafe6132e6bdf82e903bcc5355bbb9bdc295f10386940e26913"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "target": "src/game/original/BloodShells.cpp",
+      "selection": "Fresh single-player CreatePlayer/RespawnPlayer/OnClientEnterWorld/OnClientExitWorld branches; entry lifecycle and Update single-player return; typed association and return values",
+      "source_sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "target_sha256": "c8acae55a1296dc2c2e8284fa12faef90481a71bcd1d7686df1b7484604f710f"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "target": "src/game/original/BloodShells.cpp",
+      "selection": "Default Caleb profile, entry/exit state, load request, InitSinglePlayer/SendPlayerInitMessage fields and server event handling; typed local transport, GS_PLAYING/autosave remain gated",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "target_sha256": "c8acae55a1296dc2c2e8284fa12faef90481a71bcd1d7686df1b7484604f710f"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PathMgr.cpp",
+      "target": "src/game/original/BloodShells.cpp",
+      "selection": "BuildPathList enumeration; value-owned path snapshot only",
+      "source_sha256": "8118b71bc1a0063f0b12af2d02260cfb74ac9676057c070c1575465db204ba09",
+      "target_sha256": "c8acae55a1296dc2c2e8284fa12faef90481a71bcd1d7686df1b7484604f710f"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PathListData.cpp",
+      "target": "src/game/original/BloodShells.cpp",
+      "selection": "Copy position/name/action fields into owned strings",
+      "source_sha256": "8bcd8c9baa9afda9dd915e14fb4acb9d7af7c224bc6b9f15722a388689050182",
+      "target_sha256": "c8acae55a1296dc2c2e8284fa12faef90481a71bcd1d7686df1b7484604f710f"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "target": "src/game/server_clients.cpp",
+      "selection": "MoveObjectToGround downward ray/animation-0 dimensions/MoveObject flow; bounded new collision API",
+      "source_sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "target_sha256": "d0f57d2244adbabd9508858238936f057607b526ef0938263cd4d42e2e1d03b2"
+    }
+  ],
+  "references": [
+    {
+      "source": "sources/blood2/AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945"
+    },
+    {
+      "source": "sources/blood2/AppHeaders/basetypes_de.h",
+      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141"
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PhysicalAttributes.h",
+      "sha256": "bb58c0afd5e3175a9007063a64fbe31089a1a595851c61e3bfee7a19f72dda55"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/BloodServerShell.h",
+      "sha256": "c712b1c1921a2f4cb0670c956d0f7c8c47dddc4dc8a3bae057aea81cb0b34d19"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.h",
+      "sha256": "00c217428619071a260d2b1e9b44c5b828ee2ef5e4a860c7ea3cdd9964b34649"
+    }
+  ],
+  "new_code": [
+    "src/game/player_messages.h",
+    "src/game/server_clients.cpp (typed client registry, queues, model replacement and validation)",
+    "src/game/session.cpp (integration and rollback)",
+    "tests/player_tests.cpp",
+    "tests/model_fixture.h (shared synthetic ABC fixture)"
+  ],
+  "contract": "docs/PLAYER_CONTRACTS.md"
+}

@@ -14,11 +14,19 @@ struct Options {
     std::filesystem::path data_dir;
     std::filesystem::path capture_file;
     std::uint32_t frame_limit = 0;
+    std::string world = "01_SubwayA";
+    bool inspect_world = false;
+    bool inspect_player = false;
+    bool player_smoke = false;
+    bool weapons_smoke = false;
+    bool movement_smoke = false;
+    bool start_game = false;
     bool explicit_config = false;
     bool help = false;
     bool check_data = false;
     bool inspector = true;
     bool gpu_smoke = false;
+    bool world_smoke = false;
 };
 
 struct Config {

@@ -1,0 +1,106 @@
+{
+  "milestone": "M2 in progress",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/GameStartPoint.h",
+      "target": "src/game/original/GameStartPoint.h",
+      "selection": "complete file",
+      "source_sha256": "73243bb57a31e719819474273a0b4e808beb5d2eaf455d0655f9e95a4f30b2c9",
+      "target_sha256": "5692a4dbbef949ab12da88cb2e8c796b281d5432e164ef04fb041f749c546c83"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameStartPoint.cpp",
+      "target": "src/game/original/GameStartPoint.cpp",
+      "selection": "complete file",
+      "source_sha256": "88194b2c13fba7e4bc30380e84b6f8e276690b32adfce4bce28c6e6ec67dc8c2",
+      "target_sha256": "3ae1a86b933227a6c5bf2d5b1451bf736560c37e417213167e5a815b0cedb38f"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/pathpoint.h",
+      "target": "src/game/original/PathPoint.h",
+      "selection": "complete file",
+      "source_sha256": "6ff0fb589719f9ea622f7d5cc8b4154fc0809ada997d81a4a8b6b113f726eaf4",
+      "target_sha256": "a6c95438213ea131aed7252fc2ec5f26bfb47ebb2a377bf3c13579a3dddab3da"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/pathpoint.cpp",
+      "target": "src/game/original/PathPoint.cpp",
+      "selection": "complete file",
+      "source_sha256": "20c59d3fff8596049369500f61d7daae677620c8dd1e17cc86eb5ec0b2fcc76c",
+      "target_sha256": "9272d866fd6f7c00be4723505bef232d545523cf372a43a48bb6ba2635bf498c"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Trigger.cpp",
+      "target": "src/game/original/trigger_helpers.cpp",
+      "selection": "SendTriggerMsgToObject and SendTriggerMsgToObjects only",
+      "source_sha256": "373658121f86b4d792eeb986a0e093291af3e1205b831385f142cf2ea445198c",
+      "selected_lf_sha256": "351721b9f4c4fbdbc7d7ac775d3d221cc34bfd0281b956cad786f6d40a1d964b",
+      "target_sha256": "196700333c3e0af85f1f0be229ad106d8dc8e9ad480e05ae758fb9797475f192"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "target": "src/game/original/session_load.cpp",
+      "selection": "StartNewWorld CMSG_LOADWORLD field-writing block; adapted excerpt, not a complete shell",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "target_sha256": "c267c393b3de81ed297edded91fd5c207a31825ce9013344ff74a97d3cd823ee"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "target": "src/game/original/session_load.cpp",
+      "selection": "LoadWorld field-reading order and Worlds prefix; adapted excerpt, not a complete shell",
+      "source_sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "target_sha256": "c267c393b3de81ed297edded91fd5c207a31825ce9013344ff74a97d3cd823ee"
+    }
+  ],
+  "format_and_contract_references": [
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/generic_msg_de.h",
+      "sha256": "5231003078a5cf58400cebf261efb84132f3733507d336c33d4fae81b015a5f2"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/B2BaseClass.cpp",
+      "sha256": "bad14ecb54c1b62d82fa66265ba0819fa845ccd9db583e329329c60a86b05ccc"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/engineobjects.c",
+      "sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876"
+    },
+    {
+      "path": "sources/lithtech/libs/rezmgr/rezmgr.cpp",
+      "sha256": "ae2788dffd2371f1f13947130b5c2b091e7ff3a3d76364d69b420b9ed3ba119d"
+    },
+    {
+      "path": "sources/lithtech/tools/shared/world/EditObjects.cpp",
+      "sha256": "e4ad30cb7ac2bd695cbb70082992f5e27db77af94d4811b44da1fc7ee477f5b8"
+    },
+    {
+      "path": "sources/lithtech/tools/shared/world/PropList.cpp",
+      "sha256": "f3c48708cdc39969cdd01c642ace3def801d95c307a3de04636eefb50984a783"
+    },
+    {
+      "path": "sources/lithtech/runtime/shared/src/geomroutines.cpp",
+      "sha256": "6e613e26d9be3d8a91f66bcea93e4a531816fa0abcd6d5a1a00d7f73ac9ddf20"
+    },
+    {
+      "path": "OpenBlood2/OpenLithTech/src/formats/dat_parser.cpp",
+      "sha256": "87ac88dd597a70f63fe9429a555a109459a55c6db7798611ad1ba8b06929c234"
+    },
+    {
+      "path": "OpenBlood2/OpenLithTech/src/formats/rez_archive_parser.cpp",
+      "sha256": "1c32aa6b5880576ca3ed7ede4c443a5b7a14ced9f4529b869b998c320d673529"
+    },
+    {
+      "path": "nomad/src/Nomad.Formats/DatParser.cs",
+      "sha256": "d28d01a7d5dff44f328cd0dec494c52c06a9f9b81d230c6410b05ae733ebc725"
+    }
+  ]
+}

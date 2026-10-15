@@ -1,0 +1,98 @@
+{
+  "status": "M2 in progress; full original session/player not connected",
+  "date": "2026-10-15",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/WorldProperties.cpp",
+      "target": "src/game/original/WorldProperties.cpp",
+      "selection": "Complete implementation; class declaration moved into header; typed registration",
+      "source_sha256": "d93bc435da9829a8c0b6495298ee284c325d267bfd4bb32a8e35b96e1664c550",
+      "target_sha256": "632a9e3b8cc55fe9796c82b8d7049794bb18d37415dd0c2b48537007bc16c330"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/WorldProperties.cpp",
+      "target": "src/game/original/WorldProperties.h",
+      "selection": "Class declaration",
+      "source_sha256": "d93bc435da9829a8c0b6495298ee284c325d267bfd4bb32a8e35b96e1664c550",
+      "target_sha256": "1f5eecb90ba201b2312376b858f6c7002188d32c95fd7510b9a0347ce9732c5c"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/SmellHint.cpp",
+      "target": "src/game/original/SmellHint.cpp",
+      "selection": "Complete class; remove unused debug include; typed registration",
+      "source_sha256": "65989aab4012e0b67e7f13403fb59a5260f9435b8a792d40a3dfbe1d2db7241e",
+      "target_sha256": "138cf67afe43d9a95d7d303efdfe46744cbfe19c8668cff58b984734c62745a9"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/SmellHint.h",
+      "target": "src/game/original/SmellHint.h",
+      "selection": "Complete header; initialized link; selected SDK includes",
+      "source_sha256": "69fae52a36a95e2b66016cc334b4c8436748b803df4c0a5a8b034615a729006c",
+      "target_sha256": "68b624dd41e6a55a6e726dda91d0613373479953c4a885a25da909e04e37a28c"
+    },
+    {
+      "source": "sources/blood2/AppHeaders/dlink.h",
+      "target": "src/game/legacy/dlink.h",
+      "selection": "DLink and dl_TieOff/dl_Insert/dl_Remove only",
+      "source_sha256": "ae2525b9e0bbf6a893660420c040eb30e1bceea2ec15ba086c005f40617362cd",
+      "target_sha256": "ca96cfb8b7b2ad4585fd7f91c59e0abf65eca1fd014a163180038dc1fefcbbec"
+    }
+  ],
+  "references": [
+    {
+      "project": "sources/blood2",
+      "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945"
+    },
+    {
+      "project": "sources/blood2",
+      "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "AppHeaders/basedefs_de.h",
+      "sha256": "10f543764aa94339f2e48edcba384dda3cdce2d738f0be2731dcff3a1117fb72"
+    },
+    {
+      "project": "sources/blood2",
+      "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "AppHeaders/basetypes_de.h",
+      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141"
+    },
+    {
+      "project": "sources/blood2",
+      "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "project": "sources/blood2",
+      "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed"
+    },
+    {
+      "project": "OpenBlood2",
+      "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+      "path": "OpenLithTech/src/formats/abc_parser.cpp",
+      "sha256": "f63d5312ae28d2061a9641971bb845c142f435110bf2e42bebeb93bdde870426"
+    },
+    {
+      "project": "OpenBlood2",
+      "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+      "path": "OpenLithTech/src/BinaryReader.cpp",
+      "sha256": "499381c2c530854b073470075e0f864e9f53258ce44bcd66e988476ed1c5b555"
+    },
+    {
+      "project": "NoMadEngine",
+      "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+      "path": "docs/formats/specs_abc_v6.md",
+      "sha256": "2d8102a1670172c05eb6c20329f3f9b0ac24ac3b61b47813f805021d57b60dd0"
+    },
+    {
+      "project": "sources/lithtech",
+      "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+      "path": "runtime/world/src/de_world.h",
+      "sha256": "04f5649e6bfbd7c67bf7f8862919cebb6ac28104a3e2f1504efc1331d639b0c5"
+    }
+  ]
+}

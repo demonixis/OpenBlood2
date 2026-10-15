@@ -1,0 +1,142 @@
+{
+  "date": "2026-10-15",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "status": "Selective original dry-land MoveMgr; M2 incomplete; engine and local-session adaptations documented",
+  "imports": [
+    {
+      "source": "sources/blood2/ClientShellDLL/MoveMgr.h",
+      "target": "src/game/original/MoveMgr.h",
+      "source_line_ranges": [
+        [
+          1,
+          186
+        ]
+      ],
+      "selection": "Selected movement lifetime/state and methods; typed shared body replaces duplicate client model",
+      "source_sha256": "09678b4656b08ff5290cb12229bfd42946a84f18b938a8b78acff01bcc495cbc",
+      "target_sha256": "dbc83714b7bf627d5470b75358141c497fa03ca927e1c2d8364563744095f67c"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MoveMgr.cpp",
+      "target": "src/game/original/MoveMgr.cpp",
+      "source_line_ranges": [
+        [
+          46,
+          109
+        ],
+        [
+          123,
+          203
+        ],
+        [
+          392,
+          437
+        ],
+        [
+          458,
+          1047
+        ],
+        [
+          1196,
+          1230
+        ],
+        [
+          1304,
+          1457
+        ],
+        [
+          1556,
+          1626
+        ]
+      ],
+      "selection": "Selected dry-land standing branches only: flags, grounding, acceleration/drag, slope/jump, capped update, physics/force-position and position message; explicit new integrator",
+      "source_sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a",
+      "target_sha256": "a2c9fef5cbd8cf387c1090ff085fc11e6f178406851a58ef36a09520473d9e16"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
+      "target": "src/game/original/MoveMgr.cpp",
+      "source_line_ranges": [
+        [
+          257,
+          278
+        ]
+      ],
+      "selection": "TiltVectorToPlane slope helper",
+      "source_sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
+      "target_sha256": "a2c9fef5cbd8cf387c1090ff085fc11e6f178406851a58ef36a09520473d9e16"
+    },
+    {
+      "source": "sources/blood2/Shared/SharedMovement.h",
+      "target": "src/game/original/MoveMgr.cpp",
+      "source_line_ranges": [
+        [
+          1,
+          51
+        ]
+      ],
+      "selection": "Supported original control bit values; no wire layout imported",
+      "source_sha256": "4ed6d695f6d060fb1e821f7cb65687dbabcc1b305c995bb6b2611adfc54198c6",
+      "target_sha256": "a2c9fef5cbd8cf387c1090ff085fc11e6f178406851a58ef36a09520473d9e16"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "target": "src/game/original/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          2598,
+          2604
+        ],
+        [
+          6273,
+          6449
+        ],
+        [
+          6458,
+          6534
+        ]
+      ],
+      "selection": "Movement handler, physics update and forced-position byte code; shared body removes prediction leash teleport",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target_sha256": "ed0b0ed8b4cd722e65f07aa589fb21dc739692357f25fd6c115a3d9d1ca25a88"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "target": "src/game/original/BloodShells.cpp",
+      "source_line_ranges": [
+        [
+          868,
+          878
+        ],
+        [
+          1898,
+          1906
+        ],
+        [
+          2494,
+          2501
+        ],
+        [
+          4034,
+          4047
+        ]
+      ],
+      "selection": "MoveMgr initialization/update and typed position/physics/force-position routing",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "target_sha256": "ce9002f908a982477169c95cf298215040297b3604f0f560a49a5f7d018c004a"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "target": "src/game/original/BloodShells.cpp",
+      "source_line_ranges": [
+        [
+          517,
+          527
+        ]
+      ],
+      "selection": "Checked client-to-player message dispatch",
+      "source_sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "target_sha256": "ce9002f908a982477169c95cf298215040297b3604f0f560a49a5f7d018c004a"
+    }
+  ]
+}
