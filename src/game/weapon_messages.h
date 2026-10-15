@@ -17,6 +17,8 @@ namespace OpenBlood2
         Suffocate = 6,
         Death = 7,
         FreeFall = 8,
+        Blind = 9,
+        Slow = 10,
         Acid = 14
     };
     struct Damage

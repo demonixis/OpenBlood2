@@ -217,3 +217,13 @@ ordering and bounded substep timing. Later LithTech informs only world-model
 pivot/placement, not compatible BSP parsing. Original DAT base/extra counts are
 now retained separately. No prototype engine or dependency was imported.
 Earlier ledgers and patches remain historical evidence, not current file hashes.
+
+## M2 Specialized Volume Continuation
+
+[M2_SPECIALIZED_VOLUME_SOURCES.json](M2_SPECIALIZED_VOLUME_SOURCES.json) records
+Conveyor/Damage/FreeFall registration and constructors, Conveyor server and
+MoveMgr branches, and CPlayerObj's initial volume-damage protection. The new
+level clock is a typed service adaptation; the session scheduling clock is
+unchanged. [SPECIALIZED_VOLUME_CONTRACTS.md](SPECIALIZED_VOLUME_CONTRACTS.md)
+documents source quirks, authored damage identifiers and explicit map failures.
+No reference tree, dependency or prototype codebase was modified or imported.

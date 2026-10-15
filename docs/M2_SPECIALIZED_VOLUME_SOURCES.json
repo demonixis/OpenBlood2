@@ -1,0 +1,157 @@
+{
+  "date": "2026-10-15",
+  "status": "M2 incomplete; Conveyor, Damage, FreeFall and initial volume damage protection connected",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/VolumeBrushTypes.cpp",
+      "target": "src/game/registration.cpp",
+      "source_line_ranges": [
+        [
+          139,
+          162
+        ],
+        [
+          363,
+          384
+        ],
+        [
+          513,
+          536
+        ]
+      ],
+      "selection": "Conveyor, Damage, FreeFall registration defaults; inherited base defaults retained",
+      "kind": "selective original game port",
+      "source_sha256": "f38190b88a30be71b587d0758093b85f4d0102631edb5eb7564cc91f7efa3021",
+      "target_sha256": "3dcf2fafa57bbc77a3213662871831a8c4278b6109415cd79b3a2bfd31d0941e"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/VolumeBrushTypes.h",
+      "target": "src/game/original/VolumeBrush.h",
+      "source_line_ranges": [
+        [
+          48,
+          54
+        ],
+        [
+          80,
+          84
+        ],
+        [
+          103,
+          107
+        ]
+      ],
+      "selection": "Original class hierarchy and FreeFall zero-gravity constructor",
+      "kind": "selective original game port",
+      "source_sha256": "8971e136d2e6fb1d0fefe1189646abdbc0bcef13b052aea8227596912743b140",
+      "target_sha256": "515d138a3d50ae77a663aecfed98f8545aa635cbe90de42a3b287a4187a26fdf"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/VolumeBrushTypes.cpp",
+      "target": "src/game/original/VolumeBrush.cpp",
+      "source_line_ranges": [
+        [
+          168,
+          200
+        ]
+      ],
+      "selection": "Conveyor supported-character current override; shared player integration remains client-owned",
+      "kind": "selective original game port",
+      "source_sha256": "f38190b88a30be71b587d0758093b85f4d0102631edb5eb7564cc91f7efa3021",
+      "target_sha256": "8eae8f409f65269501b043ebeb91a7dc13c6c4ca8f2cc70c3ec9ca0ea41739ab"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MoveMgr.cpp",
+      "target": "src/game/original/MoveMgr.cpp",
+      "source_line_ranges": [
+        [
+          354,
+          390
+        ],
+        [
+          498,
+          529
+        ],
+        [
+          615,
+          637
+        ],
+        [
+          969,
+          994
+        ],
+        [
+          1040,
+          1046
+        ]
+      ],
+      "selection": "First-conveyor handling, braking, current, 3D speed cap, drag suppression and per-step state reset",
+      "kind": "selective original game port",
+      "source_sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a",
+      "target_sha256": "87dca141419b82a96bf14d61ac6da2fbbb0066aff08ef7aaea67e1ebc64ce5f4"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MoveMgr.h",
+      "target": "src/game/original/MoveMgr.h",
+      "source_line_ranges": [
+        [
+          1,
+          186
+        ]
+      ],
+      "selection": "Selected conveyor method/state declarations",
+      "kind": "selective original game port",
+      "source_sha256": "09678b4656b08ff5290cb12229bfd42946a84f18b938a8b78acff01bcc495cbc",
+      "target_sha256": "8407af5d4297c0afc4d76df33ae0f32a1c671cbec97207ec97ea451d5a537bf6"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "target": "src/game/original/PlayerContainers.cpp",
+      "source_line_ranges": [
+        [
+          4266,
+          4280
+        ]
+      ],
+      "selection": "Original two-second VolumeBrush damage guard before aggregate delivery; explicit typed level clock adaptation",
+      "kind": "selective original game port",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target_sha256": "2bacb6f91224651e9992ceac957ab75a9e846eebff316b9c67dd5ded090c838b"
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "target": "src/game/weapon_messages.h",
+      "source_line_ranges": [
+        [
+          376,
+          392
+        ]
+      ],
+      "selection": "Preserve numeric Blind=9 and Slow=10 in authored volume damage",
+      "kind": "selective original game port",
+      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "target_sha256": "7f880218a27060bf39e6250603b80269f079b25c47b4a5fd39d92ddd8ffd4784"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameWeapons.cpp",
+      "target": "src/game/server_weapons.cpp",
+      "source_line_ranges": [
+        [
+          757,
+          771
+        ]
+      ],
+      "selection": "Reference: voodoo Slow action is called separately from the numeric damage payload; no automatic volume slow effect",
+      "kind": "reference only; weapon special actions not ported",
+      "source_sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd",
+      "target_sha256": "4841ee8e98065eb9f64fb2305906769fac35a7cb33dc49a4e9ca2b1651e01305"
+    }
+  ],
+  "engine_adaptations": [
+    "Typed per-level elapsed simulation time without resetting monotonic object scheduling",
+    "Preserve shared player integration and fresh generic-character support queries",
+    "Bound volume damage to ten million per second, preserving the existing one-million message limit",
+    "No arbitrary model choice for ambiguous names; missing models remain failed entries"
+  ]
+}

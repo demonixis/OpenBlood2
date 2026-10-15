@@ -29,3 +29,9 @@ Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentatio
   records. Static containers reject unsupported transforms; removal invalidates
   queries immediately. Player motion must not receive generic volume integration
   a second time. Keep pending effects, keys, AI and specialized volumes visible.
+
+- Read [docs/SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md)
+  for Conveyor/Damage/FreeFall and level-entry volume damage protection. Preserve
+  source client/server conveyor differences, one player integration, authored
+  numeric damage types, and the level clock across delayed entry/reload. Keep
+  ambiguous/missing model bindings explicit; never select an arbitrary model.

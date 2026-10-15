@@ -3,6 +3,21 @@
 #include <algorithm>
 #include <cmath>
 
+DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
+{
+    auto* server = GetServerDE();
+    // Original PlayerObj.cpp 4266-4280: ignore volume damage during the first
+    // two level seconds. The explicit level clock survives delayed player entry
+    // without restarting the grace period, and resets on world replacement.
+    if (message == OpenBlood2::damage_message && server->GetWorldTime() < 2.0f &&
+        server->IsKindOf(server->GetObjectClass(sender), server->GetClass("VolumeBrush")))
+    {
+        ++protected_volume_hits;
+        return 0;
+    }
+    return CBaseCharacter::ObjectMessageFn(sender, message, read);
+}
+
 bool CPlayerObj::UpdateContainerState()
 {
     auto* server = GetServerDE();

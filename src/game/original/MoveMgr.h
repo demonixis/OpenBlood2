@@ -22,7 +22,7 @@ class CMoveMgr
     bool m_bOnGround = false, m_bLastJumpCommand = false, m_bFalling = false;
     bool m_bForcedCrouch = false;
     OpenBlood2::ContainerState containers;
-    bool m_bBodyInLiquid = false, m_bBodyOnLadder = false, m_bSwimmingOnSurface = false;
+    bool m_bBodyInLiquid = false, m_bBodyOnLadder = false, m_bBodyOnConveyor = false, m_bSwimmingOnSurface = false;
     bool m_bCanSwimJump = false, m_bSwimmingJump = false, m_bUseGravity = true;
     ContainerCode m_eLastContainerCode = CC_NOTHING;
     float m_fSwimVel = 175, m_fLadderVel = 400;
@@ -40,6 +40,7 @@ class CMoveMgr
     void UpdateMotion(float yaw, float pitch);
     void UpdateInLiquid(const OpenBlood2::ContainerInfo&);
     void UpdateOnLadder(const OpenBlood2::ContainerInfo&);
+    void UpdateOnConveyor(const OpenBlood2::ContainerInfo&);
     bool MoveLocalSolidObject(CBloodServerShell&);
     ServerDE* server_ = nullptr;
     HCLIENT client_ = nullptr;

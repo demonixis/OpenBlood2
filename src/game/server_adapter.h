@@ -35,6 +35,15 @@ namespace OpenBlood2
         bool bind();
         bool GetContainers(HOBJECT, DVector head, ContainerState&) override;
         bool damage_containers();
+        float GetWorldTime() override
+        {
+            trace_service("GetWorldTime");
+            return static_cast<float>(objects_.time() - world_time_origin_);
+        }
+        void reset_world_time()
+        {
+            world_time_origin_ = objects_.time();
+        }
         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
         SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&) override;
@@ -106,6 +115,7 @@ namespace OpenBlood2
         DVector gravity{0, -2000, 0};
 
       private:
+        double world_time_origin_ = 0;
         struct String
         {
             std::string text;

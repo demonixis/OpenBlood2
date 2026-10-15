@@ -97,6 +97,7 @@ namespace
             }
         }
         const auto original_selection = selection.id;
+        const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
         bool selection_cleared = false, world_unloaded = false;
         const auto initial_objects = game.objects.snapshot().size(), initial_strings = game.server.string_count();
         const bool smoke = options.gpu_smoke || options.world_smoke;
@@ -139,7 +140,7 @@ namespace
         unsigned forward_frames = 0, jump_frames = 0, crouch_frames = 0, run_frames = 0;
         bool crouched_hidden = false, stood_after_crouch = false, locomotion_pose = false;
         bool saw_walk = false, saw_run = false, saw_jump = false;
-        bool liquid_hidden = false;
+        bool container_hidden = false;
         float initial_air = 100;
         const bool extended_smoke = options.weapons_smoke || options.movement_smoke;
         const unsigned hide_frame = extended_smoke ? 40 : 4, show_frame = extended_smoke ? 160 : 8;
@@ -234,17 +235,24 @@ namespace
             if (options.containers_smoke && frames == 2)
             {
                 auto* player = game.server_shell.Player(game.local_client);
-                DVector position{0, 80, 0};
+                DVector position = conveyor_smoke ? DVector{-32, 80.001f, 0} : DVector{0, 80, 0};
+                DVector dimensions;
+                OpenBlood2::CollisionHit hit;
+                const auto code = conveyor_smoke ? CC_CONVEYOR : CC_WATER;
                 if (!player || game.server.TeleportObject(player->m_hObject, &position) != DE_OK ||
+                    game.server.GetObjectDims(player->m_hObject, &dimensions) != DE_OK ||
+                    game.collision.sweep(position, position, dimensions, hit) != OpenBlood2::CollisionQuery::Miss ||
                     !player->TeleportClientToServerPos() || !game.pump_player_messages(error) ||
-                    !player->UpdateContainerState() || player->containers.head.code != CC_WATER)
+                    !player->UpdateContainerState() || player->containers.count == 0 ||
+                    player->containers.body[0].code != code ||
+                    (!conveyor_smoke && player->containers.head.code != code))
                 {
-                    spdlog::error("Container smoke requires CityHub canal geometry");
+                    spdlog::error("Container smoke requires CityHub canal or SubwayA conveyor geometry");
                     return 6;
                 }
                 initial_air = player->m_fAirLevel;
 #if BLOOD2_INSPECTOR
-                inspector.container_selection = game.objects.get(player->containers.head.object)->id;
+                inspector.container_selection = game.objects.get(player->containers.body[0].object)->id;
 #endif
             }
             if (!game.step(delta))
@@ -425,12 +433,18 @@ namespace
                                      game.client_shell.move_mgr.m_bOnGround, forward_frames, jump_frames);
                     }
                 }
+                if (conveyor_smoke && frames == hide_frame)
+                    hidden_position = game.client_shell.position;
                 if (options.containers_smoke && frames == show_frame)
                 {
                     const auto* player = game.server_shell.Player(game.local_client);
-                    liquid_hidden =
-                        player && player->m_fAirLevel < initial_air && player->containers.head.code == CC_WATER &&
-                        game.client_shell.move_mgr.m_bBodyInLiquid && !game.client_shell.move_mgr.m_bUseGravity;
+                    container_hidden = conveyor_smoke ? player && game.client_shell.move_mgr.m_bBodyOnConveyor &&
+                                                            game.client_shell.move_mgr.m_bUseGravity &&
+                                                            game.client_shell.position.z < hidden_position.z - .05f
+                                                      : player && player->m_fAirLevel < initial_air &&
+                                                            player->containers.head.code == CC_WATER &&
+                                                            game.client_shell.move_mgr.m_bBodyInLiquid &&
+                                                            !game.client_shell.move_mgr.m_bUseGravity;
                 }
                 if (options.world_smoke && frames == hide_frame)
                     hidden_model_time = game.preview_animation.time;
@@ -522,7 +536,7 @@ namespace
             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
                 !selection_cleared ||
                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
-                (options.containers_smoke && !liquid_hidden) ||
+                (options.containers_smoke && !container_hidden) ||
                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
                 (options.movement_smoke &&
                  (!movement_hidden || !movement_jumped || !movement_landed || !game.client_shell.move_mgr.ready() ||
@@ -550,8 +564,8 @@ namespace
                 spdlog::info("Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, "
                              "unload/re-entry");
             if (options.containers_smoke)
-                spdlog::info("Container smoke passed: CityHub canal, underwater MoveMgr/air while hidden, volume "
-                             "inspector, unload/re-entry");
+                spdlog::info("Container smoke passed: {}, MoveMgr while hidden, volume inspector, unload/re-entry",
+                             conveyor_smoke ? "Subway conveyor current and gravity" : "CityHub canal and air");
             if (options.player_smoke)
                 spdlog::info(
                     "Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry");

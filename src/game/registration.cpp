@@ -166,6 +166,39 @@ namespace OpenBlood2
                                 {"XScaleDuration", 10.0f},
                                 {"YScaleDuration", 10.0f}}};
         const ClassInfo camera{"CameraSpot", &b2base, construct<CameraSpot>, {}};
+        const ClassInfo conveyor{"Conveyor",
+                                 &volume,
+                                 construct<Conveyor>,
+                                 {{"Code", std::int32_t(CC_CONVEYOR)},
+                                  {"ShowSurface", false},
+                                  {"SurfaceHeight", 0.0f},
+                                  {"SurfaceColor1", DVector{}},
+                                  {"SurfaceColor2", DVector{}},
+                                  {"XScaleDuration", 10.0f},
+                                  {"YScaleDuration", 10.0f}}};
+        const ClassInfo damage{"Damage",
+                               &volume,
+                               construct<::Damage>,
+                               {{"Code", std::int32_t(CC_DAMAGE)},
+                                {"Damage", 100.0f},
+                                {"ShowSurface", false},
+                                {"SurfaceHeight", 0.0f},
+                                {"SurfaceColor1", DVector{}},
+                                {"SurfaceColor2", DVector{}},
+                                {"XScaleDuration", 10.0f},
+                                {"YScaleDuration", 10.0f}}};
+        const ClassInfo freefall{"FreeFall",
+                                 &volume,
+                                 construct<FreeFall>,
+                                 {{"Code", std::int32_t(CC_FREEFALL)},
+                                  {"Damage", 9999999.0f},
+                                  {"DamageType", std::int32_t(DamageType::FreeFall)},
+                                  {"ShowSurface", false},
+                                  {"SurfaceHeight", 5.0f},
+                                  {"SurfaceColor1", DVector{}},
+                                  {"SurfaceColor2", DVector{}},
+                                  {"XScaleDuration", 10.0f},
+                                  {"YScaleDuration", 10.0f}}};
         const ClassInfo key{"Key",
                             &b2base,
                             construct<Key>,
@@ -184,7 +217,8 @@ namespace OpenBlood2
                objects.register_class(path) && objects.register_class(world_properties) &&
                objects.register_class(smell) && objects.register_class(character) && objects.register_class(player) &&
                objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
-               objects.register_class(acid) && objects.register_class(ladder);
+               objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
+               objects.register_class(damage) && objects.register_class(freefall);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

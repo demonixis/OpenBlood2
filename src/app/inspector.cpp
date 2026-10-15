@@ -1235,7 +1235,7 @@ namespace OpenBlood2
     void Inspector::draw_containers(GameSession& game, ObjectSelection& selection)
     {
         auto* player = game.server_shell.Player(game.local_client);
-        ImGui::TextUnformatted("Original volumes / liquid and ladder movement");
+        ImGui::TextUnformatted("Original volumes / liquids, ladders, conveyors and damage");
         if (!world_error.empty())
             ImGui::TextWrapped("%s", world_error.c_str());
         ImGui::TextWrapped(
@@ -1247,12 +1247,15 @@ namespace OpenBlood2
             ImGui::Checkbox("Keyboard movement (F2)", &keyboard_movement);
             ImGui::SameLine();
             ImGui::Text("Air %.1f / 100 | head code %u", player->m_fAirLevel, unsigned(state.head.code));
-            ImGui::Text("Body %zu / %zu tracked | liquid %s | ladder %s | global gravity %s", state.count, state.total,
+            ImGui::Text("Body %zu / %zu | liquid %s | ladder %s | conveyor %s | gravity %s", state.count, state.total,
                         move.m_bBodyInLiquid ? "yes" : "no", move.m_bBodyOnLadder ? "yes" : "no",
-                        move.m_bUseGravity ? "yes" : "no");
+                        move.m_bBodyOnConveyor ? "yes" : "no", move.m_bUseGravity ? "yes" : "no");
             ImGui::Text("Surface swim %s | swim jump %s | speed %.0f / ladder %.0f",
                         move.m_bSwimmingOnSurface ? "yes" : "no", move.m_bSwimmingJump ? "yes" : "no", move.m_fSwimVel,
                         move.m_fLadderVel);
+            ImGui::Text("Health %.1f | armor %.1f | level %.2fs | protected volume hits %llu",
+                        player->m_damage.m_fHitPoints, player->m_damage.m_fArmorPoints, game.server.GetWorldTime(),
+                        static_cast<unsigned long long>(player->protected_volume_hits));
             if (ImGui::CollapsingHeader("Membership / player position"))
             {
                 for (std::size_t i = 0; i < state.count; ++i)
@@ -1345,8 +1348,16 @@ namespace OpenBlood2
             if (ImGui::Button("Inspect properties"))
                 selection.id = r->id;
             ImGui::Text("Current %.1f %.1f %.1f", brush->info.current.x, brush->info.current.y, brush->info.current.z);
-            ImGui::Text("Gravity %.0f | viscosity %.2f", brush->info.gravity, brush->info.viscosity);
+            ImGui::Text("Liquid gravity %.0f | viscosity %.2f", brush->info.gravity, brush->info.viscosity);
             ImGui::Text("Damage %.1f / type %u", brush->damage, unsigned(brush->damage_type));
+            ImGui::Text("Server physics %llu | damage messages %llu",
+                        static_cast<unsigned long long>(brush->physics_calls),
+                        static_cast<unsigned long long>(brush->damage_events));
+            if (dynamic_cast<const Conveyor*>(brush))
+                ImGui::TextWrapped("Player: ladder braking/cap, gravity retained. Server: supported characters only; "
+                                   "original Hidden exception retained. No volume damage.");
+            if (dynamic_cast<const FreeFall*>(brush))
+                ImGui::TextWrapped("FreeFall: zero liquid gravity, no air depletion; source damage remains active.");
             ImGui::Text("%zu triangles | %s closed shell", shape.triangles.size(),
                         shape.convex ? "convex" : "nonconvex");
             ImGui::Text("Fog %s | near %.0f / far %.0f", brush->fog ? "requested" : "off", brush->fog_near,
@@ -1360,7 +1371,7 @@ namespace OpenBlood2
         ImGui::EndTable();
         if (ImGui::CollapsingHeader("Container limits / pending effects"))
             ImGui::TextWrapped("Static closed DAT shells; four body containers in stable object order. PolyGrid liquid "
-                               "surfaces, underwater fog/audio/color effects, key handshakes, conveyors, crane "
+                               "surfaces, underwater fog/audio/color effects, key handshakes, crane "
                                "controls, minefields and moving volume transforms are not implemented. Queries and "
                                "movement use the real shell, not its bounding box.");
     }

@@ -1,4 +1,5 @@
 #include "VolumeBrush.h"
+#include "PlayerObj.h"
 #include "engine/collision.h"
 #include <algorithm>
 #include <cmath>
@@ -31,15 +32,14 @@ bool VolumeBrush::ReadProp(ObjectCreateStruct& state)
     GenericProp prop;
     if (g_pServerDE->GetPropGeneric("Code", &prop) == DE_OK)
     {
-        if (prop.m_Long < CC_NOTHING || prop.m_Long > CC_FREEFALL || prop.m_Long == CC_CONVEYOR ||
-            prop.m_Long == CC_CRANECONTROL)
+        if (prop.m_Long < CC_NOTHING || prop.m_Long > CC_FREEFALL || prop.m_Long == CC_CRANECONTROL)
             return false;
         info.code = static_cast<ContainerCode>(prop.m_Long);
     }
     if (g_pServerDE->GetPropGeneric("DamageType", &prop) == DE_OK)
     {
         if (prop.m_Long != 0 && prop.m_Long != 4 && prop.m_Long != 6 && prop.m_Long != 7 && prop.m_Long != 8 &&
-            prop.m_Long != 14)
+            prop.m_Long != 9 && prop.m_Long != 10 && prop.m_Long != 14)
             return false;
         damage_type = static_cast<DamageType>(prop.m_Long);
     }
@@ -47,7 +47,9 @@ bool VolumeBrush::ReadProp(ObjectCreateStruct& state)
         sprite = prop.m_String;
     if (g_pServerDE->GetPropGeneric("UnlockKeyName", &prop) == DE_OK)
         unlock_key = prop.m_String;
-    if (!physics_vector(info.current) || !std::isfinite(damage) || damage < 0 || damage > 100000)
+    // The original FreeFall default is 9,999,999 damage/second. The 0.1s
+    // dose must fit the existing typed damage-message limit of one million.
+    if (!physics_vector(info.current) || !std::isfinite(damage) || damage < 0 || damage > 10000000)
         return false;
     state.m_ObjectType = OT_CONTAINER;
     state.m_ContainerCode = info.code;
@@ -124,6 +126,21 @@ void Ladder::UpdatePhysics(ContainerPhysics& value)
 {
     if (!info.hidden && !value.damage_only)
         ++physics_calls;
+}
+void Conveyor::UpdatePhysics(ContainerPhysics& value)
+{
+    // Original VolumeBrushTypes.cpp: only supported characters receive the
+    // server current. The shared local player already receives it in MoveMgr.
+    // This override intentionally has no Hidden check, unlike the client path.
+    if (value.damage_only || value.player)
+        return;
+    auto* character = dynamic_cast<CBaseCharacter*>(g_pServerDE->HandleToObject(value.object));
+    MovementState support;
+    if (character && g_pServerDE->GetMovementState(value.object, support) && support.standing)
+    {
+        value.velocity = vector_add(value.velocity, vector_scale(info.current, value.seconds));
+        ++physics_calls;
+    }
 }
 DDWORD VolumeBrush::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
 {

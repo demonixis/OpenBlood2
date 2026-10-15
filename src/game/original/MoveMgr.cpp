@@ -74,7 +74,8 @@ bool CMoveMgr::OnServerForcePos(const PlayerPosition& value)
     m_bLastJumpCommand = false;
     containers = {};
     m_eLastContainerCode = CC_NOTHING;
-    m_bBodyInLiquid = m_bBodyOnLadder = m_bSwimmingOnSurface = m_bCanSwimJump = m_bSwimmingJump = false;
+    m_bBodyInLiquid = m_bBodyOnLadder = m_bBodyOnConveyor = m_bSwimmingOnSurface = m_bCanSwimJump = m_bSwimmingJump =
+        false;
     m_bUseGravity = true;
     UpdateOnGround();
     return true;
@@ -142,12 +143,22 @@ void CMoveMgr::UpdateOnLadder(const ContainerInfo& info)
         body.velocity = vector_scale(body.velocity, std::max(0.0f, speed - m_FrameTime * (m_fLadderVel / .2f)) / speed);
     m_bUseGravity = false;
 }
+void CMoveMgr::UpdateOnConveyor(const ContainerInfo& info)
+{
+    if (info.hidden)
+        return;
+    m_bBodyOnConveyor = true;
+    const auto speed = magnitude(body.velocity);
+    if (speed > 1)
+        body.velocity = vector_scale(body.velocity, std::max(0.0f, speed - m_FrameTime * (m_fLadderVel / .2f)) / speed);
+    // Unlike ladders, conveyors retain gravity and ordinary jump controls.
+}
 void CMoveMgr::UpdateMotion(float yaw, float pitch)
 {
     body.acceleration = {};
     m_bUseGravity = true;
-    m_bBodyInLiquid = m_bBodyOnLadder = false;
-    bool did_liquid = false, did_ladder = false;
+    m_bBodyInLiquid = m_bBodyOnLadder = m_bBodyOnConveyor = false;
+    bool did_liquid = false, did_ladder = false, did_conveyor = false;
     for (std::size_t i = 0; i < containers.count; ++i)
     {
         const auto& info = containers.body[i];
@@ -160,6 +171,11 @@ void CMoveMgr::UpdateMotion(float yaw, float pitch)
         {
             UpdateOnLadder(info);
             did_ladder = true;
+        }
+        else if (info.code == CC_CONVEYOR && !did_conveyor)
+        {
+            UpdateOnConveyor(info);
+            did_conveyor = true;
         }
         if (!info.hidden)
             body.velocity = vector_add(body.velocity, vector_scale(info.current, m_FrameTime));
@@ -176,11 +192,12 @@ void CMoveMgr::UpdateMotion(float yaw, float pitch)
     if (!m_bBodyInLiquid)
         m_bSwimmingJump = false;
     const auto speed = magnitude(body.velocity);
-    const auto cap3 = m_bBodyOnLadder ? m_fLadderVel : m_fSwimVel;
-    if ((m_bBodyOnLadder || (m_bBodyInLiquid && (head_liquid || !m_bOnGround))) && speed > cap3)
+    const bool ladder_cap = m_bBodyOnLadder || m_bBodyOnConveyor;
+    const auto cap3 = ladder_cap ? m_fLadderVel : m_fSwimVel;
+    if ((ladder_cap || (m_bBodyInLiquid && (head_liquid || !m_bOnGround))) && speed > cap3)
     {
         body.velocity = vector_scale(body.velocity, cap3 / speed);
-        if (!m_bBodyOnLadder && m_bSwimmingJump)
+        if (!ladder_cap && m_bSwimmingJump)
             body.velocity.y = physics.jump_speed * .75f;
     }
     const float cp = (free_movement || in_liquid) ? std::cos(pitch) : 1.0f;
@@ -248,7 +265,7 @@ void CMoveMgr::UpdateMotion(float yaw, float pitch)
         m_bLastJumpCommand = false;
     if ((m_dwControlFlags & crouch) && (in_liquid || free_movement) && !m_bOnGround)
         body.acceleration.y -= max_acceleration;
-    if (!m_bBodyInLiquid && !m_bBodyOnLadder)
+    if (!m_bBodyInLiquid && !m_bBodyOnLadder && !m_bBodyOnConveyor)
     {
         auto air_velocity = body.velocity;
         if (!m_bOnGround)

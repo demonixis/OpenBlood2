@@ -365,7 +365,7 @@ namespace
         auto acid = volume(game, "Acid", "acid", {600, 0, -100}, {800, 600, 100},
                            {{"Damage", 10.0f}, {"DamageType", std::int32_t(14)}});
         CHECK(acid);
-        CHECK(game.objects.advance(.11));
+        CHECK(game.objects.advance(2.11));
         CHECK(game.server.damage_containers());
         CHECK(player->m_damage.last_damage.type == DamageType::Acid && player->m_damage.m_fArmorPoints < 100);
         CHECK(game.server.message_count() == 0);
@@ -375,6 +375,319 @@ namespace
         CHECK(game.objects.advance(.11));
         CHECK(game.server.damage_containers());
         CHECK(player->m_damage.IsDead() && player->m_damage.m_fHitPoints == 0 && player->m_damage.m_fArmorPoints == 0);
+        return true;
+    }
+    bool specialized_defaults(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(enter(game, root));
+        auto belt = volume(game, "Conveyor", "belt", {-100, 0, -100}, {100, 200, 100});
+        auto damage = volume(game, "Damage", "damage", {200, 0, -100}, {400, 200, 100});
+        auto fall = volume(game, "FreeFall", "fall", {500, 0, -100}, {700, 200, 100});
+        CHECK(belt && damage && fall);
+        auto* c = dynamic_cast<Conveyor*>(game.objects.get(belt)->game.get());
+        auto* d = dynamic_cast<::Damage*>(game.objects.get(damage)->game.get());
+        auto* f = dynamic_cast<FreeFall*>(game.objects.get(fall)->game.get());
+        CHECK(c && d && f);
+        CHECK(c->info.code == CC_CONVEYOR && c->damage == 0 && !c->show_surface && c->surface_height == 0);
+        CHECK(d->info.code == CC_DAMAGE && d->damage == 100 && d->damage_type == DamageType::Normal);
+        CHECK(!d->show_surface && d->info.viscosity == 0);
+        CHECK(f->info.code == CC_FREEFALL && f->info.gravity == 0 && f->damage == 9999999);
+        CHECK(f->damage_type == DamageType::FreeFall && !f->show_surface && f->surface_height == 5);
+        CHECK(game.objects.get(fall)->state.m_Flags & FLAG_RAYHIT);
+        CHECK(!(game.objects.get(belt)->state.m_Flags & FLAG_RAYHIT));
+        CHECK(!volume(game, "Damage", "invalid", {800, 0, -100}, {900, 200, 100}, {{"Damage", 10000001.0f}}));
+        CHECK(game.objects.finish_frame());
+        CHECK(!game.objects.find_class("CraneControl") && !game.objects.find_class("Minefield"));
+        CHECK(!volume(game, "VolumeBrush", "unsupported", {800, 0, -100}, {900, 200, 100},
+                      {{"Code", std::int32_t(CC_CRANECONTROL)}}));
+        CHECK(game.objects.finish_frame());
+        CHECK(game.unload_world());
+        CHECK(!game.objects.get(belt) && !game.objects.get(damage) && !game.objects.get(fall));
+        CHECK(game.server.message_count() == 0 && game.server.string_count() == 0);
+        return true;
+    }
+    bool conveyor_motion(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(enter(game, root));
+        auto belt =
+            volume(game, "Conveyor", "belt", {-500, 0, -500}, {500, 900, 500}, {{"Current", DVector{2400, 0, 0}}});
+        CHECK(belt && place(game, {0, 41.001f, 0}));
+        auto& client = game.client_shell;
+        CHECK(steps(game, 30));
+        CHECK(client.move_mgr.m_bBodyOnConveyor && !client.move_mgr.m_bBodyOnLadder);
+        CHECK(client.move_mgr.m_bUseGravity && client.move_mgr.m_bOnGround);
+        CHECK(client.position.x > 70 && client.position.x < 100);
+        CHECK(std::abs(client.move_mgr.body.velocity.x - 200) < .01f); // Source ladder-speed cap.
+        client.movement_input.jump = true;
+        CHECK(game.step(1.0 / 120));
+        CHECK(client.move_mgr.jumps == 1 && client.move_mgr.body.velocity.y > 500);
+        CHECK(!client.move_mgr.m_bOnGround && client.move_mgr.m_bBodyOnConveyor);
+        client.movement_input = {};
+        CHECK(game.step(1.0 / 120));
+        CHECK(std::hypot(client.move_mgr.body.velocity.x, client.move_mgr.body.velocity.y) < 201);
+        // Hidden first conveyor consumes the category, but later active currents
+        // still add. No conveyor braking/cap is applied by the second record.
+        CHECK(place(game, {0, 400, 0}));
+        auto* brush = dynamic_cast<Conveyor*>(game.objects.get(belt)->game.get());
+        brush->info.hidden = true;
+        CHECK(volume(game, "Conveyor", "second", {-500, 0, -500}, {500, 900, 500}, {{"Current", DVector{120, 0, 0}}}));
+        CHECK(game.step(1.0 / 120));
+        CHECK(!client.move_mgr.m_bBodyOnConveyor && client.move_mgr.m_bUseGravity);
+        CHECK(client.move_mgr.body.velocity.x > .8f && client.move_mgr.body.velocity.x < 1.01f);
+        CHECK(game.objects.remove(belt));
+        CHECK(game.step(1.0 / 120));
+        CHECK(client.move_mgr.m_bBodyOnConveyor); // Pending removal cannot mask the next volume.
+        CHECK(place(game, {800, 400, 0}));
+        CHECK(!client.move_mgr.m_bBodyOnConveyor); // Force-position resets immediately.
+        CHECK(game.step(.1));
+        CHECK(!client.move_mgr.m_bBodyOnConveyor && client.move_mgr.body.velocity.y < -150);
+        return true;
+    }
+    bool conveyor_bodies(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(test_player::setup(game, root));
+        auto belt = volume(game, "Conveyor", "belt", {-500, 0, -500}, {500, 500, 500},
+                           {{"Current", DVector{120, 0, 0}}, {"Damage", 100.0f}});
+        CHECK(belt);
+        ObjectCreateStruct create;
+        create.m_Pos = {0, 1.001f, 0};
+        auto character = game.objects.create(game.objects.find_class("CBaseCharacter"), create);
+        create.m_Pos.x = 100;
+        auto ordinary = game.objects.create(game.objects.find_class("BaseClass"), create);
+        CHECK(character && ordinary);
+        DVector dims{1, 1, 1};
+        game.server.SetObjectDims(character, &dims);
+        game.server.SetObjectDims(ordinary, &dims);
+        CHECK(game.server.advance_physics(1.0 / 120));
+        CHECK(std::abs(game.objects.get(character)->velocity.x - 1) < .001f);
+        CHECK(game.objects.get(ordinary)->velocity.x == 0);
+        auto* brush = dynamic_cast<Conveyor*>(game.objects.get(belt)->game.get());
+        CHECK(brush->physics_calls == 1);
+        brush->info.hidden = true;
+        CHECK(game.server.advance_physics(1.0 / 120));
+        CHECK(std::abs(game.objects.get(character)->velocity.x - 2) < .001f);
+        CHECK(brush->physics_calls == 2); // Source server override does not check Hidden.
+        DVector air{0, 100, 0}, zero{};
+        CHECK(game.server.TeleportObject(character, &air) == DE_OK);
+        CHECK(game.server.SetVelocity(character, &zero) == DE_OK);
+        CHECK(game.server.advance_physics(1.0 / 120));
+        CHECK(game.objects.get(character)->velocity.x == 0 && brush->physics_calls == 2);
+        CHECK(game.server.damage_containers());
+        CHECK(brush->damage_events == 0); // Conveyor override never invokes base damage.
+        return true;
+    }
+    bool specialized_damage(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(enter(game, root));
+        CHECK(volume(game, "Damage", "damage", {-100, 0, -100}, {100, 200, 100}, {{"DamageType", std::int32_t(9)}}));
+        CHECK(place(game, {0, 80, 0}));
+        auto* player = game.server_shell.Player(game.local_client);
+        CHECK(game.objects.advance(.11));
+        CHECK(game.server.damage_containers());
+        CHECK(player->m_damage.m_fHitPoints == 100 && player->protected_volume_hits == 1);
+        CHECK(game.objects.advance(1.9));
+        CHECK(game.server.damage_containers());
+        CHECK(player->m_damage.last_damage.amount == 10 && player->m_damage.last_damage.type == DamageType::Blind);
+        const auto health = player->m_damage.m_fHitPoints;
+        CHECK(health < 100);
+        CHECK(game.objects.advance(.04));
+        CHECK(game.server.damage_containers());
+        CHECK(player->m_damage.m_fHitPoints == health);
+        auto fall =
+            volume(game, "FreeFall", "fall", {200, 0, -100}, {400, 500, 100}, {{"DamageType", std::int32_t(10)}});
+        CHECK(fall && place(game, {300, 200, 0}));
+        player->m_damage.m_bGodMode = DTRUE;
+        CHECK(game.objects.advance(.11));
+        CHECK(game.server.damage_containers());
+        CHECK(player->m_damage.m_fHitPoints == health);
+        player->m_damage.m_bGodMode = DFALSE;
+        player->m_damage.SetArmorPoints(100);
+        CHECK(game.objects.advance(.11));
+        CHECK(game.server.damage_containers());
+        CHECK(player->m_damage.IsDead() && player->m_damage.m_fArmorPoints == 0);
+        CHECK(player->m_damage.last_damage.type == DamageType::Slow);
+        CHECK(std::abs(player->m_damage.last_damage.amount - 999999.9f) < .1f);
+        CHECK(game.server.message_count() == 0);
+        // Death suppresses commands; it does not corrupt the session or leak views on exit.
+        game.client_shell.movement_input.forward = true;
+        CHECK(game.step(.01));
+        CHECK(game.client_shell.move_mgr.m_dwControlFlags == 0);
+        CHECK(game.leave_player() && game.unload_world());
+        CHECK(game.server.message_count() == 0 && game.server.string_count() == 0);
+        return true;
+    }
+    bool freefall_motion(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(enter(game, root));
+        auto fall = volume(game, "FreeFall", "fall", {-500, 0, -500}, {500, 1000, 500}, {{"Damage", 0.0f}});
+        CHECK(fall && place(game, {0, 400, 0}));
+        auto& client = game.client_shell;
+        auto* player = game.server_shell.Player(game.local_client);
+        CHECK(steps(game, 60));
+        CHECK(client.move_mgr.m_bBodyInLiquid && !client.move_mgr.m_bUseGravity);
+        CHECK(std::abs(client.position.y - 400) < .01f && player->m_fAirLevel == 100);
+        client.movement_input.jump = true;
+        CHECK(steps(game, 30));
+        CHECK(client.position.y > 420 && player->m_fAirLevel == 100);
+        client.movement_input = {};
+        CHECK(place(game, {800, 400, 0}));
+        CHECK(game.step(.1));
+        CHECK(client.move_mgr.m_bUseGravity && client.move_mgr.body.velocity.y < -150);
+        // Non-player gravity also uses FreeFall's zero, with no permanent flag mutation.
+        ObjectCreateStruct create;
+        create.m_Pos = {0, 300, 0};
+        create.m_Flags = FLAG_GRAVITY;
+        auto body = game.objects.create(game.objects.find_class("BaseClass"), create);
+        CHECK(body && game.server.advance_physics(.1));
+        CHECK(game.objects.get(body)->velocity.y == 0);
+        CHECK(game.objects.get(body)->state.m_Flags & FLAG_GRAVITY);
+        CHECK(game.objects.remove(fall));
+        CHECK(game.server.advance_physics(.1));
+        CHECK(game.objects.get(body)->velocity.y < -190);
+        return true;
+    }
+    bool specialized_private(const std::filesystem::path& root)
+    {
+        GameSession game;
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(game.initialize() && game.resources.mount_game(config, error));
+        std::map<std::string, unsigned> counts;
+        unsigned skipped = 0, ambiguous = 0, missing = 0;
+        for (const auto& [path, resource] : game.resources.index())
+        {
+            (void)resource;
+            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
+                continue;
+            std::vector<std::uint8_t> bytes;
+            CHECK(game.resources.read(path, bytes, error));
+            if (!read_world(bytes, game.world, error))
+            {
+                CHECK(path == "worlds/16_bridge.dat");
+                ++skipped;
+                continue;
+            }
+            for (const auto& source : game.world.objects)
+            {
+                if (source.class_name != "Conveyor" && source.class_name != "Damage" && source.class_name != "FreeFall")
+                    continue;
+                Properties properties;
+                for (const auto& p : source.properties)
+                    properties.emplace(p.name, p.value);
+                auto object =
+                    game.objects.create(game.objects.find_class(source.class_name), {}, Creation::World, properties);
+                auto* r = game.objects.get(object);
+                if (!r && path == "worlds/14_subwayc.dat" && game.objects.error() == ObjectError::Unsupported &&
+                    !game.objects.diagnostics().empty() &&
+                    game.objects.diagnostics().back() == "noname: Ambiguous named container model")
+                {
+                    std::cout << path << " " << source.class_name << ": noname model is ambiguous\n";
+                    ++ambiguous;
+                    CHECK(game.objects.finish_frame());
+                    continue;
+                }
+                if (!r && path == "worlds/20_powerstation.dat" && source.class_name == "Damage" &&
+                    game.objects.error() == ObjectError::Unsupported && !game.objects.diagnostics().empty() &&
+                    game.objects.diagnostics().back() == "kkk: Missing named container model")
+                {
+                    std::cout << path << " Damage: missing kkk model\n";
+                    ++missing;
+                    CHECK(game.objects.finish_frame());
+                    continue;
+                }
+                if (!r || r->life != Life::Alive)
+                {
+                    std::cerr << path << " " << source.class_name << " failed\n";
+                    for (const auto& p : source.properties)
+                        if (const auto* number = std::get_if<float>(&p.value))
+                            std::cerr << p.name << "=" << *number << "\n";
+                        else if (const auto* number = std::get_if<std::int32_t>(&p.value))
+                            std::cerr << p.name << "=" << *number << "\n";
+                    for (const auto& diagnostic : game.objects.diagnostics())
+                        std::cerr << diagnostic << "\n";
+                }
+                CHECK(r && r->life == Life::Alive && r->container);
+                const auto* brush = dynamic_cast<VolumeBrush*>(r->game.get());
+                CHECK(brush);
+                const auto& s = *r->container;
+                std::cout << path << " " << source.class_name << " " << r->state.m_Name << " bounds " << s.min.x << ","
+                          << s.min.y << "," << s.min.z << " / " << s.max.x << "," << s.max.y << "," << s.max.z
+                          << " current " << brush->info.current.x << "," << brush->info.current.y << ","
+                          << brush->info.current.z << " damage " << brush->damage << " type "
+                          << unsigned(brush->damage_type) << "\n";
+                ++counts[source.class_name];
+                CHECK(game.objects.remove(object) && game.objects.finish_frame());
+            }
+        }
+        std::cout << "Skipped DATs " << skipped << "; ambiguous models " << ambiguous << "; missing models " << missing
+                  << "\n";
+        CHECK(skipped == 1 && ambiguous == 4 && missing == 1);
+        CHECK(counts["Conveyor"] == 38 && counts["Damage"] == 47 && counts["FreeFall"] == 18);
+        for (const auto& [name, count] : counts)
+            std::cout << name << ": " << count << " original instances created and removed\n";
+        // Enter a real level after time has already elapsed, then reload it.
+        // The original volume-damage grace belongs to the level, not the player.
+        CHECK(game.objects.advance(3));
+        for (unsigned cycle = 0; cycle < 2; ++cycle)
+        {
+            CHECK(game.request_world("01_SubwayA", error));
+            CHECK(game.server.GetWorldTime() == 0);
+            if (cycle == 0)
+                CHECK(game.objects.advance(2.1));
+            CHECK(game.enter_player(error));
+            auto* player = game.server_shell.Player(game.local_client);
+            HOBJECT belt = nullptr, hazard = nullptr;
+            for (auto id : game.objects.snapshot())
+            {
+                auto* record = game.objects.get(id);
+                if (std::string_view(record->state.m_Name) == "conveyor1")
+                    belt = record->handle;
+                if (std::string_view(record->state.m_Name) == "pain1")
+                    hazard = record->handle;
+            }
+            CHECK(belt && hazard);
+            ContainerPhysics dose;
+            dose.object = player->m_hObject;
+            dose.player = dose.damage_only = true;
+            CHECK(game.objects.engine_message(hazard, MID_AFFECTPHYSICS, &dose));
+            if (cycle == 0)
+                CHECK(player->m_damage.m_fHitPoints < 100 && player->protected_volume_hits == 0);
+            else
+                CHECK(player->m_damage.m_fHitPoints == 100 && player->protected_volume_hits == 1);
+            DVector dims;
+            CHECK(game.server.GetObjectDims(player->m_hObject, &dims) == DE_OK);
+            bool placed = false;
+            DVector start;
+            for (float y = dims.y; y < 200 && !placed; y += 1)
+            {
+                DVector candidate{-32, y + .001f, 0};
+                CollisionHit hit;
+                if (!game.objects.get(belt)->container->overlaps(candidate, dims) ||
+                    game.collision.sweep(candidate, candidate, dims, hit) != CollisionQuery::Miss)
+                    continue;
+                CHECK(place(game, candidate));
+                MovementState state;
+                CHECK(game.server.GetMovementState(player->m_hObject, state));
+                start = candidate;
+                placed = true;
+            }
+            CHECK(placed);
+            CHECK(steps(game, 4));
+            CHECK(game.client_shell.move_mgr.m_bBodyOnConveyor && game.client_shell.move_mgr.m_bUseGravity);
+            CHECK(game.client_shell.position.z < start.z - .1f);
+            std::cout << "Subway conveyor: start " << start.x << "," << start.y << "," << start.z << "; travel "
+                      << game.client_shell.position.z - start.z << "; level clock " << game.server.GetWorldTime()
+                      << "; protected hits " << player->protected_volume_hits << "\n";
+            CHECK(game.unload_world());
+        }
+        CHECK(game.objects.snapshot().empty());
+        CHECK(game.server.message_count() == 0 && game.server.string_count() == 0);
         return true;
     }
     bool private_data(const std::filesystem::path& root)
@@ -439,7 +752,7 @@ namespace
         for (auto id : game.objects.snapshot())
             if (game.objects.get(id)->container)
                 ++created;
-        if (created != 5)
+        if (created != 11)
         {
             for (std::size_t i = 0; i < game.entries.size(); ++i)
                 if (game.world.objects[i].class_name == "Water" || game.world.objects[i].class_name == "Ladder")
@@ -448,7 +761,7 @@ namespace
             for (auto& d : game.objects.diagnostics())
                 std::cerr << d << "\n";
         }
-        CHECK(created == 5);
+        CHECK(created == 11);
         CHECK(game.enter_player(error));
         CHECK(place(game, {0, 80, 0}));
         CHECK(game.server_shell.Player(game.local_client)->containers.head.code == CC_WATER);
@@ -483,7 +796,7 @@ namespace
         CHECK(steps(game, 20));
         CHECK(game.client_shell.move_mgr.m_bBodyOnLadder && !game.client_shell.move_mgr.m_bUseGravity);
         CHECK(game.client_shell.position.y > climb_start.y + 20);
-        std::cout << "CityHub: 5 original volumes; canal swimming and ladder ascent "
+        std::cout << "CityHub: 11 original volumes; canal swimming and ladder ascent "
                   << game.client_shell.position.y - climb_start.y << " units\n";
         CHECK(game.leave_player());
         CHECK(game.unload_world());
@@ -496,9 +809,22 @@ int main(int argc, char** argv)
     if (argc != 3)
         return 2;
     const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
-        {"geometry", geometry},     {"concave", concave},     {"membership", membership}, {"lifetime", lifetime},
-        {"physics", physics},       {"swimming", swimming},   {"surface", surface},       {"ladders", ladders},
-        {"air_damage", air_damage}, {"private", private_data}};
+        {"geometry", geometry},
+        {"concave", concave},
+        {"membership", membership},
+        {"lifetime", lifetime},
+        {"physics", physics},
+        {"swimming", swimming},
+        {"surface", surface},
+        {"ladders", ladders},
+        {"air_damage", air_damage},
+        {"specialized_defaults", specialized_defaults},
+        {"conveyor_motion", conveyor_motion},
+        {"conveyor_bodies", conveyor_bodies},
+        {"specialized_damage", specialized_damage},
+        {"freefall_motion", freefall_motion},
+        {"specialized_private", specialized_private},
+        {"private", private_data}};
     auto it = cases.find(argv[1]);
     if (it == cases.end())
         return 2;

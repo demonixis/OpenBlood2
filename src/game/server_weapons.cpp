@@ -52,7 +52,8 @@ namespace OpenBlood2
             !std::isfinite(value.amount) || value.amount < 0 || value.amount > 1e6f ||
             (value.type != DamageType::Normal && value.type != DamageType::Melee &&
              value.type != DamageType::Suffocate && value.type != DamageType::Death &&
-             value.type != DamageType::FreeFall && value.type != DamageType::Acid))
+             value.type != DamageType::FreeFall && value.type != DamageType::Blind && value.type != DamageType::Slow &&
+             value.type != DamageType::Acid))
         {
             m->bad = true;
             return DE_INVALIDPARAMS;

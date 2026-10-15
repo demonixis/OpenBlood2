@@ -318,6 +318,7 @@ namespace OpenBlood2
         server.trace_enabled = was_tracing;
         if (!cleared)
             return false;
+        server.reset_world_time();
         server_shell.PreStartWorld();
         models.clear();
         collision.clear();

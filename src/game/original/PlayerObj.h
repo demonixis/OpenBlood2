@@ -118,6 +118,7 @@ class CPlayerObj : public CBaseCharacter
     bool initialized = false, attributes_received = false;
     std::uint64_t respawns = 0, updates = 0;
     std::uint64_t movement_messages = 0;
+    std::uint64_t protected_volume_hits = 0;
     DBYTE m_byClientMoveCode = 0;
     bool m_bOnGround = false;
     std::string entry_error;
@@ -129,6 +130,7 @@ class CPlayerObj : public CBaseCharacter
 
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
 
   private:
     OpenBlood2::PlayerStats last_sent_stats_{-1, -1, -1};

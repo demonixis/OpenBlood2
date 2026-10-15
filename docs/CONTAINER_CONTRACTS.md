@@ -5,6 +5,10 @@ This extends [MOVEMENT_CONTRACTS.md](MOVEMENT_CONTRACTS.md) and
 in [M2_CONTAINER_SOURCES.json](M2_CONTAINER_SOURCES.json); validation is in
 [M2_CONTAINERS.md](../../Documentation/Implementation/M2_CONTAINERS.md).
 M2's complete playable-session gate remains open.
+The later [specialized volume extension](SPECIALIZED_VOLUME_CONTRACTS.md) adds
+Conveyor, Damage and FreeFall, additional numeric damage types, and the original
+player volume-damage grace. It supersedes those pending items and the narrower
+damage-type list below; other limits remain.
 
 ## Original rules selected
 

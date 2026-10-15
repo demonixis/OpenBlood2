@@ -43,3 +43,29 @@ class Ladder : public VolumeBrush
     // the resulting motion. It does not apply generic VolumeBrush damping/damage.
     void UpdatePhysics(OpenBlood2::ContainerPhysics&) override;
 };
+class Conveyor : public VolumeBrush
+{
+  public:
+    Conveyor()
+    {
+        info.code = CC_CONVEYOR;
+    }
+    void UpdatePhysics(OpenBlood2::ContainerPhysics&) override;
+};
+class Damage : public VolumeBrush
+{
+  public:
+    Damage()
+    {
+        info.code = CC_DAMAGE;
+    }
+};
+class FreeFall : public VolumeBrush
+{
+  public:
+    FreeFall()
+    {
+        info.code = CC_FREEFALL;
+        info.gravity = 0;
+    }
+};
