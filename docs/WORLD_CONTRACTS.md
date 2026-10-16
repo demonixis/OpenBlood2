@@ -82,3 +82,7 @@ SubwayA accounting is 18 original instances, 372 preprocessor-only entries and
 190 unported runtime objects. WorldProperties is now original executable code.
 Primary-world collision and model playback/deformation are implemented within
 the stated limits; complete shells/CPlayerObj and moving world models remain open.
+
+The [diagnostic 3D view](WORLD_VIEW_CONTRACTS.md) supersedes the absence of any world
+rasterization: existing player/scripted cameras now drive depth-tested geometry and
+letterbox presentation. Materials, lighting, models/FX and complete M2 remain open.

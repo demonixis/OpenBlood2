@@ -293,6 +293,7 @@ namespace OpenBlood2
         std::vector<ResourceUse> resource_uses;
         std::vector<std::string> trace;
         std::string world_path;
+        std::uint64_t world_revision = 0; // Changes on teardown; diagnostic geometry edits must also increment it.
         // Inspection resource, not a CPlayerObj or a replacement player controller.
         std::shared_ptr<const Model> preview_model;
         AnimationTrack preview_animation;

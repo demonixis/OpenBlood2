@@ -38,6 +38,7 @@ namespace OpenBlood2
             model.polygons.push_back(std::move(polygon));
         }
         g.world.models.push_back(std::move(model));
+        ++g.world_revision; // Invalidate diagnostic GPU geometry after fixture insertion.
         auto h = g.objects.create(g.objects.find_class("RotatingDoor"), {}, Creation::World,
                                   {{"Name", std::string("interaction_smoke_hinge")},
                                    {"Speed", 90.0f},

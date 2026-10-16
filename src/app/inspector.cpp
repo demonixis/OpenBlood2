@@ -373,6 +373,35 @@ namespace OpenBlood2
             ImGui::Separator();
             if (ImGui::BeginTabBar("Inspection"))
             {
+                if (ImGui::BeginTabItem("3D view"))
+                {
+                    ImGui::TextWrapped("Diagnostic solid-color geometry with depth. F1 shows the world; F2 enables "
+                                       "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
+                                       "the player in Session first, or launch --view-world.");
+                    ImGui::TextWrapped(
+                        "Orientation colors are not lighting. Textures/lightmaps, models, sprites, liquid surfaces, "
+                        "transparency and sky rendering remain unavailable. Unsupported objects stay in World.");
+                    if (world_mesh && world_render)
+                    {
+                        ImGui::Text("GPU: %llu frames / %llu geometry uploads",
+                                    (unsigned long long)world_render->frames,
+                                    (unsigned long long)world_render->uploads);
+                        ImGui::Text("Prepared: %zu triangles / %zu draws / %zu hidden instances",
+                                    world_render->triangles, world_render->draws, world_render->hidden);
+                        ImGui::Text("Unbound models: %zu / excluded containers: %zu", world_render->unbound,
+                                    world_render->containers);
+                        ImGui::Text(
+                            "Faces: %zu invisible / %zu degenerate / %zu transparent-as-opaque / %zu sky markers",
+                            world_mesh->invisible, world_mesh->degenerate, world_mesh->transparent, world_mesh->sky);
+                        ImGui::Text("Camera: %s at %.2f %.2f %.2f",
+                                    !game.client_shell.m_bInWorld   ? "no entered player"
+                                    : game.client_shell.view.object ? "original scripted camera"
+                                                                    : "player eye",
+                                    game.client_shell.view.position.x, game.client_shell.view.position.y,
+                                    game.client_shell.view.position.z);
+                    }
+                    ImGui::EndTabItem();
+                }
                 if ((!game.resources.mounts().empty()) && ImGui::BeginTabItem("World"))
                 {
                     draw_world(game, selection);

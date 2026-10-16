@@ -353,6 +353,7 @@ namespace OpenBlood2
         entries.clear();
         resource_uses.clear();
         world = {};
+        ++world_revision;
         world_path.clear();
         trace.clear();
         state = SessionState::Empty;

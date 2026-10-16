@@ -12,7 +12,7 @@ namespace OpenBlood2
             return false;
         }
         sdl_initialized = true;
-        window = SDL_CreateWindow("Blood II - M0 Inspector", 1200, 780,
+        window = SDL_CreateWindow("Blood II - Reconstruction", 1200, 780,
                                   SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
         if (!window)
         {

@@ -4,6 +4,12 @@ A new, independent C++20 implementation. **M0/M1 are complete for their document
 
 The three runtime targets remain small: `engine` (resources, world/object runtime, configuration, SDL_GPU), `blood2_game` (original code and typed services) and `blood2_app` (`blood2`, optional Dear ImGui). No previous prototype is a build dependency, and no EnTT/ECS was introduced.
 
+The [diagnostic 3D view](docs/WORLD_VIEW_CONTRACTS.md) now renders actual level
+geometry and current moving brushes through SDL_GPU. Run `./build/debug/blood2 --view-world` to enter the original player/cameras with
+keyboard controls enabled. F1 opens inspection. Textures, rendered models/weapons,
+full combat and M2 completion remain pending. The world shader currently requires
+Vulkan/SPIR-V; other backend artifacts remain unimplemented.
+
 ## Build and Run
 
 Requirements: CMake 3.28+, Ninja, a C++20 compiler and SDL's platform development dependencies. Only Linux/Wayland/Vulkan has been tested. Windows/D3D12 and macOS/Metal remain target configurations, not verified platforms.
@@ -20,13 +26,14 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
 
 ```sh
 ./build/debug/blood2
+./build/debug/blood2 --view-world
 ./build/debug/blood2 --inspect-world
 ./build/debug/blood2 --inspect-player
 ./build/debug/blood2 --world 02_CityHub
 ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
 ```
 
-The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **187 source entries** create, plus **4 transferred world sounds** and **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **17 unported runtime entries**, and zero failed. Runtime counts before/after player entry are **194/197**, then **185/188** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain historical load status. The [latest evidence](../Documentation/Implementation/M2_SCENE_EXPLOSIONS.md) records these counts; earlier sections below are historical snapshots.
+The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **187 source entries** create, plus **4 transferred world sounds** and **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **17 unported runtime entries**, and zero failed. Runtime counts before/after player entry are **194/197**, then **185/189** after the first update consumes nine Keys and the default player creates a held Beretta child. Every source entry remains inspectable; consumed keys retain historical load status. The [latest evidence](../Documentation/Implementation/M2_SCENE_EXPLOSIONS.md) records these counts; earlier sections below are historical snapshots.
 
 The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Door audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. World textures and a complete game session remain unimplemented; cinematic, random-emitter and world-loop audio are covered by the later continuations below. Sprites shows original placement/repeats, manifest metadata and frame clocks, with a diagnostic overlay; DTX textures are indexed but not decoded.
 
@@ -36,6 +43,8 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
 
 | Option | Behavior |
 | --- | --- |
+| `--view-world` | Enter diagnostic 3D with original player/cameras, hidden inspector and keyboard controls |
+| `--viewport-smoke` | Check actual world rendering, movement, hidden UI, resize and reload |
 | `--check-data` | File metadata/readability only; no parser or GPU |
 | `--inspect-world` | Headless REZ/DAT parsing and original subset creation/teardown |
 | `--world NAME` | Resource name, default `01_SubwayA`; exact normalized lookup, no traversal/basename fallback |

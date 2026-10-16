@@ -31,6 +31,7 @@ namespace OpenBlood2
             model.polygons.push_back(std::move(polygon));
         }
         g.world.models.push_back(std::move(model));
+        ++g.world_revision; // Invalidate diagnostic GPU geometry after fixture insertion.
 
         auto h = g.objects.create(g.objects.find_class("RotatingBrush"), {}, Creation::World,
                                   {{"Name", std::string("brush_smoke_platform")},
@@ -64,6 +65,7 @@ namespace OpenBlood2
                 plane.distance += vector_dot(plane.normal, offset);
             const auto name = fragment.name;
             g.world.models.push_back(std::move(fragment));
+            ++g.world_revision;
             auto source = g.objects.create(g.objects.find_class("CDestructableBrush"), {}, Creation::World,
                                            {{"Name", name},
                                             {"HitPoints", 50.0f},

@@ -116,3 +116,7 @@ and [cinematic/audio](CINEMATIC_CONTRACTS.md) continuations supersede the blanke
 omissions above for their bounded subsets. CinematicTrigger now uses real WAV
 voices and dry SDL output; KeyData sound requests, reverb, angular/container paths,
 general audio/rendering and complete M2 acceptance still remain unavailable.
+
+The [diagnostic 3D view](WORLD_VIEW_CONTRACTS.md) supersedes the absence of any world
+rasterization: existing player/scripted cameras now drive depth-tested geometry and
+letterbox presentation. Materials, lighting, models/FX and complete M2 remain open.

@@ -255,3 +255,11 @@ Preserve same-target no-op, SetTarget's net-zero Metacmd change, local-up yaw,
 deferred non-owning target lifetime and checked pose failures. Explicit commands
 are not autonomous acquisition or an AI state machine. Source counts and the
 actual M2 gate remain unchanged; NPCs, ExitTrigger and required FX remain open.
+
+The [diagnostic 3D world view](../Documentation/Implementation/M2_WORLD_VIEW.md) now renders actual DAT geometry and
+current world-model transforms through SDL_GPU. Read [view contracts](docs/WORLD_VIEW_CONTRACTS.md)
+before extending rendering, camera presentation or GPU lifetime. Preserve original
+coordinates, base rings, current checked visibility, world revisions and the single
+player integrator. `--view-world` is navigable inspection, not the M3 playable slice;
+texture/model/FX rendering and required NPC/ExitTrigger services remain unavailable. Current
+world shaders support Vulkan/SPIR-V only; M2 stays incomplete.

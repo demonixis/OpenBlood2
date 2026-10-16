@@ -8,6 +8,7 @@
 #include "engine/capture.h"
 #include "engine/config.h"
 #include "engine/runtime.h"
+#include "engine/world_renderer.h"
 #include "game/original/Door.h"
 #include "game/server_adapter.h"
 #include "interaction_smoke.h"
@@ -114,7 +115,7 @@ namespace
                 }
             spdlog::info("DAT v{}: {} source objects, {} original instances, {} BSP models", game.world.version,
                          game.world.objects.size(), game.objects.snapshot().size(), game.world.models.size());
-            if (options.player_smoke)
+            if (options.player_smoke || options.view_world)
             {
                 if (!game.enter_player(error))
                 {
@@ -273,9 +274,16 @@ namespace
         bool selection_cleared = false, world_unloaded = false;
         const auto initial_objects = game.objects.snapshot().size(), initial_strings = game.server.string_count();
         const bool smoke = options.gpu_smoke || options.world_smoke;
-        bool inspector_visible = BLOOD2_INSPECTOR && options.inspector;
+        bool inspector_visible = BLOOD2_INSPECTOR && options.inspector && !options.view_world;
+        OpenBlood2::WorldMesh world_mesh;
+        OpenBlood2::WorldRenderer world_renderer(runtime.gpu);
+        std::vector<OpenBlood2::WorldDraw> world_draws;
+        std::uint64_t mesh_revision = UINT64_MAX;
+        bool viewport_hidden = false, viewport_reloaded = false, viewport_unloaded = false;
 #if BLOOD2_INSPECTOR
         OpenBlood2::Inspector inspector(runtime);
+        inspector.world_mesh = &world_mesh;
+        inspector.world_render = &world_renderer.stats;
         inspector.select_models =
             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
@@ -285,7 +293,7 @@ namespace
                                    !options.random_sounds_smoke && !options.world_sounds_smoke &&
                                    !options.sprites_smoke && !options.scene_explosions_smoke;
         inspector.select_weapons = options.weapons_smoke;
-        inspector.select_movement = options.movement_smoke && !options.skeleton_smoke;
+        inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
         inspector.select_skeleton = options.skeleton_smoke;
         if (options.skeleton_smoke)
             inspector.skeleton_selection = smoke_ai_key;
@@ -308,7 +316,7 @@ namespace
         inspector.keyframe_selection = smoke_keyframe;
         inspector.brush_selection = smoke_body;
         inspector.select_doors = options.doors_smoke || options.interaction_smoke;
-        inspector.keyboard_movement = options.interaction_smoke;
+        inspector.keyboard_movement = options.interaction_smoke || options.view_world;
         inspector.select_triggers = options.triggers_smoke;
         inspector.trigger_selection = smoke_trigger;
         inspector.door_selection = smoke_door;
@@ -336,7 +344,7 @@ namespace
         bool weapons_fired = false, weapon_advanced_hidden = false;
         std::uint64_t hidden_weapon_shots = 0;
         OpenBlood2::MovementControls controls;
-        controls.enabled = options.interaction_smoke;
+        controls.enabled = options.interaction_smoke || options.view_world;
         controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
         DVector hidden_position{};
         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
@@ -566,6 +574,27 @@ namespace
                 }
             }
             selection.refresh(game.objects);
+            if (mesh_revision != game.world_revision)
+            {
+                world_renderer.clear_geometry();
+                world_mesh = {};
+                world_draws.clear();
+                if (!game.world_path.empty() && !world_mesh.build(game.world, error))
+                {
+                    spdlog::error("World mesh: {}", error);
+                    return 5;
+                }
+                mesh_revision = game.world_revision;
+                if (game.world_path.empty())
+                    viewport_unloaded = true;
+            }
+            const bool render_world = game.client_shell.m_bInWorld && !world_mesh.ranges.empty();
+            if (!OpenBlood2::world_draws(world_mesh, game.objects, world_draws, world_renderer.stats, error))
+            {
+                spdlog::error("World draw bindings: {}", error);
+                return 5;
+            }
+
             if (options.world_smoke && frames >= unload_frame && game.world_path.empty() &&
                 game.server.string_count() == 0)
                 world_unloaded = true;
@@ -618,13 +647,31 @@ namespace
             }
             if (swapchain)
             {
+                if (render_world)
+                {
+                    const auto& view = game.client_shell.view;
+                    if (!world_renderer.prepare(world_mesh, mesh_revision,
+                                                SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
+                                                height, error) ||
+                        !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
+                                             world_draws, view.position, view.rotation,
+                                             view.object && view.settings.type == 1, error))
+                    {
+                        spdlog::error("World viewport: {}", error);
+                        SDL_SubmitGPUCommandBuffer(commands);
+                        return 3;
+                    }
+                    viewport_hidden |= !inspector_visible && world_renderer.stats.triangles > 0;
+                    viewport_reloaded |=
+                        viewport_unloaded && world_renderer.stats.uploads >= 2 && world_renderer.stats.triangles > 0;
+                }
 #if BLOOD2_INSPECTOR
                 ImGui_ImplSDLGPU3_PrepareDrawData(ImGui::GetDrawData(), commands);
 #endif
                 SDL_GPUColorTargetInfo color{};
                 color.texture = capture_frame ? capture.texture : swapchain;
                 color.clear_color = {0.025f, 0.035f, 0.05f, 1.0f};
-                color.load_op = SDL_GPU_LOADOP_CLEAR;
+                color.load_op = render_world ? SDL_GPU_LOADOP_LOAD : SDL_GPU_LOADOP_CLEAR;
                 color.store_op = SDL_GPU_STOREOP_STORE;
                 SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(commands, &color, 1, nullptr);
                 if (!pass)
@@ -634,7 +681,8 @@ namespace
                     return 3;
                 }
 #if BLOOD2_INSPECTOR
-                ImGui_ImplSDLGPU3_RenderDrawData(ImGui::GetDrawData(), commands, pass);
+                if (!(options.viewport_smoke && capture_frame))
+                    ImGui_ImplSDLGPU3_RenderDrawData(ImGui::GetDrawData(), commands, pass);
                 if (ImGui::GetDrawData()->TotalVtxCount > 0)
                     ++ui_frames;
 #endif
@@ -662,6 +710,21 @@ namespace
                 {
                     spdlog::error("Capture save: {}", SDL_GetError());
                     return 3;
+                }
+                if (options.viewport_smoke)
+                {
+                    const auto* pixels =
+                        static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
+                    if (!pixels)
+                        return 3;
+                    std::size_t covered = 0;
+                    for (std::size_t i = 0; i < std::size_t(width) * height; ++i)
+                        covered += pixels[i * 4] > 32 || pixels[i * 4 + 1] > 32 || pixels[i * 4 + 2] > 32;
+                    SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
+                    spdlog::info("World viewport readback: {} / {} non-background pixels (UI excluded)", covered,
+                                 std::size_t(width) * height);
+                    if (covered < std::size_t(width) * height / 4)
+                        return 4;
                 }
                 captured = true;
                 spdlog::info("Captured GPU frame to {}", OpenBlood2::path_text(options.capture_file));
@@ -969,6 +1032,17 @@ namespace
             if (path_smoke)
                 spdlog::info("AI paths: hidden={}, reentered={}, copied points={}", paths_hidden, paths_reentered,
                              smoke_paths.size());
+            if (options.viewport_smoke)
+            {
+                spdlog::info("World viewport: hidden={}, unloaded={}, reloaded={}, uploads={}, frames={}, "
+                             "triangles={}, draws={}, depth={}x{}",
+                             viewport_hidden, viewport_unloaded, viewport_reloaded, world_renderer.stats.uploads,
+                             world_renderer.stats.frames, world_renderer.stats.triangles, world_renderer.stats.draws,
+                             world_renderer.width(), world_renderer.height());
+                if (!viewport_hidden || !viewport_unloaded || !viewport_reloaded || world_renderer.stats.uploads != 2 ||
+                    world_renderer.width() != 1000 || world_renderer.height() != 680)
+                    return 4;
+            }
             const bool ui_ok =
                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
@@ -1109,6 +1183,9 @@ int main(int argc, char** argv)
                      "  --world NAME        World resource (default: 01_SubwayA)\n"
                      "  --inspect-world     Parse/mount/create original subset headlessly; does not run a game\n"
                      "  --inspect-player    Exercise original shell/player entry headlessly; not playable\n"
+                     "  --view-world        Enter diagnostic 3D view with original player/cameras; F1 inspector, F2 "
+                     "controls\n"
+                     "  --viewport-smoke    GPU 3D depth view, movement and unload/reload checks\n"
                      "  --start-game        Check session startup; fails explicitly on missing M2 services\n"
                      "  --no-inspector      Start with the inspector hidden\n"
                      "  --frames N          Exit after N presented frames\n"

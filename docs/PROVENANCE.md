@@ -473,3 +473,15 @@ list-first selection, cached targets and Metacmd rules are retained. No producti
 NPC registration, perception/state machine or script scheduler is imported.
 See [contracts](AI_TARGET_CONTRACTS.md) and
 [execution evidence](../../Documentation/Implementation/M2_AI_TARGETS.md).
+
+## M2 diagnostic world rasterization
+
+WorldMesh, WorldRenderer, projection and GLSL shaders are new replacement engine
+code. They reuse the existing v56 reader, container transform convention and
+original CBloodClientShell camera view without importing a donor renderer.
+The later-generation `sources/lithtech/runtime/world/src/de_world.h` surface bits
+(59–63) informed invisible/transparent/sky diagnostics only; complete material
+compatibility is not claimed. SDL's pinned SDL_gpu.h defines NDC, resource binding,
+depth clipping and GPU resource lifetime. No game rule changed. See
+[contracts](WORLD_VIEW_CONTRACTS.md) and
+[evidence](../../Documentation/Implementation/M2_WORLD_VIEW.md).

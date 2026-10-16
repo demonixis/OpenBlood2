@@ -107,6 +107,10 @@ namespace OpenBlood2
                 options.inspect_world = true;
                 options.inspect_player = true;
             }
+            else if (arg == "--view-world")
+                options.view_world = true;
+            else if (arg == "--viewport-smoke")
+                options.world_smoke = options.player_smoke = options.movement_smoke = options.viewport_smoke = true;
             else if (arg == "--weapons-smoke")
             {
                 options.world_smoke = true;
@@ -228,6 +232,12 @@ namespace OpenBlood2
                 error = "Unknown option: " + std::string(arg);
                 return false;
             }
+        }
+        if (options.view_world && (options.inspect_world || options.start_game || options.check_data ||
+                                   options.gpu_smoke || options.world_smoke))
+        {
+            error = "--view-world is a separate interactive inspection mode";
+            return false;
         }
         if (options.world_smoke && options.gpu_smoke)
         {

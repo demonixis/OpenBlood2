@@ -2,6 +2,7 @@
 
 #include "engine/config.h"
 #include "engine/runtime.h"
+#include "engine/world_view.h"
 #include "game/server_adapter.h"
 
 namespace OpenBlood2
@@ -10,6 +11,8 @@ namespace OpenBlood2
     struct Inspector
     {
         Runtime& runtime;
+        const WorldMesh* world_mesh = nullptr;
+        const WorldViewStats* world_render = nullptr;
         bool context = false;
         bool platform = false;
         bool renderer = false;
