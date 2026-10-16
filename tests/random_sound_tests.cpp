@@ -346,7 +346,8 @@ namespace
                 std::cout << "cycle=" << cycle << " name=" << g.objects.get(h)->state.m_Name
                           << " sound=" << v->request.resource << '\n';
             }
-            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 188);
+            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 189 &&
+                  g.objects.attachments().size() == 1);
             CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips() &&
                   !g.server.audio.get(last) && g.objects.snapshot().empty() && !g.server.message_count() &&
                   !g.server.string_count() && !g.server.list_count());

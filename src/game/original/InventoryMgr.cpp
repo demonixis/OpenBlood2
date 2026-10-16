@@ -1,4 +1,5 @@
 #include "InventoryMgr.h"
+#include "PlayerObj.h"
 #include <algorithm>
 #include <cmath>
 namespace
@@ -161,6 +162,10 @@ InventoryResult CInventoryMgr::ChangeWeaponSlot(DBYTE slot)
         return InventoryResult::NotAvailable;
     if (CurrentWeapon() && CurrentWeapon()->data.m_nType == weapon->data.m_nType)
         return InventoryResult::Current;
+    if (CurrentWeapon())
+        CurrentWeapon()->ShowHandModel(false);
+    if (CurrentWeapon(true))
+        CurrentWeapon(true)->ShowHandModel(false);
     m_nCurWeaponSlot = slot;
     ++revision;
     return InventoryResult::Ok;
@@ -209,4 +214,20 @@ InventoryResult CInventoryMgr::QueryKey(std::string_view name)
             return InventoryResult::Ok;
         }
     return InventoryResult::NotAvailable;
+}
+
+// Original Update's live-character hand-model branch and player dead hide branch.
+bool CInventoryMgr::UpdateHandModels()
+{
+    auto* server = BaseClass::GetServerDE();
+    auto* owner = server && server->IsObjectAlive(m_hOwner)
+                      ? dynamic_cast<CBaseCharacter*>(server->HandleToObject(m_hOwner))
+                      : nullptr;
+    if (!owner)
+        return false;
+    bool ok = true;
+    for (bool left : {false, true})
+        if (auto* w = CurrentWeapon(left))
+            ok = w->ShowHandModel(!owner->m_damage.IsDead()) && ok;
+    return ok;
 }

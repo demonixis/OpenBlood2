@@ -46,6 +46,11 @@ namespace OpenBlood2
         ServerAdapter(const ServerAdapter&) = delete;
         ServerAdapter& operator=(const ServerAdapter&) = delete;
         bool bind();
+        DRESULT CreateAttachment(HOBJECT, HOBJECT, const char*, const DVector*, const DRotation*,
+                                 HATTACHMENT*) override;
+        DRESULT RemoveAttachment(HATTACHMENT) override;
+        DRESULT FindAttachment(HOBJECT, HOBJECT, HATTACHMENT*) override;
+        DRESULT GetAttachedModelNodeTransform(HATTACHMENT, const char*, DVector*, DRotation*) override;
         bool IsObjectAlive(HOBJECT) override;
         bool ValidateSpawnObject(std::string_view) override;
         void RecordSpawn(const SpawnReport&) override;

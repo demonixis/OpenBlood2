@@ -448,3 +448,16 @@ node/ray services. [Source ranges and hashes](M2_AI_SIGHT_SOURCES.json) and
 [contracts](AI_SIGHT_CONTRACTS.md) distinguish source rules from typed failures,
 current-position fallback and the existing replacement collision solver. No
 additional production AI class or general filter callback ABI is imported.
+
+## M2 held models and attachment services
+
+[Selected source ranges and hashes](M2_ATTACHMENT_SOURCES.json) cover original
+CWeapon hand creation/removal, the current inventory hand branch, dead-player
+hiding and CHandWeaponModel held initialization/visibility. Checked object handles
+replace bidirectional raw pointers; the unsafe precreate fallthrough is omitted.
+The original drop/pickup and client SFX branches are not imported.
+
+The engine attachment store and transform refresh are new replacement services.
+The later LithTech shared transform code informed offset composition only; no
+code or dependency from that engine was copied. See [contracts](ATTACHMENT_CONTRACTS.md)
+for bounded visual children, unsupported chains/physics and strengthened lifetime.

@@ -76,6 +76,12 @@ namespace test_player
         if (weapon_assets)
             for (auto path : {"c_beretta_pv_t.dtx", "c_knife_pv_t.dtx"})
                 dir.children["skins"].children["weapons"].files[path] = {1, 2, 3};
+        if (weapon_assets)
+            for (auto name : {"beretta_pu", "knifec_pu"})
+            {
+                dir.children["models"].children["powerups"].files[std::string(name) + ".abc"] = test_model::abc(true).b;
+                dir.children["skins"].children["powerups"].files[std::string(name) + ".dtx"] = {1, 2, 3};
+            }
         if (pickup_assets)
             for (auto name :
                  {"bulletammo_pu", "shellammo_pu", "bmgammo_pu", "flareammo_pu", "diebugdieammo_pu", "howitzerammo_pu",

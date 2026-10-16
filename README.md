@@ -277,3 +277,13 @@ The AI visibility increment passed 315/315 tests in both Debug and inspector-fre
 Release, plus 292/292 sequential headless checks with Clang ASan/UBSan/leak
 detection on Linux. The private catalog covers 240 animation midpoints across
 six NPC models; GPU inspection verifies hidden queries and fresh reload identities.
+
+Latest M2 continuation: [original held weapons and attachments](../Documentation/Implementation/M2_ATTACHMENTS.md) adds
+Beretta/knife hand models, current-pose attachment transforms and in-game inspection.
+The source's missing-gun-node fallback remains visible in diagnostics. Dropped weapons,
+client visibility SFX, required NPC classes and complete M2 remain unavailable.
+
+The held-model/attachment increment passed 323/323 tests in both Debug and
+inspector-free Release, plus 300/300 sequential headless checks with Clang
+ASan/UBSan/leak detection on Linux. Seven private character models cover 652
+clip/hand samples, including 160 explicit missing-gun-node origin fallbacks.

@@ -43,6 +43,10 @@ class ServerDE : public CSBase
     virtual bool IsSoundDone(OpenBlood2::SoundId, bool&) = 0;
     virtual bool KillSound(OpenBlood2::SoundId) = 0;
 
+    virtual DRESULT CreateAttachment(HOBJECT, HOBJECT, const char*, const DVector*, const DRotation*, HATTACHMENT*) = 0;
+    virtual DRESULT RemoveAttachment(HATTACHMENT) = 0;
+    virtual DRESULT FindAttachment(HOBJECT, HOBJECT, HATTACHMENT*) = 0;
+    virtual DRESULT GetAttachedModelNodeTransform(HATTACHMENT, const char*, DVector*, DRotation*) = 0;
     virtual bool IsObjectAlive(HOBJECT) = 0;
     virtual bool ValidateSpawnObject(std::string_view) = 0;
     virtual void RecordSpawn(const OpenBlood2::SpawnReport&) = 0;

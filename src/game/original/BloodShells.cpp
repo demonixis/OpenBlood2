@@ -272,6 +272,17 @@ bool CBloodClientShell::SyncWeapons(OpenBlood2::ModelStore& models, OpenBlood2::
         const auto* weapon = owner->m_InventoryMgr.CurrentWeapon(i != 0);
         const auto type = weapon ? weapon->data.m_nType : 0;
         changed[i] = type != weapons[i].type;
+        if (changed[i] && weapon)
+        {
+            std::shared_ptr<const OpenBlood2::Model> held;
+            if (!models.load(weapon->data.m_szHandModelFilename, held, error))
+                return false;
+            if (!resources.find(weapon->data.m_szHandModelSkin))
+            {
+                error = "Held weapon skin is not indexed";
+                return false;
+            }
+        }
         if (changed[i] && type && !prepared[i].Create(type, i != 0, models, resources, error))
             return false;
     }

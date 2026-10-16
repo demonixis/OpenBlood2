@@ -352,7 +352,8 @@ namespace
             }
             CHECK(moves == 297 && blocked == 2 && !f->active && f->processed == 3 && close(r->state.m_Pos, last));
             CHECK(!close(last, initial) && !close(last, vector_add(f->keys.back().position, f->targets[0].offset)));
-            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 188);
+            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 189 &&
+                  g.objects.attachments().size() == 1);
             std::cout << "cycle=" << cycle << " moves=" << moves << " blocks=" << blocked << " final=" << last.x << ','
                       << last.y << ',' << last.z << " consumed_keys=9 runtime=188\n";
             CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.server.string_count() &&

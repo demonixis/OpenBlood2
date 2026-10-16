@@ -129,3 +129,8 @@ ammo consumption. View-weapon visibility is a presentation request.
 The [AI visibility continuation](AI_SIGHT_CONTRACTS.md) adds selected original CanSee
 and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
 Visibility queries do not implement target selection, AI states or complete M2.
+
+The [held-model/attachment continuation](ATTACHMENT_CONTRACTS.md) adds original
+Beretta/knife held children and typed visual attachments. Earlier blanket hand-model
+and attachment omissions are superseded for this bounded subset. Dropping, physical
+attachments, client visibility SFX and complete M2 remain unavailable.

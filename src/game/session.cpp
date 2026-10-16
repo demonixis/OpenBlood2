@@ -386,11 +386,15 @@ namespace OpenBlood2
                                      client_shell.UpdateMovement(server_shell, seconds, error) &&
                                      client_shell.Update() && client_shell.UpdateUse(server_shell) &&
                                      client_shell.SyncWeapons(models, resources, server_shell, error) &&
-                                     client_shell.UpdateWeapons(server_shell, seconds, error);
+                                     client_shell.UpdateWeapons(server_shell, seconds, error) &&
+                                     (!server_shell.Player(local_client) ||
+                                      server_shell.Player(local_client)->m_InventoryMgr.UpdateHandModels());
                 if (!server.GetClientUserData(local_client))
                     ok = leave_player() && ok;
                 else if (!updated || !pump_player_messages(error))
                 {
+                    if (error.empty())
+                        error = "Original player update or held-weapon creation failed";
                     trace.push_back(error);
                     leave_player();
                     ok = false;
@@ -400,6 +404,7 @@ namespace OpenBlood2
         if (seconds > 0)
             ok = server.damage_containers() && ok;
         ok = objects.finish_frame() && ok;
+        ok = objects.refresh_attachments() && ok;
         ok = server.advance_lights() && ok;
         if (ok && preview_model && preview_playing &&
             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))

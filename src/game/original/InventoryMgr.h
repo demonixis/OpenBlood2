@@ -36,6 +36,7 @@ class CInventoryMgr : public Aggregate
     void SetStrength(DBYTE);
     void SetMagic(DBYTE);
     void ClearWeapons();
+    bool UpdateHandModels();
     InventoryResult ObtainWeapon(DBYTE, int slot = -1);
     InventoryResult ChangeWeaponSlot(DBYTE);
     CWeapon* GetWeapon(unsigned slot, bool left = false) const

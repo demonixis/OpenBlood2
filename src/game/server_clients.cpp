@@ -125,7 +125,7 @@ namespace OpenBlood2
     {
         trace_service("SetObjectRotation");
         auto* r = objects_.get(h);
-        if (!r || r->life != Life::Alive || (r->container || r->world_model) || !rotation ||
+        if (!r || r->life != Life::Alive || r->attachment || (r->container || r->world_model) || !rotation ||
             !physics_vector(rotation->m_Vec) || !std::isfinite(rotation->m_Spin))
             return DE_INVALIDPARAMS;
         const auto& v = rotation->m_Vec;
@@ -172,7 +172,7 @@ namespace OpenBlood2
     {
         trace_service("MoveObjectToGround");
         auto* r = objects_.get(h);
-        if (!r || r->life != Life::Alive || !collision || !collision_ready)
+        if (!r || r->life != Life::Alive || r->attachment || !collision || !collision_ready)
             return DE_INVALIDPARAMS;
         // Original ObjectUtilities::MoveObjectToGround: downward ray, animation-0
         // user dimensions for characters, then collision-aware MoveObject. The
@@ -188,7 +188,8 @@ namespace OpenBlood2
         for (auto id : objects_.snapshot())
         {
             const auto* other = objects_.get(id);
-            if (!other || other->life != Life::Alive || other->handle == h || !(other->state.m_Flags & FLAG_SOLID))
+            if (!other || other->life != Life::Alive || other->attachment || other->handle == h ||
+                !(other->state.m_Flags & FLAG_SOLID))
                 continue;
             CollisionHit hit;
             if (sweep_box(from, to, {}, other->state.m_Pos, other->dimensions, hit) == CollisionQuery::Hit &&

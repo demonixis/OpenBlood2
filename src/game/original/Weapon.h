@@ -1,6 +1,7 @@
 #pragma once
 #include "WeaponDefs.h"
 #include "game/weapon_messages.h"
+#include <string>
 
 class CInventoryMgr;
 enum class FireResult
@@ -29,7 +30,11 @@ class CWeapon
     explicit CWeapon(DBYTE type) : data(*weapon_definition(type)) {}
 
   public:
-    virtual ~CWeapon() = default;
+    virtual ~CWeapon();
+    bool ShowHandModel(DBOOL);
+    HOBJECT m_hHandModel = nullptr;
+    HATTACHMENT m_hHandAttachment = 0;
+    std::string hand_error;
     void Init(HOBJECT owner, CInventoryMgr* inventory, bool left)
     {
         m_hOwner = owner;

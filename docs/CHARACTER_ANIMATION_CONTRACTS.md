@@ -121,3 +121,8 @@ The installed corpus covers 326 clips and 6,410 node queries across the seven
 models above. All lack the two standard ankle names; Gideon also lacks the two
 upper-arm names. Their original predecessor fallback is explicit in inspection.
 The table contains 227 stored slots (219 lookups include retry assignments).
+
+The [held-model/attachment continuation](ATTACHMENT_CONTRACTS.md) adds original
+Beretta/knife held children and typed visual attachments. Earlier blanket hand-model
+and attachment omissions are superseded for this bounded subset. Dropping, physical
+attachments, client visibility SFX and complete M2 remain unavailable.

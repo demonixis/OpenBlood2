@@ -602,6 +602,18 @@ namespace OpenBlood2
             return fail(ObjectError::InvalidHandle, "RemoveObject: invalid/stale handle");
         if (record->life == Life::Pending || record->life == Life::Destroying)
             return true;
+        // Relations never own children. Both endpoint removals invalidate them before callbacks.
+        for (auto it = attachments_.begin(); it != attachments_.end();)
+        {
+            if (it->second.parent == h || it->second.child == h)
+            {
+                if (auto* child = get(it->second.child))
+                    child->attachment = 0;
+                it = attachments_.erase(it);
+            }
+            else
+                ++it;
+        }
         record->life = Life::Pending;
         record->scheduled = false;
         pending_.push_back(h);

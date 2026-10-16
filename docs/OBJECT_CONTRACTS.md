@@ -80,3 +80,8 @@ Unknown/duplicate properties still reject; world-file creation defaults are unch
 The [AI path-manager continuation](PATH_MANAGER_CONTRACTS.md) corrects GetNextObject
 to enumerate only active Alive objects. Editor snapshots remain inclusive; pending
 and stale handles are excluded. Stable slot order is not claimed retail-equivalent.
+
+The [held-model/attachment continuation](ATTACHMENT_CONTRACTS.md) adds original
+Beretta/knife held children and typed visual attachments. Earlier blanket hand-model
+and attachment omissions are superseded for this bounded subset. Dropping, physical
+attachments, client visibility SFX and complete M2 remain unavailable.

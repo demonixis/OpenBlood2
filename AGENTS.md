@@ -241,3 +241,10 @@ body-first rays, head retry only after an obstruction, target-hit requirements a
 checked lifetime. Current head poses and hidden/reload inspection are exercised;
 range/FOV, target acquisition, states, attacks and production NPCs remain unported.
 The 17 unsupported SubwayA entries and actual M2 gate remain unchanged.
+
+The latest [held-model/attachment evidence](../Documentation/Implementation/M2_ATTACHMENTS.md) connects original CWeapon held models,
+selected inventory visibility and typed parent/node transforms. Read [contracts](docs/ATTACHMENT_CONTRACTS.md).
+Preserve original gun-node/origin fallback, handheld clip, independent child removal,
+non-reused IDs and deferred ownership cleanup. Visual children only: chains, physical
+children, dropped weapons and client visibility SFX remain unavailable. Hidden/reload
+inspection runs outside UI; required AI/ExitTrigger/FX keep M2 incomplete.

@@ -351,7 +351,7 @@ namespace
         {
             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
             CHECK(g.objects.snapshot().size() == 197 && g.server.light_effects.size() == 12);
-            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 188);
+            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 189 && g.objects.attachments().size() == 1);
             KeyFramer* path = nullptr;
             for (auto id : g.objects.snapshot())
                 if (auto* f = dynamic_cast<KeyFramer*>(g.objects.get(id)->game.get());

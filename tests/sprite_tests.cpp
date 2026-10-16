@@ -391,7 +391,7 @@ namespace
                 if (r->sprite)
                     CHECK(r->sprite_track.frame == 0 && std::abs(r->sprite_track.milliseconds - 20) < 1e-6);
             }
-            CHECK(g.objects.snapshot().size() == 188 && !g.run_world(error) &&
+            CHECK(g.objects.snapshot().size() == 189 && g.objects.attachments().size() == 1 && !g.run_world(error) &&
                   error.find("17 uninstantiated") != std::string::npos);
             CHECK(g.unload_world() && weak.expired() && g.objects.snapshot().empty() && g.server.string_count() == 0 &&
                   g.server.message_count() == 0 && g.server.list_count() == 0);

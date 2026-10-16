@@ -8,6 +8,7 @@
 #include "game/original/DetailSprite.h"
 #include "game/original/Door.h"
 #include "game/original/GameStartPoint.h"
+#include "game/original/HandWeaponModel.h"
 #include "game/original/Key.h"
 #include "game/original/KeyFramer.h"
 #include "game/original/KeyPickup.h"
@@ -56,6 +57,7 @@ namespace OpenBlood2
                               {"Gravity", false, false},
                               {"TouchNotify", false, false},
                               {"Rayhit", false, false}}};
+        const ClassInfo hand_model{"CHandWeaponModel", &base, construct<CHandWeaponModel>, {}};
         const ClassInfo b2base{
             "B2BaseClass",
             &base,
@@ -601,7 +603,7 @@ namespace OpenBlood2
                objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
                objects.register_class(toggle_trigger) && objects.register_class(door) &&
                objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
-               objects.register_class(rotating_brush);
+               objects.register_class(rotating_brush) && objects.register_class(hand_model);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

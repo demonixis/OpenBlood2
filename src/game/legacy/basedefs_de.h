@@ -35,6 +35,8 @@ using HCLASS = const OpenBlood2::ClassInfo*;
 using HCONVAR = ConsoleVariable*;
 using HCLIENT = ClientHandle*;
 using HMODELANIM = DDWORD;
+using HATTACHMENT = std::uint64_t; // Checked, non-reused session identity; no DLL ABI.
+inline constexpr DRESULT DE_NODENOTFOUND = 59;
 inline constexpr DDWORD MS_PLAYDONE = 1;
 struct ArgList
 {

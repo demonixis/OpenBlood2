@@ -80,6 +80,15 @@ namespace OpenBlood2
             return slot != UINT32_MAX;
         }
     };
+    struct Attachment
+    {
+        HATTACHMENT id = 0;
+        HOBJECT parent = nullptr, child = nullptr;
+        std::string node;
+        DVector offset{};
+        DRotation rotation;
+        bool resolved = false;
+    };
     struct ObjectRecord
     {
         ObjectId id;
@@ -102,6 +111,7 @@ namespace OpenBlood2
         DBYTE blocking_priority = 0;
         std::uint64_t body_steps = 0, body_pushes = 0;
         MoverResult body_result = MoverResult::Moved;
+        HATTACHMENT attachment = 0;
         bool client_movement = false; // Local MoveMgr owns integration while associated.
         std::shared_ptr<const Model> model;
         std::shared_ptr<const Sprite> sprite;
@@ -162,6 +172,15 @@ namespace OpenBlood2
         std::vector<ObjectId> container_snapshot() const;
         HOBJECT next_alive(HOBJECT previous) const;
         const PropertyValue* property(std::string_view name) const;
+        DRESULT attach(HOBJECT, HOBJECT, const char*, const DVector*, const DRotation*, HATTACHMENT*);
+        DRESULT detach(HATTACHMENT);
+        DRESULT find_attachment(HOBJECT, HOBJECT, HATTACHMENT*) const;
+        bool refresh_attachment(HOBJECT);
+        bool refresh_attachments();
+        const std::map<HATTACHMENT, Attachment>& attachments() const
+        {
+            return attachments_;
+        }
         bool link(HOBJECT owner, HOBJECT target);
         void unlink(HOBJECT owner, HOBJECT target);
         std::size_t link_count(HOBJECT owner) const;
@@ -189,6 +208,8 @@ namespace OpenBlood2
             std::uint32_t generation = 1;
             std::unique_ptr<ObjectRecord> object;
         };
+        std::map<HATTACHMENT, Attachment> attachments_;
+        HATTACHMENT next_attachment_ = 1;
         std::map<std::string, HCLASS, CaseLess> classes_;
         std::vector<Slot> slots_;
         std::vector<std::unique_ptr<DObject>> handles_;
@@ -213,6 +234,7 @@ namespace OpenBlood2
                 id = {};
         }
     };
+    bool object_node_transform(const ObjectRecord&, const char*, DVector*, DRotation*);
     std::string property_text(const PropertyValue& value);
     bool generic_property(const PropertyValue& value, GenericProp& out);
     const char* life_name(Life life);

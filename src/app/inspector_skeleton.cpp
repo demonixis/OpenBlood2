@@ -9,6 +9,28 @@ namespace OpenBlood2
         ImGui::TextWrapped("Current ABC node transforms and original CAnim_Sound tables. Spheres are the original "
                            "initialization radii, shown at live node positions; damage localization and complete AI "
                            "behavior remain unported.");
+        if (ImGui::CollapsingHeader("Live attachments", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::TextWrapped("Held models follow current parent nodes. Visual children only; skins and first-person "
+                               "visibility SFX are not rendered.");
+            for (const auto& [id, a] : game.objects.attachments())
+            {
+                const auto* parent = game.objects.get(a.parent);
+                const auto* child = game.objects.get(a.child);
+                if (!parent || !child)
+                    continue;
+                ImGui::Text("#%llu %s -> %s | %s | %s", (unsigned long long)id, parent->state.m_Name,
+                            child->state.m_Name, a.node.empty() ? "object origin (no gun node)" : a.node.c_str(),
+                            a.resolved ? "resolved" : "POSE UNAVAILABLE");
+                ImGui::Text("Child %.2f %.2f %.2f | %s / %s", child->state.m_Pos.x, child->state.m_Pos.y,
+                            child->state.m_Pos.z, child->state.m_Flags & FLAG_VISIBLE ? "visible" : "hidden",
+                            child->activity == OBJSTATE_ACTIVE ? "active" : "inactive");
+                ImGui::TextWrapped("%s | skin indexed: %s", child->state.m_Filename,
+                                   game.resources.find(child->state.m_SkinName) ? "yes" : "NO");
+            }
+            if (game.objects.attachments().empty())
+                ImGui::TextUnformatted("No live attachments");
+        }
         if (!game.objects.get(skeleton_selection))
         {
             if (const auto* player = game.server_shell.Player(game.local_client))

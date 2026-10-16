@@ -97,6 +97,11 @@ namespace OpenBlood2
             active().trace_service("SetObjectFlags");
             if (auto* r = active().objects_.get(h))
             {
+                if (r->attachment && (flags & (FLAG_SOLID | FLAG_GRAVITY | FLAG_RAYHIT | FLAG_TOUCH_NOTIFY)))
+                {
+                    active().objects_.fail(ObjectError::Unsupported, "Physical attached children are unsupported");
+                    return;
+                }
                 if (r->container && (flags & (FLAG_SOLID | FLAG_GRAVITY)))
                 {
                     active().objects_.fail(ObjectError::Unsupported, "Container solid/gravity flags are unsupported");
@@ -159,14 +164,17 @@ namespace OpenBlood2
             active().trace_service("GetObjectPos");
             if (out)
             {
-                auto* r = active().objects_.get(h);
-                *out = r ? r->state.m_Pos : DVector{};
+                auto& o = active().objects_;
+                auto* r = o.get(h);
+                *out = r && o.refresh_attachment(h) ? r->state.m_Pos : DVector{};
             }
         };
         GetObjectRotation = [](HOBJECT h, DRotation* out) -> DRESULT
         {
             active().trace_service("GetObjectRotation");
             auto* r = active().objects_.get(h);
+            if (r && !active().objects_.refresh_attachment(h))
+                return DE_ERROR;
             if (out)
                 *out = r ? r->state.m_Rotation : DRotation{};
             return r && out ? DE_OK : DE_INVALIDPARAMS;

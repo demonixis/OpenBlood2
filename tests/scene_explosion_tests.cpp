@@ -317,7 +317,7 @@ namespace
                   counts[EntryState::Failed] == 0);
             CHECK(g.objects.snapshot().size() == 194 && g.enter_player(error) && g.objects.snapshot().size() == 197 &&
                   g.step(.02));
-            CHECK(g.objects.snapshot().size() == 188);
+            CHECK(g.objects.snapshot().size() == 189 && g.objects.attachments().size() == 1);
             auto* player = g.server_shell.Player(g.local_client);
             CHECK(player);
             auto health = player->m_damage.m_fHitPoints;

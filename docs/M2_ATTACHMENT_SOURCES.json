@@ -1,0 +1,103 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "b79cb21ff5eac8e74a635664220c3728dd170a40",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "selected_lines": [
+        [
+          241,
+          259
+        ],
+        [
+          362,
+          390
+        ],
+        [
+          1404,
+          1471
+        ]
+      ],
+      "use": "Selected destructor, ShowHandModel and CreateHandModel rules; checked handles and explicit failures"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/HandWeaponModel.cpp",
+      "sha256": "480adb2a0ad140120bb9ddb160cf8f8112508abdf70e218067213e0f04c8ed96",
+      "selected_lines": [
+        [
+          30,
+          115
+        ],
+        [
+          202,
+          227
+        ]
+      ],
+      "use": "Held model initialization and first-update visibility; drop/SFX/precreate fallthrough excluded"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "selected_lines": [
+        [
+          842,
+          898
+        ],
+        [
+          2700,
+          2711
+        ]
+      ],
+      "use": "Remove old selected hands and create living current hands"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          1771,
+          1780
+        ]
+      ],
+      "use": "Dead-player hand hiding"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "selected_lines": [
+        [
+          619,
+          634
+        ],
+        [
+          797,
+          804
+        ]
+      ],
+      "use": "Typed attachment services; strengthen undefined removal lifetime"
+    },
+    {
+      "path": "sources/lithtech/runtime/shared/src/shared_iltcommon.cpp",
+      "sha256": "52de1688c2dc67b8b3798663a0f3b489a9b8a46220d328185e5d572830f785c3",
+      "selected_lines": [
+        [
+          141,
+          193
+        ]
+      ],
+      "use": "Reference only: compose parent/node rotation and unscaled offset; not an imported engine service"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/HandWeaponModel.h",
+      "sha256": "d2688a041b58493e7a21e854568a375e1bb3ade0568037acdc7705e6388bc04a",
+      "selected_lines": [
+        [
+          29,
+          68
+        ]
+      ],
+      "use": "Original held metadata and stored SetVisible request; borrowed weapon pointer replaced"
+    }
+  ]
+}

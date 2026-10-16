@@ -22,6 +22,8 @@ namespace OpenBlood2
             return SegmentResult::Invalid;
         if (!collision || !collision_ready)
             return SegmentResult::Unavailable;
+        if (!objects_.refresh_attachments())
+            return SegmentResult::Invalid;
         CollisionHit nearest;
         const auto world_result = collision->sweep(from, to, {}, nearest);
         if (world_result == CollisionQuery::Invalid)

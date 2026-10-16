@@ -359,7 +359,8 @@ namespace
             for (unsigned i = 0; i < 6; ++i)
                 CHECK(g.step(1.0 / 60));
             v = g.server.audio.get(id);
-            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 188);
+            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 189 &&
+                  g.objects.attachments().size() == 1);
             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
                   !g.server.audio.cached_clips() && !g.server.audio.get(id) && !g.server.message_count() &&
                   !g.server.list_count() && !g.server.string_count());

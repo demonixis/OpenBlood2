@@ -49,7 +49,7 @@ namespace OpenBlood2
         DRotation q = rotation ? *rotation : DRotation{};
         if (!record || record->life != Life::Alive || !physics_vector(position) || (rotation && !normalize(q)))
             return MoverResult::Invalid;
-        if (record->container || record->client_movement)
+        if (record->attachment || record->container || record->client_movement)
             return MoverResult::Unavailable;
         if (record->world_model)
         {
