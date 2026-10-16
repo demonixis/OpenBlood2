@@ -123,3 +123,7 @@ explicit error; there is no fabricated death sequence. Skin selection is not a
 promise that every add-on texture decodes. Engine replacement activation, resize,
 friction and outside-bounds handling require retail comparison. Linux is the only
 verified platform; other platforms/XR and full M2 acceptance remain pending.
+
+The [destination initialization rehearsal](DESTINATION_TRIAL_CONTRACTS.md) extends the structural scan with temporary original callbacks and copied-player named entry.
+It isolates the current original globals, destroys the temporary session and resumes the unchanged source gameplay state.
+Ordinary second-session binding remains forbidden; no automatic transfer or completed M2 acceptance is claimed.

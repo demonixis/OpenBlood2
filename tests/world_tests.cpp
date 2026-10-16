@@ -1,8 +1,12 @@
 #include "audio_fixture.h"
 #include "game/original/AI_Mgr.h"
+#include "game/original/AmmoPickups.h"
+#include "game/original/CameraObj.h"
+#include "game/original/ExitHint.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Key.h"
 #include "game/original/PathPoint.h"
+#include "game/original/SmellHint.h"
 #include "game/server_adapter.h"
 #include <bit>
 #include <cmath>
@@ -103,7 +107,8 @@ namespace
         out.append(v);
         return out;
     }
-    Writer dat(bool gameplay = false, bool sounds = false, bool sprites = false, bool destination = false)
+    Writer dat(bool gameplay = false, bool sounds = false, bool sprites = false, bool destination = false,
+               unsigned trial = 0)
     {
         Writer w;
         w.u32(56);
@@ -122,8 +127,23 @@ namespace
         value.real(1.5);
         Writer yes;
         yes.byte(1);
-        w.u32(destination ? 5 : sprites ? 6 : gameplay || sounds ? 4 : 1);
-        if (destination)
+        w.u32(trial ? (trial == 2 ? 6 : 7) : destination ? 5 : sprites ? 6 : gameplay || sounds ? 4 : 1);
+        if (trial)
+        {
+            Writer arrival;
+            arrival.vec(trial == 3 ? 10000 : 0, 100, 0);
+            if (trial != 2)
+                w.append(object("GameStartPoint",
+                                {string_prop("Name", "arrival"), prop("Pos", 1, arrival),
+                                 string_prop("TriggerTarget", "entry-camera"), string_prop("TriggerMessage", "ON")}));
+            w.append(object("CameraObj", {string_prop("Name", "entry-camera")}));
+            w.append(object("PathPoint", {string_prop("Name", "WALK0"), prop("Pos", 1, arrival)}));
+            w.append(object("SmellHint", {string_prop("Name", "scent")}));
+            w.append(object("ExitHint", {string_prop("Name", "exit")}));
+            w.append(object("BulletAmmoPU", {string_prop("Name", "bullets"), prop("Pos", 1, arrival)}));
+            w.append(object("Sound", {string_prop("Filename", trial == 4 ? "absent.wav" : "cue.wav")}));
+        }
+        else if (destination)
         {
             w.append(object("DestinationProbe", {string_prop("Name", "owned"), prop("Pos", 1, pos)}));
             w.append(object("DirLight", {string_prop("Name", "spot")}));
@@ -193,7 +213,7 @@ namespace
         w.zero(8); // Surface packed payload may contain NaN bits.
         w.u16(0);
         w.u32(0);
-        w.u32(destination ? 1 : 0);
+        w.u32(destination || trial ? 1 : 0);
         w.u32(0);
         w.byte(0);
         w.u16(20); // Serialized material flags, independent of surface flags.
@@ -204,13 +224,22 @@ namespace
             w.u16(i);
             w.zero(3);
         }
-        w.vec();
-        w.vec(10, 0, 0);
-        w.vec(0, 0, 10);
+        if (trial)
+        {
+            w.vec(-1000, 0, -1000);
+            w.vec(1000, 0, -1000);
+            w.vec(0, 0, 1000);
+        }
+        else
+        {
+            w.vec();
+            w.vec(10, 0, 0);
+            w.vec(0, 0, 10);
+        }
         w.patch(start, static_cast<unsigned>(w.data.size()));
         w.u32(0); // No additional models.
-        w.vec(-10, -10, -10);
-        w.vec(10, 10, 10);
+        w.vec(trial ? -2000 : -10, trial ? -2000 : -10, trial ? -2000 : -10);
+        w.vec(trial ? 2000 : 10, trial ? 2000 : 10, trial ? 2000 : 10);
         return w;
     }
     Writer rez(const Bytes& payload, std::string_view name = "sample", std::uint32_t extension = 0x444154)
@@ -707,6 +736,11 @@ namespace
                 rejected_reentrant = !destination_session->inspect_destination(message, "arrival", error) &&
                                      error.find("callback") != std::string::npos &&
                                      destination_session->destination_inspection.attempts == before;
+                const auto trials = destination_session->destination_trial.attempts;
+                rejected_reentrant = rejected_reentrant &&
+                                     !destination_session->rehearse_destination(message, "arrival", error) &&
+                                     error.find("callbacks") != std::string::npos &&
+                                     destination_session->destination_trial.attempts == trials;
             }
             return 1;
         }
@@ -910,6 +944,228 @@ namespace
         }
         return true;
     }
+
+    struct GlobalSnapshot
+    {
+        std::array<DLink*, 7> heads{&AI_Mgr::m_CabalHead,    &AI_Mgr::m_MonsterHead, &CDestructable::m_DestructableHead,
+                                    &SmellHint::m_SmellHead, &ExitHint::m_ExitHead,  &AmmoPickup::m_PickupHead,
+                                    &CameraObj::m_CameraHead};
+        std::array<DDWORD*, 7> counts{
+            &AI_Mgr::m_dwNumCabal,     &AI_Mgr::m_dwNumMonster, &CDestructable::m_dwNumDestructables,
+            &SmellHint::m_dwNumSmells, &ExitHint::m_dwNumExits, &AmmoPickup::m_dwNumPickups,
+            &CameraObj::m_dwNumCameras};
+        std::array<DDWORD, 7> saved{};
+        std::vector<std::pair<DLink*, DLink>> links;
+        HOBJECT camera = g_hActiveCamera;
+        bool capture()
+        {
+            for (std::size_t i = 0; i < heads.size(); ++i)
+            {
+                saved[i] = *counts[i];
+                links.emplace_back(heads[i], *heads[i]);
+                auto* link = heads[i]->m_pNext;
+                unsigned walked = 0;
+                while (link && link != heads[i] && walked <= saved[i])
+                {
+                    links.emplace_back(link, *link);
+                    ++walked;
+                    link = link->m_pNext;
+                }
+                CHECK(walked == saved[i] && (!link || link == heads[i]));
+            }
+            return true;
+        }
+        bool unchanged() const
+        {
+            CHECK(camera == g_hActiveCamera);
+            for (std::size_t i = 0; i < heads.size(); ++i)
+                CHECK(*counts[i] == saved[i]);
+            for (const auto& [live, copy] : links)
+                CHECK(live->m_pPrev == copy.m_pPrev && live->m_pNext == copy.m_pNext && live->m_pData == copy.m_pData);
+            return true;
+        }
+    };
+    bool trial_fixture(GameSession& game, const std::filesystem::path& root)
+    {
+        CHECK(test_player::setup(game, root, true, true, true));
+        test_player::Directory dir;
+        for (unsigned i = 1; i <= 4; ++i)
+            dir.children["worlds"].files["trial" + std::to_string(i) + ".dat"] =
+                dat(false, false, false, false, i).data;
+        dir.children["worlds"].files["broken.dat"] = {56, 0, 0, 0};
+        dir.files["cue.wav"] = test_audio::wave();
+        test_model::Writer archive;
+        archive.b.resize(168);
+        archive.b[0] = archive.b[62] = archive.b[124] = 13;
+        archive.b[1] = archive.b[63] = archive.b[125] = 10;
+        archive.b[126] = 26;
+        archive.patch(127, 1);
+        const auto [offset, size] = test_player::write_dir(archive, dir);
+        archive.patch(131, offset);
+        archive.patch(135, size);
+        CHECK(save(root / "trial.rez", archive.b));
+        std::string error;
+        CHECK(game.resources.mount(root / "trial.rez", error) && game.enter_player(error));
+        // Populate the original source lists; destination destruction must not unlink these.
+        for (auto name : {"SmellHint", "ExitHint", "BulletAmmoPU", "CameraObj"})
+            CHECK(game.objects.create(game.objects.find_class(name), {}, Creation::World,
+                                      {{"Pos", DVector{200, 100, 200}}}));
+        CHECK(game.objects.finish_frame());
+        CHECK(game.step(.016)); // The source must already be a viable update before any rehearsal.
+        return true;
+    }
+    bool destination_trials(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(trial_fixture(game, root));
+        auto* player = game.server_shell.Player(game.local_client);
+        player->m_damage.SetHitPoints(37);
+        player->m_damage.SetArmorPoints(23);
+        player->m_InventoryMgr.SetAmmoCount(1, 1234);
+        CHECK(player->m_InventoryMgr.AddKey({"old-key", "Old key", "icon", "selected", 2}) == InventoryResult::Ok);
+        const auto ids = game.objects.snapshot();
+        const auto client = game.local_client;
+        const auto revision = game.world_revision;
+        const auto time = game.objects.time();
+        const auto strings = game.server.string_count();
+        GlobalSnapshot globals;
+        CHECK(globals.capture());
+        std::string error;
+        for (auto name : {"trial1", "trial4", "trial2", "trial3", "broken", "missing", "trial1"})
+        {
+            WorldMessage message;
+            CHECK(original_world_request(name, 0, LOADTYPE_NEW_LEVEL, 0, message));
+            const bool ok = game.rehearse_destination(message, "arrival", error);
+            const auto& d = game.destination_trial;
+            std::cout << name << ": loaded=" << d.world_loaded << " entered=" << d.player_entered
+                      << " cleanup=" << d.cleanup_complete << " failed=" << d.failed << " error=" << error << '\n';
+            CHECK(d.cleanup_complete && g_pServerDE == &game.server && globals.unchanged());
+            if (std::string_view(name) == "trial1" || std::string_view(name) == "trial4")
+            {
+                CHECK(ok && d.world_loaded && d.player_entered && d.entry_camera_active &&
+                      d.selected_start == "arrival");
+                CHECK(d.created == 6 && d.sounds == (std::string_view(name) == "trial1" ? 1u : 0u));
+                CHECK(d.failed == (std::string_view(name) == "trial4" ? 1u : 0u));
+                CHECK(d.health == 37 && d.armor == 23 && d.bullets == 1234 && d.keys == 0);
+            }
+            else
+                CHECK(!ok && !d.player_entered && !error.empty());
+            CHECK(game.local_client == client && game.world_revision == revision && game.objects.time() == time);
+            CHECK(game.objects.snapshot() == ids && game.client_shell.player == player->m_hObject);
+            CHECK(player->m_damage.m_fHitPoints == 37 && player->m_InventoryMgr.GetAmmoCount(1) == 1234);
+            CHECK(player->m_InventoryMgr.keys.size() == 1 && game.server.string_count() == strings);
+            CHECK(game.server.list_count() == 0 && game.server.message_count() == 0);
+        }
+        WorldMessage message;
+        CHECK(original_world_request("trial1", 0, LOADTYPE_NEW_LEVEL, 0, message));
+        CHECK(!game.rehearse_destination(message, std::string("x\0y", 3), error));
+        CHECK(globals.unchanged() && g_pServerDE == &game.server);
+        CHECK(game.rehearse_destination(message, "arrival", error));
+        const auto attempt = game.destination_trial.attempts;
+        {
+            GameSession other;
+            CHECK(!other.initialize());
+            CHECK(!other.rehearse_destination(message, "arrival", error));
+        }
+        CHECK(globals.unchanged() && game.destination_trial.attempts == attempt && g_pServerDE == &game.server);
+        const bool resumed = game.step(.016);
+        if (!resumed)
+        {
+            for (const auto& line : game.trace)
+                std::cerr << "Source trace: " << line << '\n';
+            for (const auto& line : game.objects.diagnostics())
+                std::cerr << "Source diagnostic: " << line << '\n';
+        }
+        CHECK(resumed);
+        CHECK(game.unload_world() && game.server.string_count() == 0 && game.objects.snapshot().empty());
+        CHECK(game.destination_trial.player_entered && game.destination_trial.source_revision != game.world_revision);
+        return true;
+    }
+    bool destination_trial_private(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(game.initialize());
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(game.resources.mount_game(config, error));
+        for (unsigned cycle = 0; cycle < 3; ++cycle)
+        {
+            CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error));
+            CHECK(game.step(.016));
+            auto* player = game.server_shell.Player(game.local_client);
+            player->m_damage.SetHitPoints(37);
+            player->m_InventoryMgr.SetAmmoCount(1, 1234);
+            std::vector<std::pair<AI_Mgr*, const CAnim_Sound*>> tables;
+            for (auto id : game.objects.snapshot())
+                if (auto* a = dynamic_cast<AI_Mgr*>(game.objects.get(id)->game.get()))
+                    tables.emplace_back(a, a->AnimSound());
+            CHECK(tables.size() == 15);
+            CAnim_Sound* voiced_table = nullptr;
+            for (const auto& [actor, table] : tables)
+                if (table->GetSoundRoot() == "sounds/enemies/m_cultist")
+                {
+                    // Explicit diagnostic voice: exercise retained shared-table ownership during the intro.
+                    voiced_table = const_cast<CAnim_Sound*>(table);
+                    CHECK(voiced_table->PlayVoice(actor->m_hObject, "idle1.wav", 1000, 100));
+                    break;
+                }
+            CHECK(voiced_table && voiced_table->m_hVoxSound);
+            const auto voice_id = voiced_table->m_hVoxSound;
+            std::array<std::shared_ptr<CAnim_Sound>, 4> slots;
+            AI_Mgr::ExchangeRuntimeTables(slots);
+            auto original_slots = slots;
+            AI_Mgr::ExchangeRuntimeTables(slots);
+            const auto ids = game.objects.snapshot();
+            const auto client = game.local_client;
+            const auto revision = game.world_revision;
+            const auto time = game.objects.time();
+            const auto strings = game.server.string_count();
+            std::map<SoundId, double> voices;
+            for (const auto& [id, voice] : game.server.audio.voices())
+                voices[id] = voice.cursor;
+            GlobalSnapshot globals;
+            CHECK(globals.capture());
+            for (auto name : {"02_cityhub", "01_subwaya", "16_bridge"})
+            {
+                WorldMessage message;
+                CHECK(original_world_request(name, 0, LOADTYPE_NEW_LEVEL, 0, message));
+                const bool ok = game.rehearse_destination(message, "01_egressa", error);
+                const auto& d = game.destination_trial;
+                std::cout << "Cycle " << cycle << " " << name << ": loaded=" << d.world_loaded
+                          << " entered=" << d.player_entered << " cleanup=" << d.cleanup_complete
+                          << " created=" << d.created << " unknown=" << d.unknown << " failed=" << d.failed
+                          << " objects=" << d.runtime_objects << " error=" << error << '\n';
+                CHECK(globals.unchanged() && g_pServerDE == &game.server && d.cleanup_complete);
+                if (std::string_view(name) == "16_bridge")
+                    CHECK(!ok && !d.world_loaded && !d.player_entered);
+                else
+                {
+                    CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                    if (std::string_view(name) == "02_cityhub")
+                        CHECK(d.created == 243 && d.unknown == 207 && d.failed == 35);
+                    else
+                        CHECK(d.created == 203 && d.unknown == 1 && d.failed == 0);
+                }
+                CHECK(game.objects.snapshot() == ids && game.local_client == client && game.world_revision == revision);
+                CHECK(game.objects.time() == time && game.client_shell.player == player->m_hObject);
+                CHECK(player->m_damage.m_fHitPoints == 37 && player->m_InventoryMgr.GetAmmoCount(1) == 1234);
+                CHECK(game.server.string_count() == strings && game.server.audio.voices().size() == voices.size());
+                for (const auto& [id, cursor] : voices)
+                    CHECK(game.server.audio.get(id) && game.server.audio.get(id)->cursor == cursor);
+                for (const auto& [ai, table] : tables)
+                    CHECK(ai->AnimSound() == table);
+                CHECK(voiced_table->m_hVoxSound == voice_id && game.server.audio.get(voice_id));
+                AI_Mgr::ExchangeRuntimeTables(slots);
+                CHECK(slots == original_slots);
+                AI_Mgr::ExchangeRuntimeTables(slots);
+            }
+            CHECK(game.step(.016));
+            original_slots = {};
+            CHECK(game.unload_world() && game.server.string_count() == 0 && game.server.client_count() == 0);
+        }
+        return true;
+    }
     bool private_world(const std::filesystem::path& root)
     {
         GameSession game;
@@ -971,6 +1227,8 @@ int main(int argc, char** argv)
     std::filesystem::path root = argc > 2 ? path_from_utf8(argv[2]) : std::filesystem::path{};
     if (name == "private")
         ok = private_world(root);
+    else if (name == "destination_trial_private")
+        ok = destination_trial_private(root);
     else if (name == "destination_private")
         ok = destination_private(root);
     else
@@ -980,7 +1238,9 @@ int main(int argc, char** argv)
             std::filesystem::create_directories(root, ec);
         if (ec)
             return 2;
-        if (name == "destination_messages")
+        if (name == "destination_trials")
+            ok = destination_trials(root);
+        else if (name == "destination_messages")
             ok = destination_messages();
         else if (name == "destination_schema")
             ok = destination_schema();

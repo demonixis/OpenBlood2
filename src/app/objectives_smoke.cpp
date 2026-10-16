@@ -78,6 +78,13 @@ namespace OpenBlood2
             if (g.client_shell.world_exit.received != received || !g.step(.05) || trigger->last_delivery != DE_OK)
                 return false;
         }
+        const auto trial_before = g.destination_trial.attempts;
+        if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+            g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+            !g.destination_trial.player_entered || g.destination_trial.created != 243 ||
+            g.destination_trial.unknown != 207 || g.destination_trial.failed != 35 ||
+            g.destination_trial.selected_start != "01_egressa")
+            return false;
         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
                g.client_shell.world_exit.blocked == blocked + 1 && g.server_shell.inventory_capture.valid &&
                g.server_shell.inventory_capture.captures == captures + 1 &&

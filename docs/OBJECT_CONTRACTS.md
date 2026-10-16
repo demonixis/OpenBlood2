@@ -98,3 +98,7 @@ Autonomous acquisition/retention and full AI behavior remain unavailable.
 The [destination preparation continuation](DESTINATION_CONTRACTS.md) shares const property validation and structural CPU preparation with fresh loading.
 Blocked exits now perform read-only destination lookup after refusing transfer; earlier blanket resource-lookup omissions are historical.
 No destination callbacks run and no active session is discarded; safe automatic NEW_LEVEL and M2 remain incomplete.
+
+The [destination initialization rehearsal](DESTINATION_TRIAL_CONTRACTS.md) extends the structural scan with temporary original callbacks and copied-player named entry.
+It isolates the current original globals, destroys the temporary session and resumes the unchanged source gameplay state.
+Ordinary second-session binding remains forbidden; no automatic transfer or completed M2 acceptance is claimed.

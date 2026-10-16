@@ -1473,10 +1473,10 @@ namespace
                 spdlog::info("CAMERAS smoke: original camera tracks player while UI hidden; selected view, movement "
                              "gate and reload checked");
             if (options.objectives_smoke)
-                spdlog::info(
-                    "OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
-                    "ExitTrigger NEW_LEVEL refusal preserves player/inventory; read-only CityHub preparation "
-                    "checks 1026 entries (247 schemas / 541 editor / 207 unknown / 31 invalid); unload/reload checked");
+                spdlog::info("OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
+                             "ExitTrigger NEW_LEVEL refusal preserves player/inventory; read-only CityHub preparation "
+                             "checks 1026 entries; temporary CityHub initialization/kept-player entry, cleanup and "
+                             "source restoration checked");
             if (options.pickups_smoke)
                 spdlog::info("PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked");
             if (options.weapons_smoke)

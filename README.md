@@ -518,3 +518,6 @@ The [original explosion flame continuation](../Documentation/Implementation/M2_E
 
 The [destination preparation continuation](../Documentation/Implementation/M2_DESTINATION.md) inspects destination DAT geometry, primary collision and property schemas without leaving the current session.
 Original callbacks/resources/start triggers are still unverified; this prerequisite does not enable automatic NEW_LEVEL or close M2.
+
+The [destination initialization continuation](../Documentation/Implementation/M2_DESTINATION_TRIAL.md) now executes original destination callbacks and named player entry in a temporary session, destroys it and resumes the retained source.
+Earlier callback-validation omissions are superseded for this explicit rehearsal only; destination promotion, required services and safe NEW_LEVEL still keep M2 open.

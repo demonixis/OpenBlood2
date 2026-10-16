@@ -791,3 +791,9 @@ particle rendering are documented adaptations, not a retail engine/RNG parity cl
 The [source ledger](M2_DESTINATION_SOURCES.json) records the original shell ordering and selected preprocessor-only classes.
 The [read-only preparation](DESTINATION_CONTRACTS.md) is new engine code using existing DAT/collision readers and exact property schemas;
 no new original method, reference engine dependency or commercial asset is imported. Original NEW_LEVEL execution remains refused.
+
+## Isolated destination initialization rehearsal
+
+New `destination_trial.cpp` exchanges the ported original lists, camera, shared AI tables and adapter binding to execute existing original world/KeepAlive entry callbacks in a disposable session. No new original method bodies or reference-engine code are imported.
+See [ledger](M2_DESTINATION_TRIAL_SOURCES.json), [contracts](DESTINATION_TRIAL_CONTRACTS.md) and [evidence](../../Documentation/Implementation/M2_DESTINATION_TRIAL.md).
+This is synchronous diagnostic isolation, not recovered retail staging or a completed level transfer.

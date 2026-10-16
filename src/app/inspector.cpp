@@ -326,6 +326,15 @@ namespace OpenBlood2
                 world_error = "Invalid destination request";
             inspect_destination_request = false;
         }
+        if (trial_destination_request)
+        {
+            WorldMessage message;
+            if (original_world_request(keep_world_name, 0, LOADTYPE_NEW_LEVEL, 0, message))
+                game.rehearse_destination(message, keep_start_name, world_error);
+            else
+                world_error = "Invalid destination request";
+            trial_destination_request = false;
+        }
         if (keep_world_request)
         {
             if (!game.local_client)
@@ -1062,8 +1071,14 @@ namespace OpenBlood2
             restore_player_request = true;
         ImGui::EndDisabled();
         ImGui::InputText("Destination world", keep_world_name, sizeof(keep_world_name));
+        ImGui::InputText("Destination start (empty = start)", keep_start_name, sizeof(keep_start_name));
         if (ImGui::Button("Inspect destination without leaving"))
             inspect_destination_request = true;
+        ImGui::BeginDisabled(!player);
+        if (ImGui::Button("Rehearse destination entry; retain current session"))
+            trial_destination_request = true;
+        ImGui::EndDisabled();
+        draw_destination_trial(game);
         draw_destination(game);
         ImGui::BeginDisabled(player);
         if (ImGui::Button("Load destination for inspection"))
@@ -1071,7 +1086,6 @@ namespace OpenBlood2
         ImGui::EndDisabled();
         ImGui::TextWrapped(
             "Leave the player before loading. Loading replaces the current world; the captured player is retained.");
-        ImGui::InputText("Destination start (empty = start)", keep_start_name, sizeof(keep_start_name));
         ImGui::BeginDisabled(player || !game.restoration.saved || game.world_path.empty());
         if (ImGui::Button("Enter loaded world with captured player"))
             keep_player_request = true;

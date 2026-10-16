@@ -470,3 +470,8 @@ The [destination preparation continuation](../Documentation/Implementation/M2_DE
 Read [contracts](docs/DESTINATION_CONTRACTS.md). Preserve separate syntax/execution policy, const schema checks, one final-request scan per pump,
 owned report lifetime and callback refusal. Schema success never implies callback/resource readiness or authorizes teardown.
 Automatic NEW_LEVEL, required remaining services and M2 remain incomplete.
+
+The [destination initialization continuation](../Documentation/Implementation/M2_DESTINATION_TRIAL.md) runs temporary original callbacks and named KeepAlive entry while retaining the source session.
+Read [contracts](docs/DESTINATION_TRIAL_CONTRACTS.md). Preserve fixed sentinel addresses, all seven list/count pairs, active camera, four shared AI table owners and adapter binding.
+Destroy the temporary session under its own adapter before resuming source globals; every new mutable game global needs auditing.
+No destination simulation tick, runtime promotion or transfer is implemented. Monotonic audio IDs are not rewound; M2 remains incomplete.

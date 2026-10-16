@@ -302,6 +302,8 @@ namespace OpenBlood2
         std::unordered_map<HMESSAGEWRITE, Message> messages_;
         std::vector<std::unique_ptr<ObjectList>> list_tokens_;
         std::unordered_set<ObjectList*> lists_;
+        // Only the synchronous destination rehearsal may temporarily suspend this binding.
+        friend class GameSession;
         static ServerAdapter* active_;
         static ServerAdapter& active();
         HSTRING make_string(const char* text);
@@ -348,6 +350,8 @@ namespace OpenBlood2
             unload_world();
         }
         DestinationInspection destination_inspection;
+        DestinationTrial destination_trial;
+        bool rehearse_destination(const WorldMessage&, std::string_view start, std::string& error);
         bool inspect_destination(const WorldMessage&, std::string_view start, std::string& error);
         bool load_world(const WorldMessage& message, std::string& error);
         bool request_world(std::string_view name, std::string& error);

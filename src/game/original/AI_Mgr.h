@@ -103,6 +103,7 @@ class AI_Mgr : public CBaseCharacter
         Civilian
     };
     static void ResetRuntimeTables();
+    static void ExchangeRuntimeTables(std::array<std::shared_ptr<CAnim_Sound>, 4>&);
     void ConfigureRuntime(NPCType); // Original constructor defaults, selected by production factories only.
     bool AI_Update();
     bool RuntimeReady() const

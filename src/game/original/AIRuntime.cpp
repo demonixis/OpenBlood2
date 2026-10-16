@@ -22,6 +22,10 @@ namespace
         return true;
     }
 } // namespace
+void AI_Mgr::ExchangeRuntimeTables(std::array<std::shared_ptr<CAnim_Sound>, 4>& other)
+{
+    tables.swap(other);
+}
 void AI_Mgr::ResetRuntimeTables()
 {
     tables = {};

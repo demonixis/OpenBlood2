@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "8e000ed86bd701ba32f4ceda28094240fb621009",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "use": "KeepAliveSave -> LoadWorld -> KeepAliveLoad -> RunWorld and named arrival order"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "use": "Existing selected player restore and GoToStartPoint callbacks"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "Original shared faction lists"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CultistAI.cpp",
+      "sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
+      "use": "Original class/gender shared animation and sound tables"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
+      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
+      "use": "Original class/gender shared tables and initialization ordering"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CameraObj.cpp",
+      "sha256": "5255f0d0efe9ba67b081f5ea8684d8ed60cf94c8f23caaad8c186c21718756ec",
+      "use": "Original static camera list and active camera"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "use": "Original shared destructible list"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/SmellHint.cpp",
+      "sha256": "65989aab4012e0b67e7f13403fb59a5260f9435b8a792d40a3dfbe1d2db7241e",
+      "use": "Original shared smell list"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ExitHint.cpp",
+      "sha256": "e3939c2ad9729e960b05b3dc366769b85424de808bacb2b538204edf8b522103",
+      "use": "Original shared exit-hint list"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AmmoPickups.cpp",
+      "sha256": "3ea2f1ba0b90298563b5a97c451e4e1d60e0b10fdd666320944edb23afa50696",
+      "use": "Original shared pickup list"
+    }
+  ],
+  "adaptations": [
+    "New synchronous temporary-session rehearsal; no new original functions imported",
+    "Exchange seven fixed-address intrusive heads/counts, active camera, four AI table owners and server binding; restore only after destination destruction",
+    "Retain source difficulty, copy mounted index metadata, run existing original initialization and typed KeepAlive player entry without advancing destination simulation",
+    "Owned diagnostic outcomes only; no promotion, transfer acceptance or NEW_LEVEL execution policy change",
+    "Process-wide audio ID allocation remains monotonic, and existing source hardware output is not rewound"
+  ],
+  "remaining": [
+    "Automatic safe NEW_LEVEL and full client/session state",
+    "Destination runtime callbacks and missing source classes/services",
+    "Gideon, required remaining FX/illumination and actual M2 acceptance"
+  ]
+}

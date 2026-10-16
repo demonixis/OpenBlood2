@@ -76,3 +76,7 @@ and [source ledger](M2_DESTINATION_SOURCES.json). Safe NEW_LEVEL still needs pro
 against destination original initialization/start-trigger failures while preserving
 the current world, and must resolve required classes/services. Reloading the old DAT
 would lose current NPC/world state and does not count as rollback. M2 remains open.
+
+The [destination initialization rehearsal](DESTINATION_TRIAL_CONTRACTS.md) extends the structural scan with temporary original callbacks and copied-player named entry.
+It isolates the current original globals, destroys the temporary session and resumes the unchanged source gameplay state.
+Ordinary second-session binding remains forbidden; no automatic transfer or completed M2 acceptance is claimed.

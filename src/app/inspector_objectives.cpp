@@ -63,6 +63,47 @@ namespace OpenBlood2
         }
         ImGui::TreePop();
     }
+    void Inspector::draw_destination_trial(const GameSession& game)
+    {
+        const auto& d = game.destination_trial;
+        if (!d.attempts || !ImGui::TreeNodeEx("Destination initialization rehearsal", ImGuiTreeNodeFlags_DefaultOpen))
+            return;
+        ImGui::TextWrapped("%s -> %s / requested start %s / selected %s", d.source_world.c_str(), d.destination.c_str(),
+                           d.requested_start.c_str(), d.selected_start.c_str());
+        ImGui::Text("Attempts %llu / source revision %llu / current %llu", (unsigned long long)d.attempts,
+                    (unsigned long long)d.source_revision, (unsigned long long)game.world_revision);
+        ImGui::Text("World loaded %s / player entered %s / cleanup %s", d.world_loaded ? "yes" : "no",
+                    d.player_entered ? "yes" : "no", d.cleanup_complete ? "complete" : "not completed");
+        ImGui::Text("%zu created / %zu sounds / %zu editor / %zu filtered / %zu unknown / %zu failed", d.created,
+                    d.sounds, d.editor_only, d.filtered, d.unknown, d.failed);
+        if (d.player_entered)
+            ImGui::Text("Restored HP %.1f / armor %.1f / bullets %.1f / keys %zu / active camera %s", d.health, d.armor,
+                        d.bullets, d.keys, d.entry_camera_active ? "yes" : "no");
+        ImGui::Text("Observed %zu runtime objects / %zu attachments / %zu voices", d.runtime_objects, d.attachments,
+                    d.voices);
+        ImGui::TextWrapped(
+            "The temporary world is discarded after the observed initialization/entry steps. The current session is "
+            "retained. "
+            "No simulation tick or transfer occurs. Missing classes/services and later callbacks remain unresolved.");
+        if (!d.error.empty())
+            ImGui::TextWrapped("Failure: %s", d.error.c_str());
+        if (ImGui::TreeNode("Rehearsal source results"))
+        {
+            ImGuiListClipper clip;
+            clip.Begin((int)d.entries.size());
+            while (clip.Step())
+                for (int i = clip.DisplayStart; i < clip.DisplayEnd; ++i)
+                {
+                    const auto& row = d.entries[i];
+                    ImGui::Text("%d: %s / %s / %s", i, row.class_name.c_str(), row.name.c_str(),
+                                entry_state_name(row.state));
+                    if (ImGui::IsItemHovered() && !row.detail.empty())
+                        ImGui::SetTooltip("%s", row.detail.c_str());
+                }
+            ImGui::TreePop();
+        }
+        ImGui::TreePop();
+    }
     void Inspector::draw_objectives(GameSession& game, ObjectSelection& selection)
     {
         if (ImGui::CollapsingHeader("Original level exits", ImGuiTreeNodeFlags_DefaultOpen))
@@ -74,6 +115,7 @@ namespace OpenBlood2
                                static_cast<unsigned>(exit.request.type), game.server_shell.start_point_name.c_str());
             ImGui::TextWrapped("%s", exit.error.empty() ? "No transfer attempted; safe NEW_LEVEL transfer unavailable."
                                                         : exit.error.c_str());
+            draw_destination_trial(game);
             draw_destination(game);
             const auto& fields = game.server_shell.player_capture;
             ImGui::Text("Player fields: %llu / %llu captures; %s", (unsigned long long)fields.captures,

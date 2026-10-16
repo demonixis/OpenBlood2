@@ -35,4 +35,20 @@ namespace OpenBlood2
                     invalid = 0;
         std::vector<DestinationEntry> entries;
     };
+    struct DestinationTrialEntry
+    {
+        std::string class_name, name, detail;
+        EntryState state = EntryState::Unsupported;
+    };
+    struct DestinationTrial
+    {
+        std::uint64_t attempts = 0, source_revision = 0;
+        std::string source_world, destination, requested_start, selected_start, error;
+        bool world_loaded = false, player_entered = false, cleanup_complete = false, entry_camera_active = false;
+        float health = 0, armor = 0, bullets = 0;
+        std::size_t keys = 0;
+        std::size_t created = 0, sounds = 0, editor_only = 0, filtered = 0, unknown = 0, failed = 0;
+        std::size_t runtime_objects = 0, attachments = 0, voices = 0;
+        std::vector<DestinationTrialEntry> entries;
+    };
 } // namespace OpenBlood2
