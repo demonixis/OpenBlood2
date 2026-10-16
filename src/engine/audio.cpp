@@ -200,7 +200,9 @@ namespace OpenBlood2
             !physics_vector(position) || !std::isfinite(request.volume) || request.volume < 0 || request.volume > 1 ||
             !std::isfinite(request.inner_radius) || !std::isfinite(request.outer_radius) || request.inner_radius < 0 ||
             request.outer_radius <= request.inner_radius || request.outer_radius > 1e6f ||
-            request.resource.size() > 100)
+            request.resource.size() > 100 ||
+            (request.space != SoundSpace::Local && request.space != SoundSpace::Ambient &&
+             request.space != SoundSpace::Spatial))
         {
             error = "Invalid or over-limit sound request";
             return 0;
@@ -249,18 +251,18 @@ namespace OpenBlood2
             if (v.done)
                 continue;
             float gain = v.request.volume, pan = 0;
-            if (!v.request.local)
+            if (v.request.space != SoundSpace::Local)
             {
                 const auto direction = vector_subtract(v.position, listener);
                 const auto distance = std::sqrt(vector_dot(direction, direction));
                 gain *=
                     std::clamp((v.request.outer_radius - distance) / (v.request.outer_radius - v.request.inner_radius),
                                0.0f, 1.0f);
-                if (distance > 1e-6f)
+                if (v.request.space == SoundSpace::Spatial && distance > 1e-6f)
                     pan = std::clamp(vector_dot(direction, right) / distance, -1.0f, 1.0f);
             }
-            v.left = gain * (v.request.local ? 1 : std::sqrt((1 - pan) * .5f));
-            v.right = gain * (v.request.local ? 1 : std::sqrt((1 + pan) * .5f));
+            v.left = gain * (v.request.space != SoundSpace::Spatial ? 1 : std::sqrt((1 - pan) * .5f));
+            v.right = gain * (v.request.space != SoundSpace::Spatial ? 1 : std::sqrt((1 + pan) * .5f));
             const auto& clip = *v.clip;
             const double increment = double(clip.rate) / rate;
             for (std::size_t frame = 0; frame < count; ++frame)

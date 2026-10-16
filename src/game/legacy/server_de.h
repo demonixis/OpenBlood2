@@ -33,6 +33,8 @@ class ServerDE : public CSBase
 {
   public:
     virtual OpenBlood2::SoundId PlayCinematicSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
+    virtual OpenBlood2::SoundId PlaySoundAt(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
+    virtual bool RandomInt(int, int, int&) = 0;
     virtual bool IsSoundDone(OpenBlood2::SoundId, bool&) = 0;
     virtual bool KillSound(OpenBlood2::SoundId) = 0;
 

@@ -156,3 +156,12 @@ not rendered. General sound emitters/music and complete M2 acceptance remain ope
 SubwayA now has 164 created source entries, 7 SelfTriggers, 372 editor-only and
 44 unported (171/174 runtime before/after player, 162/165 after consuming nine Keys).
 Earlier CinematicTrigger/audio omissions are superseded only for this subset.
+
+The latest [random sound evidence](../Documentation/Implementation/M2_RANDOM_SOUNDS.md) connects original RandomSoundFX and typed fixed-position ambient/spatial voices.
+Read [random sound contracts](docs/RANDOM_SOUND_CONTRACTS.md). Preserve case-sensitive prefix commands,
+OFF voice tails, first-empty list termination, interval-based replacement, sequence
+progression after failed starts, and one release per message read. Ambient attenuates
+without panning; sampled voices do not follow later emitter motion. Built-in Sound
+loops/streaming and other audio callers remain missing. SubwayA now has 166 created
+source entries, 7 SelfTriggers, 372 editor-only and 42 unported (173/176 runtime
+before/after player, 164/167 after consuming nine Keys). M2 remains incomplete.

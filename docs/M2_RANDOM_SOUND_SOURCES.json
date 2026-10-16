@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "84fac9b1a94b59d717be1319e1a4539876b46e41",
+  "status": "M2 incomplete; original RandomSoundFX with typed owned fixed-position audio",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/RandomSoundFX.cpp",
+      "source_line_ranges": [
+        [
+          20,
+          440
+        ]
+      ],
+      "source_sha256": "c5e6fd0000ea3f059c141bf46b8c0a8680cbbc11ff65627942c3277e2e0d4979",
+      "purpose": "Selected constructor/destructor, properties, callbacks, trigger prefixes, random/sequential choice, fixed placement and interval scheduling; save/load/precache excluded."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/RandomSoundFX.h",
+      "source_line_ranges": [
+        [
+          1,
+          71
+        ]
+      ],
+      "source_sha256": "b41cce07697e6f3de80096a6c19d54e13aec0bc7c45907ebdd5747ed4a8fe274",
+      "purpose": "Original state, ten-slot list and owned voice lifetime."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/basedefs_de.h",
+      "source_line_ranges": [
+        [
+          524,
+          620
+        ]
+      ],
+      "source_sha256": "10f543764aa94339f2e48edcba384dda3cdce2d738f0be2731dcff3a1117fb72",
+      "purpose": "Original mutually exclusive local/ambient/3D semantics, position and handle lifetime documentation."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/engineobjects.c",
+      "source_line_ranges": [
+        [
+          307,
+          431
+        ]
+      ],
+      "source_sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
+      "purpose": "Read-only next-step reference: built-in Sound loops outlive immediate source removal; not imported in this increment."
+    }
+  ],
+  "ports": [
+    "src/game/original/RandomSoundFX.h",
+    "src/game/original/RandomSoundFX.cpp"
+  ],
+  "adaptations": [
+    "Value-owned file strings and checked monotonic SoundId replace legacy handles",
+    "Release trigger message once instead of original double FreeString",
+    "Bound and validate ranges; reject restore, retain zero-delay disabling",
+    "Typed ambient/spatial mode and fixed-position ownership reuse bounded WAV/SDL audio",
+    "Portable seeded integer/float RNG is not retail-bit-identical"
+  ],
+  "unsupported": [
+    "Built-in Sound loops and streaming/world-owned voices",
+    "Priority arbitration, reverb, Doppler, occlusion, music and other game audio callers",
+    "Save/restore and complete M2 acceptance"
+  ]
+}

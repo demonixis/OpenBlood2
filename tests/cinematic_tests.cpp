@@ -1,6 +1,6 @@
+#include "audio_fixture.h"
 #include "game/game_settings.h"
 #include "game/original/CinematicTrigger.h"
-#include "player_fixture.h"
 #include <SDL3/SDL.h>
 #include <algorithm>
 #include <functional>
@@ -16,57 +16,8 @@ using namespace OpenBlood2;
     } while (false)
 namespace
 {
-    std::vector<std::uint8_t> wave(unsigned channels = 1, unsigned bits = 16, unsigned rate = 8000,
-                                   unsigned frames = 800)
-    {
-        test_model::Writer w;
-        for (char c : std::string("RIFF"))
-            w.u8(c);
-        w.u32(36 + frames * channels * (bits / 8));
-        for (char c : std::string("WAVEfmt "))
-            w.u8(c);
-        w.u32(16);
-        w.u16(1);
-        w.u16(channels);
-        w.u32(rate);
-        w.u32(rate * channels * (bits / 8));
-        w.u16(channels * (bits / 8));
-        w.u16(bits);
-        for (char c : std::string("data"))
-            w.u8(c);
-        w.u32(frames * channels * (bits / 8));
-        for (unsigned i = 0; i < frames * channels; ++i)
-        {
-            if (bits == 8)
-                w.u8(192);
-            else
-                w.u16(16384);
-        }
-        return w.b;
-    }
-    bool setup(GameSession& g, const std::filesystem::path& root)
-    {
-        CHECK(test_player::setup(g, root, false));
-        test_player::Directory d;
-        d.files["cue.wav"] = wave();
-        d.files["long.wav"] = wave(1, 16, 8000, 8000);
-        d.files["stereo.wav"] = wave(2);
-        auto w = test_model::Writer{};
-        w.b.resize(168);
-        w.b[0] = w.b[62] = w.b[124] = 13;
-        w.b[1] = w.b[63] = w.b[125] = 10;
-        w.b[126] = 26;
-        w.patch(127, 1);
-        auto [off, size] = test_player::write_dir(w, d);
-        w.patch(131, off);
-        w.patch(135, size);
-        std::ofstream out(root / "sound.rez", std::ios::binary);
-        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
-        out.close();
-        std::string error;
-        CHECK(g.resources.mount(root / "sound.rez", error));
-        return true;
-    }
+    using test_audio::setup;
+    using test_audio::wave;
     HOBJECT cine(GameSession& g, Properties p = {})
     {
         return g.objects.create(g.objects.find_class("CinematicTrigger"), {}, Creation::World, p);
@@ -197,7 +148,7 @@ namespace
         CHECK(h);
         SoundRequest r;
         r.resource = "cue.wav";
-        r.local = true;
+        r.space = SoundSpace::Local;
         std::string error;
         g.server.audio.inspect_pcm = true;
         auto id = g.server.PlayCinematicSound(h, r, error);
@@ -273,7 +224,7 @@ namespace
         CHECK(trigger(g, h, "OFF")); // Payload is intentionally ignored in original code.
         CHECK(g.step(.05) && !c->sound && !c->starts);
         CHECK(g.step(.001) && c->sound && c->current == 0 && c->starts == 1 && c->messages == 1);
-        CHECK(g.server.audio.get(c->sound)->request.local);
+        CHECK(g.server.audio.get(c->sound)->request.space == SoundSpace::Local);
         const auto voice = c->sound;
         CHECK(trigger(g, h, "ON") && c->sound == voice && c->current == 0);
         CHECK(g.step(.1) && !c->sound && c->current == 1);
@@ -328,9 +279,12 @@ namespace
         CHECK(filtered && g.objects.get(filtered)->life == Life::Pending && g.step(0) && !g.objects.get(filtered));
         SoundRequest r;
         r.resource = "cue.wav";
-        r.local = true;
+        r.space = SoundSpace::Local;
         std::string error;
         CHECK(!g.server.PlayCinematicSound(nullptr, r, error));
+        r.speaker = h;
+        CHECK(!g.server.PlayCinematicSound(h, r, error));
+        r.speaker = nullptr;
         r.volume = NAN;
         CHECK(!g.server.PlayCinematicSound(h, r, error));
         r.volume = 1;
@@ -361,7 +315,7 @@ namespace
         auto h = cine(g);
         SoundRequest r;
         r.resource = "cue.wav";
-        r.local = true;
+        r.space = SoundSpace::Local;
         CHECK(g.server.PlayCinematicSound(h, r, error));
         CHECK(g.server.advance_audio(.01, {}, {}));
         CHECK(g.server.audio.has_output() && g.server.audio.submitted_frames == 480 && g.server.audio.peak > .49f &&
@@ -384,9 +338,9 @@ namespace
             std::map<EntryState, unsigned> counts;
             for (const auto& e : g.entries)
                 ++counts[e.state];
-            CHECK(counts[EntryState::Created] == 164 && counts[EntryState::EditorOnly] == 372 &&
-                  counts[EntryState::Unsupported] == 44 && counts[EntryState::Failed] == 0);
-            CHECK(g.objects.snapshot().size() == 171 && g.enter_player(error) && g.objects.snapshot().size() == 174);
+            CHECK(counts[EntryState::Created] == 166 && counts[EntryState::EditorOnly] == 372 &&
+                  counts[EntryState::Unsupported] == 42 && counts[EntryState::Failed] == 0);
+            CHECK(g.objects.snapshot().size() == 173 && g.enter_player(error) && g.objects.snapshot().size() == 176);
             HOBJECT target = nullptr;
             for (auto id : g.objects.snapshot())
                 if (std::string_view(g.objects.get(id)->state.m_Name) == "cintrig1")
@@ -398,14 +352,14 @@ namespace
             CHECK(id > previous && !g.server.audio.get(previous));
             previous = id;
             const auto* v = g.server.audio.get(id);
-            CHECK(v && v->request.local && v->clip->duration() > 0);
+            CHECK(v && v->request.space == SoundSpace::Local && v->clip->duration() > 0);
             std::cout << "cycle=" << cycle << " cue=" << v->request.resource << " rate=" << v->clip->rate
                       << " frames=" << v->clip->frames() << " duration=" << v->clip->duration() << '\n';
             g.server.audio.inspect_pcm = true;
             for (unsigned i = 0; i < 6; ++i)
                 CHECK(g.step(1.0 / 60));
             v = g.server.audio.get(id);
-            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 165);
+            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 167);
             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
                   !g.server.audio.cached_clips() && !g.server.audio.get(id) && !g.server.message_count() &&
                   !g.server.list_count() && !g.server.string_count());

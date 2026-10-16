@@ -52,8 +52,8 @@ namespace OpenBlood2
         if (const auto* v = audio.get(c->sound))
         {
             ImGui::Separator();
-            ImGui::Text("Voice %llu | %s | %s", (unsigned long long)v->id, v->request.local ? "local" : "attached 3D",
-                        v->done ? "done" : "playing");
+            ImGui::Text("Voice %llu | %s | %s", (unsigned long long)v->id,
+                        v->request.space == SoundSpace::Local ? "local" : "attached 3D", v->done ? "done" : "playing");
             ImGui::Text("WAV encoding %u | %u Hz / %u channels | %.3f / %.3f s", v->clip->encoding, v->clip->rate,
                         v->clip->channels, v->cursor / v->clip->rate, v->clip->duration());
             ImGui::Text("Gains L/R %.3f / %.3f | radii %.0f / %.0f | speaker lost %s", v->left, v->right,

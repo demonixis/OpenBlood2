@@ -131,8 +131,8 @@ void CinematicTrigger::StartSound()
         return;
     SoundRequest request;
     request.resource = cue.sound;
-    request.local = same_name(cue.speaker, "player");
-    request.speaker = request.local ? nullptr : PlayedBy(cue.speaker);
+    request.space = same_name(cue.speaker, "player") ? SoundSpace::Local : SoundSpace::Spatial;
+    request.speaker = request.space == SoundSpace::Local ? nullptr : PlayedBy(cue.speaker);
     last_speaker = request.speaker;
     sound = g_pServerDE->PlayCinematicSound(m_hObject, request, error);
     ++starts;

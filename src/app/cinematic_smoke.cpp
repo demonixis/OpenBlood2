@@ -25,7 +25,7 @@ namespace OpenBlood2
         const auto* c = r ? dynamic_cast<const CinematicTrigger*>(r->game.get()) : nullptr;
         const auto* v = c ? g.server.audio.get(c->sound) : nullptr;
         return c && c->starts == 1 && !c->failures && c->current == 0 && v && !v->done && v->cursor > 0 &&
-               v->request.local && v->clip->duration() > .2 && g.server.audio.has_output() &&
+               v->request.space == SoundSpace::Local && v->clip->duration() > .2 && g.server.audio.has_output() &&
                g.server.audio.submitted_frames > 0 && g.server.audio.output_error.empty();
     }
 } // namespace OpenBlood2

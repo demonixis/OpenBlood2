@@ -78,6 +78,22 @@ namespace OpenBlood2
 
     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
     {
+        if (random_sound_request)
+        {
+            if (const auto* r = game.objects.get(random_sound_request);
+                r && r->life == Life::Alive && r->type->name == "RandomSoundFX")
+            {
+                auto text = game.server.CreateString(random_sound_command.c_str());
+                auto message = game.server.StartMessageToObject(nullptr, r->handle, 1000);
+                if (message)
+                {
+                    game.server.WriteToMessageHString(message, text);
+                    game.server.EndMessage(message);
+                }
+                game.server.FreeString(text);
+            }
+            random_sound_request = {};
+        }
         if (cinematic_request)
         {
             if (const auto* r = game.objects.get(cinematic_request);
@@ -567,6 +583,13 @@ namespace OpenBlood2
                 {
                     select_lights = false;
                     draw_lights(game, selection);
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("Random sounds", nullptr,
+                                        select_random_sounds ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_random_sounds = false;
+                    draw_random_sounds(game, selection);
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Cinematics", nullptr, select_cinematics ? ImGuiTabItemFlags_SetSelected : 0))

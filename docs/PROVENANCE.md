@@ -373,3 +373,14 @@ contracts](CINEMATIC_CONTRACTS.md) separate original timing/messages from owned
 strings, checked IDs, a source list-leak fix, malformed-data validation and new
 bounded SDL decoding/dry mixing/output. No prototype audio backend or dependency
 was imported. Missing audio remains failure; reverb is explicitly unavailable.
+
+## M2 original RandomSoundFX
+
+[Source selections](M2_RANDOM_SOUND_SOURCES.json) record exact original files/ranges
+and hashes; [contracts](RANDOM_SOUND_CONTRACTS.md) describe the adaptation boundary.
+Original commands, properties, random/sequential scheduling, fixed X/Z placement,
+voice replacement and destructor lifetime are ported directly. The duplicate
+FreeString is fixed with one owned read release; invalid ranges/restore reject.
+Typed fixed-position playback and ambient distance-only mixing are new engine
+services. The portable RNG is not the retail sequence. Built-in Sound loops, priority
+arbitration, reverb/Doppler, save/restore and the actual M2 gate remain open.

@@ -26,7 +26,7 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
 ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
 ```
 
-The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **164 source entries** create, including four original CinematicTriggers, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **44 unported runtime entries**, zero failed. Runtime counts before/after player entry are **171/174**, then **162/165** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_CINEMATICS.md) records these counts; earlier increment sections below are historical snapshots.
+The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **166 source entries** create, including two original RandomSoundFX emitters, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **42 unported runtime entries**, zero failed. Runtime counts before/after player entry are **173/176**, then **164/167** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_RANDOM_SOUNDS.md) records these counts; earlier increment sections below are historical snapshots.
 
 The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
 
@@ -174,5 +174,21 @@ to actual WAV sample duration, dry local/attached mixing and SDL playback. The
 Cinematics tab inspects inactive controllers, all cues, voices, PCM and failures.
 Interactive runs open the default audio device; output failure is visible and
 leaves offline timing. Headless tests avoid output; the device/GPU checks use SDL's
-dummy driver. Reverb, general Sound/RandomSoundFX emitters, other audio callers and
+dummy driver. Reverb, built-in Sound loops/streaming, other audio callers and
 music remain unavailable. This is not complete cinematic rendering or M2 acceptance.
+
+## Original random sound emitters
+
+RandomSoundFX now preserves original interval-based random/sequential playback,
+fixed X/Z placement and ON/OFF/TOGGLE behavior through typed owned voices. Ambient
+attenuates with distance without panning; positional audio uses the existing dry
+spatial mixer. OFF lets the current voice finish. The Random sounds tab exposes
+hidden/inactive emitters, duplicate-name object IDs, ignored slots, missing resources,
+schedules, decoded voice state and output diagnostics. Built-in Sound loops,
+streaming, priority arbitration, reverb/Doppler and complete M2 gameplay remain pending.
+See [contracts](docs/RANDOM_SOUND_CONTRACTS.md) and [source ledger](docs/M2_RANDOM_SOUND_SOURCES.json).
+
+```sh
+ctest --test-dir build/debug -R 'randomsound' --output-on-failure
+SDL_AUDIODRIVER=dummy ./build/debug/blood2 --random-sounds-smoke --capture build/random-sounds.png
+```

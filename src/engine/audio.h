@@ -20,11 +20,17 @@ namespace OpenBlood2
         }
     };
     bool read_wave(std::span<const std::uint8_t>, AudioClip&, std::string&);
+    enum class SoundSpace
+    {
+        Local,
+        Ambient,
+        Spatial
+    };
     struct SoundRequest
     {
         std::string resource;
         HOBJECT speaker = nullptr;
-        bool local = false;
+        SoundSpace space = SoundSpace::Spatial;
         float inner_radius = 250, outer_radius = 1000, volume = 1;
         bool reverb_requested = true; // Original cinematic flag; dry output currently only.
     };

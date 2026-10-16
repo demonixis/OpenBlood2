@@ -33,6 +33,8 @@ namespace OpenBlood2
       public:
         AudioMixer audio;
         SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
+        SoundId PlaySoundAt(HOBJECT, const SoundRequest&, DVector, std::string&) override;
+        bool RandomInt(int, int, int&) override;
         bool IsSoundDone(SoundId, bool&) override;
         bool KillSound(SoundId) override;
         bool advance_audio(double, DVector, DRotation);

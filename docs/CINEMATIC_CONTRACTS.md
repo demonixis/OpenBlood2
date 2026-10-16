@@ -1,6 +1,9 @@
 # Original cinematic cues and bounded audio
 
-M2 remains incomplete. Read [camera](CAMERA_CONTRACTS.md), [trigger](TRIGGER_CONTRACTS.md)
+M2 remains incomplete. The later [random sound contracts](RANDOM_SOUND_CONTRACTS.md)
+extend audio with original RandomSoundFX, fixed-position voices and ambient distance-only
+output. Earlier general-emitter omissions below are historical for this bounded subset.
+ Read [camera](CAMERA_CONTRACTS.md), [trigger](TRIGGER_CONTRACTS.md)
 and [object](OBJECT_CONTRACTS.md) contracts with the [source ledger](M2_CINEMATIC_SOURCES.json)
 and [implementation evidence](../../Documentation/Implementation/M2_CINEMATICS.md).
 
