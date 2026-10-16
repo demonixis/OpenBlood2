@@ -16,7 +16,7 @@ struct PathListData
 };
 using PathList = std::vector<PathListData>;
 
-// Selected original PathMgr rules. Save/load and AI path traversal remain unavailable.
+// Selected original PathMgr rules. Save/load remains unavailable; script helpers consume owned snapshots.
 class PathMgr
 {
   public:

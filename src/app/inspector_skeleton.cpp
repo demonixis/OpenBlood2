@@ -59,6 +59,43 @@ namespace OpenBlood2
         const auto* r = game.objects.get(skeleton_selection);
         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
+        if (target_ai && ImGui::CollapsingHeader("Original script movement", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& a = *target_ai;
+            const char* commands[]{"None", "FOLLOWPATH", "MOVETOOBJECT"};
+            const char* outcomes[]{"None", "Selected", "Moving", "Arrived", "Completed", "Failed"};
+            ImGui::TextWrapped("Typed original helpers. Full SCRIPT interpreter / AI_Update unavailable.");
+            ImGui::Text("%s | %s | mode %s | Metacmd %d", commands[static_cast<unsigned>(a.script_motion_command)],
+                        outcomes[static_cast<unsigned>(a.script_motion_outcome)],
+                        a.m_eScriptMovement == AI_Mgr::SM_WALK  ? "WALK"
+                        : a.m_eScriptMovement == AI_Mgr::SM_RUN ? "RUN"
+                                                                : "INVALID",
+                        a.Metacmd);
+            ImGui::TextWrapped("Argument: %s", a.script_motion_name.c_str());
+            ImGui::Text("Speeds %.2f / %.2f | injured node %d | done %s", a.m_fWalkSpeed, a.m_fRunSpeed,
+                        a.m_nInjuredLeg, a.m_bUpdateScriptCmd ? "yes" : "no");
+            ImGui::Text("Distance %.3f / arrival threshold %.3f", a.script_motion_distance, a.script_motion_threshold);
+            const auto d = a.script_motion_destination, v = a.script_motion_velocity;
+            ImGui::Text("Destination %.2f %.2f %.2f", d.x, d.y, d.z);
+            ImGui::Text("Requested velocity %.2f %.2f %.2f", v.x, v.y, v.z);
+            ImGui::Text("Updates %llu / failed %llu | velocity writes %llu",
+                        (unsigned long long)a.script_motion_updates, (unsigned long long)a.script_motion_failures,
+                        (unsigned long long)a.velocity_commands);
+            ImGui::Text("Arrivals %llu | trigger deliveries %llu | removals %llu | remaining %zu",
+                        (unsigned long long)a.path_arrivals, (unsigned long long)a.path_deliveries,
+                        (unsigned long long)a.path_removals, a.ScriptPath().size());
+            for (const auto& p : a.ScriptPath())
+            {
+                const auto* source = game.objects.get(p.source);
+                ImGui::TextWrapped("%s (%.2f %.2f %.2f), source %s; target %s / message %s", p.name.c_str(),
+                                   p.position.x, p.position.y, p.position.z,
+                                   source && game.server.IsObjectAlive(p.source) ? "live" : "removed",
+                                   p.action_target ? p.action_target->c_str() : "<self>",
+                                   p.action_message ? p.action_message->c_str() : "<none>");
+            }
+            if (!a.script_motion_error.empty())
+                ImGui::TextWrapped("Unavailable: %s", a.script_motion_error.c_str());
+        }
         if (character && ImGui::CollapsingHeader("Original CMovement cache / path", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& m = character->m_MoveObj;

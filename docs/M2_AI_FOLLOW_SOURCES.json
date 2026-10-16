@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "270fb8868f8d80e4376fb6cf974a60e37dcdb7f4",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          1397,
+          1654
+        ],
+        [
+          3139,
+          3157
+        ],
+        [
+          4109,
+          4167
+        ],
+        [
+          4244,
+          4274
+        ]
+      ],
+      "use": "Original movement selection, authored following, named-object following, velocity and script walk/run"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "selected_lines": [
+        [
+          165,
+          174
+        ],
+        [
+          318,
+          328
+        ]
+      ],
+      "use": "Script flags and movement modes"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Trigger.cpp",
+      "sha256": "373658121f86b4d792eeb986a0e093291af3e1205b831385f142cf2ea445198c",
+      "selected_lines": [
+        [
+          32,
+          84
+        ]
+      ],
+      "use": "Reference named-trigger helper: target iteration and REMOVE special case"
+    }
+  ],
+  "adaptations": [
+    "Typed explicit helper entry points; interpreter/AI_Update remain unavailable",
+    "Owned snapshots, checked named recipient identities and message lifetime",
+    "Reentrancy/failure latch, live-owner and bounded numeric/text validation",
+    "Explicit clip/resize/path-calculation errors; partial paths never followed",
+    "Defined zero-direction facing; opportunity-fire branches explicitly unavailable"
+  ]
+}

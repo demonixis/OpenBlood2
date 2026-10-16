@@ -1,4 +1,5 @@
 #pragma once
+#include "PathMgr.h"
 #include "PlayerObj.h"
 #include <memory>
 
@@ -191,6 +192,50 @@ class AI_Mgr : public CBaseCharacter
     DDWORD requested_animation = UINT32_MAX;
     std::string state_error;
 
+    enum AIScriptMovement
+    {
+        SM_WALK = 0,
+        SM_RUN = 1
+    };
+    enum class MotionCommand
+    {
+        None,
+        FollowPath,
+        MoveToObject
+    };
+    enum class MotionOutcome
+    {
+        None,
+        Selected,
+        Moving,
+        Arrived,
+        Completed,
+        Failed
+    };
+    bool Move(DVector direction, float speed);
+    bool Script_Walk();
+    bool Script_Run();
+    bool SetSetMovementCmd(std::string_view);
+    bool SetFollowPathCmd(PathMgr&, std::string_view);
+    bool UpdateFollowPathCmd();
+    bool SetMoveToObjectCmd(std::string_view);
+    bool UpdateMoveToObjectCmd();
+    std::span<const PathListData> ScriptPath() const
+    {
+        return script_path;
+    }
+    AIScriptMovement m_eScriptMovement = SM_WALK;
+    float m_fWalkSpeed = 5, m_fRunSpeed = 10;
+    int m_nInjuredLeg = 0;
+    bool m_bUpdateScriptCmd = false;
+    MotionCommand script_motion_command = MotionCommand::None;
+    MotionOutcome script_motion_outcome = MotionOutcome::None;
+    std::uint64_t script_motion_updates = 0, script_motion_failures = 0, velocity_commands = 0;
+    std::uint64_t path_arrivals = 0, path_deliveries = 0, path_removals = 0;
+    DVector script_motion_destination{}, script_motion_velocity{};
+    float script_motion_distance = 0, script_motion_threshold = 0;
+    std::string script_motion_name, script_motion_error;
+
     enum class TriggerOutcome
     {
         None,
@@ -262,6 +307,13 @@ class AI_Mgr : public CBaseCharacter
 
   private:
     bool trigger_busy = false;
+    bool motion_busy = false;
+    PathList script_path;
+    bool MotionFailure(const char*);
+    bool MotionReady();
+    bool ScriptLocomotion(bool run);
+    bool FaceScriptPoint(DVector);
+    bool DeliverPathAction(const PathListData&);
     DLink m_Link{};
     bool registered_cabal = true;
     static void InitLists();

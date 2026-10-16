@@ -8,6 +8,19 @@ namespace OpenBlood2
 {
     namespace
     {
+        // Explicit script-helper driver, not AI_Update or the SCRIPT interpreter.
+        class AIFollowProbe : public AI_Mgr
+        {
+            DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
+            {
+                if (m == MID_UPDATE)
+                {
+                    const bool ok = UpdateMoveToObjectCmd();
+                    GetServerDE()->SetNextUpdate(m_hObject, ok && !m_bUpdateScriptCmd ? .001f : 0);
+                }
+                return AI_Mgr::EngineMessageFn(m, d, f);
+            }
+        };
         class AIFireProbe : public AI_Mgr
         {
           public:
@@ -61,6 +74,48 @@ namespace OpenBlood2
             }
         };
     } // namespace
+    bool prepare_ai_follow_smoke(GameSession& g, ObjectId& id)
+    {
+        static const ClassInfo type{"AIFollowProbe",
+                                    g.objects.find_class("CBaseCharacter"),
+                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AIFollowProbe>(); },
+                                    {}};
+        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
+            return false;
+        ObjectCreateStruct state;
+        state.m_ObjectType = OT_MODEL;
+        state.m_Pos = {2000, 10000, 0};
+        // No model-key audio driver; this probe isolates script movement and actual model clocks.
+        SAFE_STRCPY(state.m_Name, "AI script movement probe (no interpreter)");
+        SAFE_STRCPY(state.m_Filename, "models/enemies/m_cultist1.abc");
+        auto h = g.objects.create(&type, state);
+        auto* r = g.objects.get(h);
+        auto* ai = r ? dynamic_cast<AIFollowProbe*>(r->game.get()) : nullptr;
+        auto table = std::make_shared<CAnim_Sound>();
+        if (!ai || !r->model || !table->SetAnimationIndexes(h) || !ai->InitStatics(table) ||
+            !ai->SetAnimation(table->m_nAnim_RUN[TYPE_MELEE]) || !ai->m_MoveObj.Init(h))
+            return false;
+        ObjectCreateStruct target;
+        target.m_Pos = vector_add(r->state.m_Pos, {0, 0, 20});
+        SAFE_STRCPY(target.m_Name, "AI script movement destination");
+        if (!g.objects.create(g.objects.find_class("BaseClass"), target))
+            return false;
+        ai->m_fRunSpeed = 60;
+        if (!ai->SetSetMovementCmd("RUN") || !ai->SetMoveToObjectCmd(target.m_Name))
+            return false;
+        id = r->id;
+        g.server.SetNextUpdate(h, .001f);
+        return true;
+    }
+    bool check_ai_follow_smoke(GameSession& g, ObjectId id)
+    {
+        const auto* r = g.objects.get(id);
+        const auto* a = r ? dynamic_cast<const AIFollowProbe*>(r->game.get()) : nullptr;
+        return a && r->model && a->m_bUpdateScriptCmd && a->script_motion_outcome == AI_Mgr::MotionOutcome::Completed &&
+               a->script_motion_failures == 0 && a->path_arrivals == 1 && a->velocity_commands > 0 &&
+               a->m_MoveObj.calculations == 1 && a->m_MoveObj.samples > 4 && r->state.m_Pos.z >= 20 &&
+               g.server.GetModelAnimation(a->m_hObject) < r->model->animations.size();
+    }
     bool prepare_ai_fire_smoke(GameSession& g, ObjectId& id)
     {
         static const ClassInfo type{"AIFireProbe",

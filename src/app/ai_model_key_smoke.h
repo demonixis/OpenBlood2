@@ -2,6 +2,8 @@
 #include "game/server_adapter.h"
 namespace OpenBlood2
 {
+    bool prepare_ai_follow_smoke(GameSession&, ObjectId&);
+    bool check_ai_follow_smoke(GameSession&, ObjectId);
     bool prepare_ai_fire_smoke(GameSession&, ObjectId&);
     bool check_ai_fire_smoke(GameSession&, ObjectId);
     bool prepare_ai_state_smoke(GameSession&, ObjectId&);

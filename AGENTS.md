@@ -287,3 +287,11 @@ character-only filtering, zero lateral range on misses, source offsets/partial p
 and accumulated point count. Planning never integrates motion; players do not initialize
 this cache. Bounded searches and value ownership are adaptations. Full NPC initialization,
 following/actions, shade queries and the actual M2 gate remain open.
+
+The [script movement continuation](../Documentation/Implementation/M2_AI_FOLLOW.md) connects original Script_Walk/Run,
+FOLLOWPATH and MOVETOOBJECT helpers, owned arrival actions and velocity commands.
+Read [contracts](docs/AI_FOLLOW_CONTRACTS.md). Preserve cached facing timing, initial injury slowdown,
+one-point arrival ordering, linked-target lifetime and residual velocity. Failed
+partial plans and missing opportunity-fire branches must remain failures. Full
+SCRIPT dispatch, production initialization/AI_Update/deactivation, required FX and
+ExitTrigger keep M2 incomplete; source-class counts are unchanged.

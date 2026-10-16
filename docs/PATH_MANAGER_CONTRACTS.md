@@ -105,3 +105,8 @@ SubwayA remains 187 live-created source entries, 4 transferred sounds, 372 edito
 script FOLLOWPATH/action delivery, ExitTrigger, attachments and required FX/services
 keep M2 incomplete and --start-game blocked with exit 6. No retail executable,
 other-platform or XR parity is claimed.
+
+Selected FOLLOWPATH consumption and arrival actions are now connected through
+[typed AI script helpers](AI_FOLLOW_CONTRACTS.md). Full SCRIPT dispatch and
+production AI following remain unavailable; the snapshot and lifetime contracts
+above are unchanged.

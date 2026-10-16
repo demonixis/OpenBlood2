@@ -560,3 +560,14 @@ are integrated with the original CBaseCharacter aggregate order. [Source selecti
 and [contracts](AI_NAVIGATION_CONTRACTS.md) record initial-sample safety, value
 ownership, bounds and explicit omissions. Full NPC initialization, following and
 shade queries remain unavailable; collision is the existing replacement solver.
+
+## M2 original script movement helpers
+
+Donor remains `sources/blood2` at `006b4aabd3fb348f6846cad03799cf8df685ea95`.
+Selected AI_Mgr movement/following and Trigger named-action rules are recorded in
+[M2_AI_FOLLOW_SOURCES.json](M2_AI_FOLLOW_SOURCES.json). Direct typed helpers,
+owned snapshots, checked message/lifetime boundaries and explicit failure returns
+replace unbounded legacy ownership and ignored failures. No other repository or
+commercial asset was imported. The inspector/smoke fixtures are new diagnostic
+code, not production NPC or interpreter implementations. See
+[contracts](AI_FOLLOW_CONTRACTS.md) and [evidence](../../Documentation/Implementation/M2_AI_FOLLOW.md).

@@ -29,6 +29,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <map>
 #include <spdlog/spdlog.h>
 #include <vector>
 
@@ -256,6 +257,11 @@ namespace
         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_fire_smoke(game, smoke_ai_fire))
             return 4;
         const auto original_ai_fire = smoke_ai_fire;
+        OpenBlood2::ObjectId smoke_ai_follow{};
+        bool ai_follow_hidden = false;
+        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
+            return 4;
+        const auto original_ai_follow = smoke_ai_follow;
         bool ai_sight_hidden = false;
         bool ai_target_hidden = false;
         bool hand_hidden = false;
@@ -284,7 +290,16 @@ namespace
         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
         bool selection_cleared = false, world_unloaded = false;
         const auto initial_objects = game.objects.snapshot().size(), initial_strings = game.server.string_count();
+        auto smoke_object_counts = [&]()
+        {
+            std::map<std::string, int> counts;
+            for (auto id : game.objects.snapshot())
+                if (const auto* r = game.objects.get(id))
+                    ++counts[std::string(r->type->name) + ":" + r->state.m_Name];
+            return counts;
+        };
         const bool smoke = options.gpu_smoke || options.world_smoke;
+        const auto initial_smoke_objects = smoke ? smoke_object_counts() : std::map<std::string, int>{};
         bool inspector_visible = BLOOD2_INSPECTOR && options.inspector && !options.view_world;
         OpenBlood2::WorldMesh world_mesh;
         OpenBlood2::WorldRenderer world_renderer(runtime.gpu), model_renderer(runtime.gpu);
@@ -311,7 +326,7 @@ namespace
         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
         inspector.select_skeleton = options.skeleton_smoke;
         if (options.skeleton_smoke)
-            inspector.skeleton_selection = smoke_ai_fire;
+            inspector.skeleton_selection = smoke_ai_follow;
         inspector.select_containers = options.containers_smoke;
         inspector.select_brushes = options.brushes_smoke;
         inspector.select_pickups = options.pickups_smoke;
@@ -533,6 +548,8 @@ namespace
             }
             if (options.skeleton_smoke && !inspector_visible)
                 ai_fire_hidden |= OpenBlood2::check_ai_fire_smoke(game, smoke_ai_fire);
+            if (options.skeleton_smoke && !inspector_visible)
+                ai_follow_hidden |= OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
             if (options.skeleton_smoke && !inspector_visible)
                 ai_state_hidden |= OpenBlood2::check_ai_state_smoke(game, smoke_ai_state);
             if (options.skeleton_smoke && !inspector_visible)
@@ -1072,6 +1089,8 @@ namespace
             {
                 if (game.objects.get(original_ai_fire) || !OpenBlood2::prepare_ai_fire_smoke(game, smoke_ai_fire))
                     return 4;
+                if (game.objects.get(original_ai_follow) || !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
+                    return 4;
                 bool reentered = false;
                 for (int i = 0; i < 360 && !reentered; ++i)
                 {
@@ -1082,6 +1101,16 @@ namespace
                 spdlog::info("AI weapon probe: hidden={}, reentered={}, old identity invalidated={}", ai_fire_hidden,
                              reentered, !game.objects.get(original_ai_fire));
                 if (!ai_fire_hidden || !reentered)
+                    return 4;
+            }
+            if (options.skeleton_smoke)
+            {
+                // Runs alongside the existing fire probe: do not extend the authored
+                // scene clock past the cinematic's existing lifetime assertion.
+                const bool reentered = OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
+                spdlog::info("AI script movement: hidden={}, reentered={}, old identity invalidated={}",
+                             ai_follow_hidden, reentered, !game.objects.get(original_ai_follow));
+                if (!ai_follow_hidden || !reentered)
                     return 4;
             }
             bool hand_reentered = !options.skeleton_smoke;
@@ -1179,6 +1208,12 @@ namespace
                   game.objects.snapshot().size() != initial_objects - (options.scene_explosions_smoke ? 1 : 0) ||
                   game.server.string_count() != initial_strings)))
             {
+                auto delta = smoke_object_counts();
+                for (const auto& [key, count] : initial_smoke_objects)
+                    delta[key] -= count;
+                for (const auto& [key, count] : delta)
+                    if (count)
+                        spdlog::error("Smoke object delta {}: {}", key, count);
                 spdlog::error(
                     "GPU smoke failed: selection={}, crouch/run frames={}/{}, skeleton reentry/hidden={}/{}, "
                     "crouched/stood={}/{}, locomotion/walk/run/jump={}/{}/{}/{}, objects={}/{}, strings={}/{}",

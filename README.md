@@ -350,3 +350,15 @@ production NPCs and the actual M2 session gate remain incomplete.
 
 CMovement verification: 402/402 Debug and inspector-free Release checks (27 GPU
 each), plus 162 targeted ASan/UBSan/leak checks. See [evidence](../Documentation/Implementation/M2_AI_NAVIGATION.md).
+
+The [script movement continuation](../Documentation/Implementation/M2_AI_FOLLOW.md) connects original Script_Walk/Run,
+FOLLOWPATH and MOVETOOBJECT helpers, owned arrival actions and velocity commands.
+Read [contracts](docs/AI_FOLLOW_CONTRACTS.md). Preserve cached facing timing, initial injury slowdown,
+one-point arrival ordering, linked-target lifetime and residual velocity. Failed
+partial plans and missing opportunity-fire branches must remain failures. Full
+SCRIPT dispatch, production initialization/AI_Update/deactivation, required FX and
+ExitTrigger keep M2 incomplete; source-class counts are unchanged.
+
+Script movement verification: 413/413 Debug and inspector-free Release checks
+(27 GPU each), plus 88 targeted ASan/UBSan/leak checks.
+See [evidence](../Documentation/Implementation/M2_AI_FOLLOW.md).
