@@ -112,7 +112,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     };
     if (!trace())
         return last_shot.result;
-    // Both selected definitions fire exactly one vector and use one unit.
+    // Selected definitions fire exactly one vector and use one unit (AMMO_NONE stays unlimited).
     m_pInventoryMgr->SetAmmoCount(data.m_nAmmoType, ammo - use);
     m_fLastShotTime = server->GetTime();
     m_bLastFireAlt = request.alternate;

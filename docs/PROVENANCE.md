@@ -842,3 +842,7 @@ The later LithTech surface definition is a reference, not a retail v56 renderer
 specification. See [ledger](M2_WORLD_ALPHA_SOURCES.json),
 [contracts](WORLD_ALPHA_CONTRACTS.md) and
 [evidence](../../Documentation/Implementation/M2_WORLD_ALPHA.md).
+
+## Naga eye weapon and red beam
+
+Original CNagaEyes, complete Naga Eye Beam definition, AI name/head-node branches and selected CLaserBeamFX are integrated as a Gideon dependency. See [source ledger](M2_NAGA_WEAPON_SOURCES.json) and [contracts](NAGA_WEAPON_CONTRACTS.md). The original eye impact composite and Gideon class remain unavailable; no generic replacement is claimed.

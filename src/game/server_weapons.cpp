@@ -17,11 +17,13 @@ namespace OpenBlood2
         out = {};
         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
         if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility &&
-             filter != SegmentFilter::IgnoreCharacters && filter != SegmentFilter::IgnoreVolumes) ||
+             filter != SegmentFilter::IgnoreCharacters && filter != SegmentFilter::IgnoreVolumes &&
+             filter != SegmentFilter::IgnoreOwnerClass) ||
             (start != SegmentStart::IncludeInterior && start != SegmentStart::SkipInterior) ||
             (objects != SegmentObjects::SolidOnly && objects != SegmentObjects::SolidOrRayHit &&
              objects != SegmentObjects::All) ||
-            !physics_vector(from) || !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
+            (filter == SegmentFilter::IgnoreOwnerClass && !owner) || !physics_vector(from) || !physics_vector(to) ||
+            (ignore && (!owner || owner->life != Life::Alive)) ||
             vector_dot(vector_subtract(to, from), vector_subtract(to, from)) < 1e-12f)
             return SegmentResult::Invalid;
         if (!collision || !collision_ready)
@@ -54,6 +56,8 @@ namespace OpenBlood2
             if (filter == SegmentFilter::IgnoreVolumes && dynamic_cast<const VolumeBrush*>(record->game.get()))
                 continue;
             if (filter == SegmentFilter::IgnoreCharacters && dynamic_cast<const CBaseCharacter*>(record->game.get()))
+                continue;
+            if (filter == SegmentFilter::IgnoreOwnerClass && Objects::is_kind_of(record->type, owner->type))
                 continue;
             if (fire_through && ((door && door->fire_through) || (brush && brush->fire_through)))
                 continue;

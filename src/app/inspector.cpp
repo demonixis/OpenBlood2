@@ -1531,6 +1531,17 @@ namespace OpenBlood2
 {
     void Inspector::draw_weapon_sound(const CWeapon& weapon, const GameSession& game)
     {
+        if (const auto* naga = dynamic_cast<const CNagaEyes*>(&weapon))
+        {
+            ImGui::Text("Original Naga beam: %llu | visual ray %d | endpoint %.2f %.2f %.2f",
+                        (unsigned long long)naga->beam, int(naga->beam_collision), naga->beam_end.x, naga->beam_end.y,
+                        naga->beam_end.z);
+            ImGui::TextWrapped("Visual ray ignores owner class; ordinary damage ray does not.");
+            if (!naga->beam_error.empty())
+                ImGui::TextWrapped("Beam failure: %s", naga->beam_error.c_str());
+            if (!naga->explosion_error.empty())
+                ImGui::TextWrapped("Pending: %s", naga->explosion_error.c_str());
+        }
         if (ImGui::TreeNodeEx("Original vector impacts", ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::TextWrapped("Last shot %zu contacts | total %llu | sounds %llu | failed %llu", weapon.impacts.size(),

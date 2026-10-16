@@ -2,6 +2,17 @@
 #include <cmath>
 namespace OpenBlood2
 {
+    std::uint64_t ServerAdapter::PublishLaserBeam(HOBJECT source, DVector from, DVector to, std::string& error)
+    {
+        trace_service("PublishLaserBeam (original red small beam)");
+        if (!IsObjectAlive(source) || !objects_.models || !client_resources)
+        {
+            error = "Laser source/model resources unavailable";
+            return 0;
+        }
+        return laser_beams.publish(from, to, GetObjectName(source), *objects_.models, *client_resources,
+                                   objects_.time(), error);
+    }
     std::uint64_t ServerAdapter::PublishWeaponSprites(HOBJECT source, const WeaponSpriteSettings& settings,
                                                       std::string& error)
     {

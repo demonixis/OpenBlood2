@@ -25,8 +25,8 @@ bool CWeapon::ShowHandModel(DBOOL show)
         server->RemoveObject(m_hHandModel);
     m_hHandModel = nullptr;
     hand_error.clear();
-    if (!show)
-        return true;
+    if (!show || !data.m_szHandModelFilename || !data.m_szHandModelSkin)
+        return true; // Original CreateHandModel intentionally omits model-less monster weapons.
     if (!server->IsObjectAlive(m_hOwner))
     {
         hand_error = "Hand model requires a live weapon owner";

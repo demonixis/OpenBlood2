@@ -56,7 +56,8 @@ namespace OpenBlood2
         None,
         AIVisibility,     // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
         IgnoreCharacters, // Original CMovement clearance filter.
-        IgnoreVolumes     // Original LiquidFilterFn excludes every VolumeBrush subclass.
+        IgnoreVolumes,    // Original LiquidFilterFn excludes every VolumeBrush subclass.
+        IgnoreOwnerClass  // Original IgnoreTypeFilterFn: owner class and derived classes, visual beam only.
     };
     enum class SegmentResult
     {

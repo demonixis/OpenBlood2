@@ -250,6 +250,36 @@ namespace OpenBlood2
                                    r.source.c_str(), r.lights.size(),
                                    r.error.empty() ? "created; illumination unavailable" : r.error.c_str());
         ImGui::Separator();
+        const auto& beams = game.server.laser_beams;
+        if (ImGui::TreeNode("Original laser beams"))
+        {
+            ImGui::Text("Active %zu | started %llu | expired %llu | failed %llu", beams.active.size(),
+                        (unsigned long long)beams.started, (unsigned long long)beams.expired,
+                        (unsigned long long)beams.failed);
+            for (const auto& beam : beams.active)
+            {
+                ImGui::Text("%llu: updates %llu | scale %.3f %.3f %.3f | alpha %.3f", (unsigned long long)beam.id,
+                            (unsigned long long)beam.updates, beam.scale.x, beam.scale.y, beam.scale.z, beam.alpha);
+                ImGui::TextWrapped("Models/Ammo/beam.abc | %s", beam.skin_path.c_str());
+                if (explosion_model_view)
+                    for (const auto& entry : explosion_model_view->entries)
+                        if (entry.laser_effect == beam.id)
+                        {
+                            ImGui::Text("%zu triangles | %s", entry.triangles,
+                                        entry.range == UINT32_MAX ? "not drawn" : "prepared");
+                            if (!entry.error.empty())
+                                ImGui::TextWrapped("%s", entry.error.c_str());
+                        }
+            }
+            for (const auto& report : beams.reports)
+                ImGui::TextWrapped("%llu [%s] %.1f %.1f %.1f -> %.1f %.1f %.1f | %s", (unsigned long long)report.id,
+                                   report.source.c_str(), report.from.x, report.from.y, report.from.z, report.to.x,
+                                   report.to.y, report.to.z,
+                                   report.error.empty() ? "created (historical)" : report.error.c_str());
+            if (!beams.update_error.empty())
+                ImGui::TextWrapped("Update: %s", beams.update_error.c_str());
+            ImGui::TreePop();
+        }
         const auto& models = game.server.explosion_models;
         ImGui::Text("Client explosion models: %zu active / %llu started / %llu expired / %llu failed",
                     models.active.size(), (unsigned long long)models.started, (unsigned long long)models.expired,

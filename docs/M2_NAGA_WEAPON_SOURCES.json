@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "97b5a352fda85ac7b91019a27185d5a42c236721",
+  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/GameWeapons.cpp",
+      "sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd",
+      "use": "IgnoreTypeFilterFn / CNagaEyes::FireVector: separate class-filtered visual ray, laser then explosion then base damage"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameWeapons.h",
+      "sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19",
+      "use": "CNagaEyes constructor; normal damage and zero effect flags"
+    },
+    {
+      "path": "sources/blood2/Shared/WeaponDefs.cpp",
+      "sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
+      "use": "Complete Naga Eye Beam WeaponData entry"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "use": "Base-game ID 17 + 21; add-on IDs deliberately excluded"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "NAGA_BLAST prefix selection and head_gun aiming branch"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "use": "CreateHandModel null-path guard; existing base vector/audio implementation retained"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/LaserBeamFX.cpp",
+      "sha256": "7f729e2e2b79fc9111b9b16e152ace1a274177d280ed9c0ac12e3535665a87d1",
+      "use": "Red-small SetupBeam, CreateObject, Update, UpdateBeam"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
+      "use": "Reviewed eye impact composite only; not implemented or substituted"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
+      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
+      "use": "Reviewed dependency and distinct rr_gun/extra aiming; no Gideon implementation claimed"
+    },
+    {
+      "path": "sources/blood2/Shared/SFXMsgIds.h",
+      "sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f",
+      "use": "LASER_RED_SMALL=0 and EXP_NAGA_EYE_BEAM=28; latter remains explicit unavailable request"
+    }
+  ],
+  "adaptations": [
+    "Typed visual publication and filter enum replace original packets/raw callback user data",
+    "Checked missing node, degenerate endpoints and bounded client ownership",
+    "Player acquisition remains unavailable for this NPC weapon",
+    "Existing portable shot RNG, collision and model rendering; no retail parity claim"
+  ],
+  "remaining": [
+    "Gideon production initialization/states/other weapons",
+    "EXP_NAGA_EYE_BEAM composite",
+    "safe NEW_LEVEL and remaining required services; M2 incomplete"
+  ]
+}

@@ -122,6 +122,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         return InventoryResult::NotAvailable;
     if (!m_hOwner || !BaseClass::GetServerDE()->HandleToObject(m_hOwner) || slot < -1 || slot >= 10)
         return InventoryResult::Invalid;
+    if (type == WEAP_NAGA_EYEBEAM && dynamic_cast<CPlayerObj*>(BaseClass::GetServerDE()->HandleToObject(m_hOwner)))
+        return InventoryResult::NotAvailable; // Player view/save support is a separate contract.
     int empty = -1;
     bool left = false;
     if (slot >= 0)
@@ -163,8 +165,12 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
     std::unique_ptr<CWeapon> weapon;
     if (type == WEAP_BERETTA)
         weapon = std::make_unique<CBeretta>();
-    else
+    else if (type == WEAP_MELEE)
         weapon = std::make_unique<CMelee>();
+    else if (type == WEAP_NAGA_EYEBEAM)
+        weapon = std::make_unique<CNagaEyes>();
+    else
+        return InventoryResult::NotAvailable;
     weapon->Init(m_hOwner, this, left);
     (left ? m_LWeapons : m_Weapons)[static_cast<unsigned>(empty)] = std::move(weapon);
     ++revision;

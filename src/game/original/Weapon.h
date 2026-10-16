@@ -77,7 +77,7 @@ class CWeapon
     }
     float CheckAmmo() const;
     FireResult Fire(const OpenBlood2::WeaponFire&);
-    FireResult FireVector();
+    virtual FireResult FireVector();
     std::vector<WeaponImpact> impacts; // Latest validated shot attempt, bounded to 64 contacts.
     std::string impact_error;
     std::uint64_t impact_contacts = 0, impact_sounds = 0, impact_sound_failures = 0;
@@ -91,6 +91,18 @@ class CWeapon
     bool m_bLastFireAlt = false;
     std::uint64_t shots = 0;
     WeaponShot last_shot;
+};
+// Original visual ray and ordinary damage ray deliberately have different filters.
+class CNagaEyes final : public CWeapon
+{
+  public:
+    CNagaEyes() : CWeapon(WEAP_NAGA_EYEBEAM) {}
+    FireResult FireVector() override;
+    OpenBlood2::SegmentResult beam_collision = OpenBlood2::SegmentResult::Unavailable;
+    DVector beam_end{};
+    OpenBlood2::SegmentHit beam_hit;
+    std::uint64_t beam = 0;
+    std::string beam_error, explosion_error;
 };
 class CBeretta final : public CWeapon
 {

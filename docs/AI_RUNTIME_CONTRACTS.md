@@ -129,3 +129,5 @@ It isolates the current original globals, destroys the temporary session and res
 Ordinary second-session binding remains forbidden; no automatic transfer or completed M2 acceptance is claimed.
 
 The [interactive entry correction](SESSION_PLAYBACK_CONTRACTS.md) now holds application simulation until player entry, preventing the reproduced pre-player NPC suspension. Raw diagnostic stepping retains that boundary; broader combat and M2 remain incomplete.
+
+The [Naga weapon continuation](NAGA_WEAPON_CONTRACTS.md) extends the supported NPC weapon subset with original eye-beam damage, head_gun aiming and red-small beam presentation. Gideon and the eye impact composite remain unavailable; earlier blanket weapon omissions are superseded only for this subset.

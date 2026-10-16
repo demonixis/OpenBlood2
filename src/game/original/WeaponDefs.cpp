@@ -121,6 +121,66 @@ namespace
             "interface\\statusbar\\weapons\\c_knife.pcx",   // Icon for status bar
             "interface\\statusbar\\weapons\\c_knife_h.pcx", // Highlighted icon for status bar
         },
+        // Naga Eye Beam
+        {
+            "Models\\Weapons\\Laserrifle_pv.abc",  // Model
+            "Models\\Weapons\\Laserrifle_pv.abc",  // Model
+            "Skins\\Weapons\\C_DeathRay_pv_t.dtx", // Skin
+            nullptr,                               // Model
+            nullptr,                               // Skin
+            WEAP_NAGA_EYEBEAM,                     // Type
+            TYPE_MELEE,                            // Fire type
+            AMMO_NONE,                             // Ammo type
+            1,                                     // Ammo Use
+            1,                                     // Alt Ammo Use
+            30.0f,                                 // Min Damage
+            45.0f,                                 // Max Damage
+            30.0f,                                 // Min Alt damage
+            45.0f,                                 // Max Alt damage
+            0.2f,                                  // Reload time
+            0.05f,                                 // Alt reload time
+            {0.0f, 0.0f},                          // Spread
+            {0.0f, 0.0f},                          // Alt Spread
+            0.0f,                                  // Projectile Velocity
+            0.0f,                                  // Alt Projectile Velocity
+            2000.0f,                               // Range
+            2000.0f,                               // Alt Range
+            1,                                     // Shots per fire
+            1,                                     // Alt Shots per fire
+            1,                                     // Strength or Magic required
+            0,                                     // Two-handed Strength or Magic required
+            0,                                     // Damage Radius (projectiles)
+            0,                                     // Alt Damage Radius (projectiles)
+            DFALSE,                                // Alt fire zoom
+            DFALSE,                                // Semi-auto
+            "Sounds\\Weapons\\laser\\fire.wav",    // Fire sound
+            "",                                    // Alt Fire sound
+                                                   //		"Sounds\\Weapons\\laser\\fire.wav",	// Alt Fire sound
+            "",                                    // Empty weapon sound
+            "",                                    // Alt Empty weapon sound
+            NULL,                                  // Projectile class
+            NULL,                                  // Alt Projectile class
+            0,                                     // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                    // Muzzle Flash color
+            "Naga_Beam",                           // Name
+            0,                                     // Name ID (resource)
+            "",                                    // flash sprite name
+            "",                                    // alt flash Sprite name
+            0.25f,                                 // Flash duration
+            0.10f,                                 // Flash scale
+            {0.0f, 0.0f, 0.0f},                    // 3rd person gun offset
+            {0.7f, -0.9f, 2.1f},                   // Gun Offset
+            {0.0f, 0.0f, 0.0f},                    // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                 // Recoil
+            {4.25f, -4.25f, 25.0f},                // Flash position
+            0.625f,                                // Eject interval
+            0.0f,                                  // View kick
+            DFALSE,                                // View kick is Cumulative
+            DFALSE,                                // Animation looping
+            DTRUE,                                 // Alt anim looping
+            nullptr,                               // Icon for status bar
+            nullptr,                               // Highlighted icon for status bar
+        },
     };
 }
 const WeaponData* weapon_definition(DBYTE type)

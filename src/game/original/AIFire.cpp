@@ -123,10 +123,14 @@ bool AI_Mgr::Fire(bool alternate)
     auto* weapon = m_InventoryMgr.CurrentWeapon();
     if (!weapon)
         return fail(FireResult::Unavailable, "AI has no current weapon");
-    if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_MELEE)
+    if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_MELEE &&
+        weapon->data.m_nType != WEAP_NAGA_EYEBEAM)
         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
     DRotation rotation;
-    fire_gun_node = server->GetModelNodeTransform(m_hObject, "r_gun", &fire_origin, &rotation);
+    const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM;
+    fire_gun_node = server->GetModelNodeTransform(m_hObject, naga ? "head_gun" : "r_gun", &fire_origin, &rotation);
+    if (naga && !fire_gun_node)
+        return fail(FireResult::Unavailable, "Naga beam head_gun node unavailable");
     if (fire_gun_node)
         fire_direction = vector_subtract(m_vTargetPos, fire_origin);
     else

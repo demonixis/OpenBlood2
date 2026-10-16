@@ -101,3 +101,5 @@ The [autonomous locomotion continuation](AI_LOCOMOTION_CONTRACTS.md) now supplie
 walk/run/moving fire, obstruction/ledge probes and Cultist close/far attack sequencing.
 Earlier blanket omissions are superseded only for this subset. Full initialization,
 AI_Update/deactivation, remaining states and shade recovery stay unavailable.
+
+The [Naga weapon continuation](NAGA_WEAPON_CONTRACTS.md) extends the supported NPC weapon subset with original eye-beam damage, head_gun aiming and red-small beam presentation. Gideon and the eye impact composite remain unavailable; earlier blanket weapon omissions are superseded only for this subset.

@@ -393,8 +393,10 @@ namespace OpenBlood2
             }
             ImGui::Text("Last attempt: %s", ai.fire_calls ? result : "none");
             ImGui::Text("Origin %s: %.2f %.2f %.2f | cadence %.3f / last %.3f",
-                        ai.fire_gun_node ? "r_gun" : "body fallback", ai.fire_origin.x, ai.fire_origin.y,
-                        ai.fire_origin.z, ai.m_fAttackLoadTime, ai.m_fLoadTimeStart);
+                        ai.fire_gun_node ? (weapon && weapon->data.m_nType == WEAP_NAGA_EYEBEAM ? "head_gun" : "r_gun")
+                                         : "body fallback",
+                        ai.fire_origin.x, ai.fire_origin.y, ai.fire_origin.z, ai.m_fAttackLoadTime,
+                        ai.m_fLoadTimeStart);
             ImGui::Text("Clearance: %s | rays %u | head retry %s", ai_clear_outcome_name(ai.clear_shot.outcome),
                         ai.clear_shot.rays, ai.clear_shot.retried_head ? "yes" : "no");
             if (weapon)
