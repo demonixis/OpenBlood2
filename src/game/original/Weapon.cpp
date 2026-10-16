@@ -13,6 +13,17 @@ float CWeapon::CheckAmmo() const
 }
 FireResult CWeapon::Fire(const WeaponFire& request)
 {
+    if (firing)
+        return FireResult::Blocked;
+    firing = true;
+    struct ResetFire
+    {
+        bool& value;
+        ~ResetFire()
+        {
+            value = false;
+        }
+    } reset{firing};
     auto* server = BaseClass::GetServerDE();
     if (!server || !m_pInventoryMgr || !server->IsObjectAlive(m_hOwner) || request.weapon != data.m_nType ||
         request.left != m_bLeftHand || !physics_vector(request.position) || !physics_vector(request.direction) ||

@@ -1,12 +1,15 @@
 #include "app/inspector.h"
+#include "game/original/AI_Mgr.h"
 #include "game/original/AmmoPickups.h"
+#include "game/original/HandWeaponModel.h"
 #include <imgui.h>
 namespace OpenBlood2
 {
     void Inspector::draw_pickups(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextWrapped("Original single-player ammunition, health and armor. Inventory items, timed bonuses, audio "
-                           "and pickup FX remain pending.");
+        ImGui::TextWrapped(
+            "Original single-player Beretta, ammunition, health and armor. Inventory items, timed bonuses, audio "
+            "and pickup FX remain pending.");
         if (!ImGui::BeginTable("Pickup inspection", 2, ImGuiTableFlags_Resizable))
             return;
         ImGui::TableSetupColumn("Objects", ImGuiTableColumnFlags_WidthFixed, 250);
@@ -48,7 +51,10 @@ namespace OpenBlood2
         if (p)
         {
             ImGui::Text("%s / %s", r->state.m_Name, r->type->name.c_str());
-            ImGui::Text("%s / type %u / amount %.0f", p->value.kind == PickupKind::Ammo ? "Ammo" : "Powerup",
+            ImGui::Text("%s / type %u / amount %.0f",
+                        p->value.kind == PickupKind::Ammo     ? "Ammo"
+                        : p->value.kind == PickupKind::Weapon ? "Weapon"
+                                                              : "Powerup",
                         p->value.type, p->value.amount);
             ImGui::Text("%s (resource %d)", p->display_name.c_str(), p->resource_id);
             ImGui::TextWrapped("Model: %s", r->state.m_Filename);
@@ -57,6 +63,8 @@ namespace OpenBlood2
             ImGui::Text("Position %.1f %.1f %.1f", r->state.m_Pos.x, r->state.m_Pos.y, r->state.m_Pos.z);
             ImGui::Text("Velocity %.1f %.1f %.1f", r->velocity.x, r->velocity.y, r->velocity.z);
             ImGui::Text("Dimensions %.1f %.1f %.1f", r->dimensions.x, r->dimensions.y, r->dimensions.z);
+            ImGui::Text("User flags 0x%08x / glow requested %s (not rendered)", r->user_flags,
+                        r->user_flags & (1u << 7) ? "yes" : "no");
             ImGui::Text("Rotate FX requested: %s (not rendered)", p->rotate_fx ? "yes" : "no");
             ImGui::Text("Attempts %llu / consumed %s", static_cast<unsigned long long>(p->attempts),
                         p->picked_up ? "yes" : "no");
@@ -79,6 +87,39 @@ namespace OpenBlood2
             ImGui::TextWrapped("%s -> %s: %s", v.source.c_str(), v.request.c_str(), v.outcome.c_str());
             ImGui::Text("Child currently %s", game.server.IsObjectAlive(v.child) ? "alive" : "absent");
         }
+        ImGui::SeparatorText("NPC weapon drops");
+        for (auto id : game.objects.snapshot())
+        {
+            const auto* r = game.objects.get(id);
+            if (!r)
+                continue;
+            if (const auto* ai = dynamic_cast<const AI_Mgr*>(r->game.get()); ai && ai->m_InventoryMgr.drop_attempts)
+            {
+                const auto& inv = ai->m_InventoryMgr;
+                ImGui::TextWrapped("%s: %llu/%llu drops / %s", r->state.m_Name,
+                                   static_cast<unsigned long long>(inv.drops),
+                                   static_cast<unsigned long long>(inv.drop_attempts), inv.drop_error.c_str());
+            }
+            if (const auto* hand = dynamic_cast<const CHandWeaponModel*>(r->game.get());
+                hand && (hand->dropped || !hand->drop_error.empty()))
+            {
+                ImGui::Text("%s / %s / %s / %s", r->state.m_Name, hand->dropped ? "dropped" : "held",
+                            r->state.m_Flags & FLAG_VISIBLE ? "visible" : "hidden",
+                            r->life == Life::Pending         ? "pending"
+                            : r->activity == OBJSTATE_ACTIVE ? "active"
+                                                             : "inactive");
+                ImGui::Text("Position %.1f %.1f %.1f / velocity %.1f %.1f %.1f", r->state.m_Pos.x, r->state.m_Pos.y,
+                            r->state.m_Pos.z, r->velocity.x, r->velocity.y, r->velocity.z);
+                ImGui::Text("Scheduled: %s", r->scheduled ? "yes" : "no");
+                ImGui::Text("Dimensions %.1f %.1f %.1f / next update %.2f", r->dimensions.x, r->dimensions.y,
+                            r->dimensions.z, r->due);
+                ImGui::TextWrapped("Pickup ammo: %s / %s", hand->player_owned ? "none" : "12 bullets",
+                                   hand->drop_error.c_str());
+            }
+        }
+        if (auto* player = game.server_shell.Player(game.local_client))
+            ImGui::Text("Weapon pickup voice requests: %llu (not played)",
+                        static_cast<unsigned long long>(player->weapon_pickup_voice_requests));
         ImGui::EndTable();
     }
 } // namespace OpenBlood2

@@ -1,3 +1,4 @@
+#include "game/game_settings.h"
 // Selected PlayerObj::UpdateClientPhysics and UpdateAirLevel source rules.
 #include "PlayerObj.h"
 #include <algorithm>
@@ -38,7 +39,8 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
         }
     }
     if (!m_bDead && !m_damage.IsDead() &&
-        (message == OpenBlood2::add_ammo_message || message == OpenBlood2::add_powerup_message))
+        (message == OpenBlood2::add_ammo_message || message == OpenBlood2::add_powerup_message ||
+         message == OpenBlood2::add_weapon_message))
     {
         OpenBlood2::PickupMessage pickup;
         if (server->ReadPickupMessage(read, pickup))
@@ -46,6 +48,25 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
             bool accepted = false;
             if (message == OpenBlood2::add_ammo_message)
                 accepted = m_InventoryMgr.AddAmmo(pickup.type, pickup.amount) == InventoryResult::Ok;
+            else if (message == OpenBlood2::add_weapon_message)
+            {
+                if (server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) !=
+                    static_cast<float>(GAMETYPE_SINGLE))
+                    return CBaseCharacter::ObjectMessageFn(sender, message, read);
+                auto result = m_InventoryMgr.ObtainWeapon(pickup.type);
+                if (result == InventoryResult::Ok)
+                {
+                    int chance = 0;
+                    // Original optional voice branch: retain its RNG draw. Playback remains unavailable.
+                    if (server->RandomInt(0, 99, chance) && chance < 15)
+                        ++weapon_pickup_voice_requests;
+                }
+                const auto* definition = weapon_definition(pickup.type);
+                if (result != InventoryResult::Full && pickup.amount > 0 && definition &&
+                    m_InventoryMgr.AddAmmo(definition->m_nAmmoType, pickup.amount) == InventoryResult::Ok)
+                    result = InventoryResult::Ok;
+                accepted = result == InventoryResult::Ok;
+            }
             else
                 switch (pickup.type)
                 {

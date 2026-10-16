@@ -1,0 +1,163 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "f8939c559f61f7e7fe5d7b6e3b4cae1459357972",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "selected_lines": [
+        [
+          1125,
+          1185
+        ]
+      ],
+      "use": "Single-player current weapon, busy/melee guards, left-first slot removal"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "selected_lines": [
+        [
+          867,
+          968
+        ],
+        [
+          1482,
+          1517
+        ]
+      ],
+      "use": "NPC Fire REST reset and ownership transfer from DropHandModel"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.h",
+      "sha256": "d7bd05aaff0b51c1cb6d8c356366c91114e4099303b901697d8ecfb16f87569d",
+      "selected_lines": [
+        [
+          59,
+          60
+        ]
+      ],
+      "use": "Original idle state predicate"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/HandWeaponModel.cpp",
+      "sha256": "480adb2a0ad140120bb9ddb160cf8f8112508abdf70e218067213e0f04c8ed96",
+      "selected_lines": [
+        [
+          125,
+          183
+        ],
+        [
+          190,
+          240
+        ]
+      ],
+      "use": "Drop dimensions/velocity/schedule and grounded pickup transfer; initialized rotation adaptation"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/WeaponPickups.cpp",
+      "sha256": "116eac417209ee2cc523044e02ff615406b597164df9df5d5f2e0be80cfbc1d4",
+      "selected_lines": [
+        [
+          36,
+          106
+        ],
+        [
+          498,
+          572
+        ]
+      ],
+      "use": "WeaponPickup/BerettaPU and selected non-bouncing spawn helper"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/WeaponPickups.h",
+      "sha256": "b32860805172dd270043dc8a4e8c6c13e05806825436403461ba94d44a953416",
+      "selected_lines": [
+        [
+          22,
+          36
+        ]
+      ],
+      "use": "Weapon pickup sound/default bounce/respawn"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PickupObject.cpp",
+      "sha256": "25e0388f983ec0c9e01b6deb8432f411271159a224d582e12300c10863b979da",
+      "selected_lines": [
+        [
+          536,
+          558
+        ]
+      ],
+      "use": "SpawnItem no-bounce/no-respawn branch"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          4330,
+          4365
+        ]
+      ],
+      "use": "Original weapon acquisition, 15 percent voice request, ammo acceptance and acknowledgement"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          1780,
+          1815
+        ]
+      ],
+      "use": "Lethal Cabal DropCurrentWeapon before remaining death services"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
+      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
+      "selected_lines": [
+        [
+          193,
+          196
+        ]
+      ],
+      "use": "15 percent chance draw"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/basetypes_de.h",
+      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
+      "selected_lines": [
+        [
+          354,
+          364
+        ]
+      ],
+      "use": "Original no-sliding flag bit and meaning"
+    }
+  ],
+  "adaptations": [
+    "Typed checked messages and object/attachment tokens; no raw weapon owner pointer",
+    "Initialize source undefined drop rotation; centered checked dimensions",
+    "NPC active-Fire lifetime guard; player drop input/state sync unavailable",
+    "Failed pickup/support retains inspectable stopped hand; no silent successful transfer",
+    "FLAG_NOSLIDING first-contact replacement solver; retail parity unverified",
+    "Portable chance RNG; optional pickup voices counted but not played",
+    "Corpse/gib/death branch remains explicit failure after original drop attempt"
+  ],
+  "reference_only": [
+    {
+      "path": "sources/lithtech/runtime/shared/src/moveplayer.cpp",
+      "sha256": "d18890bafe327d46dfe86cfa8d5b053316d4256a063d53056c0cfe1d035ee8e6",
+      "selected_lines": [
+        [
+          1759,
+          1776
+        ]
+      ],
+      "repository_commit": "0eab18289bed72879eddb648d3311075b108cf46",
+      "use": "Later-generation first-contact no-sliding comparison only; no code imported and not retail Blood II proof"
+    }
+  ]
+}

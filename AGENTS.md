@@ -346,3 +346,10 @@ Missing later nodes may reuse the prior transform; invalid poses must fail befor
 health mutation. Refused/nested packets cannot replay stale reactions. Lethal
 corpse/drop/gib services remain explicit failures; NPC impulses, hidden limbs,
 Gideon, ExitTrigger and required FX keep M2 incomplete.
+
+The [NPC weapon-drop continuation](../Documentation/Implementation/M2_WEAPON_DROPS.md) connects original Cabal
+DropCurrentWeapon, detached hand physics, BerettaPU and player collection.
+Read [contracts](docs/WEAPON_DROP_CONTRACTS.md). Preserve left-first selection, melee/busy refusal,
+checked independent lifetime, one-second initial support check and ammo-dependent
+pickup acceptance. Failed transfers stay inspectable. Player drop controls,
+corpses/gibs, required FX, Gideon and ExitTrigger remain unavailable; M2 stays open.

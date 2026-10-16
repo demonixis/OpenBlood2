@@ -51,8 +51,10 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
     {
         touching_ = static_cast<HOBJECT>(data);
         ++attempts;
-        auto packet = g_pServerDE->StartMessageToObject(
-            this, touching_, value.kind == PickupKind::Ammo ? add_ammo_message : add_powerup_message);
+        auto packet = g_pServerDE->StartMessageToObject(this, touching_,
+                                                        value.kind == PickupKind::Ammo     ? add_ammo_message
+                                                        : value.kind == PickupKind::Weapon ? add_weapon_message
+                                                                                           : add_powerup_message);
         if (packet)
         {
             g_pServerDE->WritePickupMessage(packet, value);

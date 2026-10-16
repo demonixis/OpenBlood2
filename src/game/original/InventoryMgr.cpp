@@ -1,6 +1,7 @@
 #include "InventoryMgr.h"
 #include "AI_Mgr.h"
 #include "PlayerObj.h"
+#include "game/game_settings.h"
 #include <algorithm>
 #include <cmath>
 namespace
@@ -274,4 +275,52 @@ bool CInventoryMgr::FindBestWeapon(float distance, CWeapon*& alternative) const
     if (best != CurrentWeapon())
         alternative = best;
     return true;
+}
+
+// Original DropCurrentWeapon: selected single-player NPC branch.
+InventoryResult CInventoryMgr::DropCurrentWeapon()
+{
+    ++drop_attempts;
+    drop_error.clear();
+    auto* server = BaseClass::GetServerDE();
+    if (server &&
+        server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) != static_cast<float>(GAMETYPE_SINGLE))
+    {
+        drop_error = "Original weapon drops require single-player mode";
+        return InventoryResult::NotAvailable;
+    }
+    auto* current = CurrentWeapon();
+    if (!server || !server->IsObjectAlive(m_hOwner) || !current || !server->IsObjectAlive(current->m_hHandModel))
+    {
+        drop_error = "No live current held weapon";
+        return InventoryResult::NotAvailable;
+    }
+    if (m_hClient)
+    {
+        drop_error = "Player drop input and view-weapon state synchronization unavailable";
+        return InventoryResult::NotAvailable;
+    }
+    // Source NPC Fire returns to REST. A nested callback may not delete its weapon.
+    if (current->firing || (CurrentWeapon(true) && CurrentWeapon(true)->firing))
+    {
+        drop_error = "Weapon is firing";
+        return InventoryResult::Busy;
+    }
+    if (current->data.m_nType == WEAP_MELEE)
+    {
+        drop_error = "Original melee weapon cannot be dropped";
+        return InventoryResult::NotAvailable;
+    }
+    auto& weapon = m_LWeapons[m_nCurWeaponSlot] ? m_LWeapons[m_nCurWeaponSlot] : m_Weapons[m_nCurWeaponSlot];
+    const auto child = weapon->m_hHandModel;
+    if (!weapon->DropHandModel())
+    {
+        drop_error = weapon->hand_error;
+        return InventoryResult::Invalid;
+    }
+    last_dropped = child;
+    weapon.reset(); // Ownership was transferred before destruction.
+    ++drops;
+    ++revision;
+    return InventoryResult::Ok;
 }

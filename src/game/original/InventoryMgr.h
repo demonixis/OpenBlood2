@@ -12,7 +12,8 @@ enum class InventoryResult
     Current,
     NotAvailable,
     Full,
-    Invalid
+    Invalid,
+    Busy
 };
 class CInventoryMgr : public Aggregate
 {
@@ -37,6 +38,10 @@ class CInventoryMgr : public Aggregate
     void SetMagic(DBYTE);
     void ClearWeapons();
     bool UpdateHandModels();
+    InventoryResult DropCurrentWeapon();
+    std::uint64_t drop_attempts = 0, drops = 0;
+    HOBJECT last_dropped = nullptr; // Non-owning; survives inventory/owner destruction.
+    std::string drop_error;
     InventoryResult ObtainWeapon(DBYTE, int slot = -1);
     InventoryResult ChangeWeaponSlot(DBYTE);
     InventoryResult ChangeWeapon(DBYTE);

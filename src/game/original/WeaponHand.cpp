@@ -70,3 +70,20 @@ bool CWeapon::ShowHandModel(DBOOL show)
     m_hHandModel = h;
     return true;
 }
+
+bool CWeapon::DropHandModel()
+{
+    auto* server = BaseClass::GetServerDE();
+    auto* hand = server && server->IsObjectAlive(m_hHandModel)
+                     ? dynamic_cast<CHandWeaponModel*>(server->HandleToObject(m_hHandModel))
+                     : nullptr;
+    if (firing || !hand || hand->owner != m_hOwner || !hand->Drop(m_hHandAttachment))
+    {
+        hand_error = firing ? "Weapon is firing" : hand ? hand->drop_error : "Dropped hand model unavailable";
+        return false;
+    }
+    m_hHandModel = nullptr;
+    m_hHandAttachment = 0;
+    hand_error.clear();
+    return true;
+}

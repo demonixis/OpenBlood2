@@ -63,6 +63,7 @@ class CPlayerObj : public CBaseCharacter
     SurfaceType m_eLastSurface = SURFTYPE_UNKNOWN, footstep_surface = SURFTYPE_UNKNOWN;
     ContainerCode footstep_container = CC_NOTHING;
     bool GetFootstepSound(std::string&);
+    std::uint64_t weapon_pickup_voice_requests = 0; // Requested only; client voice playback is unavailable.
     std::uint64_t sound_keys = 0, sound_attempts = 0, sound_starts = 0, sound_failures = 0;
     std::uint64_t suppressed_footsteps = 0, unresolved_footsteps = 0, unavailable_sound_alerts = 0;
     OpenBlood2::SoundAlertReport sound_alert;

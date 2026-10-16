@@ -57,9 +57,12 @@ namespace OpenBlood2
         auto* m = writable(h);
         if (!m)
             return DE_INVALIDPARAMS;
-        const auto limit = value.kind == PickupKind::Ammo ? 8 : 4;
-        const auto request = value.kind == PickupKind::Ammo ? add_ammo_message : add_powerup_message;
-        if (!m->routed || (value.kind != PickupKind::Ammo && value.kind != PickupKind::Powerup) ||
+        const auto limit = value.kind == PickupKind::Ammo ? 8 : value.kind == PickupKind::Weapon ? 1 : 4;
+        const auto request = value.kind == PickupKind::Ammo     ? add_ammo_message
+                             : value.kind == PickupKind::Weapon ? add_weapon_message
+                                                                : add_powerup_message;
+        if (!m->routed ||
+            (value.kind != PickupKind::Ammo && value.kind != PickupKind::Powerup && value.kind != PickupKind::Weapon) ||
             (m->id != request && m->id != picked_up_message) || !m->bytes.empty() || m->damage || m->key || m->pickup ||
             !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit || !std::isfinite(value.amount) ||
             value.amount < 0 || value.amount > 1e6f)

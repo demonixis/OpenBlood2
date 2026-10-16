@@ -1,8 +1,12 @@
 # Blood II Reconstruction aka OpenBlood2
 
-Latest combat continuation: [original NPC hit localization and recoil](../Documentation/Implementation/M2_AI_HIT.md)
+Latest death prerequisite: [original NPC weapon drops](../Documentation/Implementation/M2_WEAPON_DROPS.md)
+connects detached Beretta physics, original pickups and player collection. Corpses/gibs,
+required FX, Gideon and ExitTrigger still keep M2 incomplete.
+
+Previous combat continuation: [original NPC hit localization and recoil](../Documentation/Implementation/M2_AI_HIT.md)
 connects hit regions, limb damage, injured legs and nonlethal reactions to production
-Cultist/Civilian updates, with in-game inspection. Corpse/drop/gib services, required
+Cultist/Civilian updates, with in-game inspection. Corpse/gib services, required
 FX, Gideon and ExitTrigger still keep M2 incomplete.
 
 Production lifecycle foundation: [original Cultist/Civilian initialization and AI_Update](../Documentation/Implementation/M2_AI_RUNTIME.md)
@@ -424,3 +428,7 @@ NPC hit/recoil verification: 481/481 Debug and inspector-free Release checks
 (27 GPU each), plus 188 targeted ASan/UBSan/leak checks. See
 [evidence](../Documentation/Implementation/M2_AI_HIT.md) for source quirks,
 nonlethal production recoil and the remaining death/M2 boundary.
+
+The [NPC weapon-drop continuation](../Documentation/Implementation/M2_WEAPON_DROPS.md) connects the original Cabal drop,
+independent falling Beretta, original pickup and player collection. Corpse/gib
+services, player drop controls and the full M2 exit gate remain open.

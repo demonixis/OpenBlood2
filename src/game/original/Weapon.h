@@ -32,6 +32,8 @@ class CWeapon
   public:
     virtual ~CWeapon();
     bool ShowHandModel(DBOOL);
+    bool DropHandModel();
+    bool firing = false; // Guards the synchronous server Fire callback, including NPC REST reset.
     HOBJECT m_hHandModel = nullptr;
     HATTACHMENT m_hHandAttachment = 0;
     std::string hand_error;

@@ -1,5 +1,9 @@
 # Original pickups and destruction spawns
 
+> Extended by [NPC weapon-drop contracts](WEAPON_DROP_CONTRACTS.md): the selected
+> Cabal drop, independent falling hand and Beretta collection now work. Corpse/gib
+> and remaining death services still fail explicitly; M2 is incomplete.
+
 This is a single-player subset of M2, not complete inventory or gameplay.
 [Source selections](M2_PICKUP_SOURCES.json) record the original functions and
 adaptations. [Implementation evidence](../../Documentation/Implementation/M2_PICKUPS.md)

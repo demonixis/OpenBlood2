@@ -182,9 +182,10 @@ namespace OpenBlood2
         if (r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL)
             return unsupported("Moving this object type");
         MovementState support;
-        const bool can_step = (r->state.m_Flags & FLAG_STAIRSTEP) && (r->state.m_Flags & FLAG_SOLID) &&
-                              GetMovementState(h, support) && support.standing && support.ground_normal.y >= 0.5f &&
-                              r->velocity.y <= 0.01f && destination->y <= r->state.m_Pos.y + 0.001f;
+        const bool can_step = !(r->state.m_Flags & FLAG_NOSLIDING) && (r->state.m_Flags & FLAG_STAIRSTEP) &&
+                              (r->state.m_Flags & FLAG_SOLID) && GetMovementState(h, support) && support.standing &&
+                              support.ground_normal.y >= 0.5f && r->velocity.y <= 0.01f &&
+                              destination->y <= r->state.m_Pos.y + 0.001f;
         moving_ = true;
         const auto ids = objects_.snapshot();
         std::map<std::uint32_t, HOBJECT> touched;
@@ -345,6 +346,10 @@ namespace OpenBlood2
             auto velocity_into = vector_dot(r->velocity, nearest.normal);
             if (velocity_into < 0)
                 r->velocity = vector_subtract(r->velocity, vector_scale(nearest.normal, velocity_into));
+            // Source flag requests first-contact placement without a tangential slide.
+            // Velocity keeps the ordinary normal projection; this is replacement physics.
+            if (r->state.m_Flags & FLAG_NOSLIDING)
+                break;
             if (vector_dot(remaining, remaining) < 1e-10f)
                 break;
         }

@@ -25,6 +25,7 @@
 #include "game/original/Sound.h"
 #include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
+#include "game/original/WeaponPickups.h"
 #include "game/original/WorldProperties.h"
 #include "game/server_adapter.h"
 
@@ -410,6 +411,8 @@ namespace OpenBlood2
                                &b2base,
                                construct<PickupObject>,
                                {{"PickupTriggerTarget", std::string{}}, {"PickupTriggerMessage", std::string{}}}};
+        const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}};
+        const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
         const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}};
         const ClassInfo powerup_pickup{"PowerupPickup", &pickup, construct<PowerupPickup>, {}};
         const ClassInfo health_base{"HealthBase", &powerup_pickup, construct<HealthBase>, {}};
@@ -648,6 +651,7 @@ namespace OpenBlood2
                objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
                objects.register_class(freefall) && objects.register_class(trigger) &&
                objects.register_class(key_pickup) && objects.register_class(pickup) &&
+               objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
                objects.register_class(health_base) && objects.register_class(armor_base) &&
                objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&

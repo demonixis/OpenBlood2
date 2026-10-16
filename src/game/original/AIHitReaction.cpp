@@ -115,7 +115,9 @@ bool AI_Mgr::HandleDamage()
         m_nInjuredLeg = node;
     if (m_damage.m_fHitPoints <= 0)
     {
-        damage_reaction_error = "NPC lethal reaction requires weapon drops, corpses/gibs and death services";
+        if (m_bCabal)
+            m_InventoryMgr.DropCurrentWeapon(); // Source ignores refusal (no held weapon/busy/melee).
+        damage_reaction_error = "NPC lethal reaction requires corpses/gibs and death services";
         return false;
     }
     if (m_nState == StateScript && !(m_dwScriptFlags & (1u << 1)))

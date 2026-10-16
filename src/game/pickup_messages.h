@@ -4,11 +4,12 @@
 #include <string_view>
 namespace OpenBlood2
 {
-    inline constexpr DDWORD add_ammo_message = 1009, add_powerup_message = 3504;
+    inline constexpr DDWORD add_ammo_message = 1009, add_powerup_message = 3504, add_weapon_message = 1004;
     enum class PickupKind
     {
         Ammo,
-        Powerup
+        Powerup,
+        Weapon
     };
     struct PickupMessage
     {

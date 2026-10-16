@@ -1,5 +1,6 @@
 #include "pickup_smoke.h"
 #include "game/original/PickupObject.h"
+#include "game/original/WeaponPickups.h"
 #include "game/original/spawn_object.h"
 namespace OpenBlood2
 {
@@ -12,7 +13,8 @@ namespace OpenBlood2
         id = r->id;
         auto second = SpawnObject("WardPU Name inspect_ward", {200, 10000, 0}, {}, {});
         const auto* inspect = g.objects.get(second);
-        return inspect && inspect->model;
+        auto weapon = SpawnWeaponPickup(WEAP_BERETTA, h, {400, 10000, 0}, {}, true);
+        return inspect && inspect->model && weapon && g.objects.get(weapon)->model;
     }
     bool collect_pickup_smoke(GameSession& g, ObjectId id)
     {
@@ -26,7 +28,18 @@ namespace OpenBlood2
         if (g.server.TeleportObject(player->m_hObject, &pos) != DE_OK ||
             g.server.MoveObject(player->m_hObject, &pos) != DE_OK)
             return false;
-        return !g.server.IsObjectAlive(h) && player->m_InventoryMgr.GetAmmoCount(1) == 100 &&
-               g.server.pickup_reports.size() == 1;
+        if (g.server.IsObjectAlive(h) || player->m_InventoryMgr.GetAmmoCount(1) != 100 ||
+            g.server.pickup_reports.size() != 1)
+            return false;
+        auto weapon = SpawnWeaponPickup(WEAP_BERETTA, player->m_hObject, {600, 10000, 0}, {}, true);
+        const auto* pickup = g.objects.get(weapon);
+        if (!pickup || !pickup->model)
+            return false;
+        pos = pickup->state.m_Pos;
+        if (g.server.TeleportObject(player->m_hObject, &pos) != DE_OK ||
+            g.server.MoveObject(player->m_hObject, &pos) != DE_OK)
+            return false;
+        return !g.server.IsObjectAlive(weapon) && player->m_InventoryMgr.CurrentWeapon(true) &&
+               g.server.pickup_reports.size() == 2;
     }
 } // namespace OpenBlood2

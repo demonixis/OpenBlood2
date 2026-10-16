@@ -1,5 +1,9 @@
 # Original NPC hit localization and recoil
 
+> Extended by [NPC weapon-drop contracts](WEAPON_DROP_CONTRACTS.md): the selected
+> Cabal drop, independent falling hand and Beretta collection now work. Corpse/gib
+> and remaining death services still fail explicitly; M2 is incomplete.
+
 Production CultistAI/CivilianAI now enable the original CDestructable hit-region
 selection and AI_Mgr nonlethal damage/recoil branches after successful initialization.
 [Source ledger](M2_AI_HIT_SOURCES.json) and [execution evidence](../../Documentation/Implementation/M2_AI_HIT.md)

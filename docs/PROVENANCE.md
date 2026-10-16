@@ -637,3 +637,12 @@ failure diagnostics are portability/safety adaptations. No prototype, new
 dependency, commercial asset or death-service placeholder was imported.
 [Contracts](AI_HIT_CONTRACTS.md) and [validation](../../Documentation/Implementation/M2_AI_HIT.md)
 define the visible-node subset and remaining M2 gate.
+
+## NPC weapon drops and Beretta pickups
+
+Selective original DropCurrentWeapon/DropHandModel/CHandWeaponModel, WeaponPickup,
+BerettaPU, SpawnWeaponPickup and PlayerObj MID_ADDWEAPON rules. See the
+[source ledger](M2_WEAPON_DROP_SOURCES.json) and [contracts](WEAPON_DROP_CONTRACTS.md).
+No donor engine code/dependency was imported. Original NOSLIDING bit 25 is
+implemented by the existing replacement solver; later LithTech moveplayer was
+consulted for first-contact meaning only, not treated as retail Blood II proof.

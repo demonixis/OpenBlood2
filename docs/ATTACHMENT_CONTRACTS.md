@@ -1,5 +1,9 @@
 # Held models and attachments
 
+> Extended by [NPC weapon-drop contracts](WEAPON_DROP_CONTRACTS.md): the selected
+> Cabal drop, independent falling hand and Beretta collection now work. Corpse/gib
+> and remaining death services still fail explicitly; M2 is incomplete.
+
 Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
 this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
 The existing action/service limitations remain unless explicitly superseded.
