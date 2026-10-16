@@ -111,3 +111,8 @@ readback checks resting-fragment half alpha and the real external model/skin.
 Source entries remain 203 created / four transferred sounds / 372 editor-only /
 one unsupported Gideon / zero failures. Trails, flames, illumination, safe automatic
 NEW_LEVEL and other required services keep the actual M2 gate open.
+
+Continuation: [original fragment smoke trails](OBJECT_PARTICLE_CONTRACTS.md) supplies
+selected high-detail OBJFX_SMOKETRAIL_1 behavior. Earlier trail omissions and the
+4096 sprite-entry limit are historical; the shared renderer now holds 16384 entries.
+Other ObjectFX modes, required effects and the actual M2 gate remain open.

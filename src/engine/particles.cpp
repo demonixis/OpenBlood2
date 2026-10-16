@@ -18,7 +18,8 @@ namespace OpenBlood2
         for (const auto& v : particles)
         {
             if (!physics_vector(v.position) || !physics_vector(v.velocity) || !std::isfinite(v.lifetime) ||
-                v.lifetime < 0)
+                v.lifetime < 0 || !physics_vector(v.color) || v.color.x < 0 || v.color.x > 1 || v.color.y < 0 ||
+                v.color.y > 1 || v.color.z < 0 || v.color.z > 1)
             {
                 error = "Invalid particle state";
                 return false;

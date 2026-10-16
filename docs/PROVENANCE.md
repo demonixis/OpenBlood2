@@ -1,5 +1,15 @@
 # Source and Dependency Provenance
 
+## Original fragment smoke trails
+
+Selected CObjectParticleFX methods and CObjectGeneralFX's high-detail smoke-trail 1
+recipe come from sources/blood2/ClientShellDLL/ObjectFX.{h,cpp}, reference commit
+006b4aabd3fb348f6846cad03799cf8df685ea95. Typed IDs, owned particles/colors, bounded
+failure and existing SDL_GPU billboards replace client APIs. The zero-count unused
+division is omitted; other source timing/count/alpha quirks remain. See
+[ledger](M2_OBJECT_PARTICLE_SOURCES.json), [contracts](OBJECT_PARTICLE_CONTRACTS.md)
+and [validation](../../Documentation/Implementation/M2_OBJECT_PARTICLES.md).
+
 ## Character node visibility and player Load model setup
 
 Selected AI_Shared named/extra reset loops, Destructable hide filtering and PlayerObj

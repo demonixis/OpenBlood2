@@ -56,7 +56,7 @@ namespace OpenBlood2
                                DVector color, bool direct_extent)
     {
         error.clear();
-        if (!camera_valid_ || entries.size() >= 4096)
+        if (!camera_valid_ || entries.size() >= max_entries)
         {
             mesh.vertices.clear();
             mesh.ranges.clear();

@@ -7,7 +7,7 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishExplosionFragments(HOBJECT source, DDWORD type, DVector pos, DVector normal,
                                                            std::string& error)
     {
-        trace_service("PublishExplosionFragments (metal models; trails unavailable)");
+        trace_service("PublishExplosionFragments (metal models and original smoke trails)");
         if (!IsObjectAlive(source) || !objects_.models || !client_resources)
         {
             error = "Explosion fragment source/resources unavailable";

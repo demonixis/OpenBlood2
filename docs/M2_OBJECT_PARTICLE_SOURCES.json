@@ -1,0 +1,151 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "ff76e8858bed88da7b8d36e6a0480d2c7c3940e3",
+  "source_files": [
+    {
+      "path": "sources/blood2/ClientShellDLL/ObjectFX.cpp",
+      "sha256": "1af815cdb07c8e0fcd56bebb723e78b539cd3398221a78e3b3fcf977bf109c48",
+      "selected_lines": [
+        [
+          25,
+          92
+        ],
+        [
+          105,
+          150
+        ],
+        [
+          210,
+          290
+        ],
+        [
+          300,
+          367
+        ],
+        [
+          635,
+          642
+        ],
+        [
+          696,
+          719
+        ]
+      ],
+      "use": "Selected original single-player trail initialization/update, stream placement/color and high-detail recipe."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ObjectFX.h",
+      "sha256": "f10854489408e05859507a3b73cfbbd1ba3514988aa7caf93ec48d992bbfaffe",
+      "selected_lines": [
+        [
+          20,
+          80
+        ],
+        [
+          92,
+          180
+        ]
+      ],
+      "use": "Zeroed descriptor, flag values, initialized first-update state and unsupported mode boundary."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
+      "sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13",
+      "selected_lines": [
+        [
+          25,
+          36
+        ],
+        [
+          45,
+          109
+        ]
+      ],
+      "use": "Fixed initial system transform, no alpha assignment and radius/640 setup."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SpecialFX.h",
+      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
+      "selected_lines": [
+        [
+          32,
+          56
+        ],
+        [
+          78,
+          97
+        ]
+      ],
+      "use": "Default cadence and WantRemove clearing parent handle."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
+      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
+      "selected_lines": [
+        [
+          1435,
+          1463
+        ],
+        [
+          1474,
+          1492
+        ],
+        [
+          1607,
+          1635
+        ],
+        [
+          1133,
+          1137
+        ],
+        [
+          1164,
+          1216
+        ]
+      ],
+      "use": "Fragment/list-4 before object-particle/list-7 update and checked removal semantics."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
+      "selected_lines": [
+        [
+          1026,
+          1057
+        ],
+        [
+          1697,
+          1717
+        ]
+      ],
+      "use": "Original fragment child request and selected smoke-trail identifier."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
+      "sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
+      "selected_lines": [
+        [
+          20,
+          51
+        ]
+      ],
+      "use": "Random range semantics; private portable generator is an adaptation."
+    },
+    {
+      "path": "sources/lithtech/runtime/client/src/particlesystem.cpp",
+      "sha256": "1efc6713379529f2a840cb15243ca4b8bdf846092ac5e7c67427df0ecbcf0d44",
+      "selected_lines": [
+        [
+          234,
+          298
+        ]
+      ],
+      "use": "Existing later-engine-informed particle ordering, not a fresh engine import or retail parity."
+    }
+  ],
+  "limitations": [
+    "Only original high-detail smoke trail 1, single player and EMITLOCATION.",
+    "Private RNG, bounded storage and later-engine-informed integration/rendering are explicit adaptations.",
+    "Other ObjectFX modes, flames, illumination, safe NEW_LEVEL and M2 remain open."
+  ]
+}

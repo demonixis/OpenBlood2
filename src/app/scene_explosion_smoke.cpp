@@ -35,10 +35,12 @@ namespace OpenBlood2
             fragments.active.size() > 5 || fragments.failed || !fragments.update_error.empty())
             return false;
         for (const auto& fx : fragments.active)
-            if (!fx.model || !fx.updates || fx.trail_error.empty() || !fx.error.empty() ||
+            if (!fx.model || !fx.updates || !fx.trail_error.empty() || !fx.error.empty() ||
                 (fx.position.x == fx.settings.position.x && fx.position.y == fx.settings.position.y &&
                  fx.position.z == fx.settings.position.z))
                 return false;
+        if (!fragments.trail_started || fragments.trail_failed || !fragments.trail_particles())
+            return false;
         const auto& rings = g.server.explosion_rings;
         if (!report.ring_event || !report.ring_error.empty() || rings.active.size() != 4 || rings.started != 4 ||
             rings.failed || rings.reserved_particles() != 128 || !rings.update_error.empty())

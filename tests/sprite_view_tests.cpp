@@ -83,7 +83,7 @@ namespace
         CHECK(!scene.entries.back().error.empty() && scene.draws.empty());
         CHECK(!scene.begin_frame({nan, 0, 0}, {}, error) && scene.entries.empty());
         CHECK(scene.begin_frame({}, {}, error));
-        for (unsigned i = 0; i < 4096; ++i)
+        for (unsigned i = 0; i < SpriteView::max_entries; ++i)
             CHECK(scene.add(&sprite, {}, {}, {1, 1, 1}, 0, {}, resources, error));
         CHECK(!scene.add(&sprite, {}, {}, {1, 1, 1}, 0, {}, resources, error) && scene.entries.empty() &&
               scene.draws.empty());

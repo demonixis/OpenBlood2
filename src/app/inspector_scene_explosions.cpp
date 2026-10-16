@@ -8,7 +8,7 @@ namespace OpenBlood2
         ImGui::TextWrapped(
             "Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
             "Spatial WAV playback and selected original sprite/model components are implemented. Composite "
-            "particle flames, fragment trails and surface illumination remain unavailable. Fragment/ring/light state "
+            "particle flames and surface illumination remain unavailable. Fragment/ring/light state "
             "is shown "
             "below.");
         ImGui::Text("Audio: %s | active voices %zu | submitted frames %llu",
@@ -98,6 +98,39 @@ namespace OpenBlood2
                     ImGui::TextWrapped("%s", r.unavailable.c_str());
             }
         ImGui::Separator();
+        ImGui::Text("Fragment smoke trails: %zu systems / %zu particles / %llu started / %llu expired / %llu failed",
+                    fragments.trails.size(), fragments.trail_particles(), (unsigned long long)fragments.trail_started,
+                    (unsigned long long)fragments.trail_expired, (unsigned long long)fragments.trail_failed);
+        for (const auto& t : fragments.trails)
+        {
+            ImGui::Text("Trail %llu / fragment %llu / %s / %zu particles / %llu emitted / deadline %.3f",
+                        (unsigned long long)t.id, (unsigned long long)t.parent, t.moving ? "emitting" : "stopped",
+                        t.particles.size(), (unsigned long long)t.emitted, t.duration);
+            ImGui::Text("Origin %.2f %.2f %.2f / source %.2f %.2f %.2f / elapsed %.3f", t.origin.x, t.origin.y,
+                        t.origin.z, t.position.x, t.position.y, t.position.z, t.last_time - t.start_time);
+            ImGui::TextWrapped("%s | radius/640 %.3f | alpha %.2f (authored %.2f, unused without ramps)",
+                               t.texture.c_str(), t.radius / 640.f, t.alpha, t.requested_alpha);
+            unsigned prepared = 0;
+            if (sprite_view)
+                for (const auto& e : sprite_view->entries)
+                    if (e.trail_system == t.id)
+                    {
+                        prepared += e.range != UINT32_MAX && e.error.empty();
+                        if (!e.error.empty())
+                            ImGui::TextWrapped("%s", e.error.c_str());
+                    }
+            ImGui::Text("Prepared quads %u", prepared);
+            ImGui::PushID((int)t.id);
+            if (ImGui::TreeNode("Smoke particles"))
+            {
+                for (const auto& p : t.particles)
+                    ImGui::Text("Local %.2f %.2f %.2f / velocity %.2f %.2f %.2f / life %.3f / gray %.3f", p.position.x,
+                                p.position.y, p.position.z, p.velocity.x, p.velocity.y, p.velocity.z, p.lifetime,
+                                p.color.x);
+                ImGui::TreePop();
+            }
+            ImGui::PopID();
+        }
         const auto& rings = game.server.explosion_rings;
         ImGui::Text("Explosion rings: %zu active / %zu reserved particles / %llu started / %llu expired / %llu failed",
                     rings.active.size(), rings.reserved_particles(), (unsigned long long)rings.started,

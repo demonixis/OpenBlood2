@@ -453,3 +453,9 @@ Read [contracts](docs/EXPLOSION_FRAGMENT_CONTRACTS.md). Preserve per-update moti
 1.1-velocity rays, impact angular damping and per-condition random count draws.
 Use checked detached lifetime; unavailable collision must fail. Trails/child explosions
 are not implemented, and replacement collision is not retail parity. M2 stays open.
+
+The [fragment smoke-trail continuation](../Documentation/Implementation/M2_OBJECT_PARTICLES.md) connects selected original CObjectParticleFX and real textured particles.
+Read [contracts](docs/OBJECT_PARTICLE_CONTRACTS.md). Preserve first-update return, absolute emission timing, distance-derived count,
+unused authored alpha/count, fixed origin, strict stopped-tail lifetime and parent removal.
+Zero-count division is skipped without emission/RNG draws. Keep bounded failures and
+replacement-engine limits explicit; other ObjectFX modes and M2 remain open.

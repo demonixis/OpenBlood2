@@ -1,5 +1,9 @@
 # Blood II Reconstruction aka OpenBlood2
 
+Current continuation: [original fragment smoke trails](../Documentation/Implementation/M2_OBJECT_PARTICLES.md) adds
+distance-based emission, source stop/lifetime rules and actual DTX particle rendering.
+Other required FX/illumination and safe NEW_LEVEL keep M2 incomplete.
+
 Current continuation: [original explosion metal fragments](../Documentation/Implementation/M2_EXPLOSION_FRAGMENTS.md) adds
 launch, collision/rest, fade, real model rendering and live inspection. Trails,
 remaining FX/illumination and safe NEW_LEVEL keep M2 incomplete.

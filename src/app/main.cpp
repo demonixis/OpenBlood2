@@ -351,7 +351,8 @@ namespace
         bool explosion_model_drawn_hidden = false, explosion_fragments_drawn_hidden = false;
         OpenBlood2::SpriteView sprite_scene;
         OpenBlood2::WorldRenderer sprite_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
-        bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false, explosion_rings_drawn_hidden = false;
+        bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false, explosion_rings_drawn_hidden = false,
+             explosion_trails_drawn_hidden = false;
         bool models_hidden = false, close_weapon_hidden = false;
         std::uint64_t model_frames = 0;
         std::vector<OpenBlood2::WorldDraw> world_draws;
@@ -869,6 +870,9 @@ namespace
                         explosion_sprites_drawn_hidden |= prepared == 2;
                         unsigned particles = 0;
                         for (const auto& entry : sprite_scene.entries)
+                            if (entry.trail_system && entry.error.empty() && entry.range != UINT32_MAX)
+                                explosion_trails_drawn_hidden = true;
+                        for (const auto& entry : sprite_scene.entries)
                             if (entry.particle_system && entry.error.empty() && entry.range != UINT32_MAX &&
                                 entry.alpha < 1 && entry.alpha > 0)
                                 ++particles;
@@ -1377,6 +1381,7 @@ namespace
                 (options.scene_explosions_smoke &&
                  (!scene_explosion_hidden || !explosion_sprites_drawn_hidden || !explosion_model_drawn_hidden ||
                   !explosion_rings_drawn_hidden || !explosion_fragments_drawn_hidden ||
+                  !explosion_trails_drawn_hidden ||
                   !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
                 (options.sprites_smoke &&
                  (!sprite_hidden || !sprites_drawn_hidden || sprite_scene.draws.size() != 12 ||
@@ -1439,11 +1444,12 @@ namespace
                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
                              "and after reload; evaluated radius/color checked; world illumination unavailable");
             if (options.scene_explosions_smoke)
-                spdlog::info("SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
-                             "audio plus original explosion models/sprites/rings/fragments and evaluated point lights "
-                             "verified hidden "
-                             "and after reload; illumination/other composite "
-                             "FX unavailable");
+                spdlog::info(
+                    "SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
+                    "audio plus original explosion models/sprites/rings/fragments/trails and evaluated point lights "
+                    "verified hidden "
+                    "and after reload; illumination/other composite "
+                    "FX unavailable");
             if (options.sprites_smoke)
                 spdlog::info("SPRITES smoke: 12 original DetailSprites, SPR manifests, frame clocks, hidden UI and "
                              "unload/reload verified; 12 alpha-textured quads submitted with shared world depth");

@@ -2,7 +2,8 @@
 #include "explosion_sprite_fixture.h"
 namespace test_explosion_fragment
 {
-    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error)
+    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error,
+                      bool smoke = true)
     {
         if (!test_explosion_sprite::mount(resources, root, error))
             return false;
@@ -16,6 +17,8 @@ namespace test_explosion_fragment
         dir.children["spritetextures"].files["waterblue.dtx"] = skin;
         dir.children["models"].children["gibs"].files["gibmetal2.abc"] = test_model::abc().b;
         dir.children["skins"].children["gibs"].files["gibmetal3.dtx"] = skin;
+        if (smoke)
+            dir.children["spritetextures"].files["smoke64_2.dtx"] = skin;
         test_model::Writer w;
         w.b.resize(168);
         w.b[0] = w.b[62] = w.b[124] = 13;

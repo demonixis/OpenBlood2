@@ -111,3 +111,8 @@ FX/lighting and other services still block the unchanged M2 gate.
 Continuation: [original metal fragments](EXPLOSION_FRAGMENT_CONTRACTS.md) now supplies
 selected grenade fragment motion/collision and rendering. Earlier blanket fragment
 omissions are historical; smoke trails, other required services and M2 remain open.
+
+Continuation: [original fragment smoke trails](OBJECT_PARTICLE_CONTRACTS.md) supplies
+selected high-detail OBJFX_SMOKETRAIL_1 behavior. Earlier trail omissions and the
+4096 sprite-entry limit are historical; the shared renderer now holds 16384 entries.
+Other ObjectFX modes, required effects and the actual M2 gate remain open.

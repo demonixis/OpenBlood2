@@ -32,6 +32,16 @@ namespace OpenBlood2
                                         fx.id, i, game.resources, error))
                     return false;
             }
+        for (const auto& trail : game.server.explosion_fragments.trails)
+            for (unsigned i = 0; i < trail.particles.size(); ++i)
+            {
+                const auto& p = trail.particles[i];
+                if (!scene.add_particle(trail.texture, vector_add(trail.origin, p.position), trail.radius / 640.f,
+                                        p.color, trail.alpha, trail.id, i, game.resources, error))
+                    return false;
+                scene.entries.back().particle_system = 0;
+                scene.entries.back().trail_system = trail.id;
+            }
         scene.sort();
         return true;
     }

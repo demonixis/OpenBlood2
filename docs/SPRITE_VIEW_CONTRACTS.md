@@ -76,3 +76,8 @@ reload. These are harness observations, not a retail executable comparison.
 Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
 selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
 are historical; fragments/flames, illumination and the full M2 gate remain open.
+
+Continuation: [original fragment smoke trails](OBJECT_PARTICLE_CONTRACTS.md) supplies
+selected high-detail OBJFX_SMOKETRAIL_1 behavior. Earlier trail omissions and the
+4096 sprite-entry limit are historical; the shared renderer now holds 16384 entries.
+Other ObjectFX modes, required effects and the actual M2 gate remain open.

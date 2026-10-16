@@ -201,11 +201,13 @@ namespace
         auto check_scene = [&]() -> bool
         {
             CHECK(update_sprite_scene(game, view, error));
-            unsigned original = 0, particles = 0;
+            unsigned original = 0, particles = 0, trails = 0;
             for (const auto& entry : view.entries)
             {
                 CHECK(entry.error.empty() && entry.range < view.mesh.ranges.size());
-                if (entry.particle_system)
+                if (entry.trail_system)
+                    ++trails;
+                else if (entry.particle_system)
                     ++particles;
                 else
                     ++original;
@@ -214,7 +216,8 @@ namespace
             for (const auto& ring : game.server.explosion_rings.active)
                 expected_particles += ring.particles.size();
             CHECK(original == 30 && particles == expected_particles && particles >= 288);
-            CHECK(view.draws.size() == 30 + particles);
+            CHECK(trails == game.server.explosion_fragments.trail_particles());
+            CHECK(view.draws.size() == 30 + particles + trails);
             return true;
         };
         std::uint64_t previous = 0;

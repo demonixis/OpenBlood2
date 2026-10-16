@@ -162,11 +162,12 @@ namespace
                       near(f.angular_step.z, draw(-1, 1)));
                 CHECK(f.settings.position.x == 10 && f.settings.normal.y == 1 && f.settings.duration == 10 &&
                       f.settings.fade_time == 2);
-                CHECK(f.settings.trail_type == 1 && !f.trail_error.empty() && f.settings.spawn_explosion == 0);
+                CHECK(f.settings.trail_type == 1 && f.trail_error.empty() && f.settings.spawn_explosion == 0);
                 CHECK(near(std::sqrt(vector_dot(f.velocity, f.velocity)), f.settings.velocity));
             }
             CHECK(count >= 2 && count <= 5 && manager.active.size() == begin + count);
-            CHECK(manager.reports.back().fragments.size() == count && !manager.reports.back().unavailable.empty());
+            CHECK(manager.reports.back().fragments.size() == count && manager.reports.back().unavailable.empty() &&
+                  manager.reports.back().trails.size() == count);
         }
         for (unsigned type : {0u, 1u, 2u, 6u, 8u})
             CHECK(manager.publish(type, {}, {0, 1, 0}, "no branch", g.models, g.resources, 0, error) && error.empty() &&
