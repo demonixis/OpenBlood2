@@ -104,7 +104,11 @@ DDWORD CDestructable::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* d
             trigger_only = prop.m_Bool != 0;
     }
     if (message == MID_UPDATE)
+    {
         m_fLastDamageAmount = m_fLastDamagePercent = 0; // Original per-update accumulators.
+        if (m_bDead && m_fDeathDelay > 0)
+            m_fDeathDelay -= BaseClass::GetServerDE()->GetFrameTime();
+    }
     return Aggregate::EngineMessageFn(owner, message, data, reason);
 }
 void CDestructable::SendTrigger(const std::string& target, const std::string& message)
@@ -157,6 +161,7 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
             if (damage.type == OpenBlood2::DamageType::Death)
             {
                 m_fArmorPoints = 0;
+                m_fDeathHitPoints = 0;
                 amount = m_fHitPoints;
             }
             else if (ai_hit_localization)
@@ -176,6 +181,9 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
                     m_fHitPoints = 0; // Original Cabal headshot bypasses armor before ordinary absorption.
                 amount *= hit.multiplier;
             }
+            if (damage.type != OpenBlood2::DamageType::Death && m_bNighInvulnerable &&
+                dynamic_cast<CBaseCharacter*>(owner))
+                amount *= .05f; // Original character modifier, before impulses and armor.
             if (apply_damage_physics && damage.type != OpenBlood2::DamageType::Death)
                 ApplyDamagePhysics(amount, damage.direction);
             if (m_fArmorPoints > 0 && damage.type != OpenBlood2::DamageType::Suffocate)
@@ -196,6 +204,8 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
             }
             amount = std::max(amount, 0.0f);
             m_fHitPoints -= amount;
+            if (damage.type != OpenBlood2::DamageType::Death)
+                m_fDeathHitPoints -= amount;
             if (damage.type == OpenBlood2::DamageType::Death)
             {
                 // Source instant-death branch initializes these before adding the
@@ -278,6 +288,7 @@ bool CDestructable::Heal(float amount)
     if (!add_stat(m_fHitPoints, m_fMaxHitPoints, amount))
         return false;
     m_bDead = DFALSE;
+    m_fDeathHitPoints = m_fHitPoints;
     return true;
 }
 bool CDestructable::MegaHeal(float amount)
@@ -285,6 +296,7 @@ bool CDestructable::MegaHeal(float amount)
     if (!add_stat(m_fHitPoints, m_fMaxMegaHitPoints, amount))
         return false;
     m_bDead = DFALSE;
+    m_fDeathHitPoints = m_fHitPoints;
     return true;
 }
 bool CDestructable::AddWard(float amount)

@@ -1061,6 +1061,9 @@ namespace OpenBlood2
                         player->m_InventoryMgr.GetAmmoCount(1));
             ImGui::Text("Strength %u | Speed %u | Resistance %u | Magic %u", player->m_nAttribStrength,
                         player->m_nAttribSpeed, player->m_nAttribResistance, player->m_nAttribMagic);
+            ImGui::Text("Death HP %.2f / delay %.3fs / raw dead %d / effective dead %d / nigh-invulnerable %d",
+                        player->m_damage.m_fDeathHitPoints, player->m_damage.m_fDeathDelay, player->m_damage.m_bDead,
+                        player->m_damage.IsDead(), player->m_damage.m_bNighInvulnerable);
             ImGui::TextWrapped("Model: %s | Skin: %s (decode status in 3D view)", record->state.m_Filename,
                                record->state.m_SkinName);
             ImGui::TextWrapped("Requested slot 1: %u. Current slot: %u. Original inventory owns the Beretta/knife; "
@@ -2095,6 +2098,8 @@ namespace OpenBlood2
             }
             ImGui::Text("HP %.1f | dead %s | CanDamage %s", b->m_damage.m_fHitPoints,
                         b->m_damage.IsDead() ? "yes" : "no", b->m_damage.can_damage ? "yes" : "no");
+            ImGui::Text("Death HP %.2f / delay %.3fs / raw dead %d", b->m_damage.m_fDeathHitPoints,
+                        b->m_damage.m_fDeathDelay, b->m_damage.m_bDead);
             ImGui::Text("Destructable %s | TriggerDestroyOnly %s", b->destructable ? "yes" : "no",
                         b->m_damage.trigger_only ? "yes" : "no");
             ImGui::Text("Collision %s | FireThrough %s", b->box_physics ? "box" : "polygon",

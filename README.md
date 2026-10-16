@@ -1,5 +1,11 @@
 # Blood II Reconstruction aka OpenBlood2
 
+Latest preservation continuation: [original damage Save/Load](../Documentation/Implementation/M2_DAMAGE_STATE.md)
+adds owned health/armor/death state and original death-delay/nigh-invulnerability
+rules. Exit inspection now captures inventory and damage separately; full player
+restoration, client association and safe destination entry remain pending.
+**NEW_LEVEL is still refused and M2 remains incomplete.**
+
 Latest inventory continuation: [original Save/Load subset](../Documentation/Implementation/M2_INVENTORY_STATE.md).
 Exit requests now capture owned inventory state; original keep-alive restoration
 removes keys and recreates weapons. Full player preservation/client association

@@ -1,5 +1,10 @@
 # Original inventory Save/Load subset
 
+> Continued by [damage state contracts](DAMAGE_STATE_CONTRACTS.md): original damage
+> Save/Load values and death counter/delay/nigh-invulnerability now execute.
+> Earlier blanket damage-save omissions are historical. Whole player restoration
+> and safe level transfer remain unavailable; M2 stays open.
+
 This ports the supported fields and ordering of original `CInventoryMgr::Save`
 and `Load` into an owned typed `InventoryState`. It is an inventory aggregate
 checkpoint, **not KeepAliveSave/KeepAliveLoad, a player save or a retail save-file

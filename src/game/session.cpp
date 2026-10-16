@@ -201,8 +201,9 @@ namespace OpenBlood2
                 {
                     exit.pending = false;
                     server_shell.CapturePlayerInventory(local_client);
+                    server_shell.CapturePlayerDamage(local_client);
                     // NEW_LEVEL is rejected by the decoder before any teardown:
-                    // an inventory snapshot alone is not KeepAliveSave/Load.
+                    // aggregate snapshots alone are not KeepAliveSave/Load.
                     WorldRequest request;
                     if (!decode_world_request(exit.load, request, exit.error))
                         ++exit.blocked;

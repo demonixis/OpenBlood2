@@ -1,5 +1,10 @@
 # Rotating and destructible world-model brushes
 
+> Continued by [damage state contracts](DAMAGE_STATE_CONTRACTS.md): original damage
+> Save/Load values and death counter/delay/nigh-invulnerability now execute.
+> Earlier blanket damage-save omissions are historical. Whole player restoration
+> and safe level transfer remain unavailable; M2 stays open.
+
 > Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
 > pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
 

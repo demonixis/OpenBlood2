@@ -681,3 +681,13 @@ player inventory is captured at exit, but whole-player keep-alive transfer remai
 refused. No donor code, dependencies or commercial assets were imported. See
 [source ledger](M2_INVENTORY_STATE_SOURCES.json), [contracts](INVENTORY_STATE_CONTRACTS.md)
 and [evidence](../../Documentation/Implementation/M2_INVENTORY_STATE.md).
+
+## Original damage state preservation
+
+Selected CDestructable Save/Load fields, original death counter/delay and character
+nigh-invulnerability modifier are directly ported from the original Blood II source.
+Typed owned snapshots, checked destination binding and preflight replace packet
+reads; the source's uninitialized location byte starts at zero. No donor engine,
+dependency or commercial asset was imported. See [source ledger](M2_DAMAGE_STATE_SOURCES.json),
+[contracts](DAMAGE_STATE_CONTRACTS.md) and
+[evidence](../../Documentation/Implementation/M2_DAMAGE_STATE.md).

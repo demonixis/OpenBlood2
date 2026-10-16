@@ -11,6 +11,7 @@ void CBloodServerShell::PreStartWorld()
     world_started = false;
     updates = 0;
     inventory_capture = {};
+    damage_capture = {};
     // Team setup, active cinematics, voice and multiplayer state are outside
     // the accepted fresh single-player entry mode.
 }
@@ -44,6 +45,26 @@ bool CBloodServerShell::CapturePlayerInventory(HCLIENT client)
         return false;
     }
     if (!player->m_InventoryMgr.Save(capture.state, capture.error))
+        return false;
+    capture.valid = true;
+    ++capture.captures;
+    return true;
+}
+bool CBloodServerShell::CapturePlayerDamage(HCLIENT client)
+{
+    auto& capture = damage_capture;
+    ++capture.attempts;
+    capture.valid = false;
+    capture.state = {};
+    capture.error.clear();
+    const auto* player = Player(client);
+    if (!player || !server_.IsObjectAlive(player->m_hObject) ||
+        server_.GetObjectState(player->m_hObject) != OBJSTATE_ACTIVE)
+    {
+        capture.error = "Damage capture requires an active associated player";
+        return false;
+    }
+    if (!player->m_damage.Save(capture.state, capture.error))
         return false;
     capture.valid = true;
     ++capture.captures;

@@ -380,3 +380,10 @@ Preserve raw ammo after weapon recreation, selected-slot order, keep-alive key
 removal, transient reset and checked staged ownership. Load refuses associated
 clients; snapshots are inventory only. Player/damage fields, restored client
 association and safe destination entry remain pending; NEW_LEVEL and M2 stay open.
+
+The [damage preservation continuation](../Documentation/Implementation/M2_DAMAGE_STATE.md) connects original CDestructable
+Save/Load values and death-health/delay/nigh-invulnerability rules. Read [contracts](docs/DAMAGE_STATE_CONTRACTS.md).
+Preserve CanDamage's million-HP sentinel, separate signed death health, remaining
+duration/overshoot, character-only modifier and destination/list ownership. The
+legacy location byte is initialized to zero, not inferred from hit nodes. Captures
+are aggregate-only; full player/client/destination transfer and M2 remain open.

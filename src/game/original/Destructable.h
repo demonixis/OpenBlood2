@@ -1,6 +1,7 @@
 #pragma once
 #include "cpp_aggregate_de.h"
 #include "dlink.h"
+#include "game/destructable_state.h"
 #include "game/weapon_messages.h"
 #include <string>
 class CInventoryMgr;
@@ -10,6 +11,8 @@ class CDestructable : public Aggregate
     CDestructable();
     ~CDestructable() override;
     DBOOL Init(HOBJECT, CInventoryMgr* = nullptr);
+    bool Save(OpenBlood2::DestructableState&, std::string&) const;
+    bool Load(const OpenBlood2::DestructableState&, std::string&);
     void SetHitPoints(float hp)
     {
         m_fHitPoints = hp;
@@ -22,7 +25,7 @@ class CDestructable : public Aggregate
     }
     bool IsDead() const
     {
-        return m_bDead != 0;
+        return m_fDeathDelay > 0 ? false : m_bDead != 0;
     }
     HOBJECT GetLastDamager();
     void ClearLastDamager()
@@ -49,6 +52,9 @@ class CDestructable : public Aggregate
     static DDWORD m_dwNumDestructables;
     DBOOL m_bDead = DFALSE;
     float m_fHitPoints = 1, m_fArmorPoints = 0, m_fMass = 1, m_fResistance = 1;
+    float m_fDeathHitPoints = 1, m_fDeathDelay = 0;
+    bool m_bNighInvulnerable = false;
+    DBYTE last_damage_location = 0; // Source leaves this byte uninitialized; do not invent a node mapping.
     bool m_bGodMode = false;
     float m_fLastDamageAmount = 0, m_fLastDamagePercent = 0;
     OpenBlood2::Damage last_damage;

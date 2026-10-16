@@ -49,8 +49,35 @@ namespace OpenBlood2
                     ImGui::TreePop();
                 }
             }
-            ImGui::TextWrapped("Inventory only: player health/timers, restored client association and destination "
-                               "entry are not saved or transferred. Current inventory is unchanged.");
+            const auto& damage = game.server_shell.damage_capture;
+            ImGui::Text("Damage capture: %llu / %llu attempts; %s", (unsigned long long)damage.captures,
+                        (unsigned long long)damage.attempts, damage.valid ? "owned snapshot" : "unavailable");
+            if (!damage.error.empty())
+                ImGui::TextWrapped("%s", damage.error.c_str());
+            if (damage.valid)
+            {
+                const auto& d = damage.state;
+                ImGui::Text("Saved HP %.2f / %.2f / mega %.2f; armor %.2f / %.2f / necro %.2f", d.health, d.max_health,
+                            d.max_mega_health, d.armor, d.max_armor, d.max_necro_armor);
+                ImGui::Text("Death HP %.2f / delay %.3fs / raw dead %d / nigh-invulnerable %d", d.death_health,
+                            d.death_delay, d.dead, d.nigh_invulnerable);
+                if (ImGui::TreeNode("Saved damage contents"))
+                {
+                    ImGui::Text("Mass %.2f / resistance %.3f / physics %d / god %d / trigger only %d", d.mass,
+                                d.resistance, d.apply_damage_physics, d.god_mode, d.trigger_only);
+                    ImGui::Text("Last type %u / location byte %u / amount %.2f / fraction %.3f",
+                                static_cast<unsigned>(d.last_type), d.last_location, d.last_amount, d.last_percent);
+                    ImGui::Text("Direction %.2f %.2f %.2f", d.last_direction.x, d.last_direction.y, d.last_direction.z);
+                    ImGui::TextWrapped("Damage %s -> %s / death %s -> %s", d.damage_target.c_str(),
+                                       d.damage_message.c_str(), d.death_target.c_str(), d.death_message.c_str());
+                    ImGui::TextWrapped("Spawn %s / velocity %.2f %.2f %.2f", d.spawn_object.c_str(), d.spawn_velocity.x,
+                                       d.spawn_velocity.y, d.spawn_velocity.z);
+                    ImGui::TextUnformatted("HP >= 1000000 restores CanDamage=false (original sentinel).");
+                    ImGui::TreePop();
+                }
+            }
+            ImGui::TextWrapped("Aggregate snapshots only: full player timers, restored client association and "
+                               "destination entry remain unavailable. Current player/world are unchanged.");
             for (auto id : game.objects.snapshot())
             {
                 const auto* record = game.objects.get(id);

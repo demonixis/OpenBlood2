@@ -104,6 +104,9 @@ namespace OpenBlood2
                         a.m_bHasTargeted ? "yes" : "no", (unsigned long long)a.runtime_target_losses);
             ImGui::Text("HP %.2f / %.2f | damage factor %.3f", a.m_damage.m_fHitPoints, a.m_damage.m_fMaxHitPoints,
                         a.m_InventoryMgr.damage_multiplier);
+            ImGui::Text("Death HP %.2f / delay %.3fs / raw dead %d / effective dead %d / nigh-invulnerable %d",
+                        a.m_damage.m_fDeathHitPoints, a.m_damage.m_fDeathDelay, a.m_damage.m_bDead, a.m_damage.IsDead(),
+                        a.m_damage.m_bNighInvulnerable);
             ImGui::TextWrapped("Activation uses replacement center-ray visibility, not retail PVS. Remaining states "
                                "may fail explicitly.");
             if (!a.runtime_error.empty())

@@ -1,5 +1,10 @@
 # Original Player Entry Boundary
 
+> Continued by [damage state contracts](DAMAGE_STATE_CONTRACTS.md): original damage
+> Save/Load values and death counter/delay/nigh-invulnerability now execute.
+> Earlier blanket damage-save omissions are historical. Whole player restoration
+> and safe level transfer remain unavailable; M2 stays open.
+
 > Extended by [inventory state contracts](INVENTORY_STATE_CONTRACTS.md): supported
 > original inventory Save/Load and exit-time capture now execute. Full player
 > preservation/association and safe destination entry remain unavailable; NEW_LEVEL

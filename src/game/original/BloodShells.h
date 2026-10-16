@@ -30,6 +30,14 @@ class CBloodServerShell
         std::uint64_t attempts = 0, captures = 0;
         bool valid = false;
     } inventory_capture; // Inventory only; never a successful KeepAliveSave.
+    bool CapturePlayerDamage(HCLIENT);
+    struct DamageCapture
+    {
+        OpenBlood2::DestructableState state;
+        std::string error;
+        std::uint64_t attempts = 0, captures = 0;
+        bool valid = false;
+    } damage_capture; // Damage aggregate only; not complete player preservation.
     void SetStartPointName(const std::string& name)
     {
         start_point_name = name;

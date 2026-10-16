@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "dbe2ba41570fd377fec217b257f851cabb6f02a0",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "selected_lines": [
+        [
+          39,
+          95
+        ],
+        [
+          151,
+          195
+        ],
+        [
+          254,
+          301
+        ],
+        [
+          395,
+          438
+        ],
+        [
+          482,
+          620
+        ],
+        [
+          988,
+          1047
+        ],
+        [
+          1134,
+          1245
+        ]
+      ],
+      "use": "Original initialization, properties, saved fields, list ownership, death counter/delay and nigh modifier"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Destructable.h",
+      "sha256": "00e289d9cca1594035c8f20d0d45a076009c765e2767ce545f22f16d33bfea45",
+      "selected_lines": [
+        [
+          60,
+          100
+        ],
+        [
+          153,
+          214
+        ]
+      ],
+      "use": "Setter/IsDead and raw saved field semantics"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "selected_lines": [
+        [
+          1142,
+          1210
+        ]
+      ],
+      "use": "Active-player keep-alive enumeration; complete transfer remains unavailable"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          6541,
+          6865
+        ]
+      ],
+      "use": "Audited remaining player/relative-clock restoration prerequisite, not imported in this increment"
+    }
+  ],
+  "adaptations": [
+    "Owned typed values; destination binding replaces old saved object reference",
+    "Preflight rejects invalid/stale/reentrant/live-client restores before mutation",
+    "Uninitialized legacy last-location byte initialized to zero; no invented hit-node mapping",
+    "Unsaved raw packet, attacker identity and diagnostic pose cleared on Load"
+  ],
+  "remaining": [
+    "Whole player/timer/client/engine-object restoration and destination transition",
+    "General saves, full NPC/brush restore and other damage rules",
+    "Source per-update maximum-stat clamps remain outside the existing bounded update path"
+  ]
+}
