@@ -10,6 +10,7 @@
 #include "engine/config.h"
 #include "engine/runtime.h"
 #include "engine/world_renderer.h"
+#include "game/original/AI_Mgr.h"
 #include "game/original/Door.h"
 #include "game/server_adapter.h"
 #include "interaction_smoke.h"
@@ -326,7 +327,7 @@ namespace
         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
         inspector.select_skeleton = options.skeleton_smoke;
         if (options.skeleton_smoke)
-            inspector.skeleton_selection = smoke_ai_fire;
+            inspector.skeleton_selection = smoke_ai_follow;
         inspector.select_containers = options.containers_smoke;
         inspector.select_brushes = options.brushes_smoke;
         inspector.select_pickups = options.pickups_smoke;
@@ -1054,6 +1055,10 @@ namespace
             bool ai_target_reentered = !options.skeleton_smoke;
             if (options.skeleton_smoke)
             {
+                // Start the independent route before the existing key/state/fire clocks.
+                // Its longer script + navigation sequence must not inherit the shot-only deadline.
+                if (game.objects.get(original_ai_follow) || !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
+                    return 4;
                 if (game.objects.get(original_ai_key) || !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
                     return 4;
                 for (int i = 0; i < 90 && !ai_key_reentered; ++i)
@@ -1089,8 +1094,6 @@ namespace
             {
                 if (game.objects.get(original_ai_fire) || !OpenBlood2::prepare_ai_fire_smoke(game, smoke_ai_fire))
                     return 4;
-                if (game.objects.get(original_ai_follow) || !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
-                    return 4;
                 bool reentered = false;
                 for (int i = 0; i < 360 && !reentered; ++i)
                 {
@@ -1105,11 +1108,18 @@ namespace
             }
             if (options.skeleton_smoke)
             {
-                // Runs alongside the existing fire probe: do not extend the authored
+                // Runs alongside the existing key/state/fire probes: do not extend the authored
                 // scene clock past the cinematic's existing lifetime assertion.
                 const bool reentered = OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
                 spdlog::info("AI script interpreter: hidden={}, reentered={}, old identity invalidated={}",
                              ai_follow_hidden, reentered, !game.objects.get(original_ai_follow));
+                if (const auto* r = game.objects.get(smoke_ai_follow))
+                    if (const auto* a = dynamic_cast<const AI_Mgr*>(r->game.get()))
+                        spdlog::info("AI navigation: state={}, phase={}, z={}, updates={}, arrivals={}, failures={}, "
+                                     "points={}, error={}",
+                                     a->m_nState, a->Metacmd, r->state.m_Pos.z, a->navigation_updates,
+                                     a->navigation_arrivals, a->navigation_failures, a->m_MoveObj.path().size(),
+                                     a->navigation_error);
                 if (!ai_follow_hidden || !reentered)
                     return 4;
             }

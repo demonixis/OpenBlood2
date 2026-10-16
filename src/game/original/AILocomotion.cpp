@@ -132,7 +132,7 @@ bool AI_Mgr::IsLedge(DVector direction, bool& out)
     ledge_sampled = true;
     return true;
 }
-bool AI_Mgr::Locomotion(bool run, bool fire)
+bool AI_Mgr::Locomotion(bool run, bool fire, bool crawl)
 {
     ++locomotion_calls;
     if (locomotion_busy)
@@ -147,17 +147,19 @@ bool AI_Mgr::Locomotion(bool run, bool fire)
     const float time = server->GetTime();
     if (!std::isfinite(speed) || speed < 0 || speed > 1e7f || !std::isfinite(time))
         return LocomotionFailure("Invalid autonomous speed/clock");
-    const int command = fire ? (run ? 9 : 8) : (run ? 2 : 1);
+    const int command = crawl ? (fire ? 12 : 5) : fire ? (run ? 9 : 8) : (run ? 2 : 1);
     locomotion_command = command;
     if (!m_bAnimating || m_nCurMetacmd != command)
     {
         auto* weapon = m_InventoryMgr.CurrentWeapon();
-        const unsigned type = weapon ? weapon->data.m_nFireType : fire ? TYPE_PISTOL : TYPE_MELEE;
+        const unsigned type = weapon ? weapon->data.m_nFireType : (fire || crawl) ? TYPE_PISTOL : TYPE_MELEE;
         if (!m_pAnim_Sound || type >= 9)
             return LocomotionFailure("Locomotion animation table unavailable");
         DDWORD clip = fire ? (run ? m_pAnim_Sound->m_nAnim_FIRE_RUN[type] : m_pAnim_Sound->m_nAnim_FIRE_WALK[type])
                            : (run ? m_pAnim_Sound->m_nAnim_RUN[type] : m_pAnim_Sound->m_nAnim_WALK[type]);
-        if (!fire && !run && weapon && (m_nInjuredLeg == 10 || m_nInjuredLeg == 14))
+        if (crawl)
+            clip = fire ? m_pAnim_Sound->m_nAnim_FIRE_CRAWL[type] : m_pAnim_Sound->m_nAnim_CRAWL[type];
+        if (!crawl && !fire && !run && weapon && (m_nInjuredLeg == 10 || m_nInjuredLeg == 14))
         {
             const bool pistol = type == TYPE_PISTOL || type == TYPE_MELEE;
             clip = m_nInjuredLeg == 10 ? (pistol ? m_pAnim_Sound->m_nAnim_WALK_INJURED_LLEG_PISTOL
@@ -174,12 +176,12 @@ bool AI_Mgr::Locomotion(bool run, bool fire)
         }
         if (!SetAnimation(clip))
         {
-            if (animation_blocked)
+            if (animation_blocked && !crawl)
                 return SetNewState(StateCrawlUnder) || LocomotionFailure(state_error);
             return LocomotionFailure(state_error);
         }
         server->SetModelLooping(m_hObject, DTRUE);
-        if (!Move(m_MoveObj.GetForwardVector(), !fire && !run && m_nInjuredLeg ? speed / 3 : speed))
+        if (!Move(m_MoveObj.GetForwardVector(), !crawl && !fire && !run && m_nInjuredLeg ? speed / 3 : speed))
             return LocomotionFailure(script_motion_error);
         m_bAnimating = true;
         m_nCurMetacmd = command;
@@ -190,8 +192,14 @@ bool AI_Mgr::Locomotion(bool run, bool fire)
     bool blocked;
     if (!CheckObstructed(m_MoveObj.GetForwardVector(), speed, blocked))
         return false;
-    if (blocked && !NavigateObstacle())
-        return false;
+    if (blocked)
+    {
+        if (!NavigateObstacle())
+            return false;
+        // Both crawl commands overwrite successful recovery selection in source.
+        if (crawl && !SetNewState(StateWalkAround))
+            return LocomotionFailure(state_error);
+    }
     MovementState support;
     if (!server->GetMovementState(m_hObject, support))
         return LocomotionFailure("Locomotion support query unavailable");
@@ -249,4 +257,88 @@ bool AI_Mgr::MC_Fire_Walk()
 bool AI_Mgr::MC_Fire_Run()
 {
     return Locomotion(true, true);
+}
+
+bool AI_Mgr::MC_Crawl()
+{
+    return Locomotion(false, false, true);
+}
+bool AI_Mgr::MC_Fire_Crawl()
+{
+    return Locomotion(false, true, true);
+}
+bool AI_Mgr::MC_Crouch()
+{
+    ++locomotion_calls;
+    if (locomotion_busy)
+        return LocomotionFailure("Reentrant crouch rejected");
+    Busy busy(locomotion_busy);
+    locomotion_error.clear();
+    locomotion_command = 4;
+    if (!LocomotionReady())
+        return false;
+    if (Metacmd == std::numeric_limits<int>::max())
+        return LocomotionFailure("Crouch Metacmd overflow");
+    auto* weapon = m_InventoryMgr.CurrentWeapon();
+    const unsigned type = weapon ? weapon->data.m_nFireType : TYPE_PISTOL;
+    if (!m_pAnim_Sound || type >= 9)
+        return LocomotionFailure("Crouch animation table unavailable");
+    if (!SetAnimation(m_pAnim_Sound->m_nAnim_CROUCH[type]))
+        return LocomotionFailure(state_error);
+    ++Metacmd;
+    m_nCurMetacmd = 4; // Does not change looping, animating or velocity in source.
+    return true;
+}
+bool AI_Mgr::MC_Jump()
+{
+    ++locomotion_calls;
+    if (locomotion_busy)
+        return LocomotionFailure("Reentrant jump rejected");
+    Busy busy(locomotion_busy);
+    locomotion_error.clear();
+    locomotion_command = 3;
+    if (!LocomotionReady())
+        return false;
+    if (!std::isfinite(m_fRunSpeed) || m_fRunSpeed < 0 || m_fRunSpeed > 1e7f || !std::isfinite(m_fJumpSpeed) ||
+        m_fJumpSpeed < 0 || m_fJumpSpeed > 1e7f || Metacmd == std::numeric_limits<int>::max())
+        return LocomotionFailure("Invalid jump speeds/Metacmd");
+    auto* server = GetServerDE();
+    DVector velocity;
+    const auto forward = m_MoveObj.GetForwardVector();
+    const bool starting = !m_bAnimating || m_nCurMetacmd != 3;
+    if (starting)
+    {
+        auto* weapon = m_InventoryMgr.CurrentWeapon();
+        const unsigned type = weapon ? weapon->data.m_nFireType : TYPE_PISTOL;
+        if (!m_pAnim_Sound || type >= 9)
+            return LocomotionFailure("Jump animation table unavailable");
+        if (!SetAnimation(m_pAnim_Sound->m_nAnim_JUMP[type]))
+            return LocomotionFailure(state_error);
+        server->SetModelLooping(m_hObject, DFALSE);
+        velocity.y = m_MoveObj.GetUpVector().y * m_fJumpSpeed;
+    }
+    else if (server->GetVelocity(m_hObject, &velocity) != DE_OK)
+        return LocomotionFailure("Jump velocity unavailable");
+    velocity.x = forward.x * m_fRunSpeed;
+    velocity.z = forward.z * m_fRunSpeed;
+    if (!Move(velocity, 1e-11f))
+        return LocomotionFailure(script_motion_error);
+    if (starting)
+    {
+        m_nCurMetacmd = 3;
+        m_bAnimating = true;
+        return true;
+    }
+    MovementState support;
+    if (!server->GetMovementState(m_hObject, support))
+        return LocomotionFailure("Jump support query unavailable");
+    // Landing, not animation completion or FLAG_GRAVITY, ends this command.
+    if (support.standing)
+    {
+        if (!StopVelocity())
+            return LocomotionFailure(state_error);
+        m_bAnimating = false;
+        ++Metacmd;
+    }
+    return true;
 }

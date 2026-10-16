@@ -97,3 +97,8 @@ cycle, then the original moving-fire command. Its isolated placement, explicit
 initialization and scheduler are test fixtures, not authored AI_Update. Hidden
 inspection and world reload use the same game clocks and deferred ownership. Real
 model clip availability is checked without substituting missing civilian fire clips.
+
+The [AI recovery/navigation continuation](AI_RECOVERY_CONTRACTS.md) now executes
+jump/crouch/crawl and seven destination/recovery/visual-search states. Earlier
+blanket omissions for those bodies are superseded. Failed partial routes remain
+unusable; shade recovery, other states and full production AI_Update remain open.

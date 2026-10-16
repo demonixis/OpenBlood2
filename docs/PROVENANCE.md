@@ -594,3 +594,13 @@ Shade-dependent recovery fails explicitly; no production class or complete AI_Up
 is claimed. See [contracts](AI_LOCOMOTION_CONTRACTS.md) and
 [evidence](../../Documentation/Implementation/M2_AI_LOCOMOTION.md). No reference
 repository, dependency revision or commercial asset was changed/imported.
+
+## M2 AI recovery and destination states
+
+Donor: `sources/blood2` at `006b4aabd3fb348f6846cad03799cf8df685ea95`.
+[Source ranges/hashes](M2_AI_RECOVERY_SOURCES.json) select AI_Mgr jump/crouch/crawl
+and seven navigation states. Shared plumbing retains source phase differences;
+checked failure/lifetime paths and the failed-plan latch are documented adaptations.
+See [contracts](AI_RECOVERY_CONTRACTS.md) and
+[evidence](../../Documentation/Implementation/M2_AI_RECOVERY.md). Dependencies,
+reference trees and commercial assets are unchanged; full NPCs remain unavailable.

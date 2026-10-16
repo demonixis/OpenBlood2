@@ -311,3 +311,11 @@ queries, injury/support timing, independent fire/completion increments and cache
 attack thresholds. Missing shade recovery and crawl/jump execution remain explicit
 failures. Diagnostic drivers are not production AI_Update; NPC initialization,
 remaining states, required FX and ExitTrigger keep M2 incomplete. Counts are unchanged.
+
+The [AI recovery/navigation continuation](../Documentation/Implementation/M2_AI_RECOVERY.md) connects original jump/crouch/crawl,
+firing crawl, JumpOver/CrawlUnder, ToPos/Around and visual-search states. Read
+[contracts](docs/AI_RECOVERY_CONTRACTS.md). Preserve landing-based completion, cached movement, crawl's
+recovery overwrite, arrival/ledge short circuits and independent fire markers.
+Failed plans cannot be followed until replanning succeeds. Earlier crawl/jump-body
+omissions are superseded; shade recovery, smell/escape/recoil/death, full NPC
+initialization/AI_Update, required FX and ExitTrigger keep M2 incomplete.

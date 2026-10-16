@@ -250,6 +250,25 @@ bool AI_Mgr::DispatchState()
     dispatched_state = m_nState;
     if (Metacmd <= 0)
         Metacmd = 1;
+    switch (m_nState)
+    {
+        case StateJumpOver:
+            return AI_STATE_JumpOverObj();
+        case StateCrawlUnder:
+            return AI_STATE_CrawlUnderObj();
+        case StateWalkAround:
+            return AI_STATE_WalkAroundObj();
+        case StateRunAround:
+            return AI_STATE_RunAroundObj();
+        case StateWalkTo:
+            return AI_STATE_WalkToPos();
+        case StateRunTo:
+            return AI_STATE_RunToPos();
+        case StateSearchVisual:
+            return AI_STATE_SearchVisualTarget();
+        default:
+            break;
+    }
     if (m_nState == StateAttackClose)
         return AI_STATE_AttackClose();
     if (m_nState == StateAttackFar)

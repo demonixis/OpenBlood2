@@ -273,7 +273,8 @@ namespace
         r->model = model;
         CHECK(a->MC_Walk() && a->animation_blocked && a->m_nState == AI_Mgr::StateCrawlUnder &&
               near(r->dimensions.y, 2));
-        CHECK(!a->DispatchState()); // selecting recovery does not implement its body
+        CHECK(a->DispatchState() && a->m_nCurMetacmd == 5 && r->animation.animation == 0 &&
+              near(r->dimensions.y, 2)); // actual short crawl clip fits below the ceiling
         return true;
     }
     struct Victim : BaseClass

@@ -386,3 +386,15 @@ remaining states, required FX and ExitTrigger keep M2 incomplete. Counts are unc
 Autonomous locomotion/attack verification: 433/433 Debug and inspector-free Release
 checks (27 GPU each), plus 120 targeted ASan/UBSan/leak checks.
 See [evidence](../Documentation/Implementation/M2_AI_LOCOMOTION.md).
+
+The [AI recovery/navigation continuation](../Documentation/Implementation/M2_AI_RECOVERY.md) connects original jump/crouch/crawl,
+firing crawl, JumpOver/CrawlUnder, ToPos/Around and visual-search states. Read
+[contracts](docs/AI_RECOVERY_CONTRACTS.md). Preserve landing-based completion, cached movement, crawl's
+recovery overwrite, arrival/ledge short circuits and independent fire markers.
+Failed plans cannot be followed until replanning succeeds. Earlier crawl/jump-body
+omissions are superseded; shade recovery, smell/escape/recoil/death, full NPC
+initialization/AI_Update, required FX and ExitTrigger keep M2 incomplete.
+
+AI recovery/navigation verification: 447/447 Debug and inspector-free Release
+checks (27 GPU each), plus 134 targeted ASan/UBSan/leak checks.
+See [evidence](../Documentation/Implementation/M2_AI_RECOVERY.md).

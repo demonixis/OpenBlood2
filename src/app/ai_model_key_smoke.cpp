@@ -14,14 +14,29 @@ namespace OpenBlood2
         {
           public:
             PathMgr* diagnostic_paths = nullptr; // Owner is the enclosing GameSession.
+            bool navigation_started = false;
 
           private:
             DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
             {
                 if (m == MID_UPDATE)
                 {
-                    const bool ok = diagnostic_paths && AI_STATE_Script(*diagnostic_paths);
-                    GetServerDE()->SetNextUpdate(m_hObject, ok && m_nState == StateScript ? .001f : 0);
+                    bool ok = false;
+                    if (!navigation_started)
+                    {
+                        ok = diagnostic_paths && AI_STATE_Script(*diagnostic_paths);
+                        if (ok && m_nState == StateInactive)
+                        {
+                            DVector current;
+                            ok = GetServerDE()->GetObjectPos(m_hObject, &current) == DE_OK;
+                            m_vDestPos = vector_add(current, {0, 0, 40});
+                            ok = ok && SetNewState(StateRunTo);
+                            navigation_started = ok;
+                        }
+                    }
+                    else if (m_nState == StateRunTo)
+                        ok = DispatchState();
+                    GetServerDE()->SetNextUpdate(m_hObject, ok && m_nState != StateInactive ? .001f : 0);
                 }
                 return AI_Mgr::EngineMessageFn(m, d, f);
             }
@@ -93,7 +108,7 @@ namespace OpenBlood2
         state.m_ObjectType = OT_MODEL;
         state.m_Pos = {2000, 10000, 0};
         // No model-key audio driver; this probe isolates script movement and actual model clocks.
-        SAFE_STRCPY(state.m_Name, "AI script probe (no full AI_Update)");
+        SAFE_STRCPY(state.m_Name, "AI script/navigation probe (no full AI_Update)");
         SAFE_STRCPY(state.m_Filename, "models/enemies/m_cultist1.abc");
         auto h = g.objects.create(&type, state);
         auto* r = g.objects.get(h);
@@ -124,7 +139,9 @@ namespace OpenBlood2
                a->script_failures == 0 && a->script_outcome == AI_Mgr::ScriptOutcome::StateChanged &&
                a->m_bUpdateScriptCmd && a->script_motion_outcome == AI_Mgr::MotionOutcome::Completed &&
                a->script_motion_failures == 0 && a->path_arrivals == 1 && a->velocity_commands > 0 &&
-               a->m_MoveObj.calculations == 1 && a->m_MoveObj.samples > 4 && r->state.m_Pos.z >= 20 &&
+               a->navigation_started && a->navigation_arrivals == 1 && a->navigation_updates > 3 &&
+               a->navigation_failures == 0 && !a->navigation_plan_failed && a->m_MoveObj.calculations == 2 &&
+               a->m_MoveObj.samples > 4 && r->state.m_Pos.z >= 40 &&
                g.server.GetModelAnimation(a->m_hObject) < r->model->animations.size();
     }
     bool prepare_ai_fire_smoke(GameSession& g, ObjectId& id)

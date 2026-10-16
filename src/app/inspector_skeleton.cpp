@@ -60,11 +60,30 @@ namespace OpenBlood2
         const auto* r = game.objects.get(skeleton_selection);
         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
+        if (target_ai && ImGui::CollapsingHeader("Original navigation and recovery", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& a = *target_ai;
+            ImGui::TextWrapped("Original jump/crouch/crawl and selected route states. Full AI_Update, smell following "
+                               "and shade-based detours remain unavailable.");
+            ImGui::Text("Last driven state %d | current %d | phase %d", a.navigation_state, a.m_nState, a.Metacmd);
+            ImGui::Text("Updates %llu | arrivals %llu | failures %llu", (unsigned long long)a.navigation_updates,
+                        (unsigned long long)a.navigation_arrivals, (unsigned long long)a.navigation_failures);
+            ImGui::Text("ToPos destination (%.2f %.2f %.2f)", a.m_vDestPos.x, a.m_vDestPos.y, a.m_vDestPos.z);
+            ImGui::Text("Last distance %.3f / threshold %.3f | jump speed %.2f", a.navigation_distance,
+                        a.navigation_threshold, a.m_fJumpSpeed);
+            ImGui::Text("Remaining points %zu | failed-plan guard %s", a.m_MoveObj.path().size(),
+                        a.navigation_plan_failed ? "blocked" : "clear");
+            DVector next;
+            if (a.m_MoveObj.GetNextPathPoint(next))
+                ImGui::Text("Next point (%.2f %.2f %.2f)", next.x, next.y, next.z);
+            if (!a.navigation_error.empty())
+                ImGui::TextWrapped("Last failure: %s", a.navigation_error.c_str());
+        }
         if (target_ai && ImGui::CollapsingHeader("Original autonomous locomotion", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& a = *target_ai;
             ImGui::TextWrapped("Original walk/run/moving fire and selected Cultist attack sequencing. Full AI_Update, "
-                               "shade recovery and crawl/jump state execution remain unavailable.");
+                               "shade recovery and full NPC initialization remain unavailable.");
             ImGui::Text("Command %d | calls %llu | failures %llu", a.locomotion_command,
                         (unsigned long long)a.locomotion_calls, (unsigned long long)a.locomotion_failures);
             ImGui::Text("Obstruction %s | speed %.3f | cached vertical change %.4f | checks %llu",

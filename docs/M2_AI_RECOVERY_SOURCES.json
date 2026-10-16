@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "b8a77833f6ff6b8eebfa758a0018db9a277b0e69",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          137,
+          137
+        ],
+        [
+          187,
+          187
+        ],
+        [
+          4283,
+          4419
+        ],
+        [
+          5008,
+          5084
+        ],
+        [
+          5874,
+          5951
+        ],
+        [
+          6445,
+          6755
+        ]
+      ],
+      "use": "Jump speed/destination initialization, jump/crouch/crawl/fire-crawl and seven navigation state bodies"
+    }
+  ],
+  "adaptations": [
+    "Shared movement/state plumbing preserves explicit source branch differences",
+    "Checked clips/resize/support replace ignored failures and world-object support handle assumptions",
+    "Failed-plan latch forbids following preserved old/partial points until phase-1 success",
+    "Missing ToPos point, invalid numeric/counter input, required query failure and nested/removing decisions reject explicitly",
+    "Diagnostic driver only; no production NPC registration or full AI_Update"
+  ]
+}

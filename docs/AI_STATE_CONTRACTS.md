@@ -147,3 +147,8 @@ The [autonomous locomotion continuation](AI_LOCOMOTION_CONTRACTS.md) now supplie
 walk/run/moving fire, obstruction/ledge probes and Cultist close/far attack sequencing.
 Earlier blanket omissions are superseded only for this subset. Full initialization,
 AI_Update/deactivation, remaining states and shade recovery stay unavailable.
+
+The [AI recovery/navigation continuation](AI_RECOVERY_CONTRACTS.md) now executes
+jump/crouch/crawl and seven destination/recovery/visual-search states. Earlier
+blanket omissions for those bodies are superseded. Failed partial routes remain
+unusable; shade recovery, other states and full production AI_Update remain open.
