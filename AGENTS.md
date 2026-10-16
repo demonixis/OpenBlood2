@@ -295,3 +295,11 @@ one-point arrival ordering, linked-target lifetime and residual velocity. Failed
 partial plans and missing opportunity-fire branches must remain failures. Full
 SCRIPT dispatch, production initialization/AI_Update/deactivation, required FX and
 ExitTrigger keep M2 incomplete; source-class counts are unchanged.
+
+The [AI script continuation](../Documentation/Implementation/M2_AI_SCRIPT.md) connects original command parsing/preparation,
+loop/nonloop sequencing, waits, animation, sound and movement state dispatch.
+Read [contracts](docs/AI_SCRIPT_CONTRACTS.md). Preserve one-command cadence, source atoi-prefix rules,
+PLAYANIMATIONLOOPING fallthrough, double DONE decisions and owned callback lifetime.
+Production SCRIPT entry still requires its unported forced AI_Update; diagnostics
+must not count as registered NPCs. Required initialization/update/death, client FX
+and ExitTrigger/session services keep M2 incomplete. Source counts are unchanged.

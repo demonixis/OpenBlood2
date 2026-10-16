@@ -59,12 +59,34 @@ namespace OpenBlood2
         const auto* r = game.objects.get(skeleton_selection);
         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
+        if (target_ai && ImGui::CollapsingHeader("Original AI script interpreter", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& a = *target_ai;
+            const char* outcomes[]{"None", "Prepared", "Running", "Completed", "State changed", "Failed"};
+            ImGui::TextWrapped("Explicit script-state driver. Production SCRIPT trigger / full AI_Update unavailable.");
+            ImGui::Text("%s | flags %u | next index %zu | remaining %zu",
+                        outcomes[static_cast<unsigned>(a.script_outcome)], a.m_dwScriptFlags, a.script_index,
+                        a.ScriptCommands().size());
+            const auto& cmd = a.CurrentScriptCommand();
+            ImGui::TextWrapped("Current: %s / %s", cmd.name.empty() ? "<exhausted>" : cmd.name.c_str(),
+                               cmd.argument.c_str());
+            ImGui::Text("Wait deadline %.3f | select next %s", a.script_wait_end, a.m_bUpdateScriptCmd ? "yes" : "no");
+            ImGui::Text("Updates %llu | selections %llu | sounds %llu | failures %llu",
+                        (unsigned long long)a.script_updates, (unsigned long long)a.script_selections,
+                        (unsigned long long)a.script_sounds, (unsigned long long)a.script_failures);
+            for (const auto& instruction : a.ScriptCommands())
+                ImGui::TextWrapped("%s %s%s", instruction.name.c_str(), instruction.argument.c_str(),
+                                   instruction.command == AI_Mgr::ScriptCommand::Done ? " (DONE mapping)" : "");
+            if (!a.script_error.empty())
+                ImGui::TextWrapped("Failed: %s", a.script_error.c_str());
+        }
         if (target_ai && ImGui::CollapsingHeader("Original script movement", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& a = *target_ai;
             const char* commands[]{"None", "FOLLOWPATH", "MOVETOOBJECT"};
             const char* outcomes[]{"None", "Selected", "Moving", "Arrived", "Completed", "Failed"};
-            ImGui::TextWrapped("Typed original helpers. Full SCRIPT interpreter / AI_Update unavailable.");
+            ImGui::TextWrapped(
+                "Original movement helpers; the enclosing driver owns command sequencing. Full AI_Update unavailable.");
             ImGui::Text("%s | %s | mode %s | Metacmd %d", commands[static_cast<unsigned>(a.script_motion_command)],
                         outcomes[static_cast<unsigned>(a.script_motion_outcome)],
                         a.m_eScriptMovement == AI_Mgr::SM_WALK  ? "WALK"
@@ -123,9 +145,10 @@ namespace OpenBlood2
                 ImGui::Text("%zu: %.2f %.2f %.2f", i, m.path()[i].x, m.path()[i].y, m.path()[i].z);
             if (!m.error.empty())
                 ImGui::TextWrapped("%s", m.error.c_str());
-            ImGui::TextWrapped("Two side rays only; partial paths are not usable success. Planning does not move an "
-                               "actor. Player cache remains uninitialized, as in source. NPC following, shade-based "
-                               "position selection and full AI_Update remain unavailable.");
+            ImGui::TextWrapped(
+                "Two side rays only; partial paths are not usable success. Planning does not move an "
+                "actor. Player cache remains uninitialized, as in source. Production NPC initialization, shade-based "
+                "position selection and full AI_Update remain unavailable.");
         }
         if (target_ai && ImGui::CollapsingHeader("Original AI commands / hearing", ImGuiTreeNodeFlags_DefaultOpen))
         {
@@ -157,7 +180,7 @@ namespace OpenBlood2
             if (!ai.trigger_error.empty())
                 ImGui::TextWrapped("%s", ai.trigger_error.c_str());
             ImGui::TextWrapped("State selection does not execute missing search/dodge/attack actions. Full AI_Update "
-                               "and scripts remain unavailable.");
+                               "and production SCRIPT entry remain unavailable.");
         }
         if (target_ai && ImGui::CollapsingHeader("Original AI weapon actions", ImGuiTreeNodeFlags_DefaultOpen))
         {

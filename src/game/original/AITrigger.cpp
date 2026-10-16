@@ -256,7 +256,8 @@ bool AI_Mgr::HandleTrigger(HOBJECT sender, std::string_view text)
             return true;
         }
         else if (same(command, "SCRIPT"))
-            return TriggerFailure("AI script interpreter is not integrated");
+            return TriggerFailure(
+                "SCRIPT trigger requires the unported forced AI_Update; explicit script-state driver only");
         else
             return TriggerFailure("Unknown AI trigger command");
     }

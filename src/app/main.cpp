@@ -1108,7 +1108,7 @@ namespace
                 // Runs alongside the existing fire probe: do not extend the authored
                 // scene clock past the cinematic's existing lifetime assertion.
                 const bool reentered = OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
-                spdlog::info("AI script movement: hidden={}, reentered={}, old identity invalidated={}",
+                spdlog::info("AI script interpreter: hidden={}, reentered={}, old identity invalidated={}",
                              ai_follow_hidden, reentered, !game.objects.get(original_ai_follow));
                 if (!ai_follow_hidden || !reentered)
                     return 4;

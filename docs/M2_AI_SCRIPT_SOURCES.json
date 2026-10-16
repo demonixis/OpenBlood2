@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "875b47087dedfaca6bf97e80104079d4af6968da",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          1174,
+          1238
+        ],
+        [
+          1320,
+          1388
+        ],
+        [
+          1661,
+          1750
+        ],
+        [
+          5739,
+          5781
+        ]
+      ],
+      "use": "Script preparation, selection, simple helpers and original state switch"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AIScriptList.h",
+      "sha256": "b8cc846cf152f18aa07459297f2bde857064cb497d705bba115c9dba7d21fe2e",
+      "selected_lines": [
+        [
+          16,
+          51
+        ],
+        [
+          243,
+          289
+        ]
+      ],
+      "use": "Original command names, numeric ordering, argument limit and unknown DONE mapping"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "selected_lines": [
+        [
+          165,
+          174
+        ]
+      ],
+      "use": "Script loop/interrupt/opportunity-fire flags"
+    }
+  ],
+  "adaptations": [
+    "Explicit preparation/state driver; original trigger forced AI_Update remains unavailable",
+    "Owned bounded commands and checked lifetime; failure latch and reentrant dispatch rejection",
+    "Defined atoi-prefix conversion with overflow rejection",
+    "Named animation/resize and required service failures explicit before subsequent actions",
+    "Pure bounded parser includes final command; no claim of full SDK Parse compatibility"
+  ]
+}

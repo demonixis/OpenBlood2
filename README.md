@@ -362,3 +362,15 @@ ExitTrigger keep M2 incomplete; source-class counts are unchanged.
 Script movement verification: 413/413 Debug and inspector-free Release checks
 (27 GPU each), plus 88 targeted ASan/UBSan/leak checks.
 See [evidence](../Documentation/Implementation/M2_AI_FOLLOW.md).
+
+The [AI script continuation](../Documentation/Implementation/M2_AI_SCRIPT.md) connects original command parsing/preparation,
+loop/nonloop sequencing, waits, animation, sound and movement state dispatch.
+Read [contracts](docs/AI_SCRIPT_CONTRACTS.md). Preserve one-command cadence, source atoi-prefix rules,
+PLAYANIMATIONLOOPING fallthrough, double DONE decisions and owned callback lifetime.
+Production SCRIPT entry still requires its unported forced AI_Update; diagnostics
+must not count as registered NPCs. Required initialization/update/death, client FX
+and ExitTrigger/session services keep M2 incomplete. Source counts are unchanged.
+
+Script interpreter-state verification: 422/422 Debug and inspector-free Release
+checks (27 GPU each), plus 97 targeted ASan/UBSan/leak checks.
+See [evidence](../Documentation/Implementation/M2_AI_SCRIPT.md).

@@ -571,3 +571,15 @@ replace unbounded legacy ownership and ignored failures. No other repository or
 commercial asset was imported. The inspector/smoke fixtures are new diagnostic
 code, not production NPC or interpreter implementations. See
 [contracts](AI_FOLLOW_CONTRACTS.md) and [evidence](../../Documentation/Implementation/M2_AI_FOLLOW.md).
+
+## M2 original AI script interpreter state
+
+Donor remains `sources/blood2` at `006b4aabd3fb348f6846cad03799cf8df685ea95`.
+[M2_AI_SCRIPT_SOURCES.json](M2_AI_SCRIPT_SOURCES.json) records the selected
+AI_Mgr/AIScriptList parsing, sequencing and dispatch rules. The original trigger's
+forced AI_Update is deliberately still unsupported; explicit preparation and a
+labelled diagnostic state driver exercise this prerequisite. New owned containers,
+bounded parsing, overflow/lifetime guards and explicit service errors replace
+legacy unsafe storage/ignored failures. Source quirks are retained and tested.
+No other repository dependency or commercial asset was imported. See
+[contracts](AI_SCRIPT_CONTRACTS.md) and [evidence](../../Documentation/Implementation/M2_AI_SCRIPT.md).

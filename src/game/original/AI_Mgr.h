@@ -236,6 +236,57 @@ class AI_Mgr : public CBaseCharacter
     float script_motion_distance = 0, script_motion_threshold = 0;
     std::string script_motion_name, script_motion_error;
 
+    enum class ScriptCommand
+    {
+        Done,
+        SetMovement,
+        FollowPath,
+        PlaySound,
+        SetState,
+        Target,
+        Wait,
+        PlayAnimation,
+        PlayAnimationLooping,
+        MoveToObject
+    };
+    struct ScriptInstruction
+    {
+        ScriptCommand command = ScriptCommand::Done;
+        std::string name, argument; // Unknown names retain the original DONE mapping.
+    };
+    struct ScriptProgram
+    {
+        DDWORD flags = 0;
+        std::vector<ScriptInstruction> commands;
+    };
+    enum class ScriptOutcome
+    {
+        None,
+        Ready,
+        Running,
+        Completed,
+        StateChanged,
+        Failed
+    };
+    static bool ParseScript(std::string_view, DDWORD previous_flags, ScriptProgram&, std::string& error);
+    // Preparation is separate from the original trigger's forced AI_Update,
+    // which is not integrated. Explicit diagnostic callers drive this state.
+    bool PrepareScript(std::string_view);
+    bool AI_STATE_Script(PathMgr&);
+    std::span<const ScriptInstruction> ScriptCommands() const
+    {
+        return script_commands;
+    }
+    const ScriptInstruction& CurrentScriptCommand() const
+    {
+        return script_current;
+    }
+    ScriptOutcome script_outcome = ScriptOutcome::None;
+    std::size_t script_index = 0;
+    float script_wait_end = 0;
+    std::uint64_t script_selections = 0, script_updates = 0, script_failures = 0, script_sounds = 0;
+    std::string script_error;
+
     enum class TriggerOutcome
     {
         None,
@@ -306,6 +357,12 @@ class AI_Mgr : public CBaseCharacter
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
 
   private:
+    bool script_busy = false;
+    std::vector<ScriptInstruction> script_commands;
+    ScriptInstruction script_current;
+    bool ScriptFailure(std::string_view);
+    bool UpdateScriptCommand(PathMgr&);
+    bool FinishScript();
     bool trigger_busy = false;
     bool motion_busy = false;
     PathList script_path;

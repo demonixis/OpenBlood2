@@ -99,3 +99,8 @@ standing-fire driver and verifies the recorded outcome with UI hidden and after 
 That driver is not AI_Update. Full initialization, deactivation/PingObjects visibility,
 autonomous update/target retention, navigation, scripts, death and production NPC
 registration remain open. Required FX and ExitTrigger also keep M2 incomplete.
+
+[Script preparation/state dispatch](AI_SCRIPT_CONTRACTS.md) is now callable by an
+explicit diagnostic driver. SCRIPT trigger messages still reject the missing
+forced AI_Update; this boundary is intentionally not bypassed by running only
+its script-state fragment.

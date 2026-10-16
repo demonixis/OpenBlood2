@@ -93,3 +93,7 @@ AI initialization/update/deactivation, production CivilianAI/CultistAI/Gideon,
 death, required client FX and ExitTrigger remain open. Existing authored counts and
 startup refusal are unchanged. Diagnostic actors and targets are labelled and do not
 turn missing world classes into successful creations.
+
+The [script-state continuation](AI_SCRIPT_CONTRACTS.md) supersedes the interpreter
+omission above for explicit preparation/state dispatch. Production SCRIPT trigger
+entry and the complete forced AI_Update remain unavailable.
