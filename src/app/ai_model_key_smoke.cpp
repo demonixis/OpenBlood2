@@ -49,7 +49,19 @@ namespace OpenBlood2
             return false;
         r->animation.looping = false;
         id = r->id;
-        return true;
+        return check_ai_sight_smoke(g, id);
+    }
+    bool check_ai_sight_smoke(GameSession& g, ObjectId id)
+    {
+        const auto* r = g.objects.get(id);
+        auto* ai = r ? dynamic_cast<AI_Mgr*>(r->game.get()) : nullptr;
+        const auto* player = g.server_shell.Player(g.local_client);
+        if (!ai || !player)
+            return false;
+        ai->CanSee(player->m_hObject);
+        const auto& s = ai->sight;
+        return s.origin_head && s.rays >= 1 && s.rays <= 2 && s.target == player->m_hObject &&
+               s.outcome != AISightOutcome::Invalid && s.outcome != AISightOutcome::Unavailable;
     }
     bool check_ai_model_key_smoke(GameSession& g, ObjectId id, std::uint64_t minimum_keys)
     {

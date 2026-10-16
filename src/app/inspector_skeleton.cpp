@@ -56,7 +56,35 @@ namespace OpenBlood2
             }
             else
                 ImGui::TextUnformatted("No original character animation table on this object");
-            if (ai && ImGui::CollapsingHeader("Original AI model-key dispatch", ImGuiTreeNodeFlags_DefaultOpen))
+            if (ai && ImGui::CollapsingHeader("Original AI visibility", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                const auto& s = ai->sight;
+                ImGui::Text("%s | %u rays | %llu queries", ai_sight_outcome_name(s.outcome), s.rays,
+                            (unsigned long long)ai->sight_queries);
+                const auto* target = game.objects.get(s.target);
+                ImGui::Text("Target: %s",
+                            target && target->life == Life::Alive ? target->state.m_Name : "removed / none");
+                ImGui::Text("Origin (%s): %.2f %.2f %.2f", s.origin_head ? "animated head" : "object position",
+                            s.origin.x, s.origin.y, s.origin.z);
+                ImGui::Text("Body: %.2f %.2f %.2f | head retry: %s", s.body.x, s.body.y, s.body.z,
+                            s.retried_head ? "yes" : "no");
+                if (s.retried_head)
+                    ImGui::Text("Head: %.2f %.2f %.2f", s.head.x, s.head.y, s.head.z);
+                auto hit = [&](const char* name, const SegmentHit& h, SegmentResult result)
+                {
+                    if (result != SegmentResult::Hit)
+                        return;
+                    const auto* record = game.objects.get(h.object);
+                    ImGui::Text("%s hit: %s | fraction %.4f | polygon %u", name,
+                                h.object ? (record ? record->state.m_Name : "removed object") : "primary world",
+                                h.fraction, h.polygon);
+                };
+                hit("Body", s.body_hit, s.body_result);
+                hit("Head", s.head_hit, s.head_result);
+                ImGui::TextWrapped("Last simulation query. Requires a target hit; skips VolumeBrush and destructible "
+                                   "glass brushes. No field-of-view, distance, hearing or target acquisition implied.");
+            }
+            if (ai && ImGui::CollapsingHeader("Original AI model-key dispatch"))
             {
                 ImGui::Text("State %d | keys %llu | audio starts %llu / keys %llu | failures %llu", ai->m_nState,
                             (unsigned long long)ai->model_keys, (unsigned long long)ai->audio_starts,
@@ -76,8 +104,8 @@ namespace OpenBlood2
                             (unsigned long long)ai->chance_suppressed, (unsigned long long)ai->busy_voices);
                 ImGui::Text("No target %llu | unavailable actions %llu", (unsigned long long)ai->no_target,
                             (unsigned long long)ai->unavailable_keys);
-                ImGui::TextWrapped(
-                    "Key dispatcher only. AI states, perception, attacks and special actions remain unavailable.");
+                ImGui::TextWrapped("Key dispatcher only. AI states, target acquisition, attacks and special actions "
+                                   "remain unavailable.");
             }
             if (character && ImGui::CollapsingHeader("Character motion keys",
                                                      ai ? ImGuiTreeNodeFlags_None : ImGuiTreeNodeFlags_DefaultOpen))

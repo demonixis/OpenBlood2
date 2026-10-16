@@ -440,3 +440,11 @@ AI path-manager continuation: [source ledger](M2_PATH_MANAGER_SOURCES.json),
 [contracts](PATH_MANAGER_CONTRACTS.md). Original snapshot/prefix/reverse-order rules
 are retained with owned values. Later engine code confirms active enumeration only;
 no donor container or backend is imported. AI following and action delivery remain open.
+
+## Original AI visibility
+
+Selected AI_Mgr::CanSee and GlobalFilterFn liquid/glass branches now use checked
+node/ray services. [Source ranges and hashes](M2_AI_SIGHT_SOURCES.json) and
+[contracts](AI_SIGHT_CONTRACTS.md) distinguish source rules from typed failures,
+current-position fallback and the existing replacement collision solver. No
+additional production AI class or general filter callback ABI is imported.

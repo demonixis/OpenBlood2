@@ -234,3 +234,10 @@ Preserve active-only GetNextObject, included SMELL points, unconsumed source obj
 prefix-plus-first-digit matching, reverse enumeration and preflight/no-match output
 semantics. Returned paths own their data; source handles are inspection-only.
 AI following/actions, remaining classes/services and the M2 gate stay open.
+
+The latest [AI visibility evidence](../Documentation/Implementation/M2_AI_SIGHT.md) connects original AI_Mgr::CanSee
+and its VolumeBrush/destructible-glass filter. Read [contracts](docs/AI_SIGHT_CONTRACTS.md). Preserve
+body-first rays, head retry only after an obstruction, target-hit requirements and
+checked lifetime. Current head poses and hidden/reload inspection are exercised;
+range/FOV, target acquisition, states, attacks and production NPCs remain unported.
+The 17 unsupported SubwayA entries and actual M2 gate remain unchanged.

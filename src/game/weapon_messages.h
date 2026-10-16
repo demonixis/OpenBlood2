@@ -41,7 +41,13 @@ namespace OpenBlood2
     enum class SegmentObjects
     {
         SolidOnly,
-        All
+        All,
+        SolidOrRayHit
+    };
+    enum class SegmentFilter
+    {
+        None,
+        AIVisibility // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
     };
     enum class SegmentResult
     {

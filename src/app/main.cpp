@@ -244,6 +244,7 @@ namespace
         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
             return 4;
         const auto original_ai_key = smoke_ai_key;
+        bool ai_sight_hidden = false;
         const bool path_smoke = options.player_smoke && game.world_path == "worlds/01_subwaya.dat";
         PathList smoke_paths;
         bool paths_hidden = false;
@@ -483,6 +484,8 @@ namespace
                 spdlog::error("Object simulation step failed");
                 return 4;
             }
+            if (options.skeleton_smoke && !inspector_visible)
+                ai_sight_hidden |= OpenBlood2::check_ai_sight_smoke(game, smoke_ai_key);
             if (options.skeleton_smoke && !inspector_visible)
                 ai_key_hidden |= OpenBlood2::check_ai_model_key_smoke(game, smoke_ai_key, 2);
             if (options.skeleton_smoke && !inspector_visible)
@@ -889,6 +892,7 @@ namespace
                              character_motion_hidden, character_motion_reentered, !game.objects.get(original_motion));
             }
             bool ai_key_reentered = !options.skeleton_smoke;
+            bool ai_sight_reentered = !options.skeleton_smoke;
             if (options.skeleton_smoke)
             {
                 if (game.objects.get(original_ai_key) || !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
@@ -901,6 +905,9 @@ namespace
                 }
                 spdlog::info("AI model-key probe: hidden={}, reentered={}, old handle invalidated={}", ai_key_hidden,
                              ai_key_reentered, !game.objects.get(original_ai_key));
+                ai_sight_reentered = OpenBlood2::check_ai_sight_smoke(game, smoke_ai_key);
+                spdlog::info("AI sight probe: hidden={}, reentered={}, old handle invalidated={}", ai_sight_hidden,
+                             ai_sight_reentered, !game.objects.get(original_ai_key));
             }
             bool character_audio_reentered = !options.skeleton_smoke;
             if (options.skeleton_smoke)
@@ -929,9 +936,9 @@ namespace
                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
                 !selection_cleared || (path_smoke && (!paths_hidden || !paths_reentered)) ||
-                (options.skeleton_smoke &&
-                 (!character_audio_hidden || !character_audio_reentered || !character_motion_hidden ||
-                  !character_motion_reentered || !ai_key_hidden || !ai_key_reentered)) ||
+                (options.skeleton_smoke && (!character_audio_hidden || !character_audio_reentered ||
+                                            !character_motion_hidden || !character_motion_reentered || !ai_key_hidden ||
+                                            !ai_key_reentered || !ai_sight_hidden || !ai_sight_reentered)) ||
                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||

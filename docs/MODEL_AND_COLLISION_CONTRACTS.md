@@ -162,3 +162,7 @@ frame clocks to the existing active-object animation traversal. No model events
 are synthesized for sprites. CastWorldRay uses the solid primary-world index for
 original DetailSprite flush placement; dynamic objects are excluded by its source
 query flags. DTX decoding/rendering and verified retail ray/timing parity remain open.
+
+The [AI visibility continuation](AI_SIGHT_CONTRACTS.md) adds selected original CanSee
+and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
+Visibility queries do not implement target selection, AI states or complete M2.

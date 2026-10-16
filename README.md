@@ -268,3 +268,12 @@ The AI path-manager increment passed 307/307 tests in both Debug and inspector-f
 Release, plus 284/284 sequential headless checks with Clang ASan/UBSan/leak
 detection on Linux. Seven real SubwayA points are checked across hidden inspection
 and reload; AI path following remains unavailable.
+
+Latest M2 continuation: [original AI visibility](../Documentation/Implementation/M2_AI_SIGHT.md) connects body/head
+ray checks, source volume/glass filtering and current-pose inspection. No NPC
+state machine or target acquisition is claimed; the complete M2 gate remains open.
+
+The AI visibility increment passed 315/315 tests in both Debug and inspector-free
+Release, plus 292/292 sequential headless checks with Clang ASan/UBSan/leak
+detection on Linux. The private catalog covers 240 animation midpoints across
+six NPC models; GPU inspection verifies hidden queries and fresh reload identities.

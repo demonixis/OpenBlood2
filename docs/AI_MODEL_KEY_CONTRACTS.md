@@ -105,3 +105,7 @@ CivilianAI, ten CultistAI, Gideon and ExitTrigger. AI hearing, aiming/fire/extra
 attachments, required client FX and other services keep --start-game blocked
 with exit 6. Other platforms, XR, audible hardware and retail gameplay parity
 are not established by Linux tests and SDL dummy output.
+
+The [AI visibility continuation](AI_SIGHT_CONTRACTS.md) adds selected original CanSee
+and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
+Visibility queries do not implement target selection, AI states or complete M2.

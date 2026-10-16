@@ -1,19 +1,23 @@
 #include "engine/world_model.h"
 #include "game/original/DestructableBrush.h"
 #include "game/original/Door.h"
+#include "game/original/SurfaceTypes.h"
+#include "game/original/VolumeBrush.h"
 #include "game/server_adapter.h"
 #include <cmath>
 
 namespace OpenBlood2
 {
     SegmentResult ServerAdapter::IntersectSegment(DVector from, DVector to, HOBJECT ignore, SegmentHit& out,
-                                                  bool fire_through, SegmentObjects objects)
+                                                  bool fire_through, SegmentObjects objects, SegmentFilter filter)
     {
         trace_service("IntersectSegment");
         out = {};
         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
-        if ((objects != SegmentObjects::SolidOnly && objects != SegmentObjects::All) || !physics_vector(from) ||
-            !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
+        if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility) ||
+            (objects != SegmentObjects::SolidOnly && objects != SegmentObjects::SolidOrRayHit &&
+             objects != SegmentObjects::All) ||
+            !physics_vector(from) || !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
             vector_dot(vector_subtract(to, from), vector_subtract(to, from)) < 1e-12f)
             return SegmentResult::Invalid;
         if (!collision || !collision_ready)
@@ -27,10 +31,20 @@ namespace OpenBlood2
         {
             const auto* record = objects_.get(id);
             if (!record || record->life != Life::Alive || record->handle == ignore ||
-                (objects == SegmentObjects::SolidOnly && !(record->state.m_Flags & FLAG_SOLID)))
-                continue; // Original IGNORE_NONSOLID.
+                (objects != SegmentObjects::All &&
+                 !(record->state.m_Flags &
+                   (objects == SegmentObjects::SolidOrRayHit ? FLAG_SOLID | FLAG_RAYHIT : FLAG_SOLID))))
+                continue;
             const auto* door = dynamic_cast<const Door*>(record->game.get());
             const auto* brush = dynamic_cast<const CDestructableBrush*>(record->game.get());
+            // Original GlobalFilterFn, restricted to CanSee's two requested flags.
+            // IGNORE_LIQUID excludes every VolumeBrush subclass, not just liquids.
+            // Glass only passes when the object is a destructible brush. Baked
+            // world polygons, doors, CanDamage and FireThrough do not define this filter.
+            if (filter == SegmentFilter::AIVisibility &&
+                (dynamic_cast<const VolumeBrush*>(record->game.get()) ||
+                 (brush && brush->destructable && brush->GetSurfaceType() == SURFTYPE_GLASS)))
+                continue;
             if (fire_through && ((door && door->fire_through) || (brush && brush->fire_through)))
                 continue;
             CollisionHit hit;

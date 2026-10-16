@@ -98,7 +98,8 @@ namespace OpenBlood2
         bool GetMovementState(HOBJECT, MovementState&) override;
         SegmentResult CastWorldRay(DVector, DVector, SegmentHit&) override;
         SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false,
-                                       SegmentObjects objects = SegmentObjects::SolidOnly) override;
+                                       SegmentObjects objects = SegmentObjects::SolidOnly,
+                                       SegmentFilter filter = SegmentFilter::None) override;
         DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
         bool ReadDamage(HMESSAGEREAD, Damage&) override;
         HCLIENT connect_client();

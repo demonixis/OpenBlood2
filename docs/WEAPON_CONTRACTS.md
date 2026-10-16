@@ -125,3 +125,7 @@ limits and the remaining 190 required SubwayA instances keep M2's exit gate open
 The selected weapon path retains the player body eye as its origin; the external
 CameraObj view is separate. Blocked is an acknowledged no-shot result, with no
 ammo consumption. View-weapon visibility is a presentation request.
+
+The [AI visibility continuation](AI_SIGHT_CONTRACTS.md) adds selected original CanSee
+and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
+Visibility queries do not implement target selection, AI states or complete M2.
