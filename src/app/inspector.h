@@ -81,6 +81,7 @@ namespace OpenBlood2
         std::optional<WeaponInput> weapon_input_request;
         std::optional<PlayerRotation> weapon_aim_request;
         bool enter_player_request = false, leave_player_request = false, respawn_request = false;
+        bool capture_player_request = false, restore_player_request = false;
         ObjectId remove_request{};
         std::string spawn_request;
         std::string world_error, reload_world_name = "01_SubwayA";

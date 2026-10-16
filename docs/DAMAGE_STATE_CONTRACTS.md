@@ -1,5 +1,10 @@
 # Original CDestructable state preservation
 
+> Continued by [player restore contracts](PLAYER_RESTORE_CONTRACTS.md): supported
+> engine state and original restored-client association now execute in the same
+> loaded world. Earlier blanket omissions below are historical. Full client/world
+> state and safe NEW_LEVEL transfer remain incomplete.
+
 > Continued by [player state contracts](PLAYER_STATE_CONTRACTS.md): selected player
 > values and the original savegame initialization early return now execute.
 > Earlier blanket player-field/initialization omissions are historical; full

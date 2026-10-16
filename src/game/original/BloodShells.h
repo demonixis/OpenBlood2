@@ -14,6 +14,7 @@ class CBloodServerShell
     void PreStartWorld();
     bool PostStartWorld();
     CPlayerObj* OnClientEnterWorld(HCLIENT);
+    CPlayerObj* OnRestoredClientEnterWorld(HCLIENT, HOBJECT);
     void OnClientExitWorld(HCLIENT);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerInit&);
     FireResult OnMessage(HCLIENT, const OpenBlood2::WeaponFire&);
@@ -65,7 +66,8 @@ class CBloodClientShell
   public:
     explicit CBloodClientShell(ServerDE& server) : server_(server) {}
     bool StartNewWorld(const char*, OpenBlood2::WorldMessage&);
-    bool OnEnterWorld(HCLIENT);
+    bool OnEnterWorld(HCLIENT, bool restored = false);
+    bool restored_entry = false;
     void OnExitWorld();
     bool OnMessage(const OpenBlood2::PlayerEvent&, CBloodServerShell&);
     bool Update();

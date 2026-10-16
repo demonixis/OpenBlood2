@@ -5,6 +5,7 @@
 #include "engine/string_resources.h"
 #include "game/original/BloodShells.h"
 #include "game/original/LightFX.h"
+#include "game/player_restore.h"
 #include "game/session.h"
 #include <array>
 #include <optional>
@@ -325,6 +326,16 @@ namespace OpenBlood2
         bool request_world(std::string_view name, std::string& error);
         bool run_world(std::string& error);
         bool enter_player(std::string& error);
+        bool capture_player(PlayerRestoreState&, std::string&);
+        bool restore_player(const PlayerRestoreState&, std::string&);
+        struct Restoration
+        {
+            std::optional<PlayerRestoreState> saved;
+            std::string error;
+            std::uint64_t captures = 0, attempts = 0, restored = 0;
+            ObjectId last_player{}; // Inspection only, never a restoration input.
+        } restoration;
+
         bool select_weapon(DBYTE slot, std::string& error);
         bool leave_player();
         bool pump_player_messages(std::string& error);

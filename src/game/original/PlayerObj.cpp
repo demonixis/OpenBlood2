@@ -188,8 +188,8 @@ void CPlayerObj::ValidateAttributes()
 }
 bool CPlayerObj::OnSinglePlayerInit(const OpenBlood2::PlayerInit& init)
 {
-    if (attributes_received || !m_hClient || init.name.size() > 100 || init.name.find('\0') != std::string::npos ||
-        init.character != 0 || init.skin != 0)
+    if (restore_initialization || attributes_received || !m_hClient || init.name.size() > 100 ||
+        init.name.find('\0') != std::string::npos || init.character != 0 || init.skin != 0)
         return false;
     // Reject unsupported loadouts before allocating strings or weapons.
     for (auto type : init.weapons)
@@ -365,13 +365,8 @@ DBOOL CPlayerObj::Update(DVector*)
     ++updates;
     if (!m_hClient)
         return DTRUE;
-    if (m_bFirstUpdate)
-    {
-        ValidateAttributes();
-        if (!UpdateClientPhysics() || !TeleportClientToServerPos())
-            return DFALSE;
-        m_bFirstUpdate = DFALSE;
-    }
+    if (m_bFirstUpdate && !InitializeClientState())
+        return DFALSE;
     UpdateSound();
     if (server->GetTime() > m_fNextPingTime)
     {
@@ -382,10 +377,24 @@ DBOOL CPlayerObj::Update(DVector*)
     }
     return UpdateStats();
 }
-bool CPlayerObj::UpdateStats()
+bool CPlayerObj::InitializeClientState()
+{
+    if (!m_hClient || m_nAttribSpeed < 1 || m_nAttribSpeed > 6)
+        return false;
+    // Original first update, PlayerObj.cpp:1591-1604. ValidateAttributes belongs
+    // to fresh profile receipt, not restoration: it would alter saved caps/stats.
+    static constexpr float move[] = {220, 250, 280, 310, 330, 350};
+    m_fMoveVel = move[m_nAttribSpeed - 1];
+    m_fJumpVel = 600;
+    if (!UpdateClientPhysics() || !TeleportClientToServerPos() || !UpdateStats(true))
+        return false;
+    m_bFirstUpdate = DFALSE;
+    return true;
+}
+bool CPlayerObj::UpdateStats(bool force)
 {
     const OpenBlood2::PlayerStats value{m_damage.m_fHitPoints, m_damage.m_fArmorPoints, m_InventoryMgr.GetAmmoCount(1)};
-    if (value.health == last_sent_stats_.health && value.armor == last_sent_stats_.armor &&
+    if (!force && value.health == last_sent_stats_.health && value.armor == last_sent_stats_.armor &&
         value.bullets == last_sent_stats_.bullets)
         return true;
     if (GetServerDE()->SendToClient(m_hClient, value) != DE_OK)

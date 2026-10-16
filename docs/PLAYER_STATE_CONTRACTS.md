@@ -1,5 +1,10 @@
 # Selected original player fields and restore initialization
 
+> Continued by [player restore contracts](PLAYER_RESTORE_CONTRACTS.md): supported
+> engine state and original restored-client association now execute in the same
+> loaded world. Earlier blanket omissions below are historical. Full client/world
+> state and safe NEW_LEVEL transfer remain incomplete.
+
 > Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
 > original named resets now affect rendering/hit candidates, and the selected Load
 > model/flags/velocity tail is available before client association. Earlier blanket

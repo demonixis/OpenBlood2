@@ -307,6 +307,22 @@ namespace OpenBlood2
                 selection.id = game.objects.get(game.client_shell.player)->id;
             enter_player_request = false;
         }
+        if (capture_player_request)
+        {
+            PlayerRestoreState saved;
+            if (game.capture_player(saved, game.restoration.error))
+            {
+                game.restoration.saved = std::move(saved);
+                ++game.restoration.captures;
+            }
+            capture_player_request = false;
+        }
+        if (restore_player_request)
+        {
+            if (game.restoration.saved && game.restore_player(*game.restoration.saved, world_error))
+                selection.id = game.restoration.last_player;
+            restore_player_request = false;
+        }
         if (respawn_request)
         {
             if (auto* player = game.server_shell.Player(game.local_client))
@@ -1017,6 +1033,39 @@ namespace OpenBlood2
         }
         if (!world_error.empty())
             ImGui::TextWrapped("%s", world_error.c_str());
+        ImGui::SeparatorText("Player restoration (same loaded world)");
+        ImGui::BeginDisabled(!player);
+        if (ImGui::Button("Capture player state"))
+            capture_player_request = true;
+        ImGui::EndDisabled();
+        ImGui::SameLine();
+        ImGui::BeginDisabled(player || !game.restoration.saved);
+        if (ImGui::Button("Restore captured player"))
+            restore_player_request = true;
+        ImGui::EndDisabled();
+        const auto& restore = game.restoration;
+        ImGui::Text("Captures %llu | Restored %llu / %llu | Restored client: %s", (unsigned long long)restore.captures,
+                    (unsigned long long)restore.restored, (unsigned long long)restore.attempts,
+                    game.client_shell.restored_entry ? "yes" : "no");
+        if (!restore.error.empty())
+            ImGui::TextWrapped("%s", restore.error.c_str());
+        ImGui::TextWrapped("Capture, leave the player, then restore. Original Load resets velocity/standard node "
+                           "visibility; client force-position clears acceleration. World/NPC state, complete "
+                           "client saves and level transfer are not restored.");
+        if (restore.saved && ImGui::TreeNode("Saved engine/player values"))
+        {
+            const auto& s = *restore.saved;
+            ImGui::TextWrapped("World: %s | Model: %s | Skin: %s", s.world.c_str(), s.model.c_str(), s.skin.c_str());
+            ImGui::Text("Position %.2f %.2f %.2f | Half dimensions %.2f %.2f %.2f", s.position.x, s.position.y,
+                        s.position.z, s.dimensions.x, s.dimensions.y, s.dimensions.z);
+            ImGui::Text("Animation %u at %.2fms | loop %d done %d first %d | next update %.6fs", s.animation.animation,
+                        s.animation.time, s.animation.looping, s.animation.done, s.animation.first, s.next_update);
+            ImGui::Text("Crouched %d | eye %.1f | flags %x / user %x | priority %u", s.crouched, s.eye_level, s.flags,
+                        s.user_flags, s.blocking_priority);
+            ImGui::Text("HP %.2f | armor %.2f | bullets %.2f | air %.2f", s.damage.health, s.damage.armor,
+                        s.inventory.ammo[1], s.player.air);
+            ImGui::TreePop();
+        }
         ImGui::SeparatorText("Shell state");
         ImGui::Text("Server world started: %s | Path snapshots: %zu | Updates: %llu",
                     game.server_shell.world_started ? "yes" : "no", game.server_shell.paths.size(),

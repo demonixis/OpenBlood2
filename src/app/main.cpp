@@ -132,6 +132,18 @@ namespace
                     spdlog::error("Authored intro camera did not release player control");
                     return 4;
                 }
+                if (options.restore_smoke)
+                {
+                    OpenBlood2::PlayerRestoreState saved;
+                    if (!game.capture_player(saved, error) || !game.leave_player() ||
+                        !game.request_world(options.world, error) || !game.restore_player(saved, error))
+                    {
+                        spdlog::error("Restored player entry: {}", error);
+                        return 6;
+                    }
+                    game.restoration.saved = std::move(saved);
+                    ++game.restoration.captures;
+                }
                 selection.id = game.objects.get(game.client_shell.player)->id;
             }
         }
@@ -1036,7 +1048,8 @@ namespace
                     else
                     {
                         inspector.reload_request = true;
-                        inspector.enter_player_request = options.player_smoke;
+                        inspector.enter_player_request = options.player_smoke && !options.restore_smoke;
+                        inspector.restore_player_request = options.restore_smoke;
                     }
 #else
                     if (frames == unload_frame)
@@ -1046,7 +1059,9 @@ namespace
                         spdlog::error("{}", error);
                         return 5;
                     }
-                    else if (options.player_smoke && !game.enter_player(error))
+                    else if (options.player_smoke &&
+                             !(options.restore_smoke ? game.restore_player(*game.restoration.saved, error)
+                                                     : game.enter_player(error)))
                     {
                         spdlog::error("{}", error);
                         return 6;
@@ -1273,6 +1288,9 @@ namespace
                   forward_frames != 55 || jump_frames != 10 || crouch_frames != 45 || run_frames != 20 ||
                   !skeleton_reentered || !skeleton_hidden || !crouched_hidden || !stood_after_crouch ||
                   !locomotion_pose || !saw_walk || !saw_run || !saw_jump)) ||
+                (options.restore_smoke && (game.restoration.restored != 2 || !game.client_shell.restored_entry ||
+                                           !game.server_shell.Player(game.local_client) ||
+                                           game.server_shell.Player(game.local_client)->respawns != 0)) ||
                 (options.player_smoke && (!player_advanced_hidden || !game.client_shell.m_bInWorld ||
                                           !game.server_shell.Player(game.local_client))) ||
                 (options.world_smoke &&
@@ -1400,6 +1418,7 @@ int main(int argc, char** argv)
                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled\n"
                      "  --gpu-smoke         Exercise GPU presentation, inspector toggle, resize and quit\n"
                      "  --world-smoke       GPU lifecycle with real world unload/reload assertions\n"
+                     "  --restore-smoke     GPU saved-player entry, hidden updates and restore after reload\n"
                      "  --player-smoke      GPU shell/player entry, hidden updates and unload/re-entry\n"
                      "  --weapons-smoke     GPU Beretta/knife firing, hidden simulation and reload\n"
                      "  --doors-smoke       GPU original sliding door inspection\n"

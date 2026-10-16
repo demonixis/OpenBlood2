@@ -31,6 +31,7 @@ add_library(blood2_game STATIC src/game/server_attachments.cpp src/game/original
     src/game/original/trigger_helpers.cpp
     src/game/original/session_load.cpp
     src/game/session.cpp
+    src/game/player_restore.cpp
     src/game/registration.cpp
     src/game/server_adapter.cpp)
 target_sources(blood2_game PRIVATE src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp)

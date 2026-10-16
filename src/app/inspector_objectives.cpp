@@ -100,9 +100,8 @@ namespace OpenBlood2
                     ImGui::TreePop();
                 }
             }
-            ImGui::TextWrapped(
-                "Partial snapshots: remaining player timers, engine state, restored client association and "
-                "destination entry remain unavailable. Current player/world are unchanged.");
+            ImGui::TextWrapped("Exit snapshots remain partial. The Session tab supports same-world player restoration; "
+                               "complete timers/client saves and safe destination transfer remain unavailable.");
             for (auto id : game.objects.snapshot())
             {
                 const auto* record = game.objects.get(id);

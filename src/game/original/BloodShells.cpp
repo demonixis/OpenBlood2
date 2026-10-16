@@ -134,6 +134,32 @@ CPlayerObj* CBloodServerShell::OnClientEnterWorld(HCLIENT client)
     }
     return player;
 }
+CPlayerObj* CBloodServerShell::OnRestoredClientEnterWorld(HCLIENT client, HOBJECT object)
+{
+    // Typed local equivalent of OnClientEnterWorld's saved HCLIENTREF branch.
+    // The caller supplies a fully staged owner; never fall back to CreatePlayer.
+    if (!world_started || !client || Player(client) || !server_.IsObjectAlive(object))
+        return nullptr;
+    auto* player = dynamic_cast<CPlayerObj*>(server_.HandleToObject(object));
+    if (!player || !player->restore_initialization || !player->restore_fields_loaded || !player->restore_model_loaded ||
+        !player->restore_engine_loaded || player->GetClient() || player->m_InventoryMgr.m_hClient)
+        return nullptr;
+    if (server_.SetClientUserData(client, object) != DE_OK)
+        return nullptr;
+    player->SetClient(client);
+    // RespawnPlayer's saved-position branch: associate, initialize client,
+    // restore facing/eye; no Respawn or GoToStartPoint/start-trigger replay.
+    if (server_.SendToClient(client, OpenBlood2::PlayerInitRequest{}) != DE_OK ||
+        server_.SendToClient(client, OpenBlood2::PlayerRotation{player->m_fPitch, player->m_fYaw}) != DE_OK ||
+        !player->InitializeClientState())
+    {
+        player->SetClient(nullptr);
+        server_.SetClientUserData(client, nullptr);
+        return nullptr;
+    }
+    server_.SetGameConVar("GAME_GOTOSTARTPOINT", "1");
+    return player;
+}
 void CBloodServerShell::OnClientExitWorld(HCLIENT client)
 {
     auto* player = Player(client);
@@ -175,10 +201,11 @@ bool CBloodClientShell::StartNewWorld(const char* world, OpenBlood2::WorldMessag
         return false;
     return true; // State changes wait until the engine accepts the world.
 }
-bool CBloodClientShell::OnEnterWorld(HCLIENT client)
+bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
 {
     auto object = server_.GetClientUserData(client);
-    if (!object || m_bInWorld)
+    const auto* owner = dynamic_cast<const CPlayerObj*>(server_.HandleToObject(object));
+    if (!object || m_bInWorld || !owner || restored != owner->restore_engine_loaded)
         return false;
     if (!move_mgr.Init(server_, client))
         return false;
@@ -186,7 +213,8 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client)
     player = object;
     m_bInWorld = true;
     m_bFirstUpdate = true;
-    m_bFirstWorld = true;
+    restored_entry = restored;
+    m_bFirstWorld = !restored;
     position = {};
     camera_position = {};
     view = {};
@@ -216,6 +244,7 @@ void CBloodClientShell::OnExitWorld()
     player = nullptr;
     client_ = nullptr;
     m_bInWorld = false;
+    restored_entry = false;
     m_bFirstWorld = true;
     m_bFirstUpdate = true;
     position = {};
@@ -237,7 +266,7 @@ void CBloodClientShell::OnExitWorld()
 bool CBloodClientShell::InitSinglePlayer(CBloodServerShell& server)
 {
     if (!m_bFirstWorld)
-        return false;
+        return restored_entry;   // Restored worlds skip the profile; retain fresh-entry duplicate rejection.
     OpenBlood2::PlayerInit init; // Default entry profile; original fields/order retained.
     if (!server.OnMessage(client_, init))
         return false;

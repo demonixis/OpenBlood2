@@ -78,7 +78,7 @@ class CPlayerObj : public CBaseCharacter
     bool SaveFields(OpenBlood2::PlayerState&, std::string&) const;
     bool LoadFields(const OpenBlood2::PlayerState&, std::string&);
     bool RestoreModelState(std::string&);
-    bool restore_model_loaded = false;
+    bool restore_model_loaded = false, restore_engine_loaded = false;
     std::string restore_model_error;
     bool restore_initialization = false, restore_fields_loaded = false;
     bool GoToStartPoint(HSTRING start_name);
@@ -127,7 +127,8 @@ class CPlayerObj : public CBaseCharacter
     std::uint64_t use_commands = 0, use_messages = 0;
     bool use_door_refused = false;
     bool UpdateClientPhysics();
-    bool UpdateStats();
+    bool UpdateStats(bool force = false);
+    bool InitializeClientState();
     bool TeleportClientToServerPos();
     void SetClient(HCLIENT client)
     {

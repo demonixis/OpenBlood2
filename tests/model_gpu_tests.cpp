@@ -164,6 +164,14 @@ int main(int argc, char** argv)
         CHECK(game.resources.mount_game(config, error));
         CHECK(game.request_world("01_SubwayA", error));
         CHECK(game.enter_player(error) && game.step(1. / 60));
+        PlayerRestoreState restored;
+        CHECK(game.capture_player(restored, error));
+        const auto previous_player = game.client_shell.player;
+        CHECK(game.leave_player() && !game.objects.get(previous_player));
+        CHECK(game.restore_player(restored, error) && game.client_shell.restored_entry);
+        CHECK(game.client_shell.player != previous_player && game.restoration.restored == 1);
+        CHECK(game.server_shell.Player(game.local_client)->respawns == 0);
+        std::cout << "Restored original player/client association before private GPU rendering\n";
         game.client_shell.player_visible = true;
         game.client_shell.weapons_visible = false;
         ModelView scene;

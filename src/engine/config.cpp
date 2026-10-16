@@ -181,6 +181,8 @@ namespace OpenBlood2
                 options.world_smoke = true;
                 options.doors_smoke = true;
             }
+            else if (arg == "--restore-smoke")
+                options.world_smoke = options.player_smoke = options.restore_smoke = true;
             else if (arg == "--player-smoke")
             {
                 options.world_smoke = true;

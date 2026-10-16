@@ -1,5 +1,11 @@
 # Blood II Reconstruction aka OpenBlood2
 
+Current continuation: [player engine restoration and client association](../Documentation/Implementation/M2_PLAYER_RESTORE.md)
+connects the supported same-world living-player snapshot to original restored entry,
+without fresh stats or start-trigger replay. Session inspection supports capture,
+leave and restore. Earlier engine/association omissions below are historical;
+full client/world state and safe NEW_LEVEL transfer remain unavailable. **M2 stays open.**
+
 Latest restoration continuation: [character node visibility and selected player Load tail](../Documentation/Implementation/M2_CHARACTER_NODES.md)
 connects original named resets to real rendering/hit state and restores model/flags/
 velocity without fresh player grants. Full engine/client restoration and safe level

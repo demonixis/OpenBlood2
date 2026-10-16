@@ -710,3 +710,13 @@ reads; the source's uninitialized location byte starts at zero. No donor engine,
 dependency or commercial asset was imported. See [source ledger](M2_DAMAGE_STATE_SOURCES.json),
 [contracts](DAMAGE_STATE_CONTRACTS.md) and
 [evidence](../../Documentation/Implementation/M2_DAMAGE_STATE.md).
+
+## M2 player engine restoration and saved-client entry
+
+[Source ledger](M2_PLAYER_RESTORE_SOURCES.json) identifies the original server
+saved-client/RespawnPlayer branch, client first-world guard and player first-update
+block. `player_restore.cpp` is replacement engine orchestration using owned values,
+checked identities, current geometry and staged cleanup. It reuses the selected
+original Save/Load and model tail. First update now derives speeds without fresh
+attribute validation, matching source. See [contracts](PLAYER_RESTORE_CONTRACTS.md)
+for limits: no retail ABI, full client/world save or cross-world transfer claim.

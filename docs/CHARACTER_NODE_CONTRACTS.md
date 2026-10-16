@@ -1,5 +1,10 @@
 # Character node visibility and selected player Load tail
 
+> Continued by [player restore contracts](PLAYER_RESTORE_CONTRACTS.md): supported
+> engine state and original restored-client association now execute in the same
+> loaded world. Earlier blanket omissions below are historical. Full client/world
+> state and safe NEW_LEVEL transfer remain incomplete.
+
 The original named-node reset now has real engine state consumed by model rendering
 and NPC hit localization. `CPlayerObj::RestoreModelState` applies the supported
 model/flags/velocity portion of Load to an unassociated savegame owner; it does not

@@ -401,3 +401,10 @@ Read [contracts](docs/CHARACTER_NODE_CONTRACTS.md). Preserve contiguous extras, 
 sparse node IDs, source random fallback and Load's absent SHADOW flag. Tail failures
 may leave partial setup: discard staged owners, never claim active-player rollback.
 Engine/client restoration, safe destination entry, required FX and M2 remain open.
+
+The [player restoration continuation](../Documentation/Implementation/M2_PLAYER_RESTORE.md) connects supported engine snapshots and original saved-client association.
+Read [contracts](docs/PLAYER_RESTORE_CONTRACTS.md). Preserve staged cleanup, checked new identities, original Load overrides,
+relative scheduling, raw attributes/caps and single MoveMgr integration. First update
+must derive speeds without ValidateAttributes. No live-client replacement or start
+trigger replay; current-world clearance may reject. Whole-world/client saves,
+dead/powered states and safe NEW_LEVEL transfer remain unavailable; M2 stays open.

@@ -19,7 +19,7 @@ namespace OpenBlood2
         std::string world = "01_SubwayA";
         bool inspect_world = false;
         bool inspect_player = false;
-        bool player_smoke = false;
+        bool player_smoke = false, restore_smoke = false;
         bool weapons_smoke = false;
         bool skeleton_smoke = false;
         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,

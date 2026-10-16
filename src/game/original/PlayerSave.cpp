@@ -165,6 +165,7 @@ bool CPlayerObj::LoadFields(const OpenBlood2::PlayerState& state, std::string& e
     last_sent_stats_ = {0, 0, 0}; // Source invalidates its last-sent stat caches without changing actual stats.
     restore_fields_loaded = true;
     restore_model_loaded = false;
+    restore_engine_loaded = false;
     restore_model_error.clear();
     // No Respawn, ValidateAttributes, initialization payload or aggregate load here.
     return true;
@@ -176,6 +177,7 @@ bool CPlayerObj::RestoreModelState(std::string& error)
 {
     error.clear();
     restore_model_loaded = false;
+    restore_engine_loaded = false;
     auto fail = [&](const char* why)
     {
         error = restore_model_error = why;

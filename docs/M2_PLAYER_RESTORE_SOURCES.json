@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "ba1243c71efac7159c5c19887c1b5124d1503e0b",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "selected_lines": [
+        [
+          192,
+          245
+        ],
+        [
+          746,
+          803
+        ],
+        [
+          959,
+          977
+        ]
+      ],
+      "use": "Saved-client lookup, association and saved-position branch; explicit typed local identity replaces HCLIENTREF"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "selected_lines": [
+        [
+          5150,
+          5162
+        ],
+        [
+          5378,
+          5397
+        ]
+      ],
+      "use": "Original first-world init guard; full LoadClientData is not claimed"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          615,
+          640
+        ],
+        [
+          1591,
+          1604
+        ],
+        [
+          6838,
+          6865
+        ]
+      ],
+      "use": "Restore initialization, first-update speeds/physics/stats and Load tail"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/MoveMgr.cpp",
+      "sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a",
+      "selected_lines": [],
+      "use": "Existing ForcePos handler consulted for velocity/acceleration reset; no new physics imported"
+    }
+  ],
+  "adaptations": [
+    "Owned supported-player engine snapshot and bounded staged cleanup; not a retail save format",
+    "Explicit checked local restored-client identity; no arbitrary saved-name matching or fresh fallback",
+    "First-update movement/stat publication at association before MoveMgr stepping; original raw attributes retained",
+    "Current-world clearance and no active-client replacement; contact references not serialized"
+  ],
+  "remaining": [
+    "Safe cross-world keep-alive entry and full world/client state",
+    "Dead-player/power timers and omitted transient state",
+    "Gideon, required FX/services and actual M2 acceptance"
+  ]
+}
