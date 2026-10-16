@@ -585,6 +585,12 @@ namespace OpenBlood2
                     draw_lights(game, selection);
                     ImGui::EndTabItem();
                 }
+                if (ImGui::BeginTabItem("Sprites", nullptr, select_sprites ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_sprites = false;
+                    draw_sprites(game, selection);
+                    ImGui::EndTabItem();
+                }
                 if (ImGui::BeginTabItem("World sounds", nullptr,
                                         select_world_sounds ? ImGuiTabItemFlags_SetSelected : 0))
                 {

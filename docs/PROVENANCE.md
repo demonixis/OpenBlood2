@@ -395,3 +395,11 @@ bounded full-clip resampling, loader disposition and inspection. Runtime filenam
 initialization is safe; streaming and region metadata explicitly reject playback.
 Later-generation LithTech region-loop code was reviewed only, not imported.
 No prototype backend or dependency was added. M2 remains incomplete.
+
+## DetailSprite and SPR continuation
+
+[Selected original files and hashes](M2_SPRITE_SOURCES.json) document DetailSprite
+properties, initialization and independent repeats. [Contracts](SPRITE_CONTRACTS.md)
+separate original rules from bounded ray/parser/clock adaptations. Later-generation
+SPR references were consulted and checked against Blood II manifests; no donor
+reader or DTX decoder was imported. Save/restore and sprite rendering remain open.

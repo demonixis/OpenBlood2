@@ -59,6 +59,7 @@ class ServerDE : public CSBase
     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
     virtual float GetWorldTime() = 0;
+    virtual OpenBlood2::SegmentResult CastWorldRay(DVector, DVector, OpenBlood2::SegmentHit&) = 0;
     virtual OpenBlood2::SegmentResult IntersectSegment(
         DVector from, DVector to, HOBJECT ignore, OpenBlood2::SegmentHit&, bool fire_through = false,
         OpenBlood2::SegmentObjects objects = OpenBlood2::SegmentObjects::SolidOnly) = 0;

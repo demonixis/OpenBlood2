@@ -1,3 +1,4 @@
+#include "game/original/DetailSprite.h"
 #include "game/original/Sound.h"
 #include "game/server_adapter.h"
 #include <algorithm>
@@ -101,6 +102,12 @@ namespace OpenBlood2
                     entry.state = server.audio.get(sound->sound) ? EntryState::WorldSound : EntryState::Failed;
                     entry.detail =
                         entry.sound ? "Original Sound removed after transferring its loop to the world" : sound->error;
+                }
+                else if (const auto* sprite = r ? dynamic_cast<const DetailSprite*>(r->game.get()) : nullptr;
+                         sprite && !sprite->error.empty())
+                {
+                    entry.state = EntryState::Failed;
+                    entry.detail = sprite->error;
                 }
                 else if (r && dynamic_cast<const B2BaseClass*>(r->game.get()) &&
                          static_cast<const B2BaseClass*>(r->game.get())->filtered)
@@ -334,6 +341,7 @@ namespace OpenBlood2
         server.reset_world_time();
         server_shell.PreStartWorld();
         models.clear();
+        sprites.clear();
         collision.clear();
         server.collision_ready = false;
         server.gravity = {0, -2000, 0};

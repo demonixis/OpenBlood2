@@ -395,6 +395,17 @@ namespace OpenBlood2
                 object->world_model_basis = object->state.m_Rotation;
             }
         }
+        if (state.m_ObjectType == OT_SPRITE)
+        {
+            std::string error = "Sprite services are not attached";
+            if (!sprites || !sprites->load(state.m_Filename, object->sprite, error))
+            {
+                contexts_.pop_back();
+                remove(handle);
+                fail(ObjectError::Unsupported, std::string(state.m_Name) + ": " + error);
+                return nullptr;
+            }
+        }
         if (state.m_ObjectType == OT_MODEL && state.m_Filename[0])
         {
             if (models)

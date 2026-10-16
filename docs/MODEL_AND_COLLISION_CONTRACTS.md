@@ -149,3 +149,11 @@ changes, and grounded FLAG_STAIRSTEP movement uses an up/forward/down sweep.
 The local GetMovementState support query and weapon IntersectSegment are also
 implemented; this does not provide every original PhysicsLT query or moving BSP
 collision. Keep source rules and replacement-solver limitations distinct.
+
+## Sprite resource continuation
+
+[Sprite contracts](SPRITE_CONTRACTS.md) add bounded SPR manifests and per-instance
+frame clocks to the existing active-object animation traversal. No model events
+are synthesized for sprites. CastWorldRay uses the solid primary-world index for
+original DetailSprite flush placement; dynamic objects are excluded by its source
+query flags. DTX decoding/rendering and verified retail ray/timing parity remain open.

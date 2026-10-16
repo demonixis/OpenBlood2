@@ -1,0 +1,104 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "452676e1eba9e19ba37e757cf471090949e68070",
+  "status": "M2 incomplete; original DetailSprite and bounded SPR manifest clocks, no DTX rendering",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/DetailSprite.cpp",
+      "source_line_ranges": [
+        [
+          17,
+          280
+        ]
+      ],
+      "source_sha256": "2a98ed394d5a50ae46a216f929c79ec0ad0434f1ad3bfa1c2035689b43da4f7b",
+      "purpose": "Selected original properties, callbacks, flush ray and independent repeat creation; no save/load."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/DetailSprite.h",
+      "source_line_ranges": [
+        [
+          1,
+          67
+        ]
+      ],
+      "source_sha256": "2c80caebde118277c2b007d112ac1ce2232cb745c53f74956b49ca262528c728",
+      "purpose": "Original class and member defaults; value-owned filename and inspection diagnostics adaptation."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/basetypes_de.h",
+      "source_line_ranges": [
+        [
+          388,
+          400
+        ]
+      ],
+      "source_sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
+      "purpose": "Original OT_SPRITE numeric type."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/de_codes.h",
+      "source_line_ranges": [
+        [
+          117,
+          125
+        ]
+      ],
+      "source_sha256": "75c0fda0c3ea746ff91d05354c7d177d97bbdccb95a22b6955c51d6592f9e21e",
+      "purpose": "Ray flags: IGNORE_NONSOLID without INTERSECT_OBJECTS."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/server_de.h",
+      "source_line_ranges": [
+        [
+          297,
+          304
+        ],
+        [
+          684,
+          700
+        ]
+      ],
+      "source_sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "purpose": "Ray and equivalent SetObjectPos/TeleportObject contracts."
+    },
+    {
+      "source": "sources/lithtech/tools/shared/world/SpriteFile.cpp",
+      "source_line_ranges": [
+        [
+          1,
+          160
+        ]
+      ],
+      "source_sha256": "3221ce13de5023d85e7bee9455d3fb139f9482ab22694b344e3e48601c1821b8",
+      "purpose": "Read-only later-generation SPR layout; verified against actual Blood II manifest bytes, no code import."
+    },
+    {
+      "source": "sources/lithtech/runtime/client/src/sprite.cpp",
+      "source_line_ranges": [
+        [
+          1,
+          182
+        ]
+      ],
+      "source_sha256": "3a1d267c831f4c597ba841eb95e5684fb555a75d02aae2e333d027a4b18d29a7",
+      "purpose": "Read-only later-generation integer millisecond playback reference; not claimed retail Blood II timing."
+    }
+  ],
+  "ports": [
+    "src/game/original/DetailSprite.h",
+    "src/game/original/DetailSprite.cpp"
+  ],
+  "adaptations": [
+    "Value-owned filenames; fixed-width counts with explicit work limits",
+    "Typed solid-primary-world ray with bounded domain and explicit failure",
+    "Bounded SPR parser/cache with exact frame presence; no texture decoder",
+    "Per-instance looping integer-period clock with fractional tick carry",
+    "Durable load failures, independent repeat ownership and truthful inspection"
+  ],
+  "unsupported": [
+    "DTX decoding and sprite world rendering",
+    "Full SpriteControl API, clipping, save/restore",
+    "Retail timing/visual/physics parity and complete M2 acceptance"
+  ]
+}

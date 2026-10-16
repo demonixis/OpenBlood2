@@ -1,6 +1,7 @@
 #pragma once
 
 #include "engine/model.h"
+#include "engine/sprite.h"
 #include "game/legacy/cpp_engineobjects_de.h"
 #include "game/mover_messages.h"
 #include <map>
@@ -103,6 +104,8 @@ namespace OpenBlood2
         MoverResult body_result = MoverResult::Moved;
         bool client_movement = false; // Local MoveMgr owns integration while associated.
         std::shared_ptr<const Model> model;
+        std::shared_ptr<const Sprite> sprite;
+        SpriteTrack sprite_track;
         std::shared_ptr<const ContainerShape> container;
         // Current posed shell plus immutable authored basis for drift-free rotation.
         std::shared_ptr<const ContainerShape> world_model_base;
@@ -125,6 +128,7 @@ namespace OpenBlood2
     {
       public:
         const World* world = nullptr;
+        SpriteStore* sprites = nullptr;
         ModelStore* models = nullptr; // Optional decoded resources, attached before creation.
         Objects() = default;
         ~Objects();

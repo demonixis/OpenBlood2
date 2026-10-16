@@ -1,5 +1,9 @@
 # Resource, World and Session Contracts
 
+The later [sprite contracts](SPRITE_CONTRACTS.md) add original DetailSprite,
+strict SPR manifest/frame-reference binding and durable creation failures. DTX
+pixels remain undecoded; the complete M2 gate stays open.
+
 The later [world sound contracts](WORLD_SOUND_CONTRACTS.md) add the selected built-in
 Sound whole-clip loops and consumed-source accounting. Earlier blanket loop/world
 ownership omissions below are historical; streaming and the M2 gate remain open.

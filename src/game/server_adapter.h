@@ -90,6 +90,7 @@ namespace OpenBlood2
         }
         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
+        SegmentResult CastWorldRay(DVector, DVector, SegmentHit&) override;
         SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false,
                                        SegmentObjects objects = SegmentObjects::SolidOnly) override;
         DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
@@ -266,6 +267,7 @@ namespace OpenBlood2
       public:
         Resources resources;
         ModelStore models{resources};
+        SpriteStore sprites{resources};
         CollisionWorld collision;
         Objects objects;
         ServerAdapter server{objects};
@@ -300,6 +302,7 @@ namespace OpenBlood2
         bool initialize()
         {
             objects.models = &models;
+            objects.sprites = &sprites;
             objects.world = &world;
             server.collision = &collision;
             server.client_resources = &resources;

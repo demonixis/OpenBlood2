@@ -69,7 +69,7 @@ template <std::size_t N> void legacy_copy(char (&to)[N], const char* from)
 #define SAFE_STRCPY(dest, src) legacy_copy(dest, src)
 inline constexpr int MAX_CS_FILENAME_LEN = 100;
 inline constexpr int MAX_GP_STRING_LEN = 200;
-inline constexpr DBYTE OT_NORMAL = 0, OT_MODEL = 1, OT_WORLDMODEL = 2, OT_LIGHT = 4, OT_CONTAINER = 9;
+inline constexpr DBYTE OT_NORMAL = 0, OT_MODEL = 1, OT_WORLDMODEL = 2, OT_SPRITE = 3, OT_LIGHT = 4, OT_CONTAINER = 9;
 inline constexpr DDWORD FLAG_FULLPOSITIONRES = 1u << 8, FLAG_GOTHRUWORLD = 1u << 21, FLAG_FORCECLIENTUPDATE = 1u << 24;
 inline constexpr DDWORD FLAG_MODELGOURAUDSHADE = 1u << 3, FLAG_ANIMTRANSITION = 1u << 7, FLAG_YROTATION = 1u << 11,
                         FLAG_STAIRSTEP = 1u << 18;

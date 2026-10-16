@@ -95,7 +95,11 @@ namespace OpenBlood2
         for (auto id : objects_.snapshot())
         {
             auto* r = objects_.get(id);
-            if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE || !r->model)
+            if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE)
+                continue;
+            if (r->sprite && !advance_sprite(*r->sprite, r->sprite_track, seconds))
+                ok = objects_.fail(ObjectError::InvalidTime, "Invalid sprite clock");
+            if (!r->model)
                 continue;
             std::vector<std::uint32_t> events;
             std::string error;

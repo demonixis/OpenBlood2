@@ -175,3 +175,14 @@ remain unavailable. SubwayA has 166 live-created source entries, 4 transferred
 world sounds, 7 SelfTriggers, 372 editor-only and 38 unported entries. Runtime
 counts remain 173/176 before/after player, 164/167 after nine Keys are consumed.
 Earlier blanket Sound-loop omissions are superseded only for this subset; M2 stays open.
+
+The latest [sprite evidence](../Documentation/Implementation/M2_SPRITES.md) integrates original DetailSprite with bounded
+SPR manifests, frame clocks, flush placement and independent runtime repeats.
+Read [sprite contracts](docs/SPRITE_CONTRACTS.md). Preserve the source's unchanged rotation,
+flush-only repeat branch, column order and post-repeat difficulty filtering.
+DTX resources are indexed, not decoded or rendered; the overlay is diagnostic.
+SubwayA has 178 live-created entries, 4 transferred world sounds, 7 SelfTriggers,
+372 editor-only and 26 unported entries, with no failures. Runtime counts are
+185/188 before/after player entry, then 176/179 after nine Keys are consumed.
+M2 remains incomplete; earlier DetailSprite omissions are superseded only for
+this bounded subset.

@@ -102,7 +102,7 @@ namespace
         out.append(v);
         return out;
     }
-    Writer dat(bool gameplay = false, bool sounds = false)
+    Writer dat(bool gameplay = false, bool sounds = false, bool sprites = false)
     {
         Writer w;
         w.u32(56);
@@ -121,8 +121,19 @@ namespace
         value.real(1.5);
         Writer yes;
         yes.byte(1);
-        w.u32(gameplay || sounds ? 4 : 1);
-        if (sounds)
+        w.u32(sprites ? 6 : gameplay || sounds ? 4 : 1);
+        if (sprites)
+        {
+            Writer no;
+            no.byte(0);
+            w.append(object("DetailSprite", {string_prop("Filename", "valid.spr"), prop("Pos", 1, pos)}));
+            w.append(object("DetailSprite", {string_prop("Filename", "missing.spr")}));
+            w.append(object("DetailSprite", {string_prop("Filename", "bad.spr")}));
+            w.append(object("DetailSprite", {string_prop("Filename", "valid.spr"), prop("DifficultyMed", 5, no)}));
+            w.append(object("DetailSprite", {string_prop("Filename", "valid.spr"), prop("TypeAction", 5, yes)}));
+            w.append(object("DetailSprite", {string_prop("Filename", "frame-missing.spr")}));
+        }
+        else if (sounds)
         {
             w.append(object("Sound", {string_prop("Filename", "cue.wav"), prop("Pos", 1, pos)}));
             w.append(object("Sound", {string_prop("Filename", "missing.wav")}));
@@ -448,6 +459,57 @@ namespace
         CHECK(game.server.list_count() == 0);
         return true;
     }
+    bool sprite_entries(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(test_player::setup(game, root, false));
+        test_player::Directory dir;
+        dir.children["worlds"].files["sprites.dat"] = dat(false, false, true).data;
+        auto spr = [](std::string_view frame)
+        {
+            Writer w;
+            w.u32(1);
+            w.u32(15);
+            w.u32(1);
+            w.u32(0);
+            w.u32(0);
+            w.str(frame);
+            return w.data;
+        };
+        dir.files["valid.spr"] = spr("frame.dtx");
+        dir.files["frame-missing.spr"] = spr("absent.dtx");
+        dir.files["bad.spr"] = {0, 1};
+        dir.files["frame.dtx"] = {0};
+        test_model::Writer archive;
+        archive.b.resize(168);
+        archive.b[0] = archive.b[62] = archive.b[124] = 13;
+        archive.b[1] = archive.b[63] = archive.b[125] = 10;
+        archive.b[126] = 26;
+        archive.patch(127, 1);
+        auto [offset, size] = test_player::write_dir(archive, dir);
+        archive.patch(131, offset);
+        archive.patch(135, size);
+        CHECK(save(root / "spriteworld.rez", archive.b));
+        std::string error;
+        CHECK(game.resources.mount(root / "spriteworld.rez", error));
+        for (unsigned cycle = 0; cycle < 2; ++cycle)
+        {
+            CHECK(game.request_world("sprites", error));
+            CHECK(game.entries.size() == 6 && game.objects.snapshot().size() == 1);
+            CHECK(game.entries[0].state == EntryState::Created && game.entries[3].state == EntryState::Filtered);
+            auto* r = game.objects.get(game.entries[0].object);
+            CHECK(r && r->sprite && r->state.m_Pos.y == 6);
+            std::weak_ptr<const Sprite> weak = r->sprite;
+            for (auto i : {1u, 2u, 4u, 5u})
+                CHECK(game.entries[i].state == EntryState::Failed && !game.entries[i].object &&
+                      !game.entries[i].detail.empty());
+            CHECK(game.entries[4].detail.find("TypeAction") != std::string::npos);
+            CHECK(game.entries[5].detail.find("frame resource") != std::string::npos);
+            CHECK(game.step(.02) && r->sprite_track.milliseconds == 20);
+            CHECK(game.unload_world() && weak.expired());
+        }
+        return true;
+    }
     bool sound_entries(const std::filesystem::path& root)
     {
         GameSession game;
@@ -585,7 +647,7 @@ namespace
         CHECK(game.world.version == 56);
         CHECK(game.world.objects.size() == 580);
         CHECK(game.world.models.size() == 116);
-        CHECK(game.objects.snapshot().size() == 173);
+        CHECK(game.objects.snapshot().size() == 185);
         CHECK(game.world.models[0].points.size() == 4996);
         CHECK(game.world.models[0].polygons.size() == 3367);
         CHECK(game.resources.find(game.world_path)->overrides == 1);
@@ -645,6 +707,8 @@ int main(int argc, char** argv)
             ok = mutations();
         else if (name == "session_lifecycle")
             ok = session_lifecycle(root);
+        else if (name == "sprite_entries")
+            ok = sprite_entries(root);
         else if (name == "sound_entries")
             ok = sound_entries(root);
         else if (name == "session_messages")

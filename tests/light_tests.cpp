@@ -350,8 +350,8 @@ namespace
         for (int cycle = 0; cycle < 2; ++cycle)
         {
             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
-            CHECK(g.objects.snapshot().size() == 176 && g.server.light_effects.size() == 12);
-            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 167);
+            CHECK(g.objects.snapshot().size() == 188 && g.server.light_effects.size() == 12);
+            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 179);
             KeyFramer* path = nullptr;
             for (auto id : g.objects.snapshot())
                 if (auto* f = dynamic_cast<KeyFramer*>(g.objects.get(id)->game.get());

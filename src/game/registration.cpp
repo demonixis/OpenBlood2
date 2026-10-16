@@ -4,6 +4,7 @@
 #include "game/original/CameraSpot.h"
 #include "game/original/CinematicTrigger.h"
 #include "game/original/ClientLightFX.h"
+#include "game/original/DetailSprite.h"
 #include "game/original/Door.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Key.h"
@@ -81,6 +82,20 @@ namespace OpenBlood2
                                        {"IsListener", true},
                                        {"HidePlayer", false},
                                        {"TypeActionMode", false}}};
+        const ClassInfo detail_sprite{"DetailSprite",
+                                      &b2base,
+                                      construct<DetailSprite>,
+                                      {{"Filename", std::string{}},
+                                       {"ScaleX", 1.0f},
+                                       {"ScaleY", 1.0f},
+                                       {"FlushWithWorld", false},
+                                       {"Rotatable", true},
+                                       {"Chromakey", false},
+                                       {"Repeat", false},
+                                       {"RepeatX", std::int32_t(1)},
+                                       {"RepeatY", std::int32_t(1)},
+                                       {"SpacingX", 0.0f},
+                                       {"SpacingY", 0.0f}}};
         const ClassInfo sound{"Sound",
                               &base,
                               construct<Sound>,
@@ -557,8 +572,9 @@ namespace OpenBlood2
                objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
                objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
                objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
-               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
-               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
+               objects.register_class(detail_sprite) && objects.register_class(sound) &&
+               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
+               objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
                objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&

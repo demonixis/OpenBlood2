@@ -26,9 +26,9 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
 ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
 ```
 
-The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **166 source entries** create, including two original RandomSoundFX emitters, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **42 unported runtime entries**, zero failed. Runtime counts before/after player entry are **173/176**, then **164/167** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_RANDOM_SOUNDS.md) records these counts; earlier increment sections below are historical snapshots.
+The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **178 source entries** create, plus **4 transferred world sounds** and **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **26 unported runtime entries**, and zero failed. Runtime counts before/after player entry are **185/188**, then **176/179** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain historical load status. The [latest evidence](../Documentation/Implementation/M2_SPRITES.md) records these counts; earlier sections below are historical snapshots.
 
-The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
+The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Door audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. World textures and a complete game session remain unimplemented; cinematic, random-emitter and world-loop audio are covered by the later continuations below. Sprites shows original placement/repeats, manifest metadata and frame clocks, with a diagnostic overlay; DTX textures are indexed but not decoded.
 
 ## Configuration and Modes
 
@@ -195,10 +195,28 @@ SDL_AUDIODRIVER=dummy ./build/debug/blood2 --random-sounds-smoke --capture build
 
 The [world sound continuation](../Documentation/Implementation/M2_WORLD_SOUNDS.md) adds original built-in Sound loops that
 outlive their consumed source objects, plus inspection and bounded playback checks.
-SubwayA now has 166 live-created entries, 4 world-owned sound entries, 372 editor-only
-and 38 unported entries; runtime counts stay 173/176 before/after player. Streaming
+At that increment, SubwayA had 166 live-created entries, 4 world-owned sound entries, 372 editor-only
+and 38 unported entries; runtime counts were 173/176 before/after player. Streaming
 and historical VoiceType schemas remain unsupported. M2 remains incomplete.
 
 Use `--world-sounds-smoke --capture build/debug/world-sounds.png` with the configured
 content root for the loop ownership/output GPU scenario (silent validation:
 `SDL_AUDIODRIVER=dummy`). Contracts: [world-owned sound](docs/WORLD_SOUND_CONTRACTS.md).
+
+## Original DetailSprite and SPR inspection
+
+The latest [sprite evidence](../Documentation/Implementation/M2_SPRITES.md) integrates original DetailSprite with bounded
+SPR manifests, frame clocks, flush placement and independent runtime repeats.
+Read [sprite contracts](docs/SPRITE_CONTRACTS.md). Preserve the source's unchanged rotation,
+flush-only repeat branch, column order and post-repeat difficulty filtering.
+DTX resources are indexed, not decoded or rendered; the overlay is diagnostic.
+SubwayA has 178 live-created entries, 4 transferred world sounds, 7 SelfTriggers,
+372 editor-only and 26 unported entries, with no failures. Runtime counts are
+185/188 before/after player entry, then 176/179 after nine Keys are consumed.
+M2 remains incomplete; earlier DetailSprite omissions are superseded only for
+this bounded subset.
+
+Use `--sprites-smoke --capture build/debug/sprites.png` with the configured external
+content root to verify the twelve authored sprites, hidden-inspector clocks and
+unload/reload. SPR frames resolve exactly; DTX decoding and world rendering remain
+unavailable. Full gameplay still exits with the explicit M2 gate failure.

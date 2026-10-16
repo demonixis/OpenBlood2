@@ -47,6 +47,11 @@ namespace
         CHECK(options.containers_smoke && options.player_smoke && options.world_smoke && options.world == "02_CityHub");
         const std::array<std::string_view, 2> both_scenarios{"--containers-smoke", "--movement-smoke"};
         CHECK(!parse_options(both_scenarios, options, error));
+        const std::array<std::string_view, 1> sprites{"--sprites-smoke"};
+        CHECK(parse_options(sprites, options, error) && options.sprites_smoke && options.player_smoke &&
+              options.world_smoke);
+        const std::array<std::string_view, 2> conflict_sprites{"--sprites-smoke", "--world-sounds-smoke"};
+        CHECK(!parse_options(conflict_sprites, options, error));
         const std::array<std::string_view, 1> pickups{"--pickups-smoke"};
         CHECK(parse_options(pickups, options, error) && options.pickups_smoke && options.player_smoke &&
               options.world_smoke);
