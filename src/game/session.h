@@ -4,7 +4,7 @@
 
 namespace OpenBlood2
 {
-    inline constexpr DBYTE CMSG_LOADWORLD = 108, LOADTYPE_NEW_GAME = 1;
+    inline constexpr DBYTE CMSG_LOADWORLD = 108, LOADTYPE_NEW_GAME = 1, LOADTYPE_NEW_LEVEL = 2;
     struct WorldRequest
     {
         std::string filename;

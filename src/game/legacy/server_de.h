@@ -96,6 +96,7 @@ class ServerDE : public CSBase
     virtual DRESULT InterpolateRotation(DRotation&, const DRotation&, const DRotation&, float) = 0;
     virtual OpenBlood2::MoverResult MoveKeyframedObject(HOBJECT, DVector, const DRotation*) = 0;
     virtual DDWORD GetObjectUserFlags(HOBJECT) = 0;
+    virtual DRESULT SendWorldExit(const OpenBlood2::WorldExit&, const std::string& start_point) = 0;
     virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
     virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;
     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;

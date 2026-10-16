@@ -1,5 +1,9 @@
 # Original triggers, door SelfTrigger and keys
 
+> Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and
+> shell exit/load messages now execute. NEW_LEVEL still explicitly refuses missing
+> keep-alive transfer before teardown; this is not a completed level transition.
+
 > Extended by [objective contracts](OBJECTIVES_CONTRACTS.md): original mission
 > objective broadcasts and external localized client strings are connected.
 > Other localization/audio/HUD and full M2 acceptance remain pending.

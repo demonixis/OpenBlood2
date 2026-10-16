@@ -11,6 +11,7 @@
 #include "game/original/DetailSprite.h"
 #include "game/original/Door.h"
 #include "game/original/ExitHint.h"
+#include "game/original/ExitTrigger.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/HandWeaponModel.h"
 #include "game/original/Key.h"
@@ -474,6 +475,16 @@ namespace OpenBlood2
                 }
                 return properties;
             }()};
+        const ClassInfo exit_trigger{"ExitTrigger",
+                                     &trigger,
+                                     construct<ExitTrigger>,
+                                     {{"NextWorld", std::string{}},
+                                      {"StartPointName", std::string("start")},
+                                      {"EndEpisode", false},
+                                      {"EndOfEpisode", false, false},
+                                      {"SubWorld", false},
+                                      {"TouchActivate", false},
+                                      {"AIActivate", false}}};
         const ClassInfo objectives_trigger{
             "ObjectivesTrigger",
             &trigger,
@@ -662,11 +673,11 @@ namespace OpenBlood2
                objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
                objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
                objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
-               objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
-               objects.register_class(rotating_brush) && objects.register_class(hand_model) &&
-               objects.register_class(corpse);
+               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
+               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+               objects.register_class(door) && objects.register_class(rotating_door) &&
+               objects.register_class(destructable_brush) && objects.register_class(rotating_brush) &&
+               objects.register_class(hand_model) && objects.register_class(corpse);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

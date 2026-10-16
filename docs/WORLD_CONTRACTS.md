@@ -1,5 +1,9 @@
 # Resource, World and Session Contracts
 
+> Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and
+> shell exit/load messages now execute. NEW_LEVEL still explicitly refuses missing
+> keep-alive transfer before teardown; this is not a completed level transition.
+
 > Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
 > voice helpers, player sound keys and material/liquid footsteps now execute.
 > Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.

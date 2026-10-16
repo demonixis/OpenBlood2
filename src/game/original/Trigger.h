@@ -33,7 +33,7 @@ class Trigger : public B2BaseClass
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
     virtual void SendMessages();
-    void SendMessage(unsigned, const std::string&);
+    virtual void SendMessage(unsigned, const std::string&);
 
   private:
     bool ReadProp();

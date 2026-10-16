@@ -131,6 +131,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client)
     rotation = {};
     physics = {};
     stats = {};
+    world_exit = {};
     objectives = {};
     objectives_error.clear();
     objective_messages = 0;
@@ -161,6 +162,7 @@ void CBloodClientShell::OnExitWorld()
     rotation = {};
     physics = {};
     stats = {};
+    world_exit = {};
     objectives = {};
     objectives_error.clear();
     objective_messages = 0;
@@ -186,6 +188,29 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     ++messages;
     if (std::holds_alternative<OpenBlood2::PlayerInitRequest>(event))
         return InitSinglePlayer(server);
+    if (const auto* value = std::get_if<OpenBlood2::WorldExit>(&event))
+    {
+        ++world_exit.received;
+        // Original HandleExitWorld returns before reading its payload when dead.
+        const auto* original_player = server.Player(client_);
+        if (!original_player)
+            return false;
+        if (original_player->m_damage.IsDead())
+        {
+            ++world_exit.ignored_dead;
+            return true;
+        }
+        world_exit.request = *value;
+        world_exit.error.clear();
+        // StartNewWorld's default difficulty is EASY (0); NEW_LEVEL does not
+        // replace the server's difficulty/game settings. Audio/menu teardown and
+        // loaded-state mutation wait for an accepted transfer in this port.
+        world_exit.pending = OpenBlood2::original_world_request(value->next_world.c_str(), 0,
+                                                                OpenBlood2::LOADTYPE_NEW_LEVEL, 0, world_exit.load);
+        if (!world_exit.pending)
+            world_exit.error = "Invalid data in CBloodClientShell::HandleExitWorld";
+        return true; // A refused exit must not disconnect an intact player.
+    }
     if (const auto* value = std::get_if<OpenBlood2::PlayerRotation>(&event))
         rotation = *value;
     else if (const auto* value = std::get_if<OpenBlood2::PlayerPosition>(&event))

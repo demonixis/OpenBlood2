@@ -1330,7 +1330,7 @@ namespace
                              "gate and reload checked");
             if (options.objectives_smoke)
                 spdlog::info("OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
-                             "unload/reload checked");
+                             "ExitTrigger NEW_LEVEL refusal preserves player/inventory; unload/reload checked");
             if (options.pickups_smoke)
                 spdlog::info("PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked");
             if (options.weapons_smoke)

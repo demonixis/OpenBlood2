@@ -137,7 +137,7 @@ void Trigger::Activate(HOBJECT sender, bool touch)
         for (unsigned i = 0; i < slots.size() && g_pServerDE->IsObjectAlive(m_hObject); ++i)
             if (slots[i].delay != 0)
                 slots[i].pending = true;
-            else
+            else if (!slots[i].target.empty() && !slots[i].message.empty())
                 SendMessage(i, slots[i].message);
     }
     else

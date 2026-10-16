@@ -491,13 +491,13 @@ namespace
                 cultists += a->npc_type == AI_Mgr::NPCType::Cultist;
                 civilians += a->npc_type == AI_Mgr::NPCType::Civilian;
             }
-            CHECK(cultists == 10 && civilians == 5 && failed == 0 && unsupported == 2 && created == 202);
-            CHECK(g.objects.snapshot().size() == 224 && g.enter_player(e) && g.objects.snapshot().size() == 227);
+            CHECK(cultists == 10 && civilians == 5 && failed == 0 && unsupported == 1 && created == 203);
+            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(e) && g.objects.snapshot().size() == 228);
             for (int tick = 0; tick < 600; ++tick)
             {
                 CHECK(g.step(1.0 / 60));
                 if (!tick)
-                    CHECK(g.objects.snapshot().size() == 229 && g.objects.attachments().size() == 11);
+                    CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
             }
             std::uint64_t updates = 0, pings = 0;
             for (auto id : g.objects.snapshot())

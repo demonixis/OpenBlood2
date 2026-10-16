@@ -22,6 +22,11 @@ class CBloodServerShell
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerUse&);
     void Update(float);
     CPlayerObj* Player(HCLIENT);
+    void SetStartPointName(const std::string& name)
+    {
+        start_point_name = name;
+    }
+    std::string start_point_name; // Original CopyString ownership, retained across PreStartWorld.
     PathMgr paths;
     bool world_started = false;
     std::uint64_t updates = 0;
@@ -61,6 +66,14 @@ class CBloodClientShell
     OpenBlood2::PlayerStats stats;
     std::uint64_t messages = 0, updates = 0;
     std::string blocker;
+    struct ExitStatus
+    {
+        OpenBlood2::WorldExit request;
+        OpenBlood2::WorldMessage load;
+        std::string error;
+        std::uint64_t received = 0, ignored_dead = 0, blocked = 0;
+        bool pending = false;
+    } world_exit;
     OpenBlood2::MissionObjectives objectives;
     std::string objectives_error;
     std::uint64_t objective_messages = 0;

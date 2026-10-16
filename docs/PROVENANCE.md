@@ -660,3 +660,14 @@ initial/update/model-key rules. [Source ledger](M2_CORPSE_SOURCES.json) records
 original hashes and selected ranges; [contracts](CORPSE_CONTRACTS.md) distinguish
 source behavior, owned lifetime/rollback adaptations and missing fire/gib/FX
 branches. No donor engine, new dependency or commercial asset was imported.
+
+## M2 level exits
+
+Direct selective import from original Blood II commit
+`006b4aabd3fb348f6846cad03799cf8df685ea95`: ExitTrigger properties/precreate/broadcast,
+Trigger virtual delayed-slot dispatch, BloodServerShell start-name copying and
+BloodClientShell HandleExitWorld request/dead guard. Typed strings/events, checked
+local lifetime and explicit NEW_LEVEL refusal replace unimplemented keep-alive
+services. No prototype code, binary library or commercial asset was imported.
+See [source selections](M2_EXIT_SOURCES.json), [contracts](EXIT_CONTRACTS.md) and
+[validation](../../Documentation/Implementation/M2_EXITS.md).

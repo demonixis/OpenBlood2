@@ -49,6 +49,11 @@ namespace OpenBlood2
             error = "Malformed CMSG_LOADWORLD";
             return false;
         }
+        if (next.game_type == 0 && next.load_type == LOADTYPE_NEW_LEVEL && next.difficulty <= 3)
+        {
+            error = "LOADTYPE_NEW_LEVEL requires original KeepAliveSave/KeepAliveLoad; player transfer is unavailable";
+            return false;
+        }
         if (next.game_type != 0 || next.load_type != LOADTYPE_NEW_GAME || next.difficulty > 3)
         {
             error = "Only a fresh single-player world request is supported; saves/multiplayer are unimplemented";

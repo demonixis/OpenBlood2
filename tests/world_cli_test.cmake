@@ -1,6 +1,6 @@
 execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world
     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
-if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 224 original instances, 116 BSP models")
+if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 225 original instances, 116 BSP models")
     message(FATAL_ERROR "World inspection: ${status}: ${out}${err}")
 endif()
 execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-player
@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
 endif()
 execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 2" OR NOT out MATCHES "remaining mover classes")
+if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 1" OR NOT out MATCHES "remaining mover classes")
     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
 endif()
 execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside

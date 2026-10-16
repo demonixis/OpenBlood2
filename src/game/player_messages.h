@@ -81,6 +81,17 @@ namespace OpenBlood2
         std::uint32_t resource = 0;
         std::string title, text;
     };
-    using PlayerEvent =
-        std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats, MissionObjectives>;
+    enum class WorldExitType : DBYTE
+    {
+        World = 0,
+        Subworld = 1,
+        Episode = 2
+    };
+    struct WorldExit
+    {
+        std::string next_world; // Empty represents the source null HSTRING.
+        WorldExitType type = WorldExitType::World;
+    };
+    using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
+                                     MissionObjectives, WorldExit>;
 } // namespace OpenBlood2

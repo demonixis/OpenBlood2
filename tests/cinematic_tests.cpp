@@ -338,9 +338,9 @@ namespace
             std::map<EntryState, unsigned> counts;
             for (const auto& e : g.entries)
                 ++counts[e.state];
-            CHECK(counts[EntryState::Created] == 202 && counts[EntryState::EditorOnly] == 372 &&
-                  counts[EntryState::Unsupported] == 2 && counts[EntryState::Failed] == 0);
-            CHECK(g.objects.snapshot().size() == 224 && g.enter_player(error) && g.objects.snapshot().size() == 227);
+            CHECK(counts[EntryState::Created] == 203 && counts[EntryState::EditorOnly] == 372 &&
+                  counts[EntryState::Unsupported] == 1 && counts[EntryState::Failed] == 0);
+            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228);
             HOBJECT target = nullptr;
             for (auto id : g.objects.snapshot())
                 if (std::string_view(g.objects.get(id)->state.m_Name) == "cintrig1")
@@ -359,7 +359,7 @@ namespace
             for (unsigned i = 0; i < 6; ++i)
                 CHECK(g.step(1.0 / 60));
             v = g.server.audio.get(id);
-            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 229 &&
+            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 230 &&
                   g.objects.attachments().size() == 11);
             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
                   !g.server.audio.cached_clips() && !g.server.audio.get(id) && !g.server.message_count() &&

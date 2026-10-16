@@ -365,3 +365,11 @@ dimensions versus visual scale, source damage fractions, independent child lifet
 and no-GETHANDLE sound overlap. Failed setup retains the visible actor. Fire/gibs,
 corpse damage/limbs and blood-pool FX remain unavailable; requests are not FX.
 SubwayA counts are unchanged and M2 remains incomplete.
+
+The [level-exit continuation](../Documentation/Implementation/M2_EXITS.md) registers original ExitTrigger and
+connects typed shell exit/load requests. Read [contracts](docs/EXIT_CONTRACTS.md). Preserve
+EndEpisode/EndOfEpisode spelling, start-name copy-before-broadcast, delayed virtual
+slot rules and dead-player early return. NEW_LEVEL explicitly refuses missing
+KeepAliveSave/Load before teardown; do not substitute fresh-game entry or claim a
+completed transfer. SubwayA has 203 created, four transferred sounds, 372 editor-only,
+one unsupported (Gideon), no failures. Required transfer/FX/services keep M2 open.

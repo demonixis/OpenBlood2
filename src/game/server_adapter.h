@@ -144,6 +144,8 @@ namespace OpenBlood2
         MoverResult MoveKeyframedObject(HOBJECT, DVector, const DRotation*) override;
         DRESULT AlignRotation(DRotation&, DVector) override;
         DDWORD GetObjectUserFlags(HOBJECT) override;
+        CBloodServerShell* session_shell = nullptr;
+        DRESULT SendWorldExit(const WorldExit&, const std::string&) override;
         DRESULT SendObjectives(const MissionObjectives&) override;
         bool GetClientResourceString(std::uint32_t, std::string&) override;
         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
@@ -334,6 +336,7 @@ namespace OpenBlood2
             server.collision = &collision;
             server.client_resources = &resources;
             server.ai_paths = &server_shell.paths;
+            server.session_shell = &server_shell;
             return server.bind() && register_original_classes(objects);
         }
         HOBJECT create_example(std::string_view class_name);

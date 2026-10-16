@@ -190,11 +190,25 @@ namespace OpenBlood2
             if (events.empty())
                 return true;
             for (const auto& event : events)
+            {
                 if (!client_shell.OnMessage(event, server_shell))
                 {
                     error = "Original player entry message rejected";
                     return false;
                 }
+                auto& exit = client_shell.world_exit;
+                if (exit.pending)
+                {
+                    exit.pending = false;
+                    // NEW_LEVEL is rejected by the decoder before any teardown:
+                    // original KeepAliveSave/Load has not yet been integrated.
+                    WorldRequest request;
+                    if (!decode_world_request(exit.load, request, exit.error))
+                        ++exit.blocked;
+                    else
+                        return objects.fail(ObjectError::Unsupported, "World exit transfer is unavailable");
+                }
+            }
         }
         error = "Player entry exceeded bounded message rounds";
         return false;
@@ -325,7 +339,7 @@ namespace OpenBlood2
         error = "RunWorld blocked: " + std::to_string(missing) +
                 " uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat "
                 "reactions, "
-                "audio, autosave and remaining mover classes remain unported";
+                "audio, autosave, keep-alive level transfer and remaining mover classes remain unported";
         if (!entry_error.empty())
             error += "; player entry: " + entry_error;
         if (trace.empty() || trace.back() != error)
@@ -349,6 +363,7 @@ namespace OpenBlood2
             AI_Mgr::ResetRuntimeTables();
         server.reset_world_time();
         server_shell.PreStartWorld();
+        server_shell.start_point_name.clear();
         models.clear();
         sprites.clear();
         collision.clear();

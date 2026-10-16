@@ -79,6 +79,9 @@ namespace OpenBlood2
                     return physics_vector(value.position);
                 else if constexpr (std::is_same_v<T, PlayerStats>)
                     return std::isfinite(value.health) && std::isfinite(value.armor) && std::isfinite(value.bullets);
+                else if constexpr (std::is_same_v<T, WorldExit>)
+                    return value.next_world.size() <= 100 && value.next_world.find('\0') == std::string::npos &&
+                           static_cast<DBYTE>(value.type) <= static_cast<DBYTE>(WorldExitType::Episode);
                 else if constexpr (std::is_same_v<T, MissionObjectives>)
                     return value.resource <= 65535 - 6000 + 1 && value.title.size() <= MAX_GP_STRING_LEN &&
                            value.text.size() <= MAX_GP_STRING_LEN && value.title.find('\0') == std::string::npos &&

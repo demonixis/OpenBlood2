@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "bc755e2858fc07100089dc4a06e584b8b3a5970e",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/ExitTrigger.cpp",
+      "sha256": "24f21705c41467b725fee24d15d7cbcc4ff13808c27950fe4da61c269f561e03",
+      "selected_lines": [
+        [
+          20,
+          61
+        ],
+        [
+          72,
+          205
+        ]
+      ],
+      "use": "Registration, properties, precreate and broadcast"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ExitTrigger.h",
+      "sha256": "03a53fddd5a7244d79807224a755a86bf6bcc5387ce11056831300f59dd1ae64",
+      "selected_lines": [],
+      "use": "Virtual SendMessage override and original fields"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Trigger.cpp",
+      "sha256": "373658121f86b4d792eeb986a0e093291af3e1205b831385f142cf2ea445198c",
+      "selected_lines": [
+        [
+          449,
+          491
+        ],
+        [
+          532,
+          588
+        ],
+        [
+          735,
+          778
+        ],
+        [
+          829,
+          869
+        ]
+      ],
+      "use": "Immediate versus delayed dispatch and reset rules"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "selected_lines": [
+        [
+          806,
+          817
+        ],
+        [
+          828,
+          1000
+        ],
+        [
+          1142,
+          1210
+        ]
+      ],
+      "use": "Start-point copy, load request read order and audited unavailable keep-alive dependency"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "selected_lines": [
+        [
+          6222,
+          6330
+        ]
+      ],
+      "use": "Dead guard, exit request, NEW_LEVEL and message field order"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BloodClientShell.h",
+      "sha256": "00c217428619071a260d2b1e9b44c5b828ee2ef5e4a860c7ea3cdd9964b34649",
+      "selected_lines": [
+        [
+          146,
+          146
+        ]
+      ],
+      "use": "StartNewWorld default difficulty"
+    },
+    {
+      "path": "sources/blood2/Shared/ClientServerShared.h",
+      "sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
+      "selected_lines": [
+        [
+          42,
+          45
+        ]
+      ],
+      "use": "Exit type identifiers"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "selected_lines": [
+        [
+          537,
+          541
+        ],
+        [
+          564,
+          574
+        ]
+      ],
+      "use": "Load mode and default difficulty"
+    }
+  ]
+}

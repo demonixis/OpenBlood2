@@ -649,7 +649,7 @@ namespace
         CHECK(game.world.version == 56);
         CHECK(game.world.objects.size() == 580);
         CHECK(game.world.models.size() == 116);
-        CHECK(game.objects.snapshot().size() == 224);
+        CHECK(game.objects.snapshot().size() == 225);
         CHECK(game.world.models[0].points.size() == 4996);
         CHECK(game.world.models[0].polygons.size() == 3367);
         CHECK(game.resources.find(game.world_path)->overrides == 1);
@@ -667,7 +667,7 @@ namespace
                 std::cout << "No-player NPC " << game.objects.get(id)->state.m_Name << ": " << a->runtime_error << '\n';
             }
         CHECK(suspended == 3);
-        CHECK(game.server.service_calls["SetObjectDims"] == 53);
+        CHECK(game.server.service_calls["SetObjectDims"] == 54);
         CHECK(game.server.service_calls["GetPropGeneric"] > 0);
         for (const auto& [name, count] : game.server.service_calls)
             std::cout << "Service " << name << ": " << count << '\n';

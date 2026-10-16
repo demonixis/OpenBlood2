@@ -1,5 +1,9 @@
 # Original Player Entry Boundary
 
+> Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and
+> shell exit/load messages now execute. NEW_LEVEL still explicitly refuses missing
+> keep-alive transfer before teardown; this is not a completed level transition.
+
 > Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
 > candidate lists and stimulus/target selection now execute. Automatic NPC states
 > and complete M2 remain unavailable; earlier acquisition omissions are historical.

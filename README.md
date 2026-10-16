@@ -1,6 +1,11 @@
 # Blood II Reconstruction aka OpenBlood2
 
-Latest continuation: [ordinary NPC death and CCorpse](../Documentation/Implementation/M2_CORPSES.md)
+Latest continuation: [original ExitTrigger and shell exit requests](../Documentation/Implementation/M2_EXITS.md).
+SubwayA now has one unported entry (Gideon). NEW_LEVEL still requires unavailable
+KeepAliveSave/Load and is explicitly refused while retaining the current player and
+inventory. Earlier ExitTrigger omissions below are historical; **M2 remains open**.
+
+Previous continuation: [ordinary NPC death and CCorpse](../Documentation/Implementation/M2_CORPSES.md)
 connects independent animated corpses and real model-key sounds. Earlier blanket
 corpse omissions below are historical. Fire/gibs, corpse damage, required FX,
 Gideon and ExitTrigger still keep M2 incomplete.

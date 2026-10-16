@@ -1,4 +1,5 @@
 #include "app/inspector.h"
+#include "game/original/ExitTrigger.h"
 #include "game/original/ObjectivesTrigger.h"
 #include <imgui.h>
 namespace OpenBlood2
@@ -16,6 +17,44 @@ namespace OpenBlood2
     } // namespace
     void Inspector::draw_objectives(GameSession& game, ObjectSelection& selection)
     {
+        if (ImGui::CollapsingHeader("Original level exits", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& exit = game.client_shell.world_exit;
+            ImGui::Text("Received %llu / dead ignored %llu / transfer blocked %llu", (unsigned long long)exit.received,
+                        (unsigned long long)exit.ignored_dead, (unsigned long long)exit.blocked);
+            ImGui::TextWrapped("Requested world: %s / type %u / server start: %s", exit.request.next_world.c_str(),
+                               static_cast<unsigned>(exit.request.type), game.server_shell.start_point_name.c_str());
+            ImGui::TextWrapped("%s", exit.error.empty() ? "No transfer attempted; KeepAliveSave/Load unavailable."
+                                                        : exit.error.c_str());
+            for (auto id : game.objects.snapshot())
+            {
+                const auto* record = game.objects.get(id);
+                const auto* trigger = record ? dynamic_cast<const ExitTrigger*>(record->game.get()) : nullptr;
+                if (!trigger)
+                    continue;
+                ImGui::PushID(static_cast<int>(id.slot));
+                if (ImGui::Selectable(record->state.m_Name, selection.id == id))
+                    selection.id = id;
+                ImGui::TextWrapped("%s / %s; next %s / start %s / type %u", trigger->active ? "active" : "inactive",
+                                   record->state.m_Flags & FLAG_VISIBLE ? "visible" : "hidden",
+                                   trigger->exit.next_world.c_str(), trigger->start_point.c_str(),
+                                   static_cast<unsigned>(trigger->exit.type));
+                ImGui::Text("Broadcast attempts %llu / queued %llu / result %d", (unsigned long long)trigger->attempts,
+                            (unsigned long long)trigger->deliveries, trigger->last_delivery);
+                ImGui::Text("Player %d / object %d / relay %d / delay %.2fs / rejected %llu", trigger->player_activate,
+                            trigger->object_activate, trigger->relay_activate, trigger->max_delay,
+                            (unsigned long long)trigger->rejected);
+                ImGui::BeginDisabled(!game.local_client || !trigger->player_activate);
+                if (ImGui::Button("Send exit TRIGGER as player"))
+                {
+                    trigger_request = id;
+                    trigger_command = "TRIGGER";
+                }
+                ImGui::EndDisabled();
+                ImGui::PopID();
+            }
+            ImGui::Separator();
+        }
         ImGui::TextWrapped("Original mission objectives. Localized text comes from external cres.dll; '|' marks a line "
                            "break. Audio and original HUD remain pending.");
         if (!ImGui::BeginTable("Objectives", 2, ImGuiTableFlags_Resizable))
