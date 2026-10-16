@@ -120,5 +120,50 @@ DDWORD AI_Mgr::EngineMessageFn(DDWORD message, void* data, DFLOAT value)
         target_position_valid = false;
         ++target_link_breaks;
     }
+    if (message == MID_LINKBROKEN && data == m_hTrackObject && m_hTrackObject)
+    {
+        m_hTrackObject = nullptr;
+        tracked_position_valid = false;
+        ++tracked_invalidations;
+    }
     return CBaseCharacter::EngineMessageFn(message, data, value);
+}
+
+// Source Escape states assign a non-owning track identity without creating a link.
+// Stable checked tokens also handle removal when no MID_LINKBROKEN can be emitted.
+bool AI_Mgr::SetTrackedObject(HOBJECT object)
+{
+    auto* server = GetServerDE();
+    if (!server || !server->IsObjectAlive(m_hObject) ||
+        (object && (object == m_hObject || !server->IsObjectAlive(object))))
+        return TargetFailure("Tracked assignment requires distinct live objects");
+    m_hTrackObject = object;
+    tracked_position_valid = false;
+    ++tracked_changes;
+    return true;
+}
+HOBJECT AI_Mgr::GetTrackedObject() const
+{
+    auto* server = GetServerDE();
+    return server && server->IsObjectAlive(m_hObject) && server->IsObjectAlive(m_hTrackObject) ? m_hTrackObject
+                                                                                               : nullptr;
+}
+bool AI_Mgr::RefreshTrackedPosition()
+{
+    auto* server = GetServerDE();
+    const auto object = GetTrackedObject();
+    DVector position;
+    if (!object || server->GetObjectPos(object, &position) != DE_OK)
+    {
+        tracked_position_valid = false;
+        if (!object && m_hTrackObject)
+        {
+            m_hTrackObject = nullptr;
+            ++tracked_invalidations;
+        }
+        return TargetFailure("Tracked pose unavailable; historical coordinates retained");
+    }
+    m_vTrackObjPos = position;
+    tracked_position_valid = true;
+    return true;
 }

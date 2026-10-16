@@ -252,6 +252,12 @@ bool AI_Mgr::DispatchState()
         Metacmd = 1;
     switch (m_nState)
     {
+        case StateEscapeRun:
+            return AI_STATE_Escape_RunAway();
+        case StateEscapeHide:
+            return AI_STATE_Escape_Hide();
+        case StateGuard:
+            return AI_STATE_GuardLocation();
         case StateJumpOver:
             return AI_STATE_JumpOverObj();
         case StateCrawlUnder:

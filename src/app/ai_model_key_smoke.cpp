@@ -9,6 +9,29 @@ namespace OpenBlood2
 {
     namespace
     {
+        // Isolated original flee/hide driver. It stops scheduling once beg begins;
+        // model clocks and physics continue normally, independent of inspection.
+        class AIEscapeProbe : public CivilianAI
+        {
+          public:
+            HOBJECT diagnostic_hint = nullptr;
+            bool beg_started = false;
+
+          private:
+            DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
+            {
+                if (m == MID_UPDATE)
+                {
+                    bool ok = true;
+                    if (m_nState == StateEscapeHide && !GetTarget())
+                        ok = SetNewTarget(diagnostic_hint) && RefreshTargetPosition();
+                    ok = ok && DispatchState();
+                    beg_started = ok && m_nState == StateEscapeHide && m_nCurMetacmd == 17;
+                    GetServerDE()->SetNextUpdate(m_hObject, ok && !beg_started ? .001f : 0);
+                }
+                return CivilianAI::EngineMessageFn(m, d, f);
+            }
+        };
         // Explicit original script-state driver, not the complete AI_Update.
         class AIFollowProbe : public AI_Mgr
         {
@@ -96,6 +119,56 @@ namespace OpenBlood2
             }
         };
     } // namespace
+    bool prepare_ai_escape_smoke(GameSession& g, ObjectId& id)
+    {
+        static const ClassInfo type{"AIEscapeProbe",
+                                    g.objects.find_class("CBaseCharacter"),
+                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AIEscapeProbe>(); },
+                                    {}};
+        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
+            return false;
+        ObjectCreateStruct state;
+        state.m_ObjectType = OT_MODEL;
+        state.m_Pos = {3000, 10000, 0};
+        SAFE_STRCPY(state.m_Name, "Civilian escape/beg probe (no full AI_Update)");
+        SAFE_STRCPY(state.m_Filename, "models/enemies/f_civilian1.abc");
+        const auto h = g.objects.create(&type, state);
+        auto* r = g.objects.get(h);
+        auto* a = r ? dynamic_cast<AIEscapeProbe*>(r->game.get()) : nullptr;
+        auto table = std::make_shared<CAnim_Sound>();
+        if (!a || !r->model || !table->SetAnimationIndexes(h) || !a->InitStatics(table) ||
+            !a->SetAnimation(table->m_nAnim_RUN[TYPE_MELEE]) || !a->m_MoveObj.Init(h))
+            return false;
+        a->m_damage.Init(h);
+        a->m_damage.m_fHitPoints = a->m_damage.m_fMaxHitPoints = 100;
+        a->m_fSeeingDist = 200;
+        a->m_fRunSpeed = 120;
+        a->m_szAIState = "HIDE";
+        ObjectCreateStruct hint;
+        hint.m_Pos = vector_add(r->state.m_Pos, {0, 0, 60});
+        hint.m_Flags = FLAG_RAYHIT;
+        SAFE_STRCPY(hint.m_Name, "Diagnostic ray-hit ExitHint (authored flags unchanged)");
+        const auto exit = g.objects.create(g.objects.find_class("ExitHint"), hint);
+        DVector dims{2, 2, 2};
+        if (!exit || g.server.SetObjectDims(exit, &dims) != DE_OK || !a->SetNewState(AI_Mgr::StateEscapeRun))
+            return false;
+        a->diagnostic_hint = exit;
+        a->m_vTargetPos = vector_add(r->state.m_Pos, {0, 0, -60});
+        id = r->id;
+        g.server.SetNextUpdate(h, .001f);
+        return true;
+    }
+    bool check_ai_escape_smoke(GameSession& g, ObjectId id)
+    {
+        const auto* r = g.objects.get(id);
+        const auto* a = r ? dynamic_cast<const AIEscapeProbe*>(r->game.get()) : nullptr;
+        return a && a->beg_started && a->m_nState == AI_Mgr::StateEscapeHide && a->m_nCurMetacmd == 17 &&
+               a->GetTrackedObject() == a->diagnostic_hint && a->GetTarget() == a->diagnostic_hint &&
+               a->navigation_arrivals == 1 && a->navigation_updates > 4 && a->navigation_failures == 0 &&
+               a->locomotion_failures == 0 && a->state_failures == 0 && !a->navigation_plan_failed &&
+               a->m_MoveObj.path().empty() && r->state.m_Pos.z > 40 && std::abs(r->velocity.x) > 0 &&
+               r->animation.time > 0 && r->model && r->animation.animation < r->model->animations.size();
+    }
     bool prepare_ai_follow_smoke(GameSession& g, ObjectId& id)
     {
         static const ClassInfo type{"AIFollowProbe",

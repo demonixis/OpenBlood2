@@ -96,3 +96,7 @@ it does not replace ComputeStimuli or assert complete NPC decisions. Private tes
 attempt all four command clips on six real NPC models without substituting missing
 animations. GetPointShade/FindPosAroundObj, smell following, escape/recoil/death,
 complete NPC initialization/update, required client FX and ExitTrigger remain open.
+
+The [escape/guard continuation](AI_ESCAPE_CONTRACTS.md) supplies selected original
+escape/hide/guard and beg bodies, plus checked non-owning tracking. Earlier blanket
+omissions for those bodies are superseded; full NPC initialization/update remains open.

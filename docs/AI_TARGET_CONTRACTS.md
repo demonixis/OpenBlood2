@@ -107,3 +107,7 @@ CivilianAI, CultistAI, Gideon, ExitTrigger, required client FX and other service
 keep --start-game at exit 6. Autonomous target acquisition/retention, death/state
 transitions, script execution, navigation, attacks, track/smell links and retail,
 other-platform or XR parity remain unverified/unimplemented.
+
+The [escape/guard continuation](AI_ESCAPE_CONTRACTS.md) supplies selected original
+escape/hide/guard and beg bodies, plus checked non-owning tracking. Earlier blanket
+omissions for those bodies are superseded; full NPC initialization/update remains open.

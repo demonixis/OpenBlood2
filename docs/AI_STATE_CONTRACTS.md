@@ -152,3 +152,7 @@ The [AI recovery/navigation continuation](AI_RECOVERY_CONTRACTS.md) now executes
 jump/crouch/crawl and seven destination/recovery/visual-search states. Earlier
 blanket omissions for those bodies are superseded. Failed partial routes remain
 unusable; shade recovery, other states and full production AI_Update remain open.
+
+The [escape/guard continuation](AI_ESCAPE_CONTRACTS.md) supplies selected original
+escape/hide/guard and beg bodies, plus checked non-owning tracking. Earlier blanket
+omissions for those bodies are superseded; full NPC initialization/update remains open.

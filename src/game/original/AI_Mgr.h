@@ -158,6 +158,18 @@ class AI_Mgr : public CBaseCharacter
     bool SetNewState(int);
     bool StopVelocity();
     bool SetAnimation(DDWORD);
+    bool MC_Taunt_Beg();
+    virtual bool AI_STATE_Escape_RunAway();
+    virtual bool AI_STATE_Escape_Hide();
+    bool AI_STATE_GuardLocation();
+    bool SetTrackedObject(HOBJECT);
+    bool RefreshTrackedPosition();
+    HOBJECT GetTrackedObject() const;
+    DVector m_vGuardPos{};
+    float m_fRollSpeed = 2;
+    bool tracked_position_valid = false;
+    std::uint64_t tracked_changes = 0, tracked_invalidations = 0, escape_updates = 0;
+    float escape_hint_dot = 0;
     bool MC_Jump();
     bool MC_Crouch();
     bool MC_Crawl();
@@ -396,6 +408,8 @@ class AI_Mgr : public CBaseCharacter
     bool TriggerFailure(const char*);
     bool StateFailure(const char*);
     bool AnimationCommand(DDWORD clip, int command);
+    bool EscapeRun(bool civilian);
+    bool EscapeHide();
     bool OnStringKey(ArgList*) override;
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
 
@@ -407,6 +421,9 @@ class AI_Mgr : public CBaseCharacter
     bool navigation_busy = false;
     bool NavigationState(int);
     bool NavigationStep(int);
+    bool EscapeRunStep(bool civilian);
+    bool EscapeHideStep();
+    bool GuardStep();
     bool NavigationDecision(int stimulus = -1);
     bool NavigationFailure(std::string_view);
     bool script_busy = false;
@@ -428,6 +445,7 @@ class AI_Mgr : public CBaseCharacter
     static void InitLists();
     int PerceptionFailure(const char*);
     HOBJECT m_hTarget = nullptr;
+    HOBJECT m_hTrackObject = nullptr;
     bool TargetFailure(const char*);
     // Original subclasses share class/gender tables and their retained voice.
     // Shared ownership replaces a borrowed pointer, preserving sharing safely.

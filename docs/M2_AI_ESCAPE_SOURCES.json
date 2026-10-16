@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "fe59a9e460a3e8a774d1e264cd8de0687ffebc62",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          121,
+          121
+        ],
+        [
+          138,
+          138
+        ],
+        [
+          716,
+          728
+        ],
+        [
+          2220,
+          2221
+        ],
+        [
+          5355,
+          5379
+        ],
+        [
+          6275,
+          6352
+        ]
+      ],
+      "use": "Checked track identity/sample and original link-break branch; roll default, beg and guard bodies. Full Init/AI_Update not imported."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CultistAI.cpp",
+      "sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
+      "selected_lines": [
+        [
+          55,
+          55
+        ],
+        [
+          460,
+          555
+        ]
+      ],
+      "use": "Selected roll default and escape/hide bodies"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
+      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
+      "selected_lines": [
+        [
+          59,
+          59
+        ],
+        [
+          374,
+          485
+        ]
+      ],
+      "use": "Selected roll default and escape/hide bodies"
+    }
+  ],
+  "adaptations": [
+    "Shared escape/hide plumbing retains class-specific filters, cache and phase rules",
+    "Typed non-owning track identity with no new engine link; stale sample handling and impact sample invalidation",
+    "Required clip/query/resize/lifetime failures reject instead of unchecked continuation",
+    "Existing failed-plan latch also protects guard/escape routes",
+    "Diagnostic drivers only; authored hint flags, production class registry and dependencies unchanged"
+  ]
+}

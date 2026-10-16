@@ -263,6 +263,11 @@ namespace
         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
             return 4;
         const auto original_ai_follow = smoke_ai_follow;
+        OpenBlood2::ObjectId smoke_ai_escape{};
+        bool ai_escape_hidden = false;
+        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_escape_smoke(game, smoke_ai_escape))
+            return 4;
+        const auto original_ai_escape = smoke_ai_escape;
         bool ai_sight_hidden = false;
         bool ai_target_hidden = false;
         bool hand_hidden = false;
@@ -327,7 +332,7 @@ namespace
         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
         inspector.select_skeleton = options.skeleton_smoke;
         if (options.skeleton_smoke)
-            inspector.skeleton_selection = smoke_ai_follow;
+            inspector.skeleton_selection = smoke_ai_escape;
         inspector.select_containers = options.containers_smoke;
         inspector.select_brushes = options.brushes_smoke;
         inspector.select_pickups = options.pickups_smoke;
@@ -551,6 +556,8 @@ namespace
                 ai_fire_hidden |= OpenBlood2::check_ai_fire_smoke(game, smoke_ai_fire);
             if (options.skeleton_smoke && !inspector_visible)
                 ai_follow_hidden |= OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
+            if (options.skeleton_smoke && !inspector_visible)
+                ai_escape_hidden |= OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
             if (options.skeleton_smoke && !inspector_visible)
                 ai_state_hidden |= OpenBlood2::check_ai_state_smoke(game, smoke_ai_state);
             if (options.skeleton_smoke && !inspector_visible)
@@ -1055,6 +1062,8 @@ namespace
             bool ai_target_reentered = !options.skeleton_smoke;
             if (options.skeleton_smoke)
             {
+                if (game.objects.get(original_ai_escape) || !OpenBlood2::prepare_ai_escape_smoke(game, smoke_ai_escape))
+                    return 4;
                 // Start the independent route before the existing key/state/fire clocks.
                 // Its longer script + navigation sequence must not inherit the shot-only deadline.
                 if (game.objects.get(original_ai_follow) || !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
@@ -1121,6 +1130,11 @@ namespace
                                      a->navigation_arrivals, a->navigation_failures, a->m_MoveObj.path().size(),
                                      a->navigation_error);
                 if (!ai_follow_hidden || !reentered)
+                    return 4;
+                const bool escape_reentered = OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
+                spdlog::info("AI escape/beg: hidden={}, reentered={}, old identity invalidated={}", ai_escape_hidden,
+                             escape_reentered, !game.objects.get(original_ai_escape));
+                if (!ai_escape_hidden || !escape_reentered)
                     return 4;
             }
             bool hand_reentered = !options.skeleton_smoke;

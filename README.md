@@ -398,3 +398,15 @@ initialization/AI_Update, required FX and ExitTrigger keep M2 incomplete.
 AI recovery/navigation verification: 447/447 Debug and inspector-free Release
 checks (27 GPU each), plus 134 targeted ASan/UBSan/leak checks.
 See [evidence](../Documentation/Implementation/M2_AI_RECOVERY.md).
+
+The [AI escape/guard continuation](../Documentation/Implementation/M2_AI_ESCAPE.md) connects original Cultist/Civilian
+escape/hide, GuardLocation and the lateral beg command. Read [contracts](docs/AI_ESCAPE_CONTRACTS.md).
+Preserve class-specific hint filters, preceding cached facing, current civilian
+dimensions, guard ledge order and residual velocity. Tracking is a checked non-owning
+identity, not a new engine link. Diagnostic ray-hit hints do not change authored
+marker flags. Earlier escape/guard-body omissions are superseded; smell/recoil/death,
+full NPC initialization/AI_Update, required FX and ExitTrigger keep M2 incomplete.
+
+AI escape/guard verification: 458/458 Debug and inspector-free Release checks
+(27 GPU each), plus 145 targeted ASan/UBSan/leak checks.
+See [evidence](../Documentation/Implementation/M2_AI_ESCAPE.md).

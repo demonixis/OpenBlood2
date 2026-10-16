@@ -604,3 +604,13 @@ checked failure/lifetime paths and the failed-plan latch are documented adaptati
 See [contracts](AI_RECOVERY_CONTRACTS.md) and
 [evidence](../../Documentation/Implementation/M2_AI_RECOVERY.md). Dependencies,
 reference trees and commercial assets are unchanged; full NPCs remain unavailable.
+
+## M2 AI escape, hiding and guard
+
+Donor: `sources/blood2` at `006b4aabd3fb348f6846cad03799cf8df685ea95`.
+[Source selections](M2_AI_ESCAPE_SOURCES.json) cover Cultist/Civilian escape/hide,
+AI_Mgr beg/guard and selected track handling. Shared plumbing preserves the distinct
+source rules. [Contracts](AI_ESCAPE_CONTRACTS.md) separate safety adaptations,
+diagnostic hint flags and selected defaults from still-missing full NPC initialization.
+[Evidence](../../Documentation/Implementation/M2_AI_ESCAPE.md) records Linux checks.
+Reference repositories, commercial assets and pinned dependencies are unchanged.

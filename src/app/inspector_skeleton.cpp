@@ -60,6 +60,21 @@ namespace OpenBlood2
         const auto* r = game.objects.get(skeleton_selection);
         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
+        if (target_ai && ImGui::CollapsingHeader("Original escape and guard", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& a = *target_ai;
+            ImGui::TextWrapped(
+                "Original Civilian/Cultist flee/hide and Guard. Diagnostic drivers are not full NPC AI_Update.");
+            const auto* tracked = game.objects.get(a.GetTrackedObject());
+            ImGui::TextWrapped("Tracked: %s", tracked ? tracked->state.m_Name : "none/pending/removed");
+            ImGui::Text("Sampled object position: %s", tracked && a.tracked_position_valid ? "yes (cached)" : "no");
+            ImGui::Text("Track position (%.2f %.2f %.2f)", a.m_vTrackObjPos.x, a.m_vTrackObjPos.y, a.m_vTrackObjPos.z);
+            ImGui::Text("Guard position (%.2f %.2f %.2f)", a.m_vGuardPos.x, a.m_vGuardPos.y, a.m_vGuardPos.z);
+            ImGui::Text("Hint dot %.3f | roll speed %.2f | escape/hide updates %llu", a.escape_hint_dot, a.m_fRollSpeed,
+                        (unsigned long long)a.escape_updates);
+            ImGui::Text("Track assignments %llu | invalidations %llu", (unsigned long long)a.tracked_changes,
+                        (unsigned long long)a.tracked_invalidations);
+        }
         if (target_ai && ImGui::CollapsingHeader("Original navigation and recovery", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& a = *target_ai;

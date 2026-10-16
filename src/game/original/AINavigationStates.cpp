@@ -50,6 +50,8 @@ bool AI_Mgr::NavigationStep(int state)
                                                            : MC_Crawl();
         return ok || NavigationFailure(locomotion_error);
     }
+    if (state == StateGuard)
+        return GuardStep();
     const bool search = state == StateSearchVisual;
     const bool around = state == StateWalkAround || state == StateRunAround;
     const bool run = search || state == StateRunAround || state == StateRunTo;

@@ -5,6 +5,18 @@
 class CultistAI : public AI_Mgr
 {
   public:
+    CultistAI()
+    {
+        m_fRollSpeed = 105;
+    } // Selected original constructor default.
+    bool AI_STATE_Escape_RunAway() override
+    {
+        return EscapeRun(false);
+    }
+    bool AI_STATE_Escape_Hide() override
+    {
+        return EscapeHide();
+    }
     bool ComputeState(int stimulus = -1) override;
     bool AI_STATE_AttackClose() override;
     bool AI_STATE_AttackFar() override;

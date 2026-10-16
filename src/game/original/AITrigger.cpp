@@ -203,6 +203,7 @@ bool AI_Mgr::HandleTrigger(HOBJECT sender, std::string_view text)
                     !number(args[4], point.z) || !OpenBlood2::physics_vector(point))
                     return TriggerFailure("Invalid gun-impact coordinates");
                 m_vTrackObjPos = heard_position = point; // Source does not apply hearing distance to impacts.
+                tracked_position_valid = false;          // This is an impact location, not a tracked-object sample.
                 if (!SetNewState(StateDodge))
                     return TriggerFailure(state_error.c_str());
                 trigger_outcome = TriggerOutcome::Heard;
