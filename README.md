@@ -527,3 +527,6 @@ Earlier fire-audio omissions are superseded for these two weapons; reverb, safe 
 
 The [weapon impact continuation](../Documentation/Implementation/M2_WEAPON_IMPACTS.md) connects original glass/FireThrough/liquid vector rules, material WAV playback and impact hearing, with ordered contact inspection.
 Earlier impact-audio omissions are superseded for Beretta/knife; impact visuals, safe NEW_LEVEL and the actual M2 gate remain open.
+
+The [weapon impact sprite continuation](../Documentation/Implementation/M2_WEAPON_SPRITES.md) connects original wood/stone flashes and smoke with tint, detached lifetime and in-game inspection.
+Other impact components remain unavailable. User playtest fixes (mouse look/fire, non-attacking NPCs, train glass) take priority over more FX; M2 stays open.

@@ -445,6 +445,7 @@ namespace OpenBlood2
         ok = objects.refresh_attachments() && ok;
         ok = server.advance_lights() && ok;
         ok = server.explosion_sprites.advance(objects.time()) && ok;
+        ok = server.weapon_sprites.advance(objects.time()) && ok;
         ok = server.explosion_models.advance(objects.time()) && ok;
         ok = server.explosion_lights.advance(objects.time()) && ok;
         ok = server.explosion_rings.advance(objects.time()) && ok;

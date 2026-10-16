@@ -35,11 +35,11 @@ namespace OpenBlood2
         return true;
     }
     bool SpriteView::add(const Sprite* sprite, const SpriteTrack& track, NodePose pose, DVector scale, DDWORD flags,
-                         ObjectId object, const Resources& resources, std::string& error, float alpha)
+                         ObjectId object, const Resources& resources, std::string& error, float alpha, DVector color)
     {
         const std::string_view path =
             sprite && track.frame < sprite->frames.size() ? sprite->frames[track.frame] : std::string_view{};
-        return add_frame(path, track.frame, pose, scale, flags, object, resources, error, alpha, {1, 1, 1}, false);
+        return add_frame(path, track.frame, pose, scale, flags, object, resources, error, alpha, color, false);
     }
     bool SpriteView::add_particle(std::string_view path, DVector position, float extent, DVector color, float alpha,
                                   std::uint64_t system, unsigned index, const Resources& resources, std::string& error)
@@ -144,7 +144,7 @@ namespace OpenBlood2
         if (!physics_vector(color) || color.x < 0 || color.x > 1 || color.y < 0 || color.y > 1 || color.z < 0 ||
             color.z > 1)
         {
-            entry.error = "Invalid particle color";
+            entry.error = "Invalid sprite color";
             return true;
         }
         const float x = direct_extent ? scale.x : float(entry.width) * scale.x;

@@ -22,6 +22,20 @@ namespace OpenBlood2
                 return false;
             scene.entries.back().client_effect = fx.id;
         }
+        for (const auto& fx : game.server.weapon_sprites.flashes)
+        {
+            if (!scene.add(fx.sprite.get(), fx.track, {fx.settings.position, fx.rotation}, fx.scale, fx.flags, {},
+                           game.resources, error, fx.alpha))
+                return false;
+            scene.entries.back().weapon_effect = fx.id;
+        }
+        for (const auto& fx : game.server.weapon_sprites.smoke)
+        {
+            if (!scene.add(fx.sprite.get(), fx.track, {fx.position, {}}, fx.scale, fx.flags, {}, game.resources, error,
+                           fx.alpha, fx.color))
+                return false;
+            scene.entries.back().weapon_effect = fx.id;
+        }
         for (const auto& fx : game.server.explosion_rings.active)
             for (unsigned i = 0; i < fx.particles.size(); ++i)
             {

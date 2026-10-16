@@ -13,6 +13,7 @@
 #include "game/original/LightFX.h"
 #include "game/player_restore.h"
 #include "game/session.h"
+#include "game/weapon_sprites.h"
 #include "game/world_preparation.h"
 #include <array>
 #include <optional>
@@ -83,6 +84,8 @@ namespace OpenBlood2
         void RecordDebrisEffect(const DebrisEffect&) override;
         std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         ExplosionSprites explosion_sprites;
+        WeaponSprites weapon_sprites;
+        std::uint64_t PublishWeaponSprites(HOBJECT, const WeaponSpriteSettings&, std::string&) override;
         ExplosionModels explosion_models;
         ExplosionLights explosion_lights;
         ExplosionRings explosion_rings;
@@ -103,7 +106,7 @@ namespace OpenBlood2
         bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
         MoverResult MoveWorldModel(HOBJECT, DVector destination) override;
         MoverResult RotateWorldModel(HOBJECT, const RotationMove&) override;
-        bool GetPointContainerCode(DVector, ContainerCode&) override;
+        bool GetPointContainerCode(DVector, ContainerCode&, bool visible_only = false) override;
         bool GetContainers(HOBJECT, DVector head, ContainerState&) override;
         bool damage_containers();
         float GetWorldTime() override
@@ -120,6 +123,7 @@ namespace OpenBlood2
             explosion_effects.clear();
             scene_explosions.clear();
             explosion_sprites.clear();
+            weapon_sprites.clear();
             explosion_models.clear();
             explosion_lights.clear();
             explosion_rings.clear();

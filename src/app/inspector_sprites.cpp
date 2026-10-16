@@ -9,6 +9,7 @@ namespace OpenBlood2
         ImGui::TextWrapped("Original DetailSprite placement and SPR clock; decoded DTX alpha on world-depth quads. "
                            "Rotatable sprites use their object pose; others face the camera. Unlit replacement "
                            "presentation: glow, view bias, no-Z and sky modes remain unavailable.");
+        draw_weapon_sprites(game);
         if (sprite_view && sprite_render)
             ImGui::Text("Prepared %zu quads / %zu entries | GPU passes %llu / texture uploads %llu | %zu RGBA bytes",
                         sprite_view->draws.size(), sprite_view->entries.size(),
@@ -134,5 +135,62 @@ namespace OpenBlood2
             ImGui::Dummy(size);
         }
         ImGui::EndTable();
+    }
+} // namespace OpenBlood2
+
+namespace OpenBlood2
+{
+    void Inspector::draw_weapon_sprites(const GameSession& game)
+    {
+        if (!ImGui::CollapsingHeader("Original weapon impact flash / smoke"))
+            return;
+        const auto& effects = game.server.weapon_sprites;
+        ImGui::Text("Active: %zu flashes / %zu smoke | started %llu / expired %llu / failed %llu",
+                    effects.flashes.size(), effects.smoke.size(), (unsigned long long)effects.started,
+                    (unsigned long long)effects.expired, (unsigned long long)effects.failed);
+        ImGui::TextWrapped("Wood/stone bullet impacts only. Bubbles, marks, sparks, fragments and other composite "
+                           "effects remain unavailable.");
+        if (!effects.update_error.empty())
+            ImGui::TextWrapped("Update failure: %s", effects.update_error.c_str());
+        auto presentation = [&](std::uint64_t id)
+        {
+            if (sprite_view)
+                for (const auto& entry : sprite_view->entries)
+                    if (entry.weapon_effect == id)
+                    {
+                        ImGui::TextWrapped("Frame %s | %u x %u | %s", entry.frame_path.c_str(), entry.width,
+                                           entry.height, entry.range == UINT32_MAX ? "not prepared" : "quad prepared");
+                        if (!entry.error.empty())
+                            ImGui::TextWrapped("%s", entry.error.c_str());
+                    }
+        };
+        for (const auto& fx : effects.flashes)
+        {
+            ImGui::Text("Flash %llu / event %llu | age %.3f / %.3f | alpha %.3f", (unsigned long long)fx.id,
+                        (unsigned long long)fx.event, fx.last_time - fx.start_time, fx.settings.duration, fx.alpha);
+            presentation(fx.id);
+        }
+        for (const auto& fx : effects.smoke)
+        {
+            ImGui::Text("Smoke %llu / event %llu | first update %s | delay %.3f | age %.3f / %.3f",
+                        (unsigned long long)fx.id, (unsigned long long)fx.event, fx.first_update ? "pending" : "done",
+                        fx.delay, fx.first_update ? 0 : fx.last_time - fx.start_time, fx.settings.duration);
+            ImGui::Text("Position %.3f %.3f %.3f | scale %.3f %.3f %.3f", fx.position.x, fx.position.y, fx.position.z,
+                        fx.scale.x, fx.scale.y, fx.scale.z);
+            ImGui::Text("RGB %.2f %.2f %.2f | alpha %.3f | moving %s | callbacks %llu", fx.color.x, fx.color.y,
+                        fx.color.z, fx.alpha, fx.settings.move ? "yes" : "no", (unsigned long long)fx.updates);
+            presentation(fx.id);
+        }
+        for (const auto& r : effects.reports)
+        {
+            ImGui::Text("Event %llu / %s | flash %llu / smoke %llu", (unsigned long long)r.id, r.source.c_str(),
+                        (unsigned long long)r.flash, (unsigned long long)r.smoke);
+            if (r.settings.flash)
+                ImGui::TextWrapped("Flash resource: %s", r.settings.flash->resource.value_or("default").c_str());
+            if (r.settings.smoke)
+                ImGui::TextWrapped("Smoke resource: %s", r.settings.smoke->resource.value_or("default").c_str());
+            if (!r.error.empty())
+                ImGui::TextWrapped("%s", r.error.c_str());
+        }
     }
 } // namespace OpenBlood2

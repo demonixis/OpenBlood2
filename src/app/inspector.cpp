@@ -1527,6 +1527,10 @@ namespace OpenBlood2
                                              : (impact.effect.sound ? "released" : "no voice"));
                     if (!impact.effect.error.empty())
                         ImGui::TextWrapped("Audio failure: %s", impact.effect.error.c_str());
+                    ImGui::Text("Flash/smoke report %llu (details in Sprites)",
+                                (unsigned long long)impact.effect.sprite_event);
+                    if (!impact.effect.sprite_error.empty())
+                        ImGui::TextWrapped("Visual failure: %s", impact.effect.sprite_error.c_str());
                     ImGui::Text("Impact hearing: %u deliveries / %s", impact.alert.delivered,
                                 impact.alert.complete ? "complete" : "not completed");
                     if (!impact.alert.error.empty())

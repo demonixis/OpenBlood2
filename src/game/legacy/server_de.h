@@ -29,6 +29,10 @@ class CSBase
     virtual void ResetRead(HMESSAGEREAD) = 0;
 };
 
+namespace OpenBlood2
+{
+    struct WeaponSpriteSettings;
+}
 class PathMgr;
 class ServerDE : public CSBase
 {
@@ -69,6 +73,7 @@ class ServerDE : public CSBase
     virtual std::uint64_t PublishExplosionRings(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
     virtual std::uint64_t PublishExplosionLights(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
     virtual std::uint64_t PublishExplosionModels(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+    virtual std::uint64_t PublishWeaponSprites(HOBJECT, const OpenBlood2::WeaponSpriteSettings&, std::string&) = 0;
     virtual std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
     virtual void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) = 0;
     virtual void RecordExplosionEffect(const OpenBlood2::ExplosionEffect&) = 0;
@@ -76,7 +81,7 @@ class ServerDE : public CSBase
     virtual bool ReadKeyMessage(HMESSAGEREAD, OpenBlood2::KeyMessage&) = 0;
     virtual OpenBlood2::MoverResult MoveWorldModel(HOBJECT, DVector destination) = 0;
     virtual OpenBlood2::MoverResult RotateWorldModel(HOBJECT, const OpenBlood2::RotationMove&) = 0;
-    virtual bool GetPointContainerCode(DVector, ContainerCode&) = 0;
+    virtual bool GetPointContainerCode(DVector, ContainerCode&, bool visible_only = false) = 0;
     virtual bool GetContainers(HOBJECT, DVector head, OpenBlood2::ContainerState&) = 0;
     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;

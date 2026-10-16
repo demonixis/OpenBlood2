@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "6264522fa95f9fb4e49be8e76988b94a057f2831",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "use": "UpdateWeaponFX wood/stone ammo selection 580-648; AddImpact normal offset"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/WeaponFX.cpp",
+      "sha256": "95230fcffd888751528e1a9f1d4353844ebfce5dbf5ef0a46cb0cf0a8a1b0e25",
+      "use": "CreateObject normalization/first visible point container and FX order 98-168; CreateFlash 683-705; CreateSmoke 784-831; missing CreateBubbles explicitly retained"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SmokeImpactFX.cpp",
+      "sha256": "85b54d4bc259e1ee58fd311acb77bf1d4d60f17b373f6b150bf43aa94abc6e4a",
+      "use": "Constructor, Init, CreateObject and Update lifecycle (selected whole file)"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SmokeImpactFX.h",
+      "sha256": "37044fe547cedb817f7362c734140e0e840e1cea8935d68d319b538f7b84ebb2",
+      "use": "SMOKECREATESTRUCT defaults and original state layout"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SpecialFX.h",
+      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
+      "use": "Existing default callback scheduling reference"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "use": "Unconditional B2_LITE/NRES"
+    },
+    {
+      "path": "sources/blood2/Shared/ContainerCodes.h",
+      "sha256": "e06bd4c2b5a9a4b32c1883f9e3f59bb1ffe419d7eb4232a2a3f6570c400fce64",
+      "use": "IsLiquid including FREEFALL"
+    }
+  ],
+  "adaptations": [
+    "Typed owned bounded sprite state and per-world store; no new globals or dependencies.",
+    "Existing per-weapon portable RNG; no claim of full missing-branch or CRT ordering.",
+    "Existing 1ms FX scheduling, bounded finite durations and transforms; source per-update motion retained.",
+    "Original first-container visibility option; foot query default unchanged.",
+    "Existing diagnostic sprite renderer extended with RGB modulation; no retail raster claim."
+  ],
+  "unavailable": [
+    "bubbles",
+    "marks/decals",
+    "sparks/fragments/muzzle smoke",
+    "complete WeaponFX",
+    "safe NEW_LEVEL",
+    "actual M2 acceptance"
+  ]
+}

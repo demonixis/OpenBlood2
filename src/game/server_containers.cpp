@@ -5,7 +5,7 @@
 
 namespace OpenBlood2
 {
-    bool ServerAdapter::GetPointContainerCode(DVector point, ContainerCode& code)
+    bool ServerAdapter::GetPointContainerCode(DVector point, ContainerCode& code, bool visible_only)
     {
         trace_service("GetPointContainerCode");
         if (!physics_vector(point))
@@ -18,7 +18,9 @@ namespace OpenBlood2
                 continue;
             if (const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get()))
             {
-                code = brush->info.code; // Original foot query does not filter Hidden.
+                // First overlap wins even when hidden; do not search for a later visible volume.
+                if (!visible_only || (r->user_flags & FLAG_VISIBLE))
+                    code = brush->info.code;
                 return true;
             }
         }

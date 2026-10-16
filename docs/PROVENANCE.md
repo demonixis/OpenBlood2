@@ -813,3 +813,11 @@ BaseCharacter flesh flags are integrated. See [ledger](M2_WEAPON_IMPACT_SOURCES.
 and [contracts](WEAPON_IMPACT_CONTRACTS.md). Typed bounded continuation, later-engine
 interior policy, owned client audio RNG/strings and checked callback lifetime are
 explicit adaptations. Reference sources/assets and dependency pins remain unchanged.
+
+## Original weapon impact sprites
+
+Selected CWeaponFX flash/smoke recipes and CSmokeImpactFX lifecycle are integrated
+with typed owned settings, bounded detached lifetime and existing SDL_GPU sprites.
+See [ledger](M2_WEAPON_SPRITE_SOURCES.json) and [contracts](WEAPON_SPRITE_CONTRACTS.md).
+Per-callback motion, first-update/delay quirks and wood tint are retained; absent
+composite branches and portable RNG/raster differences stay explicit.

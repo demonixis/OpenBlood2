@@ -86,11 +86,12 @@ FireResult CWeapon::FireVector()
             impact.effect.m_nAmmoType = data.m_nAmmoType;
             impact.effect.m_eSurfaceType = static_cast<SurfaceType>(static_cast<DBYTE>(impact.surface));
             impact.effect.m_vDestPos = vector_add(impact.hit.point, vector_scale(impact.hit.normal, 1.25f));
+            impact.effect.CreateSprites(*server, m_hOwner, impact.hit.normal, impact_random);
             if (!impact.effect.PlayImpactSound(*server, m_hOwner, impact_random))
                 ++impact_sound_failures;
             if (impact.effect.sound)
                 ++impact_sounds;
-            // Other UpdateWeaponFX/AddImpact visuals and marks remain explicitly unavailable.
+            // Remaining composite visuals/marks are unavailable; creation failures do not cancel damage/audio.
         }
         auto alert = [&]
         {

@@ -85,3 +85,5 @@ This is selected impact **audio and gameplay**, not complete WeaponFX. Sparks, b
 smoke, liquid colors/splashes, tracers, decals and their source random ordering remain
 unavailable. Other weapons, retail parity, required world services, Gideon and safe
 NEW_LEVEL still keep the actual M2 exit gate open.
+
+Continuation: [weapon impact flash/smoke](WEAPON_SPRITE_CONTRACTS.md) supersedes the earlier blanket impact-visual omission for wood/stone bullet sprites only. Other composite components and M2 remain open.

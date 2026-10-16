@@ -2,6 +2,18 @@
 #include <cmath>
 namespace OpenBlood2
 {
+    std::uint64_t ServerAdapter::PublishWeaponSprites(HOBJECT source, const WeaponSpriteSettings& settings,
+                                                      std::string& error)
+    {
+        trace_service("PublishWeaponSprites (selected impact flash/smoke)");
+        if (!IsObjectAlive(source) || !objects_.sprites)
+        {
+            error = "Weapon sprite source/store unavailable";
+            return 0;
+        }
+        return weapon_sprites.publish(settings, GetObjectName(source), *objects_.sprites, objects_.time(), error);
+    }
+
     // These copied, bounded records expose pending client FX/audio. They do not
     // enqueue gameplay and never retain a pointer into an original object.
     std::uint64_t ServerAdapter::PublishExplosionFragments(HOBJECT source, DDWORD type, DVector pos, DVector normal,

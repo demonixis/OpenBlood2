@@ -484,3 +484,7 @@ Reverb/priority arbitration and other required services remain unavailable; safe
 The [weapon impact continuation](../Documentation/Implementation/M2_WEAPON_IMPACTS.md) connects original vector continuation, selected material WAVs and impact hearing.
 Read [contracts](docs/WEAPON_IMPACT_CONTRACTS.md). Preserve source branch order, raw versus stopping material, fixed endpoint, one-unit advance and B2_LITE variants.
 Keep the 64-contact bound, explicit partial failures, checked callback lifetime and detached voices. Impact visuals/decals, safe NEW_LEVEL and M2 remain open.
+
+The [weapon impact sprite continuation](../Documentation/Implementation/M2_WEAPON_SPRITES.md) connects original wood/stone flashes and smoke with tint, detached lifetime and in-game inspection.
+Read [contracts](docs/WEAPON_SPRITE_CONTRACTS.md). Preserve first-update/delay quirks, per-callback motion, first-container visibility and independent sibling failures.
+Other impact components remain unavailable. User playtest fixes (mouse look/fire, non-attacking NPCs, train glass) take priority over more FX; M2 stays open.

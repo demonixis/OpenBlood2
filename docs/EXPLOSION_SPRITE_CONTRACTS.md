@@ -106,3 +106,5 @@ are historical; fragments/flames, illumination and the full M2 gate remain open.
 Continuation: [original explosion flame particles](EXPLOSION_FLAME_CONTRACTS.md)
 now implements the selected Tesla component. Earlier blanket flame omissions are
 historical for that recipe; surface illumination and the actual M2 gate remain open.
+
+Continuation: [weapon impact flash/smoke](WEAPON_SPRITE_CONTRACTS.md) supersedes the earlier blanket impact-visual omission for wood/stone bullet sprites only. Other composite components and M2 remain open.
