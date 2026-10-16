@@ -1,5 +1,9 @@
 # Original explosion model contracts
 
+Continuation: [explosion point lights](EXPLOSION_LIGHT_CONTRACTS.md) now evaluate
+selected original transient colors/radii with independent lifetime. Earlier light
+omissions are superseded only for that state; surface illumination stays unavailable.
+
 This extends [sprite effects](EXPLOSION_SPRITE_CONTRACTS.md) and
 [scene explosions](SCENE_EXPLOSION_CONTRACTS.md). See
 [evidence](../../Documentation/Implementation/M2_EXPLOSION_MODELS.md) and
@@ -62,7 +66,7 @@ All use alpha .75, fade 1 and random orientation 1. Types 0..3 choose waveform
 model branch**: its report succeeds with no created model, not a fabricated effect.
 Other types, including RIFT_2, still reject. No generic brush/weapon FX routing or
 quality menu is introduced. Complete-composite availability stays false: rings,
-particle flames, fragments/trails and lights are still missing.
+particle flames, fragments/trails and light illumination are still missing.
 
 At most 128 models and 64 retained model-delivery reports are owned by the session.
 IDs are never reused, including across unload. Model/event IDs and failure strings
@@ -92,7 +96,8 @@ outside ImGui. No extra player integration or server world object is created.
 The Scene explosions panel shows model identity/event, time, scale, alpha, waveform,
 model/skin names, triangles/preparation/failure, totals and retained reports. Model
 and sprite failures have distinct delivery IDs. Sprite reports list missing
-particle/light/fragment components; model availability is reported separately.
+particle/fragment/illumination components; model and evaluated-light availability
+are reported separately.
 
 All nine SubwayA emitters are type 3. Three load/player/unload cycles verify nine
 168-triangle exp_sphere models, valid Explosion_1 skins, alpha .585 after .11 s,

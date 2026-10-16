@@ -137,7 +137,7 @@ namespace
         CHECK(effects.publish(1, {}, {0, 2, 0}, "partial", store, 0, error));
         CHECK(effects.active.size() == 1 && effects.started == 1 && effects.failed == 1 && !error.empty());
         CHECK(effects.reports.back().sprites.size() == 1 &&
-              effects.reports.back().unavailable == "particle ring, lights");
+              effects.reports.back().unavailable == "particle ring, light illumination");
         CHECK(effects.publish(24, {}, {0, 1, 0}, "unsupported", store, 0, error) && !error.empty());
         CHECK(effects.publish(1, {}, {}, "zero normal", store, 0, error) && !error.empty());
         const auto old_id = effects.active.front().id;

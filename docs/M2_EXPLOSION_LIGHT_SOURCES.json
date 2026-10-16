@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "7051bbb39091bd66eae1b5ae17ff7c29a15208c4",
+  "source_files": [
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
+      "selected_lines": [
+        [
+          813,
+          913
+        ],
+        [
+          1301,
+          1325
+        ],
+        [
+          1409,
+          1433
+        ],
+        [
+          1518,
+          1542
+        ],
+        [
+          1719,
+          1743
+        ],
+        [
+          2014,
+          2038
+        ],
+        [
+          2213,
+          2225
+        ]
+      ],
+      "use": "Original light initialization, creation, delayed update and selected high-detail light recipes, including reused Radius2."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.h",
+      "sha256": "2bc5a35f4da4929bdb0f10652d9014a56fdf9fe561d7ad320bf1dcf0f042dc18",
+      "selected_lines": [
+        [
+          163,
+          181
+        ],
+        [
+          486,
+          518
+        ]
+      ],
+      "use": "Descriptor/defaults; explicitly initialize false change flags to repair original indeterminate members."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
+      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
+      "selected_lines": [
+        [
+          1435,
+          1463
+        ]
+      ],
+      "use": "Absolute next-update cadence and removal."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SpecialFX.h",
+      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
+      "selected_lines": [
+        [
+          32,
+          56
+        ]
+      ],
+      "use": "One millisecond cadence and independent client lifetime."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ClientExplosionSFX.cpp",
+      "sha256": "fc51674223cf67456341d4529bc93acbe8df9365a8730b0491c7e22803c85a09",
+      "selected_lines": [
+        [
+          282,
+          304
+        ]
+      ],
+      "use": "FX publication before original null-damager damage and detached sound."
+    }
+  ],
+  "implementation": "Selected original CExplosionLightFX Init/CreateObject/Update and high-detail CExplosionFX light recipes; bounded owned client point-light state and inspection.",
+  "limitations": [
+    "No surface illumination, shadow, fog or scorch decal rendering.",
+    "No generic SFX packet ABI or light routing from other callers.",
+    "Remaining composite components and safe NEW_LEVEL keep M2 incomplete.",
+    "Private content exercises type 3; other recipes and delay use synthetic tests."
+  ]
+}

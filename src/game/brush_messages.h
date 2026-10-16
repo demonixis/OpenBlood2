@@ -25,11 +25,13 @@ namespace OpenBlood2
         float damage = 0, radius = 0;
         RadiusDamageReport targets;
         std::uint64_t voice = 0;
+        std::uint64_t light_event = 0;
+        std::string light_error;
         std::uint64_t model_event = 0;
         std::string model_error;
         std::uint64_t sprite_event = 0;
         std::string sprite_error;
-        // Sprite components are now real; the complete composite remains unavailable.
+        // Selected components execute; illumination and complete composite remain unavailable.
         bool client_fx_available = false;
     };
     struct DebrisEffect

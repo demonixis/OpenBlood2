@@ -1,5 +1,9 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The [explosion point-light continuation](../Documentation/Implementation/M2_EXPLOSION_LIGHTS.md) evaluates original flash/residual light colors, radii, delays and lifetime, independently of emitter/resource lifetime.
+Inspection and hidden/reload checks cover all nine SubwayA emitters. Surface
+illumination, remaining composite components, safe level transfer and M2 remain open.
+
 The [explosion model continuation](../Documentation/Implementation/M2_EXPLOSION_MODELS.md) adds original ABC effects,
 growth, rotation, alpha and independent lifetime to the existing fire/smoke sprites.
 The nine SubwayA emitters and GPU model opacity are tested and inspectable. Required

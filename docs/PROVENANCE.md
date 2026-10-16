@@ -759,3 +759,11 @@ explicit failures adapt engine services; original wave/fade/per-update rotations
 remain. Existing ABC/DTX/ModelView and the SDL_GPU alpha shader supply presentation.
 No reference engine, dependency or commercial asset is imported. See
 [contracts](EXPLOSION_MODEL_CONTRACTS.md) for remaining composite/rendering limits.
+
+## Original explosion point lights
+
+Selected CExplosionLightFX methods and CExplosionFX high-detail light branches come
+from sources/blood2/ClientShellDLL/ExplosionFX.cpp/.h. The [source ledger](M2_EXPLOSION_LIGHT_SOURCES.json) records hashes and exact ranges;
+[contracts](EXPLOSION_LIGHT_CONTRACTS.md) distinguish source delay/radius quirks
+from explicit initialization, bounded values and owned client-light adaptations.
+No reference file, external asset, dependency revision or renderer was modified.

@@ -1,5 +1,9 @@
 # Original dynamic light contracts
 
+Continuation: [explosion point lights](EXPLOSION_LIGHT_CONTRACTS.md) now evaluate
+selected original transient colors/radii with independent lifetime. Earlier light
+omissions are superseded only for that state; surface illumination stays unavailable.
+
 M2 is incomplete. Read [object contracts](OBJECT_CONTRACTS.md),
 [keyframe contracts](KEYFRAMER_CONTRACTS.md), [shared damage](BRUSH_CONTRACTS.md),
 [pickup/spawn contracts](PICKUP_CONTRACTS.md), [source selections](M2_LIGHT_SOURCES.json)

@@ -3,6 +3,7 @@
 #include "engine/model_store.h"
 #include "engine/objects.h"
 #include "engine/string_resources.h"
+#include "game/explosion_lights.h"
 #include "game/explosion_models.h"
 #include "game/explosion_sprites.h"
 #include "game/original/BloodShells.h"
@@ -78,6 +79,8 @@ namespace OpenBlood2
         std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         ExplosionSprites explosion_sprites;
         ExplosionModels explosion_models;
+        ExplosionLights explosion_lights;
+        std::uint64_t PublishExplosionLights(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         std::uint64_t PublishExplosionModels(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) override;
         void RecordExplosionEffect(const ExplosionEffect&) override;
@@ -107,6 +110,7 @@ namespace OpenBlood2
             scene_explosions.clear();
             explosion_sprites.clear();
             explosion_models.clear();
+            explosion_lights.clear();
             spawn_reports.clear();
             pickup_reports.clear();
             camera_effects.clear();

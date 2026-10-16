@@ -8,7 +8,8 @@ namespace OpenBlood2
         ImGui::TextWrapped(
             "Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
             "Spatial WAV playback and selected original sprite/model components are implemented. Composite "
-            "particles, fragments and lights remain unavailable.");
+            "particles, fragments and surface illumination remain unavailable. Light color/radius are evaluated "
+            "below.");
         ImGui::Text("Audio: %s | active voices %zu | submitted frames %llu",
                     game.server.audio.has_output() ? "SDL stream" : "offline clock", game.server.audio.voices().size(),
                     (unsigned long long)game.server.audio.submitted_frames);
@@ -54,6 +55,34 @@ namespace OpenBlood2
             }
             ImGui::PopID();
         }
+        ImGui::Separator();
+        const auto& lights = game.server.explosion_lights;
+        ImGui::Text("Explosion point lights: %zu active / %llu started / %llu expired / %llu failed",
+                    lights.active.size(), (unsigned long long)lights.started, (unsigned long long)lights.expired,
+                    (unsigned long long)lights.failed);
+        ImGui::TextWrapped("Evaluated client light state only; no surface illumination, shadows or scorch decals.");
+        if (!lights.update_error.empty())
+            ImGui::TextWrapped("%s", lights.update_error.c_str());
+        for (const auto& fx : lights.active)
+        {
+            ImGui::PushID(static_cast<int>(fx.id));
+            ImGui::Text("Light %llu / event %llu: %.3f / %.3f s | waiting %d / delay %.3f | %llu updates",
+                        (unsigned long long)fx.id, (unsigned long long)fx.event, fx.last_time - fx.start_time,
+                        fx.settings.duration, fx.delay > 0, fx.delay, (unsigned long long)fx.updates);
+            ImGui::Text("Position %.2f %.2f %.2f | radius %.3f (%.1f to %.1f)", fx.settings.position.x,
+                        fx.settings.position.y, fx.settings.position.z, fx.radius, fx.settings.radius1,
+                        fx.settings.radius2);
+            ImGui::ColorButton("Current light color", ImVec4(fx.color.x, fx.color.y, fx.color.z, 1),
+                               ImGuiColorEditFlags_NoTooltip, ImVec2(40, 16));
+            ImGui::SameLine();
+            ImGui::Text("RGB %.4f %.4f %.4f", fx.color.x, fx.color.y, fx.color.z);
+            ImGui::PopID();
+        }
+        if (ImGui::CollapsingHeader("Last 64 light deliveries / failures"))
+            for (const auto& r : lights.reports)
+                ImGui::TextWrapped("Event %llu / type %u / %s / %zu lights: %s", (unsigned long long)r.id, r.type,
+                                   r.source.c_str(), r.lights.size(),
+                                   r.error.empty() ? "created; illumination unavailable" : r.error.c_str());
         ImGui::Separator();
         const auto& models = game.server.explosion_models;
         ImGui::Text("Client explosion models: %zu active / %llu started / %llu expired / %llu failed",
@@ -126,6 +155,9 @@ namespace OpenBlood2
                             r.targets.null_damager ? "yes (original guard)" : "no");
                 ImGui::Text("Model event %llu | sprite event %llu", (unsigned long long)r.model_event,
                             (unsigned long long)r.sprite_event);
+                ImGui::Text("Light event %llu", (unsigned long long)r.light_event);
+                if (!r.light_error.empty())
+                    ImGui::TextWrapped("%s", r.light_error.c_str());
                 if (!r.model_error.empty())
                     ImGui::TextWrapped("%s", r.model_error.c_str());
                 if (!r.sprite_error.empty())

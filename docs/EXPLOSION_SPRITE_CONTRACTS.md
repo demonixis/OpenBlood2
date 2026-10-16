@@ -1,5 +1,9 @@
 # Original explosion sprite contracts
 
+Continuation: [explosion point lights](EXPLOSION_LIGHT_CONTRACTS.md) now evaluate
+selected original transient colors/radii with independent lifetime. Earlier light
+omissions are superseded only for that state; surface illumination stays unavailable.
+
 Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supply
 selected model components with independent lifetime and alpha rendering. The earlier
 model omission is superseded only for that subset; complete composite FX remain unavailable.
@@ -40,7 +44,7 @@ CExplosionFX detail >= 2 recipe normalizes the direction and creates these sprit
 Paths are original `Sprites\*.spr`, all recipe Z scales are zero and fade mode is
 1. These are deterministic sprite branches, not the full CExplosionFX switch or
 a quality-setting implementation. Selected model branches now use their own
-documented client RNG stream; unimplemented particle/light/fragment branches
+documented client RNG stream; unimplemented particle/fragment branches
 consume no random draws. Full composite random ordering is not claimed.
 Other preset types fail explicitly, including type 24 RIFT_2 (which has no sprite
 branch here). Brush ExplosionEffect, weapon and other FX callers are not routed.

@@ -1,10 +1,14 @@
 # Original scene explosion emitters
 
-Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supplies
+Continuation: [explosion point lights](EXPLOSION_LIGHT_CONTRACTS.md) now evaluate
+selected original transient colors/radii with independent lifetime. Earlier light
+omissions are superseded only for that state; surface illumination stays unavailable.
+
+Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supply
 selected model components with independent lifetime and alpha rendering. The earlier
 model omission is superseded only for that subset; complete composite FX remain unavailable.
 
-Continuation: [original explosion sprites](EXPLOSION_SPRITE_CONTRACTS.md). Selected original fire/smoke components now render and outlive their emitter. The complete-composite flag remains false; model/particle/light/fragment services are still unavailable. Original null-damager damage and audio behavior stay unchanged.
+Continuation: [original explosion sprites](EXPLOSION_SPRITE_CONTRACTS.md). Selected original fire/smoke components now render and outlive their emitter. The complete-composite flag remains false; particle/fragment/illumination services remain unavailable. Original null-damager damage and audio behavior stay unchanged.
 
 M2 remains incomplete. This extends [object contracts](OBJECT_CONTRACTS.md),
 [brush explosion contracts](EXPLOSION_CONTRACTS.md) and [audio contracts](CINEMATIC_CONTRACTS.md).
@@ -70,7 +74,8 @@ Typed delivery now routes selected high-detail sprite branches to original
 CExplosionSpriteFX methods; see [sprite contracts](EXPLOSION_SPRITE_CONTRACTS.md).
 The original binary client packet/complete manager is not recreated. Up to 32 owned
 SceneExplosionReports retain type, initial position/direction, configured damage,
-actual radius-delivery counters, sound ID/failure and client sprite event ID/failure.
+actual radius-delivery counters, sound ID/failure and separate client model, sprite
+and light event IDs/failures.
 Sprite success does not set complete-composite availability. Selected model components now render; particles, fragments and dynamic
 illumination remain absent. A loaded emitter is still a
 partial system; required missing services keep M2 open.

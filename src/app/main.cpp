@@ -1426,10 +1426,10 @@ namespace
                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
                              "and after reload; evaluated radius/color checked; world illumination unavailable");
             if (options.scene_explosions_smoke)
-                spdlog::info(
-                    "SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
-                    "audio plus original explosion models/sprites verified hidden and after reload; other composite "
-                    "FX unavailable");
+                spdlog::info("SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
+                             "audio plus original explosion models/sprites and evaluated point lights verified hidden "
+                             "and after reload; illumination/other composite "
+                             "FX unavailable");
             if (options.sprites_smoke)
                 spdlog::info("SPRITES smoke: 12 original DetailSprites, SPR manifests, frame clocks, hidden UI and "
                              "unload/reload verified; 12 alpha-textured quads submitted with shared world depth");

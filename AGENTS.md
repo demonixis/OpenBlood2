@@ -435,3 +435,9 @@ formulas, explicit RNG ordering, final-update removal and independent model/spri
 failure/lifetime. Fullbright alpha rendering is bounded diagnostic presentation;
 separate model/sprite sorting is not retail parity. Required remaining composite
 FX, safe NEW_LEVEL and M2 stay open; world-source counts do not change.
+
+The [explosion point-light continuation](../Documentation/Implementation/M2_EXPLOSION_LIGHTS.md) connects original CExplosionLightFX and selected high-detail light recipes.
+Read [contracts](docs/EXPLOSION_LIGHT_CONTRACTS.md). Preserve delay overshoot discard, activation return,
+linear/final updates, reused zero Radius2 and independent sibling/source lifetime.
+These are evaluated lights, not surface illumination or scorch decals. Keep missing
+composite/lighting services explicit; safe NEW_LEVEL and M2 remain incomplete.
