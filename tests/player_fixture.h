@@ -44,7 +44,7 @@ namespace test_player
         {
             auto offset = static_cast<unsigned>(w.b.size());
             w.b.insert(w.b.end(), data.begin(), data.end());
-            auto dot = name.find('.');
+            auto dot = name.rfind('.');
             auto ext = name.substr(dot + 1);
             unsigned extension = 0;
             for (char value : ext)

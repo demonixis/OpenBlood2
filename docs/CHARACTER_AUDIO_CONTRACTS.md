@@ -1,5 +1,9 @@
 # Original character voices and player animation sounds
 
+> The later [AI model-key continuation](AI_MODEL_KEY_CONTRACTS.md) adds selected
+> AI_Mgr sound dispatch. Earlier blanket AI-key audio omissions are superseded;
+> full AI behavior, hearing, fire/extra and M2 acceptance remain open.
+
 M2 remains incomplete. This extends [character animation](CHARACTER_ANIMATION_CONTRACTS.md),
 [audio](CINEMATIC_CONTRACTS.md), [movement](MOVEMENT_CONTRACTS.md) and
 [container](CONTAINER_CONTRACTS.md) contracts. Read the

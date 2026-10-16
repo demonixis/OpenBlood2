@@ -247,5 +247,14 @@ adds bounded bracket parameters, source-ordered rotation/velocity/displacement/d
 and truthful inspection. Synthetic motion and actual private-key coverage are
 separate; remaining AI/classes/services keep M2 incomplete.
 
-This increment passed 290/290 tests in both Debug and inspector-free Release,
+The preceding character-motion increment passed 290/290 tests in both Debug and inspector-free Release,
 and 267/267 sequential headless tests with Clang ASan/UBSan/leak checks on Linux.
+
+Latest M2 continuation: [original AI animation-key audio](../Documentation/Implementation/M2_AI_MODEL_KEYS.md)
+executes 140 sound markers from six real NPC models through the original dispatch
+rules. Fire/extra actions and complete NPC behavior remain unavailable; the
+17 unsupported SubwayA entries and actual M2 acceptance gate are unchanged.
+
+The AI model-key increment passed 300/300 tests in Debug and inspector-free
+Release, plus 277/277 sequential headless checks with Clang ASan/UBSan/leak
+detection on Linux. The diagnostic GPU probe preserves actual NPC model keys.

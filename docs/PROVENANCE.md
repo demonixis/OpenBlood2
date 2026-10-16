@@ -430,3 +430,8 @@ Character motion continuation: [source ledger](M2_CHARACTER_MOTION_SOURCES.json)
 [contracts](CHARACTER_MOTION_CONTRACTS.md). BaseCharacter and Sparam rules are
 selectively adapted; existing math services replace SDK calls. Later LithTech
 rotation code informs semantics only. No reference repository is a dependency.
+
+AI model-key continuation: [source ledger](M2_AI_MODEL_KEY_SOURCES.json),
+[contracts](AI_MODEL_KEY_CONTRACTS.md). Selected AI_Mgr dispatch preserves source
+camera/script gates, branch priority, shared voice semantics and the supplied
+B2_LITE variant cap. No full AI class or guessed attack behavior is registered.

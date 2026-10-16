@@ -1,5 +1,9 @@
 # Original character motion keys
 
+> The later [AI model-key continuation](AI_MODEL_KEY_CONTRACTS.md) adds selected
+> AI_Mgr sound dispatch. Earlier blanket AI-key audio omissions are superseded;
+> full AI behavior, hearing, fire/extra and M2 acceptance remain open.
+
 M2 remains incomplete. This imports the motion branch of original
 CBaseCharacter::OnStringKey and a bounded Sparam_Get lookup. It is a prerequisite
 for character integration, not a new AI implementation. CMovement path steering,

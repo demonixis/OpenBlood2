@@ -1,3 +1,4 @@
+#include "game/original/AI_Mgr.h"
 #include "inspector.h"
 #include <algorithm>
 #include <imgui.h>
@@ -5,9 +6,9 @@ namespace OpenBlood2
 {
     void Inspector::draw_skeleton(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextWrapped(
-            "Current ABC node transforms and original CAnim_Sound tables. Spheres are the original "
-            "initialization radii, shown at live node positions; damage localization and AI callers remain unported.");
+        ImGui::TextWrapped("Current ABC node transforms and original CAnim_Sound tables. Spheres are the original "
+                           "initialization radii, shown at live node positions; damage localization and complete AI "
+                           "behavior remain unported.");
         if (!game.objects.get(skeleton_selection))
         {
             if (const auto* player = game.server_shell.Player(game.local_client))
@@ -42,7 +43,8 @@ namespace OpenBlood2
         {
             const auto* character = dynamic_cast<const CBaseCharacter*>(r->game.get());
             const auto& model = *r->model;
-            const auto* anim = character ? &character->m_Anim_Sound : nullptr;
+            const auto* ai = dynamic_cast<const AI_Mgr*>(character);
+            const auto* anim = ai ? ai->AnimSound() : character ? &character->m_Anim_Sound : nullptr;
             ImGui::Text("%s | %zu nodes | %zu clips", r->state.m_Name, model.nodes.size(), model.animations.size());
             if (r->animation.animation < model.animations.size())
                 ImGui::Text("%s / %.1f ms", model.animations[r->animation.animation].name.c_str(), r->animation.time);
@@ -54,7 +56,31 @@ namespace OpenBlood2
             }
             else
                 ImGui::TextUnformatted("No original character animation table on this object");
-            if (character && ImGui::CollapsingHeader("Character motion keys", ImGuiTreeNodeFlags_DefaultOpen))
+            if (ai && ImGui::CollapsingHeader("Original AI model-key dispatch", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Text("State %d | keys %llu | audio starts %llu / keys %llu | failures %llu", ai->m_nState,
+                            (unsigned long long)ai->model_keys, (unsigned long long)ai->audio_starts,
+                            (unsigned long long)ai->audio_keys, (unsigned long long)ai->key_failures);
+                ImGui::TextWrapped("%s | %s", ai_key_outcome_name(ai->key_outcome), ai->ai_key.c_str());
+                if (!ai->ai_key_error.empty())
+                    ImGui::TextWrapped("%s", ai->ai_key_error.c_str());
+                ImGui::TextWrapped("Sound: %s", ai->ai_sound_resource.c_str());
+                if (const auto* voice = anim ? game.server.audio.get(anim->m_hVoxSound) : nullptr)
+                    ImGui::Text("Shared voice %s | %.3f / %.3f s | owner matches: %s", voice->done ? "done" : "playing",
+                                voice->cursor / voice->clip->rate, voice->clip->duration(),
+                                voice->owner == r->handle ? "yes" : "no");
+                ImGui::Text("Variant %d (source B2_LITE: 1..3) | chance draw %d", ai->selected_variant,
+                            ai->chance_roll);
+                ImGui::Text("Suppressed: camera %llu / script %llu / chance %llu / shared voice %llu",
+                            (unsigned long long)ai->camera_suppressed, (unsigned long long)ai->script_suppressed,
+                            (unsigned long long)ai->chance_suppressed, (unsigned long long)ai->busy_voices);
+                ImGui::Text("No target %llu | unavailable actions %llu", (unsigned long long)ai->no_target,
+                            (unsigned long long)ai->unavailable_keys);
+                ImGui::TextWrapped(
+                    "Key dispatcher only. AI states, perception, attacks and special actions remain unavailable.");
+            }
+            if (character && ImGui::CollapsingHeader("Character motion keys",
+                                                     ai ? ImGuiTreeNodeFlags_None : ImGuiTreeNodeFlags_DefaultOpen))
             {
                 ImGui::Text("Keys %llu | applied actions %llu | failures %llu | last mask 0x%02x",
                             (unsigned long long)character->motion_keys, (unsigned long long)character->motion_actions,
@@ -70,7 +96,8 @@ namespace OpenBlood2
                                        : "Source order: local yaw, forward/right/up velocity overwrite, world delta, "
                                          "centered dimensions.");
             }
-            if (anim && ImGui::CollapsingHeader("Character audio", ImGuiTreeNodeFlags_DefaultOpen))
+            if (anim && ImGui::CollapsingHeader("Character audio",
+                                                ai ? ImGuiTreeNodeFlags_None : ImGuiTreeNodeFlags_DefaultOpen))
             {
                 ImGui::TextWrapped("Root: %s | silent flag: %s (source helper does not test it)",
                                    anim->GetSoundRoot().c_str(), anim->m_bSilent ? "set" : "clear");

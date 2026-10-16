@@ -220,3 +220,10 @@ base-handler exclusion. Validate complete numeric groups before mutation; stop o
 service failure and preserve deferred touch removal. The seven examined character
 assets contain no motion keys; synthetic probes are explicitly labelled, not AI.
 AI states/hearing/fire, ExitTrigger, client FX and the actual M2 gate remain open.
+
+The latest [AI model-key evidence](../Documentation/Implementation/M2_AI_MODEL_KEYS.md) connects selected AI_Mgr animation-key
+sound dispatch, actual decoded voices and inspection. Read [contracts](docs/AI_MODEL_KEY_CONTRACTS.md).
+Preserve source branch priority, server-camera/script early returns, B2_LITE's
+1..3 variants, chance draw ordering and class/gender shared voice lifetime.
+Fire/show_weapon/extra remain unavailable; diagnostic probes are not registered
+world AI. CivilianAI, CultistAI, Gideon, ExitTrigger and the actual M2 gate stay open.

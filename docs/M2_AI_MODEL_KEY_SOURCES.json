@@ -1,0 +1,103 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "0cdfe7e5f5c1d4c33612974c9060ab92875d4764",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          119,
+          127
+        ],
+        [
+          276,
+          281
+        ],
+        [
+          876,
+          975
+        ]
+      ],
+      "use": "Selected source initialization and model-key dispatch; other AI behavior unported"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "selected_lines": [
+        [
+          1,
+          75
+        ]
+      ],
+      "use": "Original class/state declarations; selective interface adaptation"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "selected_lines": [
+        [
+          1,
+          18
+        ]
+      ],
+      "use": "Unconditional B2_LITE and constant NRES expansion"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
+      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
+      "selected_lines": [
+        [
+          189,
+          194
+        ]
+      ],
+      "use": "Original IsRandomChance comparison"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
+      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
+      "selected_lines": [
+        [
+          300,
+          330
+        ]
+      ],
+      "use": "Class/gender shared animation/sound tables and source roots; reference only"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CultistAI.cpp",
+      "sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
+      "selected_lines": [
+        [
+          216,
+          260
+        ]
+      ],
+      "use": "Shared tables and source roots; robe expansion outside this base-game probe"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
+      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
+      "selected_lines": [
+        [
+          220,
+          235
+        ]
+      ],
+      "use": "Shared table and sound root; reference only"
+    }
+  ],
+  "adaptations": [
+    "Shared ownership preserves original class/gender voice sharing without a borrowed lifetime",
+    "Bounded exact bracket lookup and strict finite options replace unsafe scratch buffers",
+    "Existing portable session RNG replaces CRT random functions, without retail sequence claims",
+    "Checked owner/target/camera identities and actual playback outcomes",
+    "Explicit unavailable fire/show_weapon/extra branches; no production AI registration"
+  ],
+  "not_implemented": [
+    "AI states, initialization, perception/hearing and steering",
+    "AI aiming/Fire, hand attachments/ShowHandModel, MC_Extra",
+    "ExitTrigger, required client FX and complete M2 gate"
+  ]
+}
