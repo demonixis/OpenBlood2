@@ -85,3 +85,8 @@ The [held-model/attachment continuation](ATTACHMENT_CONTRACTS.md) adds original
 Beretta/knife held children and typed visual attachments. Earlier blanket hand-model
 and attachment omissions are superseded for this bounded subset. Dropping, physical
 attachments, client visibility SFX and complete M2 remain unavailable.
+
+The [explicit target/facing continuation](AI_TARGET_CONTRACTS.md) adds original
+AI_Mgr named target/link commands and deferred target clearing. GetObjectPos now
+returns a typed status; target sampling and CanSee reject unresolved poses.
+Autonomous acquisition/retention and full AI behavior remain unavailable.

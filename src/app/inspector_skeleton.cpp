@@ -57,6 +57,28 @@ namespace OpenBlood2
         }
         ImGui::TableNextColumn();
         const auto* r = game.objects.get(skeleton_selection);
+        const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+        if (target_ai && ImGui::CollapsingHeader("Original AI target / facing", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto* target = game.objects.get(target_ai->GetTarget());
+            ImGui::Text("Target: %s | %s", target ? target->state.m_Name : "none / removed",
+                        target ? (target->life == Life::Alive ? "alive" : "pending removal") : "no link");
+            ImGui::Text("Named request: %s | outgoing links: %zu", target_ai->target_name.c_str(),
+                        game.objects.link_count(r->handle));
+            const auto pos = target_ai->m_vTargetPos;
+            ImGui::Text("Cached position: %.2f %.2f %.2f | %s", pos.x, pos.y, pos.z,
+                        target_ai->target_position_valid ? "sampled" : "unavailable");
+            ImGui::Text("Metacmd %d | turns %llu | last local yaw %.4f rad", target_ai->Metacmd,
+                        (unsigned long long)target_ai->face_commands, target_ai->face_yaw_delta);
+            ImGui::Text("Target changes %llu | broken links %llu | failures %llu",
+                        (unsigned long long)target_ai->target_changes,
+                        (unsigned long long)target_ai->target_link_breaks,
+                        (unsigned long long)target_ai->target_failures);
+            if (!target_ai->target_error.empty())
+                ImGui::TextWrapped("%s", target_ai->target_error.c_str());
+            ImGui::TextWrapped(
+                "Explicit source commands only. Automatic perception, tracking and AI states remain unavailable.");
+        }
         if (!r)
             ImGui::TextUnformatted("No selected model");
         else if (!r->model)

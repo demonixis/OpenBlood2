@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "184245acc44d027e1335b49f99625e04071e18c7",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          145,
+          145
+        ],
+        [
+          716,
+          722
+        ],
+        [
+          1269,
+          1314
+        ],
+        [
+          2200,
+          2200
+        ],
+        [
+          5556,
+          5608
+        ]
+      ],
+      "use": "Target link callback, named selection, explicit target link, target position sample and local-up face commands"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "selected_lines": [
+        [
+          353,
+          430
+        ]
+      ],
+      "use": "GetTarget and target/command interface reference"
+    },
+    {
+      "path": "sources/lithtech/runtime/shared/src/mathlt_impl.cpp",
+      "sha256": "d629bcbede04219aa9d9486491aa37f2233ba714b674517a6cc9d6c57a874564",
+      "selected_lines": [
+        [
+          114,
+          121
+        ],
+        [
+          131,
+          144
+        ]
+      ],
+      "use": "Later engine local-axis matrix composition reference only; no import"
+    }
+  ],
+  "adaptations": [
+    "Checked target identity with private assignment and deferred original link callback",
+    "Acquire new link before old release on success; failure retains previous target",
+    "Bounded names and explicit outcomes; no-match does not clear target",
+    "Current checked transforms replace unported MoveObj snapshots",
+    "Unavailable position/attachment results are checked by target and sight callers",
+    "Reject degenerate/nonfinite/overflow commands and uninitialized target snapshots"
+  ],
+  "not_implemented": [
+    "Autonomous perception/acquisition/retention and AI state machine",
+    "Track/smell ownership, script commands, navigation, attacks and production NPC registration",
+    "Retail transform scheduling, other-platform and XR parity",
+    "Complete M2"
+  ]
+}

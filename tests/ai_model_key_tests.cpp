@@ -110,8 +110,8 @@ namespace
         auto* r = g.objects.get(ai->m_hObject);
         CHECK(key(g, ai, "[play_sound:cue][fire_key:head][RotY:1]"));
         CHECK(ai->no_target == 1 && ai->audio_keys == 0 && ai->motion_keys == 0);
-        ai->m_hTarget = g.objects.create(g.objects.find_class("BaseClass"), {});
-        CHECK(ai->m_hTarget);
+        CHECK(ai->SetNewTarget(g.objects.create(g.objects.find_class("BaseClass"), {})));
+        CHECK(ai->GetTarget());
         CHECK(key(g, ai, "[extra_key:x][play_sound:cue][fire_key:head][RotY:1]"));
         CHECK(ai->key_outcome == AIKeyOutcome::Unavailable && ai->unavailable_keys == 1 && ai->motion_keys == 1 &&
               ai->audio_starts == 0);
@@ -123,9 +123,12 @@ namespace
         CHECK(ai->pending_model_commands.size() == 1);
         CHECK(key(g, ai, "[UpVel:2]"));
         CHECK(r->velocity.y == 2 && ai->key_outcome == AIKeyOutcome::None);
-        CHECK(g.objects.remove(ai->m_hTarget));
+        CHECK(g.objects.remove(ai->GetTarget()));
         CHECK(key(g, ai, "[fire_key:head][UpVel:10]"));
         CHECK(ai->key_outcome == AIKeyOutcome::Invalid && r->velocity.y == 2);
+        CHECK(g.objects.finish_frame() && !ai->GetTarget() && ai->target_link_breaks == 1);
+        CHECK(key(g, ai, "[fire_key:head][UpVel:10]"));
+        CHECK(ai->key_outcome == AIKeyOutcome::NoTarget && r->velocity.y == 2);
         return true;
     }
     bool gates(const std::filesystem::path& root)

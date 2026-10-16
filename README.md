@@ -287,3 +287,8 @@ The held-model/attachment increment passed 323/323 tests in both Debug and
 inspector-free Release, plus 300/300 sequential headless checks with Clang
 ASan/UBSan/leak detection on Linux. Seven private character models cover 652
 clip/hand samples, including 160 explicit missing-gun-node origin fallbacks.
+
+Latest M2 continuation: [original explicit AI targets and facing](../Documentation/Implementation/M2_AI_TARGETS.md) adds
+named target selection, checked links, stored-position/local-up orientation and
+inspection. Target departure/re-entry is exercised without owning the target.
+Autonomous perception, NPC states and the actual M2 acceptance gate remain open.

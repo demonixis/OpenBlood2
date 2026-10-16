@@ -461,3 +461,15 @@ The engine attachment store and transform refresh are new replacement services.
 The later LithTech shared transform code informed offset composition only; no
 code or dependency from that engine was copied. See [contracts](ATTACHMENT_CONTRACTS.md)
 for bounded visual children, unsupported chains/physics and strengthened lifetime.
+
+## M2 explicit AI targets and facing
+
+[Source selections](M2_AI_TARGET_SOURCES.json) cover original AI_Mgr SetTarget,
+SetNewTarget, MC_FaceTarget, MC_FacePos, target link-break handling and the isolated
+AI_Update position sample. Current checked transforms replace MoveObj snapshots;
+new-link preflight prevents losing an old target on failure. Typed GetObjectPos
+outcomes let AI samples reject unresolved attachment poses. Source local-up yaw,
+list-first selection, cached targets and Metacmd rules are retained. No production
+NPC registration, perception/state machine or script scheduler is imported.
+See [contracts](AI_TARGET_CONTRACTS.md) and
+[execution evidence](../../Documentation/Implementation/M2_AI_TARGETS.md).

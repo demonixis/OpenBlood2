@@ -109,3 +109,8 @@ are not established by Linux tests and SDL dummy output.
 The [AI visibility continuation](AI_SIGHT_CONTRACTS.md) adds selected original CanSee
 and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
 Visibility queries do not implement target selection, AI states or complete M2.
+
+The [explicit target/facing continuation](AI_TARGET_CONTRACTS.md) adds original
+AI_Mgr named target/link commands and deferred target clearing. GetObjectPos now
+returns a typed status; target sampling and CanSee reject unresolved poses.
+Autonomous acquisition/retention and full AI behavior remain unavailable.

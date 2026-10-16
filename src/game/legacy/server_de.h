@@ -114,7 +114,7 @@ class ServerDE : public CSBase
     void (*SetObjectUserFlags)(HOBJECT, DDWORD) = nullptr;
     HOBJECT (*GetNextObject)(HOBJECT) = nullptr;
     char* (*GetObjectName)(HOBJECT) = nullptr;
-    void (*GetObjectPos)(HOBJECT, DVector*) = nullptr;
+    DRESULT (*GetObjectPos)(HOBJECT, DVector*) = nullptr;
     DRESULT (*GetObjectRotation)(HOBJECT, DRotation*) = nullptr;
     int (*GetObjectState)(HOBJECT) = nullptr;
     void (*SetObjectState)(HOBJECT, int) = nullptr;

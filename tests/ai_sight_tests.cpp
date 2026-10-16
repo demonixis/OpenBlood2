@@ -83,7 +83,7 @@ namespace
         auto t = body(g);
         CHECK(ai && t && ai->CanSee(t));
         CHECK(ai->sight.outcome == AISightOutcome::Body && ai->sight.rays == 1 && !ai->sight.origin_head);
-        CHECK(ai->sight.body_hit.object == t && !ai->sight.retried_head && !ai->m_hTarget);
+        CHECK(ai->sight.body_hit.object == t && !ai->sight.retried_head && !ai->GetTarget());
         // No source distance/FOV/visibility-flag checks in CanSee itself.
         g.objects.get(t)->state.m_Pos = {0, 10, -900};
         g.objects.get(t)->activity = OBJSTATE_INACTIVE;
@@ -220,7 +220,7 @@ namespace
             const auto strings = g.server.string_count(), messages = g.server.message_count();
             for (int i = 0; i < 100; ++i)
                 CHECK(ai->CanSee(t));
-            CHECK(g.server.string_count() == strings && g.server.message_count() == messages && !ai->m_hTarget);
+            CHECK(g.server.string_count() == strings && g.server.message_count() == messages && !ai->GetTarget());
             auto saved = ai->sight;
             old = ai->m_hObject;
             CHECK(g.objects.remove(old) && !ai->CanSee(t) && ai->sight.outcome == AISightOutcome::Invalid);

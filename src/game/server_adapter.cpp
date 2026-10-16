@@ -159,15 +159,25 @@ namespace OpenBlood2
             auto* r = active().objects_.get(h);
             return r ? r->state.m_Name : nullptr;
         };
-        GetObjectPos = [](HOBJECT h, DVector* out)
+        GetObjectPos = [](HOBJECT h, DVector* out) -> DRESULT
         {
             active().trace_service("GetObjectPos");
-            if (out)
+            if (!out)
+                return DE_INVALIDPARAMS;
+            auto& objects = active().objects_;
+            const auto* record = objects.get(h);
+            if (!record)
             {
-                auto& o = active().objects_;
-                auto* r = o.get(h);
-                *out = r && o.refresh_attachment(h) ? r->state.m_Pos : DVector{};
+                *out = {};
+                return DE_INVALIDPARAMS;
             }
+            if (!objects.refresh_attachment(h))
+            {
+                *out = {};
+                return DE_ERROR;
+            }
+            *out = record->state.m_Pos;
+            return DE_OK;
         };
         GetObjectRotation = [](HOBJECT h, DRotation* out) -> DRESULT
         {

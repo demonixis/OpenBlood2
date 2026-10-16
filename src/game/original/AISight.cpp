@@ -39,9 +39,13 @@ bool AI_Mgr::CanSee(HOBJECT target)
     }
     DRotation rotation;
     sight.origin_head = server->GetModelNodeTransform(m_hObject, "head", &sight.origin, &rotation);
-    if (!sight.origin_head)
-        server->GetObjectPos(m_hObject, &sight.origin); // Source cached MoveObj position; current pose in this engine.
-    server->GetObjectPos(target, &sight.body);
+    // Source cached MoveObj position; current pose in this engine.
+    if ((!sight.origin_head && server->GetObjectPos(m_hObject, &sight.origin) != DE_OK) ||
+        server->GetObjectPos(target, &sight.body) != DE_OK)
+    {
+        sight.outcome = AISightOutcome::Unavailable;
+        return false;
+    }
     auto query = [&](DVector end, SegmentHit& hit, SegmentResult& result)
     {
         ++sight.rays;

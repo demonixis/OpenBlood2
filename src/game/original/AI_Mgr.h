@@ -43,7 +43,8 @@ namespace OpenBlood2
 
 // Selective original AI_Mgr::InitStatics/OnStringKey port. No production AI class
 // registration, state machine, target acquisition, Fire or MC_Extra implementation yet.
-// Selected CanSee queries are documented in AI_SIGHT_CONTRACTS.md.
+// Selected CanSee and explicit target/facing commands are documented in
+// AI_SIGHT_CONTRACTS.md and AI_TARGET_CONTRACTS.md.
 class AI_Mgr : public CBaseCharacter
 {
   public:
@@ -57,7 +58,23 @@ class AI_Mgr : public CBaseCharacter
         return m_pAnim_Sound.get();
     }
     int m_nState = StateIdle;
-    HOBJECT m_hTarget = nullptr;
+    // Target assignment must go through the original inter-object link path.
+    HOBJECT GetTarget() const
+    {
+        return m_hTarget;
+    }
+    bool SetNewTarget(HOBJECT);
+    bool SetTarget(std::string_view name);
+    bool RefreshTargetPosition();
+    bool MC_FaceTarget();
+    bool MC_FacePos(DVector);
+    DVector m_vTargetPos{};
+    int Metacmd = 1;
+    std::uint64_t target_changes = 0, target_link_breaks = 0, target_failures = 0, face_commands = 0;
+    std::string target_name, target_error;
+    DVector face_position{};
+    float face_yaw_delta = 0;
+    bool target_position_valid = false;
     OpenBlood2::AIKeyOutcome key_outcome = OpenBlood2::AIKeyOutcome::None;
     std::uint64_t model_keys = 0, audio_keys = 0, audio_starts = 0, key_failures = 0;
     std::uint64_t camera_suppressed = 0, script_suppressed = 0, chance_suppressed = 0;
@@ -67,8 +84,11 @@ class AI_Mgr : public CBaseCharacter
 
   protected:
     bool OnStringKey(ArgList*) override;
+    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
 
   private:
+    HOBJECT m_hTarget = nullptr;
+    bool TargetFailure(const char*);
     // Original subclasses share class/gender tables and their retained voice.
     // Shared ownership replaces a borrowed pointer, preserving sharing safely.
     std::shared_ptr<CAnim_Sound> m_pAnim_Sound;

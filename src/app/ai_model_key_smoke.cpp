@@ -1,5 +1,7 @@
 #include "ai_model_key_smoke.h"
+#include "engine/collision.h"
 #include "game/original/AI_Mgr.h"
+#include <cmath>
 #include <limits>
 namespace OpenBlood2
 {
@@ -19,6 +21,7 @@ namespace OpenBlood2
         ObjectCreateStruct state;
         state.m_ObjectType = OT_MODEL;
         state.m_Pos = body->state.m_Pos;
+        state.m_Pos.x -= 50;
         state.m_Flags = FLAG_MODELKEYS;
         SAFE_STRCPY(state.m_Name, "AI model-key probe (no AI states)");
         SAFE_STRCPY(state.m_Filename, "models/enemies/m_cultist1.abc");
@@ -49,7 +52,22 @@ namespace OpenBlood2
             return false;
         r->animation.looping = false;
         id = r->id;
-        return check_ai_sight_smoke(g, id);
+        return check_ai_target_smoke(g, id) && check_ai_sight_smoke(g, id);
+    }
+    bool check_ai_target_smoke(GameSession& g, ObjectId id)
+    {
+        const auto* r = g.objects.get(id);
+        auto* ai = r ? dynamic_cast<AI_Mgr*>(r->game.get()) : nullptr;
+        const auto* player = g.server_shell.Player(g.local_client);
+        const auto* body = player ? g.objects.get(player->m_hObject) : nullptr;
+        if (!ai || !body || !ai->SetNewTarget(body->handle) || !ai->RefreshTargetPosition() || !ai->MC_FaceTarget())
+            return false;
+        const auto delta = vector_subtract(body->state.m_Pos, r->state.m_Pos);
+        const auto forward = rotate_vector({0, 0, 1}, r->state.m_Rotation);
+        const auto distance = std::hypot(delta.x, delta.z);
+        return distance > 0 && std::abs(forward.x - delta.x / distance) < .001f &&
+               std::abs(forward.z - delta.z / distance) < .001f && ai->GetTarget() == body->handle &&
+               g.objects.link_count(r->handle) == 1 && ai->target_position_valid && ai->target_failures == 0;
     }
     bool check_ai_sight_smoke(GameSession& g, ObjectId id)
     {

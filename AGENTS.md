@@ -248,3 +248,10 @@ Preserve original gun-node/origin fallback, handheld clip, independent child rem
 non-reused IDs and deferred ownership cleanup. Visual children only: chains, physical
 children, dropped weapons and client visibility SFX remain unavailable. Hidden/reload
 inspection runs outside UI; required AI/ExitTrigger/FX keep M2 incomplete.
+
+The latest [explicit AI target evidence](../Documentation/Implementation/M2_AI_TARGETS.md) connects original named/link selection,
+stored-position facing and target MID_LINKBROKEN. Read [contracts](docs/AI_TARGET_CONTRACTS.md).
+Preserve same-target no-op, SetTarget's net-zero Metacmd change, local-up yaw,
+deferred non-owning target lifetime and checked pose failures. Explicit commands
+are not autonomous acquisition or an AI state machine. Source counts and the
+actual M2 gate remain unchanged; NPCs, ExitTrigger and required FX remain open.

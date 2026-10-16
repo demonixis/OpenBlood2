@@ -81,3 +81,8 @@ SubwayA remains 187 live-created entries, four transferred world sounds, 372
 editor-only, 17 unsupported and zero failed, plus seven SelfTriggers. CivilianAI,
 CultistAI, Gideon, ExitTrigger, target selection, navigation/actions, attachments
 and required FX/services keep the M2 exit gate open and --start-game at exit 6.
+
+The [explicit target/facing continuation](AI_TARGET_CONTRACTS.md) adds original
+AI_Mgr named target/link commands and deferred target clearing. GetObjectPos now
+returns a typed status; target sampling and CanSee reject unresolved poses.
+Autonomous acquisition/retention and full AI behavior remain unavailable.
