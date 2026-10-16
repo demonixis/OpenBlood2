@@ -1,5 +1,10 @@
 # Original Inventory and Vector Weapon Boundary
 
+> Extended by [inventory state contracts](INVENTORY_STATE_CONTRACTS.md): supported
+> original inventory Save/Load and exit-time capture now execute. Full player
+> preservation/association and safe destination entry remain unavailable; NEW_LEVEL
+> is still refused and M2 remains open.
+
 > Extended by [NPC hit/recoil contracts](AI_HIT_CONTRACTS.md): original visible-node
 > localization, region damage and nonlethal reactions now execute for initialized
 > Cultist/Civilian NPCs. Earlier blanket localization/recoil omissions are historical;

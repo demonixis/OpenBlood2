@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "7c340c547b783e17a024a821668bf8fc7ce52001",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "selected_lines": [
+        [
+          258,
+          332
+        ],
+        [
+          2843,
+          3061
+        ]
+      ],
+      "use": "Selected Term, Save and Load field/order/key branches"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/InvItem.h",
+      "sha256": "7b0ffbe822337d7f430466fd469c435e604d2c264c34a9af64e79f938e1329cc",
+      "selected_lines": [
+        [
+          181,
+          229
+        ]
+      ],
+      "use": "Owned key strings/charge and ignored old-owner association"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameInvItems.h",
+      "sha256": "592488eb133230295961290bc2bfd621429c6ccc11df1de010ba7ccaa0bd7aac",
+      "selected_lines": [
+        [
+          142,
+          171
+        ]
+      ],
+      "use": "CInvKey inherits base Save/Load"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "selected_lines": [
+        [
+          1142,
+          1210
+        ]
+      ],
+      "use": "Audited active player enumeration and pending whole-player keep-alive dependency"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "selected_lines": [
+        [
+          46,
+          122
+        ]
+      ],
+      "use": "Audited constructor reset of transient firing state; existing weapon implementation reused"
+    }
+  ],
+  "adaptations": [
+    "Owned typed supported inventory fields, no retail binary save compatibility",
+    "Preflight and staged Init/ObtainWeapon before commit, checked ownership and deferred child cleanup",
+    "Restore requires unassociated owner; exit capture is diagnostic inventory data, not full keep-alive"
+  ],
+  "not_implemented": [
+    "Player/Destructable Save/Load and restored client association",
+    "Destination entry and atomic world transfer",
+    "General saves, other items/weapons and unported inventory fields"
+  ]
+}

@@ -373,3 +373,10 @@ slot rules and dead-player early return. NEW_LEVEL explicitly refuses missing
 KeepAliveSave/Load before teardown; do not substitute fresh-game entry or claim a
 completed transfer. SubwayA has 203 created, four transferred sounds, 372 editor-only,
 one unsupported (Gideon), no failures. Required transfer/FX/services keep M2 open.
+
+The [inventory preservation continuation](../Documentation/Implementation/M2_INVENTORY_STATE.md) ports selected original
+CInventoryMgr Save/Load and owned exit-time capture. Read [contracts](docs/INVENTORY_STATE_CONTRACTS.md).
+Preserve raw ammo after weapon recreation, selected-slot order, keep-alive key
+removal, transient reset and checked staged ownership. Load refuses associated
+clients; snapshots are inventory only. Player/damage fields, restored client
+association and safe destination entry remain pending; NEW_LEVEL and M2 stay open.

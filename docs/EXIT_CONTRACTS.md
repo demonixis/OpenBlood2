@@ -1,5 +1,10 @@
 # Original level-exit contracts
 
+> Extended by [inventory state contracts](INVENTORY_STATE_CONTRACTS.md): supported
+> original inventory Save/Load and exit-time capture now execute. Full player
+> preservation/association and safe destination entry remain unavailable; NEW_LEVEL
+> is still refused and M2 remains open.
+
 `ExitTrigger` now executes its original property and activation branches and
 broadcasts an owned typed `SMSG_EXITWORLD` equivalent. The client shell applies
 `HandleExitWorld`'s dead-player guard and constructs the original

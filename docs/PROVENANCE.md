@@ -671,3 +671,13 @@ local lifetime and explicit NEW_LEVEL refusal replace unimplemented keep-alive
 services. No prototype code, binary library or commercial asset was imported.
 See [source selections](M2_EXIT_SOURCES.json), [contracts](EXIT_CONTRACTS.md) and
 [validation](../../Documentation/Implementation/M2_EXITS.md).
+
+## Original inventory preservation
+
+Selected CInventoryMgr Save/Load/Term and inherited CInvKey base fields, directly
+from the original Blood II source. Typed owned snapshots and staged rollback
+replace destructive message reads; no engine save format is claimed. Active
+player inventory is captured at exit, but whole-player keep-alive transfer remains
+refused. No donor code, dependencies or commercial assets were imported. See
+[source ledger](M2_INVENTORY_STATE_SOURCES.json), [contracts](INVENTORY_STATE_CONTRACTS.md)
+and [evidence](../../Documentation/Implementation/M2_INVENTORY_STATE.md).

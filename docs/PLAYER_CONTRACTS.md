@@ -1,5 +1,10 @@
 # Original Player Entry Boundary
 
+> Extended by [inventory state contracts](INVENTORY_STATE_CONTRACTS.md): supported
+> original inventory Save/Load and exit-time capture now execute. Full player
+> preservation/association and safe destination entry remain unavailable; NEW_LEVEL
+> is still refused and M2 remains open.
+
 > Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and
 > shell exit/load messages now execute. NEW_LEVEL still explicitly refuses missing
 > keep-alive transfer before teardown; this is not a completed level transition.

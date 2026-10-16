@@ -43,6 +43,7 @@ namespace OpenBlood2
         const auto old_bullets = player->m_InventoryMgr.GetAmmoCount(1);
         const auto received = g.client_shell.world_exit.received;
         const auto blocked = g.client_shell.world_exit.blocked;
+        const auto captures = g.server_shell.inventory_capture.captures;
         unsigned exits = 0;
         for (auto id : g.objects.snapshot())
         {
@@ -75,7 +76,9 @@ namespace OpenBlood2
                 return false;
         }
         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
-               g.client_shell.world_exit.blocked == blocked + 1 &&
+               g.client_shell.world_exit.blocked == blocked + 1 && g.server_shell.inventory_capture.valid &&
+               g.server_shell.inventory_capture.captures == captures + 1 &&
+               g.server_shell.inventory_capture.state.ammo[1] == old_bullets &&
                g.client_shell.world_exit.error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos &&
                old_player == g.client_shell.player && old_revision == g.world_revision &&
                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);

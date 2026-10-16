@@ -26,6 +26,31 @@ namespace OpenBlood2
                                static_cast<unsigned>(exit.request.type), game.server_shell.start_point_name.c_str());
             ImGui::TextWrapped("%s", exit.error.empty() ? "No transfer attempted; KeepAliveSave/Load unavailable."
                                                         : exit.error.c_str());
+            const auto& saved = game.server_shell.inventory_capture;
+            ImGui::Text("Inventory capture: %llu / %llu attempts; %s", (unsigned long long)saved.captures,
+                        (unsigned long long)saved.attempts, saved.valid ? "owned snapshot" : "unavailable");
+            if (!saved.error.empty())
+                ImGui::TextWrapped("%s", saved.error.c_str());
+            if (saved.valid)
+            {
+                const auto& inventory = saved.state;
+                ImGui::Text("Saved strength %u / magic %u / infinite %d / damage x%.2f", inventory.strength,
+                            inventory.magic, inventory.infinite_ammo, inventory.damage_multiplier);
+                ImGui::Text("Selected slot %u / %zu keys (discarded by original keep-alive Load)",
+                            inventory.current_slot, inventory.keys.size());
+                if (ImGui::TreeNode("Saved inventory contents"))
+                {
+                    for (unsigned i = 0; i < inventory.right.size(); ++i)
+                        ImGui::Text("Slot %u: right %u / left %u", i, inventory.right[i], inventory.left[i]);
+                    for (unsigned i = 0; i < inventory.ammo.size(); ++i)
+                        ImGui::Text("Ammo %u: %.2f", i, inventory.ammo[i]);
+                    for (const auto& key : inventory.keys)
+                        ImGui::Text("Key %s: %u uses", key.name.c_str(), key.uses);
+                    ImGui::TreePop();
+                }
+            }
+            ImGui::TextWrapped("Inventory only: player health/timers, restored client association and destination "
+                               "entry are not saved or transferred. Current inventory is unchanged.");
             for (auto id : game.objects.snapshot())
             {
                 const auto* record = game.objects.get(id);

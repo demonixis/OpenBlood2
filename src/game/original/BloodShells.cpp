@@ -10,6 +10,7 @@ void CBloodServerShell::PreStartWorld()
     paths.ClearPathList();
     world_started = false;
     updates = 0;
+    inventory_capture = {};
     // Team setup, active cinematics, voice and multiplayer state are outside
     // the accepted fresh single-player entry mode.
 }
@@ -25,6 +26,28 @@ CPlayerObj* CBloodServerShell::Player(HCLIENT client)
 {
     auto object = server_.GetClientUserData(client);
     return object ? dynamic_cast<CPlayerObj*>(server_.HandleToObject(object)) : nullptr;
+}
+bool CBloodServerShell::CapturePlayerInventory(HCLIENT client)
+{
+    auto& capture = inventory_capture;
+    ++capture.attempts;
+    capture.valid = false;
+    capture.state = {};
+    capture.error.clear();
+    const auto* player = Player(client);
+    // Original KeepAliveSave enumerates active player objects. This captures
+    // only their currently supported inventory aggregate, not a whole player.
+    if (!player || !server_.IsObjectAlive(player->m_hObject) ||
+        server_.GetObjectState(player->m_hObject) != OBJSTATE_ACTIVE)
+    {
+        capture.error = "Inventory capture requires an active associated player";
+        return false;
+    }
+    if (!player->m_InventoryMgr.Save(capture.state, capture.error))
+        return false;
+    capture.valid = true;
+    ++capture.captures;
+    return true;
 }
 CPlayerObj* CBloodServerShell::CreatePlayer(HCLIENT client)
 {

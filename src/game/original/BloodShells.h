@@ -22,6 +22,14 @@ class CBloodServerShell
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerUse&);
     void Update(float);
     CPlayerObj* Player(HCLIENT);
+    bool CapturePlayerInventory(HCLIENT);
+    struct InventoryCapture
+    {
+        OpenBlood2::InventoryState state;
+        std::string error;
+        std::uint64_t attempts = 0, captures = 0;
+        bool valid = false;
+    } inventory_capture; // Inventory only; never a successful KeepAliveSave.
     void SetStartPointName(const std::string& name)
     {
         start_point_name = name;

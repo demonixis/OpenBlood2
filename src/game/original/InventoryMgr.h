@@ -1,6 +1,7 @@
 #pragma once
 #include "B2BaseClass.h"
 #include "Weapon.h"
+#include "game/inventory_state.h"
 #include <array>
 #include <memory>
 #include <vector>
@@ -19,6 +20,10 @@ class CInventoryMgr : public Aggregate
 {
   public:
     ~CInventoryMgr() override;
+    bool Save(OpenBlood2::InventoryState&, std::string&) const;
+    // Restore before client association: rebuilding live client views is a
+    // separate player-transfer responsibility, never silently bypassed here.
+    bool Load(const OpenBlood2::InventoryState&, OpenBlood2::InventoryLoadType, std::string&);
     InventoryResult AddKey(const OpenBlood2::KeyItem&);
     InventoryResult QueryKey(std::string_view);
     std::vector<OpenBlood2::KeyItem> keys;

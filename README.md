@@ -1,5 +1,12 @@
 # Blood II Reconstruction aka OpenBlood2
 
+Latest inventory continuation: [original Save/Load subset](../Documentation/Implementation/M2_INVENTORY_STATE.md).
+Exit requests now capture owned inventory state; original keep-alive restoration
+removes keys and recreates weapons. Full player preservation/client association
+and safe destination entry remain unavailable, so NEW_LEVEL stays refused and
+**M2 stays incomplete**. Earlier blanket inventory-save omissions are superseded
+only for this aggregate subset.
+
 Latest continuation: [original ExitTrigger and shell exit requests](../Documentation/Implementation/M2_EXITS.md).
 SubwayA now has one unported entry (Gideon). NEW_LEVEL still requires unavailable
 KeepAliveSave/Load and is explicitly refused while retaining the current player and
