@@ -1,0 +1,131 @@
+#include "inspector.h"
+#include <algorithm>
+#include <imgui.h>
+namespace OpenBlood2
+{
+    void Inspector::draw_skeleton(GameSession& game, ObjectSelection& selection)
+    {
+        ImGui::TextWrapped(
+            "Current ABC node transforms and original CAnim_Sound tables. Spheres are the original "
+            "initialization radii, shown at live node positions; damage localization and AI callers remain unported.");
+        if (!game.objects.get(skeleton_selection))
+        {
+            if (const auto* player = game.server_shell.Player(game.local_client))
+                skeleton_selection = game.objects.get(player->m_hObject)->id;
+        }
+        if (!ImGui::BeginTable("Skeleton inspection", 2, ImGuiTableFlags_Resizable))
+            return;
+        ImGui::TableSetupColumn("Models", ImGuiTableColumnFlags_WidthFixed, 210);
+        ImGui::TableNextColumn();
+        for (auto id : game.objects.snapshot())
+        {
+            const auto* r = game.objects.get(id);
+            if (!r || r->state.m_ObjectType != OT_MODEL)
+                continue;
+            auto label = std::string(r->state.m_Name) + " #" + std::to_string(id.slot);
+            if (!(r->state.m_Flags & FLAG_VISIBLE))
+                label += " hidden";
+            if (r->activity != OBJSTATE_ACTIVE)
+                label += " inactive";
+            if (!r->model)
+                label += " missing model";
+            if (ImGui::Selectable(label.c_str(), skeleton_selection == id))
+                skeleton_selection = selection.id = id;
+        }
+        ImGui::TableNextColumn();
+        const auto* r = game.objects.get(skeleton_selection);
+        if (!r)
+            ImGui::TextUnformatted("No selected model");
+        else if (!r->model)
+            ImGui::TextWrapped("Model unavailable: %s", r->model_error.c_str());
+        else
+        {
+            const auto* character = dynamic_cast<const CBaseCharacter*>(r->game.get());
+            const auto& model = *r->model;
+            const auto* anim = character ? &character->m_Anim_Sound : nullptr;
+            ImGui::Text("%s | %zu nodes | %zu clips", r->state.m_Name, model.nodes.size(), model.animations.size());
+            if (r->animation.animation < model.animations.size())
+                ImGui::Text("%s / %.1f ms", model.animations[r->animation.animation].name.c_str(), r->animation.time);
+            if (anim)
+            {
+                ImGui::Text("Initial hit spheres: %s", anim->hit_spheres_valid ? "computed" : "unavailable");
+                if (!anim->hit_sphere_error.empty())
+                    ImGui::TextWrapped("%s", anim->hit_sphere_error.c_str());
+            }
+            else
+                ImGui::TextUnformatted("No original character animation table on this object");
+            std::vector<NodePose> pose;
+            if (sample_pose(model, r->animation.animation, r->animation.time, pose))
+            {
+                const auto origin = ImGui::GetCursorScreenPos();
+                const ImVec2 size{std::max(180.f, ImGui::GetContentRegionAvail().x), 220};
+                ImGui::InvisibleButton("Live skeleton front projection", size);
+                auto* draw = ImGui::GetWindowDrawList();
+                draw->AddRectFilled(origin, {origin.x + size.x, origin.y + size.y}, IM_COL32(12, 17, 23, 255));
+                draw->PushClipRect(origin, {origin.x + size.x, origin.y + size.y}, true);
+                const float scale = std::min(size.x / 160.f, size.y / 125.f);
+                auto project = [&](DVector p)
+                { return ImVec2{origin.x + size.x * .5f + p.x * scale, origin.y + size.y * .5f - p.y * scale}; };
+                for (size_t i = 0; i < pose.size(); ++i)
+                {
+                    const auto point = project(pose[i].position);
+                    const auto parent = model.nodes[i].parent;
+                    if (parent >= 0)
+                        draw->AddLine(point, project(pose[parent].position), IM_COL32(130, 200, 220, 255));
+                    draw->AddCircleFilled(point, 2, IM_COL32(200, 235, 255, 255));
+                    if (anim && anim->hit_spheres_valid)
+                        for (unsigned j = 0; j < NUM_STD_NODES; ++j)
+                            if (anim->hit_nodes_found[j] && model.nodes[i].name == szNodes[j])
+                                draw->AddCircle(point, anim->m_fHitSpheres[j] * scale, IM_COL32(255, 180, 80, 180));
+                }
+                draw->PopClipRect();
+            }
+            ImGui::TextWrapped(
+                "Local front projection. Orange radii are initialization measurements, not collision geometry.");
+            if (ImGui::CollapsingHeader("World node positions and rotations", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                if (ImGui::BeginTable("Nodes", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_ScrollY, ImVec2(0, 135)))
+                {
+                    ImGui::TableSetupColumn("Node");
+                    ImGui::TableSetupColumn("World position");
+                    ImGui::TableSetupColumn("Quaternion x y z w");
+                    ImGui::TableHeadersRow();
+                    for (const auto& node : model.nodes)
+                    {
+                        DVector p;
+                        DRotation q;
+                        const bool found = game.server.GetModelNodeTransform(r->handle, node.name.c_str(), &p, &q);
+                        ImGui::TableNextRow();
+                        ImGui::TableNextColumn();
+                        ImGui::TextUnformatted(node.name.c_str());
+                        ImGui::TableNextColumn();
+                        if (found)
+                            ImGui::Text("%.2f %.2f %.2f", p.x, p.y, p.z);
+                        else
+                            ImGui::TextUnformatted("unavailable / ambiguous");
+                        ImGui::TableNextColumn();
+                        if (found)
+                            ImGui::Text("%.2f %.2f %.2f %.2f", q.m_Vec.x, q.m_Vec.y, q.m_Vec.z, q.m_Spin);
+                    }
+                    ImGui::EndTable();
+                }
+            }
+            if (anim && ImGui::CollapsingHeader("Standard hit-sphere measurements"))
+                for (unsigned i = 0; i < NUM_STD_NODES; ++i)
+                    ImGui::Text("%s: radius %.3f | %s", szNodes[i], anim->m_fHitSpheres[i],
+                                !anim->hit_spheres_valid   ? "unavailable"
+                                : anim->hit_nodes_found[i] ? "found"
+                                                           : "previous-node fallback");
+            if (anim && ImGui::CollapsingHeader("Original animation table (including missing and default slots)"))
+                for (auto binding : anim->InspectAnimations())
+                {
+                    if (binding.index < model.animations.size())
+                        ImGui::Text("%s = %u / %s", binding.field, binding.index,
+                                    model.animations[binding.index].name.c_str());
+                    else
+                        ImGui::Text("%s = unavailable (%u)", binding.field, binding.index);
+                }
+        }
+        ImGui::EndTable();
+    }
+} // namespace OpenBlood2

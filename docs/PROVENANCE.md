@@ -411,3 +411,13 @@ CClientExplosionSFX's authored server path, shared null-damager guard and
 PlaySoundFromPos descriptor. [Contracts](SCENE_EXPLOSION_CONTRACTS.md) distinguish
 actual server/audio behavior from unavailable client FX. No donor backend,
 dependency or guessed gameplay correction was imported.
+
+## Original character animation/node continuation
+
+CAnim_Sound animation tables, CheckAnims, hit-sphere measurements and ForceAnimation
+are selectively imported; CPlayerObj consumes the actual table on character setup
+and locomotion. See [source ledger](M2_CHARACTER_ANIMATION_SOURCES.json) and
+[contracts](CHARACTER_ANIMATION_CONTRACTS.md). Node transforms use the existing
+bounded ABC sampler; later LithTech informs name matching only. OpenBlood2's
+false-returning node function was reviewed and not imported. Voice helpers,
+AI callers, damage localization, attachments and blending remain unimplemented.

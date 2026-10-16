@@ -14,6 +14,9 @@ namespace OpenBlood2
         bool platform = false;
         bool renderer = false;
         bool select_models = false;
+        bool select_skeleton = false;
+        ObjectId skeleton_selection{};
+        void draw_skeleton(GameSession&, ObjectSelection&);
         bool select_session = false;
         bool select_movement = false, keyboard_movement = false;
         bool select_containers = false;

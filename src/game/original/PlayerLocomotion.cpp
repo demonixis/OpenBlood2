@@ -77,33 +77,57 @@ bool CPlayerObj::UpdateAnim(const PlayerControls& controls)
             name = move_state == state ? locomotion_clip : (idle_random_() % 2 ? "idle1" : "idle2");
         }
         locomotion_requested_clip = name;
-        auto animation = server->GetAnimIndex(m_hObject, name.c_str());
-        // Original CAnim_Sound::CheckAnims copies the previous valid weapon
-        // column. Retail Caleb lacks walk_pistol/jmp_pistol and the knife clips;
-        // retain the original fallback instead of inventing resource aliases.
-        if (animation == UINT32_MAX && state == MoveState::Idle)
+        const unsigned column = knife ? 4 : 2;
+        DDWORD animation = UINT32_MAX;
+        switch (state)
         {
-            name = "idle1";
-            animation = server->GetAnimIndex(m_hObject, name.c_str());
+            case MoveState::Idle:
+                animation = m_Anim_Sound.m_nAnim_IDLE[name == "idle2" ? 1 : 0];
+                break;
+            case MoveState::Walk:
+                animation = m_Anim_Sound.m_nAnim_WALK[column];
+                break;
+            case MoveState::Run:
+                animation = m_Anim_Sound.m_nAnim_RUN[column];
+                break;
+            case MoveState::Jump:
+                animation = m_Anim_Sound.m_nAnim_JUMP[column];
+                break;
+            case MoveState::Crouch:
+                animation = m_Anim_Sound.m_nAnim_CROUCH[column];
+                break;
+            case MoveState::Crawl:
+                animation = m_Anim_Sound.m_nAnim_CRAWL[column];
+                break;
+            case MoveState::StrafeRight:
+                animation = m_Anim_Sound.m_nAnim_STRAFERIGHT[column];
+                break;
+            case MoveState::StrafeLeft:
+                animation = m_Anim_Sound.m_nAnim_STRAFELEFT[column];
+                break;
+            case MoveState::FireStand:
+                animation = m_Anim_Sound.m_nAnim_FIRE_STAND[column];
+                break;
+            case MoveState::FireWalk:
+                animation = m_Anim_Sound.m_nAnim_FIRE_WALK[column];
+                break;
+            case MoveState::FireRun:
+                animation = m_Anim_Sound.m_nAnim_FIRE_RUN[column];
+                break;
+            case MoveState::FireJump:
+                animation = m_Anim_Sound.m_nAnim_FIRE_JUMP[column];
+                break;
+            case MoveState::FireCrouch:
+                animation = m_Anim_Sound.m_nAnim_FIRE_CROUCH[column];
+                break;
+            case MoveState::FireCrawl:
+                animation = m_Anim_Sound.m_nAnim_FIRE_CRAWL[column];
+                break;
+            default:
+                break;
         }
-        if (animation == UINT32_MAX && state != MoveState::StrafeLeft && state != MoveState::StrafeRight &&
-            state != MoveState::Idle)
-        {
-            const bool fire = state == MoveState::FireStand || state == MoveState::FireWalk ||
-                              state == MoveState::FireRun || state == MoveState::FireJump ||
-                              state == MoveState::FireCrouch || state == MoveState::FireCrawl;
-            const auto prefix = name.substr(0, name.rfind('_') + 1);
-            const bool low = state == MoveState::Crouch || state == MoveState::Crawl;
-            const char* columns[] = {"rifle", fire ? "autorifle" : "rifle", fire || low ? "1pistol" : "pistol",
-                                     fire  ? "2pistol"
-                                     : low ? "1pistol"
-                                           : "pistol"};
-            for (int column = knife ? 3 : 1; column >= 0 && animation == UINT32_MAX; --column)
-            {
-                name = prefix + columns[column];
-                animation = server->GetAnimIndex(m_hObject, name.c_str());
-            }
-        }
+        if (!server->GetModelAnimationName(m_hObject, animation, name))
+            animation = UINT32_MAX;
         DVector dimensions;
         if (animation == UINT32_MAX || server->GetModelAnimUserDims(m_hObject, &dimensions, animation) != DE_OK)
         {

@@ -113,11 +113,12 @@ namespace OpenBlood2
                 options.player_smoke = true;
                 options.weapons_smoke = true;
             }
-            else if (arg == "--movement-smoke")
+            else if (arg == "--movement-smoke" || arg == "--skeleton-smoke")
             {
                 options.world_smoke = true;
                 options.player_smoke = true;
                 options.movement_smoke = true;
+                options.skeleton_smoke = arg == "--skeleton-smoke";
             }
             else if (arg == "--containers-smoke")
             {

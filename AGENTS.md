@@ -195,3 +195,12 @@ mark client FX unavailable; they are not successful FX services. SubwayA now has
 live-created entries, 4 transferred sounds, 372 editor-only and 17 unported, with no
 failures; runtime counts are 194/197 before/after player, then 185/188 after nine Keys.
 Required client FX, AI, ExitTrigger and other services keep M2 incomplete.
+
+The latest [character animation evidence](../Documentation/Implementation/M2_CHARACTER_ANIMATION.md) connects the full original
+CAnim_Sound animation table to player locomotion, current world-space model node
+queries and original hit-sphere measurements. Read [character contracts](docs/CHARACTER_ANIMATION_CONTRACTS.md).
+Preserve the >999 previous-slot fallback, untouched slot zero, strafe aliases,
+humiliation spelling/order and intermediate-zero ForceAnimation behavior.
+Missing head nodes fail explicitly; later-node fallback stays visible. Spheres
+are measurements, not active damage/collision services. AI, ExitTrigger, client
+FX and complete M2 remain open; SubwayA counts are unchanged.

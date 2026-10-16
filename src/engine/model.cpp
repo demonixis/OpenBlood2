@@ -252,10 +252,22 @@ namespace OpenBlood2
                     p.position = a.vec();
                     p.rotation.m_Vec = a.vec();
                     p.rotation.m_Spin = a.real();
-                    float norm = dot(p.rotation.m_Vec, p.rotation.m_Vec) + p.rotation.m_Spin * p.rotation.m_Spin;
-                    if (!a.good() || !coordinate(p.position) || norm < 0.0001f || norm > 10000)
-                        return fail("invalid node pose");
-                    p.rotation = normalize(p.rotation);
+                    const auto q = p.rotation;
+                    const double norm = double(q.m_Vec.x) * q.m_Vec.x + double(q.m_Vec.y) * q.m_Vec.y +
+                                        double(q.m_Vec.z) * q.m_Vec.z + double(q.m_Spin) * q.m_Spin;
+                    if (!a.good() || !coordinate(p.position) || norm == 0)
+                        return fail(("invalid node pose: animation=" + anim.name + " node=" + node.name +
+                                     " frame=" + std::to_string(j) + " norm2=" + std::to_string(norm) +
+                                     " position=" + std::to_string(p.position.x) + "," + std::to_string(p.position.y) +
+                                     "," + std::to_string(p.position.z))
+                                        .c_str());
+                    // Exported ABC rotations need not be unit length (retail cultist
+                    // pelvis norm squared exceeds 15,000). Double precision accepts
+                    // finite float components without squaring overflow; runtime
+                    // interpolation only sees normalized quaternions.
+                    const double length = std::sqrt(norm);
+                    p.rotation = {{float(q.m_Vec.x / length), float(q.m_Vec.y / length), float(q.m_Vec.z / length)},
+                                  float(q.m_Spin / length)};
                     na.frames.push_back(p);
                 }
                 auto size = static_cast<std::size_t>(frames) * node.deformed_vertices.size() * 3;
@@ -293,28 +305,32 @@ namespace OpenBlood2
                 return i;
         return no_animation;
     }
-    bool sample_pose(const Model& model, std::uint32_t animation, double milliseconds, std::vector<NodePose>& out)
+    namespace
     {
-        out.clear();
-        if (animation >= model.animations.size() || !std::isfinite(milliseconds) || milliseconds < 0)
-            return false;
-        const auto& a = model.animations[animation];
-        if (a.keys.empty())
-            return false;
-        auto upper = std::upper_bound(a.keys.begin(), a.keys.end(), milliseconds,
-                                      [](double time, const ModelKey& k) { return time < k.time; });
-        std::size_t hi = static_cast<std::size_t>(upper - a.keys.begin());
-        if (hi == a.keys.size())
-            --hi;
-        std::size_t lo = hi ? hi - 1 : 0;
-        float t = a.keys[hi].time > a.keys[lo].time
-                      ? static_cast<float>(std::clamp(
-                            (milliseconds - a.keys[lo].time) / (a.keys[hi].time - a.keys[lo].time), 0.0, 1.0))
-                      : 0;
-        for (std::size_t i = 0; i < model.nodes.size(); ++i)
+        bool pose_interval(const Model& model, std::uint32_t animation, double milliseconds, std::size_t& lo,
+                           std::size_t& hi, float& t)
         {
-            const auto& x = a.nodes[i].frames[lo];
-            auto y = a.nodes[i].frames[hi];
+            if (animation >= model.animations.size() || !std::isfinite(milliseconds) || milliseconds < 0)
+                return false;
+            const auto& a = model.animations[animation];
+            if (a.keys.empty() || a.nodes.size() != model.nodes.size())
+                return false;
+            auto upper = std::upper_bound(a.keys.begin(), a.keys.end(), milliseconds,
+                                          [](double time, const ModelKey& k) { return time < k.time; });
+            hi = static_cast<std::size_t>(upper - a.keys.begin());
+            if (hi == a.keys.size())
+                --hi;
+            lo = hi ? hi - 1 : 0;
+            t = a.keys[hi].time > a.keys[lo].time
+                    ? static_cast<float>(
+                          std::clamp((milliseconds - a.keys[lo].time) / (a.keys[hi].time - a.keys[lo].time), 0.0, 1.0))
+                    : 0;
+            return true;
+        }
+        NodePose local_pose(const ModelAnimation& a, std::size_t node, std::size_t lo, std::size_t hi, float t)
+        {
+            const auto& x = a.nodes[node].frames[lo];
+            auto y = a.nodes[node].frames[hi];
             if (dot(x.rotation.m_Vec, y.rotation.m_Vec) + x.rotation.m_Spin * y.rotation.m_Spin < 0)
             {
                 y.rotation.m_Vec = mul(y.rotation.m_Vec, -1);
@@ -323,6 +339,66 @@ namespace OpenBlood2
             NodePose p{add(mul(x.position, 1 - t), mul(y.position, t)),
                        normalize({add(mul(x.rotation.m_Vec, 1 - t), mul(y.rotation.m_Vec, t)),
                                   x.rotation.m_Spin * (1 - t) + y.rotation.m_Spin * t})};
+            return p;
+        }
+    } // namespace
+    DRotation compose_rotation(DRotation parent, DRotation child)
+    {
+        return compose(parent, child);
+    }
+    bool sample_node_pose(const Model& model, std::uint32_t animation, double milliseconds, std::size_t node,
+                          NodePose& out)
+    {
+        std::size_t lo, hi;
+        float t;
+        if (node >= model.nodes.size() || !pose_interval(model, animation, milliseconds, lo, hi, t))
+            return false;
+        std::array<std::size_t, 64> chain{};
+        std::size_t count = 0;
+        for (;;)
+        {
+            if (count == chain.size())
+                return false;
+            chain[count++] = node;
+            const auto parent = model.nodes[node].parent;
+            if (parent < 0)
+                break;
+            if (static_cast<std::size_t>(parent) >= node)
+                return false;
+            node = static_cast<std::size_t>(parent);
+        }
+        NodePose result{};
+        const auto& a = model.animations[animation];
+        while (count)
+        {
+            node = chain[--count];
+            if (a.nodes[node].frames.size() <= hi)
+                return false;
+            const auto local = local_pose(a, node, lo, hi, t);
+            result.position = add(result.position, rotate_vector(result.rotation, local.position));
+            result.rotation = compose(result.rotation, local.rotation);
+        }
+        if (!coordinate(result.position))
+            return false;
+        out = result;
+        return true;
+    }
+    bool sample_pose(const Model& model, std::uint32_t animation, double milliseconds, std::vector<NodePose>& out)
+    {
+        out.clear();
+        std::size_t lo, hi;
+        float t;
+        if (!pose_interval(model, animation, milliseconds, lo, hi, t))
+            return false;
+        const auto& a = model.animations[animation];
+        for (std::size_t i = 0; i < model.nodes.size(); ++i)
+        {
+            if (a.nodes[i].frames.size() <= hi)
+            {
+                out.clear();
+                return false;
+            }
+            NodePose p = local_pose(a, i, lo, hi, t);
             auto parent = model.nodes[i].parent;
             if (parent >= 0)
             {

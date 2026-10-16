@@ -20,6 +20,7 @@
 #include "world_sound_smoke.h"
 
 #include <SDL3/SDL_main.h>
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -247,7 +248,8 @@ namespace
                                    !options.random_sounds_smoke && !options.world_sounds_smoke &&
                                    !options.sprites_smoke && !options.scene_explosions_smoke;
         inspector.select_weapons = options.weapons_smoke;
-        inspector.select_movement = options.movement_smoke;
+        inspector.select_movement = options.movement_smoke && !options.skeleton_smoke;
+        inspector.select_skeleton = options.skeleton_smoke;
         inspector.select_containers = options.containers_smoke;
         inspector.select_brushes = options.brushes_smoke;
         inspector.select_pickups = options.pickups_smoke;
@@ -300,6 +302,7 @@ namespace
         DVector hidden_position{};
         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
         unsigned forward_frames = 0, jump_frames = 0, crouch_frames = 0, run_frames = 0;
+        bool skeleton_hidden = false;
         bool crouched_hidden = false, stood_after_crouch = false, locomotion_pose = false;
         bool saw_walk = false, saw_run = false, saw_jump = false;
         bool container_hidden = false;
@@ -472,6 +475,23 @@ namespace
                         crouched_hidden |= player->crouched && player->eye_level == 12;
                     if (frames > 130 && frames < 160)
                         stood_after_crouch |= !player->crouched && player->eye_level == 36;
+                    if (frames > 105 && frames < 125 && player->crouched && record->model)
+                    {
+                        DVector head;
+                        DRotation rotation;
+                        OpenBlood2::NodePose pose;
+                        auto i = std::find_if(record->model->nodes.begin(), record->model->nodes.end(),
+                                              [](const auto& node) { return node.name == "head"; });
+                        if (i != record->model->nodes.end() && player->m_Anim_Sound.hit_spheres_valid &&
+                            game.server.GetModelNodeTransform(record->handle, "head", &head, &rotation) &&
+                            sample_node_pose(*record->model, record->animation.animation, record->animation.time,
+                                             static_cast<std::size_t>(i - record->model->nodes.begin()), pose))
+                        {
+                            const auto local = OpenBlood2::rotate_vector(record->state.m_Rotation, pose.position);
+                            skeleton_hidden = std::abs(head.y - record->state.m_Pos.y - local.y) < .001f &&
+                                              player->m_Anim_Sound.m_fHitSpheres[0] > 0;
+                        }
+                    }
                     if (frames == 180 && record->model)
                     {
                         std::vector<DVector> vertices;
@@ -805,6 +825,15 @@ namespace
         {
             int width = 0, height = 0;
             SDL_GetWindowSize(runtime.window, &width, &height);
+            bool skeleton_reentered = false;
+            if (options.movement_smoke)
+                if (auto* player = game.server_shell.Player(game.local_client))
+                {
+                    DVector head;
+                    DRotation rotation;
+                    skeleton_reentered = player->m_Anim_Sound.hit_spheres_valid &&
+                                         game.server.GetModelNodeTransform(player->m_hObject, "head", &head, &rotation);
+                }
             const bool ui_ok =
                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
@@ -831,7 +860,8 @@ namespace
                 (options.movement_smoke &&
                  (!movement_hidden || !movement_jumped || !movement_landed || !game.client_shell.move_mgr.ready() ||
                   forward_frames != 55 || jump_frames != 10 || crouch_frames != 45 || run_frames != 20 ||
-                  !crouched_hidden || !stood_after_crouch || !locomotion_pose || !saw_walk || !saw_run || !saw_jump)) ||
+                  !skeleton_reentered || !skeleton_hidden || !crouched_hidden || !stood_after_crouch ||
+                  !locomotion_pose || !saw_walk || !saw_run || !saw_jump)) ||
                 (options.player_smoke && (!player_advanced_hidden || !game.client_shell.m_bInWorld ||
                                           !game.server_shell.Player(game.local_client))) ||
                 (options.world_smoke &&
@@ -963,6 +993,7 @@ int main(int argc, char** argv)
                      "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
                      "  --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload\n"
+                     "  --skeleton-smoke    Same lifecycle with original animation/node inspection\n"
                      "  --help              Show this help\n";
         return 0;
     }

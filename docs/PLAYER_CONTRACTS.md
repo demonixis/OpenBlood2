@@ -1,5 +1,10 @@
 # Original Player Entry Boundary
 
+> Extended by [character animation contracts](CHARACTER_ANIMATION_CONTRACTS.md):
+> original CAnim_Sound tables now drive locomotion; current model node queries and
+> original sphere measurements are inspectable. AI/damage-localization callers
+> and complete M2 remain unavailable.
+
 > Extended by [objective contracts](OBJECTIVES_CONTRACTS.md): original mission
 > objective broadcasts and external localized client strings are connected.
 > Other localization/audio/HUD and full M2 acceptance remain pending.

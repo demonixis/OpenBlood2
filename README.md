@@ -232,3 +232,8 @@ Required client FX, AI, ExitTrigger and other services keep M2 incomplete.
 
 Use `--scene-explosions-smoke --capture build/debug/scene-explosions.png` for the
 private GPU/audio check (SDL dummy output is used by CTest).
+
+Latest M2 continuation: [original character animations and model nodes](../Documentation/Implementation/M2_CHARACTER_ANIMATION.md)
+connects the original animation table to locomotion and exposes current skeletal
+transforms and original sphere measurements. AI/damage-localization consumers,
+ExitTrigger, client FX and the actual M2 exit gate remain incomplete.

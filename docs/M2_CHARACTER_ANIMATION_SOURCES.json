@@ -1,0 +1,119 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "30c5ce0c5926e257400827e665b75ad20858af4a",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/Anim_Sound.cpp",
+      "sha256": "238744b904e32e418188bfdc2f74d970bb544f1a027fab1c2ae9dca2b2d9aa4f",
+      "selected_lines": [
+        [
+          17,
+          135
+        ],
+        [
+          151,
+          514
+        ]
+      ],
+      "use": "Original nodes, constructor defaults, full animation discovery, CheckAnims, sphere formulas and forced animation"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Anim_Sound.h",
+      "sha256": "3e42f686a5f492bdca336efdba239d61617b366221c559c8942f6e35824ccde4",
+      "selected_lines": [
+        [
+          14,
+          263
+        ],
+        [
+          307,
+          375
+        ]
+      ],
+      "use": "Original animation names and member layout; sound helpers omitted"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          2368,
+          2379
+        ],
+        [
+          4910,
+          5450
+        ]
+      ],
+      "use": "Character table/sphere initialization and existing locomotion column consumers"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "selected_lines": [
+        [
+          791,
+          797
+        ]
+      ],
+      "use": "Original boolean current global node transform contract"
+    },
+    {
+      "path": "sources/lithtech/runtime/model/src/model.cpp",
+      "sha256": "47340a20b31acee4748dc6d171873df7560ae444bf485153cf4f86d6ac1b9cf8",
+      "selected_lines": [
+        [
+          798,
+          814
+        ]
+      ],
+      "use": "Later-generation reference for case-insensitive node lookup only; no runtime code imported"
+    },
+    {
+      "path": "OpenBlood2/OpenLithTech/src/core/game_interface.cpp",
+      "sha256": "c31ab8f6157bb1b9d4be90de2c7b615af0affd716b8af6db4bf835d6d67a9dbe",
+      "selected_lines": [
+        [
+          718,
+          722
+        ]
+      ],
+      "use": "Reviewed reference returns false; not used as implementation"
+    },
+    {
+      "path": "NoMadEngine/nomadengine/src/formats/abc_parser.cpp",
+      "sha256": "7399baf3d020a3d6b4d684c23a91c0df0bebfef39aef330bb2968b510c31539e",
+      "selected_lines": [
+        [
+          268,
+          292
+        ],
+        [
+          332,
+          353
+        ]
+      ],
+      "use": "Reference for existing non-unit quaternion normalization; no code imported"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BaseCharacter.h",
+      "sha256": "40160424f0b03f38b2513ba34e9abb44bc27d8a92b5735470d9d995f01d1face",
+      "selected_lines": [
+        [
+          55,
+          75
+        ]
+      ],
+      "use": "Original BaseCharacter-owned animation helper member"
+    }
+  ],
+  "adaptations": [
+    "C++20 fixed-width indices, value-initialized arrays, const node names, spans instead of sizeof/4",
+    "Owned per-character table and checked explicit return values; no global AI model cache",
+    "Undefined missing first-node input now fails with zero/unavailable radii; later fallback preserved",
+    "Invalid ForceAnimation target rejected before temporary clip zero",
+    "Typed owned animation-name query; original world-space node service implemented on the existing ABC sampler",
+    "Unimplemented voices, AI and damage-localization callers remain absent, not successful stubs",
+    "Remove arbitrary source quaternion norm window: finite nonzero float inputs normalized in double precision at decode; zero/nonfinite rotations and all structural budgets still reject"
+  ]
+}

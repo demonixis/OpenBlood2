@@ -72,6 +72,8 @@ namespace OpenBlood2
     bool sample_pose(const Model& model, std::uint32_t animation, double milliseconds, std::vector<NodePose>& out);
     bool sample_vertices(const Model& model, std::uint32_t animation, double milliseconds, std::vector<DVector>& out);
     DVector rotate_vector(DRotation q, DVector v);
+    DRotation compose_rotation(DRotation parent, DRotation child);
+    bool sample_node_pose(const Model&, std::uint32_t animation, double milliseconds, std::size_t node, NodePose&);
 
     struct AnimationTrack
     {

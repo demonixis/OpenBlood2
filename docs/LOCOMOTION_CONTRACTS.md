@@ -1,5 +1,10 @@
 # Player Locomotion Boundary
 
+> Extended by [character animation contracts](CHARACTER_ANIMATION_CONTRACTS.md):
+> original CAnim_Sound tables now drive locomotion; current model node queries and
+> original sphere measurements are inspectable. AI/damage-localization callers
+> and complete M2 remain unavailable.
+
 > Extended by [CONTAINER_CONTRACTS.md](CONTAINER_CONTRACTS.md): selected original
 > liquids/ladders and head/body queries are now connected. Earlier pending
 > container statements describe the dry-land increment.

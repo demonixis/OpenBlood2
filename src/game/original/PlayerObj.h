@@ -1,4 +1,5 @@
 #pragma once
+#include "Anim_Sound.h"
 #include "B2BaseClass.h"
 #include "Destructable.h"
 #include "InventoryMgr.h"
@@ -18,6 +19,7 @@ class CBaseCharacter : public B2BaseClass
     CBaseCharacter();
     CInventoryMgr m_InventoryMgr;
     CDestructable m_damage;
+    CAnim_Sound m_Anim_Sound;
     // Retain unhandled model commands for inspection, never execute them as
     // though sound/weapon/character animation-key services were available.
     std::vector<std::string> pending_model_commands;

@@ -21,6 +21,7 @@ namespace OpenBlood2
         bool inspect_player = false;
         bool player_smoke = false;
         bool weapons_smoke = false;
+        bool skeleton_smoke = false;
         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
              interaction_smoke = false, brushes_smoke = false, pickups_smoke = false, objectives_smoke = false,
              cameras_smoke = false, keyframes_smoke = false, worldpaths_smoke = false, lights_smoke = false,

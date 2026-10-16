@@ -51,7 +51,7 @@ namespace test_model
             patch(at, last ? UINT32_MAX : static_cast<std::uint32_t>(b.size()));
         }
     };
-    inline Writer abc(bool weapon = false, bool character = false)
+    inline Writer abc(bool weapon = false, bool character = false, float quaternion_w = 2)
     {
         Writer file, header, g, n, a, d;
         header.str("MonolithExport Model File v6");
@@ -154,7 +154,7 @@ namespace test_model
                 {
                     a.vec(node ? 0 : static_cast<float>(f * 10), node ? 2 : 0, 0);
                     a.vec();
-                    a.real(2);
+                    a.real(quaternion_w);
                 }
                 if (node)
                 {

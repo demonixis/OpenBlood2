@@ -583,6 +583,12 @@ namespace OpenBlood2
                     draw_weapons(game, selection);
                     ImGui::EndTabItem();
                 }
+                if (ImGui::BeginTabItem("Skeleton", nullptr, select_skeleton ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_skeleton = false;
+                    draw_skeleton(game, selection);
+                    ImGui::EndTabItem();
+                }
                 if (ImGui::BeginTabItem("Movement", nullptr, select_movement ? ImGuiTabItemFlags_SetSelected : 0))
                 {
                     select_movement = false;

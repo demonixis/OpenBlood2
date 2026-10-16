@@ -1,5 +1,10 @@
 # M2 Model and Collision Services
 
+> Extended by [character animation contracts](CHARACTER_ANIMATION_CONTRACTS.md):
+> original CAnim_Sound tables now drive locomotion; current model node queries and
+> original sphere measurements are inspectable. AI/damage-localization callers
+> and complete M2 remain unavailable.
+
 The later [player entry contracts](PLAYER_CONTRACTS.md) supersede this increment's statements that shell/player entry is entirely absent. Complete gameplay remains blocked; earlier limits below remain unless explicitly superseded.
 
 This continuation implements engine services and two original classes. It does
@@ -31,7 +36,7 @@ Limits include 128 MiB input, 6 sections, 65,536 vertices, 200,000 faces, 256 no
 poses and 32 MiB packed deformation. Coordinate magnitudes are limited to 10
 million original units. Counts are checked against remaining bytes before their
 loops. Referenced nodes/vertices and deformation ownership are checked. Repeated references within a node retain source write order (Caleb has 189 references to 120 distinct coat vertices, sometimes with differing samples);
-nonfinite floats, near-zero rotations, invalid bounds and decreasing/out-of-range
+nonfinite floats, zero rotations, invalid bounds and decreasing/out-of-range
 key times fail. Output is empty on parse failure.
 
 Models are read through the existing resource resolver. The weak cache uses the

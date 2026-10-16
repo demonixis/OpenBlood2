@@ -127,6 +127,8 @@ class ServerDE : public CSBase
     void (*SetModelLooping)(HOBJECT, DBOOL) = nullptr;
     DBOOL (*GetModelLooping)(HOBJECT) = nullptr;
     virtual DRESULT GetModelAnimUserDims(HOBJECT, DVector*, HMODELANIM) = 0;
+    virtual DBOOL GetModelNodeTransform(HOBJECT, const char*, DVector*, DRotation*) = 0;
+    virtual bool GetModelAnimationName(HOBJECT, HMODELANIM, std::string&) = 0;
     virtual DRESULT SetGlobalForce(DVector*) = 0;
     virtual DRESULT GetGlobalForce(DVector*) = 0;
     virtual DRESULT GetVelocity(HOBJECT, DVector*) = 0;

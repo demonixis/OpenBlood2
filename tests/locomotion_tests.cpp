@@ -217,6 +217,7 @@ namespace
         model->animations[animation_index(*model, "run_knife1")].name = "absent";
         model->animations[animation_index(*model, "run_pistol")].name = "absent2";
         r->model = model;
+        CHECK(p->m_Anim_Sound.SetAnimationIndexes(p->m_hObject));
         c.weapon_input = {};
         c.movement_input.crouch = false;
         c.movement_input.run = true;

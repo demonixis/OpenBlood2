@@ -91,7 +91,7 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
 bool CPlayerObj::SetCharacter(DBYTE character)
 {
     // Caleb, default skin only until the other original character branches,
-    // sound roots and hit-sphere generation are ported. Reject before mutation.
+    // sound roots are ported. Reject before mutation.
     if (character != 0 || m_nSkin != 0)
     {
         entry_error = "Only Caleb's default entry profile is ported";
@@ -103,6 +103,9 @@ bool CPlayerObj::SetCharacter(DBYTE character)
         entry_error = "Player model could not be loaded";
         return false;
     }
+    if (!m_Anim_Sound.SetAnimationIndexes(m_hObject))
+        return false;
+    m_Anim_Sound.GenerateHitSpheres(m_hObject);
     m_nCharacter = character;
     return true;
 }
