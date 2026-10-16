@@ -414,3 +414,10 @@ Preserve key removal, raw stats, case-insensitive solo marker selection/last fal
 trigger-before-teleport ordering, checked callback lifetime and one MoveMgr integrator.
 Failure cleans staged ownership, not destination trigger effects or an unloaded world.
 Automatic NEW_LEVEL still refuses before teardown; safe transfer and M2 remain open.
+
+The [sprite presentation continuation](../Documentation/Implementation/M2_SPRITE_VIEW.md) draws original DetailSprite frames
+using actual DTX alpha, current authored/camera rotations and shared world depth.
+Read [contracts](docs/SPRITE_VIEW_CONTRACTS.md). Preserve read-only clocks, disabled chromakey, explicit
+unsupported modes, stable depth order and world-revision cache ownership. Missing
+textures emit diagnostics, not guessed quads. Required FX and safe NEW_LEVEL still
+keep M2 incomplete; source-class counts are unchanged.

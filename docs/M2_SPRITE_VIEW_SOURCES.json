@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "003d1ea749e8442807c5b14f8ac09586abadce90",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/DetailSprite.cpp",
+      "sha256": "2a98ed394d5a50ae46a216f929c79ec0ad0434f1ad3bfa1c2035689b43da4f7b",
+      "selected_lines": [
+        [
+          17,
+          120
+        ],
+        [
+          195,
+          280
+        ]
+      ],
+      "use": "Existing original placement, scale and rotatable flags remain unchanged; no new game-rule port."
+    },
+    {
+      "path": "sources/blood2/AppHeaders/basetypes_de.h",
+      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
+      "selected_lines": [
+        [
+          285,
+          335
+        ]
+      ],
+      "use": "Original sprite flags, disabled chromakey, glow/bias/no-Z/sky meanings."
+    },
+    {
+      "path": "sources/lithtech/runtime/render_a/src/sys/d3d/drawsprite.cpp",
+      "sha256": "05c4a1982b2c84242d414924c8a1229b102d8584e92b95acee239430f558dea4",
+      "selected_lines": [
+        [
+          256,
+          289
+        ],
+        [
+          377,
+          445
+        ],
+        [
+          509,
+          575
+        ]
+      ],
+      "use": "Read-only later-generation reference for dimension half extents, camera/object bases and UV order; no wholesale import or retail parity claim."
+    },
+    {
+      "path": "sources/lithtech/runtime/client/src/sprite.cpp",
+      "sha256": "3a1d267c831f4c597ba841eb95e5684fb555a75d02aae2e333d027a4b18d29a7",
+      "selected_lines": [
+        [
+          19,
+          64
+        ]
+      ],
+      "use": "SPR metadata reference; metadata remains separate from chosen alpha presentation."
+    }
+  ],
+  "implementation": "New owned presentation and SDL_GPU alpha pass reusing existing original DetailSprite, SPR clock and bounded DTX decoder. No dependencies or game behavior imported.",
+  "limitations": [
+    "Later-generation size convention is not verified Blood II raster parity.",
+    "Unlit actual-alpha policy; glow/bias/no-Z/sky explicitly unsupported.",
+    "M2 remains incomplete."
+  ]
+}

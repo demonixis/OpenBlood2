@@ -98,3 +98,8 @@ without texture reload, resize and close-view depth isolation. CPU tests cover
 bounds, pose conventions, exact cached paths, source offsets, read-only clocks,
 hidden/removal state, weapon selection and two unload/re-entry cycles. The normal
 viewport smoke captures a real first-person model with ImGui absent from the image.
+
+The [sprite presentation continuation](SPRITE_VIEW_CONTRACTS.md) now draws supported
+original sprites with actual DTX alpha and shared world/model depth, before view
+weapons. Earlier blanket sprite-rendering omissions are superseded for this bounded
+subset. World/model opacity policy is unchanged; required FX and M2 remain open.

@@ -414,7 +414,7 @@ namespace OpenBlood2
                         "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
                         "the player in Session first, or launch --view-world.");
                     ImGui::TextWrapped(
-                        "Opaque textures/models are unlit. Lightmaps, sprites, liquid surfaces, "
+                        "World textures/models and alpha sprites are unlit. Lightmaps, liquid surfaces, "
                         "transparency and sky rendering remain unavailable. Unsupported objects stay in World.");
                     if (world_mesh && world_render)
                     {

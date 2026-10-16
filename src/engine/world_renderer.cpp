@@ -1,4 +1,5 @@
 #include "engine/world_renderer.h"
+#include "engine/shaders/sprite_frag.h"
 #include "engine/shaders/world_frag.h"
 #include "engine/shaders/world_vert.h"
 #include <cstring>
@@ -49,8 +50,8 @@ namespace OpenBlood2
         info.num_uniform_buffers = 1;
         auto* vertex = SDL_CreateGPUShader(device_, &info);
         info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
-        info.code = reinterpret_cast<const Uint8*>(world_frag);
-        info.code_size = sizeof(world_frag);
+        info.code = reinterpret_cast<const Uint8*>(style_ == DrawStyle::SpriteAlpha ? sprite_frag : world_frag);
+        info.code_size = style_ == DrawStyle::SpriteAlpha ? sizeof(sprite_frag) : sizeof(world_frag);
         info.num_uniform_buffers = 0;
         info.num_samplers = 1;
         auto* fragment = SDL_CreateGPUShader(device_, &info);
@@ -76,6 +77,16 @@ namespace OpenBlood2
         attributes[2].offset = offsetof(WorldVertex, uv);
         SDL_GPUColorTargetDescription target{};
         target.format = format;
+        if (style_ == DrawStyle::SpriteAlpha)
+        {
+            target.blend_state.enable_blend = true;
+            target.blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+            target.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+            target.blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
+            target.blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+            target.blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+            target.blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+        }
         SDL_GPUGraphicsPipelineCreateInfo create{};
         create.vertex_shader = vertex;
         create.fragment_shader = fragment;
@@ -86,7 +97,7 @@ namespace OpenBlood2
         create.rasterizer_state.enable_depth_clip = true;
         create.multisample_state.sample_count = SDL_GPU_SAMPLECOUNT_1;
         create.depth_stencil_state.enable_depth_test = true;
-        create.depth_stencil_state.enable_depth_write = true;
+        create.depth_stencil_state.enable_depth_write = style_ == DrawStyle::Opaque;
         create.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
         create.target_info.color_target_descriptions = &target;
         create.target_info.num_color_targets = 1;
@@ -216,7 +227,9 @@ namespace OpenBlood2
             SDL_GPUSamplerCreateInfo info{};
             info.min_filter = info.mag_filter = SDL_GPU_FILTER_NEAREST;
             info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
-            info.address_mode_u = info.address_mode_v = info.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+            info.address_mode_u = info.address_mode_v = info.address_mode_w =
+                style_ == DrawStyle::SpriteAlpha ? SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE
+                                                 : SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
             sampler_ = SDL_CreateGPUSampler(device_, &info);
             if (!sampler_)
             {

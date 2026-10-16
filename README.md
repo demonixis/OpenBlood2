@@ -1,5 +1,10 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The [sprite presentation continuation](../Documentation/Implementation/M2_SPRITE_VIEW.md) renders the 12 original SubwayA
+blood splats with decoded alpha and in-game resource/mode diagnostics. Hidden UI,
+world depth and unload/reload are tested. This is a prerequisite for client FX;
+required FX emitters, safe automatic level transfer and M2 remain incomplete.
+
 The [named keep-alive entry continuation](../Documentation/Implementation/M2_PLAYER_KEEPALIVE.md) preserves supported player stats/weapons into an explicitly loaded destination,
 discards keys and executes original named start entry. Session exposes its mode,
 selected marker and fallback. Automatic level transfer and the M2 gate remain open.

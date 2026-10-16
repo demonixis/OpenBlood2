@@ -81,3 +81,8 @@ repeat, row orientation, alpha-ignored policy, reload replacement and rejected-u
 cleanup alongside the existing depth/camera/resize checks. The real-world smoke
 retains movement, hidden UI and unload/re-entry assertions and now requires at least
 50 decoded materials and no rejected material. See [run evidence](../../Documentation/Implementation/M2_TEXTURES.md).
+
+The [sprite presentation continuation](SPRITE_VIEW_CONTRACTS.md) now draws supported
+original sprites with actual DTX alpha and shared world/model depth, before view
+weapons. Earlier blanket sprite-rendering omissions are superseded for this bounded
+subset. World/model opacity policy is unchanged; required FX and M2 remain open.

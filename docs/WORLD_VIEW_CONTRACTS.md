@@ -96,3 +96,8 @@ No pixel-identical retail comparison, optimization or additional platform is cla
 The [DTX continuation](TEXTURE_CONTRACTS.md) supersedes the absence of world textures: opaque unlit base colors now render, with named rejection diagnostics and bounded cache ownership. World vertices are now 32 bytes; the three-million-vertex payload limit is 96 MB. Earlier geometry limits, current transforms and the M2 gate remain unchanged.
 
 The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.
+
+The [sprite presentation continuation](SPRITE_VIEW_CONTRACTS.md) now draws supported
+original sprites with actual DTX alpha and shared world/model depth, before view
+weapons. Earlier blanket sprite-rendering omissions are superseded for this bounded
+subset. World/model opacity policy is unchanged; required FX and M2 remain open.

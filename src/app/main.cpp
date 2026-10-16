@@ -1,6 +1,7 @@
 #include "ai_model_key_smoke.h"
 #include "app/model_scene.h"
 #include "app/movement_controls.h"
+#include "app/sprite_scene.h"
 #include "brush_smoke.h"
 #include "build_info.h"
 #include "camera_smoke.h"
@@ -346,6 +347,9 @@ namespace
         OpenBlood2::WorldMesh world_mesh;
         OpenBlood2::WorldRenderer world_renderer(runtime.gpu), model_renderer(runtime.gpu);
         OpenBlood2::ModelView model_scene;
+        OpenBlood2::SpriteView sprite_scene;
+        OpenBlood2::WorldRenderer sprite_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
+        bool sprites_drawn_hidden = false;
         bool models_hidden = false, close_weapon_hidden = false;
         std::uint64_t model_frames = 0;
         std::vector<OpenBlood2::WorldDraw> world_draws;
@@ -355,6 +359,8 @@ namespace
         OpenBlood2::Inspector inspector(runtime);
         inspector.world_mesh = &world_mesh;
         inspector.model_view = &model_scene;
+        inspector.sprite_view = &sprite_scene;
+        inspector.sprite_render = &sprite_renderer.stats;
         inspector.world_render = &world_renderer.stats;
         if (options.keepalive_smoke)
             SAFE_STRCPY(inspector.keep_start_name, "01_egressa");
@@ -678,6 +684,8 @@ namespace
                 world_renderer.clear_geometry();
                 model_renderer.clear_geometry();
                 model_scene.clear();
+                sprite_scene.clear();
+                sprite_renderer.clear_geometry();
                 world_mesh = {};
                 world_draws.clear();
                 if (!game.world_path.empty() && !world_mesh.build(game.world, error, &game.resources))
@@ -699,6 +707,12 @@ namespace
             if (!OpenBlood2::update_model_scene(game, model_scene, error))
             {
                 spdlog::error("Model presentation: {}", error);
+                return 5;
+            }
+
+            if (!OpenBlood2::update_sprite_scene(game, sprite_scene, error))
+            {
+                spdlog::error("Sprite presentation: {}", error);
                 return 5;
             }
 
@@ -789,11 +803,29 @@ namespace
                         !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
                                              model_scene.world_draws, view.position, view.rotation,
                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
-                                             world_renderer.depth_target()) ||
-                        (!model_scene.close_draws.empty() &&
-                         !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
-                                              model_scene.close_draws, view.position, view.rotation, false, error,
-                                              OpenBlood2::DrawLoad::ClearDepth)))
+                                             world_renderer.depth_target()))
+                    {
+                        spdlog::error("Model viewport: {}", error);
+                        SDL_SubmitGPUCommandBuffer(commands);
+                        return 3;
+                    }
+                    if (!sprite_renderer.prepare(sprite_scene.mesh, sprite_scene.revision,
+                                                 SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
+                                                 height, error, true) ||
+                        !sprite_renderer.draw(commands, capture_frame ? capture.texture : swapchain, sprite_scene.mesh,
+                                              sprite_scene.draws, view.position, view.rotation,
+                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
+                                              world_renderer.depth_target()))
+                    {
+                        spdlog::error("Sprite viewport: {}", error);
+                        SDL_SubmitGPUCommandBuffer(commands);
+                        return 3;
+                    }
+                    sprites_drawn_hidden |= !inspector_visible && sprite_scene.draws.size() == 12;
+                    if (!model_scene.close_draws.empty() &&
+                        !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
+                                             model_scene.close_draws, view.position, view.rotation, false, error,
+                                             OpenBlood2::DrawLoad::ClearDepth))
                     {
                         spdlog::error("Model viewport: {}", error);
                         SDL_SubmitGPUCommandBuffer(commands);
@@ -1292,7 +1324,9 @@ namespace
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
                 (options.scene_explosions_smoke &&
                  (!scene_explosion_hidden || !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
-                (options.sprites_smoke && (!sprite_hidden || !OpenBlood2::check_sprite_smoke(game))) ||
+                (options.sprites_smoke &&
+                 (!sprite_hidden || !sprites_drawn_hidden || sprite_scene.draws.size() != 12 ||
+                  sprite_renderer.stats.uploads < 2 || !OpenBlood2::check_sprite_smoke(game))) ||
                 (options.world_sounds_smoke && (!world_sound_hidden || !OpenBlood2::check_world_sound_smoke(game))) ||
                 (options.random_sounds_smoke &&
                  (!random_sound_hidden || !OpenBlood2::check_random_sound_smoke(game, smoke_random_sound))) ||
@@ -1355,7 +1389,7 @@ namespace
                              "audio verified hidden and after reload; client FX unavailable");
             if (options.sprites_smoke)
                 spdlog::info("SPRITES smoke: 12 original DetailSprites, SPR manifests, frame clocks, hidden UI and "
-                             "unload/reload verified; textures indexed, not rendered");
+                             "unload/reload verified; 12 alpha-textured quads submitted with shared world depth");
             if (options.world_sounds_smoke)
                 spdlog::info("WORLD SOUNDS smoke: four authored loops survive consumed Sound objects, advance with "
                              "hidden UI and reload; SDL PCM submission verified");

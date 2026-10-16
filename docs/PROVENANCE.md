@@ -729,3 +729,13 @@ uses KeepAlive type 1 to discard keys. Explicit mode/start ownership, final body
 clearance and callback-lifetime checks are engine adaptations. No dependency,
 reference repository or commercial resource is imported. See
 [contracts](PLAYER_KEEPALIVE_CONTRACTS.md); automatic NEW_LEVEL remains refused.
+
+## Original-sprite presentation
+
+[Source ledger](M2_SPRITE_VIEW_SOURCES.json) records unchanged original DetailSprite
+placement and SDK flags, including disabled chromakey. The later LithTech D3D
+renderer is a read-only geometry/UV reference. New SpriteView and an explicit
+SDL_GPU alpha style reuse existing readers and shaders without importing that
+renderer. Actual DTX alpha, bounded owned caches and stable sorting are replacement
+presentation; retail size/blending parity remains unverified. See
+[contracts](SPRITE_VIEW_CONTRACTS.md). No dependency or commercial asset was added.

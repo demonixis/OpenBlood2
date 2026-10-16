@@ -88,3 +88,8 @@ TypeAction schema rejection. The two accepted flush placements hit real Temple
 entrance geometry. No catalog entry repeats; synthetic tests cover that branch.
 The known 16_bridge.dat structural rejection remains unchanged. No commercial
 resource bytes are copied into the repository.
+
+The [sprite presentation continuation](SPRITE_VIEW_CONTRACTS.md) now draws supported
+original sprites with actual DTX alpha and shared world/model depth, before view
+weapons. Earlier blanket sprite-rendering omissions are superseded for this bounded
+subset. World/model opacity policy is unchanged; required FX and M2 remain open.

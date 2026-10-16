@@ -10,10 +10,18 @@ namespace OpenBlood2
         Load,
         ClearDepth
     };
+    enum class DrawStyle
+    {
+        Opaque,
+        SpriteAlpha
+    };
     class WorldRenderer
     {
       public:
-        explicit WorldRenderer(SDL_GPUDevice* device) : device_(device) {}
+        explicit WorldRenderer(SDL_GPUDevice* device, DrawStyle style = DrawStyle::Opaque)
+            : device_(device), style_(style)
+        {
+        }
         ~WorldRenderer();
         WorldRenderer(const WorldRenderer&) = delete;
         WorldRenderer& operator=(const WorldRenderer&) = delete;
@@ -39,6 +47,7 @@ namespace OpenBlood2
 
       private:
         SDL_GPUDevice* device_ = nullptr;
+        DrawStyle style_;
         SDL_GPUGraphicsPipeline* pipeline_ = nullptr;
         SDL_GPUBuffer* vertices_ = nullptr;
         SDL_GPUTransferBuffer* vertex_transfer_ = nullptr;

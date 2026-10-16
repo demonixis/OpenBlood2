@@ -6,8 +6,14 @@ namespace OpenBlood2
 {
     void Inspector::draw_sprites(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextWrapped("Original DetailSprite placement and real SPR frame clock. DTX resources are indexed, "
-                           "not decoded. Texture rendering and billboard geometry remain unavailable.");
+        ImGui::TextWrapped("Original DetailSprite placement and SPR clock; decoded DTX alpha on world-depth quads. "
+                           "Rotatable sprites use their object pose; others face the camera. Unlit replacement "
+                           "presentation: glow, view bias, no-Z and sky modes remain unavailable.");
+        if (sprite_view && sprite_render)
+            ImGui::Text("Prepared %zu quads / %zu entries | GPU passes %llu / texture uploads %llu | %zu RGBA bytes",
+                        sprite_view->draws.size(), sprite_view->entries.size(),
+                        static_cast<unsigned long long>(sprite_render->frames),
+                        static_cast<unsigned long long>(sprite_render->uploads), sprite_view->mesh.texture_bytes);
         if (ImGui::CollapsingHeader("Authored sources (including failed / filtered / removed)"))
             for (size_t i = 0; i < game.entries.size(); ++i)
                 if (game.world.objects[i].class_name == "DetailSprite")
@@ -59,8 +65,18 @@ namespace OpenBlood2
             ImGui::Text("Transparent %d / translucent %d / color key 0x%x", s.transparent, s.translucent, s.color_key);
             ImGui::TextWrapped("Manifest: %s", r->state.m_Filename);
             const auto& path = s.frames[r->sprite_track.frame];
-            ImGui::TextWrapped("Frame: %s [%s; not decoded]", path.c_str(),
-                               game.resources.find(path) ? "indexed" : "missing");
+            ImGui::TextWrapped("Frame: %s [%s]", path.c_str(), game.resources.find(path) ? "indexed" : "missing");
+            if (sprite_view)
+                for (const auto& entry : sprite_view->entries)
+                    if (entry.object == r->id)
+                    {
+                        ImGui::Text("Decoded %u x %u | zero alpha %zu / partial alpha %zu", entry.width, entry.height,
+                                    entry.zero_alpha, entry.partial_alpha);
+                        ImGui::Text("Presentation: %s / %s", entry.rotatable ? "object rotation" : "camera facing",
+                                    entry.range != UINT32_MAX ? "quad prepared" : "not drawn");
+                        if (!entry.error.empty())
+                            ImGui::TextWrapped("%s", entry.error.c_str());
+                    }
             if (const auto* d = dynamic_cast<const DetailSprite*>(r->game.get()))
             {
                 ImGui::Text("Flush %d / rotatable %d / chromakey %d / repeat %d", d->flush, d->rotatable, d->chromakey,

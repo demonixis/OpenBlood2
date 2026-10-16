@@ -6,3 +6,6 @@ foreach(stage vert frag)
         --vn "world_${stage}" -o "${shader_dir}/world_${stage}.h" "${shader_dir}/world.${stage}"
         COMMAND_ERROR_IS_FATAL ANY)
 endforeach()
+execute_process(COMMAND "${GLSLANG}" -V --target-env vulkan1.0
+    --vn "sprite_frag" -o "${shader_dir}/sprite_frag.h" "${shader_dir}/sprite.frag"
+    COMMAND_ERROR_IS_FATAL ANY)
