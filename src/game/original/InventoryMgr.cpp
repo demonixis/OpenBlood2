@@ -53,6 +53,14 @@ CInventoryMgr::~CInventoryMgr()
 DDWORD CInventoryMgr::EngineMessageFn(LPBASECLASS object, DDWORD message, void* data, DFLOAT fData)
 {
     if (message == MID_UPDATE)
+        for (unsigned i = 0; i < m_Weapons.size(); ++i)
+        {
+            if (m_Weapons[i])
+                m_Weapons[i]->UpdateSounds();
+            if (m_LWeapons[i])
+                m_LWeapons[i]->UpdateSounds();
+        }
+    if (message == MID_UPDATE)
         if (auto* ai = dynamic_cast<AI_Mgr*>(object);
             ai && ai->npc_type != AI_Mgr::NPCType::Diagnostic && ai->RuntimeReady())
             if (!UpdateHandModels())

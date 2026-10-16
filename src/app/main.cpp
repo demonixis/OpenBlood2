@@ -86,13 +86,13 @@ namespace
             return 4;
         }
         if ((options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
-             options.world_sounds_smoke || options.random_sounds_smoke ||
+             options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke ||
              (!options.gpu_smoke && !options.world_smoke)) &&
             !game.server.audio.open_output(error))
         {
             spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
             if (options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
-                options.world_sounds_smoke || options.random_sounds_smoke)
+                options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke)
                 return 4;
         }
         HOBJECT key = nullptr;
@@ -1119,14 +1119,21 @@ namespace
                 if (options.weapons_smoke && frames == show_frame)
                 {
                     const auto& inv = game.server_shell.Player(game.local_client)->m_InventoryMgr;
-                    weapon_advanced_hidden =
-                        inv.GetWeapon(1)->shots > hidden_weapon_shots && inv.GetWeapon(0)->shots > 0;
+                    weapon_advanced_hidden = inv.GetWeapon(1)->shots > hidden_weapon_shots &&
+                                             inv.GetWeapon(0)->shots > 0 &&
+                                             inv.GetWeapon(1)->sounds_played == inv.GetWeapon(1)->shots &&
+                                             inv.GetWeapon(0)->sounds_played == inv.GetWeapon(0)->shots &&
+                                             !inv.GetWeapon(1)->sound_failures && !inv.GetWeapon(0)->sound_failures;
                 }
                 if (options.weapons_smoke && frames == unload_frame)
                 {
                     const auto& inv = game.server_shell.Player(game.local_client)->m_InventoryMgr;
-                    weapons_fired =
-                        inv.GetWeapon(1)->shots > 0 && inv.GetWeapon(0)->shots > 0 && inv.GetAmmoCount(1) < 50;
+                    weapons_fired = inv.GetWeapon(1)->shots > 0 && inv.GetWeapon(0)->shots > 0 &&
+                                    inv.GetAmmoCount(1) < 50 &&
+                                    inv.GetWeapon(1)->sounds_played == inv.GetWeapon(1)->shots &&
+                                    inv.GetWeapon(0)->sounds_played == inv.GetWeapon(0)->shots &&
+                                    !inv.GetWeapon(1)->sound_failures && !inv.GetWeapon(0)->sound_failures &&
+                                    game.server.audio.has_output() && game.server.audio.submitted_frames > 0;
                 }
                 if (frames == hide_frame || frames == show_frame)
                     event_ok = push_toggle(runtime.window);
@@ -1481,7 +1488,7 @@ namespace
                 spdlog::info("PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked");
             if (options.weapons_smoke)
                 spdlog::info("Weapon smoke passed: animation-key shots, bullets consumed, knife strikes, firing while "
-                             "hidden, unload/re-entry");
+                             "hidden, decoded fire voices submitted to SDL, unload/re-entry");
             if (options.movement_smoke)
                 spdlog::info("Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, "
                              "unload/re-entry");

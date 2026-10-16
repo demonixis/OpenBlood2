@@ -64,50 +64,69 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     direction = vector_add(direction, vector_scale(up, sample(-spread.v, spread.v) / 2000));
     direction = vector_scale(direction, 1 / std::sqrt(vector_dot(direction, direction)));
     const auto range = request.alternate ? data.m_fAltRange : data.m_fRange;
-    // Source FireSpread aligns the eye only for a player. NPCs fire the
-    // spread direction from their actual gun node (or body fallback).
-    if (const auto* player = dynamic_cast<CPlayerObj*>(server->HandleToObject(m_hOwner)))
+    const auto trace = [&]()
     {
-        DVector eye;
-        server->GetObjectPos(m_hOwner, &eye);
-        eye.y += player->eye_level;
-        auto aim = vector_add(eye, vector_scale(direction, range));
-        SegmentHit aim_hit;
-        const auto query = server->IntersectSegment(eye, aim, m_hOwner, aim_hit);
+        auto aim_direction = direction;
+        // Source FireSpread aligns the eye only for a player. NPCs fire the
+        // spread direction from their actual gun node (or body fallback).
+        if (const auto* player = dynamic_cast<CPlayerObj*>(server->HandleToObject(m_hOwner)))
+        {
+            DVector eye;
+            server->GetObjectPos(m_hOwner, &eye);
+            eye.y += player->eye_level;
+            auto aim = vector_add(eye, vector_scale(aim_direction, range));
+            SegmentHit aim_hit;
+            const auto query = server->IntersectSegment(eye, aim, m_hOwner, aim_hit);
+            if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
+            {
+                last_shot.result = FireResult::Unavailable;
+                return false;
+            }
+            if (query == SegmentResult::Hit)
+                aim = aim_hit.point;
+            aim_direction = vector_subtract(aim, request.position);
+            const auto aim_length = std::sqrt(vector_dot(aim_direction, aim_direction));
+            if (aim_length < 1e-6f)
+            {
+                last_shot.result = FireResult::Invalid;
+                return false;
+            }
+            aim_direction = vector_scale(aim_direction, 1 / aim_length);
+        }
+        last_shot.direction = aim_direction;
+        last_shot.end = vector_add(request.position, vector_scale(aim_direction, range));
+        const auto query = server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, true);
+        last_shot.collision = query;
         if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
         {
             last_shot.result = FireResult::Unavailable;
-            return last_shot.result;
+            return false;
         }
-        if (query == SegmentResult::Hit)
-            aim = aim_hit.point;
-        direction = vector_subtract(aim, request.position);
-        const auto aim_length = std::sqrt(vector_dot(direction, direction));
-        if (aim_length < 1e-6f)
-        {
-            last_shot.result = FireResult::Invalid;
-            return last_shot.result;
-        }
-        direction = vector_scale(direction, 1 / aim_length);
-    }
-    last_shot.direction = direction;
-    last_shot.end = vector_add(request.position, vector_scale(direction, range));
-    const auto query = server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, true);
-    last_shot.collision = query;
-    if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
-    {
-        last_shot.result = FireResult::Unavailable;
+        return true;
+    };
+    if (!trace())
         return last_shot.result;
-    }
     // Both selected definitions fire exactly one vector and use one unit.
     m_pInventoryMgr->SetAmmoCount(data.m_nAmmoType, ammo - use);
     m_fLastShotTime = server->GetTime();
     m_bLastFireAlt = request.alternate;
     ++shots;
     last_shot.result = FireResult::Fired;
-    if (query == SegmentResult::Hit && last_shot.hit.object)
+    PlayFireSound(request.alternate, request.position);
+    if (!server->IsObjectAlive(m_hOwner))
     {
-        Damage damage{direction, last_shot.hit.point, last_shot.damage * m_pInventoryMgr->damage_multiplier,
+        last_shot.interrupted = true;
+        last_shot.hit = {};
+        last_shot.collision = SegmentResult::Unavailable;
+        return last_shot.result; // Accepted shot; a hearing callback removed its owner before impact.
+    }
+    // Keep the existing no-consumption collision preflight. After actual hearing
+    // callbacks, resolve the final ray again rather than damage a stale/moved target.
+    if (fire_sound_alert.eligible && !trace())
+        return last_shot.result;
+    if (last_shot.collision == SegmentResult::Hit && last_shot.hit.object)
+    {
+        Damage damage{last_shot.direction, last_shot.hit.point, last_shot.damage * m_pInventoryMgr->damage_multiplier,
                       damage_type, m_hOwner};
         auto message =
             server->StartMessageToObject(server->HandleToObject(m_hOwner), last_shot.hit.object, damage_message);

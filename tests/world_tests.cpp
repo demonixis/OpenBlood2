@@ -1112,6 +1112,11 @@ namespace
                 }
             CHECK(voiced_table && voiced_table->m_hVoxSound);
             const auto voice_id = voiced_table->m_hVoxSound;
+            // Explicit diagnostic audio, not a shot through the intro camera's input gate.
+            auto* weapon = player->m_InventoryMgr.CurrentWeapon();
+            weapon->PlayFireSound(false, game.client_shell.position);
+            const auto fire_voices = weapon->fire_sounds;
+            CHECK(weapon->sounds_played == 1 && game.server.audio.get(weapon->last_fire_sound));
             std::array<std::shared_ptr<CAnim_Sound>, 4> slots;
             AI_Mgr::ExchangeRuntimeTables(slots);
             auto original_slots = slots;
@@ -1156,6 +1161,7 @@ namespace
                 for (const auto& [ai, table] : tables)
                     CHECK(ai->AnimSound() == table);
                 CHECK(voiced_table->m_hVoxSound == voice_id && game.server.audio.get(voice_id));
+                CHECK(weapon->fire_sounds == fire_voices);
                 AI_Mgr::ExchangeRuntimeTables(slots);
                 CHECK(slots == original_slots);
                 AI_Mgr::ExchangeRuntimeTables(slots);

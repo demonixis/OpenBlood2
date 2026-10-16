@@ -1,5 +1,10 @@
 # Original character voices and player animation sounds
 
+> Extended by [weapon fire-audio contracts](WEAPON_AUDIO_CONTRACTS.md): Beretta/knife
+> retained playback and automatic gunfire hearing now execute; source weapon voices
+> survive disposable destination rehearsal. Earlier fire-audio omissions are historical.
+> Required services and safe NEW_LEVEL still keep M2 incomplete.
+
 > Extended by [AI command/hearing contracts](AI_TRIGGER_CONTRACTS.md): player sound
 > alerts, original hearing reactions and selected trigger commands now execute.
 > Complete production NPCs and M2 remain open.

@@ -1,5 +1,10 @@
 # Original Inventory and Vector Weapon Boundary
 
+> Extended by [weapon fire-audio contracts](WEAPON_AUDIO_CONTRACTS.md): Beretta/knife
+> retained playback and automatic gunfire hearing now execute; source weapon voices
+> survive disposable destination rehearsal. Earlier fire-audio omissions are historical.
+> Required services and safe NEW_LEVEL still keep M2 incomplete.
+
 > Continued by [damage state contracts](DAMAGE_STATE_CONTRACTS.md): original damage
 > Save/Load values and death counter/delay/nigh-invulnerability now execute.
 > Earlier blanket damage-save omissions are historical. Whole player restoration

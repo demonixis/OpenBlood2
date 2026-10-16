@@ -4,6 +4,7 @@
 #include "server_de.h"
 CWeapon::~CWeapon()
 {
+    KillSounds();
     ShowHandModel(false);
 }
 bool CWeapon::ShowHandModel(DBOOL show)

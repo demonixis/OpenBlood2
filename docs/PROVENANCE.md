@@ -797,3 +797,11 @@ no new original method, reference engine dependency or commercial asset is impor
 New `destination_trial.cpp` exchanges the ported original lists, camera, shared AI tables and adapter binding to execute existing original world/KeepAlive entry callbacks in a disposable session. No new original method bodies or reference-engine code are imported.
 See [ledger](M2_DESTINATION_TRIAL_SOURCES.json), [contracts](DESTINATION_TRIAL_CONTRACTS.md) and [evidence](../../Documentation/Implementation/M2_DESTINATION_TRIAL.md).
 This is synchronous diagnostic isolation, not recovered retail staging or a completed level transfer.
+
+## Original retained weapon fire sounds
+
+Selected Weapon.cpp PlayFireSound, Update sound cleanup and KillSounds execute with
+original InventoryMgr all-slot scheduling and ObjectUtilities attached sound/hearing
+ordering. See [ledger](M2_WEAPON_AUDIO_SOURCES.json) and [contracts](WEAPON_AUDIO_CONTRACTS.md).
+Typed decoded duration, checked voice IDs, callback-aware final rays and explicit
+interrupted shots are preservation adaptations. No reference code/assets or pins changed.

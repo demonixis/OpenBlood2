@@ -43,6 +43,7 @@ class ServerDE : public CSBase
     virtual bool RandomInt(int, int, int&) = 0;
     virtual bool IsSoundDone(OpenBlood2::SoundId, bool&) = 0;
     virtual bool KillSound(OpenBlood2::SoundId) = 0;
+    virtual bool GetSoundDuration(OpenBlood2::SoundId, float&) = 0;
 
     virtual DRESULT CreateAttachment(HOBJECT, HOBJECT, const char*, const DVector*, const DRotation*, HATTACHMENT*) = 0;
     virtual DRESULT RemoveAttachment(HATTACHMENT) = 0;

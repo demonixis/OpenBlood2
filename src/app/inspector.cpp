@@ -1481,6 +1481,37 @@ namespace OpenBlood2
 
 namespace OpenBlood2
 {
+    void Inspector::draw_weapon_sound(const CWeapon& weapon, const GameSession& game)
+    {
+        if (!ImGui::TreeNodeEx("Original weapon fire audio", ImGuiTreeNodeFlags_DefaultOpen))
+            return;
+        ImGui::TextWrapped("Attempts %llu / played %llu / failed %llu / evicted %llu / released %llu",
+                           (unsigned long long)weapon.sound_attempts, (unsigned long long)weapon.sounds_played,
+                           (unsigned long long)weapon.sound_failures, (unsigned long long)weapon.sound_evictions,
+                           (unsigned long long)weapon.sounds_released);
+        ImGui::TextWrapped("Last resource: %s", weapon.fire_sound_resource.c_str());
+        if (!weapon.fire_sound_error.empty())
+            ImGui::TextWrapped("Audio failure: %s", weapon.fire_sound_error.c_str());
+        const auto& alert = weapon.fire_sound_alert;
+        ImGui::Text("Gunfire alert: %u deliveries / %s", alert.delivered,
+                    alert.complete ? "complete" : "not completed");
+        if (!alert.error.empty())
+            ImGui::TextWrapped("Alert failure: %s", alert.error.c_str());
+        for (unsigned i = 0; i < weapon.fire_sounds.size(); ++i)
+        {
+            const auto id = weapon.fire_sounds[i];
+            const auto* voice = game.server.audio.get(id);
+            ImGui::TextWrapped("Slot %u: %llu / %s / expected end %.3f", i, (unsigned long long)id,
+                               voice ? (voice->done ? "complete" : "playing") : (id ? "unresolved" : "empty"),
+                               weapon.fire_sound_ends[i]);
+            if (voice)
+                ImGui::TextWrapped("  Cursor %.0f / %zu frames; priority %u; attached spatial / dry reverb",
+                                   voice->cursor, voice->clip->frames(), unsigned(voice->request.priority));
+        }
+        ImGui::TextWrapped(
+            "Playback and hearing are separate results. View-weapon SOUND_KEY references do not start another voice.");
+        ImGui::TreePop();
+    }
     void Inspector::draw_weapons(GameSession& game, ObjectSelection& selection)
     {
         ImGui::TextUnformatted("Original inventory / Beretta 92F / Chosen Knife");
@@ -1492,8 +1523,8 @@ namespace OpenBlood2
             return;
         }
         auto& inventory = player->m_InventoryMgr;
-        ImGui::TextWrapped("Hold a fire button to drive the original client animation and server shot path. Preview is "
-                           "wireframe; sound requests and impacts are inspected, not rendered or played.");
+        ImGui::TextWrapped("Hold a fire button to drive original animation, shots, decoded fire sounds and AI hearing. "
+                           "The model preview is diagnostic; remaining impact FX and audio reverb are unavailable.");
         if (!world_error.empty())
             ImGui::TextWrapped("%s", world_error.c_str());
         if (!ImGui::BeginTable("Weapon inspection", 2, ImGuiTableFlags_Resizable))
@@ -1579,6 +1610,7 @@ namespace OpenBlood2
         ImGui::TextWrapped("State %u | FIRE_KEY events %llu | Client shots %llu", static_cast<unsigned>(view.state),
                            static_cast<unsigned long long>(view.fire_keys),
                            static_cast<unsigned long long>(view.shots));
+        draw_weapon_sound(*weapon, game);
         if (view.model && view.animation.animation < view.model->animations.size())
         {
             const auto& model = *view.model;
@@ -1626,7 +1658,8 @@ namespace OpenBlood2
         }
         if (!view.pending_sound.empty())
         {
-            ImGui::Text("Sound indexed: %s | playback unavailable", view.sound_indexed ? "yes" : "no");
+            ImGui::Text("View/model-key sound reference indexed: %s (see server fire voices above)",
+                        view.sound_indexed ? "yes" : "no");
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("%s", view.pending_sound.c_str());
         }
@@ -1639,6 +1672,8 @@ namespace OpenBlood2
                                : shot.result == FireResult::Fired ? "fired"
                                                                   : "failed",
                                shot.damage, shot.request.seed, shot.request.alternate ? "alternate" : "primary");
+            if (shot.interrupted)
+                ImGui::TextUnformatted("Shot interrupted before impact: owner removed by hearing callback.");
             ImGui::TextWrapped("Hit: %s | damage delivered %s",
                                hit                                    ? hit->type->name.c_str()
                                : shot.hit.object                      ? "removed object"

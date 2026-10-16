@@ -1,5 +1,10 @@
 # Original AI trigger commands and hearing
 
+> Extended by [weapon fire-audio contracts](WEAPON_AUDIO_CONTRACTS.md): Beretta/knife
+> retained playback and automatic gunfire hearing now execute; source weapon voices
+> survive disposable destination rehearsal. Earlier fire-audio omissions are historical.
+> Required services and safe NEW_LEVEL still keep M2 incomplete.
+
 Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
 this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
 The existing action/service limitations remain unless explicitly superseded.

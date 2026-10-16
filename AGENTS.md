@@ -475,3 +475,8 @@ The [destination initialization continuation](../Documentation/Implementation/M2
 Read [contracts](docs/DESTINATION_TRIAL_CONTRACTS.md). Preserve fixed sentinel addresses, all seven list/count pairs, active camera, four shared AI table owners and adapter binding.
 Destroy the temporary session under its own adapter before resuming source globals; every new mutable game global needs auditing.
 No destination simulation tick, runtime promotion or transfer is implemented. Monotonic audio IDs are not rewound; M2 remains incomplete.
+
+The [weapon fire-audio continuation](../Documentation/Implementation/M2_WEAPON_AUDIO.md) connects original retained fire sounds and automatic gunfire hearing.
+Read [contracts](docs/WEAPON_AUDIO_CONTRACTS.md). Preserve four slots, first-empty/earliest-end ordering, playback-before-alert even on missing WAV,
+all-inventory cleanup and dry-fire silence. Refresh rays after eligible hearing callbacks, defer removal and expose interrupted shots.
+Reverb/priority arbitration and other required services remain unavailable; safe NEW_LEVEL and M2 stay open.

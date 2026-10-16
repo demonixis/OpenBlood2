@@ -104,6 +104,7 @@ namespace OpenBlood2
         char path_prefix[101]{};
         void draw_paths(GameSession&, ObjectSelection&);
         void draw_session(GameSession&, ObjectSelection&);
+        void draw_weapon_sound(const CWeapon&, const GameSession&);
         void draw_weapons(GameSession&, ObjectSelection&);
         void draw_movement(GameSession&, ObjectSelection&);
         void draw_containers(GameSession&, ObjectSelection&);

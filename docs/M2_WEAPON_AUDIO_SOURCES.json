@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "9c0509b3a43b4e4567725365a050c201d3bef752",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "use": "Update sound loop 402-425, PlayFireSound 453-520, empty-fire branch 530-551, KillSounds 562-576, Fire ordering 866-950"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.h",
+      "sha256": "d7bd05aaff0b51c1cb6d8c356366c91114e4099303b901697d8ecfb16f87569d",
+      "use": "Original four retained sound slots and end-time state"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "use": "Update 2665-2685 visits both hands of every weapon slot"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "use": "PlaySoundFromObject 38-82; existing SendSoundTrigger faction broadcast 284-358"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
+      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
+      "use": "PlaySoundFromObject default flags/volume 25-27"
+    },
+    {
+      "path": "sources/blood2/Shared/WeaponDefs.h",
+      "sha256": "9a16f7a9f5fe8c57be73aac97bbeb87e712725bc856b1fb110c531875fa655ca",
+      "use": "MAX_FIRE_SOUNDS=4 and original Beretta/knife primary, alternate and empty filenames"
+    },
+    {
+      "path": "sources/blood2/Shared/SoundTypes.h",
+      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "use": "Player/AI base plus HIGH priorities"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
+      "use": "Existing FIRE_KEY caller and commented-out SOUND_KEY audio branch; no duplicate client sound added"
+    }
+  ],
+  "adaptations": [
+    "Typed retained SoundId slots and duration service backed by decoded samples; no legacy audio ABI",
+    "Existing spatial attached mixer, with explicit unsupported reverb and priority arbitration",
+    "Existing collision preflight retained; refresh final ray after eligible hearing callbacks, even failed delivery; owner removal interrupts impact",
+    "Inventory aggregate updates all right/left weapon sound slots; destructor releases retained voices",
+    "Owned diagnostics and source-session voice/slot retention through disposable destination rehearsal"
+  ],
+  "remaining": [
+    "Other weapons and impact sounds/FX",
+    "Audio reverb, priority arbitration, multiplayer client prediction and retail parity",
+    "Gideon, required world services/illumination, safe NEW_LEVEL and actual M2 acceptance"
+  ]
+}

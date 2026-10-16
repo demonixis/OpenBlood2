@@ -345,6 +345,8 @@ namespace
                         CHECK(game.step(1.0 / 60));
                     CHECK(view.shots > before && view.fire_keys > 0);
                     CHECK(view.sound_indexed);
+                    CHECK(inv.CurrentWeapon()->sounds_played == inv.CurrentWeapon()->shots &&
+                          inv.CurrentWeapon()->sound_failures == 0);
                     std::vector<DVector> pose;
                     CHECK(sample_vertices(*view.model, view.animation.animation, view.animation.time, pose));
                     CHECK(pose.size() == view.model->vertices.size());

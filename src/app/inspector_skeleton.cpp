@@ -399,6 +399,7 @@ namespace OpenBlood2
                         ai.clear_shot.rays, ai.clear_shot.retried_head ? "yes" : "no");
             if (weapon)
             {
+                draw_weapon_sound(*weapon, game);
                 const auto& shot = weapon->last_shot;
                 ImGui::Text("Ammo %.0f | damage %.2f | shot seed %u",
                             ai.m_InventoryMgr.GetAmmoCount(weapon->data.m_nAmmoType), shot.damage,

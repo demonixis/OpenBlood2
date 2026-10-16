@@ -521,3 +521,6 @@ Original callbacks/resources/start triggers are still unverified; this prerequis
 
 The [destination initialization continuation](../Documentation/Implementation/M2_DESTINATION_TRIAL.md) now executes original destination callbacks and named player entry in a temporary session, destroys it and resumes the retained source.
 Earlier callback-validation omissions are superseded for this explicit rehearsal only; destination promotion, required services and safe NEW_LEVEL still keep M2 open.
+
+The [weapon fire-audio continuation](../Documentation/Implementation/M2_WEAPON_AUDIO.md) connects original Beretta/knife WAV playback, four retained voices and automatic NPC hearing, with hidden-UI lifetime checks and inspection.
+Earlier fire-audio omissions are superseded for these two weapons; reverb, safe NEW_LEVEL and the complete M2 gate remain open.

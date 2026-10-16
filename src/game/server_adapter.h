@@ -48,6 +48,7 @@ namespace OpenBlood2
         bool RandomInt(int, int, int&) override;
         bool IsSoundDone(SoundId, bool&) override;
         bool KillSound(SoundId) override;
+        bool GetSoundDuration(SoundId, float&) override;
         bool advance_audio(double, DVector, DRotation);
         explicit ServerAdapter(Objects& objects);
         ~ServerAdapter() override;

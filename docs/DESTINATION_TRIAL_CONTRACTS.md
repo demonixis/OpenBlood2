@@ -1,5 +1,10 @@
 # Isolated destination initialization rehearsal
 
+> Extended by [weapon fire-audio contracts](WEAPON_AUDIO_CONTRACTS.md): Beretta/knife
+> retained playback and automatic gunfire hearing now execute; source weapon voices
+> survive disposable destination rehearsal. Earlier fire-audio omissions are historical.
+> Required services and safe NEW_LEVEL still keep M2 incomplete.
+
 This extends [structural destination preparation](DESTINATION_CONTRACTS.md) with
 actual original object initialization and [named keep-alive player entry](PLAYER_KEEPALIVE_CONTRACTS.md)
 in a temporary session. It then destroys that session and resumes the source.

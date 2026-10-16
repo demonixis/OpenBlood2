@@ -96,6 +96,16 @@ namespace OpenBlood2
         done = voice->done;
         return true;
     }
+    bool ServerAdapter::GetSoundDuration(SoundId id, float& duration)
+    {
+        trace_service("GetSoundDuration");
+        duration = 0;
+        const auto* voice = audio.get(id);
+        if (!voice || !voice->clip)
+            return false;
+        duration = static_cast<float>(voice->clip->duration());
+        return true;
+    }
     bool ServerAdapter::KillSound(SoundId id)
     {
         trace_service("KillSound");
