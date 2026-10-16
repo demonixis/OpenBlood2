@@ -524,3 +524,6 @@ Earlier callback-validation omissions are superseded for this explicit rehearsal
 
 The [weapon fire-audio continuation](../Documentation/Implementation/M2_WEAPON_AUDIO.md) connects original Beretta/knife WAV playback, four retained voices and automatic NPC hearing, with hidden-UI lifetime checks and inspection.
 Earlier fire-audio omissions are superseded for these two weapons; reverb, safe NEW_LEVEL and the complete M2 gate remain open.
+
+The [weapon impact continuation](../Documentation/Implementation/M2_WEAPON_IMPACTS.md) connects original glass/FireThrough/liquid vector rules, material WAV playback and impact hearing, with ordered contact inspection.
+Earlier impact-audio omissions are superseded for Beretta/knife; impact visuals, safe NEW_LEVEL and the actual M2 gate remain open.

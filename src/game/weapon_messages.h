@@ -38,6 +38,7 @@ namespace OpenBlood2
         HOBJECT object = nullptr;
         std::uint32_t polygon = UINT32_MAX;
         double fraction = 1;
+        std::uint16_t texture_flags = 0; // Baked material identifier, distinct from polygon render flags.
     };
     enum class SegmentObjects
     {
@@ -45,11 +46,17 @@ namespace OpenBlood2
         All,
         SolidOrRayHit
     };
+    enum class SegmentStart
+    {
+        IncludeInterior,
+        SkipInterior
+    };
     enum class SegmentFilter
     {
         None,
-        AIVisibility,    // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
-        IgnoreCharacters // Original CMovement clearance filter.
+        AIVisibility,     // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
+        IgnoreCharacters, // Original CMovement clearance filter.
+        IgnoreVolumes     // Original LiquidFilterFn excludes every VolumeBrush subclass.
     };
     enum class SegmentResult
     {

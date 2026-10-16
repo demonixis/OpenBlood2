@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "e211d4e5d623f5f1ba26218ca5439c6e0430c65c",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "use": "FireVector 660-789; UpdateWeaponFX 580-648 selected sound/mark conditions; AddImpact 1891-1914 normal offset; AlignFireVector 1095-1138 liquid filter"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "use": "GetSurfaceType 223-249; existing SendSoundTrigger impact broadcast"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
+      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
+      "use": "IsBrushObject/IsDoor class tests"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/VolumeBrushTypes.cpp",
+      "sha256": "f38190b88a30be71b587d0758093b85f4d0102631edb5eb7564cc91f7efa3021",
+      "use": "LiquidFilterFn 35-47 excludes all VolumeBrush classes"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/VolumeBrush.cpp",
+      "sha256": "ef2392f8e42f9f8185e94d0712a91c96c3a1dc89f5615ef00ff4f31bcfb6a94f",
+      "use": "Initial user flags 407-410 do not assign LIQUID material"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BaseCharacter.cpp",
+      "sha256": "0002f599c46971e006829e2c41405d872e8fbb08d8ff7590cadd50d91e14aa95",
+      "use": "Default flesh surface 44 and initial user-flag high byte 85-89"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
+      "sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
+      "use": "Raw user-flag surface and GetSurfaceType fallback"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/WeaponFX.cpp",
+      "sha256": "95230fcffd888751528e1a9f1d4353844ebfce5dbf5ef0a46cb0cf0a8a1b0e25",
+      "use": "PlayImpactSound 977-992; GetImpactSound 1104-1152"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
+      "sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
+      "use": "PlaySoundFromPos defaults, spatial radii and reverb request"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "use": "Unconditional B2_LITE/NRES and surface identifiers"
+    },
+    {
+      "path": "sources/blood2/Shared/WeaponDefs.h",
+      "sha256": "9a16f7a9f5fe8c57be73aac97bbeb87e712725bc856b1fb110c531875fa655ca",
+      "use": "Ammo identifiers and supported weapon definitions"
+    },
+    {
+      "path": "sources/blood2/Shared/SoundTypes.h",
+      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "use": "MISC_LOW priority"
+    },
+    {
+      "path": "sources/lithtech/runtime/world/src/fullintersectline.cpp",
+      "sha256": "f199f999a63986325675d9cb1bf2bdede98942e03cf0725dab937f506f6f3409",
+      "use": "Later-generation reference only: SOLID|RAYHIT and CHECK_FROM_POINT_INSIDE_OBJECTS policy 613-647"
+    }
+  ],
+  "adaptations": [
+    "Typed multi-contact damage and checked callback lifetime; maximum 64 contacts and forward-progress guard",
+    "SOLID|RAYHIT and explicit interior-entry policy, informed by a later engine reference; no retail parity claim",
+    "Owned impact strings and per-weapon portable client FX RNG separate from gameplay RNG",
+    "Detached decoded WAV audio with truthful failures; reverb/priority arbitration unavailable",
+    "Historical read-only inspection; original default character flesh surface only, lower user flags preserved"
+  ],
+  "remaining": [
+    "Weapon impact visuals, decals, visual random ordering and other weapons",
+    "Gideon, required world services/illumination, safe NEW_LEVEL, actual M2 acceptance"
+  ]
+}

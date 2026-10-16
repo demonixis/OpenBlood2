@@ -1,5 +1,9 @@
 # M2 Model and Collision Services
 
+> Extended by [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md): original multi-hit
+> material rules, selected impact audio and automatic impact hearing now execute.
+> Earlier impact-audio omissions are historical; visuals and the M2 gate remain open.
+
 > Extended by [character animation contracts](CHARACTER_ANIMATION_CONTRACTS.md):
 > original CAnim_Sound tables now drive locomotion; current model node queries and
 > original sphere measurements are inspectable. AI/damage-localization callers

@@ -1483,6 +1483,64 @@ namespace OpenBlood2
 {
     void Inspector::draw_weapon_sound(const CWeapon& weapon, const GameSession& game)
     {
+        if (ImGui::TreeNodeEx("Original vector impacts", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::TextWrapped("Last shot %zu contacts | total %llu | sounds %llu | failed %llu", weapon.impacts.size(),
+                               (unsigned long long)weapon.impact_contacts, (unsigned long long)weapon.impact_sounds,
+                               (unsigned long long)weapon.impact_sound_failures);
+            if (!weapon.impact_error.empty())
+                ImGui::TextWrapped("Impact failure: %s", weapon.impact_error.c_str());
+            for (unsigned i = 0; i < weapon.impacts.size(); ++i)
+            {
+                const auto& impact = weapon.impacts[i];
+                const char* branch = "object";
+                switch (impact.branch)
+                {
+                    case WeaponImpactBranch::World:
+                        branch = "world";
+                        break;
+                    case WeaponImpactBranch::Brush:
+                        branch = "brush";
+                        break;
+                    case WeaponImpactBranch::Door:
+                        branch = "door";
+                        break;
+                    case WeaponImpactBranch::Volume:
+                        branch = "volume";
+                        break;
+                    case WeaponImpactBranch::Other:
+                        break;
+                }
+                ImGui::PushID(static_cast<int>(i));
+                if (ImGui::TreeNode("Contact", "%u: %s / material %u / %s", i + 1, branch, impact.surface,
+                                    impact.continued ? "continue" : "stop"))
+                {
+                    const auto* object = game.objects.get(impact.hit.object);
+                    const auto* voice = game.server.audio.get(impact.effect.sound);
+                    ImGui::TextWrapped("Target: %s | stopping material %u | damage delivered %s",
+                                       object ? object->state.m_Name
+                                              : (impact.hit.object ? "removed" : "primary world"),
+                                       impact.stopping_surface, impact.damage_delivered ? "yes" : "no");
+                    ImGui::Text("Position %.2f %.2f %.2f", impact.hit.point.x, impact.hit.point.y, impact.hit.point.z);
+                    ImGui::TextWrapped("Impact audio: %s / %s", impact.effect.resource.c_str(),
+                                       voice ? (voice->done ? "complete" : "playing")
+                                             : (impact.effect.sound ? "released" : "no voice"));
+                    if (!impact.effect.error.empty())
+                        ImGui::TextWrapped("Audio failure: %s", impact.effect.error.c_str());
+                    ImGui::Text("Impact hearing: %u deliveries / %s", impact.alert.delivered,
+                                impact.alert.complete ? "complete" : "not completed");
+                    if (!impact.alert.error.empty())
+                        ImGui::TextWrapped("Hearing failure: %s", impact.alert.error.c_str());
+                    if (impact.target_removed)
+                        ImGui::TextUnformatted("Target removed by hearing before damage.");
+                    ImGui::TreePop();
+                }
+                ImGui::PopID();
+            }
+            ImGui::TextWrapped("Ordered historical contacts; resolve handles before inspection. Impact visuals, decals "
+                               "and reverb remain unavailable.");
+            ImGui::TreePop();
+        }
         if (!ImGui::TreeNodeEx("Original weapon fire audio", ImGuiTreeNodeFlags_DefaultOpen))
             return;
         ImGui::TextWrapped("Attempts %llu / played %llu / failed %llu / evicted %llu / released %llu",
@@ -1550,6 +1608,10 @@ namespace OpenBlood2
                 ImGui::Text("%u%s", slot, inventory.m_nCurWeaponSlot == slot ? " *" : "");
                 ImGui::TableNextColumn();
                 ImGui::TextUnformatted(right ? right->data.m_szWeaponName : "empty");
+                if (right)
+                    ImGui::TextWrapped(
+                        "Impacts %llu / sounds %llu / failures %llu", (unsigned long long)right->impact_contacts,
+                        (unsigned long long)right->impact_sounds, (unsigned long long)right->impact_sound_failures);
                 ImGui::TableNextColumn();
                 ImGui::TextUnformatted(left ? left->data.m_szWeaponName : "empty");
                 ImGui::TableNextColumn();

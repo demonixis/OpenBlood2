@@ -34,6 +34,8 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     if (!std::isfinite(length) || length < 1e-6f)
         return FireResult::Invalid;
     last_shot = {};
+    impacts.clear();
+    impact_error.clear();
     last_shot.request = request;
     const auto forward = vector_scale(request.direction, 1 / length);
     // AlignRotation's world-up basis (stable vertical fallback).
@@ -76,7 +78,9 @@ FireResult CWeapon::Fire(const WeaponFire& request)
             eye.y += player->eye_level;
             auto aim = vector_add(eye, vector_scale(aim_direction, range));
             SegmentHit aim_hit;
-            const auto query = server->IntersectSegment(eye, aim, m_hOwner, aim_hit);
+            const auto query =
+                server->IntersectSegment(eye, aim, m_hOwner, aim_hit, false, SegmentObjects::SolidOrRayHit,
+                                         SegmentFilter::IgnoreVolumes, SegmentStart::SkipInterior);
             if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
             {
                 last_shot.result = FireResult::Unavailable;
@@ -95,7 +99,9 @@ FireResult CWeapon::Fire(const WeaponFire& request)
         }
         last_shot.direction = aim_direction;
         last_shot.end = vector_add(request.position, vector_scale(aim_direction, range));
-        const auto query = server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, true);
+        const auto query =
+            server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, false,
+                                     SegmentObjects::SolidOrRayHit, SegmentFilter::None, SegmentStart::SkipInterior);
         last_shot.collision = query;
         if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
         {
@@ -124,23 +130,5 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     // callbacks, resolve the final ray again rather than damage a stale/moved target.
     if (fire_sound_alert.eligible && !trace())
         return last_shot.result;
-    if (last_shot.collision == SegmentResult::Hit && last_shot.hit.object)
-    {
-        Damage damage{last_shot.direction, last_shot.hit.point, last_shot.damage * m_pInventoryMgr->damage_multiplier,
-                      damage_type, m_hOwner};
-        auto message =
-            server->StartMessageToObject(server->HandleToObject(m_hOwner), last_shot.hit.object, damage_message);
-        if (!message)
-            last_shot.result = FireResult::DeliveryFailed;
-        else if (server->WriteDamage(message, damage) != DE_OK)
-        {
-            server->EndHMessageWrite(message);
-            last_shot.result = FireResult::DeliveryFailed;
-        }
-        else if (server->EndMessage(message) != DE_OK)
-            last_shot.result = FireResult::DeliveryFailed;
-        else
-            last_shot.damage_delivered = true;
-    }
-    return last_shot.result;
+    return FireVector();
 }

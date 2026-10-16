@@ -805,3 +805,11 @@ original InventoryMgr all-slot scheduling and ObjectUtilities attached sound/hea
 ordering. See [ledger](M2_WEAPON_AUDIO_SOURCES.json) and [contracts](WEAPON_AUDIO_CONTRACTS.md).
 Typed decoded duration, checked voice IDs, callback-aware final rays and explicit
 interrupted shots are preservation adaptations. No reference code/assets or pins changed.
+
+## Original vector impacts and material audio
+
+Selected Weapon.cpp FireVector/AddImpact, WeaponFX.cpp impact sound methods and
+BaseCharacter flesh flags are integrated. See [ledger](M2_WEAPON_IMPACT_SOURCES.json)
+and [contracts](WEAPON_IMPACT_CONTRACTS.md). Typed bounded continuation, later-engine
+interior policy, owned client audio RNG/strings and checked callback lifetime are
+explicit adaptations. Reference sources/assets and dependency pins remain unchanged.

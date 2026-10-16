@@ -1,6 +1,7 @@
 #pragma once
 #include "AISound.h"
 #include "WeaponDefs.h"
+#include "WeaponFX.h"
 #include "engine/audio.h"
 #include "game/weapon_messages.h"
 #include <array>
@@ -25,6 +26,24 @@ struct WeaponShot
     OpenBlood2::SegmentHit hit;
     bool damage_delivered = false, interrupted = false;
     FireResult result = FireResult::Invalid;
+};
+enum class WeaponImpactBranch
+{
+    World,
+    Brush,
+    Door,
+    Volume,
+    Other
+};
+struct WeaponImpact
+{
+    OpenBlood2::SegmentHit hit;
+    DVector from{};
+    unsigned surface = 0, stopping_surface = 0;
+    WeaponImpactBranch branch = WeaponImpactBranch::Other;
+    bool continued = false, effect_requested = false, damage_delivered = false, target_removed = false;
+    CWeaponFX effect;
+    OpenBlood2::SoundAlertReport alert;
 };
 // Selected vector-weapon path and original retained fire-sound lifecycle.
 class CWeapon
@@ -58,6 +77,11 @@ class CWeapon
     }
     float CheckAmmo() const;
     FireResult Fire(const OpenBlood2::WeaponFire&);
+    FireResult FireVector();
+    std::vector<WeaponImpact> impacts; // Latest validated shot attempt, bounded to 64 contacts.
+    std::string impact_error;
+    std::uint64_t impact_contacts = 0, impact_sounds = 0, impact_sound_failures = 0;
+    std::minstd_rand impact_random{1}; // Separate owned client-FX randomness; never changes game/shot RNG.
     const WeaponData& data;
     HOBJECT m_hOwner = nullptr;
     CInventoryMgr* m_pInventoryMgr = nullptr;

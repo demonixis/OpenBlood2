@@ -86,7 +86,8 @@ class ServerDE : public CSBase
     virtual OpenBlood2::SegmentResult IntersectSegment(
         DVector from, DVector to, HOBJECT ignore, OpenBlood2::SegmentHit&, bool fire_through = false,
         OpenBlood2::SegmentObjects objects = OpenBlood2::SegmentObjects::SolidOnly,
-        OpenBlood2::SegmentFilter filter = OpenBlood2::SegmentFilter::None) = 0;
+        OpenBlood2::SegmentFilter filter = OpenBlood2::SegmentFilter::None,
+        OpenBlood2::SegmentStart start = OpenBlood2::SegmentStart::IncludeInterior) = 0;
     virtual DRESULT WriteDamage(HMESSAGEWRITE, const OpenBlood2::Damage&) = 0;
     virtual bool ReadDamage(HMESSAGEREAD, OpenBlood2::Damage&) = 0;
     // Source adaptation: client association is a checked object handle, never a

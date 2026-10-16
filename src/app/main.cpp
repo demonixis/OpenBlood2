@@ -1119,11 +1119,12 @@ namespace
                 if (options.weapons_smoke && frames == show_frame)
                 {
                     const auto& inv = game.server_shell.Player(game.local_client)->m_InventoryMgr;
-                    weapon_advanced_hidden = inv.GetWeapon(1)->shots > hidden_weapon_shots &&
-                                             inv.GetWeapon(0)->shots > 0 &&
-                                             inv.GetWeapon(1)->sounds_played == inv.GetWeapon(1)->shots &&
-                                             inv.GetWeapon(0)->sounds_played == inv.GetWeapon(0)->shots &&
-                                             !inv.GetWeapon(1)->sound_failures && !inv.GetWeapon(0)->sound_failures;
+                    weapon_advanced_hidden =
+                        inv.GetWeapon(1)->shots > hidden_weapon_shots && inv.GetWeapon(0)->shots > 0 &&
+                        inv.GetWeapon(1)->sounds_played == inv.GetWeapon(1)->shots &&
+                        inv.GetWeapon(0)->sounds_played == inv.GetWeapon(0)->shots &&
+                        !inv.GetWeapon(1)->sound_failures && !inv.GetWeapon(0)->sound_failures &&
+                        inv.GetWeapon(1)->impact_sounds > 0 && !inv.GetWeapon(1)->impact_sound_failures;
                 }
                 if (options.weapons_smoke && frames == unload_frame)
                 {
@@ -1133,7 +1134,11 @@ namespace
                                     inv.GetWeapon(1)->sounds_played == inv.GetWeapon(1)->shots &&
                                     inv.GetWeapon(0)->sounds_played == inv.GetWeapon(0)->shots &&
                                     !inv.GetWeapon(1)->sound_failures && !inv.GetWeapon(0)->sound_failures &&
+                                    inv.GetWeapon(1)->impact_sounds > 0 && !inv.GetWeapon(1)->impact_sound_failures &&
                                     game.server.audio.has_output() && game.server.audio.submitted_frames > 0;
+                    spdlog::info("Weapon impacts: contacts={}, sounds={}, failures={}, hidden={}",
+                                 inv.GetWeapon(1)->impact_contacts, inv.GetWeapon(1)->impact_sounds,
+                                 inv.GetWeapon(1)->impact_sound_failures, weapon_advanced_hidden);
                 }
                 if (frames == hide_frame || frames == show_frame)
                     event_ok = push_toggle(runtime.window);

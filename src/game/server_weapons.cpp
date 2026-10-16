@@ -10,13 +10,15 @@
 namespace OpenBlood2
 {
     SegmentResult ServerAdapter::IntersectSegment(DVector from, DVector to, HOBJECT ignore, SegmentHit& out,
-                                                  bool fire_through, SegmentObjects objects, SegmentFilter filter)
+                                                  bool fire_through, SegmentObjects objects, SegmentFilter filter,
+                                                  SegmentStart start)
     {
         trace_service("IntersectSegment");
         out = {};
         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
         if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility &&
-             filter != SegmentFilter::IgnoreCharacters) ||
+             filter != SegmentFilter::IgnoreCharacters && filter != SegmentFilter::IgnoreVolumes) ||
+            (start != SegmentStart::IncludeInterior && start != SegmentStart::SkipInterior) ||
             (objects != SegmentObjects::SolidOnly && objects != SegmentObjects::SolidOrRayHit &&
              objects != SegmentObjects::All) ||
             !physics_vector(from) || !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
@@ -49,6 +51,8 @@ namespace OpenBlood2
                 (dynamic_cast<const VolumeBrush*>(record->game.get()) ||
                  (brush && brush->destructable && brush->GetSurfaceType() == SURFTYPE_GLASS)))
                 continue;
+            if (filter == SegmentFilter::IgnoreVolumes && dynamic_cast<const VolumeBrush*>(record->game.get()))
+                continue;
             if (filter == SegmentFilter::IgnoreCharacters && dynamic_cast<const CBaseCharacter*>(record->game.get()))
                 continue;
             if (fire_through && ((door && door->fire_through) || (brush && brush->fire_through)))
@@ -60,7 +64,7 @@ namespace OpenBlood2
             // USE follows entry-face rays: an enclosing body/sensor must not
             // mask all interactions. Later LithTech exposes interior hits as an
             // opt-in flag; ordinary USE does not request it.
-            if (objects == SegmentObjects::All && hit.start_solid)
+            if ((objects == SegmentObjects::All || start == SegmentStart::SkipInterior) && hit.start_solid)
                 continue;
             if (query == CollisionQuery::Hit && (!found || hit.fraction < nearest.fraction))
             {
@@ -71,7 +75,7 @@ namespace OpenBlood2
         }
         if (!found)
             return SegmentResult::Miss;
-        out = {nearest.point, nearest.normal, nearest.object, nearest.polygon, nearest.fraction};
+        out = {nearest.point, nearest.normal, nearest.object, nearest.polygon, nearest.fraction, nearest.texture_flags};
         return SegmentResult::Hit;
     }
     void ServerAdapter::RecordBrushDestruction(HOBJECT handle, DVector direction, float damage, DBYTE amount)

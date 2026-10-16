@@ -1,5 +1,9 @@
 # Original Inventory and Vector Weapon Boundary
 
+> Extended by [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md): original multi-hit
+> material rules, selected impact audio and automatic impact hearing now execute.
+> Earlier impact-audio omissions are historical; visuals and the M2 gate remain open.
+
 > Extended by [weapon fire-audio contracts](WEAPON_AUDIO_CONTRACTS.md): Beretta/knife
 > retained playback and automatic gunfire hearing now execute; source weapon voices
 > survive disposable destination rehearsal. Earlier fire-audio omissions are historical.

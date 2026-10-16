@@ -1,5 +1,9 @@
 # Original weapon fire audio and hearing
 
+> Extended by [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md): original multi-hit
+> material rules, selected impact audio and automatic impact hearing now execute.
+> Earlier impact-audio omissions are historical; visuals and the M2 gate remain open.
+
 Selected `CWeapon::PlayFireSound`, the sound loop in `Update`, and `KillSounds`
 now execute for the original Beretta and Chosen Knife. See [source ledger](M2_WEAPON_AUDIO_SOURCES.json)
 and [validation](../../Documentation/Implementation/M2_WEAPON_AUDIO.md).

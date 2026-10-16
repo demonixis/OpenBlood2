@@ -141,7 +141,8 @@ namespace OpenBlood2
         SegmentResult CastWorldRay(DVector, DVector, SegmentHit&) override;
         SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false,
                                        SegmentObjects objects = SegmentObjects::SolidOnly,
-                                       SegmentFilter filter = SegmentFilter::None) override;
+                                       SegmentFilter filter = SegmentFilter::None,
+                                       SegmentStart start = SegmentStart::IncludeInterior) override;
         DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
         bool ReadDamage(HMESSAGEREAD, Damage&) override;
         HCLIENT connect_client();

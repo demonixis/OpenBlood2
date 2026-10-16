@@ -480,3 +480,7 @@ The [weapon fire-audio continuation](../Documentation/Implementation/M2_WEAPON_A
 Read [contracts](docs/WEAPON_AUDIO_CONTRACTS.md). Preserve four slots, first-empty/earliest-end ordering, playback-before-alert even on missing WAV,
 all-inventory cleanup and dry-fire silence. Refresh rays after eligible hearing callbacks, defer removal and expose interrupted shots.
 Reverb/priority arbitration and other required services remain unavailable; safe NEW_LEVEL and M2 stay open.
+
+The [weapon impact continuation](../Documentation/Implementation/M2_WEAPON_IMPACTS.md) connects original vector continuation, selected material WAVs and impact hearing.
+Read [contracts](docs/WEAPON_IMPACT_CONTRACTS.md). Preserve source branch order, raw versus stopping material, fixed endpoint, one-unit advance and B2_LITE variants.
+Keep the 64-contact bound, explicit partial failures, checked callback lifetime and detached voices. Impact visuals/decals, safe NEW_LEVEL and M2 remain open.

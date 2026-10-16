@@ -220,9 +220,13 @@ namespace
                                    {"HitPoints", 100.f},
                                    {"SurfaceType", std::int32_t(SURFTYPE_GLASS)}});
         CHECK(h && a->Fire() && a->clear_shot.first_hit.object == t->m_hObject);
-        CHECK(a->m_InventoryMgr.CurrentWeapon()->last_shot.hit.object == h); // Clear aim still damages the glass.
+        const auto* weapon = a->m_InventoryMgr.CurrentWeapon();
+        CHECK(weapon->impacts.size() == 2 && weapon->impacts[0].hit.object == h && weapon->impacts[0].continued &&
+              weapon->impacts[0].damage_delivered && weapon->impacts[1].hit.object == t->m_hObject &&
+              weapon->impacts[1].damage_delivered);
         auto* brush = dynamic_cast<CDestructableBrush*>(g.objects.get(h)->game.get());
-        CHECK(brush);
+        CHECK(brush && brush->m_damage.m_fHitPoints < 100 && t->damage.m_fHitPoints < 1000 &&
+              a->m_InventoryMgr.GetAmmoCount(1) == 99); // One vector damages glass then target using one round.
         brush->destructable = false;
         CHECK(!a->Fire() && a->fire_result == FireResult::Blocked);
         CHECK(g.objects.remove(h) && g.objects.finish_frame());

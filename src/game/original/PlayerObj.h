@@ -21,6 +21,7 @@ class CBaseCharacter : public B2BaseClass
 {
   public:
     CBaseCharacter();
+    DDWORD m_dwSurfType = SURFTYPE_FLESH;
     CInventoryMgr m_InventoryMgr;
     CDestructable m_damage;
     CMovement m_MoveObj;

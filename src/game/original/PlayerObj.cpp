@@ -21,6 +21,7 @@ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
     {
         auto flags = g_pServerDE->GetObjectFlags(m_hObject);
         g_pServerDE->SetObjectFlags(m_hObject, flags | FLAG_MODELGOURAUDSHADE | FLAG_ANIMTRANSITION);
+        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (m_dwSurfType << 24));
     }
     if (message == MID_MODELSTRINGKEY && data && !OnStringKey(static_cast<ArgList*>(data)) &&
         pending_model_commands.size() < 32)
