@@ -346,7 +346,9 @@ namespace
         bool inspector_visible = BLOOD2_INSPECTOR && options.inspector && !options.view_world;
         OpenBlood2::WorldMesh world_mesh;
         OpenBlood2::WorldRenderer world_renderer(runtime.gpu), model_renderer(runtime.gpu);
-        OpenBlood2::ModelView model_scene;
+        OpenBlood2::ModelView model_scene, explosion_model_scene;
+        OpenBlood2::WorldRenderer explosion_model_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
+        bool explosion_model_drawn_hidden = false;
         OpenBlood2::SpriteView sprite_scene;
         OpenBlood2::WorldRenderer sprite_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
         bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false;
@@ -359,6 +361,7 @@ namespace
         OpenBlood2::Inspector inspector(runtime);
         inspector.world_mesh = &world_mesh;
         inspector.model_view = &model_scene;
+        inspector.explosion_model_view = &explosion_model_scene;
         inspector.sprite_view = &sprite_scene;
         inspector.sprite_render = &sprite_renderer.stats;
         inspector.world_render = &world_renderer.stats;
@@ -684,6 +687,8 @@ namespace
                 world_renderer.clear_geometry();
                 model_renderer.clear_geometry();
                 model_scene.clear();
+                explosion_model_scene.clear();
+                explosion_model_renderer.clear_geometry();
                 sprite_scene.clear();
                 sprite_renderer.clear_geometry();
                 world_mesh = {};
@@ -710,6 +715,11 @@ namespace
                 return 5;
             }
 
+            if (!OpenBlood2::update_explosion_model_scene(game, explosion_model_scene, error))
+            {
+                spdlog::error("Explosion model presentation: {}", error);
+                return 5;
+            }
             if (!OpenBlood2::update_sprite_scene(game, sprite_scene, error))
             {
                 spdlog::error("Sprite presentation: {}", error);
@@ -808,6 +818,27 @@ namespace
                         spdlog::error("Model viewport: {}", error);
                         SDL_SubmitGPUCommandBuffer(commands);
                         return 3;
+                    }
+                    if (!explosion_model_scene.world_draws.empty())
+                    {
+                        if (!explosion_model_renderer.prepare(
+                                explosion_model_scene.mesh, explosion_model_scene.revision,
+                                SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width, height, error,
+                                true) ||
+                            !explosion_model_renderer.draw(commands, capture_frame ? capture.texture : swapchain,
+                                                           explosion_model_scene.mesh,
+                                                           explosion_model_scene.world_draws, view.position,
+                                                           view.rotation, view.object && view.settings.type == 1, error,
+                                                           OpenBlood2::DrawLoad::Load, world_renderer.depth_target()))
+                        {
+                            spdlog::error("Explosion model viewport: {}", error);
+                            SDL_SubmitGPUCommandBuffer(commands);
+                            return 3;
+                        }
+                        if (!inspector_visible && options.scene_explosions_smoke)
+                            for (const auto& entry : explosion_model_scene.entries)
+                                explosion_model_drawn_hidden |= entry.error.empty() && entry.range != UINT32_MAX &&
+                                                                entry.triangles > 0 && entry.alpha < .75f;
                     }
                     if (!sprite_renderer.prepare(sprite_scene.mesh, sprite_scene.revision,
                                                  SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
@@ -1332,7 +1363,7 @@ namespace
                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
                 (options.scene_explosions_smoke &&
-                 (!scene_explosion_hidden || !explosion_sprites_drawn_hidden ||
+                 (!scene_explosion_hidden || !explosion_sprites_drawn_hidden || !explosion_model_drawn_hidden ||
                   !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
                 (options.sprites_smoke &&
                  (!sprite_hidden || !sprites_drawn_hidden || sprite_scene.draws.size() != 12 ||
@@ -1395,9 +1426,10 @@ namespace
                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
                              "and after reload; evaluated radius/color checked; world illumination unavailable");
             if (options.scene_explosions_smoke)
-                spdlog::info("SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
-                             "audio plus original explosion sprites verified hidden and after reload; other composite "
-                             "FX unavailable");
+                spdlog::info(
+                    "SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
+                    "audio plus original explosion models/sprites verified hidden and after reload; other composite "
+                    "FX unavailable");
             if (options.sprites_smoke)
                 spdlog::info("SPRITES smoke: 12 original DetailSprites, SPR manifests, frame clocks, hidden UI and "
                              "unload/reload verified; 12 alpha-textured quads submitted with shared world depth");

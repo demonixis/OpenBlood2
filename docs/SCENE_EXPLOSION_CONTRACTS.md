@@ -1,5 +1,9 @@
 # Original scene explosion emitters
 
+Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supplies
+selected model components with independent lifetime and alpha rendering. The earlier
+model omission is superseded only for that subset; complete composite FX remain unavailable.
+
 Continuation: [original explosion sprites](EXPLOSION_SPRITE_CONTRACTS.md). Selected original fire/smoke components now render and outlive their emitter. The complete-composite flag remains false; model/particle/light/fragment services are still unavailable. Original null-damager damage and audio behavior stay unchanged.
 
 M2 remains incomplete. This extends [object contracts](OBJECT_CONTRACTS.md),
@@ -67,8 +71,8 @@ CExplosionSpriteFX methods; see [sprite contracts](EXPLOSION_SPRITE_CONTRACTS.md
 The original binary client packet/complete manager is not recreated. Up to 32 owned
 SceneExplosionReports retain type, initial position/direction, configured damage,
 actual radius-delivery counters, sound ID/failure and client sprite event ID/failure.
-Sprite success does not set complete-composite availability. Models, particles,
-fragments and dynamic illumination remain absent. A loaded emitter is still a
+Sprite success does not set complete-composite availability. Selected model components now render; particles, fragments and dynamic
+illumination remain absent. A loaded emitter is still a
 partial system; required missing services keep M2 open.
 
 ## Inspection and verification

@@ -428,3 +428,10 @@ Read [contracts](docs/EXPLOSION_SPRITE_CONTRACTS.md). Preserve normal offsets, s
 Per-instance alpha only extends the sprite pass. Reports explicitly retain missing
 composite components; these sprites do not complete the FX service or M2 gate.
 Safe NEW_LEVEL and other required services remain open; source counts are unchanged.
+
+The [explosion model continuation](../Documentation/Implementation/M2_EXPLOSION_MODELS.md) connects original CExplosionModelFX and selected high-detail model recipes.
+Read [contracts](docs/EXPLOSION_MODEL_CONTRACTS.md). Preserve cached-axis/per-update rotation, wave/fade
+formulas, explicit RNG ordering, final-update removal and independent model/sprite
+failure/lifetime. Fullbright alpha rendering is bounded diagnostic presentation;
+separate model/sprite sorting is not retail parity. Required remaining composite
+FX, safe NEW_LEVEL and M2 stay open; world-source counts do not change.

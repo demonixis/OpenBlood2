@@ -30,6 +30,11 @@ namespace OpenBlood2
         if (g.objects.get(selected) || g.server.scene_explosions.size() != 1)
             return false;
         const auto& report = g.server.scene_explosions.back();
+        const auto& models = g.server.explosion_models;
+        if (!report.model_event || !report.model_error.empty() || models.active.size() != 1 || models.started != 1 ||
+            models.failed || models.reports.size() != 1 || !models.active[0].updates ||
+            models.active[0].alpha >= .75f || !models.active[0].error.empty())
+            return false;
         const auto& sprites = g.server.explosion_sprites;
         if (!report.sprite_event || !report.sprite_error.empty() || sprites.active.size() != 2 ||
             sprites.started != 2 || sprites.failed || sprites.reports.size() != 1)

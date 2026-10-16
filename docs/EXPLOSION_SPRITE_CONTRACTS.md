@@ -1,5 +1,9 @@
 # Original explosion sprite contracts
 
+Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supply
+selected model components with independent lifetime and alpha rendering. The earlier
+model omission is superseded only for that subset; complete composite FX remain unavailable.
+
 M2 remains incomplete. This extends [scene emitters](SCENE_EXPLOSION_CONTRACTS.md)
 and [sprite presentation](SPRITE_VIEW_CONTRACTS.md). See
 [evidence](../../Documentation/Implementation/M2_EXPLOSION_SPRITES.md) and
@@ -35,8 +39,9 @@ CExplosionFX detail >= 2 recipe normalizes the direction and creates these sprit
 
 Paths are original `Sprites\*.spr`, all recipe Z scales are zero and fade mode is
 1. These are deterministic sprite branches, not the full CExplosionFX switch or
-a quality-setting implementation. Unimplemented model/particle/light/fragment
-branches consume no random draws; full composite random ordering is not claimed.
+a quality-setting implementation. Selected model branches now use their own
+documented client RNG stream; unimplemented particle/light/fragment branches
+consume no random draws. Full composite random ordering is not claimed.
 Other preset types fail explicitly, including type 24 RIFT_2 (which has no sprite
 branch here). Brush ExplosionEffect, weapon and other FX callers are not routed.
 The complete-composite availability flag remains false even after sprite success.

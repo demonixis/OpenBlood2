@@ -1,6 +1,29 @@
 #include "app/model_scene.h"
+#include <algorithm>
 namespace OpenBlood2
 {
+    bool update_explosion_model_scene(const GameSession& game, ModelView& scene, std::string& error)
+    {
+        scene.begin_frame();
+        for (const auto& fx : game.server.explosion_models.active)
+        {
+            const bool visible = fx.scale.x > 0 && fx.scale.y > 0 && fx.scale.z > 0;
+            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.settings.position, fx.rotation}, fx.scale,
+                           visible, false, {}, fx.model_path, game.resources, error, {}, fx.alpha, true))
+                return false;
+            scene.entries.back().client_effect = fx.id;
+        }
+        const auto& camera = game.client_shell.view;
+        const auto forward = rotate_vector(camera.rotation, {0, 0, 1});
+        auto depth = [&](const WorldDraw& d)
+        {
+            return (d.position.x - camera.position.x) * forward.x + (d.position.y - camera.position.y) * forward.y +
+                   (d.position.z - camera.position.z) * forward.z;
+        };
+        std::stable_sort(scene.world_draws.begin(), scene.world_draws.end(),
+                         [&](const auto& a, const auto& b) { return depth(a) > depth(b); });
+        return true;
+    }
     bool update_model_scene(GameSession& game, ModelView& scene, std::string& error)
     {
         scene.begin_frame();

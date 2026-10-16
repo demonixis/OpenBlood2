@@ -71,6 +71,7 @@ void CClientExplosionSFX::SetupFX()
     report.damage = damage;
     report.radius = radius;
     report.sound = sound;
+    report.model_event = g_pServerDE->PublishExplosionModels(m_hObject, type, position, normal, report.model_error);
     report.sprite_event = g_pServerDE->PublishExplosionSprites(m_hObject, type, position, normal, report.sprite_error);
     // IMPORTANT: the source passes NULL, so DamageObject's null-damager guard
     // suppresses every delivery. Do not silently "repair" this gameplay behavior.

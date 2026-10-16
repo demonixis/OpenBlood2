@@ -15,6 +15,7 @@ namespace OpenBlood2
         Runtime& runtime;
         const WorldMesh* world_mesh = nullptr;
         const ModelView* model_view = nullptr;
+        const ModelView* explosion_model_view = nullptr;
         const SpriteView* sprite_view = nullptr;
         const WorldViewStats* sprite_render = nullptr;
         const WorldViewStats* world_render = nullptr;

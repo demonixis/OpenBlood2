@@ -1,5 +1,9 @@
 # Animated model presentation
 
+Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supplies
+selected model components with independent lifetime and alpha rendering. The earlier
+model omission is superseded only for that subset; complete composite FX remain unavailable.
+
 > Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
 > original named resets now affect rendering/hit candidates, and the selected Load
 > model/flags/velocity tail is available before client association. Earlier blanket

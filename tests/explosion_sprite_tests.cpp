@@ -137,7 +137,7 @@ namespace
         CHECK(effects.publish(1, {}, {0, 2, 0}, "partial", store, 0, error));
         CHECK(effects.active.size() == 1 && effects.started == 1 && effects.failed == 1 && !error.empty());
         CHECK(effects.reports.back().sprites.size() == 1 &&
-              effects.reports.back().unavailable == "model, particle ring, lights");
+              effects.reports.back().unavailable == "particle ring, lights");
         CHECK(effects.publish(24, {}, {0, 1, 0}, "unsupported", store, 0, error) && !error.empty());
         CHECK(effects.publish(1, {}, {}, "zero normal", store, 0, error) && !error.empty());
         const auto old_id = effects.active.front().id;
@@ -172,6 +172,9 @@ namespace
         CHECK(near(effects.active[0].settings.position.y, 45) && near(effects.active[0].settings.normal.y, 1));
         CHECK(game.server.scene_explosions.back().sprite_error.empty() &&
               !game.server.scene_explosions.back().client_fx_available);
+        // This fixture intentionally has no ABC model: failed model creation cannot cancel sibling sprites.
+        CHECK(!game.server.scene_explosions.back().model_error.empty() && game.server.explosion_models.active.empty() &&
+              game.server.explosion_models.failed == 2);
         CHECK(game.server.scene_explosions.back().targets.delivered == 0);
         CHECK(game.step(.11) && !game.objects.get(h) && effects.active.size() == 4);
         CHECK(effects.active[0].track.frame == 1 && near(effects.active[0].alpha, 1 - .11f / 1.5f));

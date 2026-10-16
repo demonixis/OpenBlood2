@@ -749,3 +749,13 @@ handles; bounded capacity, explicit resource failures and initialized scale stat
 are adaptations. Shared alignment and per-draw SDL_GPU alpha extend the existing
 small engine. Composite components and random alignment are not replaced with
 placeholders. See [contracts](EXPLOSION_SPRITE_CONTRACTS.md); references/assets stay external.
+
+## Original explosion model effects
+
+[Source ledger](M2_EXPLOSION_MODEL_SOURCES.json) records CExplosionModelFX methods,
+high-detail CExplosionFX model recipes, ClientUtilities random formulas and source
+update/delivery order. Typed ownership, finite budgets, private portable RNG and
+explicit failures adapt engine services; original wave/fade/per-update rotations
+remain. Existing ABC/DTX/ModelView and the SDL_GPU alpha shader supply presentation.
+No reference engine, dependency or commercial asset is imported. See
+[contracts](EXPLOSION_MODEL_CONTRACTS.md) for remaining composite/rendering limits.

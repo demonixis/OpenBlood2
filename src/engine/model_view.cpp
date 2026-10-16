@@ -23,7 +23,8 @@ namespace OpenBlood2
     }
     bool ModelView::add(const Model* model, const AnimationTrack& track, std::string_view skin, NodePose pose,
                         DVector scale, bool visible, bool close, ObjectId object, std::string_view label,
-                        const Resources& resources, std::string& error, std::span<const std::uint8_t> hidden_nodes)
+                        const Resources& resources, std::string& error, std::span<const std::uint8_t> hidden_nodes,
+                        float alpha, bool require_skin)
     {
         error.clear();
         auto fail = [&](const char* reason)
@@ -38,6 +39,9 @@ namespace OpenBlood2
         }
         entries.push_back({object, std::string(label), std::string(skin), {}, visible, close, 0});
         auto& entry = entries.back();
+        entry.alpha = alpha;
+        if (!std::isfinite(alpha) || alpha < 0 || alpha > 1)
+            return fail("Invalid model alpha");
         if (!model)
         {
             entry.error = "Model is missing or not decoded";
@@ -77,14 +81,14 @@ namespace OpenBlood2
             if (entry.error.empty())
                 material = found->second;
         }
-        if (!visible)
+        if (!visible || (require_skin && !entry.error.empty()))
             return true;
         if (!physics_vector(scale) || scale.x <= 0 || scale.y <= 0 || scale.z <= 0 || model->vertices.size() > 65536 ||
             model->faces.size() > 200000 || model->faces.size() * 3 > 1000000 - mesh.vertices.size())
         {
             return fail("Invalid model scale/geometry budget");
         }
-        WorldDraw draw{static_cast<std::uint32_t>(mesh.ranges.size()), pose.position, pose.rotation};
+        WorldDraw draw{static_cast<std::uint32_t>(mesh.ranges.size()), pose.position, pose.rotation, alpha};
         WorldViewUniform uniform;
         if (!world_view_uniform({}, {}, 1, draw, uniform))
         {

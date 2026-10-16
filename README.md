@@ -1,5 +1,10 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The [explosion model continuation](../Documentation/Implementation/M2_EXPLOSION_MODELS.md) adds original ABC effects,
+growth, rotation, alpha and independent lifetime to the existing fire/smoke sprites.
+The nine SubwayA emitters and GPU model opacity are tested and inspectable. Required
+particle/light/fragment services, safe automatic level transfer and M2 remain open.
+
 The [explosion sprite continuation](../Documentation/Implementation/M2_EXPLOSION_SPRITES.md) connects original fire/smoke
 recipes and lifecycle to real alpha-textured rendering and in-game inspection.
 Nine SubwayA emitters are exercised through creation, removal and reload. Composite

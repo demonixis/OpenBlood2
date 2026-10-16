@@ -5,9 +5,10 @@ namespace OpenBlood2
 {
     void Inspector::draw_scene_explosions(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextWrapped("Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
-                           "Spatial WAV playback and selected original sprite components are implemented. Composite "
-                           "models, particles and lights remain unavailable.");
+        ImGui::TextWrapped(
+            "Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
+            "Spatial WAV playback and selected original sprite/model components are implemented. Composite "
+            "particles, fragments and lights remain unavailable.");
         ImGui::Text("Audio: %s | active voices %zu | submitted frames %llu",
                     game.server.audio.has_output() ? "SDL stream" : "offline clock", game.server.audio.voices().size(),
                     (unsigned long long)game.server.audio.submitted_frames);
@@ -54,6 +55,34 @@ namespace OpenBlood2
             ImGui::PopID();
         }
         ImGui::Separator();
+        const auto& models = game.server.explosion_models;
+        ImGui::Text("Client explosion models: %zu active / %llu started / %llu expired / %llu failed",
+                    models.active.size(), (unsigned long long)models.started, (unsigned long long)models.expired,
+                    (unsigned long long)models.failed);
+        if (!models.update_error.empty())
+            ImGui::TextWrapped("%s", models.update_error.c_str());
+        for (const auto& fx : models.active)
+        {
+            ImGui::Text("Model FX %llu / event %llu: %.3f s, alpha %.3f, scale %.2f %.2f %.2f / wave %u",
+                        (unsigned long long)fx.id, (unsigned long long)fx.event, fx.last_time - fx.start_time, fx.alpha,
+                        fx.scale.x, fx.scale.y, fx.scale.z, fx.settings.waveform);
+            ImGui::TextWrapped("%s | %s", fx.model_path.c_str(), fx.skin_path.c_str());
+            if (explosion_model_view)
+                for (const auto& entry : explosion_model_view->entries)
+                    if (entry.client_effect == fx.id)
+                    {
+                        ImGui::Text("%zu triangles | %s", entry.triangles,
+                                    entry.range == UINT32_MAX ? "not drawn" : "prepared");
+                        if (!entry.error.empty())
+                            ImGui::TextWrapped("%s", entry.error.c_str());
+                    }
+        }
+        if (ImGui::CollapsingHeader("Last 64 model deliveries / failures"))
+            for (const auto& r : models.reports)
+                ImGui::TextWrapped("Event %llu / type %u / model %llu / %s", (unsigned long long)r.id, r.type,
+                                   (unsigned long long)r.model,
+                                   r.error.empty() ? (r.model ? "created" : "no model branch authored")
+                                                   : r.error.c_str());
         const auto& effects = game.server.explosion_sprites;
         ImGui::Text("Client explosion sprites: %zu active / %llu started / %llu expired / %llu failed",
                     effects.active.size(), (unsigned long long)effects.started, (unsigned long long)effects.expired,
@@ -95,7 +124,10 @@ namespace OpenBlood2
                             r.targets.candidates, r.targets.in_radius, r.targets.delivered);
                 ImGui::Text("Null damager: %s | complete composite unavailable",
                             r.targets.null_damager ? "yes (original guard)" : "no");
-                ImGui::Text("Sprite delivery event %llu", (unsigned long long)r.sprite_event);
+                ImGui::Text("Model event %llu | sprite event %llu", (unsigned long long)r.model_event,
+                            (unsigned long long)r.sprite_event);
+                if (!r.model_error.empty())
+                    ImGui::TextWrapped("%s", r.model_error.c_str());
                 if (!r.sprite_error.empty())
                     ImGui::TextWrapped("%s", r.sprite_error.c_str());
                 if (const auto* v = game.server.audio.get(r.voice))

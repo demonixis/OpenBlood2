@@ -1,0 +1,115 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "e3e9a5241e6d89c66750d7116a69bcb7ccadc900",
+  "source_files": [
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
+      "selected_lines": [
+        [
+          25,
+          195
+        ],
+        [
+          1248,
+          1268
+        ],
+        [
+          1356,
+          1376
+        ],
+        [
+          1467,
+          1485
+        ],
+        [
+          1574,
+          1594
+        ],
+        [
+          2149,
+          2177
+        ]
+      ],
+      "use": "Original model lifecycle, scale/fade/cached-axis rules and selected high-detail model recipes."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.h",
+      "sha256": "2bc5a35f4da4929bdb0f10652d9014a56fdf9fe561d7ad320bf1dcf0f042dc18",
+      "selected_lines": [
+        [
+          21,
+          44
+        ],
+        [
+          236,
+          279
+        ]
+      ],
+      "use": "Original descriptor and class; explicit false initialization repairs indeterminate scale state."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
+      "sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
+      "selected_lines": [
+        [
+          20,
+          51
+        ]
+      ],
+      "use": "Original modulo/range formulas and ordered random draws; portable private generator replaces platform rand."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
+      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
+      "selected_lines": [
+        [
+          1435,
+          1463
+        ]
+      ],
+      "use": "Original absolute next-update cadence and removal."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SpecialFX.h",
+      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
+      "selected_lines": [
+        [
+          32,
+          56
+        ]
+      ],
+      "use": "1 ms update interval and independent client-object destruction."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ClientExplosionSFX.cpp",
+      "sha256": "fc51674223cf67456341d4529bc93acbe8df9365a8730b0491c7e22803c85a09",
+      "selected_lines": [
+        [
+          282,
+          304
+        ]
+      ],
+      "use": "FX before null-damager radius call and detached sound."
+    },
+    {
+      "path": "sources/blood2/AppHeaders/basetypes_de.h",
+      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
+      "selected_lines": [
+        [
+          285,
+          325
+        ]
+      ],
+      "use": "Gouraud/no-light flags and their original meanings."
+    }
+  ],
+  "implementation": "Selected original CExplosionModelFX methods and CExplosionFX model recipes; typed independent client visual lifetime and existing ModelView/SDL_GPU alpha presentation.",
+  "limitations": [
+    "Private visual validation covers the authored grenade/default sphere branch.",
+    "Portable RNG stream differs from retail platform rand; no full composite random parity.",
+    "Particles, fragments, lights, other effect callers and types remain missing.",
+    "Unlit separate alpha-model/sprite passes are not retail transparency parity.",
+    "Safe automatic NEW_LEVEL and M2 remain incomplete."
+  ]
+}
