@@ -16,6 +16,8 @@ namespace OpenBlood2
             SDL_ReleaseGPUTexture(device_, depth_);
         if (pipeline_)
             SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
+        if (alpha_pipeline_)
+            SDL_ReleaseGPUGraphicsPipeline(device_, alpha_pipeline_);
     }
     void WorldRenderer::clear_geometry()
     {
@@ -31,12 +33,24 @@ namespace OpenBlood2
                 SDL_ReleaseGPUTexture(device_, texture);
         textures_.clear();
         revision_ = UINT64_MAX;
-        stats.triangles = stats.draws = 0;
+        stats.triangles = stats.draws = stats.alpha_batches = 0;
+        alpha_order_.clear();
     }
-    bool WorldRenderer::pipeline(SDL_GPUTextureFormat format, std::string& error)
+    bool WorldRenderer::pipeline(SDL_GPUTextureFormat format, std::string& error, bool translucent)
     {
-        if (pipeline_ && color_format_ == format)
+        if (color_format_ != format)
+        {
+            if (pipeline_)
+                SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
+            if (alpha_pipeline_)
+                SDL_ReleaseGPUGraphicsPipeline(device_, alpha_pipeline_);
+            pipeline_ = alpha_pipeline_ = nullptr;
+            color_format_ = format;
+        }
+        auto*& selected = translucent ? alpha_pipeline_ : pipeline_;
+        if (selected)
             return true;
+        const bool alpha = translucent || style_ == DrawStyle::SpriteAlpha;
         if (!(SDL_GetGPUShaderFormats(device_) & SDL_GPU_SHADERFORMAT_SPIRV))
         {
             error = "Diagnostic world renderer currently requires the Vulkan/SPIR-V backend";
@@ -51,9 +65,9 @@ namespace OpenBlood2
         info.num_uniform_buffers = 1;
         auto* vertex = SDL_CreateGPUShader(device_, &info);
         info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
-        info.code = reinterpret_cast<const Uint8*>(style_ == DrawStyle::SpriteAlpha ? sprite_frag : world_frag);
-        info.code_size = style_ == DrawStyle::SpriteAlpha ? sizeof(sprite_frag) : sizeof(world_frag);
-        info.num_uniform_buffers = style_ == DrawStyle::SpriteAlpha ? 1 : 0;
+        info.code = reinterpret_cast<const Uint8*>(alpha ? sprite_frag : world_frag);
+        info.code_size = alpha ? sizeof(sprite_frag) : sizeof(world_frag);
+        info.num_uniform_buffers = alpha ? 1 : 0;
         info.num_samplers = 1;
         auto* fragment = SDL_CreateGPUShader(device_, &info);
         if (!vertex || !fragment)
@@ -78,7 +92,7 @@ namespace OpenBlood2
         attributes[2].offset = offsetof(WorldVertex, uv);
         SDL_GPUColorTargetDescription target{};
         target.format = format;
-        if (style_ == DrawStyle::SpriteAlpha)
+        if (alpha)
         {
             target.blend_state.enable_blend = true;
             target.blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
@@ -98,7 +112,7 @@ namespace OpenBlood2
         create.rasterizer_state.enable_depth_clip = true;
         create.multisample_state.sample_count = SDL_GPU_SAMPLECOUNT_1;
         create.depth_stencil_state.enable_depth_test = true;
-        create.depth_stencil_state.enable_depth_write = style_ == DrawStyle::Opaque;
+        create.depth_stencil_state.enable_depth_write = !alpha;
         create.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
         create.target_info.color_target_descriptions = &target;
         create.target_info.num_color_targets = 1;
@@ -112,9 +126,7 @@ namespace OpenBlood2
             error = SDL_GetError();
             return false;
         }
-        if (pipeline_)
-            SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
-        pipeline_ = next;
+        selected = next;
         color_format_ = format;
         return true;
     }
@@ -343,13 +355,22 @@ namespace OpenBlood2
     }
     bool WorldRenderer::draw(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target, const WorldMesh& mesh,
                              std::span<const WorldDraw> draws, DVector eye, DRotation view, bool letterbox,
-                             std::string& error, DrawLoad load, SDL_GPUTexture* shared_depth)
+                             std::string& error, DrawLoad load, SDL_GPUTexture* shared_depth, WorldPass world_pass)
     {
         if (!pipeline_ || !depth_ || (!vertices_ && !mesh.vertices.empty()))
         {
             error = "Diagnostic renderer not prepared";
             return false;
         }
+        const bool translucent = world_pass == WorldPass::Translucent;
+        if (translucent && (style_ != DrawStyle::Opaque || load != DrawLoad::Load))
+        {
+            error = "Transparent world pass requires loaded opaque depth";
+            return false;
+        }
+        if (translucent &&
+            (!world_alpha_order(mesh, draws, eye, view, alpha_order_, error) || !pipeline(color_format_, error, true)))
+            return false;
         const Uint32 top = letterbox ? height_ / 6 : 0, height = height_ - 2 * top;
         const float aspect = float(width_) / float(height);
         WorldViewUniform uniform;
@@ -407,16 +428,16 @@ namespace OpenBlood2
         }
         SDL_GPUViewport viewport{0, float(top), float(width_), float(height), 0, 1};
         SDL_SetGPUViewport(pass, &viewport);
-        SDL_BindGPUGraphicsPipeline(pass, pipeline_);
+        SDL_BindGPUGraphicsPipeline(pass, translucent ? alpha_pipeline_ : pipeline_);
         if (vertices_)
         {
             SDL_GPUBufferBinding binding{vertices_, 0};
             SDL_BindGPUVertexBuffers(pass, 0, &binding, 1);
-            for (const auto& d : draws)
+            auto emit = [&](const WorldDraw& d, const WorldBatch* face)
             {
                 const auto& r = mesh.ranges[d.range];
                 if (!r.count)
-                    continue;
+                    return;
                 world_view_uniform(eye, view, aspect, d, uniform);
                 if (load == DrawLoad::ClearDepth)
                 {
@@ -425,9 +446,9 @@ namespace OpenBlood2
                     uniform.projection[3] = -near * far / (far - near);
                 }
                 SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
-                if (style_ == DrawStyle::SpriteAlpha)
+                if (translucent || style_ == DrawStyle::SpriteAlpha)
                 {
-                    const std::array<float, 4> modulation{d.alpha, 0, 0, 0};
+                    const std::array<float, 4> modulation{translucent ? 1.f : d.alpha, 0, 0, 0};
                     SDL_PushGPUFragmentUniformData(commands, 0, modulation.data(), sizeof(modulation));
                 }
                 auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material)
@@ -436,15 +457,33 @@ namespace OpenBlood2
                     SDL_BindGPUFragmentSamplers(pass, 0, &texture, 1);
                     SDL_DrawGPUPrimitives(pass, count, 1, first, 0);
                 };
-                if (r.batches.empty())
+                if (face)
+                    batch(face->first, face->count, face->material);
+                else if (r.batches.empty())
                     batch(r.first, r.count, 0);
                 else
                     for (const auto& b : r.batches)
-                        batch(b.first, b.count, b.material);
-            }
+                        if (style_ == DrawStyle::SpriteAlpha || !b.translucent)
+                            batch(b.first, b.count, b.material);
+            };
+            if (translucent)
+                for (const auto& ordered : alpha_order_)
+                {
+                    const auto& d = draws[ordered.draw];
+                    emit(d, &mesh.ranges[d.range].batches[ordered.batch]);
+                }
+            else
+                for (const auto& d : draws)
+                    emit(d, nullptr);
         }
         SDL_EndGPURenderPass(pass);
-        ++stats.frames;
+        if (translucent)
+        {
+            ++stats.alpha_frames;
+            stats.alpha_batches = alpha_order_.size();
+        }
+        else
+            ++stats.frames;
         return true;
     }
 } // namespace OpenBlood2

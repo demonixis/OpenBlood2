@@ -450,8 +450,8 @@ namespace OpenBlood2
                         "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
                         "the player in Session first, or launch --view-world.");
                     ImGui::TextWrapped(
-                        "World textures/models and alpha sprites are unlit. Lightmaps, liquid surfaces, "
-                        "transparency and sky rendering remain unavailable. Unsupported objects stay in World.");
+                        "World textures/models, glass and alpha sprites are unlit. Lightmaps, liquid surfaces "
+                        "and sky rendering remain unavailable. World alpha uses sorted faces; FX sort separately.");
                     if (world_mesh && world_render)
                     {
                         ImGui::Text("GPU: %llu frames / %llu world uploads", (unsigned long long)world_render->frames,
@@ -461,8 +461,21 @@ namespace OpenBlood2
                         ImGui::Text("Unbound models: %zu / excluded containers: %zu", world_render->unbound,
                                     world_render->containers);
                         ImGui::Text(
-                            "Faces: %zu invisible / %zu degenerate / %zu transparent-as-opaque / %zu sky markers",
+                            "Faces: %zu invisible / %zu degenerate / %zu authored transparent / %zu sky markers",
                             world_mesh->invisible, world_mesh->degenerate, world_mesh->transparent, world_mesh->sky);
+                        ImGui::Text("Alpha: %zu prepared faces / %zu submitted batches / %llu passes",
+                                    world_mesh->blended, world_render->alpha_batches,
+                                    (unsigned long long)world_render->alpha_frames);
+                        if (ImGui::TreeNode("Transparent world faces (including hidden/unbound models)"))
+                        {
+                            for (const auto& range : world_mesh->ranges)
+                                for (const auto& batch : range.batches)
+                                    if (batch.translucent)
+                                        ImGui::Text("%s: %s, %u triangles", range.name.c_str(),
+                                                    world_mesh->materials[batch.material].path.c_str(),
+                                                    batch.count / 3);
+                            ImGui::TreePop();
+                        }
                         std::size_t decoded = 0, failed = 0;
                         for (std::size_t i = 1; i < world_mesh->materials.size(); ++i)
                             world_mesh->materials[i].error.empty() ? ++decoded : ++failed;

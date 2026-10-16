@@ -74,7 +74,7 @@ namespace OpenBlood2
                               .18f + .5f * std::abs(normal.z / length)};
                 if (surface.flags & (1u << 4))
                     color = {.25f, .4f, .65f};
-                if (surface.flags & (1u << 3))
+                if ((surface.flags & (1u << 3)) && !(surface.flags & (1u << 4)))
                     color = {.65f, .25f, .5f};
                 std::uint32_t material = 0;
                 if (resources && !model.textures.empty())
@@ -101,7 +101,7 @@ namespace OpenBlood2
                         materials.push_back(std::move(entry));
                         found = material_ids.emplace(key, id).first;
                     }
-                    if (!(surface.flags & ((1u << 3) | (1u << 4))))
+                    if (!(surface.flags & (1u << 4)))
                     {
                         if (materials[found->second].error.empty())
                         {
@@ -114,6 +114,14 @@ namespace OpenBlood2
                 }
                 if ((count - 2) * 3 > max_vertices - vertices.size())
                     return fail("Diagnostic triangle budget exceeded");
+                const bool translucent = material && (surface.flags & (1u << 3)) && !(surface.flags & (1u << 4));
+                DVector center{};
+                if (translucent)
+                    for (std::size_t i = 0; i < count; ++i)
+                        center = vector_add(
+                            center,
+                            vector_scale(vector_subtract(model.points[polygon.points[i]], range.pivot), 1.f / count));
+                bool first_triangle = true;
                 const auto a = model.points[polygon.points[0]];
                 for (std::size_t i = 1; i + 1 < count; ++i)
                 {
@@ -124,8 +132,13 @@ namespace OpenBlood2
                         ++degenerate;
                         continue;
                     }
-                    if (range.batches.empty() || range.batches.back().material != material)
-                        range.batches.push_back({static_cast<std::uint32_t>(vertices.size()), 0, material});
+                    if (range.batches.empty() || range.batches.back().material != material ||
+                        range.batches.back().translucent != translucent || (translucent && first_triangle))
+                        range.batches.push_back(
+                            {static_cast<std::uint32_t>(vertices.size()), 0, material, translucent, center});
+                    if (translucent && first_triangle)
+                        ++blended;
+                    first_triangle = false;
                     range.batches.back().count += 3;
                     for (auto p : {a, b, c})
                     {
@@ -147,6 +160,57 @@ namespace OpenBlood2
             range.count = static_cast<std::uint32_t>(vertices.size()) - range.first;
             ranges.push_back(std::move(range));
         }
+        return true;
+    }
+    bool world_alpha_order(const WorldMesh& mesh, std::span<const WorldDraw> draws, DVector eye, DRotation view,
+                           std::vector<WorldAlphaBatch>& order, std::string& error)
+    {
+        order.clear();
+        error.clear();
+        auto fail = [&]()
+        {
+            order.clear();
+            error = "Invalid or excessive transparent world draw";
+            return false;
+        };
+        if (!physics_vector(eye) || !valid_rotation(view) || draws.size() > 65536)
+            return fail();
+        const auto forward = rotate_vector({0, 0, 1}, view);
+        for (std::size_t i = 0; i < draws.size(); ++i)
+        {
+            const auto& d = draws[i];
+            if (d.range >= mesh.ranges.size() || !physics_vector(d.position) || !valid_rotation(d.rotation))
+                return fail();
+            const auto& range = mesh.ranges[d.range];
+            for (std::size_t j = 0; j < range.batches.size(); ++j)
+            {
+                const auto& b = range.batches[j];
+                if (!b.translucent)
+                    continue;
+                if (!b.count || b.count % 3 || b.first < range.first || b.first > mesh.vertices.size() ||
+                    b.count > mesh.vertices.size() - b.first || b.first > std::size_t(range.first) + range.count ||
+                    b.count > std::size_t(range.first) + range.count - b.first || !physics_vector(b.center) ||
+                    order.size() >= 1000000)
+                    return fail();
+                const auto center = vector_add(d.position, rotate_vector(b.center, d.rotation));
+                const auto delta = vector_subtract(center, eye);
+                const double depth =
+                    double(delta.x) * forward.x + double(delta.y) * forward.y + double(delta.z) * forward.z;
+                if (!std::isfinite(depth))
+                    return fail();
+                order.push_back({i, j, depth});
+            }
+        }
+        // Explicit index tie-break preserves source order without stable_sort's temporary allocation.
+        std::sort(order.begin(), order.end(),
+                  [](const auto& a, const auto& b)
+                  {
+                      if (a.depth != b.depth)
+                          return a.depth > b.depth;
+                      if (a.draw != b.draw)
+                          return a.draw < b.draw;
+                      return a.batch < b.batch;
+                  });
         return true;
     }
     bool world_draws(const WorldMesh& mesh, const Objects& objects, std::vector<WorldDraw>& draws,

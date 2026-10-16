@@ -6,7 +6,7 @@
 
 namespace OpenBlood2
 {
-    // Opaque base textures only; no baked light, sky or transparency claim.
+    // Unlit base textures; authored transparent faces use decoded DTX alpha.
     struct WorldVertex
     {
         DVector position, color;
@@ -20,6 +20,8 @@ namespace OpenBlood2
     struct WorldBatch
     {
         std::uint32_t first = 0, count = 0, material = 0;
+        bool translucent = false;
+        DVector center{}; // One local-space center per translucent polygon, for sorting.
     };
     struct WorldRange
     {
@@ -35,7 +37,7 @@ namespace OpenBlood2
         // Slot zero is white. Failed resources remain named diagnostic records.
         std::vector<WorldMaterial> materials;
         std::size_t texture_bytes = 0;
-        std::size_t invisible = 0, degenerate = 0, transparent = 0, sky = 0;
+        std::size_t invisible = 0, degenerate = 0, transparent = 0, sky = 0, blended = 0;
         bool build(const World&, std::string&, const Resources* = nullptr);
     };
     struct WorldDraw
@@ -49,10 +51,19 @@ namespace OpenBlood2
     {
         std::size_t triangles = 0, draws = 0, hidden = 0, unbound = 0, containers = 0;
         std::size_t batches = 0;
-        std::uint64_t uploads = 0, frames = 0;
+        std::uint64_t uploads = 0, frames = 0, alpha_frames = 0;
+        std::size_t alpha_batches = 0;
     };
     // Never creates objects or advances simulation; current checked identities only.
     bool world_draws(const WorldMesh&, const Objects&, std::vector<WorldDraw>&, WorldViewStats&, std::string&);
+    struct WorldAlphaBatch
+    {
+        std::size_t draw = 0, batch = 0;
+        double depth = 0;
+    };
+    // Stable far-to-near order of current posed faces. Does not retain object handles.
+    bool world_alpha_order(const WorldMesh&, std::span<const WorldDraw>, DVector eye, DRotation view,
+                           std::vector<WorldAlphaBatch>&, std::string&);
     // Row vectors packed for the shader. Original +Y up / +Z forward, SDL depth [0,1].
     struct WorldViewUniform
     {

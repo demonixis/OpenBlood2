@@ -148,10 +148,23 @@ namespace
         CHECK(mesh.vertices[0].uv[0] == 2 && mesh.vertices[0].uv[1] == -1);
         CHECK(mesh.vertices[3].uv == mesh.vertices[0].uv && mesh.vertices[3].position.x == -492);
         CHECK(mesh.ranges[0].batches.size() == 1 && mesh.ranges[1].batches[0].material == 1);
+        world.models[0].surfaces[0].flags = 8;
+        // Shared material with opaque faces does not imply a shared blend mode.
+        world.models[0].polygons.push_back(world.models[0].polygons[0]);
+        CHECK(mesh.build(world, error, &resources));
+        CHECK(mesh.blended == 2 && mesh.ranges[0].batches.size() == 2);
+        CHECK(mesh.ranges[0].batches[0].translucent && !mesh.ranges[1].batches[0].translucent);
+        CHECK(mesh.ranges[0].batches[0].material == mesh.ranges[1].batches[0].material);
+        CHECK(mesh.vertices[0].uv[0] == 2 && mesh.vertices[0].color.y == 1);
+        world.models[0].surfaces[0].flags |= 16; // Sky remains an explicit opaque marker.
+        CHECK(mesh.build(world, error, &resources));
+        CHECK(mesh.blended == 0 && mesh.ranges[0].batches[0].material == 0);
+        world.models[0].surfaces[0].flags = 8;
         world.models[0].textures[0] = "missing.dtx";
         world.models[1].textures[0] = "bad.dtx";
         CHECK(mesh.build(world, error, &resources));
         CHECK(mesh.materials.size() == 3 && !mesh.materials[1].error.empty() && !mesh.materials[2].error.empty());
+        CHECK(mesh.blended == 0 && !mesh.ranges[0].batches[0].translucent);
         CHECK(mesh.ranges[0].batches[0].material == 0 && mesh.vertices[0].color.x == 1 &&
               mesh.vertices[0].color.y == 0);
         world.models[0].textures[0] = "../a.dtx";

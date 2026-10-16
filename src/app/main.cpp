@@ -859,6 +859,16 @@ namespace
                         SDL_SubmitGPUCommandBuffer(commands);
                         return 3;
                     }
+                    if (world_mesh.blended &&
+                        !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
+                                             world_draws, view.position, view.rotation,
+                                             view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
+                                             nullptr, OpenBlood2::WorldPass::Translucent))
+                    {
+                        spdlog::error("Transparent world viewport: {}", error);
+                        SDL_SubmitGPUCommandBuffer(commands);
+                        return 3;
+                    }
                     if (!explosion_model_scene.world_draws.empty())
                     {
                         if (!explosion_model_renderer.prepare(
@@ -1448,6 +1458,11 @@ namespace
                     world_mesh.materials[i].error.empty() ? ++decoded : ++missing;
                 spdlog::info("World textures: decoded={}, rejected={}, RGBA bytes={}, prepared batches={}", decoded,
                              missing, world_mesh.texture_bytes, world_renderer.stats.batches);
+                spdlog::info("World alpha: prepared={}, submitted={}, passes={}", world_mesh.blended,
+                             world_renderer.stats.alpha_batches, world_renderer.stats.alpha_frames);
+                if (world_mesh.blended != 31 || world_renderer.stats.alpha_batches != 31 ||
+                    world_renderer.stats.alpha_frames != world_renderer.stats.frames)
+                    return 4;
                 if (decoded < 50 || missing || !viewport_hidden || !viewport_unloaded || !viewport_reloaded ||
                     world_renderer.stats.uploads != 2 || world_renderer.width() != 1000 ||
                     world_renderer.height() != 680)

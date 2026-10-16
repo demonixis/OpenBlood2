@@ -15,6 +15,11 @@ namespace OpenBlood2
         Opaque,
         SpriteAlpha
     };
+    enum class WorldPass
+    {
+        Opaque,
+        Translucent
+    };
     class WorldRenderer
     {
       public:
@@ -29,7 +34,7 @@ namespace OpenBlood2
                      std::string& error, bool dynamic = false);
         bool draw(SDL_GPUCommandBuffer*, SDL_GPUTexture*, const WorldMesh&, std::span<const WorldDraw>, DVector eye,
                   DRotation view, bool letterbox, std::string& error, DrawLoad = DrawLoad::Clear,
-                  SDL_GPUTexture* shared_depth = nullptr);
+                  SDL_GPUTexture* shared_depth = nullptr, WorldPass = WorldPass::Opaque);
         SDL_GPUTexture* depth_target() const
         {
             return depth_;
@@ -49,6 +54,8 @@ namespace OpenBlood2
         SDL_GPUDevice* device_ = nullptr;
         DrawStyle style_;
         SDL_GPUGraphicsPipeline* pipeline_ = nullptr;
+        SDL_GPUGraphicsPipeline* alpha_pipeline_ = nullptr;
+        std::vector<WorldAlphaBatch> alpha_order_;
         SDL_GPUBuffer* vertices_ = nullptr;
         SDL_GPUTransferBuffer* vertex_transfer_ = nullptr;
         Uint32 vertex_capacity_ = 0;
@@ -60,6 +67,6 @@ namespace OpenBlood2
         SDL_GPUTextureFormat color_format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
         Uint32 width_ = 0, height_ = 0;
         std::uint64_t revision_ = UINT64_MAX;
-        bool pipeline(SDL_GPUTextureFormat, std::string&);
+        bool pipeline(SDL_GPUTextureFormat, std::string&, bool translucent = false);
     };
 } // namespace OpenBlood2

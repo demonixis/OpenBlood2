@@ -101,3 +101,5 @@ The [sprite presentation continuation](SPRITE_VIEW_CONTRACTS.md) now draws suppo
 original sprites with actual DTX alpha and shared world/model depth, before view
 weapons. Earlier blanket sprite-rendering omissions are superseded for this bounded
 subset. World/model opacity policy is unchanged; required FX and M2 remain open.
+
+The [world-alpha correction](WORLD_ALPHA_CONTRACTS.md) supersedes earlier blanket world-opacity/transparent-marker statements for resolved bit-3 surfaces. Sky and rejected resources remain opaque markers; ordinary surfaces still ignore alpha. The new sorted world pass precedes the separately sorted translucent FX passes. M2 remains incomplete.

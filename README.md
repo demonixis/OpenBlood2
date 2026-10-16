@@ -538,3 +538,5 @@ The [keyboard/mouse continuation](../Documentation/Implementation/M2_PLAYER_CONT
 NPC attack and train-glass reports remain unresolved; M2 is still incomplete.
 
 [Interactive entry correction](../Documentation/Implementation/M2_NPC_ENTRY.md): a loaded world now waits for player entry instead of advancing NPCs without a player. Use **Enter player** in the header, or launch `--view-world` for immediate entry. Session exposes NPC ready/failed/active counts. Autonomous fire/damage is verified in a labelled SubwayA encounter; train glass and complete M2 remain open.
+
+[Train-window correction](../Documentation/Implementation/M2_WORLD_ALPHA.md): the 31 transparent SubwayA faces now bind the original dirtyglass texture and blend its decoded alpha. Hidden-UI/reload/GPU checks cover the shared-depth pass; missing resources remain explicit. Lighting, global FX transparency ordering, required services and M2 remain incomplete.

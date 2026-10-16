@@ -103,6 +103,8 @@ namespace
         std::string error;
         CHECK(mesh.build(w, error));
         CHECK(mesh.vertices[6].position.x == -12 && mesh.vertices[6].position.z == -26);
+        mesh.ranges[1].batches[0].translucent = true; // Synthetic alpha surface for identity/lifetime checks.
+        std::vector<WorldAlphaBatch> order;
         auto h = g.create_example("CameraSpot");
         CHECK(h);
         auto* r = g.objects.get(h);
@@ -117,10 +119,12 @@ namespace
         WorldViewStats stats;
         CHECK(world_draws(mesh, g.objects, draws, stats, error));
         CHECK(draws.size() == 2 && stats.unbound == 0);
+        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error) && order.size() == 1);
         CHECK(draws[1].position.x == 30 && draws[1].rotation.m_Spin == r->state.m_Rotation.m_Spin);
         r->state.m_Flags &= ~FLAG_VISIBLE;
         CHECK(world_draws(mesh, g.objects, draws, stats, error));
         CHECK(draws.size() == 1 && stats.hidden == 1);
+        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error) && order.empty());
         r->state.m_Flags |= FLAG_VISIBLE;
         mesh.ranges.push_back(mesh.ranges[1]);
         CHECK(!world_draws(mesh, g.objects, draws, stats, error));
@@ -129,10 +133,45 @@ namespace
         CHECK(g.objects.remove(h));
         CHECK(world_draws(mesh, g.objects, draws, stats, error));
         CHECK(draws.size() == 1 && stats.unbound == 1);
+        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error) && order.empty());
         CHECK(g.objects.finish_frame());
         CHECK(!g.objects.get(h));
         CHECK(world_draws(mesh, g.objects, draws, stats, error));
         CHECK(draws.size() == 1);
+        return true;
+    }
+    bool alpha_order()
+    {
+        WorldMesh mesh;
+        mesh.vertices.resize(18);
+        mesh.ranges = {{0, 12, {}, "two faces", {{0, 6, 0, true, {0, 0, 2}}, {6, 6, 0, true, {0, 0, 4}}}},
+                       {12, 6, {}, "moving", {{12, 6, 0, true, {0, 0, 3}}}}};
+        std::vector<WorldDraw> draws = {{0, {}, {}}, {1, {}, {}}};
+        std::vector<WorldAlphaBatch> order;
+        std::string error;
+        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error));
+        CHECK(order.size() == 3 && order[0].batch == 1 && order[1].draw == 1 && order[2].batch == 0);
+        draws[1].position.z = 3;
+        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error));
+        CHECK(order[0].draw == 1 && order[0].depth == 6);
+        draws[1].position = {};
+        draws[1].rotation = rotation_from_euler({0, 3.14159265f, 0});
+        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error));
+        CHECK(order.back().draw == 1 && order.back().depth < -2.99);
+        CHECK(world_alpha_order(mesh, draws, {}, draws[1].rotation, order, error));
+        CHECK(order[0].draw == 1);
+        draws[1].rotation = {};
+        draws[1].position.z = 1; // Equal depths retain deterministic source order.
+        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error));
+        CHECK(order[0].draw == 0 && order[0].batch == 1 && order[1].draw == 1);
+        mesh.ranges[1].batches[0].count = 7;
+        CHECK(!world_alpha_order(mesh, draws, {}, {}, order, error) && order.empty());
+        mesh.ranges[1].batches[0].count = 6;
+        draws[1].range = 2;
+        CHECK(!world_alpha_order(mesh, draws, {}, {}, order, error) && order.empty());
+        draws.resize(1);
+        CHECK(!world_alpha_order(mesh, draws, {std::numeric_limits<float>::quiet_NaN(), 0, 0}, {}, order, error));
+        CHECK(order.empty());
         return true;
     }
     bool private_world(const char* directory)
@@ -154,6 +193,22 @@ namespace
             revision = g.world_revision;
             CHECK(mesh.build(g.world, error, &g.resources));
             CHECK(mesh.ranges.size() == 116 && mesh.vertices.size() > 1000);
+            CHECK(mesh.transparent == 31 && mesh.blended == 31);
+            std::size_t glass_faces = 0;
+            for (const auto& range : mesh.ranges)
+                for (const auto& batch : range.batches)
+                    if (batch.translucent)
+                    {
+                        ++glass_faces;
+                        const auto& material = mesh.materials[batch.material];
+                        CHECK(material.path == "textures/greys/dirtyglass.dtx" && material.error.empty());
+                        CHECK(material.image.flags == 10 && material.image.width == 64 && material.image.height == 64);
+                        for (std::size_t i = 3; i < material.image.rgba.size(); i += 4)
+                            CHECK(material.image.rgba[i] >= 51 && material.image.rgba[i] <= 102);
+                        CHECK(batch.count == 6 && mesh.vertices[batch.first].color.x == 1);
+                    }
+            CHECK(glass_faces == 31);
+            std::cout << "SubwayA glass: 31 faces bind textures/greys/dirtyglass.dtx; 64x64, flags=10, alpha=51..102\n";
             std::size_t decoded = 0, failed = 0;
             for (std::size_t i = 1; i < mesh.materials.size(); ++i)
                 mesh.materials[i].error.empty() ? ++decoded : ++failed;
@@ -167,6 +222,12 @@ namespace
             CHECK(g.step(1. / 60));
             CHECK(world_draws(mesh, g.objects, draws, stats, error));
             CHECK(stats.draws > 50 && stats.triangles > 1000);
+            std::vector<WorldAlphaBatch> order;
+            CHECK(world_alpha_order(mesh, draws, {}, {}, order, error));
+            CHECK(order.size() == 31);
+            for (std::size_t i = 1; i < order.size(); ++i)
+                CHECK(order[i - 1].depth >= order[i].depth);
+
             std::size_t posed = 0;
             for (auto id : g.objects.snapshot())
             {
@@ -217,7 +278,8 @@ int main(int argc, char** argv)
     if (argc < 2)
         return 2;
     std::string_view c = argv[1];
-    bool ok = c == "lifetime"              ? lifetime()
+    bool ok = c == "alpha_order"           ? alpha_order()
+              : c == "lifetime"            ? lifetime()
               : c == "mesh"                ? mesh_test()
               : c == "rejects"             ? rejects()
               : c == "camera"              ? camera()

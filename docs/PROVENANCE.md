@@ -832,3 +832,13 @@ See [ledger](M2_PLAYER_CONTROL_SOURCES.json).
 ## Interactive NPC entry preservation
 
 The [application playback policy](SESSION_PLAYBACK_CONTRACTS.md) holds a loaded world until original player entry. No new original method is imported or AI/faction rule altered; see [source context](M2_NPC_ENTRY_SOURCES.json).
+
+## Transparent world presentation
+
+New engine code binds existing decoded DTX alpha on authored bit-3 faces, reuses
+the packaged sprite shader with a world repeat sampler and sorts current posed
+polygon centers. No original game method or donor implementation is imported.
+The later LithTech surface definition is a reference, not a retail v56 renderer
+specification. See [ledger](M2_WORLD_ALPHA_SOURCES.json),
+[contracts](WORLD_ALPHA_CONTRACTS.md) and
+[evidence](../../Documentation/Implementation/M2_WORLD_ALPHA.md).

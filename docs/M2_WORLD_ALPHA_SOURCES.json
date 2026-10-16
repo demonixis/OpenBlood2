@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "1eba2fc1078a31a4884d5ba4dab8ffe9722108fa",
+  "source_files": [
+    {
+      "path": "sources/lithtech/runtime/world/src/de_world.h",
+      "sha256": "04f5649e6bfbd7c67bf7f8862919cebb6ac28104a3e2f1504efc1331d639b0c5",
+      "use": "Later-generation surface bit 3 (translucent), bits 2/4 reference only; not proof of complete retail v56 parity"
+    },
+    {
+      "path": "NoMadEngine/nomadengine/src/formats/dtx_parser.cpp",
+      "sha256": "c5f02d6d927800536b85eee14671700ac670144f74fe43046386d04a22ebe461",
+      "use": "Revisited historical alpha donor; existing stricter -2 decoder retained, no code imported"
+    }
+  ],
+  "adaptations": [
+    "New engine presentation only; no original game code imported or changed.",
+    "Existing strict DTX decoder, authored DAT flags, UVs and current object transforms retained.",
+    "Existing sprite alpha shader reused with the world repeat sampler and unit modulation.",
+    "Polygon-center ordering is replacement rendering, not retail parity."
+  ],
+  "remaining": [
+    "global translucent ordering across effects/intersections",
+    "lighting, sky, liquids, generic object alpha",
+    "required original services, safe NEW_LEVEL, M2 acceptance"
+  ]
+}
