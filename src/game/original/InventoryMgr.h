@@ -39,6 +39,8 @@ class CInventoryMgr : public Aggregate
     bool UpdateHandModels();
     InventoryResult ObtainWeapon(DBYTE, int slot = -1);
     InventoryResult ChangeWeaponSlot(DBYTE);
+    InventoryResult ChangeWeapon(DBYTE);
+    bool FindBestWeapon(float target_distance, CWeapon*& alternative) const;
     CWeapon* GetWeapon(unsigned slot, bool left = false) const
     {
         return slot < 10 ? (left ? m_LWeapons[slot].get() : m_Weapons[slot].get()) : nullptr;

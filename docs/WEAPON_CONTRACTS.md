@@ -1,5 +1,9 @@
 # Original Inventory and Vector Weapon Boundary
 
+> Extended by [AI weapon-action contracts](AI_FIRE_CONTRACTS.md): supported weapon
+> choice, aiming, clearance, standing fire and AI fire_key now execute. Earlier
+> blanket weapon/fire omissions are historical; full NPCs and M2 remain open.
+
 > Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
 > candidate lists and stimulus/target selection now execute. Automatic NPC states
 > and complete M2 remain unavailable; earlier acquisition omissions are historical.

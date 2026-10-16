@@ -1,5 +1,9 @@
 # Original AI state decisions and stationary actions
 
+> Extended by [AI weapon-action contracts](AI_FIRE_CONTRACTS.md): supported weapon
+> choice, aiming, clearance, standing fire and AI fire_key now execute. Earlier
+> blanket weapon/fire omissions are historical; full NPCs and M2 remain open.
+
 M2 remains incomplete. This ports selected AI_Mgr, CivilianAI and CultistAI
 methods from [these source ranges](M2_AI_STATE_SOURCES.json). It builds on
 [perception](AI_PERCEPTION_CONTRACTS.md), [targets](AI_TARGET_CONTRACTS.md),

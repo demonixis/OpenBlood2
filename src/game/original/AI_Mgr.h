@@ -39,7 +39,9 @@ namespace OpenBlood2
         NoTarget,
         Unavailable,
         Invalid,
-        PlaybackFailed
+        PlaybackFailed,
+        FireAttempt,
+        FireBlocked
     };
     const char* ai_key_outcome_name(AIKeyOutcome);
     enum class AISightOutcome
@@ -63,10 +65,30 @@ namespace OpenBlood2
         bool origin_head = false, retried_head = false;
         unsigned rays = 0;
     };
+    enum class AIClearOutcome
+    {
+        None,
+        Clear,
+        Target,
+        Head,
+        Blocked,
+        Invalid,
+        Unavailable
+    };
+    const char* ai_clear_outcome_name(AIClearOutcome);
+    struct AIClearShot
+    {
+        AIClearOutcome outcome = AIClearOutcome::None;
+        DVector origin{}, direction{}, head{};
+        SegmentHit first_hit, head_hit;
+        SegmentResult first_result = SegmentResult::Miss, head_result = SegmentResult::Miss;
+        unsigned rays = 0;
+        bool retried_head = false;
+    };
 } // namespace OpenBlood2
 
 // Selective original AI_Mgr::InitStatics/OnStringKey port. No production AI class
-// registration or complete AI_Update, Fire or MC_Extra implementation yet.
+// registration or complete AI_Update or MC_Extra implementation yet.
 // Perception commands: AI_PERCEPTION_CONTRACTS.md; no automatic AI update loop.
 // Selected CanSee and explicit target/facing commands are documented in
 // AI_SIGHT_CONTRACTS.md and AI_TARGET_CONTRACTS.md.
@@ -136,6 +158,19 @@ class AI_Mgr : public CBaseCharacter
     bool StopVelocity();
     bool SetAnimation(DDWORD);
     bool MC_Idle();
+    bool MC_BestWeapon();
+    bool MC_Fire_Stand();
+    bool CheckClearShot(DVector origin, DVector& direction, bool alternate = false);
+    bool Fire(bool alternate = false); // Source acceptance includes dry attempts; inspect fire_result.
+    OpenBlood2::AIClearShot clear_shot;
+    FireResult fire_result = FireResult::Invalid;
+    DVector fire_origin{}, fire_direction{};
+    bool fire_gun_node = false;
+    std::uint64_t fire_calls = 0, fire_shots = 0, fire_dry = 0, fire_blocked = 0, fire_failures = 0;
+    std::string fire_error;
+    float weapon_distance = 0, m_fAttackLoadTime = 0, m_fLoadTimeStart = 0, m_fTimeStart = 0;
+    DBYTE best_weapon = 0;
+
     bool MC_Talk();
     bool MC_Special(int);
     // Only the original state-dispatch portion, not AI_Update/deactivation/retention.
@@ -146,7 +181,7 @@ class AI_Mgr : public CBaseCharacter
     virtual bool AI_STATE_Special(int); // Consolidates the eight original virtual handlers.
     int m_nLastState = StateIdle, m_nCurMetacmd = 1, m_nTrapped = 0;
     DDWORD m_nCurAnimation = 999;
-    bool m_bAnimating = false, m_bHasTargeted = false;
+    bool m_bAnimating = false, m_bHasTargeted = false, animation_blocked = false;
     float m_fWaitForIdleTime = 0;
     DVector m_vDims{1, 1, 1}, m_vScale{1, 1, 1};
     std::string m_szAIState = "IDLE";

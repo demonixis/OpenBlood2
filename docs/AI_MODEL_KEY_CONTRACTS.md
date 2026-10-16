@@ -1,5 +1,9 @@
 # Original AI animation keys
 
+> Extended by [AI weapon-action contracts](AI_FIRE_CONTRACTS.md): supported weapon
+> choice, aiming, clearance, standing fire and AI fire_key now execute. Earlier
+> blanket weapon/fire omissions are historical; full NPCs and M2 remain open.
+
 > Extended by [AI state/action contracts](AI_STATE_CONTRACTS.md): selected original
 > state decisions, transitions and stationary animation commands now execute.
 > Full AI_Update and production NPCs remain unavailable; M2 is still open.

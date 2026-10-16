@@ -536,3 +536,11 @@ are imported with explicit failure and checked ownership. The diagnostic driver
 does not implement AI_Update or register partial NPCs. See
 [source ranges and hashes](M2_AI_STATE_SOURCES.json) and
 [contracts and dimension-service adaptation](AI_STATE_CONTRACTS.md).
+
+## M2 AI weapon actions
+
+Selected original InventoryMgr selection, AI_Mgr default Fire/CheckClearShot,
+MC_Fire_Stand/MC_BestWeapon and key firing are connected with typed failures and
+checked lifetimes. CWeapon's original player-only eye-alignment condition is
+restored. See [source ranges/hashes](M2_AI_FIRE_SOURCES.json) and
+[contracts/adaptations](AI_FIRE_CONTRACTS.md). No production NPC is registered.

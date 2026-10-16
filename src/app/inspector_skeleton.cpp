@@ -58,11 +58,62 @@ namespace OpenBlood2
         ImGui::TableNextColumn();
         const auto* r = game.objects.get(skeleton_selection);
         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+        if (target_ai && ImGui::CollapsingHeader("Original AI weapon actions", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& ai = *target_ai;
+            const auto* weapon = ai.m_InventoryMgr.CurrentWeapon();
+            ImGui::TextWrapped("Original standing fire and weapon choice. Diagnostic driver; full NPC update, attack "
+                               "states, navigation and death remain unavailable.");
+            ImGui::Text("Weapon %u | last selection: alternative %u / distance %.2f", weapon ? weapon->data.m_nType : 0,
+                        ai.best_weapon, ai.weapon_distance);
+            ImGui::Text("Attempts %llu | shots %llu | dry %llu | blocked %llu | failures %llu",
+                        (unsigned long long)ai.fire_calls, (unsigned long long)ai.fire_shots,
+                        (unsigned long long)ai.fire_dry, (unsigned long long)ai.fire_blocked,
+                        (unsigned long long)ai.fire_failures);
+            const char* result = "invalid";
+            switch (ai.fire_result)
+            {
+                case FireResult::Fired:
+                    result = "fired";
+                    break;
+                case FireResult::Dry:
+                    result = "dry (accepted by source AI)";
+                    break;
+                case FireResult::Blocked:
+                    result = "blocked";
+                    break;
+                case FireResult::Unavailable:
+                    result = "unavailable";
+                    break;
+                case FireResult::DeliveryFailed:
+                    result = "damage delivery failed";
+                    break;
+                case FireResult::Invalid:
+                    break;
+            }
+            ImGui::Text("Last attempt: %s", ai.fire_calls ? result : "none");
+            ImGui::Text("Origin %s: %.2f %.2f %.2f | cadence %.3f / last %.3f",
+                        ai.fire_gun_node ? "r_gun" : "body fallback", ai.fire_origin.x, ai.fire_origin.y,
+                        ai.fire_origin.z, ai.m_fAttackLoadTime, ai.m_fLoadTimeStart);
+            ImGui::Text("Clearance: %s | rays %u | head retry %s", ai_clear_outcome_name(ai.clear_shot.outcome),
+                        ai.clear_shot.rays, ai.clear_shot.retried_head ? "yes" : "no");
+            if (weapon)
+            {
+                const auto& shot = weapon->last_shot;
+                ImGui::Text("Ammo %.0f | damage %.2f | shot seed %u",
+                            ai.m_InventoryMgr.GetAmmoCount(weapon->data.m_nAmmoType), shot.damage,
+                            unsigned(shot.request.seed));
+                ImGui::TextWrapped("Damage message: %s",
+                                   shot.damage_delivered ? "delivered (not a health assertion)" : "none");
+            }
+            if (!ai.fire_error.empty())
+                ImGui::TextWrapped("Failed: %s", ai.fire_error.c_str());
+        }
         if (target_ai && ImGui::CollapsingHeader("Original AI state actions", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& ai = *target_ai;
             ImGui::TextWrapped("Selected original decisions and stationary actions. Full AI_Update, navigation, "
-                               "combat/death and production NPC registration remain unavailable.");
+                               "full combat/death and production NPC registration remain unavailable.");
             ImGui::Text("State %d | last %d | requested %d | dispatched %d", ai.m_nState, ai.m_nLastState,
                         ai.requested_state, ai.dispatched_state);
             ImGui::Text("Authored %s | metacmd %d / current %d | animating %s", ai.m_szAIState.c_str(), ai.Metacmd,
@@ -112,7 +163,7 @@ namespace OpenBlood2
             if (!ai.perception_error.empty())
                 ImGui::TextWrapped("%s", ai.perception_error.c_str());
             ImGui::TextWrapped("Recorded source perception commands. No automatic NPC update/state machine, navigation "
-                               "or attack yet.");
+                               "or attack-state scheduler yet.");
         }
         if (target_ai && ImGui::CollapsingHeader("Original AI target / facing"))
         {
@@ -132,8 +183,7 @@ namespace OpenBlood2
                         (unsigned long long)target_ai->target_failures);
             if (!target_ai->target_error.empty())
                 ImGui::TextWrapped("%s", target_ai->target_error.c_str());
-            ImGui::TextWrapped(
-                "Original target commands. State-driven updates, tracking and AI states remain unavailable.");
+            ImGui::TextWrapped("Original target commands. Full state-driven updates and tracking remain unavailable.");
         }
         if (!r)
             ImGui::TextUnformatted("No selected model");

@@ -1,0 +1,99 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "7f2c1a644716e297fda3904c47d630d1c9079d73",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          880,
+          903
+        ],
+        [
+          3204,
+          3222
+        ],
+        [
+          3437,
+          3539
+        ],
+        [
+          4469,
+          4528
+        ],
+        [
+          5612,
+          5670
+        ]
+      ],
+      "use": "Default supported weapon aim, clear-shot retry, key dispatch, standing fire and best-weapon commands; monster branches excluded"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "selected_lines": [
+        [
+          772,
+          837
+        ],
+        [
+          908,
+          939
+        ]
+      ],
+      "use": "Type selection and original right-slot damage/range/raw-ammo heuristic"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "selected_lines": [
+        [
+          864,
+          1040
+        ]
+      ],
+      "use": "Existing shot rules; player-only eye alignment"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "selected_lines": [
+        [
+          412,
+          477
+        ]
+      ],
+      "use": "Original global ray filter categories; CDestructableModel remains unavailable"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "selected_lines": [
+        [
+          77,
+          113
+        ]
+      ],
+      "use": "Original metacommand IDs"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "selected_lines": [
+        [
+          200,
+          232
+        ]
+      ],
+      "use": "Base-game last-player-weapon boundary"
+    }
+  ],
+  "adaptations": [
+    "Checked typed query/shot failures and pending owner/target identities",
+    "Existing atomic foot-anchored resize; blocked recovery distinguished from unavailable service",
+    "Existing owned portable shot RNG with session-selected byte seed, not CRT bit parity",
+    "Bounds check for missing melee SWITCH_WEAPON column; destination animation preflight",
+    "Diagnostic schedulers only; no partial NPC production registrations"
+  ]
+}

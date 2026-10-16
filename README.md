@@ -1,9 +1,9 @@
 # Blood II Reconstruction aka OpenBlood2
 
-Latest gameplay continuation: [original AI state decisions/actions](../Documentation/Implementation/M2_AI_STATES.md) adds
-transitions, civilian/cultist decisions and stationary animation commands with
-inspection and explicit failure. Full AI_Update, production NPC actions, required
-FX, ExitTrigger and the actual M2 gate remain open.
+Latest gameplay continuation: [original AI weapon actions](../Documentation/Implementation/M2_AI_FIRE.md) connects
+weapon choice, aiming/clearance, standing fire and model-key shots with inspection.
+Full AI_Update and production NPCs, navigation/death, required FX, ExitTrigger and
+the actual M2 gate remain open.
 
 Latest gameplay continuation: [original AI perception](../Documentation/Implementation/M2_AI_PERCEPTION.md) adds faction membership,
 radius/FOV/visibility selection, stimulus priorities and ExitHint. These commands
@@ -334,3 +334,8 @@ The [AI state/action continuation](docs/AI_STATE_CONTRACTS.md) passes 372/372 De
 and inspector-free Release checks (27 GPU cases), and 115 targeted headless
 ASan/UBSan/leak checks. Stationary action completion, state decisions, failure and
 lifetime are tested; production NPCs and the complete M2 gate remain open.
+
+The [AI weapon-action continuation](docs/AI_FIRE_CONTRACTS.md) passes 384/384 Debug
+and inspector-free Release checks (27 GPU), plus 136 targeted headless ASan/UBSan/
+leak checks. Selection, clearance, timed/key firing, real damage and deferred removal
+are verified for the bounded path; required production NPCs and M2 remain open.

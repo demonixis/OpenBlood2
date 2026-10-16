@@ -12,6 +12,10 @@ namespace OpenBlood2
     {
         switch (value)
         {
+            case AIKeyOutcome::FireAttempt:
+                return "Weapon attempt (inspect shot result)";
+            case AIKeyOutcome::FireBlocked:
+                return "Fire blocked";
             case AIKeyOutcome::None:
                 return "No AI action";
             case AIKeyOutcome::Played:
@@ -112,8 +116,15 @@ bool AI_Mgr::OnStringKey(ArgList* args)
         }
         if (!server->IsObjectAlive(m_hTarget))
             return fail(AIKeyOutcome::Invalid, "AI fire target is pending or stale");
-        ++unavailable_keys;
-        fail(AIKeyOutcome::Unavailable, "Original AI Fire/aiming is not integrated");
+        if (Fire())
+            key_outcome = AIKeyOutcome::FireAttempt;
+        else if (fire_result == FireResult::Blocked)
+            key_outcome = AIKeyOutcome::FireBlocked;
+        else
+        {
+            ++unavailable_keys;
+            fail(AIKeyOutcome::Unavailable, fire_error.c_str());
+        }
     }
     else if (branch == 1 || branch == 2)
     {

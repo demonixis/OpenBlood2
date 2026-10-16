@@ -14,7 +14,7 @@ float CWeapon::CheckAmmo() const
 FireResult CWeapon::Fire(const WeaponFire& request)
 {
     auto* server = BaseClass::GetServerDE();
-    if (!server || !m_pInventoryMgr || !server->HandleToObject(m_hOwner) || request.weapon != data.m_nType ||
+    if (!server || !m_pInventoryMgr || !server->IsObjectAlive(m_hOwner) || request.weapon != data.m_nType ||
         request.left != m_bLeftHand || !physics_vector(request.position) || !physics_vector(request.direction))
         return FireResult::Invalid;
     const auto length = std::sqrt(vector_dot(request.direction, request.direction));
@@ -51,33 +51,35 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     direction = vector_add(direction, vector_scale(up, sample(-spread.v, spread.v) / 2000));
     direction = vector_scale(direction, 1 / std::sqrt(vector_dot(direction, direction)));
     const auto range = request.alternate ? data.m_fAltRange : data.m_fRange;
-    // FireSpread -> AlignFireVector: project from Caleb's current eye, then
-    // aim the muzzle at that intersection. Player input owns the muzzle origin.
-    DVector eye;
-    server->GetObjectPos(m_hOwner, &eye);
-    const auto* player = dynamic_cast<CPlayerObj*>(server->HandleToObject(m_hOwner));
-    eye.y += player ? player->eye_level : 36;
-    auto aim = vector_add(eye, vector_scale(direction, range));
-    SegmentHit aim_hit;
-    auto query = server->IntersectSegment(eye, aim, m_hOwner, aim_hit);
-    if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
+    // Source FireSpread aligns the eye only for a player. NPCs fire the
+    // spread direction from their actual gun node (or body fallback).
+    if (const auto* player = dynamic_cast<CPlayerObj*>(server->HandleToObject(m_hOwner)))
     {
-        last_shot.result = FireResult::Unavailable;
-        return last_shot.result;
+        DVector eye;
+        server->GetObjectPos(m_hOwner, &eye);
+        eye.y += player->eye_level;
+        auto aim = vector_add(eye, vector_scale(direction, range));
+        SegmentHit aim_hit;
+        const auto query = server->IntersectSegment(eye, aim, m_hOwner, aim_hit);
+        if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
+        {
+            last_shot.result = FireResult::Unavailable;
+            return last_shot.result;
+        }
+        if (query == SegmentResult::Hit)
+            aim = aim_hit.point;
+        direction = vector_subtract(aim, request.position);
+        const auto aim_length = std::sqrt(vector_dot(direction, direction));
+        if (aim_length < 1e-6f)
+        {
+            last_shot.result = FireResult::Invalid;
+            return last_shot.result;
+        }
+        direction = vector_scale(direction, 1 / aim_length);
     }
-    if (query == SegmentResult::Hit)
-        aim = aim_hit.point;
-    direction = vector_subtract(aim, request.position);
-    const auto aim_length = std::sqrt(vector_dot(direction, direction));
-    if (aim_length < 1e-6f)
-    {
-        last_shot.result = FireResult::Invalid;
-        return last_shot.result;
-    }
-    direction = vector_scale(direction, 1 / aim_length);
     last_shot.direction = direction;
     last_shot.end = vector_add(request.position, vector_scale(direction, range));
-    query = server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, true);
+    const auto query = server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, true);
     last_shot.collision = query;
     if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
     {

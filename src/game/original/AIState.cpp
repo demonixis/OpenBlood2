@@ -82,6 +82,7 @@ bool AI_Mgr::SetAnimation(DDWORD clip)
     using OpenBlood2::ResizeResult;
     state_error.clear();
     requested_animation = clip;
+    animation_blocked = false;
     auto* server = GetServerDE();
     std::string name;
     if (!server || !server->IsObjectAlive(m_hObject) || !server->GetModelAnimationName(m_hObject, clip, name))
@@ -100,6 +101,7 @@ bool AI_Mgr::SetAnimation(DDWORD clip)
         // Explicit replacement for the old SetObjectDims2: existing atomic,
         // foot-anchored clearance, no partial pushing or fabricated successful resize.
         const auto result = server->ResizeObject(m_hObject, dimensions);
+        animation_blocked = result == ResizeResult::Blocked;
         if (result != ResizeResult::Resized)
             return StateFailure(result == ResizeResult::Blocked ? "AI animation resize blocked"
                                                                 : "AI animation resize unavailable or invalid");
@@ -204,7 +206,7 @@ bool AI_Mgr::AI_STATE_Idle()
     {
         case 1:
             if (m_bCabal)
-                return StateFailure("Original MC_BestWeapon is not integrated");
+                return MC_BestWeapon();
             ++Metacmd;
             return true;
         case 2:
@@ -226,7 +228,7 @@ bool AI_Mgr::AI_STATE_Passive()
     {
         case 1:
             if (m_bCabal)
-                return StateFailure("Original MC_BestWeapon is not integrated");
+                return MC_BestWeapon();
             ++Metacmd;
             return true;
         case 2:

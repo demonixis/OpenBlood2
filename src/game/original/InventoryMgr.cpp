@@ -231,3 +231,41 @@ bool CInventoryMgr::UpdateHandModels()
             ok = w->ShowHandModel(!owner->m_damage.IsDead()) && ok;
     return ok;
 }
+
+// Original InventoryMgr.cpp:772-837,908-939. Only supported weapon types exist.
+InventoryResult CInventoryMgr::ChangeWeapon(DBYTE type)
+{
+    auto* server = BaseClass::GetServerDE();
+    if (!server || !server->IsObjectAlive(m_hOwner) || !weapon_definition(type))
+        return InventoryResult::Invalid;
+    if (CurrentWeapon() && CurrentWeapon()->data.m_nType == type)
+        return InventoryResult::Current;
+    for (unsigned i = 0; i < m_Weapons.size(); ++i)
+        if (m_Weapons[i] && m_Weapons[i]->data.m_nType == type)
+            return ChangeWeaponSlot(static_cast<DBYTE>(i));
+    return InventoryResult::NotAvailable;
+}
+bool CInventoryMgr::FindBestWeapon(float distance, CWeapon*& alternative) const
+{
+    alternative = nullptr;
+    auto* server = BaseClass::GetServerDE();
+    if (!server || !server->IsObjectAlive(m_hOwner) || !std::isfinite(distance) || distance < 0)
+        return false;
+    auto* best = CurrentWeapon();
+    for (const auto& slot : m_Weapons)
+    {
+        auto* candidate = slot.get();
+        if (!candidate)
+            continue;
+        const auto damage = best ? static_cast<DDWORD>(best->data.m_fMaxDamage) : 0;
+        const float ammo = best ? GetAmmoCount(best->data.m_nAmmoType) : 0;
+        // Raw AMMO_NONE pool is deliberately zero here, unlike CheckAmmo().
+        if (distance < candidate->data.m_fRange && candidate->data.m_nDamageRadius < distance &&
+            GetAmmoCount(candidate->data.m_nAmmoType) &&
+            (static_cast<DDWORD>(candidate->data.m_fMaxDamage) > damage || ammo <= 0))
+            best = candidate;
+    }
+    if (best != CurrentWeapon())
+        alternative = best;
+    return true;
+}

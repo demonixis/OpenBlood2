@@ -326,7 +326,9 @@ namespace
         CHECK(base->DispatchState() && g.server.advance_models(1) && base->DispatchState() && base->Metacmd == 3);
         CHECK(base->DispatchState() && base->Metacmd == 1);
         base->m_bCabal = true;
-        CHECK(!base->DispatchState() && base->state_error.find("BestWeapon") != std::string::npos);
+        CHECK(!base->DispatchState() && base->state_error.find("inventory query failed") != std::string::npos);
+        CHECK(base->m_InventoryMgr.Init(base->m_hObject, nullptr));
+        CHECK(base->DispatchState() && base->Metacmd == 2); // Connected empty-inventory selection.
         base->m_nState = AI_Mgr::StateInactive;
         CHECK(base->DispatchState());
         return true;

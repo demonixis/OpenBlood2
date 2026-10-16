@@ -8,6 +8,43 @@ namespace OpenBlood2
 {
     namespace
     {
+        class AIFireProbe : public AI_Mgr
+        {
+          public:
+            HOBJECT diagnostic_target = nullptr;
+
+          private:
+            DDWORD EngineMessageFn(DDWORD message, void* data, DFLOAT value) override
+            {
+                if (message == MID_UPDATE)
+                {
+                    GetServerDE()->SetNextUpdate(m_hObject, .001f);
+                    if (!MC_Fire_Stand())
+                        GetServerDE()->SetNextUpdate(m_hObject, 0);
+                }
+                return AI_Mgr::EngineMessageFn(message, data, value);
+            }
+        };
+        class AIFireTarget : public BaseClass
+        {
+          public:
+            CDestructable damage;
+            AIFireTarget()
+            {
+                AddAggregate(&damage);
+            }
+
+          private:
+            DDWORD EngineMessageFn(DDWORD message, void* data, DFLOAT value) override
+            {
+                if (message == MID_INITIALUPDATE)
+                {
+                    damage.Init(m_hObject);
+                    damage.m_fHitPoints = damage.m_fMaxHitPoints = 10000;
+                }
+                return BaseClass::EngineMessageFn(message, data, value);
+            }
+        };
         // Explicit state-action driver for this smoke only. It does not implement
         // the missing AI_Update (deactivation, retention, navigation, death, etc.).
         class AIStateProbe : public CivilianAI
@@ -24,6 +61,61 @@ namespace OpenBlood2
             }
         };
     } // namespace
+    bool prepare_ai_fire_smoke(GameSession& g, ObjectId& id)
+    {
+        static const ClassInfo type{"AIFireProbe",
+                                    g.objects.find_class("CBaseCharacter"),
+                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AIFireProbe>(); },
+                                    {}};
+        static const ClassInfo target_type{"AIFireTarget",
+                                           g.objects.find_class("BaseClass"),
+                                           []() -> std::unique_ptr<BaseClass>
+                                           { return std::make_unique<AIFireTarget>(); },
+                                           {}};
+        if ((!g.objects.find_class(type.name) && !g.objects.register_class(type)) ||
+            (!g.objects.find_class(target_type.name) && !g.objects.register_class(target_type)))
+            return false;
+        ObjectCreateStruct state;
+        state.m_ObjectType = OT_MODEL;
+        state.m_Pos = {1000, 10000, 0};
+        state.m_Flags = FLAG_MODELKEYS;
+        SAFE_STRCPY(state.m_Name, "AI weapon probe (no full AI_Update)");
+        SAFE_STRCPY(state.m_Filename, "models/enemies/m_cultist1.abc");
+        auto h = g.objects.create(&type, state);
+        auto* r = g.objects.get(h);
+        auto* ai = r ? dynamic_cast<AIFireProbe*>(r->game.get()) : nullptr;
+        if (!ai || !r->model || !ai->m_InventoryMgr.Init(h, nullptr) ||
+            ai->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA, 0) != InventoryResult::Ok)
+            return false;
+        ai->m_InventoryMgr.SetAmmoCount(AMMO_BULLET, 100);
+        auto table = std::make_shared<CAnim_Sound>();
+        if (!table->SetAnimationIndexes(h) || !table->SetSoundRoot("sounds/enemies/m_cultist") ||
+            !ai->InitStatics(table))
+            return false;
+        ObjectCreateStruct target;
+        target.m_Pos = {1000, 10000, 300};
+        target.m_Flags = FLAG_SOLID;
+        SAFE_STRCPY(target.m_Name, "AI weapon damage receiver (diagnostic)");
+        const auto victim = g.objects.create(&target_type, target);
+        DVector dimensions{60, 100, 30};
+        if (!victim || g.server.SetObjectDims(victim, &dimensions) != DE_OK || !ai->SetNewTarget(victim) ||
+            !ai->RefreshTargetPosition())
+            return false;
+        ai->diagnostic_target = victim;
+        g.server.SetNextUpdate(h, .001f);
+        id = r->id;
+        return true;
+    }
+    bool check_ai_fire_smoke(GameSession& g, ObjectId id)
+    {
+        const auto* r = g.objects.get(id);
+        const auto* ai = r ? dynamic_cast<const AIFireProbe*>(r->game.get()) : nullptr;
+        const auto* target =
+            ai ? dynamic_cast<const AIFireTarget*>(g.server.HandleToObject(ai->diagnostic_target)) : nullptr;
+        return ai && target && ai->fire_shots > 2 && ai->animation_finishes > 0 && ai->fire_failures == 0 &&
+               ai->state_failures == 0 && ai->key_failures == 0 && ai->audio_starts > 0 &&
+               target->damage.m_fHitPoints < 10000 && ai->m_InventoryMgr.GetAmmoCount(AMMO_BULLET) < 100;
+    }
     bool prepare_ai_state_smoke(GameSession& g, ObjectId& id)
     {
         static const ClassInfo type{"AIStateProbe",
