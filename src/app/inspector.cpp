@@ -375,24 +375,42 @@ namespace OpenBlood2
             {
                 if (ImGui::BeginTabItem("3D view"))
                 {
-                    ImGui::TextWrapped("Diagnostic solid-color geometry with depth. F1 shows the world; F2 enables "
+                    ImGui::TextWrapped("Diagnostic textured geometry with depth. F1 shows the world; F2 enables "
                                        "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
                                        "the player in Session first, or launch --view-world.");
                     ImGui::TextWrapped(
-                        "Orientation colors are not lighting. Textures/lightmaps, models, sprites, liquid surfaces, "
+                        "Opaque textures are unlit. Lightmaps, models, sprites, liquid surfaces, "
                         "transparency and sky rendering remain unavailable. Unsupported objects stay in World.");
                     if (world_mesh && world_render)
                     {
-                        ImGui::Text("GPU: %llu frames / %llu geometry uploads",
-                                    (unsigned long long)world_render->frames,
+                        ImGui::Text("GPU: %llu frames / %llu world uploads", (unsigned long long)world_render->frames,
                                     (unsigned long long)world_render->uploads);
-                        ImGui::Text("Prepared: %zu triangles / %zu draws / %zu hidden instances",
+                        ImGui::Text("Prepared: %zu triangles / %zu instances / %zu hidden instances",
                                     world_render->triangles, world_render->draws, world_render->hidden);
                         ImGui::Text("Unbound models: %zu / excluded containers: %zu", world_render->unbound,
                                     world_render->containers);
                         ImGui::Text(
                             "Faces: %zu invisible / %zu degenerate / %zu transparent-as-opaque / %zu sky markers",
                             world_mesh->invisible, world_mesh->degenerate, world_mesh->transparent, world_mesh->sky);
+                        std::size_t decoded = 0, failed = 0;
+                        for (std::size_t i = 1; i < world_mesh->materials.size(); ++i)
+                            world_mesh->materials[i].error.empty() ? ++decoded : ++failed;
+                        ImGui::Text("Materials: %zu decoded / %zu rejected / %zu RGBA bytes / %zu batches", decoded,
+                                    failed, world_mesh->texture_bytes, world_render->batches);
+                        if (ImGui::TreeNode("Texture resources (mip zero, nearest repeat)"))
+                        {
+                            for (std::size_t i = 1; i < world_mesh->materials.size(); ++i)
+                            {
+                                const auto& material = world_mesh->materials[i];
+                                if (material.error.empty())
+                                    ImGui::Text("%s: %ux%u, %u stored mips, flags 0x%x", material.path.c_str(),
+                                                material.image.width, material.image.height, material.image.mipmaps,
+                                                material.image.flags);
+                                else
+                                    ImGui::Text("%s: %s", material.path.c_str(), material.error.c_str());
+                            }
+                            ImGui::TreePop();
+                        }
                         ImGui::Text("Camera: %s at %.2f %.2f %.2f",
                                     !game.client_shell.m_bInWorld   ? "no entered player"
                                     : game.client_shell.view.object ? "original scripted camera"

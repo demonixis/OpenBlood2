@@ -91,3 +91,5 @@ occlusion, both windings, near clipping, axis orientation, camera/object transfo
 resize, letterbox and reupload. Headless cases cover malformed mesh inputs, base
 rings, projection, invisible/inactive/pending lifetime and private posed geometry.
 No pixel-identical retail comparison, optimization or additional platform is claimed.
+
+The [DTX continuation](TEXTURE_CONTRACTS.md) supersedes the absence of world textures: opaque unlit base colors now render, with named rejection diagnostics and bounded cache ownership. World vertices are now 32 bytes; the three-million-vertex payload limit is 96 MB. Earlier geometry limits, current transforms and the M2 gate remain unchanged.

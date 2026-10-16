@@ -485,3 +485,17 @@ compatibility is not claimed. SDL's pinned SDL_gpu.h defines NDC, resource bindi
 depth clipping and GPU resource lifetime. No game rule changed. See
 [contracts](WORLD_VIEW_CONTRACTS.md) and
 [evidence](../../Documentation/Implementation/M2_WORLD_VIEW.md).
+
+## M2 DTX world materials
+
+`texture.cpp` is a new bounded reader informed by the C++ DTX parser in
+`OpenBlood2/OpenLithTech/src/formats/dtx_parser.cpp` and its NoMadEngine counterpart,
+then checked against the complete externally mounted retail corpus. It does not
+copy their basename/payload-size guesses, unrestricted allocations or implicit
+fallbacks. The older converter's contradictory channel order is not adopted.
+The -2 layout is measured data; later `sources/lithtech/runtime/shared/src/dtxmgr.h`
+(version -5) is a generation-boundary reference, not a compatible specification.
+UV dot products follow the reviewed world surface representation and the donor's
+resource-manager calculation, evaluated before subtracting the authored pivot.
+Shader sampling, bounded batches, upload lifetime and tests are new engine code;
+no gameplay source changed. See [contracts](TEXTURE_CONTRACTS.md).

@@ -19,7 +19,8 @@ namespace OpenBlood2
         Capture& operator=(const Capture&) = delete;
         ~Capture();
         bool initialize(SDL_GPUDevice* gpu, SDL_GPUTextureFormat format, Uint32 w, Uint32 h);
-        bool enqueue(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* swapchain);
+        bool enqueue(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* swapchain, Uint32 target_width,
+                     Uint32 target_height);
         bool save(const char* filename);
     };
 

@@ -31,6 +31,9 @@ namespace OpenBlood2
         SDL_GPUGraphicsPipeline* pipeline_ = nullptr;
         SDL_GPUBuffer* vertices_ = nullptr;
         SDL_GPUTexture* depth_ = nullptr;
+        std::vector<SDL_GPUTexture*> textures_;
+        SDL_GPUSampler* sampler_ = nullptr;
+        bool upload_materials(const WorldMesh&, std::string&);
         SDL_GPUTextureFormat color_format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
         Uint32 width_ = 0, height_ = 0;
         std::uint64_t revision_ = UINT64_MAX;

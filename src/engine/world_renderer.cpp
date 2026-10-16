@@ -8,6 +8,8 @@ namespace OpenBlood2
     WorldRenderer::~WorldRenderer()
     {
         clear_geometry();
+        if (sampler_)
+            SDL_ReleaseGPUSampler(device_, sampler_);
         if (depth_)
             SDL_ReleaseGPUTexture(device_, depth_);
         if (pipeline_)
@@ -18,6 +20,10 @@ namespace OpenBlood2
         if (vertices_)
             SDL_ReleaseGPUBuffer(device_, vertices_);
         vertices_ = nullptr;
+        for (auto* texture : textures_)
+            if (texture)
+                SDL_ReleaseGPUTexture(device_, texture);
+        textures_.clear();
         revision_ = UINT64_MAX;
         stats.triangles = stats.draws = 0;
     }
@@ -42,6 +48,7 @@ namespace OpenBlood2
         info.code = reinterpret_cast<const Uint8*>(world_frag);
         info.code_size = sizeof(world_frag);
         info.num_uniform_buffers = 0;
+        info.num_samplers = 1;
         auto* fragment = SDL_CreateGPUShader(device_, &info);
         if (!vertex || !fragment)
         {
@@ -55,17 +62,20 @@ namespace OpenBlood2
         SDL_GPUVertexBufferDescription buffer{};
         buffer.pitch = sizeof(WorldVertex);
         buffer.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
-        SDL_GPUVertexAttribute attributes[2]{};
+        SDL_GPUVertexAttribute attributes[3]{};
         attributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
         attributes[1].location = 1;
         attributes[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
         attributes[1].offset = offsetof(WorldVertex, color);
+        attributes[2].location = 2;
+        attributes[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
+        attributes[2].offset = offsetof(WorldVertex, uv);
         SDL_GPUColorTargetDescription target{};
         target.format = format;
         SDL_GPUGraphicsPipelineCreateInfo create{};
         create.vertex_shader = vertex;
         create.fragment_shader = fragment;
-        create.vertex_input_state = {&buffer, 1, attributes, 2};
+        create.vertex_input_state = {&buffer, 1, attributes, 3};
         create.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
         create.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
         create.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
@@ -170,9 +180,132 @@ namespace OpenBlood2
             return false;
         }
         vertices_ = next;
+        if (!upload_materials(mesh, error))
+        {
+            clear_geometry();
+            return false;
+        }
         revision_ = revision;
         ++stats.uploads;
         return true;
+    }
+    bool WorldRenderer::upload_materials(const WorldMesh& mesh, std::string& error)
+    {
+        if (!sampler_)
+        {
+            SDL_GPUSamplerCreateInfo info{};
+            info.min_filter = info.mag_filter = SDL_GPU_FILTER_NEAREST;
+            info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+            info.address_mode_u = info.address_mode_v = info.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+            sampler_ = SDL_CreateGPUSampler(device_, &info);
+            if (!sampler_)
+            {
+                error = SDL_GetError();
+                return false;
+            }
+        }
+        const Texture white{1, 1, 1, 0, 0, {255, 255, 255, 255}};
+        const auto count = std::max(std::size_t(1), mesh.materials.size());
+        if (count > 4097)
+        {
+            error = "GPU texture count limit exceeded";
+            return false;
+        }
+        std::vector<const Texture*> images(count, &white);
+        std::size_t bytes = 0;
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            if (!mesh.materials.empty())
+                images[i] = mesh.materials[i].error.empty() ? &mesh.materials[i].image : nullptr;
+            if (const auto* image = images[i])
+            {
+                if (!image->width || !image->height || image->width > 1024 || image->height > 1024 ||
+                    image->rgba.size() != std::size_t(image->width) * image->height * 4 ||
+                    image->rgba.size() > 128 * 1024 * 1024 - bytes)
+                {
+                    error = "Invalid GPU texture dimensions/payload/budget";
+                    return false;
+                }
+                bytes += image->rgba.size();
+            }
+        }
+        if (!images[0])
+        {
+            error = "Missing diagnostic GPU texture";
+            return false;
+        }
+        SDL_GPUTransferBufferCreateInfo transfer_info{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, static_cast<Uint32>(bytes),
+                                                      0};
+        auto* transfer = SDL_CreateGPUTransferBuffer(device_, &transfer_info);
+        if (!transfer)
+        {
+            error = SDL_GetError();
+            return false;
+        }
+        textures_.resize(count);
+        bool success = false;
+        if (auto* mapped = static_cast<Uint8*>(SDL_MapGPUTransferBuffer(device_, transfer, false)))
+        {
+            std::size_t offset = 0;
+            bool allocated = true;
+            for (std::size_t i = 0; i < count; ++i)
+            {
+                if (const auto* image = images[i])
+                {
+                    SDL_GPUTextureCreateInfo info{};
+                    info.type = SDL_GPU_TEXTURETYPE_2D;
+                    info.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+                    info.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
+                    info.width = image->width;
+                    info.height = image->height;
+                    info.layer_count_or_depth = 1;
+                    info.num_levels = 1;
+                    textures_[i] = SDL_CreateGPUTexture(device_, &info);
+                    if (!textures_[i])
+                    {
+                        allocated = false;
+                        break;
+                    }
+                    std::memcpy(mapped + offset, image->rgba.data(), image->rgba.size());
+                    offset += image->rgba.size();
+                }
+            }
+            SDL_UnmapGPUTransferBuffer(device_, transfer);
+            if (allocated)
+                if (auto* commands = SDL_AcquireGPUCommandBuffer(device_))
+                {
+                    if (auto* copy = SDL_BeginGPUCopyPass(commands))
+                    {
+                        Uint32 offset = 0;
+                        for (std::size_t i = 0; i < count; ++i)
+                        {
+                            if (const auto* image = images[i])
+                            {
+                                SDL_GPUTextureTransferInfo source{};
+                                source.transfer_buffer = transfer;
+                                source.offset = offset;
+                                source.pixels_per_row = image->width;
+                                source.rows_per_layer = image->height;
+                                SDL_GPUTextureRegion target{};
+                                target.texture = textures_[i];
+                                target.w = image->width;
+                                target.h = image->height;
+                                target.d = 1;
+                                SDL_UploadToGPUTexture(copy, &source, &target, false);
+                                offset += static_cast<Uint32>(image->rgba.size());
+                            }
+                        }
+                        SDL_EndGPUCopyPass(copy);
+                        success = SDL_SubmitGPUCommandBuffer(commands);
+                    }
+                    else
+                        SDL_CancelGPUCommandBuffer(commands);
+                }
+        }
+        SDL_ReleaseGPUTransferBuffer(device_, transfer);
+        if (!success)
+            error = SDL_GetError();
+        return success;
     }
     bool WorldRenderer::draw(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target, const WorldMesh& mesh,
                              std::span<const WorldDraw> draws, DVector eye, DRotation view, bool letterbox,
@@ -194,6 +327,20 @@ namespace OpenBlood2
                 return false;
             }
             const auto& r = mesh.ranges[d.range];
+            for (const auto& b : r.batches)
+            {
+                if (b.material >= textures_.size() || !textures_[b.material] || b.first < r.first ||
+                    b.first > std::size_t(r.first) + r.count || b.count > std::size_t(r.first) + r.count - b.first)
+                {
+                    error = "Invalid diagnostic GPU material batch";
+                    return false;
+                }
+            }
+            if (r.count && (textures_.empty() || !textures_[0]))
+            {
+                error = "GPU materials not prepared";
+                return false;
+            }
             if (r.first > mesh.vertices.size() || r.count > mesh.vertices.size() - r.first)
             {
                 error = "Invalid diagnostic GPU range";
@@ -233,7 +380,17 @@ namespace OpenBlood2
                     continue;
                 world_view_uniform(eye, view, aspect, d, uniform);
                 SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
-                SDL_DrawGPUPrimitives(pass, r.count, 1, r.first, 0);
+                auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material)
+                {
+                    SDL_GPUTextureSamplerBinding texture{textures_[material], sampler_};
+                    SDL_BindGPUFragmentSamplers(pass, 0, &texture, 1);
+                    SDL_DrawGPUPrimitives(pass, count, 1, first, 0);
+                };
+                if (r.batches.empty())
+                    batch(r.first, r.count, 0);
+                else
+                    for (const auto& b : r.batches)
+                        batch(b.first, b.count, b.material);
             }
         }
         SDL_EndGPURenderPass(pass);

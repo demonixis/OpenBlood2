@@ -22,7 +22,7 @@ namespace OpenBlood2
             return {v.x, v.y, v.z, 0};
         }
     } // namespace
-    bool WorldMesh::build(const World& world, std::string& error)
+    bool WorldMesh::build(const World& world, std::string& error, const Resources* resources)
     {
         *this = {};
         error.clear();
@@ -35,6 +35,9 @@ namespace OpenBlood2
         if (world.models.empty() || world.models.size() > 4097)
             return fail("Diagnostic mesh requires a bounded primary world");
         constexpr std::size_t max_vertices = 3000000;
+        materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}});
+        texture_bytes = 4;
+        std::map<std::string, std::uint32_t> material_ids;
         for (const auto& model : world.models)
         {
             if (model.polygons.size() > 65536 || model.points.size() > 65536 || !physics_vector(model.translation))
@@ -73,6 +76,49 @@ namespace OpenBlood2
                     color = {.25f, .4f, .65f};
                 if (surface.flags & (1u << 3))
                     color = {.65f, .25f, .5f};
+                std::uint32_t material = 0;
+                if (resources && !model.textures.empty())
+                {
+                    if (surface.texture >= model.textures.size() || !physics_vector(surface.origin) ||
+                        !physics_vector(surface.u) || !physics_vector(surface.v))
+                        return fail("Invalid world texture mapping");
+                    const auto& path = model.textures[surface.texture];
+                    std::string key;
+                    if (!resource_path(path, key))
+                        return fail("Invalid world texture resource path");
+                    auto found = material_ids.find(key);
+                    if (found == material_ids.end())
+                    {
+                        if (materials.size() >= 4097)
+                            return fail("World texture count budget exceeded");
+                        WorldMaterial entry;
+                        entry.path = key;
+                        const auto* resource = resources->find(key);
+                        std::vector<std::uint8_t> bytes;
+                        if (!resource)
+                            entry.error = "Missing exact-path resource";
+                        else if (resource->size > 3 * 1024 * 1024)
+                            entry.error = "DTX resource exceeds byte limit";
+                        else if (resources->read(key, bytes, entry.error))
+                            read_texture(bytes, entry.image, entry.error);
+                        if (entry.image.rgba.size() > 128 * 1024 * 1024 - texture_bytes)
+                            return fail("World texture memory budget exceeded");
+                        texture_bytes += entry.image.rgba.size();
+                        const auto id = static_cast<std::uint32_t>(materials.size());
+                        materials.push_back(std::move(entry));
+                        found = material_ids.emplace(key, id).first;
+                    }
+                    if (!(surface.flags & ((1u << 3) | (1u << 4))))
+                    {
+                        if (materials[found->second].error.empty())
+                        {
+                            material = found->second;
+                            color = {1, 1, 1}; // Unlit authored albedo.
+                        }
+                        else
+                            color = {1, 0, 1}; // Explicit unresolved material marker.
+                    }
+                }
                 if ((count - 2) * 3 > max_vertices - vertices.size())
                     return fail("Diagnostic triangle budget exceeded");
                 const auto a = model.points[polygon.points[0]];
@@ -85,8 +131,24 @@ namespace OpenBlood2
                         ++degenerate;
                         continue;
                     }
+                    if (range.batches.empty() || range.batches.back().material != material)
+                        range.batches.push_back({static_cast<std::uint32_t>(vertices.size()), 0, material});
+                    range.batches.back().count += 3;
                     for (auto p : {a, b, c})
-                        vertices.push_back({vector_subtract(p, range.pivot), color});
+                    {
+                        WorldVertex vertex{vector_subtract(p, range.pivot), color};
+                        if (material)
+                        {
+                            const auto delta = vector_subtract(p, surface.origin);
+                            const auto& image = materials[material].image;
+                            vertex.uv = {vector_dot(delta, surface.u) / image.width,
+                                         vector_dot(delta, surface.v) / image.height};
+                            if (!std::isfinite(vertex.uv[0]) || !std::isfinite(vertex.uv[1]) ||
+                                std::abs(vertex.uv[0]) > 1e6f || std::abs(vertex.uv[1]) > 1e6f)
+                                return fail("World texture coordinates exceed limits");
+                        }
+                        vertices.push_back(vertex);
+                    }
                 }
             }
             range.count = static_cast<std::uint32_t>(vertices.size()) - range.first;
@@ -98,7 +160,7 @@ namespace OpenBlood2
                      WorldViewStats& stats, std::string& error)
     {
         draws.clear();
-        stats.triangles = stats.draws = stats.hidden = stats.unbound = stats.containers = 0;
+        stats.triangles = stats.draws = stats.hidden = stats.unbound = stats.containers = stats.batches = 0;
         error.clear();
         if (mesh.ranges.empty())
             return true;
@@ -152,7 +214,10 @@ namespace OpenBlood2
         }
         stats.unbound = std::count(bound.begin(), bound.end(), false);
         for (const auto& draw : draws)
+        {
             stats.triangles += mesh.ranges[draw.range].count / 3;
+            stats.batches += mesh.ranges[draw.range].batches.empty() ? 1 : mesh.ranges[draw.range].batches.size();
+        }
         stats.draws = draws.size();
         return true;
     }

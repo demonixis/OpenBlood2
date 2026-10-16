@@ -152,8 +152,17 @@ namespace
             CHECK(g.request_world("01_SubwayA", error));
             CHECK(g.world_revision > revision);
             revision = g.world_revision;
-            CHECK(mesh.build(g.world, error));
+            CHECK(mesh.build(g.world, error, &g.resources));
             CHECK(mesh.ranges.size() == 116 && mesh.vertices.size() > 1000);
+            std::size_t decoded = 0, failed = 0;
+            for (std::size_t i = 1; i < mesh.materials.size(); ++i)
+                mesh.materials[i].error.empty() ? ++decoded : ++failed;
+            std::cout << "Textures: decoded=" << decoded << " failed=" << failed << " bytes=" << mesh.texture_bytes
+                      << '\n';
+            CHECK(decoded > 50);
+            for (const auto& material : mesh.materials)
+                if (!material.error.empty())
+                    std::cout << material.path << ": " << material.error << '\n';
             CHECK(g.enter_player(error));
             CHECK(g.step(1. / 60));
             CHECK(world_draws(mesh, g.objects, draws, stats, error));

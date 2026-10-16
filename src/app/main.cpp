@@ -579,7 +579,7 @@ namespace
                 world_renderer.clear_geometry();
                 world_mesh = {};
                 world_draws.clear();
-                if (!game.world_path.empty() && !world_mesh.build(game.world, error))
+                if (!game.world_path.empty() && !world_mesh.build(game.world, error, &game.resources))
                 {
                     spdlog::error("World mesh: {}", error);
                     return 5;
@@ -687,7 +687,7 @@ namespace
                     ++ui_frames;
 #endif
                 SDL_EndGPURenderPass(pass);
-                if (capture_frame && !capture.enqueue(commands, swapchain))
+                if (capture_frame && !capture.enqueue(commands, swapchain, width, height))
                 {
                     spdlog::error("Capture copy: {}", SDL_GetError());
                     SDL_SubmitGPUCommandBuffer(commands);
@@ -1039,8 +1039,14 @@ namespace
                              viewport_hidden, viewport_unloaded, viewport_reloaded, world_renderer.stats.uploads,
                              world_renderer.stats.frames, world_renderer.stats.triangles, world_renderer.stats.draws,
                              world_renderer.width(), world_renderer.height());
-                if (!viewport_hidden || !viewport_unloaded || !viewport_reloaded || world_renderer.stats.uploads != 2 ||
-                    world_renderer.width() != 1000 || world_renderer.height() != 680)
+                std::size_t decoded = 0, missing = 0;
+                for (std::size_t i = 1; i < world_mesh.materials.size(); ++i)
+                    world_mesh.materials[i].error.empty() ? ++decoded : ++missing;
+                spdlog::info("World textures: decoded={}, rejected={}, RGBA bytes={}, prepared batches={}", decoded,
+                             missing, world_mesh.texture_bytes, world_renderer.stats.batches);
+                if (decoded < 50 || missing || !viewport_hidden || !viewport_unloaded || !viewport_reloaded ||
+                    world_renderer.stats.uploads != 2 || world_renderer.width() != 1000 ||
+                    world_renderer.height() != 680)
                     return 4;
             }
             const bool ui_ok =
@@ -1084,7 +1090,12 @@ namespace
                   game.objects.snapshot().size() != initial_objects - (options.scene_explosions_smoke ? 1 : 0) ||
                   game.server.string_count() != initial_strings)))
             {
-                spdlog::error("GPU smoke failed its render/toggle/resize/quit assertions");
+                spdlog::error(
+                    "GPU smoke failed: selection={}, crouch/run frames={}/{}, skeleton reentry/hidden={}/{}, "
+                    "crouched/stood={}/{}, locomotion/walk/run/jump={}/{}/{}/{}, objects={}/{}, strings={}/{}",
+                    selection_cleared, crouch_frames, run_frames, skeleton_reentered, skeleton_hidden, crouched_hidden,
+                    stood_after_crouch, locomotion_pose, saw_walk, saw_run, saw_jump, game.objects.snapshot().size(),
+                    initial_objects, game.server.string_count(), initial_strings);
                 return 4;
             }
             spdlog::info("GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and "

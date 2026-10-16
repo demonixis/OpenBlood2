@@ -263,3 +263,5 @@ coordinates, base rings, current checked visibility, world revisions and the sin
 player integrator. `--view-world` is navigable inspection, not the M3 playable slice;
 texture/model/FX rendering and required NPC/ExitTrigger services remain unavailable. Current
 world shaders support Vulkan/SPIR-V only; M2 stays incomplete.
+
+The [DTX world-texture continuation](../Documentation/Implementation/M2_TEXTURES.md) adds bounded version -2 palette decoding, exact-path material caching and opaque SDL_GPU sampling. Read [texture contracts](docs/TEXTURE_CONTRACTS.md) before extending images/materials. Preserve the -2/-5 generation boundary, strict lengths, pre-pivot UVs, world-revision ownership and explicit failed resources. Alpha/sky markers, unlit mip-zero sampling and unsupported version-0 assets remain visible limitations. Models, required original services and the M2 gate remain open.

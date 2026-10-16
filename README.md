@@ -6,7 +6,7 @@ The three runtime targets remain small: `engine` (resources, world/object runtim
 
 The [diagnostic 3D view](docs/WORLD_VIEW_CONTRACTS.md) now renders actual level
 geometry and current moving brushes through SDL_GPU. Run `./build/debug/blood2 --view-world` to enter the original player/cameras with
-keyboard controls enabled. F1 opens inspection. Textures, rendered models/weapons,
+keyboard controls enabled. F1 opens inspection. [Original DTX textures](docs/TEXTURE_CONTRACTS.md) now appear as unlit opaque materials. Rendered models/weapons,
 full combat and M2 completion remain pending. The world shader currently requires
 Vulkan/SPIR-V; other backend artifacts remain unimplemented.
 

@@ -35,7 +35,8 @@ namespace OpenBlood2
         return transfer != nullptr;
     }
 
-    bool Capture::enqueue(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* swapchain)
+    bool Capture::enqueue(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* swapchain, Uint32 target_width,
+                          Uint32 target_height)
     {
         SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(commands);
         if (!copy)
@@ -56,8 +57,8 @@ namespace OpenBlood2
         blit.source.w = width;
         blit.source.h = height;
         blit.destination.texture = swapchain;
-        blit.destination.w = width;
-        blit.destination.h = height;
+        blit.destination.w = target_width;
+        blit.destination.h = target_height;
         blit.load_op = SDL_GPU_LOADOP_DONT_CARE;
         blit.filter = SDL_GPU_FILTER_NEAREST;
         SDL_BlitGPUTexture(commands, &blit);

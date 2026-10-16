@@ -29,7 +29,7 @@ int main(int argc, char** argv)
     triangle({-2, -2, 4}, {-2, 2, 4}, {2, 2, 4}, {0, 0, 1});            // Opposite winding is visible too.
     triangle({-1, -1, .5f}, {1, -1, .5f}, {0, 1, .5f}, {1, 1, 0});      // Must be near-clipped.
     triangle({1, .6f, 2}, {1.5f, .6f, 2}, {1.25f, 1.2f, 2}, {0, 1, 0}); // +X right / +Y up.
-    mesh.ranges.push_back({0, static_cast<unsigned>(mesh.vertices.size()), {}, "synthetic"});
+    mesh.ranges.push_back({0, static_cast<unsigned>(mesh.vertices.size()), {}, "synthetic", {}});
     WorldRenderer renderer(runtime.gpu);
     for (int cycle = 0; cycle < 3; ++cycle)
     {
@@ -54,9 +54,9 @@ int main(int argc, char** argv)
         SDL_GPUTexture* swap = nullptr;
         Uint32 sw = 0, sh = 0;
         CHECK(SDL_WaitAndAcquireGPUSwapchainTexture(cmd, runtime.window, &swap, &sw, &sh));
-        CHECK(swap);
+        CHECK(swap && sw && sh); // Compositor size may lag this test's offscreen target.
         CHECK(renderer.draw(cmd, capture.texture, mesh, std::span(&draw, 1), eye, view, false, error));
-        CHECK(capture.enqueue(cmd, swap));
+        CHECK(capture.enqueue(cmd, swap, sw, sh));
         CHECK(SDL_SubmitGPUCommandBuffer(cmd));
         CHECK(SDL_WaitForGPUIdle(runtime.gpu));
         auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
@@ -104,7 +104,64 @@ int main(int argc, char** argv)
         CHECK(correct);
         renderer.clear_geometry();
     }
+    // Known 2x2 colors, repeated twice in both directions. GPU pixels test the
+    // sampler, row direction, material binding, opaque policy and reload ownership.
+    for (int cycle = 0; cycle < 2; ++cycle)
+    {
+        WorldMesh textured;
+        textured.materials = {
+            {"white", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}},
+            {"synthetic", "", {2, 2, 1, 0, 0, {255, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255, 0, 255, 255, 255, 0}}}};
+        if (cycle)
+            textured.materials[1].image.rgba[2] = 255;
+        textured.vertices = {{{-1, 1, 2}, {1, 1, 1}, {0, 0}}, {{1, 1, 2}, {1, 1, 1}, {2, 0}},
+                             {{1, -1, 2}, {1, 1, 1}, {2, 2}}, {{-1, 1, 2}, {1, 1, 1}, {0, 0}},
+                             {{1, -1, 2}, {1, 1, 1}, {2, 2}}, {{-1, -1, 2}, {1, 1, 1}, {0, 2}}};
+        textured.ranges.push_back({0, 6, {}, "textured", {{0, 6, 1}}});
+        WorldDraw draw;
+        Capture capture;
+        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240));
+        CHECK(renderer.prepare(textured, 10 + cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error));
+        auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
+        CHECK(cmd);
+        CHECK(renderer.draw(cmd, capture.texture, textured, std::span(&draw, 1), {}, {}, false, error));
+        auto* copy = SDL_BeginGPUCopyPass(cmd);
+        CHECK(copy);
+        SDL_GPUTextureRegion region{};
+        region.texture = capture.texture;
+        region.w = 320;
+        region.h = 240;
+        region.d = 1;
+        SDL_GPUTextureTransferInfo target{};
+        target.transfer_buffer = capture.transfer;
+        target.pixels_per_row = 320;
+        target.rows_per_layer = 240;
+        SDL_DownloadFromGPUTexture(copy, &region, &target);
+        SDL_EndGPUCopyPass(copy);
+        CHECK(SDL_SubmitGPUCommandBuffer(cmd));
+        CHECK(SDL_WaitForGPUIdle(runtime.gpu));
+        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
+        CHECK(pixels);
+        auto rgb = [&](int x, int y, int r, int g, int b)
+        {
+            const auto* p = pixels + (y * 320 + x) * 4;
+            return p[0] == r && p[1] == g && p[2] == b && p[3] == 255;
+        };
+        const bool correct = rgb(90, 50, 255, 0, cycle ? 255 : 0) && rgb(130, 50, 0, 255, 0) &&
+                             rgb(170, 50, 255, 0, cycle ? 255 : 0) && rgb(210, 50, 0, 255, 0) &&
+                             rgb(90, 90, 0, 0, 255) && rgb(130, 90, 255, 255, 255) &&
+                             rgb(90, 130, 255, 0, cycle ? 255 : 0);
+        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
+        if (argc == 2)
+            CHECK(capture.save((std::string(argv[1]) + ".textures.png").c_str()));
+        CHECK(correct);
+        // Rejected uploads must not leave a usable stale material cache.
+        textured.materials[1].image.rgba.pop_back();
+        CHECK(!renderer.prepare(textured, 100 + cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error));
+        CHECK(!error.empty());
+        renderer.clear_geometry();
+    }
     std::cout << "GPU readback: depth occlusion, opposite winding, near clipping, +X/+Y orientation, camera/object "
-                 "transforms, resize and reupload pass\n";
+                 "transforms, resize, textured repeat/row orientation/opaque sampling and reupload pass\n";
     return 0;
 }
