@@ -116,3 +116,7 @@ Continuation: [original fragment smoke trails](OBJECT_PARTICLE_CONTRACTS.md) sup
 selected high-detail OBJFX_SMOKETRAIL_1 behavior. Earlier trail omissions and the
 4096 sprite-entry limit are historical; the shared renderer now holds 16384 entries.
 Other ObjectFX modes, required effects and the actual M2 gate remain open.
+
+Continuation: [original explosion flame particles](EXPLOSION_FLAME_CONTRACTS.md)
+now implements the selected Tesla component. Earlier blanket flame omissions are
+historical for that recipe; surface illumination and the actual M2 gate remain open.

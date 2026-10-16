@@ -459,3 +459,9 @@ Read [contracts](docs/OBJECT_PARTICLE_CONTRACTS.md). Preserve first-update retur
 unused authored alpha/count, fixed origin, strict stopped-tail lifetime and parent removal.
 Zero-count division is skipped without emission/RNG draws. Keep bounded failures and
 replacement-engine limits explicit; other ObjectFX modes and M2 remain open.
+
+The [explosion flame continuation](../Documentation/Implementation/M2_EXPLOSION_FLAMES.md) connects original three-zone particle emission and the selected Tesla recipe.
+Read [contracts](docs/EXPLOSION_FLAME_CONTRACTS.md). Preserve immediate bursts, one overdue emission per callback, additive deadlines,
+initial alpha 1 for fades, final emission and unused normal/ramp fields. Bulk sampling
+is a documented later-engine policy, not retail RNG parity. Keep bounded failures,
+detached lifetime and read-only rendering; illumination, safe NEW_LEVEL and M2 remain open.

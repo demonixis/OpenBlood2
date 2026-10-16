@@ -76,6 +76,7 @@ void CClientExplosionSFX::SetupFX()
     report.ring_event = g_pServerDE->PublishExplosionRings(m_hObject, type, position, normal, report.ring_error);
     report.fragment_event =
         g_pServerDE->PublishExplosionFragments(m_hObject, type, position, normal, report.fragment_error);
+    report.flame_event = g_pServerDE->PublishExplosionFlames(m_hObject, type, position, normal, report.flame_error);
     report.light_event = g_pServerDE->PublishExplosionLights(m_hObject, type, position, normal, report.light_error);
     // IMPORTANT: the source passes NULL, so DamageObject's null-damager guard
     // suppresses every delivery. Do not silently "repair" this gameplay behavior.

@@ -27,6 +27,8 @@ namespace OpenBlood2
         std::uint64_t voice = 0;
         std::uint64_t fragment_event = 0;
         std::string fragment_error;
+        std::uint64_t flame_event = 0;
+        std::string flame_error;
         std::uint64_t ring_event = 0;
         std::string ring_error;
         std::uint64_t light_event = 0;

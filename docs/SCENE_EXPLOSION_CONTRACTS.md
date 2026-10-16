@@ -119,3 +119,7 @@ the full sanitizer suite must pass without increasing the timeout.
 Continuation: [original metal fragments](EXPLOSION_FRAGMENT_CONTRACTS.md) now supplies
 selected grenade fragment motion/collision and rendering. Earlier blanket fragment
 omissions are historical; smoke trails, other required services and M2 remain open.
+
+Continuation: [original explosion flame particles](EXPLOSION_FLAME_CONTRACTS.md)
+now implements the selected Tesla component. Earlier blanket flame omissions are
+historical for that recipe; surface illumination and the actual M2 gate remain open.

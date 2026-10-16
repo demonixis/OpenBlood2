@@ -1,0 +1,104 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "61f4fb14735eeb222149eb85f7bdf359cc444e93",
+  "source_files": [
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
+      "selected_lines": [
+        [
+          520,
+          664
+        ],
+        [
+          2141,
+          2234
+        ]
+      ],
+      "use": "Original flame lifecycle, three bulk emissions, unused ramps and selected high-detail Tesla recipe."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.h",
+      "sha256": "2bc5a35f4da4929bdb0f10652d9014a56fdf9fe561d7ad320bf1dcf0f042dc18",
+      "selected_lines": [
+        [
+          103,
+          139
+        ],
+        [
+          375,
+          446
+        ]
+      ],
+      "use": "Zeroed original descriptor, ramp flags and member declarations."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
+      "sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13",
+      "selected_lines": [
+        [
+          22,
+          111
+        ]
+      ],
+      "use": "Particle origin/identity rotation, flags and radius/640 setup."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
+      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
+      "selected_lines": [
+        [
+          1435,
+          1463
+        ]
+      ],
+      "use": "Original minimum-cadence update and terminal removal."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SpecialFX.h",
+      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
+      "selected_lines": [
+        [
+          32,
+          56
+        ]
+      ],
+      "use": "One millisecond default effect interval."
+    },
+    {
+      "path": "sources/blood2/Shared/SFXMsgIds.h",
+      "sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f",
+      "selected_lines": [
+        [
+          129,
+          140
+        ]
+      ],
+      "use": "EXP_TESLA_ALT numeric ID 8."
+    },
+    {
+      "path": "sources/lithtech/runtime/client/src/particlesystem.cpp",
+      "sha256": "1efc6713379529f2a840cb15243ca4b8bdf846092ac5e7c67427df0ecbcf0d44",
+      "selected_lines": [
+        [
+          87,
+          124
+        ]
+      ],
+      "use": "Later-engine reference only: six uniform samples, velocity/lifetime correlation and bulk calls."
+    }
+  ],
+  "adaptations": [
+    "Typed owned settings and bounded detached particle systems; no legacy pointer ABI",
+    "Finite descriptor/clock and atomic burst capacity validation",
+    "Original three bulk calls implemented with later LithTech six-sample policy; deterministic independent RNG, not retail parity",
+    "Normalized color and existing radius/640 particle sprite renderer",
+    "Zero-origin initialization avoids original indeterminate fallback"
+  ],
+  "omitted": [
+    "Other flame/composite recipes and weapon/brush callers",
+    "Retail engine/RNG/raster parity, surface lighting, shadows and complete FX service",
+    "Safe automatic NEW_LEVEL and complete M2 acceptance"
+  ],
+  "status": "M2 incomplete; selected original explosion flame lifecycle and Tesla recipe"
+}

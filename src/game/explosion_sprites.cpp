@@ -44,7 +44,7 @@ namespace OpenBlood2
                 : type == 1 ? 2.f
                             : 2.5f,
                 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
-            unavailable = type == 3 ? "light illumination" : "light illumination";
+            unavailable = "light illumination";
         }
         else if (type == 6)
         {
@@ -55,7 +55,7 @@ namespace OpenBlood2
         else if (type == 8)
         {
             add(30, .1f, .75f, 3, .75f, 0, 0, "Sprites\\TesAltLoop.spr");
-            unavailable = "particle flame, light illumination";
+            unavailable = "light illumination";
         }
         else
         {

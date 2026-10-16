@@ -513,3 +513,5 @@ nonlethal production recoil and the remaining death/M2 boundary.
 The [NPC weapon-drop continuation](../Documentation/Implementation/M2_WEAPON_DROPS.md) connects the original Cabal drop,
 independent falling Beretta, original pickup and player collection. Corpse/gib
 services, player drop controls and the full M2 exit gate remain open.
+
+The [original explosion flame continuation](../Documentation/Implementation/M2_EXPLOSION_FLAMES.md) adds selected Tesla particles with actual texture/color/alpha rendering and in-game inspection. M2 remains incomplete.

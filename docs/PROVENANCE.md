@@ -777,3 +777,11 @@ from sources/blood2/ClientShellDLL/ExplosionFX.cpp/.h. The [source ledger](M2_EX
 [contracts](EXPLOSION_LIGHT_CONTRACTS.md) distinguish source delay/radius quirks
 from explicit initialization, bounded values and owned client-light adaptations.
 No reference file, external asset, dependency revision or renderer was modified.
+
+## Original explosion flame particles
+
+See [source selections and hashes](M2_EXPLOSION_FLAME_SOURCES.json) and
+[contracts](EXPLOSION_FLAME_CONTRACTS.md). CExplosionFlameFX preserves original
+three-zone bursts, clocks/fades and unused ramps, with the high-detail Tesla recipe.
+Owned typed state, explicit bounds, later-engine six-sample bulk service and existing
+particle rendering are documented adaptations, not a retail engine/RNG parity claim.

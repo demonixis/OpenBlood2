@@ -103,3 +103,7 @@ against known synthetic texels and actual external smoke64_2 alpha quads.
 SubwayA accounting stays 203 created / four transferred sounds / 372 editor-only /
 one unsupported Gideon / zero failures. Remaining flames, illumination, safe
 NEW_LEVEL and other required services keep the observable M2 exit gate open.
+
+Continuation: [original explosion flame particles](EXPLOSION_FLAME_CONTRACTS.md)
+now implements the selected Tesla component. Earlier blanket flame omissions are
+historical for that recipe; surface illumination and the actual M2 gate remain open.

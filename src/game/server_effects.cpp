@@ -16,6 +16,18 @@ namespace OpenBlood2
         return explosion_fragments.publish(type, pos, normal, GetObjectName(source), *objects_.models,
                                            *client_resources, objects_.time(), error);
     }
+    std::uint64_t ServerAdapter::PublishExplosionFlames(HOBJECT source, DDWORD type, DVector position, DVector normal,
+                                                        std::string& error)
+    {
+        trace_service("PublishExplosionFlames (selected original three-zone particles)");
+        if (!IsObjectAlive(source) || !client_resources)
+        {
+            error = "Explosion flame source/resources unavailable";
+            return 0;
+        }
+        return explosion_flames.publish(type, position, normal, GetObjectName(source), *client_resources,
+                                        objects_.time(), error);
+    }
     std::uint64_t ServerAdapter::PublishExplosionRings(HOBJECT source, DDWORD type, DVector position, DVector normal,
                                                        std::string& error)
     {

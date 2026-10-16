@@ -102,3 +102,7 @@ required FX/services and the actual M2 acceptance criteria remain open.
 Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
 selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
 are historical; fragments/flames, illumination and the full M2 gate remain open.
+
+Continuation: [original explosion flame particles](EXPLOSION_FLAME_CONTRACTS.md)
+now implements the selected Tesla component. Earlier blanket flame omissions are
+historical for that recipe; surface illumination and the actual M2 gate remain open.
