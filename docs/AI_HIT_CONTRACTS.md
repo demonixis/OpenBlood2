@@ -1,5 +1,9 @@
 # Original NPC hit localization and recoil
 
+> Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
+> transfer ordinary deaths. Earlier blanket corpse omissions are historical;
+> fire/gibs, corpse damage, required FX and complete M2 remain unavailable.
+
 > Extended by [NPC weapon-drop contracts](WEAPON_DROP_CONTRACTS.md): the selected
 > Cabal drop, independent falling hand and Beretta collection now work. Corpse/gib
 > and remaining death services still fail explicitly; M2 is incomplete.

@@ -50,7 +50,7 @@ class CDestructable : public Aggregate
     DBOOL m_bDead = DFALSE;
     float m_fHitPoints = 1, m_fArmorPoints = 0, m_fMass = 1, m_fResistance = 1;
     bool m_bGodMode = false;
-    float m_fLastDamageAmount = 0;
+    float m_fLastDamageAmount = 0, m_fLastDamagePercent = 0;
     OpenBlood2::Damage last_damage;
     // Production NPCs enable the original visible-node localization path after table initialization.
     bool ai_hit_localization = false;

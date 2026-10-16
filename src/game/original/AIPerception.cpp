@@ -23,6 +23,8 @@ AI_Mgr::AI_Mgr()
 }
 AI_Mgr::~AI_Mgr()
 {
+    if (m_hCurSound && GetServerDE())
+        GetServerDE()->KillSound(m_hCurSound);
     if (m_Link.m_pData)
     {
         dl_Remove(&m_Link);

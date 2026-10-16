@@ -142,6 +142,16 @@ namespace OpenBlood2
         const char* y = string_data(b);
         return x && y && !CaseLess{}(x, y) && !CaseLess{}(y, x);
     }
+    bool ServerAdapter::GetModelFilenames(HOBJECT h, std::string& model, std::string& skin)
+    {
+        trace_service("GetModelFilenames");
+        const auto* r = objects_.get(h);
+        if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL || !r->model || !r->state.m_Filename[0])
+            return false;
+        model = r->state.m_Filename;
+        skin = r->state.m_SkinName;
+        return true;
+    }
     DRESULT ServerAdapter::SetModelFilenames(HOBJECT h, const char* model, const char* skin)
     {
         trace_service("SetModelFilenames");

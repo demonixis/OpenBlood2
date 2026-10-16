@@ -269,6 +269,11 @@ namespace
         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_escape_smoke(game, smoke_ai_escape))
             return 4;
         const auto original_ai_escape = smoke_ai_escape;
+        OpenBlood2::ObjectId smoke_corpse{};
+        bool corpse_hidden = false, corpse_drawn = false;
+        if (options.skeleton_smoke && !OpenBlood2::prepare_corpse_smoke(game, smoke_corpse))
+            return 4;
+        const auto original_corpse = smoke_corpse;
         OpenBlood2::ObjectId smoke_ai_runtime{};
         if (options.skeleton_smoke)
             OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
@@ -338,7 +343,7 @@ namespace
         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
         inspector.select_skeleton = options.skeleton_smoke;
         if (options.skeleton_smoke)
-            inspector.skeleton_selection = smoke_ai_runtime;
+            inspector.skeleton_selection = smoke_corpse;
         inspector.select_containers = options.containers_smoke;
         inspector.select_brushes = options.brushes_smoke;
         inspector.select_pickups = options.pickups_smoke;
@@ -576,6 +581,8 @@ namespace
             if (options.skeleton_smoke && !inspector_visible)
                 ai_follow_hidden |= OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
             if (options.skeleton_smoke && !inspector_visible)
+                corpse_hidden |= OpenBlood2::check_corpse_smoke(game, smoke_corpse, frames == 110);
+            if (options.skeleton_smoke && !inspector_visible)
                 ai_escape_hidden |= OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
             if (options.skeleton_smoke && !inspector_visible)
                 ai_runtime_hidden |= OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
@@ -667,6 +674,11 @@ namespace
                 spdlog::error("Model presentation: {}", error);
                 return 5;
             }
+
+            if (options.skeleton_smoke && !inspector_visible)
+                for (const auto& entry : model_scene.entries)
+                    if (entry.object == smoke_corpse && entry.visible && entry.error.empty() && entry.triangles > 0)
+                        corpse_drawn = true;
 
             if (options.world_smoke && frames >= unload_frame && game.world_path.empty() &&
                 game.server.string_count() == 0)
@@ -1092,6 +1104,8 @@ namespace
                 // Its longer script + navigation sequence must not inherit the shot-only deadline.
                 if (game.objects.get(original_ai_follow) || !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
                     return 4;
+                if (game.objects.get(original_corpse) || !OpenBlood2::prepare_corpse_smoke(game, smoke_corpse))
+                    return 4;
                 if (game.objects.get(original_ai_key) || !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
                     return 4;
                 for (int i = 0; i < 90 && !ai_key_reentered; ++i)
@@ -1160,6 +1174,11 @@ namespace
                     "Original NPC AI_Update + hit localization: hidden={}, reentered={}, old identity invalidated={}",
                     ai_runtime_hidden, runtime_reentered, !game.objects.get(original_ai_runtime));
                 if (!ai_runtime_hidden || !runtime_reentered || game.objects.get(original_ai_runtime))
+                    return 4;
+                const bool corpse_reentered = OpenBlood2::check_corpse_smoke(game, smoke_corpse, true);
+                spdlog::info("Original corpse: hidden={}, rendered={}, reentered={}, old identity invalidated={}",
+                             corpse_hidden, corpse_drawn, corpse_reentered, !game.objects.get(original_corpse));
+                if (!corpse_hidden || !corpse_drawn || !corpse_reentered || game.objects.get(original_corpse))
                     return 4;
                 const bool escape_reentered = OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
                 spdlog::info("AI escape/beg: hidden={}, reentered={}, old identity invalidated={}", ai_escape_hidden,

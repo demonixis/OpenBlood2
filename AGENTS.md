@@ -358,3 +358,10 @@ The [inspector/input continuation](../Documentation/Implementation/M2_CONTROLS.m
 and native inspector folding/resizing. Preserve text/focus suppression, F2's
 explicit preference, original cinematic gates and single MoveMgr integration.
 Folding or hiding UI must not stop the session; M2 remains incomplete.
+
+The [ordinary death continuation](../Documentation/Implementation/M2_CORPSES.md) connects original Dying/MC_Dead/CCorpse.
+Read [contracts](docs/CORPSE_CONTRACTS.md). Preserve two-call transfer, cached pose, raw clip
+dimensions versus visual scale, source damage fractions, independent child lifetime
+and no-GETHANDLE sound overlap. Failed setup retains the visible actor. Fire/gibs,
+corpse damage/limbs and blood-pool FX remain unavailable; requests are not FX.
+SubwayA counts are unchanged and M2 remains incomplete.

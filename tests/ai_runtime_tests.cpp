@@ -258,7 +258,10 @@ namespace
         CHECK(g.objects.remove(h) && g.objects.finish_frame());
         g_hActiveCamera = nullptr;
         a->m_nState = AI_Mgr::StateDying;
-        CHECK(!a->AI_Update() && a->runtime_error.find("not integrated") != std::string::npos);
+        CHECK(a->AI_Update() && a->death_starts == 1 && !a->runtime_failed);
+        // This injected model has no resource filename; transfer must retain a failed visible actor.
+        CHECK(!a->AI_Update() && a->runtime_error.find("Corpse class/model filenames") != std::string::npos &&
+              !a->m_bRemoveMe);
         return true;
     }
     bool spatial(const char*)

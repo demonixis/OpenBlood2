@@ -239,6 +239,15 @@ class AI_Mgr : public CBaseCharacter
     std::string locomotion_error;
     bool HandleDamage();
     bool MC_Recoil();
+    bool MC_Dead();
+    bool AI_STATE_Dying();
+    bool CreateCorpse();
+    DDWORD m_nCorpseType = 0;
+    OpenBlood2::SoundId m_hCurSound = 0; // Original per-actor retained sound, distinct from shared table voice.
+    int death_slot = -1, kill_voice_roll = -1;
+    std::uint64_t death_starts = 0, corpses_created = 0, kill_voice_requests = 0;
+    HOBJECT last_corpse = nullptr; // Non-owning; the corpse survives its original actor.
+    std::string death_error;
     bool AI_STATE_Recoil();
     std::uint64_t damage_reactions = 0, recoil_starts = 0;
     int recoil_node = -1, recoil_slot = -1;

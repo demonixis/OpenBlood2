@@ -147,6 +147,7 @@ namespace OpenBlood2
         DRESULT SendObjectives(const MissionObjectives&) override;
         bool GetClientResourceString(std::uint32_t, std::string&) override;
         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
+        bool GetModelFilenames(HOBJECT, std::string&, std::string&) override;
         DRESULT SetModelFilenames(HOBJECT, const char*, const char*) override;
         DRESULT GetObjectDims(HOBJECT, DVector*) override;
         DRESULT SetObjectRotation(HOBJECT, const DRotation*) override;

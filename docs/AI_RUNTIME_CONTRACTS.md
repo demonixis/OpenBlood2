@@ -1,5 +1,9 @@
 # Original Cultist/Civilian initialization and AI_Update
 
+> Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
+> transfer ordinary deaths. Earlier blanket corpse omissions are historical;
+> fire/gibs, corpse damage, required FX and complete M2 remain unavailable.
+
 > Extended by [NPC hit/recoil contracts](AI_HIT_CONTRACTS.md): original visible-node
 > localization, region damage and nonlethal reactions now execute for initialized
 > Cultist/Civilian NPCs. Earlier blanket localization/recoil omissions are historical;

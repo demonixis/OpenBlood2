@@ -1,5 +1,10 @@
 # Blood II Reconstruction aka OpenBlood2
 
+Latest continuation: [ordinary NPC death and CCorpse](../Documentation/Implementation/M2_CORPSES.md)
+connects independent animated corpses and real model-key sounds. Earlier blanket
+corpse omissions below are historical. Fire/gibs, corpse damage, required FX,
+Gideon and ExitTrigger still keep M2 incomplete.
+
 The inspector is now **collapsible and resizable**: click the title arrow to fold
 or unfold it, drag its borders to resize, or use F1 to hide/show it. After entering
 the player in Session, keyboard movement is enabled by default: **WASD/ZQSD**,
@@ -7,7 +12,7 @@ the player in Session, keyboard movement is enabled by default: **WASD/ZQSD**,
 keyboard controls. SubwayA's original intro temporarily blocks movement; wait for
 it to end. See [input/UI evidence](../Documentation/Implementation/M2_CONTROLS.md).
 
-Latest death prerequisite: [original NPC weapon drops](../Documentation/Implementation/M2_WEAPON_DROPS.md)
+Previous death prerequisite: [original NPC weapon drops](../Documentation/Implementation/M2_WEAPON_DROPS.md)
 connects detached Beretta physics, original pickups and player collection. Corpses/gibs,
 required FX, Gideon and ExitTrigger still keep M2 incomplete.
 

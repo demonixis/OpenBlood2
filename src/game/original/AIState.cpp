@@ -252,6 +252,8 @@ bool AI_Mgr::DispatchState()
         Metacmd = 1;
     switch (m_nState)
     {
+        case StateDying:
+            return AI_STATE_Dying();
         case StateRecoil:
             return AI_STATE_Recoil();
         case StateEscapeRun:

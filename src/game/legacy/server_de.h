@@ -99,6 +99,7 @@ class ServerDE : public CSBase
     virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
     virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;
     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;
+    virtual bool GetModelFilenames(HOBJECT, std::string&, std::string&) = 0;
     virtual DRESULT SetModelFilenames(HOBJECT, const char*, const char*) = 0;
     virtual DRESULT GetObjectDims(HOBJECT, DVector*) = 0;
     virtual DRESULT SetObjectRotation(HOBJECT, const DRotation*) = 0;

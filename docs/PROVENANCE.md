@@ -652,3 +652,11 @@ consulted for first-contact meaning only, not treated as retail Blood II proof.
 Application-owned SDL/ImGui usability changes only. No new original-source import
 or dependency update. Existing MoveMgr bindings and camera gates remain unchanged;
 see [evidence](../../Documentation/Implementation/M2_CONTROLS.md).
+
+## Ordinary NPC death and CCorpse
+
+Selected original MC_Dead/AI_STATE_Dying/CreateCorpse, lethal gates and corpse
+initial/update/model-key rules. [Source ledger](M2_CORPSE_SOURCES.json) records
+original hashes and selected ranges; [contracts](CORPSE_CONTRACTS.md) distinguish
+source behavior, owned lifetime/rollback adaptations and missing fire/gib/FX
+branches. No donor engine, new dependency or commercial asset was imported.

@@ -204,7 +204,9 @@ namespace
             CHECK(near(a->m_damage.m_fArmorPoints, 20 - 10 * factor * .3f));
             CHECK(near(a->m_damage.m_fHitPoints, node == 0 ? 0 : 100 - 10 * factor * .7f));
             CHECK(a->m_damage.GetLastDamager() == from && a->m_damage.accepted_damage == 1 && a->damage_reactions == 1);
-            CHECK(a->runtime_failed == (node == 0));
+            CHECK(!a->runtime_failed);
+            if (node == 0)
+                CHECK(a->m_nState == AI_Mgr::StateRecoil && a->kill_voice_roll >= 0);
         }
         // Ordinary miss may draw 18 -> mapped -1, half damage, no reaction/state change.
         GameSession g;
@@ -221,13 +223,15 @@ namespace
         {
             a->m_damage.SetHitPoints(100);
             a->m_damage.m_fLastDamageAmount = 0;
+            a->m_damage.m_fLastDamagePercent = 0;
             CHECK(send(g, a->m_hObject, d));
             found = a->m_damage.node_hit == -1;
         }
         CHECK(found && a->m_damage.hit.random_fallback && a->m_damage.hit.raw_node == 18 &&
               a->m_damage.m_fHitPoints == 99);
         a->m_bCabal = true;
-        CHECK(send(g, a->m_hObject, shot(from, 0, 0)) && a->m_damage.IsDead() && a->runtime_failed);
+        CHECK(send(g, a->m_hObject, shot(from, 0, 0)) && a->m_damage.IsDead() && !a->runtime_failed &&
+              a->m_nState == AI_Mgr::StateRecoil);
         return true;
     }
     bool reactions(const char*)
@@ -245,6 +249,7 @@ namespace
         CHECK(send(g, a->m_hObject, shot(from, 14, 2)) && a->m_nInjuredLeg == 10);
         a->m_damage.SetHitPoints(100);
         a->m_damage.m_fLastDamageAmount = 0;
+        a->m_damage.m_fLastDamagePercent = 0;
         CHECK(send(g, a->m_hObject, shot(from, 2, 19)) && a->m_nState == AI_Mgr::StateAttackClose);
         // Accumulator (20), compared against remaining HP (80), exact boundary recoils.
         CHECK(send(g, a->m_hObject, shot(from, 2, 1)) && a->m_nState == AI_Mgr::StateRecoil);

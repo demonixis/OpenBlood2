@@ -1,0 +1,170 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "09f574dfe908306b3fcbf896a837ea8a97287ffc",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          1780,
+          1898
+        ],
+        [
+          3761,
+          3860
+        ],
+        [
+          5469,
+          5520
+        ],
+        [
+          5722,
+          5735
+        ]
+      ],
+      "use": "Lethal selection, ordinary corpse transfer, death command and state"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "selected_lines": [],
+      "use": "Original death flags and per-actor fields"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/corpse.cpp",
+      "sha256": "f92ec5bd0e4175f61461aae1f5fe498b0a1d21b5f0ee7d889573d02480543fdd",
+      "selected_lines": [
+        [
+          1,
+          295
+        ],
+        [
+          350,
+          383
+        ],
+        [
+          570,
+          609
+        ],
+        [
+          750,
+          899
+        ]
+      ],
+      "use": "Ordinary initial/update, measurements, sound keys and primary-world blood-pool request"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/corpse.h",
+      "sha256": "a3b9b0feda537fe7cccb6dfcb65d13437bdab288c93ef7beeb62e8d04c1fe6dc",
+      "selected_lines": [],
+      "use": "Original class fields and API"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "selected_lines": [
+        [
+          160,
+          178
+        ],
+        [
+          367,
+          384
+        ],
+        [
+          410,
+          438
+        ],
+        [
+          598,
+          609
+        ]
+      ],
+      "use": "Damage fraction and mass/friction rules"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PhysicalAttributes.h",
+      "sha256": "bb58c0afd5e3175a9007063a64fbe31089a1a595851c61e3bfee7a19f72dda55",
+      "selected_lines": [
+        [
+          15,
+          20
+        ]
+      ],
+      "use": "Friction endpoints"
+    },
+    {
+      "path": "sources/blood2/Shared/ClientServerShared.h",
+      "sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
+      "selected_lines": [
+        [
+          14,
+          24
+        ]
+      ],
+      "use": "User flag values"
+    },
+    {
+      "path": "sources/blood2/Shared/SoundTypes.h",
+      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "selected_lines": [
+        [
+          12,
+          27
+        ]
+      ],
+      "use": "Sound priority"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/basedefs_de.h",
+      "sha256": "10f543764aa94339f2e48edcba384dda3cdce2d738f0be2731dcff3a1117fb72",
+      "selected_lines": [
+        [
+          538,
+          548
+        ],
+        [
+          566,
+          592
+        ]
+      ],
+      "use": "GETHANDLE ownership and attached auto-release"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
+      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
+      "selected_lines": [
+        [
+          193,
+          196
+        ]
+      ],
+      "use": "Strict percent chance comparison; portable existing RNG replaces CRT rand stream"
+    }
+  ],
+  "adaptations": [
+    "Checked typed model filenames and owned sound root replace raw-pointer user data",
+    "Transactional child setup; deferred rollback leaves failed source visible",
+    "Existing replacement character-body physics and checked teleport, without retail parity claim",
+    "Initialized sound ownership; original no-GETHANDLE auto-release, no fake busy latch",
+    "Reused original measurement formulas with missing-head failure and previous-node fallback",
+    "Unsupported fire/gib/corpse damage and splat FX remain visible failures/requests",
+    "Strict bounded numeric sound parameters and nonpositive-maxHP division guard",
+    "Existing portable RNG replaces CRT rand stream; exact retail sequence not claimed"
+  ],
+  "reference_only": [
+    {
+      "path": "sources/lithtech/runtime/server/src/server_iltsoundmgr.cpp",
+      "sha256": "010e1649c509de4177cb00704dda62a230a4690da47f8f47544c91052d3787a3",
+      "selected_lines": [
+        [
+          138,
+          145
+        ]
+      ],
+      "use": "Later-generation corroboration of null output without GETHANDLE; no code imported"
+    }
+  ]
+}

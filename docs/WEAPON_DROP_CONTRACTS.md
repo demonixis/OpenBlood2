@@ -1,5 +1,9 @@
 # Original NPC weapon drops and Beretta pickups
 
+> Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
+> transfer ordinary deaths. Earlier blanket corpse omissions are historical;
+> fire/gibs, corpse damage, required FX and complete M2 remain unavailable.
+
 This extends [attachments](ATTACHMENT_CONTRACTS.md), [pickups](PICKUP_CONTRACTS.md)
 and [NPC hit reactions](AI_HIT_CONTRACTS.md). The selected single-player source
 path is `DropCurrentWeapon -> DropHandModel -> CHandWeaponModel::Drop/Update ->

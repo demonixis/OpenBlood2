@@ -117,8 +117,35 @@ bool AI_Mgr::HandleDamage()
     {
         if (m_bCabal)
             m_InventoryMgr.DropCurrentWeapon(); // Source ignores refusal (no held weapon/busy/melee).
-        damage_reaction_error = "NPC lethal reaction requires corpses/gibs and death services";
-        return false;
+        auto* s = GetServerDE();
+        OpenBlood2::MovementState support;
+        if (!s->GetMovementState(m_hObject, support))
+        {
+            damage_reaction_error = "NPC death support query unavailable";
+            return false;
+        }
+        if (support.ground_object && !(s->GetObjectFlags(support.ground_object) & FLAG_SOLID))
+            m_dwFlags |= 0x40u; // FLAG_ALWAYSGIB; primary world has a real polygon, not a fabricated HOBJECT.
+        const auto type = m_damage.reaction_damage_type;
+        if (type == OpenBlood2::DamageType::Fire && !(m_dwFlags & 0x40u))
+        {
+            damage_reaction_error = "NPC fire death requires original burning services";
+            return false;
+        }
+        if (!(m_dwFlags & 0x800u) &&
+            (type == OpenBlood2::DamageType::Explode || (m_dwFlags & 0x40u) || m_damage.m_fLastDamagePercent >= .9f))
+        {
+            damage_reaction_error = "NPC gib death requires original gib services";
+            return false;
+        }
+        if (!s->RandomInt(0, 99, kill_voice_roll))
+        {
+            damage_reaction_error = "NPC kill voice draw unavailable";
+            return false;
+        }
+        const auto attacker = m_damage.GetLastDamager();
+        if (kill_voice_roll < 6 && attacker && s->IsKindOf(s->GetObjectClass(attacker), s->GetClass("CPlayerObj")))
+            ++kill_voice_requests; // Optional VME_KILL request; voice-event playback remains unavailable.
     }
     if (m_nState == StateScript && !(m_dwScriptFlags & (1u << 1)))
         return true;

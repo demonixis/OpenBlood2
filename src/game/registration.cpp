@@ -6,6 +6,7 @@
 #include "game/original/CivilianAI.h"
 #include "game/original/ClientExplosionSFX.h"
 #include "game/original/ClientLightFX.h"
+#include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
 #include "game/original/DetailSprite.h"
 #include "game/original/Door.h"
@@ -79,6 +80,7 @@ namespace OpenBlood2
                 {"TypeCoop", true},
                 {"DifficultyInsane", true, false} // Read by original code, absent from its class registration.
             }};
+        const ClassInfo corpse{"CCorpse", &b2base, construct<CCorpse>, {}};
         const ClassInfo camera_object{"CameraObj",
                                       &b2base,
                                       construct<CameraObj>,
@@ -663,7 +665,8 @@ namespace OpenBlood2
                objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
                objects.register_class(toggle_trigger) && objects.register_class(door) &&
                objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
-               objects.register_class(rotating_brush) && objects.register_class(hand_model);
+               objects.register_class(rotating_brush) && objects.register_class(hand_model) &&
+               objects.register_class(corpse);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

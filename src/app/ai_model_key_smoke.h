@@ -2,6 +2,8 @@
 #include "game/server_adapter.h"
 namespace OpenBlood2
 {
+    bool prepare_corpse_smoke(GameSession&, ObjectId&);
+    bool check_corpse_smoke(GameSession&, ObjectId, bool log = false);
     bool check_ai_runtime_smoke(GameSession&, ObjectId&);
     bool prepare_ai_escape_smoke(GameSession&, ObjectId&);
     bool check_ai_escape_smoke(GameSession&, ObjectId);

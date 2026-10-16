@@ -1,4 +1,5 @@
 #include "game/original/AI_Mgr.h"
+#include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
 #include "inspector.h"
 #include <algorithm>
@@ -7,12 +8,13 @@ namespace OpenBlood2
 {
     void Inspector::draw_skeleton(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextWrapped("Original hit spheres at current ABC node poses. Initialized NPCs use them for hit "
-                           "localization. Death/corpse services remain unavailable.");
+        ImGui::TextWrapped(
+            "Original hit spheres at current ABC node poses. Initialized NPCs use them for hit "
+            "localization. Ordinary corpse animation is integrated; fire/gibs and blood-pool FX remain unavailable.");
         if (ImGui::CollapsingHeader("Live attachments"))
         {
             ImGui::TextWrapped("Held models follow current parent nodes. Physical/nested attachments and dropped "
-                               "weapons remain unavailable.");
+                               "weapon attachment chains remain unavailable.");
             for (const auto& [id, a] : game.objects.attachments())
             {
                 const auto* parent = game.objects.get(a.parent);
@@ -59,6 +61,35 @@ namespace OpenBlood2
         const auto* r = game.objects.get(skeleton_selection);
         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
+        if (const auto* corpse = r ? dynamic_cast<const CCorpse*>(r->game.get()) : nullptr)
+        {
+            const auto& c = *corpse;
+            ImGui::TextUnformatted("Original CCorpse (independent lifetime)");
+            ImGui::Text("Setup %s | animation %s | updates %llu", c.configured ? "ready" : "FAILED",
+                        c.animation_done ? "done" : "running", (unsigned long long)c.updates);
+            ImGui::Text("Clip %u | time %.3f | removal deadline %.3f", r->animation.animation,
+                        double(r->animation.time), c.remove_time);
+            ImGui::Text("Raw dimensions %.2f %.2f %.2f | visual scale %.2f %.2f %.2f", r->dimensions.x, r->dimensions.y,
+                        r->dimensions.z, r->state.m_Scale.x, r->state.m_Scale.y, r->state.m_Scale.z);
+            ImGui::Text("Sound keys %llu / starts %llu | last voice %llu", (unsigned long long)c.sound_attempts,
+                        (unsigned long long)c.sound_starts, (unsigned long long)c.last_sound);
+            ImGui::TextWrapped("%s | %s", c.sound_resource.c_str(), c.sound_error.c_str());
+            ImGui::Text("Blood-pool ray %d | request %s", int(c.pool_result), c.pool_requested ? "yes" : "no");
+            ImGui::TextWrapped("%s", c.pool_error.c_str());
+            ImGui::Text("Damage refused %llu | limb-loss requested %s", (unsigned long long)c.damage_refusals,
+                        c.limb_loss ? "yes" : "no");
+            ImGui::TextWrapped("Corpse damage, limb hiding, gibs, fire and splat FX remain unavailable. %s %s",
+                               c.error.c_str(), c.damage_error.c_str());
+        }
+        if (target_ai && ImGui::CollapsingHeader("Original NPC death"))
+        {
+            const auto& a = *target_ai;
+            ImGui::Text("Starts %llu | corpses %llu | slot %d / clip %u", (unsigned long long)a.death_starts,
+                        (unsigned long long)a.corpses_created, a.death_slot, a.m_nCorpseType);
+            ImGui::Text("Frame damage fraction %.3f | optional kill-voice requests %llu (unavailable)",
+                        a.m_damage.m_fLastDamagePercent, (unsigned long long)a.kill_voice_requests);
+            ImGui::TextWrapped("%s", a.death_error.c_str());
+        }
         if (target_ai && target_ai->npc_type != AI_Mgr::NPCType::Diagnostic &&
             ImGui::CollapsingHeader("Original NPC lifecycle", ImGuiTreeNodeFlags_DefaultOpen))
         {

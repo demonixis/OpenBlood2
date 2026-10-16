@@ -104,7 +104,7 @@ DDWORD CDestructable::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* d
             trigger_only = prop.m_Bool != 0;
     }
     if (message == MID_UPDATE)
-        m_fLastDamageAmount = 0; // Original per-update accumulator.
+        m_fLastDamageAmount = m_fLastDamagePercent = 0; // Original per-update accumulators.
     return Aggregate::EngineMessageFn(owner, message, data, reason);
 }
 void CDestructable::SendTrigger(const std::string& target, const std::string& message)
@@ -196,7 +196,21 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
             }
             amount = std::max(amount, 0.0f);
             m_fHitPoints -= amount;
-            m_fLastDamageAmount += amount;
+            if (damage.type == OpenBlood2::DamageType::Death)
+            {
+                // Source instant-death branch initializes these before adding the
+                // incoming resisted packet, even if current HP is below maximum.
+                m_fLastDamageAmount = m_fMaxHitPoints + damage.amount * m_fResistance;
+                m_fLastDamagePercent = 100;
+                if (m_fMaxHitPoints > 0)
+                    m_fLastDamagePercent += damage.amount * m_fResistance / m_fMaxHitPoints;
+            }
+            else
+            {
+                m_fLastDamageAmount += amount;
+                if (m_fMaxHitPoints > 0)
+                    m_fLastDamagePercent += amount / m_fMaxHitPoints;
+            }
             last_damage = damage;
             if (amount != 0)
                 reaction_damage_type = damage.type;

@@ -2,11 +2,52 @@
 #include "engine/collision.h"
 #include "game/original/AI_Mgr.h"
 #include "game/original/CivilianAI.h"
+#include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
 #include <cmath>
 #include <limits>
+#include <spdlog/spdlog.h>
 namespace OpenBlood2
 {
+    bool prepare_corpse_smoke(GameSession& g, ObjectId& selection)
+    {
+        const auto* player = g.objects.get(g.client_shell.player);
+        if (!player)
+            return false;
+        auto pos = player->state.m_Pos;
+        pos.z += 80;
+        auto h = g.objects.create(
+            g.objects.find_class("CultistAI"), {}, Creation::World,
+            {{"Pos", pos}, {"Name", std::string("Corpse smoke donor")}, {"AIState", std::string("IDLE")}});
+        auto* a = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h));
+        if (!a || !a->RuntimeReady() || !a->m_MoveObj.Update())
+            return false;
+        // Isolated death-action probe during the authored camera: no production
+        // actor or intro gate is changed. Headless catalog tests cover AI_Update.
+        // The real neck clip lasts 900 ms, within the existing hidden-UI window.
+        // Catalog tests also complete the seven-second torso clip without shortcuts.
+        a->m_damage.node_hit = 1;
+        a->m_damage.side_hit = 0;
+        if (!a->SetNewState(AI_Mgr::StateDying) || !a->DispatchState() || !a->DispatchState())
+            return false;
+        const auto* corpse = g.objects.get(a->last_corpse);
+        if (!corpse)
+            return false;
+        selection = corpse->id;
+        return g.objects.remove(h) && g.objects.finish_frame();
+    }
+    bool check_corpse_smoke(GameSession& g, ObjectId id, bool log)
+    {
+        const auto* r = g.objects.get(id);
+        const auto* c = r ? dynamic_cast<const CCorpse*>(r->game.get()) : nullptr;
+        if (log)
+            spdlog::info(
+                "Corpse diagnostic: present={}, setup={}, complete={}, sounds={}, updates={}, time={}, error={}",
+                c != nullptr, c && c->configured, c && c->animation_done, c ? c->sound_starts : 0, c ? c->updates : 0,
+                r ? r->animation.time : 0, c ? c->error : "removed");
+        return c && c->configured && c->error.empty() && c->animation_done && c->sound_starts > 0 && r->model &&
+               (r->state.m_Flags & FLAG_VISIBLE) && !r->attachment;
+    }
     bool check_ai_runtime_smoke(GameSession& g, ObjectId& selection)
     {
         unsigned cultists = 0, civilians = 0;
