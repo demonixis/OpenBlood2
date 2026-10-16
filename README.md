@@ -544,3 +544,5 @@ NPC attack and train-glass reports remain unresolved; M2 is still incomplete.
 The [Naga weapon continuation](../Documentation/Implementation/M2_NAGA_WEAPON.md) connects original eye-beam damage, AI fire-key aiming and the real red beam model as a prerequisite for Gideon. Its impact composite, Gideon itself and the actual M2 exit gate remain incomplete.
 
 The [energy projectile continuation](../Documentation/Implementation/M2_ENERGY_PROJECTILES.md) adds original moving flare projectiles, deferred explosion damage, checked shooter attribution and real sprite/WAV presentation. This is a Gideon prerequisite; its remaining weapons/state lifecycle, missing FX and safe NEW_LEVEL keep M2 incomplete.
+
+The [wind weapon continuation](../Documentation/Implementation/M2_WIND_WEAPON.md) connects the original one-shot shockwave, full-radius damage and actual model/WAV presentation. The repaired ground query and checked callback lifetime are explicit. Gideon state/shield integration, required services and safe NEW_LEVEL keep M2 incomplete.

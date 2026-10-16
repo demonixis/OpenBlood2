@@ -607,7 +607,7 @@ namespace OpenBlood2
                                     object->contact_normal.y, object->contact_normal.z, object->contact_polygon);
                         if (const auto* projectile = dynamic_cast<const CProjectile*>(object->game.get()))
                         {
-                            ImGui::Text("Original energy projectile | configured %s | contact %s | steps %llu",
+                            ImGui::Text("Original projectile | configured %s | contact %s | steps %llu",
                                         projectile->configured ? "yes" : "no", projectile->m_bExplode ? "yes" : "no",
                                         (unsigned long long)projectile->flight_steps);
                             ImGui::Text("Damage %.2f / radius %d / HP %.2f / start %.3f / lifetime %.2f",
@@ -722,6 +722,18 @@ namespace OpenBlood2
                             ImGui::Text("%.3f %s: %s at %.2f %.2f %.2f / delivered %u", report.time,
                                         report.source.c_str(), report.outcome.c_str(), report.position.x,
                                         report.position.y, report.position.z, report.delivered);
+                            if (report.shockwave)
+                            {
+                                ImGui::Text("Shockwave ground query %d: %.1f %.1f %.1f -> %.1f %.1f %.1f",
+                                            int(report.query), report.query_from.x, report.query_from.y,
+                                            report.query_from.z, report.query_to.x, report.query_to.y,
+                                            report.query_to.z);
+                                ImGui::Text("Blast %.1f %.1f %.1f / normal %.1f %.1f %.1f / candidates %u / in radius "
+                                            "%u / interrupted %s",
+                                            report.blast_position.x, report.blast_position.y, report.blast_position.z,
+                                            report.blast_normal.x, report.blast_normal.y, report.blast_normal.z,
+                                            report.candidates, report.in_radius, report.cancelled ? "yes" : "no");
+                            }
                             if (!report.error.empty())
                                 ImGui::TextWrapped("Failure: %s", report.error.c_str());
                         }
@@ -1560,12 +1572,12 @@ namespace OpenBlood2
 {
     void Inspector::draw_weapon_sound(const CWeapon& weapon, const GameSession& game)
     {
-        if (const auto* energy = dynamic_cast<const CEnergyBlast*>(&weapon))
+        if (weapon.data.m_szProjectileClass)
         {
-            ImGui::Text("Energy projectile alive: %s",
-                        BaseClass::GetServerDE()->IsObjectAlive(energy->projectile) ? "yes" : "no");
-            if (!energy->projectile_error.empty())
-                ImGui::TextWrapped("Projectile: %s", energy->projectile_error.c_str());
+            ImGui::Text("Original projectile alive: %s",
+                        BaseClass::GetServerDE()->IsObjectAlive(weapon.projectile) ? "yes" : "no");
+            if (!weapon.projectile_error.empty())
+                ImGui::TextWrapped("Projectile: %s", weapon.projectile_error.c_str());
         }
         if (const auto* naga = dynamic_cast<const CNagaEyes*>(&weapon))
         {

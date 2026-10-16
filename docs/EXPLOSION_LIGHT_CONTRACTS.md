@@ -96,3 +96,5 @@ illumination, safe automatic NEW_LEVEL and required services remain open.
 Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
 selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
 are historical; fragments/flames, illumination and the full M2 gate remain open.
+
+The [wind/shockwave continuation](WIND_WEAPON_CONTRACTS.md) extends the runtime-only projectile subset with OT_NORMAL scale metadata and the original type20 model/light recipe. Earlier type/resource restrictions are superseded only for this bounded subset; production Gideon and M2 remain incomplete.

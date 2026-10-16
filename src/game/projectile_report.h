@@ -9,5 +9,9 @@ namespace OpenBlood2
         DVector position{};
         double time = 0;
         unsigned delivered = 0;
+        bool shockwave = false, cancelled = false;
+        DVector query_from{}, query_to{}, blast_position{}, blast_normal{};
+        SegmentResult query = SegmentResult::Unavailable;
+        unsigned candidates = 0, in_radius = 0;
     };
 } // namespace OpenBlood2

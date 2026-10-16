@@ -118,3 +118,5 @@ are historical; fragments/flames, illumination and the full M2 gate remain open.
 Continuation: [original metal fragments](EXPLOSION_FRAGMENT_CONTRACTS.md) now supplies
 selected grenade fragment motion/collision and rendering. Earlier blanket fragment
 omissions are historical; smoke trails, other required services and M2 remain open.
+
+The [wind/shockwave continuation](WIND_WEAPON_CONTRACTS.md) extends the runtime-only projectile subset with OT_NORMAL scale metadata and the original type20 model/light recipe. Earlier type/resource restrictions are superseded only for this bounded subset; production Gideon and M2 remain incomplete.

@@ -6,10 +6,6 @@
 #include <random>
 
 using namespace OpenBlood2;
-FireResult CWeapon::FireProjectile()
-{
-    return last_shot.result = FireResult::Unavailable;
-}
 float CWeapon::CheckAmmo() const
 {
     return data.m_nAmmoType == AMMO_NONE ? 1.0f

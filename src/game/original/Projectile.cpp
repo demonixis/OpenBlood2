@@ -6,7 +6,7 @@
 #include "radius_damage.h"
 #include <cmath>
 using namespace OpenBlood2;
-CProjectile::CProjectile() : BaseClass(OT_SPRITE)
+CProjectile::CProjectile(DBYTE type) : BaseClass(type)
 {
     AddAggregate(&m_damage);
 }
@@ -21,8 +21,21 @@ void CProjectile::Finish(const char* outcome)
 {
     DVector position;
     g_pServerDE->GetObjectPos(m_hObject, &position);
-    g_pServerDE->RecordProjectile(
-        {g_pServerDE->GetObjectName(m_hObject), outcome, error, position, g_pServerDE->GetTime(), targets.delivered});
+    ProjectileReport report{
+        g_pServerDE->GetObjectName(m_hObject), outcome, error, position, g_pServerDE->GetTime(), targets.delivered};
+    report.cancelled = targets.cancelled;
+    report.candidates = targets.candidates;
+    report.in_radius = targets.in_radius;
+    if (const auto* wave = dynamic_cast<const CBehemothShockwaveProjectile*>(this))
+    {
+        report.shockwave = true;
+        report.query_from = wave->ground_from;
+        report.query_to = wave->ground_to;
+        report.query = wave->ground_result;
+        report.blast_position = wave->blast_position;
+        report.blast_normal = wave->blast_normal;
+    }
+    g_pServerDE->RecordProjectile(report);
     g_pServerDE->RemoveObject(m_hObject); // Destruction stays deferred through all callbacks.
 }
 DDWORD CProjectile::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
@@ -34,14 +47,14 @@ DDWORD CProjectile::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
             return 0;
         const auto result = BaseClass::EngineMessageFn(message, data, reason);
         auto& state = *static_cast<ObjectCreateStruct*>(data);
-        legacy_copy(state.m_Filename, "Sprites\\yellowflare2.spr");
-        legacy_copy(state.m_SkinName, "Skins\\Ammo\\Grenade.dtx"); // Source fallback, unused for a sprite.
+        legacy_copy(state.m_Filename, filename ? filename : "");
+        legacy_copy(state.m_SkinName, skin ? skin : "");
         state.m_NextUpdate = .001f;
         return result;
     }
     if (message == MID_INITIALUPDATE && !InitialUpdate())
         Fail("Projectile initialization failed");
-    else if (message == MID_UPDATE && !Update() && !failed)
+    else if (message == MID_UPDATE && g_pServerDE->IsObjectAlive(m_hObject) && !Update() && !failed)
         Finish(exploded ? "exploded" : "expired");
     else if (message == MID_LINKBROKEN)
     {

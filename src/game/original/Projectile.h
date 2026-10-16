@@ -7,9 +7,9 @@
 class CProjectile : public BaseClass
 {
   public:
-    CProjectile();
+    explicit CProjectile(DBYTE type = OT_SPRITE);
     bool Setup(DVector, DBYTE, float damage, float speed, int radius, HOBJECT);
-    bool AdvanceFlight(double seconds);
+    virtual bool AdvanceFlight(double seconds);
     void HandleContact(const OpenBlood2::SegmentHit&);
     void Explode();
     CDestructable m_damage;
@@ -28,6 +28,8 @@ class CProjectile : public BaseClass
 
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+    const char* filename = "Models\\Ammo\\Grenade.abc";
+    const char* skin = "Skins\\Ammo\\Grenade.dtx";
     virtual bool InitialUpdate();
     virtual bool Update();
     virtual void AddExplosion(DVector, DVector) = 0;
@@ -36,8 +38,32 @@ class CProjectile : public BaseClass
 };
 class CEnergyBlastProjectile final : public CProjectile
 {
+  public:
+    CEnergyBlastProjectile()
+    {
+        filename = "Sprites\\yellowflare2.spr";
+        skin = "Skins\\Ammo\\Grenade.dtx";
+    }
+
   protected:
     bool InitialUpdate() override;
+    bool Update() override;
+    void AddExplosion(DVector, DVector) override;
+};
+
+class CBehemothShockwaveProjectile final : public CProjectile
+{
+  public:
+    CBehemothShockwaveProjectile() : CProjectile(OT_NORMAL) {}
+    DVector ground_from{}, ground_to{}, blast_position{}, blast_normal{};
+    OpenBlood2::SegmentResult ground_result = OpenBlood2::SegmentResult::Unavailable;
+    OpenBlood2::SegmentHit ground_hit;
+    OpenBlood2::SceneExplosionReport effect;
+    bool AdvanceFlight(double) override
+    {
+        return !failed;
+    } // One update at the shooter's current position.
+  protected:
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
 };

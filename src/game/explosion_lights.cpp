@@ -14,6 +14,17 @@ namespace OpenBlood2
             error = "Explosion requires a finite position and nonzero normal";
             return false;
         }
+        if (type == 20)
+        {
+            ExplosionLightSettings s;
+            s.position = vector_add(position, vector_scale(normal, 15)); // Raw source normal, even on a ray miss.
+            s.color1 = s.color2 = {1, 1, 1};
+            s.duration = 1;
+            s.radius1 = 400;
+            s.radius2 = 100;
+            out.push_back(s);
+            return true;
+        }
         if (type > 3 && type != 6 && type != 8)
         {
             error = "Explosion light recipe is unavailable";

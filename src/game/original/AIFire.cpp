@@ -1,5 +1,5 @@
 // Selected original AI_Mgr.cpp:3204-3539,4469-4528,5612-5670.
-// See AI_FIRE_CONTRACTS.md: supported vector weapons only; no full AI_Update.
+// See AI_FIRE_CONTRACTS.md and the Naga/energy/wind continuations for supported aiming branches.
 #include "AI_Mgr.h"
 #include "engine/collision.h"
 #include <cmath>
@@ -124,7 +124,8 @@ bool AI_Mgr::Fire(bool alternate)
     if (!weapon)
         return fail(FireResult::Unavailable, "AI has no current weapon");
     if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_MELEE &&
-        weapon->data.m_nType != WEAP_NAGA_EYEBEAM && weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST)
+        weapon->data.m_nType != WEAP_NAGA_EYEBEAM && weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST &&
+        weapon->data.m_nType != WEAP_GIDEON_WIND)
         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
     DRotation rotation;
     const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM;

@@ -79,6 +79,8 @@ class CWeapon
     FireResult Fire(const OpenBlood2::WeaponFire&);
     virtual const char* FireSound(bool alternate) const;
     virtual FireResult FireProjectile();
+    HOBJECT projectile = nullptr; // Checked independent runtime child, never owning.
+    std::string projectile_error;
     virtual FireResult FireVector();
     std::vector<WeaponImpact> impacts; // Latest validated shot attempt, bounded to 64 contacts.
     std::string impact_error;
@@ -111,9 +113,17 @@ class CEnergyBlast final : public CWeapon
   public:
     CEnergyBlast() : CWeapon(WEAP_ZEALOT_ENERGYBLAST) {}
     const char* FireSound(bool alternate) const override;
-    FireResult FireProjectile() override;
-    HOBJECT projectile = nullptr; // Checked, independent runtime child.
-    std::string projectile_error;
+};
+class CGideonWind final : public CWeapon
+{
+  public:
+    CGideonWind() : CWeapon(WEAP_GIDEON_WIND) {}
+    FireResult FireVector() override
+    {
+        // Both original definitions select the shockwave projectile. The unused
+        // 1200-unit vector push branch is not part of this integration.
+        return last_shot.result = FireResult::Unavailable;
+    }
 };
 class CBeretta final : public CWeapon
 {

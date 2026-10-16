@@ -14,6 +14,24 @@ namespace OpenBlood2
             error = "Explosion requires a finite position and nonzero normal";
             return false;
         }
+        if (type == 20)
+        {
+            ExplosionModelSettings s;
+            s.position = position;
+            s.normal = normal;
+            s.scale1 = {200, 200, 200};
+            s.scale2 = {1500, 1500, 1500};
+            s.rotations = {.05f, 0, 0};
+            s.duration = .5f;
+            s.alpha = .5f;
+            s.waveform = 1;
+            s.fade = 1;
+            s.random_rotation = 0;
+            s.model = "Models\\Explosions\\exp_sphere.abc";
+            s.skin = "Skins\\Explosions\\bmothball.dtx";
+            output = std::move(s);
+            return true;
+        }
         if (type == 6)
             return true; // Original napalm fireball has no model component.
         if (type > 3 && type != 8)

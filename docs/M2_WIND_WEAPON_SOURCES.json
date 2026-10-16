@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "64b5f6110211aeaddc67f1e4824aedddc7070ba7",
+  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/GameProjectiles.cpp",
+      "sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f",
+      "use": "CBehemothShockwaveProjectile constructor and Update, lines5055-5165"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameProjectiles.h",
+      "sha256": "9acd38645c28d90b508a0a55a02760bcea5c6c40318b6266635711d2ba1f1bc0",
+      "use": "Shockwave class and LIFELEECH_PUSH_RADIUS450"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Projectile.cpp",
+      "sha256": "52b805c67775579b5703e0ad1099a8ea44d76b245349c8f6d1fac0a1b3b74ef2",
+      "use": "Base lifecycle, Setup and default unused resource strings"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "use": "Base projectile creation/setup branch"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameWeapons.cpp",
+      "sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd",
+      "use": "CGideonWind Fire and dormant vector-push branch analysis"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "GIDEON_WIND name and generic firing branch"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
+      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
+      "use": "Dependency review only; no production boss integration"
+    },
+    {
+      "path": "sources/blood2/Shared/WeaponDefs.cpp",
+      "sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
+      "use": "Complete Gideon Wind WeaponData entry"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "use": "Base-game ID42 and TYPE_RIFLE0"
+    },
+    {
+      "path": "sources/blood2/Shared/SFXMsgIds.h",
+      "sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f",
+      "use": "EXP_SHOCKBALL_LARGE20"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
+      "use": "Original high-detail shockball model/light recipe3157-3207"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/basedefs_de.h",
+      "sha256": "10f543764aa94339f2e48edcba384dda3cdce2d738f0be2731dcff3a1117fb72",
+      "use": "IntersectQuery constructor leaves endpoints uninitialized"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/DVector.h",
+      "sha256": "00dbaaa87923d403af84be40850813a6d8ae0f0f24a107557f299249f3f922ae",
+      "use": "Empty default vector constructor confirms undefined ground endpoint"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "use": "DamageObject preserves raw direction, target position, type byte and separate attacker identity"
+    }
+  ],
+  "adaptations": [
+    "Defined downward endpoint replaces original uninitialized read",
+    "Existing replacement solid entry-face ray skips enclosing bodies; retail parity unverified",
+    "Checked snapshot list traversal, reentrancy latch and deferred removal",
+    "Runtime-only normal projectile; finite scale metadata without render geometry",
+    "Owned high-detail model/light/audio and terminal inspection, no new mutable globals"
+  ],
+  "remaining": [
+    "Production Gideon initialization/states/rr_gun/shield/powerup",
+    "Dormant wind vector-push branch, other projectile families and save/restore",
+    "Surface illumination and complete retail presentation/physics parity",
+    "Safe NEW_LEVEL and actual M2 gate"
+  ]
+}

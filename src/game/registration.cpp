@@ -64,6 +64,8 @@ namespace OpenBlood2
                               {"Gravity", false, false},
                               {"TouchNotify", false, false},
                               {"Rayhit", false, false}}};
+        const ClassInfo shockwave_projectile{
+            "CBehemothShockwaveProjectile", &base, construct<CBehemothShockwaveProjectile>, {}};
         const ClassInfo energy_projectile{"CEnergyBlastProjectile", &base, construct<CEnergyBlastProjectile>, {}};
         const ClassInfo hand_model{"CHandWeaponModel", &base, construct<CHandWeaponModel>, {}};
         const ClassInfo b2base{
@@ -680,7 +682,7 @@ namespace OpenBlood2
                objects.register_class(door) && objects.register_class(rotating_door) &&
                objects.register_class(destructable_brush) && objects.register_class(rotating_brush) &&
                objects.register_class(hand_model) && objects.register_class(corpse) &&
-               objects.register_class(energy_projectile);
+               objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

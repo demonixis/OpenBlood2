@@ -850,3 +850,7 @@ Original CNagaEyes, complete Naga Eye Beam definition, AI name/head-node branche
 ## Energy projectile dependency
 
 Selected original CEnergyBlast/CProjectile/CEnergyBlastProjectile methods and complete Energy Blast definition are integrated with typed checked transport and replacement point flight. See [ledger](M2_ENERGY_PROJECTILE_SOURCES.json) and [contracts](ENERGY_PROJECTILE_CONTRACTS.md). Zealot variants, trail/Tesla-primary composite and Gideon remain unavailable.
+
+## Original Gideon wind and shockwave
+
+Selected original Gideon Wind definition, projectile Update and high-detail model/light recipe are integrated. See [ledger](M2_WIND_WEAPON_SOURCES.json) and [contracts](WIND_WEAPON_CONTRACTS.md). The undefined ray endpoint is repaired, typed callback/lifetime checks are explicit, and production Gideon remains unported.

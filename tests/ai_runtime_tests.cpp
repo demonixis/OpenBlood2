@@ -276,7 +276,11 @@ namespace
         CHECK(g.server.ScaleObject(h, {2, 3, 4}) && g.objects.get(h)->state.m_Scale.y == 3);
         CHECK(!g.server.ScaleObject(h, {0, 1, 1}) && !g.server.ScaleObject(h, {1, INFINITY, 1}));
         auto normal = object(g);
-        CHECK(normal && !g.server.ScaleObject(normal, {1, 1, 1}));
+        CHECK(normal && g.server.ScaleObject(normal, {2, 3, 4})); // Original OT_NORMAL projectile metadata.
+        CHECK(g.objects.get(normal)->state.m_Scale.x == 2 && g.objects.get(normal)->state.m_Scale.y == 3 &&
+              g.objects.get(normal)->state.m_Scale.z == 4 && !g.objects.get(normal)->model &&
+              !g.objects.get(normal)->sprite);
+        CHECK(!g.server.ScaleObject(normal, {-1, 1, 1}));
         g.world.min = {-100, -100, -100};
         g.world.max = {100, 100, 100};
         g.world.models.emplace_back();

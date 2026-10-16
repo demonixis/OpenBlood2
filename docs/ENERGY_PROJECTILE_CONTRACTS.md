@@ -110,3 +110,5 @@ retains terminal histories, and Scene explosions retains component/audio reports
 These clocks/history survive hidden UI. Rendering is read-only. Unload clears
 objects, voices and histories. No mutable process-global state was added; isolated
 destination rehearsal preserves the source projectile and aggregate lists.
+
+The [wind/shockwave continuation](WIND_WEAPON_CONTRACTS.md) extends the runtime-only projectile subset with OT_NORMAL scale metadata and the original type20 model/light recipe. Earlier type/resource restrictions are superseded only for this bounded subset; production Gideon and M2 remain incomplete.
