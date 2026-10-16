@@ -351,7 +351,7 @@ namespace
         bool explosion_model_drawn_hidden = false;
         OpenBlood2::SpriteView sprite_scene;
         OpenBlood2::WorldRenderer sprite_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
-        bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false;
+        bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false, explosion_rings_drawn_hidden = false;
         bool models_hidden = false, close_weapon_hidden = false;
         std::uint64_t model_frames = 0;
         std::vector<OpenBlood2::WorldDraw> world_draws;
@@ -861,6 +861,12 @@ namespace
                                 entry.alpha < 1)
                                 ++prepared;
                         explosion_sprites_drawn_hidden |= prepared == 2;
+                        unsigned particles = 0;
+                        for (const auto& entry : sprite_scene.entries)
+                            if (entry.particle_system && entry.error.empty() && entry.range != UINT32_MAX &&
+                                entry.alpha < 1 && entry.alpha > 0)
+                                ++particles;
+                        explosion_rings_drawn_hidden |= particles >= 32;
                     }
                     if (!model_scene.close_draws.empty() &&
                         !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
@@ -1364,6 +1370,7 @@ namespace
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
                 (options.scene_explosions_smoke &&
                  (!scene_explosion_hidden || !explosion_sprites_drawn_hidden || !explosion_model_drawn_hidden ||
+                  !explosion_rings_drawn_hidden ||
                   !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
                 (options.sprites_smoke &&
                  (!sprite_hidden || !sprites_drawn_hidden || sprite_scene.draws.size() != 12 ||

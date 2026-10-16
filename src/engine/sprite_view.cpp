@@ -37,6 +37,24 @@ namespace OpenBlood2
     bool SpriteView::add(const Sprite* sprite, const SpriteTrack& track, NodePose pose, DVector scale, DDWORD flags,
                          ObjectId object, const Resources& resources, std::string& error, float alpha)
     {
+        const std::string_view path =
+            sprite && track.frame < sprite->frames.size() ? sprite->frames[track.frame] : std::string_view{};
+        return add_frame(path, track.frame, pose, scale, flags, object, resources, error, alpha, {1, 1, 1}, false);
+    }
+    bool SpriteView::add_particle(std::string_view path, DVector position, float extent, DVector color, float alpha,
+                                  std::uint64_t system, unsigned index, const Resources& resources, std::string& error)
+    {
+        if (!add_frame(path, 0, {position, {}}, {extent, extent, 0}, FLAG_VISIBLE, {}, resources, error, alpha, color,
+                       true))
+            return false;
+        entries.back().particle_system = system;
+        entries.back().particle_index = index;
+        return true;
+    }
+    bool SpriteView::add_frame(std::string_view path, unsigned frame, NodePose pose, DVector scale, DDWORD flags,
+                               ObjectId object, const Resources& resources, std::string& error, float alpha,
+                               DVector color, bool direct_extent)
+    {
         error.clear();
         if (!camera_valid_ || entries.size() >= 4096)
         {
@@ -56,15 +74,15 @@ namespace OpenBlood2
             entry.error = "Invalid sprite alpha";
             return true;
         }
-        entry.frame = track.frame;
+        entry.frame = frame;
         entry.visible = (flags & FLAG_VISIBLE) != 0;
         entry.rotatable = (flags & FLAG_ROTATEABLESPRITE) != 0;
-        if (!sprite || track.frame >= sprite->frames.size())
+        if (path.empty())
         {
             entry.error = "Sprite manifest/current frame unavailable";
             return true;
         }
-        entry.frame_path = sprite->frames[track.frame];
+        entry.frame_path = path;
         std::string key;
         if (!resource_path(entry.frame_path, key))
         {
@@ -123,7 +141,14 @@ namespace OpenBlood2
             entry.error = "Invalid sprite transform/scale";
             return true;
         }
-        const float x = float(entry.width) * scale.x, y = float(entry.height) * scale.y;
+        if (!physics_vector(color) || color.x < 0 || color.x > 1 || color.y < 0 || color.y > 1 || color.z < 0 ||
+            color.z > 1)
+        {
+            entry.error = "Invalid particle color";
+            return true;
+        }
+        const float x = direct_extent ? scale.x : float(entry.width) * scale.x;
+        const float y = direct_extent ? scale.y : float(entry.height) * scale.y;
         if (!physics_vector({x, y, 0}))
         {
             entry.error = "Sprite dimensions exceed presentation limits";
@@ -133,10 +158,10 @@ namespace OpenBlood2
             return true;
         // Later LithTech renderer uses texture dimensions as half extents. This is
         // replacement presentation, not a claim of verified Blood II raster parity.
-        const WorldVertex corners[] = {{{-x, y, 0}, {1, 1, 1}, {0, 0}},
-                                       {{x, y, 0}, {1, 1, 1}, {1, 0}},
-                                       {{x, -y, 0}, {1, 1, 1}, {1, 1}},
-                                       {{-x, -y, 0}, {1, 1, 1}, {0, 1}}};
+        const WorldVertex corners[] = {{{-x, y, 0}, color, {0, 0}},
+                                       {{x, y, 0}, color, {1, 0}},
+                                       {{x, -y, 0}, color, {1, 1}},
+                                       {{-x, -y, 0}, color, {0, 1}}};
         WorldRange range;
         range.first = static_cast<std::uint32_t>(mesh.vertices.size());
         range.count = 6;

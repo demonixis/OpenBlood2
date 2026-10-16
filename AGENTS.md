@@ -441,3 +441,9 @@ Read [contracts](docs/EXPLOSION_LIGHT_CONTRACTS.md). Preserve delay overshoot di
 linear/final updates, reused zero Radius2 and independent sibling/source lifetime.
 These are evaluated lights, not surface illumination or scorch decals. Keep missing
 composite/lighting services explicit; safe NEW_LEVEL and M2 remain incomplete.
+
+The [explosion particle-ring continuation](../Documentation/Implementation/M2_EXPLOSION_RINGS.md) connects original ring lifecycle/recipes and actual textured particles.
+Read [contracts](docs/EXPLOSION_RING_CONTRACTS.md). Preserve cached-right emission, delay return/overshoot, source per-update rotation,
+ordered independent RNG and detached ownership. Particle stepping/quad sizing follow
+explicit later-engine reference policies, not verified retail parity. Keep missing
+fragments/flames/illumination and safe NEW_LEVEL explicit; M2 remains incomplete.

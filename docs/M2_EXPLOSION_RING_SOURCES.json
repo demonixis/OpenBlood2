@@ -1,0 +1,169 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "f6b81c25606884f640d3ed711c5f232bc448f082",
+  "source_files": [
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
+      "selected_lines": [
+        [
+          338,
+          514
+        ],
+        [
+          1282,
+          1298
+        ],
+        [
+          1390,
+          1406
+        ],
+        [
+          1498,
+          1515
+        ],
+        [
+          1608,
+          1698
+        ]
+      ],
+      "use": "Original ring methods and selected high-detail fire/smoke recipes."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.h",
+      "sha256": "2bc5a35f4da4929bdb0f10652d9014a56fdf9fe561d7ad320bf1dcf0f042dc18",
+      "selected_lines": [
+        [
+          74,
+          100
+        ],
+        [
+          326,
+          374
+        ]
+      ],
+      "use": "Original descriptor and FX constructor fields; typed settings initialize all fields instead of memset on a polymorphic descriptor."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
+      "sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13",
+      "selected_lines": [
+        [
+          22,
+          111
+        ]
+      ],
+      "use": "Typed replacement for particle object creation, radius/640 and explicit zero origin."
+    },
+    {
+      "path": "sources/blood2/AppHeaders/client_de.h",
+      "sha256": "d4bd76f15d1689a0314f832bcba0877d2bbabcdf830a8a44da9d662b4aa534e1",
+      "selected_lines": [
+        [
+          880,
+          905
+        ]
+      ],
+      "use": "Particle API position/rotation and color conventions."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
+      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
+      "selected_lines": [
+        [
+          1435,
+          1463
+        ]
+      ],
+      "use": "Effect scheduling/removal."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SpecialFX.h",
+      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
+      "selected_lines": [
+        [
+          32,
+          56
+        ]
+      ],
+      "use": "One-millisecond effect cadence."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
+      "sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
+      "selected_lines": [
+        [
+          20,
+          51
+        ]
+      ],
+      "use": "Random float range mapping; private deterministic stream is an adaptation."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ClientExplosionSFX.cpp",
+      "sha256": "fc51674223cf67456341d4529bc93acbe8df9365a8730b0491c7e22803c85a09",
+      "selected_lines": [
+        [
+          282,
+          304
+        ]
+      ],
+      "use": "FX-before-damage/audio publication and null-damager suppression."
+    },
+    {
+      "path": "sources/lithtech/runtime/client/src/particlesystem.cpp",
+      "sha256": "1efc6713379529f2a840cb15243ca4b8bdf846092ac5e7c67427df0ecbcf0d44",
+      "selected_lines": [
+        [
+          234,
+          298
+        ]
+      ],
+      "use": "Later-generation reference for lifetime/position/gravity order, not Blood II parity."
+    },
+    {
+      "path": "sources/lithtech/runtime/client/src/clientde_impl.cpp",
+      "sha256": "abcb1404c1a1fa3462fec343232a2387676674b677f77a9f19c7f67c714c865b",
+      "selected_lines": [
+        [
+          2726,
+          2743
+        ]
+      ],
+      "use": "Later-generation SetupParticleSystem radius storage."
+    },
+    {
+      "path": "sources/lithtech/runtime/client/src/particlesystem.h",
+      "sha256": "62f1ba3197c387430c9bd25b94412576eebabf88e50ce8018b10d7fd7fe6352d",
+      "selected_lines": [
+        [
+          73,
+          95
+        ]
+      ],
+      "use": "Later-generation particle size initialized from system radius."
+    },
+    {
+      "path": "sources/lithtech/runtime/render_a/src/sys/d3d/drawparticles.cpp",
+      "sha256": "ab49bac5ad8e60e371a24e091d5280dd0247e3fd19a839f265924a74b6db5759",
+      "selected_lines": [
+        [
+          90,
+          110
+        ],
+        [
+          255,
+          303
+        ]
+      ],
+      "use": "Later-generation camera-facing quad size, not a renderer import."
+    }
+  ],
+  "implementation": "Selected original CExplosionRingFX and high-detail recipes; bounded replacement engine particle simulation and actual alpha DTX billboards.",
+  "limitations": [
+    "Later engine references establish a replacement policy, not retail motion/raster parity.",
+    "No particle collision, fragment/flame services, illumination or full composite RNG ordering.",
+    "Private data exercises type 3; other recipes/modes use synthetic tests.",
+    "Safe automatic NEW_LEVEL and actual M2 acceptance remain open."
+  ]
+}

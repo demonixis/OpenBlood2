@@ -5,6 +5,7 @@
 #include "engine/string_resources.h"
 #include "game/explosion_lights.h"
 #include "game/explosion_models.h"
+#include "game/explosion_rings.h"
 #include "game/explosion_sprites.h"
 #include "game/original/BloodShells.h"
 #include "game/original/LightFX.h"
@@ -80,6 +81,8 @@ namespace OpenBlood2
         ExplosionSprites explosion_sprites;
         ExplosionModels explosion_models;
         ExplosionLights explosion_lights;
+        ExplosionRings explosion_rings;
+        std::uint64_t PublishExplosionRings(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         std::uint64_t PublishExplosionLights(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         std::uint64_t PublishExplosionModels(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) override;
@@ -111,6 +114,7 @@ namespace OpenBlood2
             explosion_sprites.clear();
             explosion_models.clear();
             explosion_lights.clear();
+            explosion_rings.clear();
             spawn_reports.clear();
             pickup_reports.clear();
             camera_effects.clear();

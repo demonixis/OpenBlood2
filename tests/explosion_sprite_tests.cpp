@@ -136,8 +136,7 @@ namespace
         ExplosionSprites effects;
         CHECK(effects.publish(1, {}, {0, 2, 0}, "partial", store, 0, error));
         CHECK(effects.active.size() == 1 && effects.started == 1 && effects.failed == 1 && !error.empty());
-        CHECK(effects.reports.back().sprites.size() == 1 &&
-              effects.reports.back().unavailable == "particle ring, light illumination");
+        CHECK(effects.reports.back().sprites.size() == 1 && effects.reports.back().unavailable == "light illumination");
         CHECK(effects.publish(24, {}, {0, 1, 0}, "unsupported", store, 0, error) && !error.empty());
         CHECK(effects.publish(1, {}, {}, "zero normal", store, 0, error) && !error.empty());
         const auto old_id = effects.active.front().id;
@@ -199,6 +198,25 @@ namespace
         config.data_dir = root;
         CHECK(game.initialize() && game.resources.mount_game(config, error));
         SpriteView view;
+        auto check_scene = [&]() -> bool
+        {
+            CHECK(update_sprite_scene(game, view, error));
+            unsigned original = 0, particles = 0;
+            for (const auto& entry : view.entries)
+            {
+                CHECK(entry.error.empty() && entry.range < view.mesh.ranges.size());
+                if (entry.particle_system)
+                    ++particles;
+                else
+                    ++original;
+            }
+            std::size_t expected_particles = 0;
+            for (const auto& ring : game.server.explosion_rings.active)
+                expected_particles += ring.particles.size();
+            CHECK(original == 30 && particles == expected_particles && particles >= 288);
+            CHECK(view.draws.size() == 30 + particles);
+            return true;
+        };
         std::uint64_t previous = 0;
         for (unsigned cycle = 0; cycle < 3; ++cycle)
         {
@@ -218,13 +236,13 @@ namespace
                 }
             }
             CHECK(count == 9 && game.server.explosion_sprites.active.size() == 18 && game.step(.11));
-            CHECK(update_sprite_scene(game, view, error) && view.draws.size() == 30);
+            CHECK(check_scene());
             for (const auto& entry : view.entries)
                 CHECK(entry.error.empty());
             CHECK(game.server.explosion_sprites.active.front().id > previous);
             previous = game.server.explosion_sprites.active.back().id;
             CHECK(game.step(.3));
-            CHECK(update_sprite_scene(game, view, error) && view.draws.size() == 30);
+            CHECK(check_scene());
             CHECK(game.unload_world() && game.server.explosion_sprites.active.empty() &&
                   game.server.explosion_sprites.reports.empty());
             view.clear();

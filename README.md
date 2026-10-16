@@ -1,5 +1,9 @@
 # Blood II Reconstruction aka OpenBlood2
 
+Current continuation: [original explosion particle rings](../Documentation/Implementation/M2_EXPLOSION_RINGS.md) adds
+fire/smoke particle motion, real DTX alpha rendering and per-particle inspection.
+Remaining composite FX, illumination and safe NEW_LEVEL keep M2 incomplete.
+
 The [explosion point-light continuation](../Documentation/Implementation/M2_EXPLOSION_LIGHTS.md) evaluates original flash/residual light colors, radii, delays and lifetime, independently of emitter/resource lifetime.
 Inspection and hidden/reload checks cover all nine SubwayA emitters. Surface
 illumination, remaining composite components, safe level transfer and M2 remain open.

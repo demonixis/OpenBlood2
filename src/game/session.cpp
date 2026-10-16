@@ -437,6 +437,7 @@ namespace OpenBlood2
         ok = server.explosion_sprites.advance(objects.time()) && ok;
         ok = server.explosion_models.advance(objects.time()) && ok;
         ok = server.explosion_lights.advance(objects.time()) && ok;
+        ok = server.explosion_rings.advance(objects.time()) && ok;
         if (ok && preview_model && preview_playing &&
             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
             preview_playing = false;

@@ -12,7 +12,8 @@ namespace OpenBlood2
         bool visible = false, rotatable = false;
         std::uint32_t range = UINT32_MAX;
         float alpha = 1;
-        std::uint64_t client_effect = 0;
+        std::uint64_t client_effect = 0, particle_system = 0;
+        unsigned particle_index = 0;
     };
     // Read-only presentation snapshot: owned textures/values, never a retained game pointer.
     class SpriteView
@@ -26,6 +27,8 @@ namespace OpenBlood2
         bool begin_frame(DVector eye, DRotation camera, std::string& error);
         bool add(const Sprite*, const SpriteTrack&, NodePose, DVector scale, DDWORD flags, ObjectId, const Resources&,
                  std::string& error, float alpha = 1);
+        bool add_particle(std::string_view texture, DVector position, float half_extent, DVector color, float alpha,
+                          std::uint64_t system, unsigned index, const Resources&, std::string&);
         void sort();
         WorldMesh mesh;
         std::vector<WorldDraw> draws;
@@ -33,6 +36,8 @@ namespace OpenBlood2
         std::uint64_t revision = 0;
 
       private:
+        bool add_frame(std::string_view, unsigned frame, NodePose, DVector, DDWORD, ObjectId, const Resources&,
+                       std::string&, float alpha, DVector color, bool direct_extent);
         struct Material
         {
             std::uint32_t index = 0;

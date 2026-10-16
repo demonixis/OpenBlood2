@@ -30,6 +30,13 @@ namespace OpenBlood2
         if (g.objects.get(selected) || g.server.scene_explosions.size() != 1)
             return false;
         const auto& report = g.server.scene_explosions.back();
+        const auto& rings = g.server.explosion_rings;
+        if (!report.ring_event || !report.ring_error.empty() || rings.active.size() != 4 || rings.started != 4 ||
+            rings.failed || rings.reserved_particles() != 128 || !rings.update_error.empty())
+            return false;
+        if (rings.active[0].particles.size() != 32 || !rings.active[0].updates || rings.active[0].alpha >= 1 ||
+            rings.active[0].particles[0].position.x <= 10)
+            return false;
         const auto& lights = g.server.explosion_lights;
         if (!report.light_event || !report.light_error.empty() || lights.active.size() != 2 || lights.started != 2 ||
             lights.failed || lights.reports.size() != 1 || !lights.update_error.empty())

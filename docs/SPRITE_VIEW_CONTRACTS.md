@@ -72,3 +72,7 @@ partial, opaque and opaque-black pixels, overlap order, world occlusion, absence
 depth writes, resize/reupload and a real private bloodsplat at its authored pose.
 The application smoke additionally requires all 12 quads with hidden UI and after
 reload. These are harness observations, not a retail executable comparison.
+
+Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
+selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
+are historical; fragments/flames, illumination and the full M2 gate remain open.

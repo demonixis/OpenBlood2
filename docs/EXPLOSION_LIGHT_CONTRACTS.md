@@ -92,3 +92,7 @@ without ImGui. This proves evaluated state and inspector operation, not light pi
 SubwayA counts remain 203 created / four transferred sounds / 372 editor-only /
 one unsupported Gideon / zero failed sources. Other composite components,
 illumination, safe automatic NEW_LEVEL and required services remain open.
+
+Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
+selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
+are historical; fragments/flames, illumination and the full M2 gate remain open.

@@ -22,6 +22,16 @@ namespace OpenBlood2
                 return false;
             scene.entries.back().client_effect = fx.id;
         }
+        for (const auto& fx : game.server.explosion_rings.active)
+            for (unsigned i = 0; i < fx.particles.size(); ++i)
+            {
+                auto local = rotate_vector(fx.rotation, fx.particles[i].position);
+                const DVector position{fx.settings.position.x + local.x, fx.settings.position.y + local.y,
+                                       fx.settings.position.z + local.z};
+                if (!scene.add_particle(fx.texture, position, fx.settings.radius / 640.f, fx.settings.color, fx.alpha,
+                                        fx.id, i, game.resources, error))
+                    return false;
+            }
         scene.sort();
         return true;
     }

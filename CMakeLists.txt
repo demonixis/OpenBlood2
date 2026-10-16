@@ -14,13 +14,13 @@ include(CTest)
 include(cmake/Dependencies.cmake)
 configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
 
-add_library(engine STATIC src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+add_library(engine STATIC src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
 target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
 target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
 target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
 
-add_library(blood2_game STATIC src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+add_library(blood2_game STATIC src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
     src/game/original/engineobjects.cpp
     src/game/original/B2BaseClass.cpp
     src/game/original/CameraSpot.cpp

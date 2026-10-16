@@ -110,3 +110,7 @@ private original sphere. Hidden/reloaded application smoke requires a model draw
 World accounting stays 203 created / four transferred sounds / 372 editor-only /
 one unsupported Gideon / zero failed sources. Safe automatic NEW_LEVEL and other
 required FX/services keep the actual M2 gate open.
+
+Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
+selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
+are historical; fragments/flames, illumination and the full M2 gate remain open.

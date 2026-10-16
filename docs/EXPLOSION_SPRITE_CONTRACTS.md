@@ -98,3 +98,7 @@ preparation across three load/player/unload cycles. This does not add source-wor
 objects: counts remain 203 created, 4 transferred sounds, 372 editor-only, one
 unsupported Gideon and zero failed sources. Safe automatic NEW_LEVEL, remaining
 required FX/services and the actual M2 acceptance criteria remain open.
+
+Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
+selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
+are historical; fragments/flames, illumination and the full M2 gate remain open.
