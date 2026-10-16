@@ -44,6 +44,7 @@ namespace OpenBlood2
         const auto received = g.client_shell.world_exit.received;
         const auto blocked = g.client_shell.world_exit.blocked;
         const auto captures = g.server_shell.inventory_capture.captures;
+        const auto field_captures = g.server_shell.player_capture.captures;
         const auto damage_captures = g.server_shell.damage_capture.captures;
         unsigned exits = 0;
         for (auto id : g.objects.snapshot())
@@ -83,6 +84,9 @@ namespace OpenBlood2
                g.server_shell.damage_capture.captures == damage_captures + 1 &&
                g.server_shell.damage_capture.state.health == player->m_damage.m_fHitPoints &&
                g.server_shell.damage_capture.state.armor == player->m_damage.m_fArmorPoints &&
+               g.server_shell.player_capture.valid && g.server_shell.player_capture.captures == field_captures + 1 &&
+               g.server_shell.player_capture.state.air == player->m_fAirLevel &&
+               g.server_shell.player_capture.state.name == std::optional<std::string>("") &&
                g.client_shell.world_exit.error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos &&
                old_player == g.client_shell.player && old_revision == g.world_revision &&
                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);

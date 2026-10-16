@@ -26,6 +26,30 @@ namespace OpenBlood2
                                static_cast<unsigned>(exit.request.type), game.server_shell.start_point_name.c_str());
             ImGui::TextWrapped("%s", exit.error.empty() ? "No transfer attempted; KeepAliveSave/Load unavailable."
                                                         : exit.error.c_str());
+            const auto& fields = game.server_shell.player_capture;
+            ImGui::Text("Player fields: %llu / %llu captures; %s", (unsigned long long)fields.captures,
+                        (unsigned long long)fields.attempts, fields.valid ? "owned subset" : "unavailable");
+            if (!fields.error.empty())
+                ImGui::TextWrapped("%s", fields.error.c_str());
+            if (fields.valid)
+            {
+                const auto& p = fields.state;
+                ImGui::Text("Saved player %s | air %.2f | pitch/yaw %.3f / %.3f",
+                            p.name ? (p.name->empty() ? "<empty>" : p.name->c_str()) : "<null>", p.air, p.pitch, p.yaw);
+                ImGui::Text("Smell clock offset %.3fs / delay %.3fs | dead %d / blocked %d", p.smell_time_offset,
+                            p.smell_delay, p.dead, p.movement_blocked);
+                if (ImGui::TreeNode("Saved player field contents"))
+                {
+                    ImGui::Text("Character %u / skin %u | STR %u SPD %u RES %u MAG %u", p.character, p.skin, p.strength,
+                                p.speed, p.resistance, p.magic);
+                    ImGui::Text("Move state %u | last crouch %d / forced crouch %d", p.move_state, p.last_crouch,
+                                p.forced_crouch);
+                    ImGui::TextWrapped("Trigger string: %s", p.trigger ? p.trigger->c_str() : "<null>");
+                    ImGui::TextWrapped("Selected original value block only. Power timers, engine/model state, "
+                                       "client restoration and destination transfer remain unavailable.");
+                    ImGui::TreePop();
+                }
+            }
             const auto& saved = game.server_shell.inventory_capture;
             ImGui::Text("Inventory capture: %llu / %llu attempts; %s", (unsigned long long)saved.captures,
                         (unsigned long long)saved.attempts, saved.valid ? "owned snapshot" : "unavailable");
@@ -76,8 +100,9 @@ namespace OpenBlood2
                     ImGui::TreePop();
                 }
             }
-            ImGui::TextWrapped("Aggregate snapshots only: full player timers, restored client association and "
-                               "destination entry remain unavailable. Current player/world are unchanged.");
+            ImGui::TextWrapped(
+                "Partial snapshots: remaining player timers, engine state, restored client association and "
+                "destination entry remain unavailable. Current player/world are unchanged.");
             for (auto id : game.objects.snapshot())
             {
                 const auto* record = game.objects.get(id);

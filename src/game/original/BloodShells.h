@@ -38,6 +38,14 @@ class CBloodServerShell
         std::uint64_t attempts = 0, captures = 0;
         bool valid = false;
     } damage_capture; // Damage aggregate only; not complete player preservation.
+    bool CapturePlayerFields(HCLIENT);
+    struct PlayerCapture
+    {
+        OpenBlood2::PlayerState state;
+        std::string error;
+        std::uint64_t attempts = 0, captures = 0;
+        bool valid = false;
+    } player_capture; // Selected fields only; engine/client/timers still prevent transfer.
     void SetStartPointName(const std::string& name)
     {
         start_point_name = name;

@@ -1,5 +1,14 @@
 # Source and Dependency Provenance
 
+## Original player fields and restore initialization
+
+Selected PlayerObj Save/Load values retain raw fields, relative smell time,
+nullable strings and zeroed stat caches. The savegame InitialUpdate branch now
+binds aggregates/factions without fresh grants. Typed ownership/validation and
+staged string allocation are adaptations. Full Load/engine/client transfer remains
+unavailable. See [source ledger](M2_PLAYER_STATE_SOURCES.json),
+[contracts](PLAYER_STATE_CONTRACTS.md) and [validation](../../Documentation/Implementation/M2_PLAYER_STATE.md).
+
 ## Project Code
 
 M0 started a new repository and build. No source file, project skeleton, build flags, compatibility table or gameplay implementation has been copied/cherry-picked from OpenBlood2, NoMadEngine or nomad. M1 imports the selected original Blood 2 code below directly from the preserved reference tree. The prior audit supplies behavioral requirements for the contract tests.

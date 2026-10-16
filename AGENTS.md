@@ -387,3 +387,10 @@ Preserve CanDamage's million-HP sentinel, separate signed death health, remainin
 duration/overshoot, character-only modifier and destination/list ownership. The
 legacy location byte is initialized to zero, not inferred from hit nodes. Captures
 are aggregate-only; full player/client/destination transfer and M2 remain open.
+
+The [player field/restore-initialization continuation](../Documentation/Implementation/M2_PLAYER_STATE.md) preserves selected original
+CPlayerObj values and the savegame early return. Read [contracts](docs/PLAYER_STATE_CONTRACTS.md). Preserve relative
+smell clocks, nullable strings, raw attributes, separate player death and zeroed
+stat caches. Restore initialization grants no fresh stats/scent/scheduling. Active
+powers refuse missing timer preservation. These are partial fields, not full player
+or client/engine restoration; NEW_LEVEL and M2 remain open.

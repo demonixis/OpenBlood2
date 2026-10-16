@@ -7,6 +7,7 @@
 #include "Movement.h"
 #include "SurfaceTypes.h"
 #include "dlink.h"
+#include "game/player_state.h"
 #include <array>
 #include <random>
 #include <string>
@@ -74,6 +75,9 @@ class CPlayerObj : public CBaseCharacter
     DBOOL InitialUpdate(int);
     DBOOL Update(DVector*);
     bool Respawn();
+    bool SaveFields(OpenBlood2::PlayerState&, std::string&) const;
+    bool LoadFields(const OpenBlood2::PlayerState&, std::string&);
+    bool restore_initialization = false, restore_fields_loaded = false;
     bool GoToStartPoint(HSTRING start_name);
     bool SetCharacter(DBYTE);
     bool OnSinglePlayerInit(const OpenBlood2::PlayerInit&);

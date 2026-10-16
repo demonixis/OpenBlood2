@@ -1,5 +1,10 @@
 # Original CDestructable state preservation
 
+> Continued by [player state contracts](PLAYER_STATE_CONTRACTS.md): selected player
+> values and the original savegame initialization early return now execute.
+> Earlier blanket player-field/initialization omissions are historical; full
+> engine/client/player restoration and level transfer remain unavailable.
+
 Original CDestructable Save/Load value fields now have an owned typed
 `DestructableState`: health/armor and their four caps, mass/resistance, death health,
 raw dead flag, remaining death delay, nigh-invulnerability, god/trigger-only and

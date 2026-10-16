@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "988e4eb8aa2f6a1dea14cd460a163f77ffd3cc57",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          590,
+          657
+        ],
+        [
+          6541,
+          6865
+        ]
+      ],
+      "use": "Selected common/savegame initialization, implemented Save/Load value fields and stat-cache invalidation; remaining fields and Load tail audited but not imported"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.h",
+      "sha256": "fb92d0a74b30d2a13b0589a2e4f90658a366cc2163e1fe37d446b2b50ed1da4a",
+      "selected_lines": [
+        [
+          22,
+          40
+        ]
+      ],
+      "use": "Original PMOVE values; 15/16 remain unsupported"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "selected_lines": [
+        [
+          1142,
+          1210
+        ]
+      ],
+      "use": "Active-player keep-alive selection; capture is still partial"
+    }
+  ],
+  "adaptations": [
+    "Owned typed optional strings preserve null/empty and validate before replacement",
+    "Partial value APIs explicitly named SaveFields/LoadFields; unsupported active powers refuse",
+    "Already mapped crouch/PMOVE fields retain the existing locomotion adaptation",
+    "Callback/stale/live-client guards and staged string allocation preserve lifetime"
+  ],
+  "remaining": [
+    "Full player fields and Load tail",
+    "Engine body/model/scheduling restoration and client saved data/association",
+    "Safe destination transfer and actual M2 acceptance"
+  ]
+}

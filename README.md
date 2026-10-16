@@ -1,5 +1,10 @@
 # Blood II Reconstruction aka OpenBlood2
 
+Latest player-preservation continuation: [selected original player fields](../Documentation/Implementation/M2_PLAYER_STATE.md)
+adds owned strings, raw attributes/air/movement values and relative clock rebasing,
+plus the original restore-initialization early return. Full player/client/engine
+restoration and safe destination entry remain unavailable; **M2 stays open**.
+
 Latest preservation continuation: [original damage Save/Load](../Documentation/Implementation/M2_DAMAGE_STATE.md)
 adds owned health/armor/death state and original death-delay/nigh-invulnerability
 rules. Exit inspection now captures inventory and damage separately; full player

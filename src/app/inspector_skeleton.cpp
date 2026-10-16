@@ -81,6 +81,16 @@ namespace OpenBlood2
             ImGui::TextWrapped("Corpse damage, limb hiding, gibs, fire and splat FX remain unavailable. %s %s",
                                c.error.c_str(), c.damage_error.c_str());
         }
+        if (const auto* player = character ? dynamic_cast<const CPlayerObj*>(character) : nullptr)
+        {
+            ImGui::Text("Player restore initialization %d / selected fields loaded %d / associated %d",
+                        player->restore_initialization, player->restore_fields_loaded, player->GetClient() != nullptr);
+            ImGui::Text("Air %.2f | smell timestamp %.3f / delay %.3f", player->m_fAirLevel, player->m_fSmellTime,
+                        player->m_fSmellDelay);
+            if (player->restore_initialization)
+                ImGui::TextWrapped(
+                    "Restore initialization and value fields only; this is not a completed player restore.");
+        }
         if (target_ai && ImGui::CollapsingHeader("Original NPC death"))
         {
             const auto& a = *target_ai;

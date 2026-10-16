@@ -1,5 +1,10 @@
 # Original inventory Save/Load subset
 
+> Continued by [player state contracts](PLAYER_STATE_CONTRACTS.md): selected player
+> values and the original savegame initialization early return now execute.
+> Earlier blanket player-field/initialization omissions are historical; full
+> engine/client/player restoration and level transfer remain unavailable.
+
 > Continued by [damage state contracts](DAMAGE_STATE_CONTRACTS.md): original damage
 > Save/Load values and death counter/delay/nigh-invulnerability now execute.
 > Earlier blanket damage-save omissions are historical. Whole player restoration

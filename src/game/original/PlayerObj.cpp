@@ -64,17 +64,20 @@ void CPlayerObj::PostPropRead(ObjectCreateStruct* state)
 DBOOL CPlayerObj::InitialUpdate(int reason)
 {
     auto* server = GetServerDE();
-    if (reason == INITIALUPDATE_SAVEGAME)
-    {
-        entry_error = "Player save restoration is not ported";
-        return DFALSE;
-    }
-    // InitialUpdate precedes SetClient, as in the original engine.
-    if (!m_InventoryMgr.Init(m_hObject, m_hClient) || !m_damage.Init(m_hObject, &m_InventoryMgr) ||
-        !server->SetBlockingPriority(m_hObject, 50))
+    // Original common restore initialization: bind aggregates/lists before
+    // the savegame early return. Fresh stats, scent, strings and scheduling follow it.
+    if (!m_InventoryMgr.Init(m_hObject, m_hClient) || !m_damage.Init(m_hObject, &m_InventoryMgr))
         return DFALSE;
     AI_Mgr::InsertPlayer(*this);
     m_bFirstUpdate = DTRUE;
+    if (reason == INITIALUPDATE_SAVEGAME)
+    {
+        restore_initialization = initialized = true;
+        m_fMoveVel = m_fJumpVel = 0;
+        return DTRUE;
+    }
+    if (!server->SetBlockingPriority(m_hObject, 50))
+        return DFALSE;
     m_InventoryMgr.SetAmmoCount(1, 50);
     server->SetNextUpdate(m_hObject, .001f);
     m_damage.SetHitPoints(100);
