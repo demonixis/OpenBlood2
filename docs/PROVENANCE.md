@@ -646,3 +646,9 @@ BerettaPU, SpawnWeaponPickup and PlayerObj MID_ADDWEAPON rules. See the
 No donor engine code/dependency was imported. Original NOSLIDING bit 25 is
 implemented by the existing replacement solver; later LithTech moveplayer was
 consulted for first-contact meaning only, not treated as retail Blood II proof.
+
+## Inspector folding and keyboard defaults
+
+Application-owned SDL/ImGui usability changes only. No new original-source import
+or dependency update. Existing MoveMgr bindings and camera gates remain unchanged;
+see [evidence](../../Documentation/Implementation/M2_CONTROLS.md).

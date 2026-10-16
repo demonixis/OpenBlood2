@@ -1,5 +1,12 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The inspector is now **collapsible and resizable**: click the title arrow to fold
+or unfold it, drag its borders to resize, or use F1 to hide/show it. After entering
+the player in Session, keyboard movement is enabled by default: **WASD/ZQSD**,
+**Shift** run, **Space** jump, **Ctrl** crouch, **arrows** look, **E** USE. **F2** toggles
+keyboard controls. SubwayA's original intro temporarily blocks movement; wait for
+it to end. See [input/UI evidence](../Documentation/Implementation/M2_CONTROLS.md).
+
 Latest death prerequisite: [original NPC weapon drops](../Documentation/Implementation/M2_WEAPON_DROPS.md)
 connects detached Beretta physics, original pickups and player collection. Corpses/gibs,
 required FX, Gideon and ExitTrigger still keep M2 incomplete.

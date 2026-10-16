@@ -360,24 +360,34 @@ namespace OpenBlood2
         if (!visible)
             return;
         const auto display = ImGui::GetIO().DisplaySize;
-        ImGui::SetNextWindowPos(ImVec2(16, 16), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(display.x - 32, display.y - 32), ImGuiCond_Always);
-        if (ImGui::Begin("Blood II | In-game inspector", &visible,
-                         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
+        ImGui::SetNextWindowPos(ImVec2(16, 16), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(display.x - 32, display.y - 32), ImGuiCond_FirstUseEver);
+        const ImVec2 maximum(std::max(1.0f, display.x - 32), std::max(1.0f, display.y - 32));
+        ImGui::SetNextWindowSizeConstraints(ImVec2(std::min(480.0f, maximum.x), std::min(300.0f, maximum.y)), maximum);
+        const bool expanded = ImGui::Begin("Blood II | In-game inspector", &visible);
+        collapsed = ImGui::IsWindowCollapsed();
+        if (expanded)
         {
             ImGui::TextColored(ImVec4(0.95f, 0.48f, 0.43f, 1),
                                game.world_path.empty() ? "ORIGINAL OBJECT DIAGNOSTICS" : "M2  /  WORLD INSPECTION");
             ImGui::TextWrapped("Original objects, ABC animation and primary-world collision. Full original player "
                                "session remains blocked.");
-            ImGui::TextDisabled("F1: toggle inspector    |    Escape: quit when UI does not capture input");
+            ImGui::TextDisabled("Title arrow: fold/unfold | Drag borders: resize | F1: hide/show | Escape: quit");
+            ImGui::Checkbox("Keyboard movement (F2)", &keyboard_movement);
+            ImGui::TextWrapped("WASD / ZQSD: walk | Shift: run | Space: jump | Ctrl: crouch | Arrows: look | E: use");
+            if (!game.client_shell.m_bInWorld)
+                ImGui::TextDisabled("Enter the player in Session to use the keyboard.");
+            else if (game.client_shell.view.object && !game.client_shell.view.settings.player_movement)
+                ImGui::TextDisabled("The original cinematic currently blocks movement. Controls return when it ends.");
             ImGui::Separator();
             if (ImGui::BeginTabBar("Inspection"))
             {
                 if (ImGui::BeginTabItem("3D view"))
                 {
-                    ImGui::TextWrapped("Diagnostic textured geometry with depth. F1 shows the world; F2 enables "
-                                       "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
-                                       "the player in Session first, or launch --view-world.");
+                    ImGui::TextWrapped(
+                        "Diagnostic textured geometry with depth. Fold the title bar to see the world. F2 toggles "
+                        "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
+                        "the player in Session first, or launch --view-world.");
                     ImGui::TextWrapped(
                         "Opaque textures/models are unlit. Lightmaps, sprites, liquid surfaces, "
                         "transparency and sky rendering remain unavailable. Unsupported objects stay in World.");
@@ -1080,8 +1090,6 @@ namespace OpenBlood2
         const auto& body = move.body;
         if (ImGui::Button("Select player"))
             selection.id = game.objects.get(player->m_hObject)->id;
-        ImGui::SameLine();
-        ImGui::Checkbox("Keyboard movement (F2)", &keyboard_movement);
         ImGui::TextWrapped(
             "WASD / ZQSD: walk | Shift: run | Space: jump | Ctrl: crouch | Arrows: look. F1 hides UI. Text editing and "
             "focus loss suspend keys.");
@@ -1567,8 +1575,6 @@ namespace OpenBlood2
         {
             const auto& state = player->containers;
             const auto& move = game.client_shell.move_mgr;
-            ImGui::Checkbox("Keyboard movement (F2)", &keyboard_movement);
-            ImGui::SameLine();
             ImGui::Text("Air %.1f / 100 | head code %u", player->m_fAirLevel, unsigned(state.head.code));
             ImGui::Text("Body %zu / %zu | liquid %s | ladder %s | conveyor %s | gravity %s", state.count, state.total,
                         move.m_bBodyInLiquid ? "yes" : "no", move.m_bBodyOnLadder ? "yes" : "no",

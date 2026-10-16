@@ -113,9 +113,10 @@ discarded time. A local top view draws the actual primary-world solid slice,
 solid object boxes and player heading. It is a diagnostic map, not game rendering.
 Hold buttons supply temporary commands at frame boundaries.
 
-**F2** or the checkbox enables physical **WASD / AZERTY ZQSD**, **Shift** run,
+Keyboard movement is enabled by default. **F2** or the common-header checkbox toggles physical **WASD / AZERTY ZQSD**, **Shift** run,
 **Space** jump, **Ctrl** crouch and arrow-key look. **F1** hides the inspector without stopping
-keyboard movement. Text editing suppresses keyboard commands; focus loss clears
+keyboard movement. The title arrow folds/unfolds it, and its borders resize it;
+folded input fields cannot capture gameplay keys. See [UI evidence](../../Documentation/Implementation/M2_CONTROLS.md). Text editing suppresses keyboard commands; focus loss clears
 pressed keys and suppresses panel movement. When keyboard movement is enabled,
 its keys are routed away from ImGui navigation (unless editing text); Space cannot
 also activate a focused inspection button. Game rules receive no SDL types.

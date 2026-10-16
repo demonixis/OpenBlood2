@@ -353,3 +353,8 @@ Read [contracts](docs/WEAPON_DROP_CONTRACTS.md). Preserve left-first selection, 
 checked independent lifetime, one-second initial support check and ammo-dependent
 pickup acceptance. Failed transfers stay inspectable. Player drop controls,
 corpses/gibs, required FX, Gideon and ExitTrigger remain unavailable; M2 stays open.
+
+The [inspector/input continuation](../Documentation/Implementation/M2_CONTROLS.md) enables keyboard controls by default
+and native inspector folding/resizing. Preserve text/focus suppression, F2's
+explicit preference, original cinematic gates and single MoveMgr integration.
+Folding or hiding UI must not stop the session; M2 remains incomplete.

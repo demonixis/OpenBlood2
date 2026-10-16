@@ -11,7 +11,7 @@ namespace OpenBlood2
     struct MovementControls
     {
         std::array<bool, SDL_SCANCODE_COUNT> keys{};
-        bool focused = false, enabled = false, use_suppressed = false;
+        bool focused = false, enabled = true, use_suppressed = false;
         bool consumes(const SDL_Event& event, bool text_editing) const
         {
             if (!focused || !enabled || text_editing ||

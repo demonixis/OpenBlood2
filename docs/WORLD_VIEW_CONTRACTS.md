@@ -78,7 +78,8 @@ The shader compiler is an offline tool, not a new runtime dependency.
 
 `--view-world` mounts the selected world and enters the existing original player
 subset, starts with the inspector hidden and keyboard controls enabled, and retains
-the authored intro. F1 toggles the inspector; F2 toggles movement. Physical WASD/ZQSD,
+the authored intro. F1 toggles inspector visibility; its title arrow folds/unfolds it. F2 toggles movement,
+which now also starts enabled for normal Session entry. Physical WASD/ZQSD,
 arrows, Shift, Space, Ctrl and E retain existing movement/look/USE rules and focus/text
 input handling. Mouse-look, weapon mouse bindings and rendered view weapons are not
 added by this increment. `--start-game` still exits 6 for required missing services.

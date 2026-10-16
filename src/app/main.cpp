@@ -36,6 +36,7 @@
 
 #if BLOOD2_INSPECTOR
 #include "app/inspector.h"
+#include "app/inspector_controls_smoke.h"
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlgpu3.h>
@@ -357,7 +358,6 @@ namespace
         inspector.keyframe_selection = smoke_keyframe;
         inspector.brush_selection = smoke_body;
         inspector.select_doors = options.doors_smoke || options.interaction_smoke;
-        inspector.keyboard_movement = options.interaction_smoke || options.view_world;
         inspector.select_triggers = options.triggers_smoke;
         inspector.trigger_selection = smoke_trigger;
         inspector.door_selection = smoke_door;
@@ -369,6 +369,11 @@ namespace
 #else
         (void)config;
         (void)data;
+#endif
+#if BLOOD2_INSPECTOR
+        OpenBlood2::InspectorControlsSmoke inspector_controls_smoke;
+        const bool check_inspector_controls =
+            options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
 #endif
         bool done = false;
         bool resized = false;
@@ -385,7 +390,6 @@ namespace
         bool weapons_fired = false, weapon_advanced_hidden = false;
         std::uint64_t hidden_weapon_shots = 0;
         OpenBlood2::MovementControls controls;
-        controls.enabled = options.interaction_smoke || options.view_world;
         controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
         DVector hidden_position{};
         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
@@ -408,12 +412,16 @@ namespace
             while (SDL_PollEvent(&event))
             {
                 controls.event(event, SDL_GetWindowID(runtime.window));
+                if (options.movement_smoke &&
+                    (event.type == SDL_EVENT_WINDOW_FOCUS_LOST || event.type == SDL_EVENT_WINDOW_FOCUS_GAINED))
+                    spdlog::info("Movement smoke focus at frame {}: {}", frames, controls.focused);
 #if BLOOD2_INSPECTOR
                 if (event.type == SDL_EVENT_KEY_DOWN && event.key.scancode == SDL_SCANCODE_F2 && !event.key.repeat)
                     inspector.keyboard_movement = controls.enabled;
 #endif
 #if BLOOD2_INSPECTOR
-                if (!controls.consumes(event, inspector_visible && ImGui::GetIO().WantTextInput))
+                if (!controls.consumes(event,
+                                       inspector_visible && !inspector.collapsed && ImGui::GetIO().WantTextInput))
                     ImGui_ImplSDL3_ProcessEvent(&event);
 #endif
                 if (event.type == SDL_EVENT_QUIT || (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED &&
@@ -457,7 +465,7 @@ namespace
 #if BLOOD2_INSPECTOR
             inspector.apply_commands(game, selection);
             controls.enabled = inspector.keyboard_movement;
-            text_editing = inspector_visible && ImGui::GetIO().WantTextInput;
+            text_editing = inspector_visible && !inspector.collapsed && ImGui::GetIO().WantTextInput;
 #endif
             if (frames == reload_frame + 1 &&
                 (options.weapons_smoke || options.movement_smoke || options.interaction_smoke) &&
@@ -510,6 +518,10 @@ namespace
             controls.look(game.client_shell.rotation, delta, text_editing);
             if (options.movement_smoke)
             {
+                if (frames == 45 || frames == 100 || frames == 170 || frames == 185)
+                    spdlog::info("Movement smoke input at {}: enabled={}, focused={}, text={}, W={}, Ctrl={}", frames,
+                                 controls.enabled, controls.focused, text_editing, controls.keys[SDL_SCANCODE_W],
+                                 controls.keys[SDL_SCANCODE_LCTRL]);
                 forward_frames += movement.forward;
                 jump_frames += movement.jump;
                 crouch_frames += movement.crouch;
@@ -668,8 +680,12 @@ namespace
                 ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
             else
                 ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+            if (check_inspector_controls)
+                inspector_controls_smoke.before_frame(frames);
             ImGui::NewFrame();
             inspector.draw(config, data, inspector_visible, frames, game, selection);
+            if (check_inspector_controls && !inspector_controls_smoke.after_draw(frames, game, inspector))
+                return 4;
             ImGui::Render();
 #endif
             SDL_GPUCommandBuffer* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
@@ -837,8 +853,7 @@ namespace
                         SDL_Event focus{};
                         focus.type = SDL_EVENT_WINDOW_FOCUS_GAINED;
                         focus.window.windowID = SDL_GetWindowID(runtime.window);
-                        event_ok = SDL_PushEvent(&focus) && key_event(SDL_SCANCODE_F2, true) &&
-                                   key_event(SDL_SCANCODE_F2, false);
+                        event_ok = SDL_PushEvent(&focus); // Default controls must work without an F2 opt-in.
                     }
                     if (frames == 45)
                         event_ok = key_event(SDL_SCANCODE_W, true) && key_event(SDL_SCANCODE_SPACE, true);

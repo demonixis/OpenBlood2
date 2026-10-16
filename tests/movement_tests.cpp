@@ -334,7 +334,7 @@ namespace
             event.key.windowID = id;
             input.event(event, window);
         };
-        key(SDL_SCANCODE_F2, true);
+        CHECK(input.enabled); // Normal inspector entry and no-UI launches share this default.
         key(SDL_SCANCODE_W, true);
         key(SDL_SCANCODE_SPACE, true);
         key(SDL_SCANCODE_LSHIFT, true);
@@ -347,6 +347,11 @@ namespace
         key(SDL_SCANCODE_RIGHT, true);
         input.look(rotation, .1, false);
         CHECK(rotation.yaw > .19f);
+        key(SDL_SCANCODE_F2, true);
+        CHECK(!input.enabled && !input.sample(false).forward);
+        key(SDL_SCANCODE_F2, false);
+        key(SDL_SCANCODE_F2, true);
+        CHECK(input.enabled && input.sample(false).forward);
         event = {};
         event.type = SDL_EVENT_WINDOW_FOCUS_LOST;
         event.window.windowID = window;
