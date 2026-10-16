@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "38262899bd81e0976ae16ed8ee9f2153c58f0c12",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          770,
+          806
+        ],
+        [
+          987,
+          1263
+        ]
+      ],
+      "use": "Selected trigger relay, hearing, state/target/animation/sound commands and MID_TRIGGER forwarding; SCRIPT interpreter excluded"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "selected_lines": [
+        [
+          284,
+          358
+        ]
+      ],
+      "use": "Original two-faction sound broadcast and one-decimal payload"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          4850,
+          4899
+        ]
+      ],
+      "use": "Alert after player playback attempt"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "selected_lines": [
+        [
+          117,
+          171
+        ]
+      ],
+      "use": "Dodge, sound trigger and interruptible script constants"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "selected_lines": [
+        [
+          188,
+          190
+        ]
+      ],
+      "use": "Original sound identifiers"
+    },
+    {
+      "path": "sources/blood2/Shared/SoundTypes.h",
+      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "selected_lines": [
+        [
+          14,
+          30
+        ]
+      ],
+      "use": "Original sound priority"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AIScriptList.h",
+      "sha256": "b8cc846cf152f18aa07459297f2bde857064cb497d705bba115c9dba7d21fe2e",
+      "selected_lines": [
+        [
+          22,
+          27
+        ]
+      ],
+      "use": "Original command spellings"
+    }
+  ],
+  "adaptations": [
+    "Checked owned messages and callback-safe list snapshots",
+    "Strict bounded text/numeric validation and reentrant AI guard",
+    "Typed acceptance distinct from original overloaded false return",
+    "Required unavailable scripts and state actions stay explicit"
+  ]
+}

@@ -1,4 +1,5 @@
 #pragma once
+#include "AISound.h"
 #include "Anim_Sound.h"
 #include "B2BaseClass.h"
 #include "Destructable.h"
@@ -60,6 +61,8 @@ class CPlayerObj : public CBaseCharacter
     bool GetFootstepSound(std::string&);
     std::uint64_t sound_keys = 0, sound_attempts = 0, sound_starts = 0, sound_failures = 0;
     std::uint64_t suppressed_footsteps = 0, unresolved_footsteps = 0, unavailable_sound_alerts = 0;
+    OpenBlood2::SoundAlertReport sound_alert;
+    std::uint64_t sound_alerts = 0;
     std::string sound_resource, sound_error;
     void UpdateSound();
     void PostPropRead(ObjectCreateStruct*);

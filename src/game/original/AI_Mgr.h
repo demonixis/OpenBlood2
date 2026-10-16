@@ -191,6 +191,34 @@ class AI_Mgr : public CBaseCharacter
     DDWORD requested_animation = UINT32_MAX;
     std::string state_error;
 
+    enum class TriggerOutcome
+    {
+        None,
+        Ignored,
+        Heard,
+        Turned,
+        State,
+        Target,
+        Animation,
+        Sound,
+        Relay,
+        Failed
+    };
+    bool HandleTrigger(HOBJECT sender, std::string_view text);
+    bool PlayAnimation(std::string_view name);
+    float m_fHearingDist = 0;
+    DDWORD m_dwFlags = 0, m_dwScriptFlags = 0;
+    DVector m_vTrackObjPos{};
+    std::string trigger_relay_target;
+    TriggerOutcome trigger_outcome = TriggerOutcome::None;
+    std::uint64_t trigger_calls = 0, trigger_commands = 0, trigger_failures = 0;
+    std::uint64_t hearing_events = 0, hearing_reactions = 0, hearing_ignored = 0, trigger_relays = 0;
+    int heard_sound = -1;
+    HOBJECT heard_sender = nullptr; // Non-owning historical identity; inspect through checked lookup.
+    DVector heard_position{};
+    float heard_distance = 0;
+    std::string trigger_text, trigger_error;
+
     bool InitStatics(std::shared_ptr<CAnim_Sound>);
     bool CanSee(HOBJECT);
     OpenBlood2::AISight sight;
@@ -225,12 +253,15 @@ class AI_Mgr : public CBaseCharacter
     std::string ai_key, ai_key_error, ai_sound_resource;
 
   protected:
+    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
+    bool TriggerFailure(const char*);
     bool StateFailure(const char*);
     bool AnimationCommand(DDWORD clip, int command);
     bool OnStringKey(ArgList*) override;
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
 
   private:
+    bool trigger_busy = false;
     DLink m_Link{};
     bool registered_cabal = true;
     static void InitLists();

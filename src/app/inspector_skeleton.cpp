@@ -58,6 +58,38 @@ namespace OpenBlood2
         ImGui::TableNextColumn();
         const auto* r = game.objects.get(skeleton_selection);
         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+        if (target_ai && ImGui::CollapsingHeader("Original AI commands / hearing", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& ai = *target_ai;
+            const char* outcomes[]{"None",
+                                   "Ignored",
+                                   "Heard location",
+                                   "Turned",
+                                   "State selected",
+                                   "Target selected",
+                                   "Animation started",
+                                   "Sound started",
+                                   "Relay delivered",
+                                   "Failed"};
+            ImGui::Text("Result: %s | commands %llu / failures %llu",
+                        outcomes[static_cast<unsigned>(ai.trigger_outcome)], (unsigned long long)ai.trigger_commands,
+                        (unsigned long long)ai.trigger_failures);
+            ImGui::TextWrapped("Last command: %s", ai.trigger_text.c_str());
+            ImGui::Text("Hearing %.1f | events %llu / reactions %llu / ignored %llu", ai.m_fHearingDist,
+                        (unsigned long long)ai.hearing_events, (unsigned long long)ai.hearing_reactions,
+                        (unsigned long long)ai.hearing_ignored);
+            const auto* sender = game.objects.get(ai.heard_sender);
+            ImGui::Text("Sound %d | sender %s | distance %.2f", ai.heard_sound,
+                        sender && sender->life == Life::Alive ? sender->state.m_Name : "none / removed",
+                        ai.heard_distance);
+            ImGui::Text("Heard position %.2f %.2f %.2f", ai.heard_position.x, ai.heard_position.y, ai.heard_position.z);
+            ImGui::Text("Relay: %s | delivered %llu", ai.trigger_relay_target.c_str(),
+                        (unsigned long long)ai.trigger_relays);
+            if (!ai.trigger_error.empty())
+                ImGui::TextWrapped("%s", ai.trigger_error.c_str());
+            ImGui::TextWrapped("State selection does not execute missing search/dodge/attack actions. Full AI_Update "
+                               "and scripts remain unavailable.");
+        }
         if (target_ai && ImGui::CollapsingHeader("Original AI weapon actions", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& ai = *target_ai;
@@ -312,10 +344,15 @@ namespace OpenBlood2
                     ImGui::Text("Ground material: %d | foot material: %d | volume: %u | next foot: %s",
                                 player->m_eLastSurface, player->footstep_surface, unsigned(player->footstep_container),
                                 player->m_bNextFootstepLeft ? "left" : "right");
-                    ImGui::Text("AI sound alerts unavailable: %llu",
-                                (unsigned long long)player->unavailable_sound_alerts);
+                    ImGui::Text("AI sound alert failures: %llu", (unsigned long long)player->unavailable_sound_alerts);
+                    ImGui::Text("Alert attempts %llu | last messages delivered %u / eligible %u | %s",
+                                (unsigned long long)player->sound_alerts, player->sound_alert.delivered,
+                                player->sound_alert.eligible, player->sound_alert.complete ? "complete" : "incomplete");
+                    if (!player->sound_alert.error.empty())
+                        ImGui::TextWrapped("%s", player->sound_alert.error.c_str());
                 }
-                ImGui::TextWrapped("Dry audio only. AI hearing, voice-manager events and reverb remain unavailable.");
+                ImGui::TextWrapped("Dry audio only. AI hearing is separate from playback; voice-manager events and "
+                                   "reverb remain unavailable.");
             }
             std::vector<NodePose> pose;
             if (sample_pose(model, r->animation.animation, r->animation.time, pose))

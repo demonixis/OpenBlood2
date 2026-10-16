@@ -544,3 +544,11 @@ MC_Fire_Stand/MC_BestWeapon and key firing are connected with typed failures and
 checked lifetimes. CWeapon's original player-only eye-alignment condition is
 restored. See [source ranges/hashes](M2_AI_FIRE_SOURCES.json) and
 [contracts/adaptations](AI_FIRE_CONTRACTS.md). No production NPC is registered.
+
+## M2 AI commands and hearing
+
+Selected original AI_Mgr HandleTrigger/PlayAnimation/message dispatch and
+ObjectUtilities SendSoundTrigger are integrated, including the original player
+sound caller. See [source hashes/ranges](M2_AI_TRIGGER_SOURCES.json) and
+[bounded contracts/adaptations](AI_TRIGGER_CONTRACTS.md). Scripts and full NPCs
+remain unported; checked snapshots replace mutable callback list traversal.

@@ -1,5 +1,9 @@
 # Original character voices and player animation sounds
 
+> Extended by [AI command/hearing contracts](AI_TRIGGER_CONTRACTS.md): player sound
+> alerts, original hearing reactions and selected trigger commands now execute.
+> Complete production NPCs and M2 remain open.
+
 > The later [AI model-key continuation](AI_MODEL_KEY_CONTRACTS.md) adds selected
 > AI_Mgr sound dispatch. Earlier blanket AI-key audio omissions are superseded;
 > full AI behavior, hearing, fire/extra and M2 acceptance remain open.

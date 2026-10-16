@@ -101,6 +101,9 @@ namespace OpenBlood2
         if (!victim || g.server.SetObjectDims(victim, &dimensions) != DE_OK || !ai->SetNewTarget(victim) ||
             !ai->RefreshTargetPosition())
             return false;
+        ai->m_fHearingDist = 1000;
+        if (!ai->HandleTrigger(victim, "SOUND_TRIGGER 2"))
+            return false;
         ai->diagnostic_target = victim;
         g.server.SetNextUpdate(h, .001f);
         id = r->id;
@@ -112,9 +115,11 @@ namespace OpenBlood2
         const auto* ai = r ? dynamic_cast<const AIFireProbe*>(r->game.get()) : nullptr;
         const auto* target =
             ai ? dynamic_cast<const AIFireTarget*>(g.server.HandleToObject(ai->diagnostic_target)) : nullptr;
-        return ai && target && ai->fire_shots > 2 && ai->animation_finishes > 0 && ai->fire_failures == 0 &&
-               ai->state_failures == 0 && ai->key_failures == 0 && ai->audio_starts > 0 &&
-               target->damage.m_fHitPoints < 10000 && ai->m_InventoryMgr.GetAmmoCount(AMMO_BULLET) < 100;
+        return ai && target && ai->hearing_reactions == 1 && ai->trigger_failures == 0 &&
+               ai->trigger_outcome == AI_Mgr::TriggerOutcome::Heard && ai->fire_shots > 2 &&
+               ai->animation_finishes > 0 && ai->fire_failures == 0 && ai->state_failures == 0 &&
+               ai->key_failures == 0 && ai->audio_starts > 0 && target->damage.m_fHitPoints < 10000 &&
+               ai->m_InventoryMgr.GetAmmoCount(AMMO_BULLET) < 100;
     }
     bool prepare_ai_state_smoke(GameSession& g, ObjectId& id)
     {

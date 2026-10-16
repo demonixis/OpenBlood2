@@ -130,9 +130,17 @@ bool CPlayerObj::PlayPlayerSound(std::string_view sound, float radius, DBYTE vol
         request.priority = static_cast<DBYTE>(priority + 4); // Original PLAYER base + caller modifier.
         m_hCurSound = server->PlayCharacterSound(m_hObject, request, true, sound_error);
     }
-    // Original SendSoundTrigger happens after every playback attempt. AI lists/receivers
-    // are not imported: count the missing operation explicitly, never claim delivery.
-    ++unavailable_sound_alerts;
+    // Source alerts after every playback attempt, including a missing WAV.
+    DVector position;
+    ++sound_alerts;
+    sound_alert = {};
+    if (server->GetObjectPos(m_hObject, &position) != DE_OK)
+    {
+        sound_alert.error = "Player sound position unavailable";
+        ++unavailable_sound_alerts;
+    }
+    else if (!SendSoundTrigger(m_hObject, 2, position, radius, sound_alert))
+        ++unavailable_sound_alerts;
     if (m_hCurSound)
         ++sound_starts;
     else

@@ -1,5 +1,9 @@
 # Original AI state decisions and stationary actions
 
+> Extended by [AI command/hearing contracts](AI_TRIGGER_CONTRACTS.md): player sound
+> alerts, original hearing reactions and selected trigger commands now execute.
+> Complete production NPCs and M2 remain open.
+
 > Extended by [AI weapon-action contracts](AI_FIRE_CONTRACTS.md): supported weapon
 > choice, aiming, clearance, standing fire and AI fire_key now execute. Earlier
 > blanket weapon/fire omissions are historical; full NPCs and M2 remain open.

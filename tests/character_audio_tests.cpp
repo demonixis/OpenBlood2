@@ -190,7 +190,7 @@ namespace
         CHECK(old && p->sound_starts == 1 && p->pending_model_commands.empty());
         CHECK(key(g, h, "play_sound", "missing"));
         CHECK(!g.server.audio.get(old) && !p->m_hCurSound && p->sound_failures == 1 &&
-              p->unavailable_sound_alerts == 2);
+              p->unavailable_sound_alerts == 0 && p->sound_alerts == 2 && p->sound_alert.complete);
         CHECK(key(g, h, "play_sound", "cue.wav") && p->sound_resource == "sounds\\chosen\\caleb\\cue.wav.wav" &&
               !p->m_hCurSound);
         CHECK(p->PlayPlayerSound("sounds/chosen/caleb/cue.wav", 1000, 255, false, 0));
@@ -482,8 +482,8 @@ namespace
             g.client_shell.movement_input = {};
             std::cout << "cycle=" << cycle << " keys=" << p->sound_keys << " starts=" << p->sound_starts
                       << " material=" << p->m_eLastSurface << " last=" << p->sound_resource << '\n';
-            CHECK(heard && p->sound_starts > 0 && p->sound_failures == 0 &&
-                  p->unavailable_sound_alerts == p->sound_attempts);
+            CHECK(heard && p->sound_starts > 0 && p->sound_failures == 0 && p->unavailable_sound_alerts == 0 &&
+                  p->sound_alerts == p->sound_attempts && p->sound_alert.complete);
             CHECK(g.unload_world() && g.server.audio.voices().empty() && g.server.audio.cached_clips() == 0 &&
                   !g.server.audio.get(old));
         }

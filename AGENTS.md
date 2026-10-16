@@ -273,3 +273,10 @@ The [AI perception continuation](../Documentation/Implementation/M2_AI_PERCEPTIO
 The [AI state/action continuation](../Documentation/Implementation/M2_AI_STATES.md) adds original transitions, Cultist/Civilian decisions and stationary idle/talk/special commands. Read [contracts](docs/AI_STATE_CONTRACTS.md). Preserve strict idle deadline, last-state exclusions, idle/talk command sharing, special-action random draws and failed-perception guards. Animation resize uses the documented atomic foot-anchored replacement. Diagnostic dispatch is not AI_Update; production NPCs, combat/navigation/death, required FX and ExitTrigger remain unavailable. M2 stays open.
 
 The [AI weapon-action continuation](../Documentation/Implementation/M2_AI_FIRE.md) connects original weapon choice, supported aiming/clearance, standing fire and fire_key delivery. Read [contracts](docs/AI_FIRE_CONTRACTS.md). Preserve raw-ammo selection, strict cadence/range, initial-miss versus head-retry behavior, cached-head writes, dry acceptance and independent completion increments. Player eye alignment must remain player-only. Missing switch columns/services fail; diagnostic firing does not register production NPCs or implement AI_Update. Navigation/death, required FX and ExitTrigger still keep M2 open.
+
+The [AI command/hearing continuation](../Documentation/Implementation/M2_AI_TRIGGERS.md) connects selected original HandleTrigger,
+PlayAnimation, SendSoundTrigger and player sound alerts. Read [contracts](docs/AI_TRIGGER_CONTRACTS.md). Preserve
+source command early returns, exact hearing boundaries, reversed gunfire class test,
+impact guards, two-faction order/duplicates and alert-after-playback-failure. Snapshot
+checked identities across callbacks; delivery is not reaction. Scripts and full NPC
+initialization/AI_Update/deactivation remain unavailable; M2 stays open.

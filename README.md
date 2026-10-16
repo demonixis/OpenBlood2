@@ -1,14 +1,10 @@
 # Blood II Reconstruction aka OpenBlood2
 
-Latest gameplay continuation: [original AI weapon actions](../Documentation/Implementation/M2_AI_FIRE.md) connects
-weapon choice, aiming/clearance, standing fire and model-key shots with inspection.
-Full AI_Update and production NPCs, navigation/death, required FX, ExitTrigger and
-the actual M2 gate remain open.
-
-Latest gameplay continuation: [original AI perception](../Documentation/Implementation/M2_AI_PERCEPTION.md) adds faction membership,
-radius/FOV/visibility selection, stimulus priorities and ExitHint. These commands
-run against the real player in diagnostic probes; original NPC states/actions,
-client FX, ExitTrigger and the M2 exit gate remain incomplete.
+Latest gameplay continuation: [original AI commands and hearing](../Documentation/Implementation/M2_AI_TRIGGERS.md) connects
+trigger commands, two-faction broadcasts and player sound alerts, building on
+[weapon actions](../Documentation/Implementation/M2_AI_FIRE.md) and [perception](../Documentation/Implementation/M2_AI_PERCEPTION.md).
+Full NPC initialization/AI_Update, required actions, client FX and ExitTrigger
+still block the actual M2 gate.
 
 A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory, KeyPickup, original player USE, RotatingDoor, RotatingBrush, selected CDestructableBrush damage/removal and original CDebris explosive area damage and BoxPhysics pushable/gravity brushes with original damage impulses are connected. Original ammo/health/armor pickups and destruction spawns extend this subset; complete player gameplay remains missing. This is not a playable game.
 
@@ -339,3 +335,11 @@ The [AI weapon-action continuation](docs/AI_FIRE_CONTRACTS.md) passes 384/384 De
 and inspector-free Release checks (27 GPU), plus 136 targeted headless ASan/UBSan/
 leak checks. Selection, clearance, timed/key firing, real damage and deferred removal
 are verified for the bounded path; required production NPCs and M2 remain open.
+
+The [AI command/hearing continuation](docs/AI_TRIGGER_CONTRACTS.md) connects original trigger commands,
+two-faction sound broadcasts and actual player alerts. Search/dodge/attack selection
+is inspectable but their complete NPC actions and the M2 gate remain unavailable.
+
+Command/hearing verification: 393/393 Debug and inspector-free Release checks
+(27 GPU each), 145 targeted ASan/UBSan/leak checks, and 19/19 final Debug hearing/audio
+checks after numeric-validation refinements. See the [evidence](../Documentation/Implementation/M2_AI_TRIGGERS.md).
