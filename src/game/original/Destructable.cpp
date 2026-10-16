@@ -1,5 +1,6 @@
 // Selected shared damage/lifetime and brush trigger branches; see M2_BRUSH_SOURCES.json.
 #include "Destructable.h"
+#include "AI_Mgr.h"
 #include "engine/collision.h"
 #include "engine/objects.h"
 #include "spawn_object.h"
@@ -34,6 +35,13 @@ DBOOL CDestructable::Init(HOBJECT object, CInventoryMgr* inventory)
     }
     m_pInventoryMgr = inventory;
     return DTRUE;
+}
+HOBJECT CDestructable::GetLastDamager()
+{
+    auto* server = BaseClass::GetServerDE();
+    if (!server || !server->IsObjectAlive(last_damager_))
+        last_damager_ = nullptr;
+    return last_damager_;
 }
 void CDestructable::CalculateResistance(DBYTE value)
 {
@@ -173,6 +181,10 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
             m_fHitPoints -= amount;
             m_fLastDamageAmount += amount;
             last_damage = damage;
+            // Original AI-only retaliation identity; limb multipliers remain unavailable.
+            // A checked token avoids sharing/breaking the AI target's directed link.
+            if (dynamic_cast<AI_Mgr*>(owner) && damage.type != OpenBlood2::DamageType::Death)
+                last_damager_ = damage.attacker;
             if (m_fHitPoints <= 0)
             {
                 m_bDead = DTRUE;

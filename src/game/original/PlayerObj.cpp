@@ -2,6 +2,7 @@
 // docs/M2_PLAYER_SOURCES.json. This is an executable lifecycle port, not the
 // complete 7,657-line PlayerObj gameplay implementation.
 #include "PlayerObj.h"
+#include "AI_Mgr.h"
 #include "GameStartPoint.h"
 #include <algorithm>
 #include <cmath>
@@ -37,6 +38,7 @@ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
 }
 CPlayerObj::~CPlayerObj()
 {
+    AI_Mgr::RemovePlayer(*this);
     auto* server = GetServerDE();
     if (m_hCurSound)
         server->KillSound(m_hCurSound);
@@ -70,6 +72,7 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
     if (!m_InventoryMgr.Init(m_hObject, m_hClient) || !m_damage.Init(m_hObject, &m_InventoryMgr) ||
         !server->SetBlockingPriority(m_hObject, 50))
         return DFALSE;
+    AI_Mgr::InsertPlayer(*this);
     m_bFirstUpdate = DTRUE;
     m_InventoryMgr.SetAmmoCount(1, 50);
     server->SetNextUpdate(m_hObject, .001f);

@@ -11,8 +11,8 @@ namespace OpenBlood2
                            "behavior remain unported.");
         if (ImGui::CollapsingHeader("Live attachments", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            ImGui::TextWrapped("Held models follow current parent nodes. Visual children only; skins and first-person "
-                               "visibility SFX are not rendered.");
+            ImGui::TextWrapped("Held models follow current parent nodes. Physical/nested attachments and dropped "
+                               "weapons remain unavailable.");
             for (const auto& [id, a] : game.objects.attachments())
             {
                 const auto* parent = game.objects.get(a.parent);
@@ -58,7 +58,42 @@ namespace OpenBlood2
         ImGui::TableNextColumn();
         const auto* r = game.objects.get(skeleton_selection);
         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
-        if (target_ai && ImGui::CollapsingHeader("Original AI target / facing", ImGuiTreeNodeFlags_DefaultOpen))
+        if (target_ai && ImGui::CollapsingHeader("Original AI perception", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& ai = *target_ai;
+            ImGui::Text("Faction: %s | Cabal %u / Monster %u (player in both)", ai.m_bCabal ? "Cabal" : "Monster",
+                        AI_Mgr::m_dwNumCabal, AI_Mgr::m_dwNumMonster);
+            ImGui::Text("Ranges: sight %.1f / smell %.1f / sense %.1f", ai.m_fSeeingDist, ai.m_fSmellingDist,
+                        ai.m_fSensingDist);
+            ImGui::Text("Stimulus %d | damage memory %s | calls %llu / failures %llu", ai.stimulus,
+                        ai.from_damage ? "used" : "not used", (unsigned long long)ai.perception_calls,
+                        (unsigned long long)ai.perception_failures);
+            ImGui::Text("Strength: sight %.3f / smell %.3f / sense %.3f / health %.3f", ai.m_fStimuli[0],
+                        ai.m_fStimuli[2], ai.m_fStimuli[3], ai.m_fStimuli[5]);
+            auto report = [&](const char* label, const AIFindReport& query)
+            {
+                const auto* selected = game.objects.get(query.selected);
+                ImGui::Text("%s: %s | selected %s", label, query.valid ? "evaluated" : "not evaluated / failed",
+                            selected && selected->life == Life::Alive ? selected->state.m_Name : "none / removed");
+                ImGui::Text("Visited %u / eligible %u / rays %u | distance %.2f | origin %s", query.visited,
+                            query.eligible, query.rays, query.distance, query.origin_head ? "head" : "body");
+                if (!query.error.empty())
+                    ImGui::TextWrapped("%s", query.error.c_str());
+            };
+            report("Sight", ai.stimulus_queries[0]);
+            report("Smell", ai.stimulus_queries[1]);
+            report("Sense", ai.stimulus_queries[2]);
+            if (ImGui::TreeNode("Last radius query"))
+            {
+                report("Query", ai.find);
+                ImGui::TreePop();
+            }
+            if (!ai.perception_error.empty())
+                ImGui::TextWrapped("%s", ai.perception_error.c_str());
+            ImGui::TextWrapped("Recorded source perception commands. No automatic NPC update/state machine, navigation "
+                               "or attack yet.");
+        }
+        if (target_ai && ImGui::CollapsingHeader("Original AI target / facing"))
         {
             const auto* target = game.objects.get(target_ai->GetTarget());
             ImGui::Text("Target: %s | %s", target ? target->state.m_Name : "none / removed",
@@ -77,7 +112,7 @@ namespace OpenBlood2
             if (!target_ai->target_error.empty())
                 ImGui::TextWrapped("%s", target_ai->target_error.c_str());
             ImGui::TextWrapped(
-                "Explicit source commands only. Automatic perception, tracking and AI states remain unavailable.");
+                "Original target commands. State-driven updates, tracking and AI states remain unavailable.");
         }
         if (!r)
             ImGui::TextUnformatted("No selected model");
@@ -148,7 +183,7 @@ namespace OpenBlood2
                             (unsigned long long)ai->chance_suppressed, (unsigned long long)ai->busy_voices);
                 ImGui::Text("No target %llu | unavailable actions %llu", (unsigned long long)ai->no_target,
                             (unsigned long long)ai->unavailable_keys);
-                ImGui::TextWrapped("Key dispatcher only. AI states, target acquisition, attacks and special actions "
+                ImGui::TextWrapped("Key dispatcher only. AI states, attacks and special actions "
                                    "remain unavailable.");
             }
             if (character && ImGui::CollapsingHeader("Character motion keys",

@@ -517,3 +517,13 @@ geometry and the original fire/camera axes, then checked visually; no pixel-iden
 retail claim. Related [ABC v6 importer](https://github.com/haekb/io_scene_lithtech/blob/master/src/reader_abc_v6_pc.py)
 and [Godot reader](https://github.com/haekb/godot-abc-reader/blob/master/Models/ABC6.gd)
 were reviewed for quaternion inversion and the distinct winding flag; no code was imported.
+
+## M2 AI perception
+
+Selected original AI_Mgr list membership, FindObjectInRadius, ComputeStimuli and
+ChooseOpportunityTarget now execute with typed query reports and checked lifetime.
+Original player dual-faction membership and the small ExitHint class are imported.
+AI attacker memory adapts the original damage identity branch to safe tokens;
+local damage/limb behavior and timed-power activation remain incomplete. See
+[source ranges/hashes](M2_AI_PERCEPTION_SOURCES.json) and
+[contracts and explicit source-UB corrections](AI_PERCEPTION_CONTRACTS.md).

@@ -1,5 +1,9 @@
 # Original Player Entry Boundary
 
+> Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
+> candidate lists and stimulus/target selection now execute. Automatic NPC states
+> and complete M2 remain unavailable; earlier acquisition omissions are historical.
+
 > Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
 > voice helpers, player sound keys and material/liquid footsteps now execute.
 > Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.

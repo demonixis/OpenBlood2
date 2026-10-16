@@ -60,7 +60,13 @@ namespace OpenBlood2
         auto* ai = r ? dynamic_cast<AI_Mgr*>(r->game.get()) : nullptr;
         const auto* player = g.server_shell.Player(g.local_client);
         const auto* body = player ? g.objects.get(player->m_hObject) : nullptr;
-        if (!ai || !body || !ai->SetNewTarget(body->handle) || !ai->RefreshTargetPosition() || !ai->MC_FaceTarget())
+        if (!ai || !body || !ai->InsertMe())
+            return false;
+        ai->m_fSeeingDist = 1500;
+        ai->m_fSensingDist = 200;
+        const auto stimulus = ai->ComputeStimuli();
+        if ((stimulus != 1 && stimulus != 4) || ai->GetTarget() != body->handle || !ai->RefreshTargetPosition() ||
+            !ai->MC_FaceTarget())
             return false;
         const auto delta = vector_subtract(body->state.m_Pos, r->state.m_Pos);
         const auto forward = rotate_vector({0, 0, 1}, r->state.m_Rotation);

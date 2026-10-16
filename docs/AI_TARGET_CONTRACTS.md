@@ -1,5 +1,9 @@
 # Original explicit AI targets and facing
 
+> Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
+> candidate lists and stimulus/target selection now execute. Automatic NPC states
+> and complete M2 remain unavailable; earlier acquisition omissions are historical.
+
 M2 remains incomplete. This ports AI_Mgr::SetTarget, SetNewTarget,
 MC_FaceTarget, MC_FacePos and its target MID_LINKBROKEN branch. The isolated
 RefreshTargetPosition call selects the GetObjectPos statement from AI_Update;

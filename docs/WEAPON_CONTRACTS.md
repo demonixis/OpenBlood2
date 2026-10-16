@@ -1,5 +1,9 @@
 # Original Inventory and Vector Weapon Boundary
 
+> Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
+> candidate lists and stimulus/target selection now execute. Automatic NPC states
+> and complete M2 remain unavailable; earlier acquisition omissions are historical.
+
 > Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
 > pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
 

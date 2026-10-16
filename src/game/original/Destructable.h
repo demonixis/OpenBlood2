@@ -24,6 +24,11 @@ class CDestructable : public Aggregate
     {
         return m_bDead != 0;
     }
+    HOBJECT GetLastDamager();
+    void ClearLastDamager()
+    {
+        last_damager_ = nullptr;
+    }
     void CalculateResistance(DBYTE);
     bool Heal(float);
     bool MegaHeal(float);
@@ -55,6 +60,9 @@ class CDestructable : public Aggregate
     DDWORD EngineMessageFn(LPBASECLASS, DDWORD, void*, DFLOAT) override;
     DDWORD ObjectMessageFn(LPBASECLASS, HOBJECT, DDWORD, HMESSAGEREAD) override;
 
+  public:
+  private:
+    HOBJECT last_damager_ = nullptr; // Checked identity, never a borrowed C++ pointer.
   public:
     float m_fMaxHitPoints = 1, m_fMaxMegaHitPoints = 1, m_fMaxArmorPoints = 1, m_fMaxNecroArmorPoints = 1;
 };

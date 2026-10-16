@@ -1,5 +1,10 @@
 # Blood II Reconstruction aka OpenBlood2
 
+Latest gameplay continuation: [original AI perception](../Documentation/Implementation/M2_AI_PERCEPTION.md) adds faction membership,
+radius/FOV/visibility selection, stimulus priorities and ExitHint. These commands
+run against the real player in diagnostic probes; original NPC states/actions,
+client FX, ExitTrigger and the M2 exit gate remain incomplete.
+
 A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory, KeyPickup, original player USE, RotatingDoor, RotatingBrush, selected CDestructableBrush damage/removal and original CDebris explosive area damage and BoxPhysics pushable/gravity brushes with original damage impulses are connected. Original ammo/health/armor pickups and destruction spawns extend this subset; complete player gameplay remains missing. This is not a playable game.
 
 The three runtime targets remain small: `engine` (resources, world/object runtime, configuration, SDL_GPU), `blood2_game` (original code and typed services) and `blood2_app` (`blood2`, optional Dear ImGui). No previous prototype is a build dependency, and no EnTT/ECS was introduced.
@@ -79,8 +84,8 @@ ctest --preset debug
 ctest --preset debug -L world
 ```
 
-The current suite has **274 synthetic headless tests**, **49 private headless tests**
-and **27 serial GPU tests** (350 total with the installation and GPU options enabled).
+The current suite has **283 synthetic headless tests**, **51 private headless tests**
+and **27 serial GPU tests** (361 total with the installation and GPU options enabled).
 Coverage includes bounded readers, original object/service behavior, player/weapon
 lifetime, movement, interactions, animation/attachments and real GPU presentation.
 Synthetic fixtures never substitute for private resource acceptance.
@@ -313,3 +318,9 @@ The [animated model continuation](docs/MODEL_VIEW_CONTRACTS.md) adds real ABC/he
 The animated-model continuation passes 350/350 tests in both Debug and inspector-free
 Release, including 27 GPU cases, plus 116/116 targeted Clang ASan/UBSan/leak checks.
 The final reader normalizes inverse rotations and model -Z into the engine basis.
+
+The [AI perception continuation](docs/AI_PERCEPTION_CONTRACTS.md) passes 361/361
+Debug and inspector-free Release checks, including 27 GPU cases, and all 334
+headless ASan/UBSan/leak cases. Player membership, candidate/stimulus rules and
+checked attacker lifetime are exercised; required original NPC states and the
+complete M2 gate remain open.

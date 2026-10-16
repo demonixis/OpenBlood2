@@ -1,0 +1,159 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "6ce71bba3ff3d99ba1aaeba31f51a1f8dfc8819a",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          150,
+          175
+        ],
+        [
+          244,
+          260
+        ],
+        [
+          1995,
+          2015
+        ],
+        [
+          2304,
+          2486
+        ],
+        [
+          2914,
+          3069
+        ]
+      ],
+      "use": "Faction lists, InsertMe, stimulus/optional target selection and radius search"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "selected_lines": [
+        [
+          34,
+          47
+        ],
+        [
+          136,
+          139
+        ]
+      ],
+      "use": "Original stimulus slots/types and FIND flag values"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          350,
+          362
+        ],
+        [
+          431,
+          443
+        ],
+        [
+          527,
+          537
+        ],
+        [
+          614,
+          622
+        ]
+      ],
+      "use": "Zero-initialized power bits, both-faction insertion and unlink"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.h",
+      "sha256": "fb92d0a74b30d2a13b0589a2e4f90658a366cc2163e1fe37d446b2b50ed1da4a",
+      "selected_lines": [
+        [
+          58,
+          68
+        ],
+        [
+          119,
+          119
+        ]
+      ],
+      "use": "Activation storage/query indices"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "selected_lines": [
+        [
+          188,
+          196
+        ],
+        [
+          438,
+          484
+        ]
+      ],
+      "use": "AI-only last-attacker identity and historical link lifetime"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Destructable.h",
+      "sha256": "00e289d9cca1594035c8f20d0d45a076009c765e2767ce545f22f16d33bfea45",
+      "selected_lines": [
+        [
+          95,
+          99
+        ]
+      ],
+      "use": "Last-damager getter/clear"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ExitHint.cpp",
+      "sha256": "e3939c2ad9729e960b05b3dc366769b85424de808bacb2b538204edf8b522103",
+      "selected_lines": [
+        [
+          1,
+          35
+        ]
+      ],
+      "use": "Original hint initialization and list insertion"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ExitHint.h",
+      "sha256": "3a90b2d27e388b91c5f634bfffe1f785051635f2e58c29c099b2f29217d600fb",
+      "selected_lines": [
+        [
+          1,
+          51
+        ]
+      ],
+      "use": "Original hint list lifetime"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BaseCharacter.h",
+      "sha256": "40160424f0b03f38b2513ba34e9abb44bc27d8a92b5735470d9d995f01d1face",
+      "selected_lines": [
+        [
+          37,
+          37
+        ]
+      ],
+      "use": "IsDead delegates to the damage aggregate"
+    }
+  ],
+  "adaptations": [
+    "Typed candidate-list selector avoids creatable incomplete AI registration",
+    "Initialized/idempotent list membership, checked pending/stale identities and bounded traversal",
+    "Current checked poses replace MoveObj cached transforms",
+    "Explicit failure for unavailable queries, undefined normalization/specific+avoid and unsafe non-character cast",
+    "Checked damage-memory identity replaces overlapping directed link; limb damage pipeline remains absent",
+    "Powerup activation storage/query only; timing/collection remain absent"
+  ],
+  "not_implemented": [
+    "Production NPCs, automatic AI_Update/state machine and navigation",
+    "AI auditory alerts, retention/death/scripts, Fire and special model keys",
+    "Timed powers, complete damage localization, required client FX and ExitTrigger/session",
+    "Retail/other-platform/XR parity"
+  ]
+}

@@ -1,5 +1,9 @@
 # Original AI visibility queries
 
+> Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
+> candidate lists and stimulus/target selection now execute. Automatic NPC states
+> and complete M2 remain unavailable; earlier acquisition omissions are historical.
+
 M2 remains incomplete. This ports AI_Mgr::CanSee and the two GlobalFilterFn flags
 it requests. See [source selections](M2_AI_SIGHT_SOURCES.json),
 [execution evidence](../../Documentation/Implementation/M2_AI_SIGHT.md),

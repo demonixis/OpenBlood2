@@ -7,6 +7,7 @@
 #include "game/original/ClientLightFX.h"
 #include "game/original/DetailSprite.h"
 #include "game/original/Door.h"
+#include "game/original/ExitHint.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/HandWeaponModel.h"
 #include "game/original/Key.h"
@@ -256,6 +257,7 @@ namespace OpenBlood2
                              &b2base,
                              construct<PathPoint>,
                              {{"ActionTarget", std::string{}}, {"ActionMessage", std::string{}}}};
+        const ClassInfo exit_hint{"ExitHint", &b2base, construct<ExitHint>, {}};
         const ClassInfo smell{"SmellHint", &b2base, construct<SmellHint>, {}};
         const ClassInfo character{"CBaseCharacter", &b2base, construct<CBaseCharacter>, {}};
         const ClassInfo player{"CPlayerObj", &character, construct<CPlayerObj>, {}};
@@ -587,23 +589,24 @@ namespace OpenBlood2
                objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
                objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
-               objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
-               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
-               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
-               objects.register_class(freefall) && objects.register_class(trigger) &&
-               objects.register_class(key_pickup) && objects.register_class(pickup) &&
-               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
-               objects.register_class(health_base) && objects.register_class(armor_base) &&
-               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
-               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
-               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
-               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
-               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
-               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
-               objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
-               objects.register_class(rotating_brush) && objects.register_class(hand_model);
+               objects.register_class(exit_hint) && objects.register_class(character) &&
+               objects.register_class(player) && objects.register_class(volume) && objects.register_class(water) &&
+               objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
+               objects.register_class(conveyor) && objects.register_class(damage) && objects.register_class(freefall) &&
+               objects.register_class(trigger) && objects.register_class(key_pickup) &&
+               objects.register_class(pickup) && objects.register_class(ammo_pickup) &&
+               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
+               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
+               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
+               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
+               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
+               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
+               objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
+               objects.register_class(necroward_pickup) && objects.register_class(objectives_trigger) &&
+               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+               objects.register_class(door) && objects.register_class(rotating_door) &&
+               objects.register_class(destructable_brush) && objects.register_class(rotating_brush) &&
+               objects.register_class(hand_model);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

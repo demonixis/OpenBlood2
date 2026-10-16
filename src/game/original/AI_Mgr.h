@@ -4,6 +4,30 @@
 
 namespace OpenBlood2
 {
+    enum class AIFindList
+    {
+        Enemies,
+        Smells,
+        Exits,
+        Ammo
+    };
+    enum AIFindFlags : unsigned
+    {
+        FindAvoidTarget = 1,
+        FindVisible = 2,
+        FindFaceObject = 4,
+        FindSpecific = 8
+    };
+    struct AIFindReport
+    {
+        AIFindList list = AIFindList::Enemies;
+        unsigned flags = 0, visited = 0, eligible = 0, rays = 0;
+        float range = 0, distance = 0;
+        DVector origin{};
+        HOBJECT selected = nullptr;
+        bool valid = false, origin_head = false;
+        std::string error;
+    };
     enum class AIKeyOutcome
     {
         None,
@@ -42,12 +66,32 @@ namespace OpenBlood2
 } // namespace OpenBlood2
 
 // Selective original AI_Mgr::InitStatics/OnStringKey port. No production AI class
-// registration, state machine, target acquisition, Fire or MC_Extra implementation yet.
+// registration, state machine, Fire or MC_Extra implementation yet.
+// Perception commands: AI_PERCEPTION_CONTRACTS.md; no automatic AI update loop.
 // Selected CanSee and explicit target/facing commands are documented in
 // AI_SIGHT_CONTRACTS.md and AI_TARGET_CONTRACTS.md.
 class AI_Mgr : public CBaseCharacter
 {
   public:
+    AI_Mgr();
+    ~AI_Mgr() override;
+    bool InsertMe();
+    static void InsertPlayer(CPlayerObj&);
+    static void RemovePlayer(CPlayerObj&);
+    static DLink m_CabalHead, m_MonsterHead;
+    static unsigned m_dwNumCabal, m_dwNumMonster;
+    bool m_bCabal = true;
+    float m_fSeeingDist = 0, m_fSmellingDist = 0, m_fSensingDist = 0;
+    std::array<float, 6> m_fStimuli{}; // sight, sound, smell, sense, threat, health
+    HOBJECT FindObjectInRadius(OpenBlood2::AIFindList, float, unsigned flags = 0, HCLASS specific = nullptr);
+    int ComputeStimuli(); // Original 0/1/3/4 results; -1 means a required query failed.
+    bool ChooseOpportunityTarget();
+    OpenBlood2::AIFindReport find;
+    std::array<OpenBlood2::AIFindReport, 3> stimulus_queries;
+    std::uint64_t perception_calls = 0, perception_failures = 0;
+    int stimulus = 0;
+    bool from_damage = false;
+    std::string perception_error;
     static constexpr int StateIdle = 5, StateScript = 101;
     bool InitStatics(std::shared_ptr<CAnim_Sound>);
     bool CanSee(HOBJECT);
@@ -87,6 +131,10 @@ class AI_Mgr : public CBaseCharacter
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
 
   private:
+    DLink m_Link{};
+    bool registered_cabal = true;
+    static void InitLists();
+    int PerceptionFailure(const char*);
     HOBJECT m_hTarget = nullptr;
     bool TargetFailure(const char*);
     // Original subclasses share class/gender tables and their retained voice.

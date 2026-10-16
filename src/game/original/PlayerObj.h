@@ -32,10 +32,26 @@ class CBaseCharacter : public B2BaseClass
     virtual bool OnStringKey(ArgList*);
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
 };
+enum PowerupType
+{
+    PU_NONE = -1,
+    PU_INVULNERABLE,
+    PU_INVISIBLE,
+    PU_TRIPLEDAMAGE,
+    PU_INCORPOREAL,
+    PU_SILENT,
+    PU_MAXTYPES
+};
 class CPlayerObj : public CBaseCharacter
 {
   public:
     ~CPlayerObj() override;
+    // Original activation storage/query only; collection/timing is still unported.
+    std::array<bool, PU_MAXTYPES> m_bPowerupActivated{};
+    bool IsPowerupActive(int index) const
+    {
+        return index >= 0 && index < PU_MAXTYPES && m_bPowerupActivated[index];
+    }
     bool PlayPlayerSound(std::string_view, float radius, DBYTE volume, bool stream, DBYTE priority = 2);
     OpenBlood2::SoundId m_hCurSound = 0;
     bool m_bDisableFootsteps = false, m_bNextFootstepLeft = true;
@@ -126,6 +142,8 @@ class CPlayerObj : public CBaseCharacter
     bool OnStringKey(ArgList*) override;
 
   private:
+    friend class AI_Mgr;
+    DLink m_CabalLink{}, m_MonsterLink{};
     OpenBlood2::PlayerStats last_sent_stats_{-1, -1, -1};
     std::minstd_rand idle_random_{1};
     float animation_start_ = 0;
