@@ -433,6 +433,10 @@ namespace
         std::uint64_t hidden_weapon_shots = 0;
         OpenBlood2::MovementControls controls;
         controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
+        controls.mouse_requested = options.view_world && !smoke;
+        std::string mouse_error;
+        auto* initial_controlled = game.objects.get(game.client_shell.player);
+        auto controlled_player = initial_controlled ? initial_controlled->id : OpenBlood2::ObjectId{};
         DVector hidden_position{};
         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
         unsigned forward_frames = 0, jump_frames = 0, crouch_frames = 0, run_frames = 0;
@@ -453,6 +457,9 @@ namespace
             SDL_Event event{};
             while (SDL_PollEvent(&event))
             {
+                const bool escape_releases_mouse =
+                    event.type == SDL_EVENT_KEY_DOWN && event.key.windowID == SDL_GetWindowID(runtime.window) &&
+                    event.key.scancode == SDL_SCANCODE_ESCAPE && (controls.mouse_requested || controls.mouse_captured);
                 controls.event(event, SDL_GetWindowID(runtime.window));
                 if (options.movement_smoke &&
                     (event.type == SDL_EVENT_WINDOW_FOCUS_LOST || event.type == SDL_EVENT_WINDOW_FOCUS_GAINED))
@@ -474,7 +481,8 @@ namespace
                 }
                 if (event.type == SDL_EVENT_WINDOW_RESIZED && event.window.windowID == SDL_GetWindowID(runtime.window))
                     resized = true;
-                if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat)
+                if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat &&
+                    event.key.windowID == SDL_GetWindowID(runtime.window))
                 {
 #if BLOOD2_INSPECTOR
                     if (event.key.key == SDLK_F1)
@@ -482,10 +490,10 @@ namespace
                         inspector_visible = !inspector_visible;
                         ++toggles;
                     }
-                    if (event.key.key == SDLK_ESCAPE && !ImGui::GetIO().WantCaptureKeyboard)
+                    if (event.key.key == SDLK_ESCAPE && !escape_releases_mouse && !ImGui::GetIO().WantCaptureKeyboard)
                         done = true;
 #else
-                    if (event.key.key == SDLK_ESCAPE)
+                    if (event.key.key == SDLK_ESCAPE && !escape_releases_mouse)
                         done = true;
 #endif
                 }
@@ -503,6 +511,7 @@ namespace
             const double delta = smoke ? 1.0 / 60.0 : static_cast<double>(tick - previous_tick) / 1e9;
             previous_tick = tick;
             game.client_shell.movement_input = {};
+            game.client_shell.weapon_input = {};
             bool text_editing = false;
 #if BLOOD2_INSPECTOR
             inspector.apply_commands(game, selection);
@@ -545,6 +554,30 @@ namespace
             if (options.pickups_smoke && frames == reload_frame + 1)
                 if (!OpenBlood2::prepare_pickup_smoke(game, smoke_pickup))
                     return 4;
+            const auto* controlled = game.objects.get(game.client_shell.player);
+            const auto current_player = controlled ? controlled->id : OpenBlood2::ObjectId{};
+            if (current_player != controlled_player)
+            {
+                controls.player_changed();
+                controlled_player = current_player;
+                game.client_shell.weapon_input = {};
+            }
+            const bool was_captured = controls.mouse_captured;
+            if (!controls.sync_mouse(runtime.window, game.client_shell.m_bInWorld, text_editing, mouse_error))
+                spdlog::error("Mouse capture: {}", mouse_error);
+#if BLOOD2_INSPECTOR
+            inspector.mouse_captured = controls.mouse_captured;
+            inspector.mouse_error = mouse_error;
+            if (was_captured != controls.mouse_captured)
+                inspector_visible = !controls.mouse_captured;
+#else
+            (void)was_captured;
+#endif
+            const auto fire_buttons = controls.sample_fire(text_editing);
+            game.client_shell.weapon_input.primary |= fire_buttons.primary;
+            game.client_shell.weapon_input.alternate |= fire_buttons.alternate;
+            if (!controls.focused && !smoke)
+                game.client_shell.weapon_input = {};
             game.client_shell.use_down = controls.sample_use(text_editing);
             auto keyboard = controls.sample(text_editing);
             auto& movement = game.client_shell.movement_input;
@@ -576,7 +609,7 @@ namespace
                     spdlog::error("{}", error);
                     return 6;
                 }
-                game.client_shell.weapon_input = {frames < 120, frames >= 120, false};
+                // Fire controls arrive via SDL events below, through the normal input adapter.
             }
             if (options.containers_smoke && frames == 2)
             {
@@ -964,6 +997,29 @@ namespace
             if (smoke)
             {
                 bool event_ok = true;
+                if (options.weapons_smoke)
+                {
+                    auto key = [&](SDL_Scancode code, bool down)
+                    {
+                        SDL_Event e{};
+                        e.type = down ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
+                        e.key.windowID = SDL_GetWindowID(runtime.window);
+                        e.key.scancode = code;
+                        e.key.down = down;
+                        return SDL_PushEvent(&e);
+                    };
+                    if (frames == 2 || frames == reload_frame + 1)
+                    {
+                        SDL_Event focus{};
+                        focus.type = SDL_EVENT_WINDOW_FOCUS_GAINED;
+                        focus.window.windowID = SDL_GetWindowID(runtime.window);
+                        event_ok = SDL_PushEvent(&focus) && key(SDL_SCANCODE_F, true);
+                    }
+                    if (frames == 119)
+                        event_ok = key(SDL_SCANCODE_F, false) && key(SDL_SCANCODE_G, true);
+                    if (frames == unload_frame - 1)
+                        event_ok = key(SDL_SCANCODE_G, false);
+                }
                 if (options.movement_smoke)
                 {
                     auto key_event = [&](SDL_Scancode code, bool down)
@@ -1346,6 +1402,7 @@ namespace
                                                     game.server.audio.output_error.empty();
                 }
                 game.client_shell.movement_input = {};
+                game.client_shell.weapon_input = {};
                 spdlog::info("Character audio: hidden={}, reentered={}, starts={}, surface={}, submitted={}",
                              character_audio_hidden, character_audio_reentered, player ? player->sound_starts : 0,
                              player ? int(player->m_eLastSurface) : -1, game.server.audio.submitted_frames);

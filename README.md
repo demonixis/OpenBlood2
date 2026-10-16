@@ -78,8 +78,11 @@ The inspector is now **collapsible and resizable**: click the title arrow to fol
 or unfold it, drag its borders to resize, or use F1 to hide/show it. After entering
 the player in Session, keyboard movement is enabled by default: **WASD/ZQSD**,
 **Shift** run, **Space** jump, **Ctrl** crouch, **arrows** look, **E** USE. **F2** toggles
-keyboard controls. SubwayA's original intro temporarily blocks movement; wait for
-it to end. See [input/UI evidence](../Documentation/Implementation/M2_CONTROLS.md).
+game controls. **F/G** fire primary/alternate; **F3** captures the mouse and hides inspection;
+**mouse** looks and **left/right buttons** fire. **Escape** releases the cursor for the inspector.
+SubwayA's original intro temporarily blocks movement/fire; wait for it to end.
+See [input/UI evidence](../Documentation/Implementation/M2_CONTROLS.md) and
+[keyboard/mouse evidence](../Documentation/Implementation/M2_PLAYER_CONTROLS.md).
 
 Previous death prerequisite: [original NPC weapon drops](../Documentation/Implementation/M2_WEAPON_DROPS.md)
 connects detached Beretta physics, original pickups and player collection. Corpses/gibs,
@@ -101,7 +104,7 @@ The three runtime targets remain small: `engine` (resources, world/object runtim
 
 The [diagnostic 3D view](docs/WORLD_VIEW_CONTRACTS.md) now renders actual level
 geometry and current moving brushes through SDL_GPU. Run `./build/debug/blood2 --view-world` to enter the original player/cameras with
-keyboard controls enabled. F1 opens inspection. [Original DTX textures](docs/TEXTURE_CONTRACTS.md) now appear as unlit opaque materials. [Existing models and first-person weapons](docs/MODEL_VIEW_CONTRACTS.md) now render too;
+keyboard controls enabled and mouse capture requested. F1/Escape release the cursor for inspection. [Original DTX textures](docs/TEXTURE_CONTRACTS.md) now appear as unlit opaque materials. [Existing models and first-person weapons](docs/MODEL_VIEW_CONTRACTS.md) now render too;
 full combat and M2 completion remain pending. The world shader currently requires
 Vulkan/SPIR-V; other backend artifacts remain unimplemented.
 
@@ -530,3 +533,6 @@ Earlier impact-audio omissions are superseded for Beretta/knife; impact visuals,
 
 The [weapon impact sprite continuation](../Documentation/Implementation/M2_WEAPON_SPRITES.md) connects original wood/stone flashes and smoke with tint, detached lifetime and in-game inspection.
 Other impact components remain unavailable. User playtest fixes (mouse look/fire, non-attacking NPCs, train glass) take priority over more FX; M2 stays open.
+
+The [keyboard/mouse continuation](../Documentation/Implementation/M2_PLAYER_CONTROLS.md) adds F/G primary/alternate fire, F3 mouse capture, mouse look and left/right button fire. Escape releases the cursor for inspection.
+NPC attack and train-glass reports remain unresolved; M2 is still incomplete.

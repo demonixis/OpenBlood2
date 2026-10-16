@@ -27,7 +27,8 @@ namespace OpenBlood2
         ObjectId skeleton_selection{};
         void draw_skeleton(GameSession&, ObjectSelection&);
         bool select_session = false;
-        bool select_movement = false, keyboard_movement = true;
+        bool select_movement = false, keyboard_movement = true, mouse_captured = false;
+        std::string mouse_error;
         bool collapsed = false;
         bool select_containers = false;
         bool select_triggers = false;

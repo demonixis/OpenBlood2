@@ -415,11 +415,19 @@ namespace OpenBlood2
                                game.world_path.empty() ? "ORIGINAL OBJECT DIAGNOSTICS" : "M2  /  WORLD INSPECTION");
             ImGui::TextWrapped("Original objects, ABC animation and primary-world collision. Full original player "
                                "session remains blocked.");
-            ImGui::TextDisabled("Title arrow: fold/unfold | Drag borders: resize | F1: hide/show | Escape: quit");
-            ImGui::Checkbox("Keyboard movement (F2)", &keyboard_movement);
+            ImGui::PushTextWrapPos(0);
+            ImGui::TextDisabled("Title arrow: fold/unfold | Drag borders: resize | F1: inspector | F3: mouse capture | "
+                                "Esc: release/quit");
+            ImGui::PopTextWrapPos();
+            ImGui::Checkbox("Game controls (F2)", &keyboard_movement);
             ImGui::TextWrapped("WASD / ZQSD: walk | Shift: run | Space: jump | Ctrl: crouch | Arrows: look | E: use");
+            ImGui::TextWrapped(
+                "F3: capture mouse and hide inspector | Mouse: look | Left/F: fire | Right/G: alternate fire");
+            ImGui::Text("Mouse: %s", mouse_captured ? "captured" : "released for UI");
+            if (!mouse_error.empty())
+                ImGui::TextWrapped("Mouse capture failed: %s", mouse_error.c_str());
             if (!game.client_shell.m_bInWorld)
-                ImGui::TextDisabled("Enter the player in Session to use the keyboard.");
+                ImGui::TextDisabled("Enter the player in Session to use game controls.");
             else if (game.client_shell.view.object && !game.client_shell.view.settings.player_movement)
                 ImGui::TextDisabled("The original cinematic currently blocks movement. Controls return when it ends.");
             ImGui::Separator();
@@ -1541,8 +1549,8 @@ namespace OpenBlood2
                 }
                 ImGui::PopID();
             }
-            ImGui::TextWrapped("Ordered historical contacts; resolve handles before inspection. Impact visuals, decals "
-                               "and reverb remain unavailable.");
+            ImGui::TextWrapped("Ordered historical contacts; resolve handles before inspection. Wood/stone flash and "
+                               "smoke are connected; remaining impact FX, decals and reverb are unavailable.");
             ImGui::TreePop();
         }
         if (!ImGui::TreeNodeEx("Original weapon fire audio", ImGuiTreeNodeFlags_DefaultOpen))

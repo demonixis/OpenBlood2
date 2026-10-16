@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "8a1f4f0bbeeb85a8bc3cb0b01835946dc4787d28",
+  "source_files": [
+    {
+      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "use": "CalculateCameraRotation and original client input context; not imported as a new mouse implementation"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
+      "use": "Existing CViewWeapon firing state and animation key path retained"
+    }
+  ],
+  "adaptations": [
+    "Application-only SDL event mapping and cursor ownership; no newly imported game method.",
+    "Explicit new key bindings and relative mouse sensitivity, not retail input configuration.",
+    "Existing typed CViewWeapon/FIRE_KEY/server fire and MoveMgr paths unchanged."
+  ],
+  "remaining": [
+    "NPC attack playtest issue",
+    "train-window material issue",
+    "complete input devices/rebinding",
+    "safe NEW_LEVEL and M2"
+  ]
+}

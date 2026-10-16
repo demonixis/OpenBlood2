@@ -488,3 +488,7 @@ Keep the 64-contact bound, explicit partial failures, checked callback lifetime 
 The [weapon impact sprite continuation](../Documentation/Implementation/M2_WEAPON_SPRITES.md) connects original wood/stone flashes and smoke with tint, detached lifetime and in-game inspection.
 Read [contracts](docs/WEAPON_SPRITE_CONTRACTS.md). Preserve first-update/delay quirks, per-callback motion, first-container visibility and independent sibling failures.
 Other impact components remain unavailable. User playtest fixes (mouse look/fire, non-attacking NPCs, train glass) take priority over more FX; M2 stays open.
+
+The [keyboard/mouse control fix](../Documentation/Implementation/M2_PLAYER_CONTROLS.md) connects F/G and captured mouse firing plus relative mouse look to existing original gameplay.
+Read [contracts](docs/PLAYER_CONTROL_CONTRACTS.md). Preserve UI-only uncaptured clicks, one-time delta consumption, focus/player-change resets and original FIRE_KEY/camera gates.
+F3 captures, Escape releases; --view-world requests capture initially. Next priorities are non-attacking NPCs and train glass, before further cosmetic FX. M2 remains open.

@@ -821,3 +821,10 @@ with typed owned settings, bounded detached lifetime and existing SDL_GPU sprite
 See [ledger](M2_WEAPON_SPRITE_SOURCES.json) and [contracts](WEAPON_SPRITE_CONTRACTS.md).
 Per-callback motion, first-update/delay quirks and wood tint are retained; absent
 composite branches and portable RNG/raster differences stay explicit.
+
+## Keyboard fire and relative mouse
+
+The [application controls](PLAYER_CONTROL_CONTRACTS.md) are new SDL mapping/cursor
+ownership code. They feed the already ported original weapon state machine, FIRE_KEY
+and player rotation; no new game method or reference engine is imported.
+See [ledger](M2_PLAYER_CONTROL_SOURCES.json).
