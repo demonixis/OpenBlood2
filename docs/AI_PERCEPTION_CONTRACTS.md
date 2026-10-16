@@ -1,5 +1,9 @@
 # Original AI perception and candidate lists
 
+> Extended by [AI state/action contracts](AI_STATE_CONTRACTS.md): selected original
+> state decisions, transitions and stationary animation commands now execute.
+> Full AI_Update and production NPCs remain unavailable; M2 is still open.
+
 M2 remains incomplete. Selected original `AI_Mgr::FindObjectInRadius`,
 `ComputeStimuli`, `ChooseOpportunityTarget`, faction membership and `ExitHint`
 now execute. There is still no production CivilianAI/CultistAI/Gideon registration

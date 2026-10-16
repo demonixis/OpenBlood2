@@ -1,0 +1,116 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "2b2096495668d166a27981d5cccf9e5fdf506dee",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          94,
+          238
+        ],
+        [
+          291,
+          369
+        ],
+        [
+          1907,
+          1981
+        ],
+        [
+          2257,
+          2298
+        ],
+        [
+          3139,
+          3157
+        ],
+        [
+          3965,
+          4020
+        ],
+        [
+          5527,
+          5551
+        ],
+        [
+          6358,
+          6420
+        ]
+      ],
+      "use": "State parsing/transitions, Move stop branch, animation selection, idle/talk/special commands and idle/passive handlers; selected dispatch only"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "selected_lines": [
+        [
+          34,
+          113
+        ],
+        [
+          175,
+          175
+        ],
+        [
+          374,
+          380
+        ]
+      ],
+      "use": "State/command numbers, idle wait and StopVelocity"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
+      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
+      "selected_lines": [
+        [
+          339,
+          366
+        ],
+        [
+          493,
+          639
+        ]
+      ],
+      "use": "Civilian state decisions, idle and Special1..8 actions"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CultistAI.cpp",
+      "sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
+      "selected_lines": [
+        [
+          269,
+          332
+        ]
+      ],
+      "use": "Cultist state decisions, including EscapeRun fallthrough"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "selected_lines": [
+        [
+          727,
+          731
+        ]
+      ],
+      "use": "Original obsolete dimension-service declarations; not an implementation of the retail solver"
+    }
+  ],
+  "adaptations": [
+    "Boolean failure and checked identities; no production NPC registration",
+    "Bounded ASCII state parsing and explicit unsupported state actions",
+    "Current checked body position replaces MoveObj cached transform",
+    "Existing foot-anchored atomic ResizeObject replaces old SetObjectDims2; not retail parity",
+    "Stop velocity validated before state-field commit; failed perception cannot select a state",
+    "Eight original Civilian special virtual functions consolidated into one indexed override",
+    "Diagnostic scheduler is separate from missing original AI_Update"
+  ],
+  "not_implemented": [
+    "Complete NPC initialization/properties/AI_Update, deactivation and retention",
+    "MC_BestWeapon, navigation, escape/hide, recoil/death, combat, scripts and hearing",
+    "Required FX and ExitTrigger; complete M2 gate",
+    "Retail, other-platform and XR parity"
+  ]
+}

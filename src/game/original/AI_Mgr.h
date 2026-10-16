@@ -66,7 +66,7 @@ namespace OpenBlood2
 } // namespace OpenBlood2
 
 // Selective original AI_Mgr::InitStatics/OnStringKey port. No production AI class
-// registration, state machine, Fire or MC_Extra implementation yet.
+// registration or complete AI_Update, Fire or MC_Extra implementation yet.
 // Perception commands: AI_PERCEPTION_CONTRACTS.md; no automatic AI update loop.
 // Selected CanSee and explicit target/facing commands are documented in
 // AI_SIGHT_CONTRACTS.md and AI_TARGET_CONTRACTS.md.
@@ -92,7 +92,70 @@ class AI_Mgr : public CBaseCharacter
     int stimulus = 0;
     bool from_damage = false;
     std::string perception_error;
-    static constexpr int StateIdle = 5, StateScript = 101;
+    // Original numeric state IDs. Selection does not imply an implemented action.
+    enum State : int
+    {
+        StateAttackClose = 0,
+        StateAttackFar = 1,
+        StateSearchVisual = 2,
+        StateEscapeHide = 3,
+        StateEscapeRun = 4,
+        StateIdle = 5,
+        StateGuard = 6,
+        StateFindHealth = 7,
+        StateFindAmmo = 8,
+        StateHide = 9,
+        StateDodge = 10,
+        StateTeleport = 11,
+        StateEnemyAttach = 12,
+        StateAssistAlly = 13,
+        StateSearchSmell = 14,
+        StateSpecial1 = 15,
+        StateSpecial2 = 16,
+        StateSpecial3 = 17,
+        StateSpecial4 = 18,
+        StateSpecial5 = 19,
+        StateSpecial6 = 20,
+        StateSpecial7 = 21,
+        StateSpecial8 = 22,
+        StateSpecial9 = 23,
+        StatePassive = 24,
+        StateDying = 100,
+        StateScript = 101,
+        StateRecoil = 102,
+        StateJumpOver = 103,
+        StateCrawlUnder = 104,
+        StateWalkAround = 105,
+        StateRunAround = 106,
+        StateWalkTo = 107,
+        StateRunTo = 108,
+        StateInactive = 999
+    };
+    static bool StateStrToInt(std::string_view, int&);
+    bool SetNewState(int);
+    bool StopVelocity();
+    bool SetAnimation(DDWORD);
+    bool MC_Idle();
+    bool MC_Talk();
+    bool MC_Special(int);
+    // Only the original state-dispatch portion, not AI_Update/deactivation/retention.
+    bool DispatchState();
+    virtual bool ComputeState(int stimulus = -1);
+    virtual bool AI_STATE_Idle();
+    bool AI_STATE_Passive();
+    virtual bool AI_STATE_Special(int); // Consolidates the eight original virtual handlers.
+    int m_nLastState = StateIdle, m_nCurMetacmd = 1, m_nTrapped = 0;
+    DDWORD m_nCurAnimation = 999;
+    bool m_bAnimating = false, m_bHasTargeted = false;
+    float m_fWaitForIdleTime = 0;
+    DVector m_vDims{1, 1, 1}, m_vScale{1, 1, 1};
+    std::string m_szAIState = "IDLE";
+    std::uint64_t state_changes = 0, state_dispatches = 0, state_failures = 0;
+    std::uint64_t animation_starts = 0, animation_finishes = 0;
+    int requested_state = StateIdle, dispatched_state = StateIdle, animation_choice = -1;
+    DDWORD requested_animation = UINT32_MAX;
+    std::string state_error;
+
     bool InitStatics(std::shared_ptr<CAnim_Sound>);
     bool CanSee(HOBJECT);
     OpenBlood2::AISight sight;
@@ -127,6 +190,8 @@ class AI_Mgr : public CBaseCharacter
     std::string ai_key, ai_key_error, ai_sound_resource;
 
   protected:
+    bool StateFailure(const char*);
+    bool AnimationCommand(DDWORD clip, int command);
     bool OnStringKey(ArgList*) override;
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
 

@@ -1,5 +1,10 @@
 # Blood II Reconstruction aka OpenBlood2
 
+Latest gameplay continuation: [original AI state decisions/actions](../Documentation/Implementation/M2_AI_STATES.md) adds
+transitions, civilian/cultist decisions and stationary animation commands with
+inspection and explicit failure. Full AI_Update, production NPC actions, required
+FX, ExitTrigger and the actual M2 gate remain open.
+
 Latest gameplay continuation: [original AI perception](../Documentation/Implementation/M2_AI_PERCEPTION.md) adds faction membership,
 radius/FOV/visibility selection, stimulus priorities and ExitHint. These commands
 run against the real player in diagnostic probes; original NPC states/actions,
@@ -324,3 +329,8 @@ Debug and inspector-free Release checks, including 27 GPU cases, and all 334
 headless ASan/UBSan/leak cases. Player membership, candidate/stimulus rules and
 checked attacker lifetime are exercised; required original NPC states and the
 complete M2 gate remain open.
+
+The [AI state/action continuation](docs/AI_STATE_CONTRACTS.md) passes 372/372 Debug
+and inspector-free Release checks (27 GPU cases), and 115 targeted headless
+ASan/UBSan/leak checks. Stationary action completion, state decisions, failure and
+lifetime are tested; production NPCs and the complete M2 gate remain open.

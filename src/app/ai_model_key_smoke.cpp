@@ -1,10 +1,66 @@
 #include "ai_model_key_smoke.h"
 #include "engine/collision.h"
 #include "game/original/AI_Mgr.h"
+#include "game/original/CivilianAI.h"
 #include <cmath>
 #include <limits>
 namespace OpenBlood2
 {
+    namespace
+    {
+        // Explicit state-action driver for this smoke only. It does not implement
+        // the missing AI_Update (deactivation, retention, navigation, death, etc.).
+        class AIStateProbe : public CivilianAI
+        {
+            DDWORD EngineMessageFn(DDWORD message, void* data, DFLOAT value) override
+            {
+                if (message == MID_UPDATE)
+                {
+                    GetServerDE()->SetNextUpdate(m_hObject, .001f);
+                    if (!DispatchState())
+                        GetServerDE()->SetNextUpdate(m_hObject, 0);
+                }
+                return AI_Mgr::EngineMessageFn(message, data, value);
+            }
+        };
+    } // namespace
+    bool prepare_ai_state_smoke(GameSession& g, ObjectId& id)
+    {
+        static const ClassInfo type{"AIStateProbe",
+                                    g.objects.find_class("CBaseCharacter"),
+                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AIStateProbe>(); },
+                                    {}};
+        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
+            return false;
+        ObjectCreateStruct state;
+        state.m_ObjectType = OT_MODEL;
+        // Isolated diagnostic placement, not an authored NPC or a navigable actor.
+        state.m_Pos = {0, 10000, 0};
+        state.m_Flags = FLAG_MODELKEYS;
+        SAFE_STRCPY(state.m_Name, "Civilian action probe (no full AI_Update)");
+        SAFE_STRCPY(state.m_Filename, "models/enemies/f_civilian1.abc");
+        auto h = g.objects.create(&type, state);
+        auto* r = g.objects.get(h);
+        auto* ai = r ? dynamic_cast<AIStateProbe*>(r->game.get()) : nullptr;
+        if (!ai || !r->model)
+            return false;
+        auto table = std::make_shared<CAnim_Sound>();
+        if (!table->SetAnimationIndexes(h) || !table->SetSoundRoot("sounds/enemies/f_civ") || !ai->InitStatics(table))
+            return false;
+        ai->m_szAIState = "SPECIAL4";
+        if (!ai->ComputeState(0))
+            return false;
+        g.server.SetNextUpdate(h, .001f);
+        id = r->id;
+        return true;
+    }
+    bool check_ai_state_smoke(GameSession& g, ObjectId id)
+    {
+        const auto* r = g.objects.get(id);
+        const auto* ai = r ? dynamic_cast<const AIStateProbe*>(r->game.get()) : nullptr;
+        return ai && ai->state_dispatches > 1 && ai->animation_starts > 1 && ai->animation_finishes > 0 &&
+               ai->state_changes > 1 && ai->state_failures == 0 && ai->m_nState == AI_Mgr::StateSpecial4;
+    }
     bool prepare_ai_model_key_smoke(GameSession& g, ObjectId& id)
     {
         // Diagnostic registration only: never satisfies a required world AI class.

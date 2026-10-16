@@ -58,6 +58,27 @@ namespace OpenBlood2
         ImGui::TableNextColumn();
         const auto* r = game.objects.get(skeleton_selection);
         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+        if (target_ai && ImGui::CollapsingHeader("Original AI state actions", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& ai = *target_ai;
+            ImGui::TextWrapped("Selected original decisions and stationary actions. Full AI_Update, navigation, "
+                               "combat/death and production NPC registration remain unavailable.");
+            ImGui::Text("State %d | last %d | requested %d | dispatched %d", ai.m_nState, ai.m_nLastState,
+                        ai.requested_state, ai.dispatched_state);
+            ImGui::Text("Authored %s | metacmd %d / current %d | animating %s", ai.m_szAIState.c_str(), ai.Metacmd,
+                        ai.m_nCurMetacmd, ai.m_bAnimating ? "yes" : "no");
+            ImGui::Text("Transitions %llu | dispatches %llu | failures %llu", (unsigned long long)ai.state_changes,
+                        (unsigned long long)ai.state_dispatches, (unsigned long long)ai.state_failures);
+            ImGui::Text("Idle deadline %.2f | has targeted %s | trapped %d", ai.m_fWaitForIdleTime,
+                        ai.m_bHasTargeted ? "yes" : "no", ai.m_nTrapped);
+            ImGui::Text("Clip %u / requested %u | choice %d | starts %llu / finishes %llu", ai.m_nCurAnimation,
+                        ai.requested_animation, ai.animation_choice, (unsigned long long)ai.animation_starts,
+                        (unsigned long long)ai.animation_finishes);
+            ImGui::Text("Cached half extents %.2f %.2f %.2f | scale %.2f %.2f %.2f", ai.m_vDims.x, ai.m_vDims.y,
+                        ai.m_vDims.z, ai.m_vScale.x, ai.m_vScale.y, ai.m_vScale.z);
+            if (!ai.state_error.empty())
+                ImGui::TextWrapped("Unavailable/failed: %s", ai.state_error.c_str());
+        }
         if (target_ai && ImGui::CollapsingHeader("Original AI perception", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& ai = *target_ai;

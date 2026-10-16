@@ -1,5 +1,9 @@
 # Original AI animation keys
 
+> Extended by [AI state/action contracts](AI_STATE_CONTRACTS.md): selected original
+> state decisions, transitions and stationary animation commands now execute.
+> Full AI_Update and production NPCs remain unavailable; M2 is still open.
+
 M2 remains incomplete. This selectively ports AI_Mgr::InitStatics and OnStringKey,
 using the existing [character audio](CHARACTER_AUDIO_CONTRACTS.md),
 [motion keys](CHARACTER_MOTION_CONTRACTS.md), [camera](CAMERA_CONTRACTS.md) and

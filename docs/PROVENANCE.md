@@ -527,3 +527,12 @@ AI attacker memory adapts the original damage identity branch to safe tokens;
 local damage/limb behavior and timed-power activation remain incomplete. See
 [source ranges/hashes](M2_AI_PERCEPTION_SOURCES.json) and
 [contracts and explicit source-UB corrections](AI_PERCEPTION_CONTRACTS.md).
+
+## M2 AI state decisions and stationary actions
+
+Selected original AI_Mgr state parsing, transitions, animation commands, Idle and
+Passive handlers, CivilianAI decisions/Idle/Special1..8 and CultistAI decisions
+are imported with explicit failure and checked ownership. The diagnostic driver
+does not implement AI_Update or register partial NPCs. See
+[source ranges and hashes](M2_AI_STATE_SOURCES.json) and
+[contracts and dimension-service adaptation](AI_STATE_CONTRACTS.md).

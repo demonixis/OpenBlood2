@@ -1,5 +1,9 @@
 # Original character animations and node queries
 
+> Extended by [AI state/action contracts](AI_STATE_CONTRACTS.md): selected original
+> state decisions, transitions and stationary animation commands now execute.
+> Full AI_Update and production NPCs remain unavailable; M2 is still open.
+
 > Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
 > voice helpers, player sound keys and material/liquid footsteps now execute.
 > Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.

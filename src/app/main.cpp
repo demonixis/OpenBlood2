@@ -246,6 +246,11 @@ namespace
         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
             return 4;
         const auto original_ai_key = smoke_ai_key;
+        OpenBlood2::ObjectId smoke_ai_state{};
+        bool ai_state_hidden = false;
+        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_state_smoke(game, smoke_ai_state))
+            return 4;
+        const auto original_ai_state = smoke_ai_state;
         bool ai_sight_hidden = false;
         bool ai_target_hidden = false;
         bool hand_hidden = false;
@@ -301,7 +306,7 @@ namespace
         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
         inspector.select_skeleton = options.skeleton_smoke;
         if (options.skeleton_smoke)
-            inspector.skeleton_selection = smoke_ai_key;
+            inspector.skeleton_selection = smoke_ai_state;
         inspector.select_containers = options.containers_smoke;
         inspector.select_brushes = options.brushes_smoke;
         inspector.select_pickups = options.pickups_smoke;
@@ -521,6 +526,8 @@ namespace
                     old_hand =
                         game.server_shell.Player(game.local_client)->m_InventoryMgr.CurrentWeapon()->m_hHandAttachment;
             }
+            if (options.skeleton_smoke && !inspector_visible)
+                ai_state_hidden |= OpenBlood2::check_ai_state_smoke(game, smoke_ai_state);
             if (options.skeleton_smoke && !inspector_visible)
                 ai_target_hidden |= OpenBlood2::check_ai_target_smoke(game, smoke_ai_key);
             if (options.skeleton_smoke && !inspector_visible)
@@ -1040,6 +1047,20 @@ namespace
                 spdlog::info("AI sight probe: hidden={}, reentered={}, old handle invalidated={}", ai_sight_hidden,
                              ai_sight_reentered, !game.objects.get(original_ai_key));
             }
+            bool ai_state_reentered = !options.skeleton_smoke;
+            if (options.skeleton_smoke)
+            {
+                if (game.objects.get(original_ai_state) || !OpenBlood2::prepare_ai_state_smoke(game, smoke_ai_state))
+                    return 4;
+                for (int i = 0; i < 360 && !ai_state_reentered; ++i)
+                {
+                    if (!game.step(1.0 / 60))
+                        return 4;
+                    ai_state_reentered = OpenBlood2::check_ai_state_smoke(game, smoke_ai_state);
+                }
+                spdlog::info("AI state probe: hidden={}, reentered={}, old handle invalidated={}", ai_state_hidden,
+                             ai_state_reentered, !game.objects.get(original_ai_state));
+            }
             bool hand_reentered = !options.skeleton_smoke;
             if (options.skeleton_smoke)
             {
@@ -1101,8 +1122,8 @@ namespace
                 (options.skeleton_smoke &&
                  (!character_audio_hidden || !character_audio_reentered || !character_motion_hidden ||
                   !character_motion_reentered || !ai_key_hidden || !ai_key_reentered || !ai_sight_hidden ||
-                  !ai_sight_reentered || !ai_target_hidden || !ai_target_reentered || !hand_hidden ||
-                  !hand_reentered)) ||
+                  !ai_sight_reentered || !ai_state_hidden || !ai_state_reentered || !ai_target_hidden ||
+                  !ai_target_reentered || !hand_hidden || !hand_reentered)) ||
                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
