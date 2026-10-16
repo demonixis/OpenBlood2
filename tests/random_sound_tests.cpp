@@ -318,7 +318,7 @@ namespace
             std::map<EntryState, unsigned> counts;
             for (const auto& e : g.entries)
                 ++counts[e.state];
-            CHECK(counts[EntryState::Created] == 166 && counts[EntryState::Unsupported] == 42 &&
+            CHECK(counts[EntryState::Created] == 166 && counts[EntryState::Unsupported] == 38 &&
                   counts[EntryState::EditorOnly] == 372 && !counts[EntryState::Failed]);
             CHECK(g.objects.snapshot().size() == 173 && g.enter_player(error) && g.objects.snapshot().size() == 176);
             std::vector<HOBJECT> targets;

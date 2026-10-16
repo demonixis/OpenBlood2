@@ -1,5 +1,10 @@
 # Resource, World and Session Contracts
 
+The later [world sound contracts](WORLD_SOUND_CONTRACTS.md) add the selected built-in
+Sound whole-clip loops and consumed-source accounting. Earlier blanket loop/world
+ownership omissions below are historical; streaming and the M2 gate remain open.
+
+
 > Extended by [BRUSH_CONTRACTS.md](BRUSH_CONTRACTS.md): RotatingBrush and
 > selected destructible brushes are connected. Earlier omissions/counts below
 > describe their previous increments; the full M2 gate remains open.

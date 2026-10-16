@@ -21,6 +21,9 @@ namespace OpenBlood2
         ObjectId trigger_selection{}, trigger_request{};
         std::string trigger_command;
         bool grant_key_request = false;
+        bool select_world_sounds = false;
+        SoundId world_sound_selection = 0;
+        void draw_world_sounds(GameSession&);
         bool select_random_sounds = false;
         ObjectId random_sound_selection{}, random_sound_request{};
         std::string random_sound_command;

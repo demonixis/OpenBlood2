@@ -13,6 +13,7 @@ namespace OpenBlood2
     enum class EntryState
     {
         Created,
+        WorldSound,
         EditorOnly,
         Unsupported,
         Filtered,
@@ -27,6 +28,7 @@ namespace OpenBlood2
     struct WorldEntry
     {
         ObjectId object;
+        std::uint64_t sound = 0; // World-owned sound survives the consumed original source instance.
         EntryState state = EntryState::Unsupported;
         std::string detail;
     };

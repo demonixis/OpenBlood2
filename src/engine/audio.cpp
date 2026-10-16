@@ -36,7 +36,7 @@ namespace OpenBlood2
         const auto riff_end = std::uint64_t(u32(bytes, 4)) + 8;
         bool final_odd_data = false;
         unsigned chunks = 0;
-        bool seen_fmt = false, seen_data = false;
+        bool seen_fmt = false, seen_data = false, loop_metadata = false;
         for (std::size_t pos = 12; pos < bytes.size();)
         {
             if (++chunks > 1024 || bytes.size() - pos < 8)
@@ -53,6 +53,9 @@ namespace OpenBlood2
             if (end > bytes.size())
                 return fail("Truncated WAVE chunk/padding");
             auto chunk = bytes.subspan(pos + 8, n);
+            if (!std::memcmp(bytes.data() + pos, "cue ", 4) || !std::memcmp(bytes.data() + pos, "smpl", 4) ||
+                (!std::memcmp(bytes.data() + pos, "LIST", 4) && n >= 4 && !std::memcmp(chunk.data(), "adtl", 4)))
+                loop_metadata = true;
             if (!std::memcmp(bytes.data() + pos, "fmt ", 4))
             {
                 if (seen_fmt)
@@ -144,6 +147,7 @@ namespace OpenBlood2
         value.rate = rate;
         value.channels = channels;
         value.encoding = encoding;
+        value.loop_metadata = loop_metadata;
         value.samples.resize(std::size_t(converted_length) / sizeof(float));
         std::memcpy(value.samples.data(), converted, converted_length);
         SDL_free(converted);
@@ -210,6 +214,11 @@ namespace OpenBlood2
         std::shared_ptr<const AudioClip> clip;
         if (!load(resources, request.resource, clip, error))
             return 0;
+        if (request.loop && clip->loop_metadata)
+        {
+            error = "WAVE region-loop metadata is not supported; refusing whole-clip substitution";
+            return 0;
+        }
         const auto id = next_sound++;
         voices_.emplace(id, AudioVoice{id, owner, request, std::move(clip), position});
         return id;
@@ -267,10 +276,13 @@ namespace OpenBlood2
             const double increment = double(clip.rate) / rate;
             for (std::size_t frame = 0; frame < count; ++frame)
             {
-                const auto cursor = v.cursor + frame * increment;
-                if (cursor >= clip.frames())
+                auto cursor = v.cursor + frame * increment;
+                if (v.request.loop)
+                    cursor = std::fmod(cursor, double(clip.frames()));
+                else if (cursor >= clip.frames())
                     break;
-                const auto a = std::size_t(cursor), b = std::min(a + 1, clip.frames() - 1);
+                const auto a = std::size_t(cursor);
+                const auto b = v.request.loop ? (a + 1) % clip.frames() : std::min(a + 1, clip.frames() - 1);
                 const float blend = float(cursor - a);
                 auto sample = [&](unsigned channel)
                 {
@@ -280,8 +292,18 @@ namespace OpenBlood2
                 mixed[frame * 2] += sample(0) * v.left;
                 mixed[frame * 2 + 1] += sample(clip.channels - 1) * v.right;
             }
-            v.cursor = std::min(double(clip.frames()), v.cursor + frames * increment);
-            v.done = v.cursor >= clip.frames();
+            const auto advanced = v.cursor + frames * increment;
+            if (v.request.loop)
+            {
+                const auto wraps = std::uint64_t(advanced / clip.frames());
+                v.loops += std::min(wraps, std::numeric_limits<std::uint64_t>::max() - v.loops);
+                v.cursor = std::fmod(advanced, double(clip.frames()));
+            }
+            else
+            {
+                v.cursor = std::min(double(clip.frames()), advanced);
+                v.done = v.cursor >= clip.frames();
+            }
         }
         for (auto& value : mixed)
         {

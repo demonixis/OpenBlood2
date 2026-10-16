@@ -1,3 +1,4 @@
+#include "audio_fixture.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Key.h"
 #include "game/original/PathPoint.h"
@@ -101,7 +102,7 @@ namespace
         out.append(v);
         return out;
     }
-    Writer dat(bool gameplay = false)
+    Writer dat(bool gameplay = false, bool sounds = false)
     {
         Writer w;
         w.u32(56);
@@ -120,8 +121,15 @@ namespace
         value.real(1.5);
         Writer yes;
         yes.byte(1);
-        w.u32(gameplay ? 4 : 1);
-        if (gameplay)
+        w.u32(gameplay || sounds ? 4 : 1);
+        if (sounds)
+        {
+            w.append(object("Sound", {string_prop("Filename", "cue.wav"), prop("Pos", 1, pos)}));
+            w.append(object("Sound", {string_prop("Filename", "missing.wav")}));
+            w.append(object("Sound", {string_prop("Filename", "cue.wav"), prop("FileStream", 5, yes)}));
+            w.append(object("Sound", {string_prop("Filename", "cue.wav"), prop("VoiceType", 6, integer)}));
+        }
+        else if (gameplay)
         {
             w.append(object("GameStartPoint", {string_prop("Name", "Start"), prop("Pos", 1, pos),
                                                prop("Rotation", 7, rot), prop("TeamID", 6, integer)}));
@@ -440,6 +448,45 @@ namespace
         CHECK(game.server.list_count() == 0);
         return true;
     }
+    bool sound_entries(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(test_audio::setup(game, root));
+        test_player::Directory dir;
+        dir.children["worlds"].files["sounds.dat"] = dat(false, true).data;
+        test_model::Writer archive;
+        archive.b.resize(168);
+        archive.b[0] = archive.b[62] = archive.b[124] = 13;
+        archive.b[1] = archive.b[63] = archive.b[125] = 10;
+        archive.b[126] = 26;
+        archive.patch(127, 1);
+        auto [offset, size] = test_player::write_dir(archive, dir);
+        archive.patch(131, offset);
+        archive.patch(135, size);
+        CHECK(save(root / "soundworld.rez", archive.b));
+        std::string error;
+        CHECK(game.resources.mount(root / "soundworld.rez", error));
+        for (unsigned cycle = 0; cycle < 2; ++cycle)
+        {
+            CHECK(game.request_world("sounds", error));
+            CHECK(game.entries.size() == 4 && game.objects.snapshot().empty());
+            CHECK(game.entries[0].state == EntryState::WorldSound && !game.entries[0].object);
+            auto id = game.entries[0].sound;
+            const auto* voice = game.server.audio.get(id);
+            CHECK(voice && voice->world_owned && voice->position.x == 5 && voice->position.y == 6 &&
+                  voice->position.z == 7);
+            for (unsigned i = 1; i < 4; ++i)
+                CHECK(game.entries[i].state == EntryState::Failed && !game.entries[i].sound &&
+                      !game.entries[i].detail.empty());
+            CHECK(game.entries[1].detail.find("Missing") != std::string::npos);
+            CHECK(game.entries[2].detail.find("FileStream") != std::string::npos);
+            CHECK(game.entries[3].detail.find("VoiceType") != std::string::npos);
+            CHECK(game.server.audio.voices().size() == 1 && game.step(.25));
+            CHECK(game.server.audio.get(id)->loops == 2);
+            CHECK(game.unload_world() && game.entries.empty() && !game.server.audio.get(id));
+        }
+        return true;
+    }
     bool session_messages()
     {
         WorldMessage m;
@@ -598,6 +645,8 @@ int main(int argc, char** argv)
             ok = mutations();
         else if (name == "session_lifecycle")
             ok = session_lifecycle(root);
+        else if (name == "sound_entries")
+            ok = sound_entries(root);
         else if (name == "session_messages")
             ok = session_messages();
         else if (name == "original_trigger")

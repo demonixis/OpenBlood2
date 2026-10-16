@@ -339,7 +339,7 @@ namespace
             for (const auto& e : g.entries)
                 ++counts[e.state];
             CHECK(counts[EntryState::Created] == 166 && counts[EntryState::EditorOnly] == 372 &&
-                  counts[EntryState::Unsupported] == 42 && counts[EntryState::Failed] == 0);
+                  counts[EntryState::Unsupported] == 38 && counts[EntryState::Failed] == 0);
             CHECK(g.objects.snapshot().size() == 173 && g.enter_player(error) && g.objects.snapshot().size() == 176);
             HOBJECT target = nullptr;
             for (auto id : g.objects.snapshot())

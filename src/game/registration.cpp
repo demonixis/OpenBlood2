@@ -16,6 +16,7 @@
 #include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
 #include "game/original/SmellHint.h"
+#include "game/original/Sound.h"
 #include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
 #include "game/original/WorldProperties.h"
@@ -80,6 +81,16 @@ namespace OpenBlood2
                                        {"IsListener", true},
                                        {"HidePlayer", false},
                                        {"TypeActionMode", false}}};
+        const ClassInfo sound{"Sound",
+                              &base,
+                              construct<Sound>,
+                              {{"Filename", std::string{}},
+                               {"Priority", std::int32_t(0)},
+                               {"OuterRadius", 100.0f},
+                               {"InnerRadius", 10.0f},
+                               {"Volume", std::int32_t(100)},
+                               {"Ambient", true},
+                               {"FileStream", false}}};
         const ClassInfo random_sound{"RandomSoundFX", &b2base, construct<RandomSoundFX>, []
                                      {
                                          std::vector<PropertySpec> p{
@@ -546,8 +557,8 @@ namespace OpenBlood2
                objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
                objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
                objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
-               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
-               objects.register_class(game_start) && objects.register_class(path) &&
+               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
+               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
                objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&

@@ -47,7 +47,7 @@ endif()
 add_executable(world_tests world_tests.cpp)
 target_link_libraries(world_tests PRIVATE blood2_game)
 blood2_project_options(world_tests)
-foreach(case IN ITEMS rez_structure rez_rejection resource_mount world_properties world_geometry
+foreach(case IN ITEMS sound_entries rez_structure rez_rejection resource_mount world_properties world_geometry
         world_rejection mutations session_lifecycle session_messages original_trigger)
     add_test(NAME world.${case} COMMAND world_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/world-fixtures/${case}")
     set_tests_properties(world.${case} PROPERTIES LABELS "headless;world" TIMEOUT 20)
@@ -410,4 +410,25 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
     add_test(NAME gpu.randomsound COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
         --data-dir "${BLOOD2_TEST_DATA_DIR}" --random-sounds-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/random-sounds.png")
     set_tests_properties(gpu.randomsound PROPERTIES LABELS "private;gpu;randomsound" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+endif()
+
+add_executable(sound_tests sound_tests.cpp)
+target_link_libraries(sound_tests PRIVATE blood2_game)
+blood2_project_options(sound_tests)
+
+foreach(case defaults loops resampling lifetime failures metadata)
+    add_test(NAME sound.${case} COMMAND sound_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/sound-fixtures/${case}")
+    set_tests_properties(sound.${case} PROPERTIES LABELS "headless;sound" TIMEOUT 30)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    foreach(case catalog subway)
+        add_test(NAME sound.${case} COMMAND sound_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
+        set_tests_properties(sound.${case} PROPERTIES LABELS "headless;private;sound" TIMEOUT 90)
+    endforeach()
+endif()
+
+if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+    add_test(NAME gpu.sound COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+        --data-dir "${BLOOD2_TEST_DATA_DIR}" --world-sounds-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/world-sounds.png")
+    set_tests_properties(gpu.sound PROPERTIES LABELS "private;gpu;sound" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
 endif()

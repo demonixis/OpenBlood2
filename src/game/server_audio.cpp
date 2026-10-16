@@ -26,6 +26,28 @@ namespace OpenBlood2
         }
         return audio.play(*client_resources, owner, request, position, error);
     }
+    SoundId ServerAdapter::PlayWorldSound(HOBJECT source, const SoundRequest& request, bool file_stream,
+                                          std::string& error)
+    {
+        trace_service("PlayWorldSound");
+        if (!IsObjectAlive(source) || !client_resources || request.speaker || request.space == SoundSpace::Local ||
+            !request.loop)
+        {
+            error = "World sound requires a live source and an unattached ambient/spatial loop";
+            return 0;
+        }
+        if (file_stream)
+        {
+            error = "FileStream/TIMESYNC playback is not implemented";
+            return 0;
+        }
+        DVector position{};
+        GetObjectPos(source, &position);
+        const auto id = audio.play(*client_resources, source, request, position, error);
+        if (auto* voice = audio.get(id))
+            voice->world_owned = true;
+        return id;
+    }
     bool ServerAdapter::RandomInt(int low, int high, int& value)
     {
         trace_service("RandomInt");
@@ -53,7 +75,7 @@ namespace OpenBlood2
         std::vector<SoundId> removed;
         for (const auto& [id, entry] : audio.voices())
         {
-            if (!IsObjectAlive(entry.owner))
+            if (!entry.world_owned && !IsObjectAlive(entry.owner))
             {
                 removed.push_back(id);
                 continue;

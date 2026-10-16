@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "66bb0337758b0050ca26b3784a883545a35c63df",
+  "status": "M2 incomplete; selected original nonstreaming whole-clip Sound loops",
+  "references": [
+    {
+      "source": "sources/blood2/AppHeaders/engineobjects.c",
+      "source_line_ranges": [
+        [
+          305,
+          431
+        ]
+      ],
+      "source_sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
+      "purpose": "Port built-in Sound properties, initial looping request, fixed position and immediate unconditional source removal; C callbacks adapted to typed C++ BaseClass."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/basedefs_de.h",
+      "source_line_ranges": [
+        [
+          524,
+          620
+        ]
+      ],
+      "source_sha256": "10f543764aa94339f2e48edcba384dda3cdce2d738f0be2731dcff3a1117fb72",
+      "purpose": "Original ambient/spatial, unattached looping lifetime, streaming/timesync and priority contracts."
+    },
+    {
+      "source": "sources/lithtech/runtime/sound/src/wave.cpp",
+      "source_line_ranges": [
+        [
+          104,
+          151
+        ]
+      ],
+      "source_sha256": "8612e3dce4e166ad438e4b0f35121ea3991ec779ed9cfe069357de4b81bd571b",
+      "purpose": "Read-only later-generation cue/ltxt region-loop reference; no code imported and no Blood II compatibility inferred."
+    },
+    {
+      "source": "sources/lithtech/runtime/sound/src/soundbuffer.cpp",
+      "source_line_ranges": [
+        [
+          233,
+          261
+        ]
+      ],
+      "source_sha256": "088e1a05dead4a746d49a4630de7c7cfb113da381f4385ac9a76cfa5e6df4dda",
+      "purpose": "Read-only later-generation loop-region fallback; not imported."
+    }
+  ],
+  "ports": [
+    "src/game/original/Sound.h",
+    "src/game/original/Sound.cpp"
+  ],
+  "adaptations": [
+    "Typed C++ callback with value-owned strings and safe empty runtime filename",
+    "Checked world-owned voice transfer; consumed source disposition distinct from live instance",
+    "Bounded full-clip modulo/resampling with seam interpolation and wrap diagnostics",
+    "FileStream/TIMESYNC and region-loop metadata reject playback; strict schema preserved"
+  ],
+  "unsupported": [
+    "Streaming, region loops, priority arbitration, reverb/Doppler/occlusion",
+    "Historical VoiceType schemas, general audio callers, music, save/restore",
+    "Complete M2 acceptance"
+  ]
+}

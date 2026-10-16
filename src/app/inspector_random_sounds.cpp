@@ -77,7 +77,7 @@ namespace OpenBlood2
                                                                : "MISSING");
         }
         ImGui::TextWrapped("Hidden/inactive emitters are included. Archive presence is separate from decoding. "
-                           "The original unused Ambient property remains visible in World. Sound loops, other callers, "
+                           "The original unused Ambient property remains visible in World. Other callers, "
                            "reverb, Doppler and complete M2 gameplay remain unavailable.");
     }
 } // namespace OpenBlood2

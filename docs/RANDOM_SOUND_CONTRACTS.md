@@ -1,5 +1,10 @@
 # Original random sound emitters
 
+The later [world sound contracts](WORLD_SOUND_CONTRACTS.md) add the selected built-in
+Sound whole-clip loops and consumed-source accounting. Earlier blanket loop/world
+ownership omissions below are historical; streaming and the M2 gate remain open.
+
+
 M2 remains incomplete. Read [cinematic audio](CINEMATIC_CONTRACTS.md),
 [object lifetime](OBJECT_CONTRACTS.md), the [source ledger](M2_RANDOM_SOUND_SOURCES.json)
 and [implementation evidence](../../Documentation/Implementation/M2_RANDOM_SOUNDS.md).

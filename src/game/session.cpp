@@ -1,3 +1,4 @@
+#include "game/original/Sound.h"
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
@@ -10,6 +11,8 @@ namespace OpenBlood2
         {
             case EntryState::Created:
                 return "Original instance";
+            case EntryState::WorldSound:
+                return "World-owned sound";
             case EntryState::EditorOnly:
                 return "Preprocessor only";
             case EntryState::Unsupported:
@@ -91,6 +94,13 @@ namespace OpenBlood2
                 {
                     entry.object = r->id;
                     entry.state = EntryState::Created;
+                }
+                else if (const auto* sound = r ? dynamic_cast<const Sound*>(r->game.get()) : nullptr)
+                {
+                    entry.sound = sound->sound;
+                    entry.state = server.audio.get(sound->sound) ? EntryState::WorldSound : EntryState::Failed;
+                    entry.detail =
+                        entry.sound ? "Original Sound removed after transferring its loop to the world" : sound->error;
                 }
                 else if (r && dynamic_cast<const B2BaseClass*>(r->game.get()) &&
                          static_cast<const B2BaseClass*>(r->game.get())->filtered)

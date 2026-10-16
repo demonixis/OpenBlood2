@@ -211,7 +211,7 @@ namespace
                 CHECK(game.step(1.0 / 60.0));
             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
-            CHECK(!game.run_world(error) && error.find("42 uninstantiated") != std::string::npos);
+            CHECK(!game.run_world(error) && error.find("38 uninstantiated") != std::string::npos);
             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()

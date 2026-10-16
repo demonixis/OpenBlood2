@@ -384,3 +384,14 @@ FreeString is fixed with one owned read release; invalid ranges/restore reject.
 Typed fixed-position playback and ambient distance-only mixing are new engine
 services. The portable RNG is not the retail sequence. Built-in Sound loops, priority
 arbitration, reverb/Doppler, save/restore and the actual M2 gate remain open.
+
+## M2 built-in Sound loops
+
+[Source selections](M2_WORLD_SOUND_SOURCES.json) identify the original built-in
+Sound C callback, properties and SDK sound ownership contract. The C++ adaptation
+retains unconditional source removal and transfers successful playback to the
+world. [Contracts](WORLD_SOUND_CONTRACTS.md) separate original rules from new
+bounded full-clip resampling, loader disposition and inspection. Runtime filename
+initialization is safe; streaming and region metadata explicitly reject playback.
+Later-generation LithTech region-loop code was reviewed only, not imported.
+No prototype backend or dependency was added. M2 remains incomplete.

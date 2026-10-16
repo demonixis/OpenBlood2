@@ -192,3 +192,13 @@ See [contracts](docs/RANDOM_SOUND_CONTRACTS.md) and [source ledger](docs/M2_RAND
 ctest --test-dir build/debug -R 'randomsound' --output-on-failure
 SDL_AUDIODRIVER=dummy ./build/debug/blood2 --random-sounds-smoke --capture build/random-sounds.png
 ```
+
+The [world sound continuation](../Documentation/Implementation/M2_WORLD_SOUNDS.md) adds original built-in Sound loops that
+outlive their consumed source objects, plus inspection and bounded playback checks.
+SubwayA now has 166 live-created entries, 4 world-owned sound entries, 372 editor-only
+and 38 unported entries; runtime counts stay 173/176 before/after player. Streaming
+and historical VoiceType schemas remain unsupported. M2 remains incomplete.
+
+Use `--world-sounds-smoke --capture build/debug/world-sounds.png` with the configured
+content root for the loop ownership/output GPU scenario (silent validation:
+`SDL_AUDIODRIVER=dummy`). Contracts: [world-owned sound](docs/WORLD_SOUND_CONTRACTS.md).

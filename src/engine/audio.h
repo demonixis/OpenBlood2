@@ -9,6 +9,7 @@ namespace OpenBlood2
     struct AudioClip
     {
         unsigned rate = 0, channels = 0, encoding = 0;
+        bool loop_metadata = false; // Region loops require a separate validated reader; never silently ignore them.
         std::vector<float> samples;
         std::size_t frames() const
         {
@@ -32,6 +33,8 @@ namespace OpenBlood2
         HOBJECT speaker = nullptr;
         SoundSpace space = SoundSpace::Spatial;
         float inner_radius = 250, outer_radius = 1000, volume = 1;
+        bool loop = false;
+        DBYTE priority = 0;           // Authored intent; priority arbitration is unavailable.
         bool reverb_requested = true; // Original cinematic flag; dry output currently only.
     };
     struct AudioVoice
@@ -44,6 +47,8 @@ namespace OpenBlood2
         double cursor = 0;
         float left = 1, right = 1;
         bool done = false, speaker_lost = false;
+        bool world_owned = false; // Owner is provenance only for transferred, unattached loops.
+        std::uint64_t loops = 0;
     };
     class AudioMixer
     {

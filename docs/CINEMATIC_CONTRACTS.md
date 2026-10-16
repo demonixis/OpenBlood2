@@ -1,5 +1,10 @@
 # Original cinematic cues and bounded audio
 
+The later [world sound contracts](WORLD_SOUND_CONTRACTS.md) add the selected built-in
+Sound whole-clip loops and consumed-source accounting. Earlier blanket loop/world
+ownership omissions below are historical; streaming and the M2 gate remain open.
+
+
 M2 remains incomplete. The later [random sound contracts](RANDOM_SOUND_CONTRACTS.md)
 extend audio with original RandomSoundFX, fixed-position voices and ambient distance-only
 output. Earlier general-emitter omissions below are historical for this bounded subset.

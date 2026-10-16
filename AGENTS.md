@@ -165,3 +165,13 @@ without panning; sampled voices do not follow later emitter motion. Built-in Sou
 loops/streaming and other audio callers remain missing. SubwayA now has 166 created
 source entries, 7 SelfTriggers, 372 editor-only and 42 unported (173/176 runtime
 before/after player, 164/167 after consuming nine Keys). M2 remains incomplete.
+
+The latest [world sound evidence](../Documentation/Implementation/M2_WORLD_SOUNDS.md) integrates the original built-in Sound
+with typed world-owned whole-clip loops. Read [world sound contracts](docs/WORLD_SOUND_CONTRACTS.md).
+Preserve immediate deferred source removal, durable success/failure accounting,
+source-independent playback and unload ownership. FileStream/TIMESYNC and region
+metadata reject playback; priority arbitration and historical VoiceType schemas
+remain unavailable. SubwayA has 166 live-created source entries, 4 transferred
+world sounds, 7 SelfTriggers, 372 editor-only and 38 unported entries. Runtime
+counts remain 173/176 before/after player, 164/167 after nine Keys are consumed.
+Earlier blanket Sound-loop omissions are superseded only for this subset; M2 stays open.
