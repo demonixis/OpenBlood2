@@ -379,7 +379,7 @@ namespace OpenBlood2
                                        "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
                                        "the player in Session first, or launch --view-world.");
                     ImGui::TextWrapped(
-                        "Opaque textures are unlit. Lightmaps, models, sprites, liquid surfaces, "
+                        "Opaque textures/models are unlit. Lightmaps, sprites, liquid surfaces, "
                         "transparency and sky rendering remain unavailable. Unsupported objects stay in World.");
                     if (world_mesh && world_render)
                     {
@@ -417,6 +417,24 @@ namespace OpenBlood2
                                                                     : "player eye",
                                     game.client_shell.view.position.x, game.client_shell.view.position.y,
                                     game.client_shell.view.position.z);
+                    }
+                    if (model_view)
+                    {
+                        ImGui::Text("Model snapshot: %zu world / %zu close draws / %zu vertices / %zu skin bytes",
+                                    model_view->world_draws.size(), model_view->close_draws.size(),
+                                    model_view->mesh.vertices.size(), model_view->mesh.texture_bytes);
+                        ImGui::TextWrapped(
+                            "Current ABC poses; first-person body/held children follow local camera visibility. "
+                            "View weapons use original offsets with zero bob; no lighting, chrome or muzzle FX.");
+                        if (ImGui::TreeNode("Model visibility and skin diagnostics"))
+                        {
+                            for (const auto& entry : model_view->entries)
+                                ImGui::TextWrapped("%s: %s, %zu triangles, skin %s%s%s", entry.label.c_str(),
+                                                   entry.visible ? "visible" : "hidden", entry.triangles,
+                                                   entry.skin.c_str(), entry.error.empty() ? "" : " / ",
+                                                   entry.error.c_str());
+                            ImGui::TreePop();
+                        }
                     }
                     ImGui::EndTabItem();
                 }
@@ -489,7 +507,7 @@ namespace OpenBlood2
                                     static_cast<unsigned>(state.m_ObjectType), state.m_Flags, object->activity,
                                     game.objects.link_count(object->handle));
                         if (state.m_Filename[0] || state.m_SkinName[0])
-                            ImGui::TextWrapped("Model: %s / Skin (not decoded): %s", state.m_Filename,
+                            ImGui::TextWrapped("Model: %s / Skin (decode status in 3D view): %s", state.m_Filename,
                                                state.m_SkinName);
                         if (object->model)
                             ImGui::Text("Decoded ABC: %zu nodes / %zu animations; clip %u at %.1f ms",
@@ -1033,7 +1051,7 @@ namespace OpenBlood2
                         player->m_InventoryMgr.GetAmmoCount(1));
             ImGui::Text("Strength %u | Speed %u | Resistance %u | Magic %u", player->m_nAttribStrength,
                         player->m_nAttribSpeed, player->m_nAttribResistance, player->m_nAttribMagic);
-            ImGui::TextWrapped("Model: %s | Skin: %s (indexed, not decoded)", record->state.m_Filename,
+            ImGui::TextWrapped("Model: %s | Skin: %s (decode status in 3D view)", record->state.m_Filename,
                                record->state.m_SkinName);
             ImGui::TextWrapped("Requested slot 1: %u. Current slot: %u. Original inventory owns the Beretta/knife; "
                                "inspect their use in Weapons. Muzzle light exists but is not rendered.",
@@ -1293,8 +1311,8 @@ namespace OpenBlood2
                 }
                 draw->PopClipRect();
             }
-            ImGui::TextWrapped(
-                "Native coordinates; skeletal and vertex animation. Wireframe preview; skin is not decoded.");
+            ImGui::TextWrapped("Engine +Z forward; skeletal and vertex animation. Wireframe preview; skin decode "
+                               "status is in 3D view.");
             ImGui::TableNextColumn();
             if (ImGui::BeginChild("Animation keys", ImVec2(0, 300)))
             {

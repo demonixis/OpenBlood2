@@ -25,8 +25,10 @@ The reader retains all vertices, the primary vertex count, progressive LOD
 metadata, UVs, normals, face indices, node indices/parents/flags, animation bounds,
 key times/strings, node transforms, packed vertex deformation and animation user
 dimensions. Extra LOD selection and normal deformation are not implemented.
-Skeleton poses interpolate translation and normalized quaternions in native
-coordinates, composing each child with its parent. Vertex-deformed nodes decode
+Skeleton poses interpolate translation and normalized quaternions in engine
+coordinates, composing each child with its parent. The model-view continuation
+normalizes ABC -Z forward to engine +Z at decode time, including bounds and
+deformation; see [the conversion contract](MODEL_VIEW_CONTRACTS.md). Vertex-deformed nodes decode
 `byte * scale + translation`, interpolate adjacent frames and apply the node
 pose. Caleb's coat requires this path; treating its packed coordinates as rigid
 vertices produces visibly broken geometry.
@@ -166,3 +168,5 @@ query flags. DTX decoding/rendering and verified retail ray/timing parity remain
 The [AI visibility continuation](AI_SIGHT_CONTRACTS.md) adds selected original CanSee
 and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
 Visibility queries do not implement target selection, AI states or complete M2.
+
+The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.

@@ -6,7 +6,7 @@ The three runtime targets remain small: `engine` (resources, world/object runtim
 
 The [diagnostic 3D view](docs/WORLD_VIEW_CONTRACTS.md) now renders actual level
 geometry and current moving brushes through SDL_GPU. Run `./build/debug/blood2 --view-world` to enter the original player/cameras with
-keyboard controls enabled. F1 opens inspection. [Original DTX textures](docs/TEXTURE_CONTRACTS.md) now appear as unlit opaque materials. Rendered models/weapons,
+keyboard controls enabled. F1 opens inspection. [Original DTX textures](docs/TEXTURE_CONTRACTS.md) now appear as unlit opaque materials. [Existing models and first-person weapons](docs/MODEL_VIEW_CONTRACTS.md) now render too;
 full combat and M2 completion remain pending. The world shader currently requires
 Vulkan/SPIR-V; other backend artifacts remain unimplemented.
 
@@ -44,7 +44,7 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
 | Option | Behavior |
 | --- | --- |
 | `--view-world` | Enter diagnostic 3D with original player/cameras, hidden inspector and keyboard controls |
-| `--viewport-smoke` | Check actual world rendering, movement, hidden UI, resize and reload |
+| `--viewport-smoke` | Check textured world/view-weapon rendering, movement, hidden UI, resize and reload |
 | `--check-data` | File metadata/readability only; no parser or GPU |
 | `--inspect-world` | Headless REZ/DAT parsing and original subset creation/teardown |
 | `--world NAME` | Resource name, default `01_SubwayA`; exact normalized lookup, no traversal/basename fallback |
@@ -79,7 +79,11 @@ ctest --preset debug
 ctest --preset debug -L world
 ```
 
-There are **151 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases, 6 door/mover/collision/lifetime cases, 8 trigger/key/ownership/contact cases, 9 USE/rotation/input/transport cases, 7 brush/ramp/damage/lifetime cases and 8 debris/explosion/radius/chain/lifetime cases and 10 pushable/physics/priority/rider cases, 9 pickup/spawn cases and 6 objective/resource-string cases plus 6 camera/tracking/player-gate cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
+The current suite has **274 synthetic headless tests**, **49 private headless tests**
+and **27 serial GPU tests** (350 total with the installation and GPU options enabled).
+Coverage includes bounded readers, original object/service behavior, player/weapon
+lifetime, movement, interactions, animation/attachments and real GPU presentation.
+Synthetic fixtures never substitute for private resource acceptance.
 
 Enable installation-specific tests and real GPU windows explicitly:
 
@@ -89,7 +93,9 @@ cmake --build --preset debug --parallel
 ctest --preset debug
 ```
 
-The configured installation adds nineteen private headless tests and fourteen GPU tests, for **184 cases**. GPU captures are `build/debug/tests/gpu.png`, `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png`, `doors.png`, `triggers.png`, `interaction.png`, `brushes.png`, `pickups.png`, `objectives.png` and `cameras.png`. The ignored local presets enable these options:
+GPU captures are written under `build/debug/tests/`, including `viewport.png`
+(first person) and `model-private.png` (isolated Caleb/held-model diagnostic).
+The ignored local presets enable these options:
 
 ```sh
 cmake --preset local-debug
@@ -301,3 +307,9 @@ Latest M2 continuation: [original explicit AI targets and facing](../Documentati
 named target selection, checked links, stored-position/local-up orientation and
 inspection. Target departure/re-entry is exercised without owning the target.
 Autonomous perception, NPC states and the actual M2 acceptance gate remain open.
+
+The [animated model continuation](docs/MODEL_VIEW_CONTRACTS.md) adds real ABC/held/first-person weapon drawing, original view offsets and a corrected legacy node-rotation default. Hidden/missing objects remain inspectable. Required NPCs, transitions and client FX still block M2 completion.
+
+The animated-model continuation passes 350/350 tests in both Debug and inspector-free
+Release, including 27 GPU cases, plus 116/116 targeted Clang ASan/UBSan/leak checks.
+The final reader normalizes inverse rotations and model -Z into the engine basis.

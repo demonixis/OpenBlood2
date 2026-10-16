@@ -93,14 +93,7 @@ namespace OpenBlood2
                             return fail("World texture count budget exceeded");
                         WorldMaterial entry;
                         entry.path = key;
-                        const auto* resource = resources->find(key);
-                        std::vector<std::uint8_t> bytes;
-                        if (!resource)
-                            entry.error = "Missing exact-path resource";
-                        else if (resource->size > 3 * 1024 * 1024)
-                            entry.error = "DTX resource exceeds byte limit";
-                        else if (resources->read(key, bytes, entry.error))
-                            read_texture(bytes, entry.image, entry.error);
+                        read_texture_resource(*resources, key, entry.image, entry.error);
                         if (entry.image.rgba.size() > 128 * 1024 * 1024 - texture_bytes)
                             return fail("World texture memory budget exceeded");
                         texture_bytes += entry.image.rgba.size();

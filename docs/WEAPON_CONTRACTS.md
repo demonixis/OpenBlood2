@@ -134,3 +134,5 @@ The [held-model/attachment continuation](ATTACHMENT_CONTRACTS.md) adds original
 Beretta/knife held children and typed visual attachments. Earlier blanket hand-model
 and attachment omissions are superseded for this bounded subset. Dropping, physical
 attachments, client visibility SFX and complete M2 remain unavailable.
+
+The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.

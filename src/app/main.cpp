@@ -1,4 +1,5 @@
 #include "ai_model_key_smoke.h"
+#include "app/model_scene.h"
 #include "app/movement_controls.h"
 #include "brush_smoke.h"
 #include "build_info.h"
@@ -276,13 +277,17 @@ namespace
         const bool smoke = options.gpu_smoke || options.world_smoke;
         bool inspector_visible = BLOOD2_INSPECTOR && options.inspector && !options.view_world;
         OpenBlood2::WorldMesh world_mesh;
-        OpenBlood2::WorldRenderer world_renderer(runtime.gpu);
+        OpenBlood2::WorldRenderer world_renderer(runtime.gpu), model_renderer(runtime.gpu);
+        OpenBlood2::ModelView model_scene;
+        bool models_hidden = false, close_weapon_hidden = false;
+        std::uint64_t model_frames = 0;
         std::vector<OpenBlood2::WorldDraw> world_draws;
         std::uint64_t mesh_revision = UINT64_MAX;
         bool viewport_hidden = false, viewport_reloaded = false, viewport_unloaded = false;
 #if BLOOD2_INSPECTOR
         OpenBlood2::Inspector inspector(runtime);
         inspector.world_mesh = &world_mesh;
+        inspector.model_view = &model_scene;
         inspector.world_render = &world_renderer.stats;
         inspector.select_models =
             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
@@ -577,6 +582,8 @@ namespace
             if (mesh_revision != game.world_revision)
             {
                 world_renderer.clear_geometry();
+                model_renderer.clear_geometry();
+                model_scene.clear();
                 world_mesh = {};
                 world_draws.clear();
                 if (!game.world_path.empty() && !world_mesh.build(game.world, error, &game.resources))
@@ -592,6 +599,12 @@ namespace
             if (!OpenBlood2::world_draws(world_mesh, game.objects, world_draws, world_renderer.stats, error))
             {
                 spdlog::error("World draw bindings: {}", error);
+                return 5;
+            }
+
+            if (!OpenBlood2::update_model_scene(game, model_scene, error))
+            {
+                spdlog::error("Model presentation: {}", error);
                 return 5;
             }
 
@@ -637,6 +650,12 @@ namespace
                                ? 14u
                                : 2u) &&
                 !captured && !options.capture_file.empty();
+            if (capture_frame && options.viewport_smoke)
+                for (const auto& weapon : game.client_shell.weapons)
+                    if (weapon.model && weapon.animation.animation < weapon.model->animations.size())
+                        spdlog::info("Captured view weapon: clip={}, time={}ms, state={}",
+                                     weapon.model->animations[weapon.animation.animation].name, weapon.animation.time,
+                                     static_cast<unsigned>(weapon.state));
             if (capture_frame &&
                 !capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
                                     height))
@@ -661,6 +680,25 @@ namespace
                         SDL_SubmitGPUCommandBuffer(commands);
                         return 3;
                     }
+                    if (!model_renderer.prepare(model_scene.mesh, model_scene.revision,
+                                                SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
+                                                height, error, true) ||
+                        !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
+                                             model_scene.world_draws, view.position, view.rotation,
+                                             view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
+                                             world_renderer.depth_target()) ||
+                        (!model_scene.close_draws.empty() &&
+                         !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
+                                              model_scene.close_draws, view.position, view.rotation, false, error,
+                                              OpenBlood2::DrawLoad::ClearDepth)))
+                    {
+                        spdlog::error("Model viewport: {}", error);
+                        SDL_SubmitGPUCommandBuffer(commands);
+                        return 3;
+                    }
+                    ++model_frames;
+                    models_hidden |= !inspector_visible && !model_scene.world_draws.empty();
+                    close_weapon_hidden |= !inspector_visible && !model_scene.close_draws.empty();
                     viewport_hidden |= !inspector_visible && world_renderer.stats.triangles > 0;
                     viewport_reloaded |=
                         viewport_unloaded && world_renderer.stats.uploads >= 2 && world_renderer.stats.triangles > 0;
@@ -1039,6 +1077,13 @@ namespace
                              viewport_hidden, viewport_unloaded, viewport_reloaded, world_renderer.stats.uploads,
                              world_renderer.stats.frames, world_renderer.stats.triangles, world_renderer.stats.draws,
                              world_renderer.width(), world_renderer.height());
+                spdlog::info(
+                    "Model viewport: frames={}, world hidden={}, weapon hidden={}, instances={}, close={}, vertices={}",
+                    model_frames, models_hidden, close_weapon_hidden, model_scene.world_draws.size(),
+                    model_scene.close_draws.size(), model_scene.mesh.vertices.size());
+                if (!close_weapon_hidden || !model_scene.world_draws.empty() ||
+                    model_frames != world_renderer.stats.frames)
+                    return 4;
                 std::size_t decoded = 0, missing = 0;
                 for (std::size_t i = 1; i < world_mesh.materials.size(); ++i)
                     world_mesh.materials[i].error.empty() ? ++decoded : ++missing;

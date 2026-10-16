@@ -109,12 +109,16 @@ namespace OpenBlood2
         model.command = header.string();
         if (!end(header))
             return fail("invalid header");
+        // Legacy v6 exports omit TransformInfo and store inverse node rotations.
+        // Convert once at the data boundary; all runtime poses use engine rotations.
+        bool conjugate_animation = true;
         if (sections.contains("TransformInfo"))
         {
             Reader r(sections.at("TransformInfo"));
             const auto geometry = r.u32(), animation = r.u32();
             if (!end(r) || geometry || animation)
                 return fail("unsupported nonzero transform flags");
+            conjugate_animation = false;
         }
         Reader g(sections.at("Geometry"));
         model.min = g.vec();
@@ -268,6 +272,8 @@ namespace OpenBlood2
                     const double length = std::sqrt(norm);
                     p.rotation = {{float(q.m_Vec.x / length), float(q.m_Vec.y / length), float(q.m_Vec.z / length)},
                                   float(q.m_Spin / length)};
+                    if (conjugate_animation)
+                        p.rotation.m_Vec = mul(p.rotation.m_Vec, -1);
                     na.frames.push_back(p);
                 }
                 auto size = static_cast<std::size_t>(frames) * node.deformed_vertices.size() * 3;
@@ -295,6 +301,44 @@ namespace OpenBlood2
         }
         if (!end(d))
             return fail("invalid animation dimensions");
+        // ABC model space faces -Z; engine object/camera space faces +Z.
+        // Reflect every spatial field once, including S*R*S for node rotations.
+        // Keeping this at the reader boundary makes rendering, node queries and
+        // attached children agree; it is independent of TransformInfo's flags.
+        auto reflect = [](DVector& v) { v.z = -v.z; };
+        auto reflect_bounds = [](DVector& lo, DVector& hi)
+        {
+            const float z = lo.z;
+            lo.z = -hi.z;
+            hi.z = -z;
+        };
+        reflect_bounds(model.min, model.max);
+        for (auto& vertex : model.vertices)
+        {
+            reflect(vertex.position);
+            reflect(vertex.normal);
+        }
+        for (auto& face : model.faces)
+            reflect(face.normal);
+        for (auto& node : model.nodes)
+            reflect_bounds(node.min, node.max);
+        for (auto& animation : model.animations)
+        {
+            reflect_bounds(animation.min, animation.max);
+            for (auto& key : animation.keys)
+                reflect_bounds(key.min, key.max);
+            for (auto& node : animation.nodes)
+            {
+                reflect(node.scale);
+                reflect(node.translation);
+                for (auto& pose : node.frames)
+                {
+                    reflect(pose.position);
+                    pose.rotation.m_Vec.x = -pose.rotation.m_Vec.x;
+                    pose.rotation.m_Vec.y = -pose.rotation.m_Vec.y;
+                }
+            }
+        }
         out = std::move(model);
         return true;
     }

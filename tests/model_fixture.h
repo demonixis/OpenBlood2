@@ -51,7 +51,8 @@ namespace test_model
             patch(at, last ? UINT32_MAX : static_cast<std::uint32_t>(b.size()));
         }
     };
-    inline Writer abc(bool weapon = false, bool character = false, float quaternion_w = 2)
+    inline Writer abc(bool weapon = false, bool character = false, float quaternion_w = 2, float quaternion_z = 0,
+                      int transform_flags = -1, float quaternion_y = 0)
     {
         Writer file, header, g, n, a, d;
         header.str("MonolithExport Model File v6");
@@ -76,7 +77,7 @@ namespace test_model
         g.u32(3);
         for (int i = 0; i < 3; ++i)
         {
-            g.vec(i == 1 ? 1 : 0, 0, i == 2 ? 1 : 0);
+            g.vec(i == 1 ? 1 : 0, 0, i == 2 ? -1 : 0); // ABC -Z becomes engine +Z.
             g.u8(0);
             g.u8(127);
             g.u8(0);
@@ -153,7 +154,7 @@ namespace test_model
                 for (int f = 0; f < (single ? 1 : 3); ++f)
                 {
                     a.vec(node ? 0 : static_cast<float>(f * 10), node ? 2 : 0, 0);
-                    a.vec();
+                    a.vec(0, quaternion_y, quaternion_z);
                     a.real(quaternion_w);
                 }
                 if (node)
@@ -167,7 +168,7 @@ namespace test_model
                             a.u8(3);
                         }
                     }
-                    a.vec(.5f, 1, 2);
+                    a.vec(.5f, 1, -2); // Encode the fixture's +Z deformation in ABC coordinates.
                     a.vec(1, 0, 0);
                 }
                 else
@@ -185,7 +186,14 @@ namespace test_model
                 d.vec(1, 2, 1);
         }
         file.section("Animation", a);
-        file.section("AnimDims", d, true);
+        file.section("AnimDims", d, transform_flags < 0);
+        if (transform_flags >= 0)
+        {
+            Writer flags;
+            flags.u32(static_cast<unsigned>(transform_flags));
+            flags.u32(static_cast<unsigned>(transform_flags));
+            file.section("TransformInfo", flags, true);
+        }
         return file;
     }
 } // namespace test_model

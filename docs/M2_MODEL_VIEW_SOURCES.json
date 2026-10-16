@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "6e162da0520d16ede0ca63b3499b44c6876e2734",
+  "source_files": [
+    {
+      "path": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
+      "selected_lines": [
+        [
+          164,
+          164
+        ],
+        [
+          226,
+          230
+        ],
+        [
+          341,
+          362
+        ],
+        [
+          1315,
+          1315
+        ]
+      ],
+      "use": "Selected placement/hand offset and close-view intent; bob zero, replacement depth pass"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "selected_lines": [
+        [
+          5426,
+          5468
+        ]
+      ],
+      "use": "Reference for original visibility/view positioning; complete UpdateGun not imported"
+    },
+    {
+      "path": "OpenBlood2/OpenLithTech/src/formats/file_formats.h",
+      "sha256": "19d73605fd24da6317492aaffe4cece212f3a8af197176136a744896d52d321d",
+      "selected_lines": [
+        [
+          87,
+          90
+        ]
+      ],
+      "use": "Default inverse animation convention when TransformInfo absent"
+    },
+    {
+      "path": "OpenBlood2/OpenLithTech/src/formats/abc_parser.cpp",
+      "sha256": "f63d5312ae28d2061a9641971bb845c142f435110bf2e42bebeb93bdde870426",
+      "selected_lines": [
+        [
+          315,
+          363
+        ]
+      ],
+      "use": "Reference normalized conjugation and parent composition; not wholesale imported"
+    },
+    {
+      "path": "NoMadEngine/nomadengine/src/formats/abc_parser.cpp",
+      "sha256": "7399baf3d020a3d6b4d684c23a91c0df0bebfef39aef330bb2968b510c31539e",
+      "selected_lines": [
+        [
+          315,
+          363
+        ]
+      ],
+      "use": "Related reference, not independent original-engine proof"
+    },
+    {
+      "path": "nomad/src/Nomad.Formats/AbcModels.cs",
+      "sha256": "a76323a3b156f6a1f92b49062960d906d4be7d40cb3b1921a303ba3fe5a50945",
+      "selected_lines": [
+        [
+          27,
+          27
+        ]
+      ],
+      "use": "Related default flag reference; not imported"
+    }
+  ],
+  "external_references": [
+    {
+      "url": "https://github.com/haekb/io_scene_lithtech/blob/master/src/reader_abc_v6_pc.py",
+      "use": "Reviewed default inverse rotations; no code imported"
+    },
+    {
+      "url": "https://github.com/haekb/godot-abc-reader/blob/master/Models/ABC6.gd",
+      "use": "Reviewed distinct winding and animation flags; no code imported"
+    }
+  ]
+}

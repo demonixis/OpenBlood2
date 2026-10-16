@@ -2,8 +2,21 @@
 #include "BloodShells.h"
 #include "engine/collision.h"
 #include "engine/model_commands.h"
+#include <cmath>
 
 using namespace OpenBlood2;
+bool CViewWeapon::AdjustAngleAndSetPos(float pitch, float yaw, DVector eye, NodePose& out) const
+{
+    out = {};
+    const auto* data = weapon_definition(type);
+    if (!model || !data || !std::isfinite(pitch) || !std::isfinite(yaw) || !physics_vector(eye))
+        return false;
+    out.rotation = rotation_from_euler({pitch, yaw, 0});
+    const DVector offset{left ? -data->m_vViewModelOffset.x : data->m_vViewModelOffset.x, data->m_vViewModelOffset.y,
+                         data->m_vViewModelOffset.z};
+    out.position = vector_add(eye, rotate_vector(out.rotation, offset));
+    return physics_vector(out.position);
+}
 bool CViewWeapon::Create(DBYTE weapon, bool left_hand, ModelStore& models, Resources& resources, std::string& error)
 {
     const auto* definition = weapon_definition(weapon);

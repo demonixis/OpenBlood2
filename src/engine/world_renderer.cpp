@@ -20,6 +20,10 @@ namespace OpenBlood2
         if (vertices_)
             SDL_ReleaseGPUBuffer(device_, vertices_);
         vertices_ = nullptr;
+        if (vertex_transfer_)
+            SDL_ReleaseGPUTransferBuffer(device_, vertex_transfer_);
+        vertex_transfer_ = nullptr;
+        vertex_capacity_ = 0;
         for (auto* texture : textures_)
             if (texture)
                 SDL_ReleaseGPUTexture(device_, texture);
@@ -103,7 +107,7 @@ namespace OpenBlood2
         return true;
     }
     bool WorldRenderer::prepare(const WorldMesh& mesh, std::uint64_t revision, SDL_GPUTextureFormat format,
-                                Uint32 width, Uint32 height, std::string& error)
+                                Uint32 width, Uint32 height, std::string& error, bool dynamic)
     {
         error.clear();
         if (!width || !height || width > 8192 || height > 8192 || mesh.vertices.size() > 3000000)
@@ -136,50 +140,10 @@ namespace OpenBlood2
             height_ = height;
         }
         if (revision_ == revision)
-            return true;
+            return !dynamic || upload_vertices(mesh, error);
         clear_geometry();
-        if (mesh.vertices.empty())
-        {
-            revision_ = revision;
-            return true;
-        }
-        const auto bytes = static_cast<Uint32>(mesh.vertices.size() * sizeof(WorldVertex));
-        SDL_GPUBufferCreateInfo info{SDL_GPU_BUFFERUSAGE_VERTEX, bytes, 0};
-        auto* next = SDL_CreateGPUBuffer(device_, &info);
-        SDL_GPUTransferBufferCreateInfo transfer_info{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, bytes, 0};
-        auto* transfer = SDL_CreateGPUTransferBuffer(device_, &transfer_info);
-        bool success = false;
-        if (next && transfer)
-        {
-            if (auto* data = SDL_MapGPUTransferBuffer(device_, transfer, false))
-            {
-                std::memcpy(data, mesh.vertices.data(), bytes);
-                SDL_UnmapGPUTransferBuffer(device_, transfer);
-                if (auto* commands = SDL_AcquireGPUCommandBuffer(device_))
-                {
-                    if (auto* copy = SDL_BeginGPUCopyPass(commands))
-                    {
-                        SDL_GPUTransferBufferLocation source{transfer, 0};
-                        SDL_GPUBufferRegion target{next, 0, bytes};
-                        SDL_UploadToGPUBuffer(copy, &source, &target, false);
-                        SDL_EndGPUCopyPass(copy);
-                        success = SDL_SubmitGPUCommandBuffer(commands);
-                    }
-                    else
-                        SDL_CancelGPUCommandBuffer(commands);
-                }
-            }
-        }
-        if (transfer)
-            SDL_ReleaseGPUTransferBuffer(device_, transfer);
-        if (!success)
-        {
-            error = SDL_GetError();
-            if (next)
-                SDL_ReleaseGPUBuffer(device_, next);
+        if (!upload_vertices(mesh, error))
             return false;
-        }
-        vertices_ = next;
         if (!upload_materials(mesh, error))
         {
             clear_geometry();
@@ -188,6 +152,62 @@ namespace OpenBlood2
         revision_ = revision;
         ++stats.uploads;
         return true;
+    }
+    bool WorldRenderer::upload_vertices(const WorldMesh& mesh, std::string& error)
+    {
+        if (mesh.vertices.size() > 3000000)
+        {
+            error = "GPU vertex budget exceeded";
+            return false;
+        }
+        const auto bytes = static_cast<Uint32>(mesh.vertices.size() * sizeof(WorldVertex));
+        if (!bytes)
+            return true;
+        if (bytes > vertex_capacity_)
+        {
+            SDL_GPUBufferCreateInfo info{SDL_GPU_BUFFERUSAGE_VERTEX, bytes, 0};
+            auto* next = SDL_CreateGPUBuffer(device_, &info);
+            SDL_GPUTransferBufferCreateInfo transfer_info{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, bytes, 0};
+            auto* transfer = SDL_CreateGPUTransferBuffer(device_, &transfer_info);
+            if (!next || !transfer)
+            {
+                if (next)
+                    SDL_ReleaseGPUBuffer(device_, next);
+                if (transfer)
+                    SDL_ReleaseGPUTransferBuffer(device_, transfer);
+                error = SDL_GetError();
+                return false;
+            }
+            if (vertices_)
+                SDL_ReleaseGPUBuffer(device_, vertices_);
+            if (vertex_transfer_)
+                SDL_ReleaseGPUTransferBuffer(device_, vertex_transfer_);
+            vertices_ = next;
+            vertex_transfer_ = transfer;
+            vertex_capacity_ = bytes;
+        }
+        bool success = false;
+        if (auto* data = SDL_MapGPUTransferBuffer(device_, vertex_transfer_, true))
+        {
+            std::memcpy(data, mesh.vertices.data(), bytes);
+            SDL_UnmapGPUTransferBuffer(device_, vertex_transfer_);
+            if (auto* commands = SDL_AcquireGPUCommandBuffer(device_))
+            {
+                if (auto* copy = SDL_BeginGPUCopyPass(commands))
+                {
+                    SDL_GPUTransferBufferLocation source{vertex_transfer_, 0};
+                    SDL_GPUBufferRegion target{vertices_, 0, bytes};
+                    SDL_UploadToGPUBuffer(copy, &source, &target, true);
+                    SDL_EndGPUCopyPass(copy);
+                    success = SDL_SubmitGPUCommandBuffer(commands);
+                }
+                else
+                    SDL_CancelGPUCommandBuffer(commands);
+            }
+        }
+        if (!success)
+            error = SDL_GetError();
+        return success;
     }
     bool WorldRenderer::upload_materials(const WorldMesh& mesh, std::string& error)
     {
@@ -309,7 +329,7 @@ namespace OpenBlood2
     }
     bool WorldRenderer::draw(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target, const WorldMesh& mesh,
                              std::span<const WorldDraw> draws, DVector eye, DRotation view, bool letterbox,
-                             std::string& error)
+                             std::string& error, DrawLoad load, SDL_GPUTexture* shared_depth)
     {
         if (!pipeline_ || !depth_ || (!vertices_ && !mesh.vertices.empty()))
         {
@@ -350,16 +370,16 @@ namespace OpenBlood2
         SDL_GPUColorTargetInfo color{};
         color.texture = target;
         color.clear_color = {.025f, .035f, .05f, 1};
-        color.load_op = SDL_GPU_LOADOP_CLEAR;
+        color.load_op = load == DrawLoad::Clear ? SDL_GPU_LOADOP_CLEAR : SDL_GPU_LOADOP_LOAD;
         color.store_op = SDL_GPU_STOREOP_STORE;
         SDL_GPUDepthStencilTargetInfo depth{};
-        depth.texture = depth_;
+        depth.texture = shared_depth ? shared_depth : depth_;
         depth.clear_depth = 1;
-        depth.load_op = SDL_GPU_LOADOP_CLEAR;
-        depth.store_op = SDL_GPU_STOREOP_DONT_CARE;
+        depth.load_op = load == DrawLoad::Load ? SDL_GPU_LOADOP_LOAD : SDL_GPU_LOADOP_CLEAR;
+        depth.store_op = SDL_GPU_STOREOP_STORE;
         depth.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
         depth.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
-        depth.cycle = true;
+        depth.cycle = load != DrawLoad::Load;
         auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
         if (!pass)
         {
@@ -379,6 +399,12 @@ namespace OpenBlood2
                 if (!r.count)
                     continue;
                 world_view_uniform(eye, view, aspect, d, uniform);
+                if (load == DrawLoad::ClearDepth)
+                {
+                    constexpr float near = .01f, far = 65536;
+                    uniform.projection[2] = far / (far - near);
+                    uniform.projection[3] = -near * far / (far - near);
+                }
                 SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
                 auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material)
                 {

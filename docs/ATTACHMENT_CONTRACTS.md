@@ -95,3 +95,5 @@ dual Berettas add two. These are owned children, not newly supported source entr
 AI states/classes, ExitTrigger, required client FX and the remaining M2 services
 keep the playable-session gate open. Linux software/hardware graphics checks do
 not establish retail attachment timing, other-platform or XR parity.
+
+The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.

@@ -1,10 +1,28 @@
 #include "engine/texture.h"
 #include "engine/formats/reader.h"
+#include "engine/resources.h"
 #include <algorithm>
 #include <bit>
 
 namespace OpenBlood2
 {
+    bool read_texture_resource(const Resources& resources, std::string_view path, Texture& out, std::string& error)
+    {
+        out = {};
+        const auto* resource = resources.find(path);
+        if (!resource)
+        {
+            error = "Missing exact-path resource";
+            return false;
+        }
+        if (resource->size > 3 * 1024 * 1024)
+        {
+            error = "DTX resource exceeds byte limit";
+            return false;
+        }
+        std::vector<std::uint8_t> bytes;
+        return resources.read(path, bytes, error) && read_texture(bytes, out, error);
+    }
     bool read_texture(std::span<const std::uint8_t> bytes, Texture& out, std::string& error)
     {
         out = {};

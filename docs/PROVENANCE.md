@@ -499,3 +499,21 @@ UV dot products follow the reviewed world surface representation and the donor's
 resource-manager calculation, evaluated before subtracting the authored pivot.
 Shader sampling, bounded batches, upload lifetime and tests are new engine code;
 no gameplay source changed. See [contracts](TEXTURE_CONTRACTS.md).
+
+## M2 animated model presentation
+
+Selected original CViewWeapon::AdjustAngleAndSetPos now places owned client models
+using the original WeaponData offsets and left-hand reflection; bob is explicitly
+zero. The [source ledger](M2_MODEL_VIEW_SOURCES.json) records reviewed ranges/hashes.
+Model snapshotting, bounded skin caching and dynamic SDL_GPU/shared-depth rendering
+are new engine code. The ABC reader now conjugates node quaternions for omitted
+TransformInfo, matching reviewed legacy defaults and independently checked Beretta
+key bounds. Explicit zero/direct and unsupported nonzero flags remain distinct.
+See [contracts](MODEL_VIEW_CONTRACTS.md); no gameplay firing/physics rules changed.
+
+The ABC model basis is normalized from file -Z to runtime +Z at decode time, including
+S*R*S node rotations and deformation. This is inferred from real Beretta muzzle/hand
+geometry and the original fire/camera axes, then checked visually; no pixel-identical
+retail claim. Related [ABC v6 importer](https://github.com/haekb/io_scene_lithtech/blob/master/src/reader_abc_v6_pc.py)
+and [Godot reader](https://github.com/haekb/godot-abc-reader/blob/master/Models/ABC6.gd)
+were reviewed for quaternion inversion and the distinct winding flag; no code was imported.

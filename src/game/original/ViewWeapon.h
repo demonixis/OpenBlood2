@@ -20,6 +20,8 @@ class CViewWeapon
     bool Create(DBYTE, bool, OpenBlood2::ModelStore&, OpenBlood2::Resources&, std::string&);
     bool Update(ServerDE&, CBloodServerShell&, HCLIENT, const OpenBlood2::WeaponInput&, DVector, DVector, double,
                 std::string&);
+    // Selected original placement, with the unimplemented bob inputs held at zero.
+    bool AdjustAngleAndSetPos(float pitch, float yaw, DVector eye, OpenBlood2::NodePose&) const;
     DBYTE type = 0;
     bool left = false;
     std::shared_ptr<const OpenBlood2::Model> model;

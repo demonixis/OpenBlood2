@@ -56,6 +56,8 @@ namespace OpenBlood2
     };
     struct Model
     {
+        // Spatial fields are normalized to engine +Z forward by read_model.
+        // Synthetic in-memory models use this same basis directly.
         std::string command;
         DVector min, max;
         std::uint32_t main_vertices = 0;
