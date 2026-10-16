@@ -920,8 +920,8 @@ namespace OpenBlood2
     {
         ImGui::TextUnformatted("Original shell and CPlayerObj entry subset");
         ImGui::TextWrapped(
-            "Inspect the original entry/lifetime code. Beretta/knife inspection is in Weapons. Movement, full combat "
-            "reactions, audio and autosave remain unported; this is not a playable session.");
+            "Original shell/player state and copied AI paths. Complete AI behavior, remaining combat/FX, audio "
+            "callers and save support are still unavailable.");
         auto* player = game.server_shell.Player(game.local_client);
         if (!player)
         {
@@ -949,6 +949,7 @@ namespace OpenBlood2
                     game.client_shell.m_bInWorld ? "yes" : "no",
                     static_cast<unsigned long long>(game.client_shell.messages),
                     static_cast<unsigned long long>(game.client_shell.updates));
+        draw_paths(game, selection);
         if (player)
         {
             const auto* record = game.objects.get(player->m_hObject);

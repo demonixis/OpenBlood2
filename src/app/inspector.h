@@ -85,6 +85,8 @@ namespace OpenBlood2
         void draw_resources(const GameSession&);
         void draw_models(GameSession&);
         void draw_services(const GameSession&);
+        char path_prefix[101]{};
+        void draw_paths(GameSession&, ObjectSelection&);
         void draw_session(GameSession&, ObjectSelection&);
         void draw_weapons(GameSession&, ObjectSelection&);
         void draw_movement(GameSession&, ObjectSelection&);

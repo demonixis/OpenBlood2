@@ -1,5 +1,6 @@
 #pragma once
 #include "MoveMgr.h"
+#include "PathMgr.h"
 #include "PlayerObj.h"
 #include "ViewWeapon.h"
 #include "game/session.h"
@@ -9,7 +10,7 @@
 class CBloodServerShell
 {
   public:
-    explicit CBloodServerShell(ServerDE& server) : server_(server) {}
+    explicit CBloodServerShell(ServerDE& server) : paths(server), server_(server) {}
     void PreStartWorld();
     bool PostStartWorld();
     CPlayerObj* OnClientEnterWorld(HCLIENT);
@@ -21,12 +22,7 @@ class CBloodServerShell
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerUse&);
     void Update(float);
     CPlayerObj* Player(HCLIENT);
-    struct PathEntry
-    {
-        DVector position;
-        std::string name, action_target, action_message;
-    };
-    std::vector<PathEntry> paths;
+    PathMgr paths;
     bool world_started = false;
     std::uint64_t updates = 0;
 

@@ -435,3 +435,8 @@ AI model-key continuation: [source ledger](M2_AI_MODEL_KEY_SOURCES.json),
 [contracts](AI_MODEL_KEY_CONTRACTS.md). Selected AI_Mgr dispatch preserves source
 camera/script gates, branch priority, shared voice semantics and the supplied
 B2_LITE variant cap. No full AI class or guessed attack behavior is registered.
+
+AI path-manager continuation: [source ledger](M2_PATH_MANAGER_SOURCES.json),
+[contracts](PATH_MANAGER_CONTRACTS.md). Original snapshot/prefix/reverse-order rules
+are retained with owned values. Later engine code confirms active enumeration only;
+no donor container or backend is imported. AI following and action delivery remain open.

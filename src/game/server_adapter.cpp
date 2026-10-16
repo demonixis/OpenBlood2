@@ -120,7 +120,13 @@ namespace OpenBlood2
         GetNextObject = [](HOBJECT previous) -> HOBJECT
         {
             active().trace_service("GetNextObject");
-            return active().objects_.next_alive(previous);
+            auto& objects = active().objects_;
+            auto next = objects.next_alive(previous);
+            // The original SDK has a separate inactive enumeration. Preserve the
+            // active-only GetNextObject contract without changing editor snapshots.
+            while (next && objects.get(next)->activity != OBJSTATE_ACTIVE)
+                next = objects.next_alive(next);
+            return next;
         };
         SetObjectDims = [](HOBJECT h, DVector* dims) -> DRESULT
         {

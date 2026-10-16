@@ -14,6 +14,7 @@
 #include "keyframe_smoke.h"
 #include "light_smoke.h"
 #include "objectives_smoke.h"
+#include "path_manager_smoke.h"
 #include "pickup_smoke.h"
 #include "random_sound_smoke.h"
 #include "scene_explosion_smoke.h"
@@ -243,6 +244,11 @@ namespace
         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
             return 4;
         const auto original_ai_key = smoke_ai_key;
+        const bool path_smoke = options.player_smoke && game.world_path == "worlds/01_subwaya.dat";
+        PathList smoke_paths;
+        bool paths_hidden = false;
+        if (path_smoke && !OpenBlood2::prepare_path_manager_smoke(game, smoke_paths))
+            return 4;
         bool interaction_hidden = false;
         const auto original_selection = selection.id;
         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
@@ -780,6 +786,8 @@ namespace
                     hidden_model_time = game.preview_animation.time;
                 if (options.world_smoke && frames == show_frame)
                     model_advanced_hidden = game.preview_model && game.preview_animation.time > hidden_model_time;
+                if (path_smoke && frames == show_frame - 1)
+                    paths_hidden = OpenBlood2::check_path_manager_smoke(game, smoke_paths, false);
                 if (options.player_smoke && frames == hide_frame)
                     hidden_player_updates = game.server_shell.Player(game.local_client)->updates;
                 if (options.player_smoke && frames == show_frame)
@@ -913,10 +921,14 @@ namespace
                              character_audio_hidden, character_audio_reentered, player ? player->sound_starts : 0,
                              player ? int(player->m_eLastSurface) : -1, game.server.audio.submitted_frames);
             }
+            const bool paths_reentered = !path_smoke || OpenBlood2::check_path_manager_smoke(game, smoke_paths, true);
+            if (path_smoke)
+                spdlog::info("AI paths: hidden={}, reentered={}, copied points={}", paths_hidden, paths_reentered,
+                             smoke_paths.size());
             const bool ui_ok =
                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
-                !selection_cleared ||
+                !selection_cleared || (path_smoke && (!paths_hidden || !paths_reentered)) ||
                 (options.skeleton_smoke &&
                  (!character_audio_hidden || !character_audio_reentered || !character_motion_hidden ||
                   !character_motion_reentered || !ai_key_hidden || !ai_key_reentered)) ||

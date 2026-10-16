@@ -38,7 +38,9 @@ movement, combat reactions, audio and autosave still prevent a playable session.
 2. `CBloodServerShell::PreStartWorld` resets the entry subset. After original
    world objects exist, `PostStartWorld` copies PathPoint positions, names and
    actions using the original PathMgr/PathListData traversal. The snapshot owns
-   its strings; AI path selection, sorting and save methods are not provided.
+   its strings. The [path-manager continuation](PATH_MANAGER_CONTRACTS.md) now
+   provides original prefix selection and reverse enumeration order; AI following
+   and save methods remain unavailable.
 3. Explicit player entry preloads Caleb's ABC and requires an indexed default
    skin. `OnClientEnterWorld` calls `CreatePlayer`, which creates a registered
    `CPlayerObj` through the existing original virtual callbacks. Its ancestry is

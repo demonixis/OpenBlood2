@@ -1,0 +1,114 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "951708a90568cad0bfcc6795168a9b77cb211b3d",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/PathMgr.cpp",
+      "sha256": "8118b71bc1a0063f0b12af2d02260cfb74ac9676057c070c1575465db204ba09",
+      "selected_lines": [
+        [
+          25,
+          61
+        ],
+        [
+          66,
+          131
+        ],
+        [
+          151,
+          182
+        ]
+      ],
+      "use": "Build/GetPath and effective reverse enumeration from null sentinel"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PathMgr.h",
+      "sha256": "ec0972b4e66d94767e9461e74fd53ec2097442167e5c806b370e0476589ef78e",
+      "selected_lines": [
+        [
+          18,
+          51
+        ]
+      ],
+      "use": "Original ownership and clear interface"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PathListData.cpp",
+      "sha256": "8bcd8c9baa9afda9dd915e14fb4acb9d7af7c224bc6b9f15722a388689050182",
+      "selected_lines": [
+        [
+          22,
+          80
+        ]
+      ],
+      "use": "Original copied position/name/action ownership"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PathList.h",
+      "sha256": "8df80ab80a3ceaaa2ad5fb0fed657b85d06ce1767f9c1ae852a4a35072f0966b",
+      "selected_lines": [
+        [
+          17,
+          203
+        ]
+      ],
+      "use": "Original owned-manager versus borrowed-result container; replaced with value vectors"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/dlink.h",
+      "sha256": "ae2525b9e0bbf6a893660420c040eb30e1bceea2ec15ba086c005f40617362cd",
+      "selected_lines": [
+        [
+          84,
+          114
+        ]
+      ],
+      "use": "Sentinel initialization and insertion confirm reverse order; reference only"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "selected_lines": [
+        [
+          654,
+          663
+        ]
+      ],
+      "use": "Separate active and inactive enumeration interfaces"
+    },
+    {
+      "path": "sources/lithtech/runtime/server/src/serverde_impl.cpp",
+      "sha256": "5e1973f36bea781f23f99d7e0bb32ddb474ebf83c142c6877b15c157ba2fd53f",
+      "selected_lines": [
+        [
+          2531,
+          2588
+        ]
+      ],
+      "use": "Later engine confirms active GetNextObject boundary; no code import"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "selected_lines": [
+        [
+          576,
+          589
+        ]
+      ],
+      "use": "Original PostStartWorld manager invocation"
+    }
+  ],
+  "adaptations": [
+    "Owned strings/optional actions and value vectors replace HSTRING and borrowed PathList pointers",
+    "Checked typed source lifetime and inspection-only source identity",
+    "Bounded 100-byte prefix and 4096-point atomic snapshot",
+    "ASCII case folding, source reverse enumeration and output-clearing semantics",
+    "Active-only GetNextObject correction; editor enumeration unchanged"
+  ],
+  "not_implemented": [
+    "AI script following, path action delivery, navigation and states",
+    "PathList save/load and GetNextInactiveObject",
+    "Remaining required classes/services and complete M2"
+  ]
+}

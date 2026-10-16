@@ -258,3 +258,13 @@ rules. Fire/extra actions and complete NPC behavior remain unavailable; the
 The AI model-key increment passed 300/300 tests in Debug and inspector-free
 Release, plus 277/277 sequential headless checks with Clang ASan/UBSan/leak
 detection on Linux. The diagnostic GPU probe preserves actual NPC model keys.
+
+Latest M2 continuation: [original AI path selection](../Documentation/Implementation/M2_PATH_MANAGER.md)
+connects PathMgr, owned route data, active enumeration and Session inspection.
+SubwayA's seven points select in the original reverse enumeration order. AI
+following/action delivery and the unchanged M2 exit gate remain incomplete.
+
+The AI path-manager increment passed 307/307 tests in both Debug and inspector-free
+Release, plus 284/284 sequential headless checks with Clang ASan/UBSan/leak
+detection on Linux. Seven real SubwayA points are checked across hidden inspection
+and reload; AI path following remains unavailable.

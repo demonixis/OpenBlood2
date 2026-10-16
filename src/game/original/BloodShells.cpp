@@ -2,13 +2,12 @@
 // original call ordering is retained; source-level adaptations replace raw
 // client data / packet reads with checked handles and owned typed values.
 #include "BloodShells.h"
-#include "PathPoint.h"
 #include "game/game_settings.h"
 #include <cmath>
 
 void CBloodServerShell::PreStartWorld()
 {
-    paths.clear();
+    paths.ClearPathList();
     world_started = false;
     updates = 0;
     // Team setup, active cinematics, voice and multiplayer state are outside
@@ -16,26 +15,9 @@ void CBloodServerShell::PreStartWorld()
 }
 bool CBloodServerShell::PostStartWorld()
 {
-    paths.clear();
-    // Original PathMgr::BuildPathList / PathListData::Copy, with value-owned
-    // strings. No AI GetPath/sorting/save support is implied by this snapshot.
-    for (HOBJECT object = server_.GetNextObject(nullptr); object; object = server_.GetNextObject(object))
-    {
-        if (!server_.IsKindOf(server_.GetObjectClass(object), server_.GetClass("PathPoint")))
-            continue;
-        auto* point = dynamic_cast<PathPoint*>(server_.HandleToObject(object));
-        if (!point)
-            return false;
-        PathEntry entry;
-        server_.GetObjectPos(object, &entry.position);
-        if (const char* value = server_.GetObjectName(object))
-            entry.name = value;
-        if (const char* value = server_.GetStringData(point->GetActionTarget()))
-            entry.action_target = value;
-        if (const char* value = server_.GetStringData(point->GetActionMessage()))
-            entry.action_message = value;
-        paths.push_back(std::move(entry));
-    }
+    world_started = false;
+    if (!paths.BuildPathList())
+        return false;
     world_started = true;
     return true;
 }

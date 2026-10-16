@@ -130,7 +130,7 @@ namespace OpenBlood2
         objects.finish_frame();
         if (!server_shell.PostStartWorld())
         {
-            error = "Original shell path snapshot failed";
+            error = "Original shell path snapshot failed: " + server_shell.paths.error();
             server.trace_enabled = false;
             unload_world();
             return false;

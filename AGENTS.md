@@ -227,3 +227,10 @@ Preserve source branch priority, server-camera/script early returns, B2_LITE's
 1..3 variants, chance draw ordering and class/gender shared voice lifetime.
 Fire/show_weapon/extra remain unavailable; diagnostic probes are not registered
 world AI. CivilianAI, CultistAI, Gideon, ExitTrigger and the actual M2 gate stay open.
+
+The latest [AI path-manager evidence](../Documentation/Implementation/M2_PATH_MANAGER.md) connects original PathMgr selection
+and owned snapshots to shell lifetime and in-game inspection. Read [contracts](docs/PATH_MANAGER_CONTRACTS.md).
+Preserve active-only GetNextObject, included SMELL points, unconsumed source objects,
+prefix-plus-first-digit matching, reverse enumeration and preflight/no-match output
+semantics. Returned paths own their data; source handles are inspection-only.
+AI following/actions, remaining classes/services and the M2 gate stay open.

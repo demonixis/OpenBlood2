@@ -76,3 +76,7 @@ an object. `create_props` preserves the supplied position/rotation and nonempty 
 unless the string explicitly overrides them (only for schema-declared properties).
 This is needed by the original SpawnObject helper; see [pickup contracts](PICKUP_CONTRACTS.md).
 Unknown/duplicate properties still reject; world-file creation defaults are unchanged.
+
+The [AI path-manager continuation](PATH_MANAGER_CONTRACTS.md) corrects GetNextObject
+to enumerate only active Alive objects. Editor snapshots remain inclusive; pending
+and stale handles are excluded. Stable slot order is not claimed retail-equivalent.
