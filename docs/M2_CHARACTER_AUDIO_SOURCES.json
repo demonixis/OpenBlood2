@@ -1,0 +1,224 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "014e32b9dd105ef81fb4f875837175fddb39b6ee",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/Anim_Sound.cpp",
+      "sha256": "238744b904e32e418188bfdc2f74d970bb544f1a027fab1c2ae9dca2b2d9aa4f",
+      "selected_lines": [
+        [
+          128,
+          142
+        ],
+        [
+          522,
+          607
+        ]
+      ],
+      "use": "Original voice lifetime, paths, busy guard and attached playback"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Anim_Sound.h",
+      "sha256": "3e42f686a5f492bdca336efdba239d61617b366221c559c8942f6e35824ccde4",
+      "selected_lines": [
+        [
+          296,
+          301
+        ],
+        [
+          377,
+          381
+        ]
+      ],
+      "use": "Sound fields and helper declarations"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          377,
+          423
+        ],
+        [
+          503,
+          504
+        ],
+        [
+          919,
+          925
+        ],
+        [
+          1608,
+          1616
+        ],
+        [
+          2378,
+          2379
+        ],
+        [
+          3114,
+          3144
+        ],
+        [
+          4878,
+          4901
+        ],
+        [
+          5769,
+          5820
+        ],
+        [
+          6457,
+          6487
+        ]
+      ],
+      "use": "Player sounds, footstep selection, completion, root and incoming surface byte"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BaseCharacter.cpp",
+      "sha256": "0002f599c46971e006829e2c41405d872e8fbb08d8ff7590cadd50d91e14aa95",
+      "selected_lines": [
+        [
+          61,
+          67
+        ]
+      ],
+      "use": "Virtual string-key callback dispatch"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "selected_lines": [
+        [
+          38,
+          84
+        ],
+        [
+          284,
+          352
+        ]
+      ],
+      "use": "Attached sound utility and unavailable AI hearing delivery"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
+      "sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
+      "selected_lines": [
+        [
+          225,
+          250
+        ]
+      ],
+      "use": "Polygon material then object-user-flags fallback"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/MoveMgr.cpp",
+      "sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a",
+      "selected_lines": [
+        [
+          394,
+          415
+        ],
+        [
+          1623,
+          1623
+        ]
+      ],
+      "use": "Last supporting surface and outgoing byte"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "selected_lines": [
+        [
+          502,
+          520
+        ]
+      ],
+      "use": "Original SurfaceType identifiers"
+    },
+    {
+      "path": "sources/blood2/Shared/SoundTypes.h",
+      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "selected_lines": [
+        [
+          14,
+          30
+        ]
+      ],
+      "use": "Original priority values"
+    },
+    {
+      "path": "sources/blood2/Shared/ContainerCodes.h",
+      "sha256": "e06bd4c2b5a9a4b32c1883f9e3f59bb1ffe419d7eb4232a2a3f6570c400fce64",
+      "selected_lines": [],
+      "use": "Original IsLiquid classification"
+    },
+    {
+      "path": "OpenBlood2/tools/Research/convert_dat.py",
+      "sha256": "35e1802e6f597476e9c2c0a28070062b503fa091c1f73bbf2e0389386e72446b",
+      "use": "Reference final v56 TextureFlags field; no code copied"
+    },
+    {
+      "path": "sources/lithtech/runtime/client/src/clientde_impl.cpp",
+      "sha256": "abcb1404c1a1fa3462fec343232a2387676674b677f77a9f19c7f67c714c865b",
+      "use": "Later engine GetPolyTextureFlags semantic reference; no binary/layout reuse"
+    },
+    {
+      "path": "sources/lithtech/tools/shared/engine/dtxmgr.h",
+      "sha256": "9e0bfad07330e9a1b10bd123211d06062862f434d3d5408a7380a2ea64060df0",
+      "use": "DTX user-flags metadata offset for private cross-check, no production DTX service"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
+      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
+      "selected_lines": [
+        [
+          25,
+          27
+        ]
+      ],
+      "use": "Original utility defaults: bInstant=false confirms attached player playback"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          276,
+          281
+        ],
+        [
+          880,
+          975
+        ]
+      ],
+      "use": "Reviewed future caller ownership and Sparam/camera/script gates; not imported"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
+      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
+      "selected_lines": [
+        [
+          301,
+          331
+        ]
+      ],
+      "use": "Reviewed class/gender-static CAnim_Sound ownership; not imported"
+    }
+  ],
+  "adaptations": [
+    "Owned bounded strings and typed checked sound IDs, no packet ABI",
+    "Actual success return for PlayVoice/PlayPlayerSound instead of source unconditional true",
+    "Checked movement surface assignment after successful motion",
+    "Source-compatible raw first point-container query using existing replacement geometry",
+    "Game rule audio helpers separate from bounded SDL mixer; dry reverb metadata only"
+  ],
+  "not_implemented": [
+    "AI hearing and character AI callers",
+    "Voice-manager/pain/death/landing/weapon sound callers",
+    "Reverb, priority arbitration and streaming",
+    "ExitTrigger, full client FX and M2 gameplay gate"
+  ]
+}

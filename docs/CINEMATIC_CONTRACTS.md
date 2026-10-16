@@ -1,5 +1,9 @@
 # Original cinematic cues and bounded audio
 
+> Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
+> voice helpers, player sound keys and material/liquid footsteps now execute.
+> Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
+
 The later [world sound contracts](WORLD_SOUND_CONTRACTS.md) add the selected built-in
 Sound whole-clip loops and consumed-source accounting. Earlier blanket loop/world
 ownership omissions below are historical; streaming and the M2 gate remain open.

@@ -1,5 +1,9 @@
 # Resource, World and Session Contracts
 
+> Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
+> voice helpers, player sound keys and material/liquid footsteps now execute.
+> Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
+
 > Extended by [scene explosion contracts](SCENE_EXPLOSION_CONTRACTS.md): original
 > CClientExplosionSFX activation/removal and detached audio, preserving its null
 > damager (zero delivered damage). Client FX and complete M2 remain unavailable.

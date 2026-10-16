@@ -1,5 +1,9 @@
 # Original character animations and node queries
 
+> Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
+> voice helpers, player sound keys and material/liquid footsteps now execute.
+> Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
+
 This extends [locomotion](LOCOMOTION_CONTRACTS.md) and [model services](MODEL_AND_COLLISION_CONTRACTS.md).
 M2 remains incomplete. CAnim_Sound imports animation discovery, CheckAnims,
 GenerateHitSpheres and ForceAnimation from Blood II; its voice helpers, damage

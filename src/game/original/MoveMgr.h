@@ -1,4 +1,5 @@
 #pragma once
+#include "SurfaceTypes.h"
 #include "server_de.h"
 
 class CBloodServerShell;
@@ -19,6 +20,7 @@ class CMoveMgr
     OpenBlood2::PlayerPhysics physics;
     DDWORD m_dwControlFlags = 0, m_dwLastControlFlags = 0;
     DBYTE m_ClientMoveCode = 0;
+    SurfaceType m_eLastSurface = SURFTYPE_UNKNOWN;
     bool m_bOnGround = false, m_bLastJumpCommand = false, m_bFalling = false;
     bool m_bForcedCrouch = false;
     OpenBlood2::ContainerState containers;

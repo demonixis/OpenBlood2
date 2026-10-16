@@ -54,6 +54,48 @@ namespace OpenBlood2
             }
             else
                 ImGui::TextUnformatted("No original character animation table on this object");
+            if (anim && ImGui::CollapsingHeader("Character audio", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::TextWrapped("Root: %s | silent flag: %s (source helper does not test it)",
+                                   anim->GetSoundRoot().c_str(), anim->m_bSilent ? "set" : "clear");
+                ImGui::Text("Voice helper: %llu starts / %llu attempts / %llu failures / %llu busy",
+                            (unsigned long long)anim->sound_starts, (unsigned long long)anim->sound_attempts,
+                            (unsigned long long)anim->sound_failures, (unsigned long long)anim->voice_busy);
+                if (!anim->sound_error.empty())
+                    ImGui::TextWrapped("%s", anim->sound_error.c_str());
+                auto voice = [&](SoundId id)
+                {
+                    const auto* v = game.server.audio.get(id);
+                    if (!v)
+                    {
+                        ImGui::Text("Voice %llu: none / released", (unsigned long long)id);
+                        return;
+                    }
+                    ImGui::TextWrapped("%s | %s | %.3f / %.3f s | attached %.1f %.1f %.1f", v->request.resource.c_str(),
+                                       v->done ? "done" : "playing", v->cursor / v->clip->rate, v->clip->duration(),
+                                       v->position.x, v->position.y, v->position.z);
+                };
+                voice(anim->m_hVoxSound);
+                if (const auto* player = dynamic_cast<const CPlayerObj*>(character))
+                {
+                    ImGui::Text("Player keys: %llu | starts %llu / attempts %llu / failures %llu",
+                                (unsigned long long)player->sound_keys, (unsigned long long)player->sound_starts,
+                                (unsigned long long)player->sound_attempts, (unsigned long long)player->sound_failures);
+                    ImGui::TextWrapped("Last request: %s", player->sound_resource.c_str());
+                    if (!player->sound_error.empty())
+                        ImGui::TextWrapped("%s", player->sound_error.c_str());
+                    voice(player->m_hCurSound);
+                    ImGui::Text("Footsteps: %llu speed-suppressed / %llu unmapped",
+                                (unsigned long long)player->suppressed_footsteps,
+                                (unsigned long long)player->unresolved_footsteps);
+                    ImGui::Text("Ground material: %d | foot material: %d | volume: %u | next foot: %s",
+                                player->m_eLastSurface, player->footstep_surface, unsigned(player->footstep_container),
+                                player->m_bNextFootstepLeft ? "left" : "right");
+                    ImGui::Text("AI sound alerts unavailable: %llu",
+                                (unsigned long long)player->unavailable_sound_alerts);
+                }
+                ImGui::TextWrapped("Dry audio only. AI hearing, voice-manager events and reverb remain unavailable.");
+            }
             std::vector<NodePose> pose;
             if (sample_pose(model, r->animation.animation, r->animation.time, pose))
             {

@@ -11,6 +11,7 @@ namespace OpenBlood2
         std::uint32_t polygon = UINT32_MAX;
         HOBJECT object = nullptr;
         bool start_solid = false;
+        std::uint16_t texture_flags = 0;
     };
     enum class CollisionQuery
     {
@@ -47,6 +48,7 @@ namespace OpenBlood2
             std::array<DVector, 3> points;
             DVector min, max;
             std::uint32_t polygon;
+            std::uint16_t texture_flags = 0;
         };
         struct Node
         {

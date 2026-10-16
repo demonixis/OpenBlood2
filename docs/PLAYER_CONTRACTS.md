@@ -1,5 +1,9 @@
 # Original Player Entry Boundary
 
+> Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
+> voice helpers, player sound keys and material/liquid footsteps now execute.
+> Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
+
 > Extended by [character animation contracts](CHARACTER_ANIMATION_CONTRACTS.md):
 > original CAnim_Sound tables now drive locomotion; current model node queries and
 > original sphere measurements are inspectable. AI/damage-localization callers

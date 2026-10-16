@@ -19,7 +19,8 @@ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
         auto flags = g_pServerDE->GetObjectFlags(m_hObject);
         g_pServerDE->SetObjectFlags(m_hObject, flags | FLAG_MODELGOURAUDSHADE | FLAG_ANIMTRANSITION);
     }
-    if (message == MID_MODELSTRINGKEY && data && pending_model_commands.size() < 32)
+    if (message == MID_MODELSTRINGKEY && data && !OnStringKey(static_cast<ArgList*>(data)) &&
+        pending_model_commands.size() < 32)
     {
         auto* args = static_cast<ArgList*>(data);
         std::string command;
@@ -27,7 +28,8 @@ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
         {
             if (i)
                 command += ' ';
-            command += args->argv[i];
+            if (args->argv[i])
+                command += args->argv[i];
         }
         pending_model_commands.push_back(std::move(command));
     }
@@ -36,6 +38,8 @@ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
 CPlayerObj::~CPlayerObj()
 {
     auto* server = GetServerDE();
+    if (m_hCurSound)
+        server->KillSound(m_hCurSound);
     if (m_hClient)
         server->SetClientUserData(m_hClient, nullptr);
     if (m_hstrTrigger)
@@ -90,8 +94,8 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
 }
 bool CPlayerObj::SetCharacter(DBYTE character)
 {
-    // Caleb, default skin only until the other original character branches,
-    // sound roots are ported. Reject before mutation.
+    // Caleb, default skin only until the other original character branches
+    // are ported. Reject before mutation.
     if (character != 0 || m_nSkin != 0)
     {
         entry_error = "Only Caleb's default entry profile is ported";
@@ -106,6 +110,7 @@ bool CPlayerObj::SetCharacter(DBYTE character)
     if (!m_Anim_Sound.SetAnimationIndexes(m_hObject))
         return false;
     m_Anim_Sound.GenerateHitSpheres(m_hObject);
+    m_Anim_Sound.SetSoundRoot("sounds\\chosen\\caleb");
     m_nCharacter = character;
     return true;
 }
@@ -339,6 +344,7 @@ bool CPlayerObj::HandlePlayerPositionMessage(const OpenBlood2::PlayerMove& move)
     // prediction leash. Here one local body resolves collisions once, so use
     // the resulting support and never teleport through a rejected collision.
     m_bOnGround = state.standing && state.ground_normal.y >= 0.5f;
+    m_eLastSurface = static_cast<SurfaceType>(move.surface);
     ++movement_messages;
     return true;
 }
@@ -356,6 +362,7 @@ DBOOL CPlayerObj::Update(DVector*)
             return DFALSE;
         m_bFirstUpdate = DFALSE;
     }
+    UpdateSound();
     return UpdateStats();
 }
 bool CPlayerObj::UpdateStats()

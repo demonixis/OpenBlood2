@@ -5,14 +5,34 @@
 #include <string>
 #include <vector>
 
-// Original animation/node subset. Voice helpers and damage localization callers
-// are not yet imported. See CHARACTER_ANIMATION_CONTRACTS.md.
+// Original animation/node and voice subsets. Damage localization and AI callers
+// remain pending. See CHARACTER_ANIMATION_CONTRACTS.md and CHARACTER_AUDIO_CONTRACTS.md.
 inline constexpr unsigned NUM_ALL_NODES = 21, NUM_STD_NODES = 18;
 extern const std::array<const char*, NUM_ALL_NODES> szNodes;
 void CheckAnims(std::span<DDWORD>);
 class CAnim_Sound
 {
   public:
+    CAnim_Sound() = default;
+    ~CAnim_Sound();
+    CAnim_Sound(const CAnim_Sound&) = delete;
+    CAnim_Sound& operator=(const CAnim_Sound&) = delete;
+    bool SetSoundRoot(std::string_view);
+    const std::string& GetSoundRoot() const
+    {
+        return sound_root_;
+    }
+    void SetSilent(DBOOL silent)
+    {
+        m_bSilent = silent;
+    }
+    bool GetSoundPath(std::string&, int index = 0) const;
+    bool PlayVoice(HOBJECT, std::string_view, float radius, int volume);
+    OpenBlood2::SoundId PlaySound(HOBJECT, std::string_view, float radius, int volume, bool get_handle = false);
+    OpenBlood2::SoundId m_hVoxSound = 0;
+    DBOOL m_bSilent = DFALSE; // Source helper methods do not test this flag.
+    std::uint64_t sound_attempts = 0, sound_starts = 0, sound_failures = 0, voice_busy = 0;
+    std::string sound_resource, sound_error;
     bool SetAnimationIndexes(HOBJECT);
     bool GenerateHitSpheres(HOBJECT);
     bool ForceAnimation(HOBJECT, DDWORD);
@@ -74,4 +94,7 @@ class CAnim_Sound
     DDWORD m_nAnim_CORPSE[12]{};
     DDWORD m_nAnim_LIMB[3]{};
     DDWORD m_nAnim_SPECIAL[9]{};
+
+  private:
+    std::string sound_root_;
 };

@@ -421,3 +421,7 @@ and locomotion. See [source ledger](M2_CHARACTER_ANIMATION_SOURCES.json) and
 bounded ABC sampler; later LithTech informs name matching only. OpenBlood2's
 false-returning node function was reviewed and not imported. Voice helpers,
 AI callers, damage localization, attachments and blending remain unimplemented.
+
+Character audio continuation: [source ledger](M2_CHARACTER_AUDIO_SOURCES.json),
+[contracts](CHARACTER_AUDIO_CONTRACTS.md). Original Anim_Sound and PlayerObj sound
+rules are integrated selectively; no reference repository is a build dependency.

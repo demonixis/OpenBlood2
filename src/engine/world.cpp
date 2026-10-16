@@ -154,7 +154,7 @@ namespace OpenBlood2
                     r.string();
                     r.string();
                 }
-                r.u16();
+                s.texture_flags = r.u16();
                 if (!r.require(effect <= 1 && s.texture < textures && s.plane < planes))
                     return false;
                 out.surfaces.push_back(s);

@@ -32,6 +32,8 @@ class CSBase
 class ServerDE : public CSBase
 {
   public:
+    virtual OpenBlood2::SoundId PlayCharacterSound(HOBJECT, const OpenBlood2::SoundRequest&, bool retain,
+                                                   std::string&) = 0;
     virtual OpenBlood2::SoundId PlayCinematicSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
     virtual OpenBlood2::SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
     virtual OpenBlood2::SoundId PlaySoundAt(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
@@ -57,6 +59,7 @@ class ServerDE : public CSBase
     virtual bool ReadKeyMessage(HMESSAGEREAD, OpenBlood2::KeyMessage&) = 0;
     virtual OpenBlood2::MoverResult MoveWorldModel(HOBJECT, DVector destination) = 0;
     virtual OpenBlood2::MoverResult RotateWorldModel(HOBJECT, const OpenBlood2::RotationMove&) = 0;
+    virtual bool GetPointContainerCode(DVector, ContainerCode&) = 0;
     virtual bool GetContainers(HOBJECT, DVector head, OpenBlood2::ContainerState&) = 0;
     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;

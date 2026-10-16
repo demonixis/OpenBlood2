@@ -1,5 +1,9 @@
 # Container, liquid and ladder boundary
 
+> Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
+> voice helpers, player sound keys and material/liquid footsteps now execute.
+> Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
+
 > The [scene explosion continuation](SCENE_EXPLOSION_CONTRACTS.md#hot-query-allocation-adjustment)
 > reduces hot-query copying to fresh snapshots of bound containers. Order,
 > lifetime, membership and source physics rules are unchanged.

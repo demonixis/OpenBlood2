@@ -3,6 +3,7 @@
 #include "B2BaseClass.h"
 #include "Destructable.h"
 #include "InventoryMgr.h"
+#include "SurfaceTypes.h"
 #include "dlink.h"
 #include <array>
 #include <random>
@@ -20,17 +21,31 @@ class CBaseCharacter : public B2BaseClass
     CInventoryMgr m_InventoryMgr;
     CDestructable m_damage;
     CAnim_Sound m_Anim_Sound;
-    // Retain unhandled model commands for inspection, never execute them as
-    // though sound/weapon/character animation-key services were available.
+    // Retain commands outside the selected original player sound-key path.
+    // Recording a key never claims its missing service was executed.
     std::vector<std::string> pending_model_commands;
 
   protected:
+    virtual bool OnStringKey(ArgList*)
+    {
+        return false;
+    }
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
 };
 class CPlayerObj : public CBaseCharacter
 {
   public:
     ~CPlayerObj() override;
+    bool PlayPlayerSound(std::string_view, float radius, DBYTE volume, bool stream, DBYTE priority = 2);
+    OpenBlood2::SoundId m_hCurSound = 0;
+    bool m_bDisableFootsteps = false, m_bNextFootstepLeft = true;
+    SurfaceType m_eLastSurface = SURFTYPE_UNKNOWN, footstep_surface = SURFTYPE_UNKNOWN;
+    ContainerCode footstep_container = CC_NOTHING;
+    bool GetFootstepSound(std::string&);
+    std::uint64_t sound_keys = 0, sound_attempts = 0, sound_starts = 0, sound_failures = 0;
+    std::uint64_t suppressed_footsteps = 0, unresolved_footsteps = 0, unavailable_sound_alerts = 0;
+    std::string sound_resource, sound_error;
+    void UpdateSound();
     void PostPropRead(ObjectCreateStruct*);
     DBOOL InitialUpdate(int);
     DBOOL Update(DVector*);
@@ -108,6 +123,7 @@ class CPlayerObj : public CBaseCharacter
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
+    bool OnStringKey(ArgList*) override;
 
   private:
     OpenBlood2::PlayerStats last_sent_stats_{-1, -1, -1};

@@ -187,7 +187,7 @@ namespace
         w.u32(0);
         w.u32(0);
         w.byte(0);
-        w.u16(0);
+        w.u16(20); // Serialized material flags, independent of surface flags.
         w.zero(12);
         w.u32(0);
         for (unsigned i = 0; i < 3; ++i)
@@ -348,6 +348,7 @@ namespace
         CHECK(m.polygons[0].points == std::vector<std::uint16_t>({0, 1, 2}));
         CHECK(m.planes[0].normal.y == 1);
         CHECK(m.textures[0] == "t.dtx");
+        CHECK(m.surfaces[0].texture_flags == 20 && m.surfaces[0].flags == 0);
         CHECK(w.min.x == -10);
         return true;
     }

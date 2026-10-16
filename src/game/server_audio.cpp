@@ -1,6 +1,23 @@
 #include "game/server_adapter.h"
 namespace OpenBlood2
 {
+    SoundId ServerAdapter::PlayCharacterSound(HOBJECT object, const SoundRequest& request, bool retain,
+                                              std::string& error)
+    {
+        trace_service("PlayCharacterSound");
+        if (!IsObjectAlive(object) || !client_resources || request.speaker != object ||
+            request.space != SoundSpace::Spatial || request.loop)
+        {
+            error = "Character sound requires a live attached owner and a spatial one-shot request";
+            return 0;
+        }
+        DVector position{};
+        GetObjectPos(object, &position);
+        const auto id = audio.play(*client_resources, object, request, position, error);
+        if (auto* voice = audio.get(id))
+            voice->auto_remove = !retain;
+        return id;
+    }
     SoundId ServerAdapter::PlayCinematicSound(HOBJECT owner, const SoundRequest& request, std::string& error)
     {
         trace_service("PlayCinematicSound");

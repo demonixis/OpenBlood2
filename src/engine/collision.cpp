@@ -222,7 +222,8 @@ namespace OpenBlood2
                             model.points[polygon.points[j + 1]]},
                            {},
                            {},
-                           i};
+                           i,
+                           model.surfaces[polygon.surface].texture_flags};
                 auto normal =
                     cross(vector_subtract(t.points[1], t.points[0]), vector_subtract(t.points[2], t.points[0]));
                 if (vector_dot(normal, normal) < 1e-12f)
@@ -286,6 +287,7 @@ namespace OpenBlood2
             {
                 hit = candidate;
                 hit.polygon = triangles_[i].polygon;
+                hit.texture_flags = triangles_[i].texture_flags;
                 found = true;
             }
         }

@@ -5,6 +5,25 @@
 
 namespace OpenBlood2
 {
+    bool ServerAdapter::GetPointContainerCode(DVector point, ContainerCode& code)
+    {
+        trace_service("GetPointContainerCode");
+        if (!physics_vector(point))
+            return false;
+        code = CC_NOTHING;
+        for (auto id : objects_.container_snapshot())
+        {
+            const auto* r = objects_.get(id);
+            if (!r || r->life != Life::Alive || !r->container || !r->container->contains(point))
+                continue;
+            if (const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get()))
+            {
+                code = brush->info.code; // Original foot query does not filter Hidden.
+                return true;
+            }
+        }
+        return true;
+    }
     bool ServerAdapter::GetContainers(HOBJECT object, DVector head, ContainerState& state)
     {
         trace_service("GetContainers");

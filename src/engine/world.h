@@ -26,6 +26,7 @@ namespace OpenBlood2
         DVector origin, u, v;
         std::uint16_t texture = 0;
         std::uint32_t plane = 0, flags = 0;
+        std::uint16_t texture_flags = 0; // Serialized v56 surface material, not render flags.
     };
     struct Polygon
     {

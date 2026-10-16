@@ -93,6 +93,9 @@ namespace OpenBlood2
             state.ground_normal = nearest.normal;
             state.ground_object = nearest.object;
             state.ground_polygon = nearest.polygon;
+            state.ground_surface = nearest.texture_flags;
+            if (!state.ground_surface && nearest.object)
+                state.ground_surface = GetObjectUserFlags(nearest.object) >> 24;
         }
         return true;
     }

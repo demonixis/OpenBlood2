@@ -76,13 +76,14 @@ namespace
             spdlog::error("Original game boundary initialization failed");
             return 4;
         }
-        if ((options.scene_explosions_smoke || options.cinematics_smoke || options.world_sounds_smoke ||
-             options.random_sounds_smoke || (!options.gpu_smoke && !options.world_smoke)) &&
+        if ((options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
+             options.world_sounds_smoke || options.random_sounds_smoke ||
+             (!options.gpu_smoke && !options.world_smoke)) &&
             !game.server.audio.open_output(error))
         {
             spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
-            if (options.scene_explosions_smoke || options.cinematics_smoke || options.world_sounds_smoke ||
-                options.random_sounds_smoke)
+            if (options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
+                options.world_sounds_smoke || options.random_sounds_smoke)
                 return 4;
         }
         HOBJECT key = nullptr;
@@ -302,7 +303,7 @@ namespace
         DVector hidden_position{};
         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
         unsigned forward_frames = 0, jump_frames = 0, crouch_frames = 0, run_frames = 0;
-        bool skeleton_hidden = false;
+        bool skeleton_hidden = false, character_audio_hidden = false;
         bool crouched_hidden = false, stood_after_crouch = false, locomotion_pose = false;
         bool saw_walk = false, saw_run = false, saw_jump = false;
         bool container_hidden = false;
@@ -468,6 +469,12 @@ namespace
                 const auto* record = player ? game.objects.get(player->m_hObject) : nullptr;
                 if (player && record)
                 {
+                    if (options.skeleton_smoke && !inspector_visible)
+                        if (const auto* voice = game.server.audio.get(player->m_hCurSound))
+                            character_audio_hidden |=
+                                voice->cursor > 0 && voice->request.speaker == player->m_hObject &&
+                                voice->request.resource.starts_with("sounds/player/footsteps/") &&
+                                game.server.audio.submitted_frames > 0 && game.server.audio.output_error.empty();
                     saw_walk |= player->move_state == CPlayerObj::MoveState::Walk;
                     saw_run |= player->move_state == CPlayerObj::MoveState::Run;
                     saw_jump |= player->move_state == CPlayerObj::MoveState::Jump;
@@ -834,10 +841,30 @@ namespace
                     skeleton_reentered = player->m_Anim_Sound.hit_spheres_valid &&
                                          game.server.GetModelNodeTransform(player->m_hObject, "head", &head, &rotation);
                 }
+            bool character_audio_reentered = !options.skeleton_smoke;
+            if (options.skeleton_smoke)
+            {
+                auto* player = game.server_shell.Player(game.local_client);
+                game.client_shell.movement_input.forward = true;
+                for (int i = 0; player && i < 90 && !character_audio_reentered; ++i)
+                {
+                    if (!game.step(1.0 / 60))
+                        return 4;
+                    if (const auto* voice = game.server.audio.get(player->m_hCurSound))
+                        character_audio_reentered = voice->cursor > 0 && player->sound_starts > 0 &&
+                                                    game.server.audio.submitted_frames > 0 &&
+                                                    game.server.audio.output_error.empty();
+                }
+                game.client_shell.movement_input = {};
+                spdlog::info("Character audio: hidden={}, reentered={}, starts={}, surface={}, submitted={}",
+                             character_audio_hidden, character_audio_reentered, player ? player->sound_starts : 0,
+                             player ? int(player->m_eLastSurface) : -1, game.server.audio.submitted_frames);
+            }
             const bool ui_ok =
                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
                 !selection_cleared ||
+                (options.skeleton_smoke && (!character_audio_hidden || !character_audio_reentered)) ||
                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||

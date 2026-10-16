@@ -204,3 +204,11 @@ humiliation spelling/order and intermediate-zero ForceAnimation behavior.
 Missing head nodes fail explicitly; later-node fallback stays visible. Spheres
 are measurements, not active damage/collision services. AI, ExitTrigger, client
 FX and complete M2 remain open; SubwayA counts are unchanged.
+
+The latest [character audio evidence](../Documentation/Implementation/M2_CHARACTER_AUDIO.md) connects original CAnim_Sound
+voice helpers, player model-key audio and surface/liquid footsteps to real WAV
+playback. Read [audio contracts](docs/CHARACTER_AUDIO_CONTRACTS.md). Preserve busy-voice refusal,
+player interrupt-before-failure, source 3D speed threshold and left/right alternation,
+raw first-container liquid precedence and distinct baked material flags. Typed
+movement keeps stale surface messages rejected. AI sound alerts remain explicitly
+unavailable; no new AI class or complete M2 gate is claimed.

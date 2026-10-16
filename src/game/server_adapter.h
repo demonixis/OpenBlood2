@@ -32,6 +32,7 @@ namespace OpenBlood2
     {
       public:
         AudioMixer audio;
+        SoundId PlayCharacterSound(HOBJECT, const SoundRequest&, bool retain, std::string&) override;
         SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
         SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) override;
         SoundId PlaySoundAt(HOBJECT, const SoundRequest&, DVector, std::string&) override;
@@ -67,6 +68,7 @@ namespace OpenBlood2
         bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
         MoverResult MoveWorldModel(HOBJECT, DVector destination) override;
         MoverResult RotateWorldModel(HOBJECT, const RotationMove&) override;
+        bool GetPointContainerCode(DVector, ContainerCode&) override;
         bool GetContainers(HOBJECT, DVector head, ContainerState&) override;
         bool damage_containers();
         float GetWorldTime() override

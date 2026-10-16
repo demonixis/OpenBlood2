@@ -104,6 +104,8 @@ void CMoveMgr::UpdateControlFlags(const MovementInput& input, bool can_move)
 void CMoveMgr::UpdateOnGround()
 {
     m_bOnGround = body.standing;
+    if (m_bOnGround)
+        m_eLastSurface = static_cast<SurfaceType>(body.ground_surface);
     if (m_bOnGround && body.ground_normal.y < 0.5f)
     {
         const auto across = normalized(cross(body.ground_normal, {0, 1, 0}));
@@ -285,7 +287,8 @@ void CMoveMgr::UpdateMotion(float yaw, float pitch)
 }
 PlayerMove CMoveMgr::WritePositionInfo(DVector destination, DVector velocity) const
 {
-    return {m_ClientMoveCode, destination, velocity, body.acceleration, m_bOnGround};
+    return {m_ClientMoveCode,  destination, velocity,
+            body.acceleration, m_bOnGround, static_cast<DBYTE>(m_eLastSurface)};
 }
 bool CMoveMgr::MoveLocalSolidObject(CBloodServerShell& shell)
 {
