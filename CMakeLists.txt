@@ -43,7 +43,7 @@ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_m
 target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
     src/game/server_activation.cpp src/game/original/AIRuntime.cpp
     src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/Movement.cpp
-    src/game/original/AIState.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+    src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
     src/game/original/CivilianAI.cpp
     src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
 target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)

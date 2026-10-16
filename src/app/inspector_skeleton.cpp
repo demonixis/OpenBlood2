@@ -7,9 +7,8 @@ namespace OpenBlood2
 {
     void Inspector::draw_skeleton(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextWrapped("Current ABC node transforms and original CAnim_Sound tables. Spheres are the original "
-                           "initialization radii, shown at live node positions; damage localization and complete AI "
-                           "behavior remain unported.");
+        ImGui::TextWrapped("Original hit spheres at current ABC node poses. Initialized NPCs use them for hit "
+                           "localization. Death/corpse services remain unavailable.");
         if (ImGui::CollapsingHeader("Live attachments"))
         {
             ImGui::TextWrapped("Held models follow current parent nodes. Physical/nested attachments and dropped "
@@ -78,6 +77,30 @@ namespace OpenBlood2
                                "may fail explicitly.");
             if (!a.runtime_error.empty())
                 ImGui::TextWrapped("Failure: %s", a.runtime_error.c_str());
+        }
+        if (target_ai && ImGui::CollapsingHeader("Original NPC hit and recoil", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& a = *target_ai;
+            const auto& d = a.m_damage;
+            const auto& h = d.hit;
+            ImGui::Text("Localization %s | accepted packets %llu | queries %llu",
+                        d.ai_hit_localization ? "enabled" : "disabled", (unsigned long long)d.accepted_damage,
+                        (unsigned long long)d.hit_queries);
+            ImGui::Text("Last query %s | raw node %d | region %d | side %d", h.valid ? "valid" : "unavailable/none",
+                        h.raw_node, h.node, h.side);
+            ImGui::Text("Random fallback %s | missing later nodes %u | distance %.3f | multiplier %.2f",
+                        h.random_fallback ? "yes" : "no", h.missing_nodes, h.distance, h.multiplier);
+            ImGui::Text("Head kill %s | injured leg %d | accumulated damage %.3f", h.head_kill ? "yes" : "no",
+                        a.m_nInjuredLeg, d.m_fLastDamageAmount);
+            ImGui::Text("Reactions %llu | recoil starts %llu | selected node %d / slot %d",
+                        (unsigned long long)a.damage_reactions, (unsigned long long)a.recoil_starts, a.recoil_node,
+                        a.recoil_slot);
+            if (!h.error.empty())
+                ImGui::TextWrapped("Localization failure: %s", h.error.c_str());
+            if (!a.damage_reaction_error.empty())
+                ImGui::TextWrapped("Reaction failure: %s", a.damage_reaction_error.c_str());
+            ImGui::TextWrapped(
+                "Visible-node hit spheres; no limb hiding. Death/corpses/gibs and NPC impulses remain unavailable.");
         }
         if (target_ai && ImGui::CollapsingHeader("Original escape and guard", ImGuiTreeNodeFlags_DefaultOpen))
         {

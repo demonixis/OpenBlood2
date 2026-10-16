@@ -1,5 +1,10 @@
 # Original Cultist/Civilian initialization and AI_Update
 
+> Extended by [NPC hit/recoil contracts](AI_HIT_CONTRACTS.md): original visible-node
+> localization, region damage and nonlethal reactions now execute for initialized
+> Cultist/Civilian NPCs. Earlier blanket localization/recoil omissions are historical;
+> lethal death/corpse/drop services remain unavailable and M2 is incomplete.
+
 CultistAI and CivilianAI are now registered for world creation. Their selected
 original constructors, properties, model selection, initialization and AI_Update
 execute through typed services. See [source selections](M2_AI_RUNTIME_SOURCES.json)

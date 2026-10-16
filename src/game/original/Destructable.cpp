@@ -120,8 +120,8 @@ void CDestructable::SendTrigger(const std::string& target, const std::string& me
     if (text)
         server->FreeString(text);
 }
-// Selected ordinary normal/melee damage branch from Destructable.cpp. AI hit
-// limbs, player damage impulses, powerups and complete character death reactions are deferred.
+// Shared damage; production NPC localization is in AIHitReaction.cpp.
+// Player/NPC impulses, powerups and complete death reactions remain bounded separately.
 DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD message, HMESSAGEREAD read)
 {
     if (message == 1000)
@@ -159,6 +159,23 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
                 m_fArmorPoints = 0;
                 amount = m_fHitPoints;
             }
+            else if (ai_hit_localization)
+            {
+                auto* ai = dynamic_cast<AI_Mgr*>(owner);
+                if (!ai || !ai->AnimSound() || !LocalizeHit(damage, *ai->AnimSound()))
+                {
+                    handling_damage = false;
+                    if (ai)
+                        ai->RuntimeFailure(hit.error.empty() ? "NPC hit table unavailable" : hit.error);
+                    return 0;
+                }
+                node_hit = hit.node;
+                side_hit = hit.side;
+                hit.head_kill = node_hit == 1 && ai->m_bCabal;
+                if (hit.head_kill)
+                    m_fHitPoints = 0; // Original Cabal headshot bypasses armor before ordinary absorption.
+                amount *= hit.multiplier;
+            }
             if (apply_damage_physics && damage.type != OpenBlood2::DamageType::Death)
                 ApplyDamagePhysics(amount, damage.direction);
             if (m_fArmorPoints > 0 && damage.type != OpenBlood2::DamageType::Suffocate)
@@ -181,7 +198,10 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
             m_fHitPoints -= amount;
             m_fLastDamageAmount += amount;
             last_damage = damage;
-            // Original AI-only retaliation identity; limb multipliers remain unavailable.
+            if (amount != 0)
+                reaction_damage_type = damage.type;
+            ++accepted_damage;
+            // Original AI-only retaliation identity.
             // A checked token avoids sharing/breaking the AI target's directed link.
             if (dynamic_cast<AI_Mgr*>(owner) && damage.type != OpenBlood2::DamageType::Death)
                 last_damager_ = damage.attacker;

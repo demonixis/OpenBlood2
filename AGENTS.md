@@ -336,3 +336,13 @@ SubwayA has 202 created source entries, 4 transferred sounds, 372 editor-only,
 2 unsupported and no creation failures. Remaining actions/death, Gideon, required
 FX and ExitTrigger keep M2 open. User-reported pink train glass and direct movement
 failure after intro are retained in the evidence for later investigation.
+
+The [NPC hit/recoil continuation](../Documentation/Implementation/M2_AI_HIT.md) connects original visible-node hit localization,
+region damage and nonlethal HandleDamage/MC_Recoil through production AI_Update.
+Read [contracts](docs/AI_HIT_CONTRACTS.md). Preserve NORMAL=0 random fallback including raw node 18,
+unwrapped side-angle difference, Cabal head kill before armor, strict limp threshold,
+remaining-HP/accumulated-damage recoil threshold and Civilian EscapeRun override.
+Missing later nodes may reuse the prior transform; invalid poses must fail before
+health mutation. Refused/nested packets cannot replay stale reactions. Lethal
+corpse/drop/gib services remain explicit failures; NPC impulses, hidden limbs,
+Gideon, ExitTrigger and required FX keep M2 incomplete.

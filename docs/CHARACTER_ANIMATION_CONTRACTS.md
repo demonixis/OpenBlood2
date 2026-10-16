@@ -1,5 +1,10 @@
 # Original character animations and node queries
 
+> Extended by [NPC hit/recoil contracts](AI_HIT_CONTRACTS.md): original visible-node
+> localization, region damage and nonlethal reactions now execute for initialized
+> Cultist/Civilian NPCs. Earlier blanket localization/recoil omissions are historical;
+> lethal death/corpse/drop services remain unavailable and M2 is incomplete.
+
 > Extended by [AI state/action contracts](AI_STATE_CONTRACTS.md): selected original
 > state decisions, transitions and stationary animation commands now execute.
 > Full AI_Update and production NPCs remain unavailable; M2 is still open.

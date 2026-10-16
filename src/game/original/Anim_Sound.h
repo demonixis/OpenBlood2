@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-// Original animation/node and voice subsets. Damage localization and AI callers
-// remain pending. See CHARACTER_ANIMATION_CONTRACTS.md and CHARACTER_AUDIO_CONTRACTS.md.
+// Original animation/node and voice subsets, also used by production NPC hit localization.
+// See CHARACTER_ANIMATION_CONTRACTS.md and AI_HIT_CONTRACTS.md.
 inline constexpr unsigned NUM_ALL_NODES = 21, NUM_STD_NODES = 18;
 extern const std::array<const char*, NUM_ALL_NODES> szNodes;
 void CheckAnims(std::span<DDWORD>);

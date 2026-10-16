@@ -91,6 +91,24 @@ namespace OpenBlood2
         return record && objects_.refresh_attachment(object) &&
                object_node_transform(*record, name, position, rotation);
     }
+    ServerDE::NodeQuery ServerAdapter::QueryModelNodeTransform(HOBJECT object, const char* name, DVector* position,
+                                                               DRotation* rotation)
+    {
+        trace_service("QueryModelNodeTransform");
+        const auto* r = objects_.get(object);
+        if (!r || r->life != Life::Alive || !r->model || r->state.m_ObjectType != OT_MODEL || !name || !*name ||
+            !position || !rotation)
+            return NodeQuery::Unavailable;
+        unsigned matches = 0;
+        for (const auto& node : r->model->nodes)
+            matches += !CaseLess{}(node.name, name) && !CaseLess{}(name, node.name);
+        if (!matches)
+            return NodeQuery::Missing;
+        if (matches != 1 || !objects_.refresh_attachment(object) ||
+            !object_node_transform(*r, name, position, rotation))
+            return NodeQuery::Unavailable;
+        return NodeQuery::Found;
+    }
     bool ServerAdapter::GetModelAnimationName(HOBJECT object, HMODELANIM animation, std::string& name)
     {
         trace_service("GetModelAnimationName");

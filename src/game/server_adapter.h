@@ -186,6 +186,7 @@ namespace OpenBlood2
         DRESULT EndMessage(HMESSAGEWRITE) override;
         DRESULT MoveObject(HOBJECT, DVector*) override;
         DRESULT GetModelAnimUserDims(HOBJECT, DVector*, HMODELANIM) override;
+        NodeQuery QueryModelNodeTransform(HOBJECT, const char*, DVector*, DRotation*) override;
         DBOOL GetModelNodeTransform(HOBJECT, const char*, DVector*, DRotation*) override;
         bool GetModelAnimationName(HOBJECT, HMODELANIM, std::string&) override;
         DRESULT SetGlobalForce(DVector*) override;

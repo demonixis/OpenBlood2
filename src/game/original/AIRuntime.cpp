@@ -271,6 +271,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (reason == INITIALUPDATE_WORLDFILE && s->MoveObjectToGround(m_hObject) != DE_OK)
         return RuntimeFailure("NPC world ground placement failed");
     m_fLastUpdate = s->GetTime();
+    m_damage.ai_hit_localization = true;
     runtime_initialized = true;
     return true;
 }

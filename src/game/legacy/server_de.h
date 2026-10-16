@@ -142,6 +142,13 @@ class ServerDE : public CSBase
     void (*SetModelLooping)(HOBJECT, DBOOL) = nullptr;
     DBOOL (*GetModelLooping)(HOBJECT) = nullptr;
     virtual DRESULT GetModelAnimUserDims(HOBJECT, DVector*, HMODELANIM) = 0;
+    enum class NodeQuery
+    {
+        Found,
+        Missing,
+        Unavailable
+    };
+    virtual NodeQuery QueryModelNodeTransform(HOBJECT, const char*, DVector*, DRotation*) = 0;
     virtual DBOOL GetModelNodeTransform(HOBJECT, const char*, DVector*, DRotation*) = 0;
     virtual bool GetModelAnimationName(HOBJECT, HMODELANIM, std::string&) = 0;
     virtual DRESULT SetGlobalForce(DVector*) = 0;

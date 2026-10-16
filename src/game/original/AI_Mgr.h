@@ -237,6 +237,12 @@ class AI_Mgr : public CBaseCharacter
     std::uint64_t locomotion_calls = 0, locomotion_failures = 0;
     int locomotion_command = 0;
     std::string locomotion_error;
+    bool HandleDamage();
+    bool MC_Recoil();
+    bool AI_STATE_Recoil();
+    std::uint64_t damage_reactions = 0, recoil_starts = 0;
+    int recoil_node = -1, recoil_slot = -1;
+    std::string damage_reaction_error;
     bool MC_Idle();
     bool MC_BestWeapon();
     bool MC_Fire_Stand();

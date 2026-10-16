@@ -1,6 +1,11 @@
 # Blood II Reconstruction aka OpenBlood2
 
-Latest gameplay continuation: [original Cultist/Civilian initialization and AI_Update](../Documentation/Implementation/M2_AI_RUNTIME.md)
+Latest combat continuation: [original NPC hit localization and recoil](../Documentation/Implementation/M2_AI_HIT.md)
+connects hit regions, limb damage, injured legs and nonlethal reactions to production
+Cultist/Civilian updates, with in-game inspection. Corpse/drop/gib services, required
+FX, Gideon and ExitTrigger still keep M2 incomplete.
+
+Production lifecycle foundation: [original Cultist/Civilian initialization and AI_Update](../Documentation/Implementation/M2_AI_RUNTIME.md)
 registers the fifteen authored SubwayA NPCs, with original properties, animation,
 inventory, activation and state dispatch. Remaining combat/death actions, required
 FX, Gideon and ExitTrigger still keep M2 incomplete.
@@ -414,3 +419,8 @@ Production NPC lifecycle verification: 472/472 Debug and inspector-free Release
 checks (27 GPU each), plus 179 targeted ASan/UBSan/leak checks. See
 [evidence](../Documentation/Implementation/M2_AI_RUNTIME.md) for the no-player
 self-target boundary and remaining M2 requirements.
+
+NPC hit/recoil verification: 481/481 Debug and inspector-free Release checks
+(27 GPU each), plus 188 targeted ASan/UBSan/leak checks. See
+[evidence](../Documentation/Implementation/M2_AI_HIT.md) for source quirks,
+nonlethal production recoil and the remaining death/M2 boundary.

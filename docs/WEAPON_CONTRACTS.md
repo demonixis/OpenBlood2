@@ -1,5 +1,10 @@
 # Original Inventory and Vector Weapon Boundary
 
+> Extended by [NPC hit/recoil contracts](AI_HIT_CONTRACTS.md): original visible-node
+> localization, region damage and nonlethal reactions now execute for initialized
+> Cultist/Civilian NPCs. Earlier blanket localization/recoil omissions are historical;
+> lethal death/corpse/drop services remain unavailable and M2 is incomplete.
+
 > Extended by [AI weapon-action contracts](AI_FIRE_CONTRACTS.md): supported weapon
 > choice, aiming, clearance, standing fire and AI fire_key now execute. Earlier
 > blanket weapon/fire omissions are historical; full NPCs and M2 remain open.

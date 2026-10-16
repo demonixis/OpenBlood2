@@ -1141,8 +1141,9 @@ namespace
                 if (!ai_follow_hidden || !reentered)
                     return 4;
                 const bool runtime_reentered = OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
-                spdlog::info("Original NPC AI_Update: hidden={}, reentered={}, old identity invalidated={}",
-                             ai_runtime_hidden, runtime_reentered, !game.objects.get(original_ai_runtime));
+                spdlog::info(
+                    "Original NPC AI_Update + hit localization: hidden={}, reentered={}, old identity invalidated={}",
+                    ai_runtime_hidden, runtime_reentered, !game.objects.get(original_ai_runtime));
                 if (!ai_runtime_hidden || !runtime_reentered || game.objects.get(original_ai_runtime))
                     return 4;
                 const bool escape_reentered = OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);

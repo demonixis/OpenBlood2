@@ -93,7 +93,7 @@ DDWORD CivilianAI::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
         }
     }
     const auto result = AI_Mgr::ObjectMessageFn(sender, message, read);
-    if (npc_type == NPCType::Civilian && message == OpenBlood2::damage_message &&
+    if (!runtime_failed && npc_type == NPCType::Civilian && message == OpenBlood2::damage_message &&
         GetServerDE()->IsObjectAlive(m_hObject))
     {
         if (!SetNewState(StateEscapeRun))

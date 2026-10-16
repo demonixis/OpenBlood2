@@ -624,3 +624,16 @@ damage factors. Another LithTech generation supplies only a linear Random refere
 [Contracts](AI_RUNTIME_CONTRACTS.md) distinguish checked-lifetime/error adaptations,
 world-scoped tables, replacement visibility/physics and still-missing actions.
 No reference tree, commercial asset or dependency pin changed.
+
+## M2 NPC hit localization and recoil
+
+Selected `CDestructable::CalculateHitLimb/SetProperNode/HandleDamage` and
+`AI_Mgr::HandleDamage/MC_Recoil/AI_STATE_Recoil`, with the existing Civilian
+post-damage override, come from `sources/blood2` commit
+`006b4aabd3fb348f6846cad03799cf8df685ea95`. See
+[M2_AI_HIT_SOURCES.json](M2_AI_HIT_SOURCES.json) for hashes and exact selections.
+Typed node outcomes, receipt/lifetime guards, explicit zero-segment handling and
+failure diagnostics are portability/safety adaptations. No prototype, new
+dependency, commercial asset or death-service placeholder was imported.
+[Contracts](AI_HIT_CONTRACTS.md) and [validation](../../Documentation/Implementation/M2_AI_HIT.md)
+define the visible-node subset and remaining M2 gate.

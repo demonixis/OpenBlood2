@@ -1,0 +1,104 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "3f14a7ceda7e56c49f55b7920824a63c0d2e1b0b",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "selected_lines": [
+        [
+          394,
+          514
+        ],
+        [
+          591,
+          651
+        ],
+        [
+          739,
+          893
+        ]
+      ],
+      "use": "AI hit selection, region mapping, side and damage multipliers; visible-node subset"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          763,
+          806
+        ],
+        [
+          1780,
+          1907
+        ],
+        [
+          5417,
+          5463
+        ],
+        [
+          6428,
+          6440
+        ]
+      ],
+      "use": "Base/aggregate damage order, nonlethal damage, recoil command/state; lethal branch explicitly unavailable"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
+      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
+      "selected_lines": [
+        [
+          144,
+          200
+        ]
+      ],
+      "use": "Civilian damage override after base HandleDamage"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Anim_Sound.h",
+      "sha256": "3e42f686a5f492bdca336efdba239d61617b366221c559c8942f6e35824ccde4",
+      "selected_lines": [
+        [
+          14,
+          33
+        ],
+        [
+          350,
+          383
+        ]
+      ],
+      "use": "Original node constants and shared recoil table"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "selected_lines": [
+        [
+          375,
+          400
+        ]
+      ],
+      "use": "Damage identifiers, especially NORMAL=0 and FIRE=1"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "selected_lines": [
+        [
+          90,
+          175
+        ]
+      ],
+      "use": "Original recoil command, limp/always-recoil flags and script interruption bit"
+    }
+  ],
+  "adaptations": [
+    "Typed node-query outcomes separate missing names and pose failures",
+    "Explicit tied-axis/zero-segment handling replaces NaN projection",
+    "No hidden-node service: renderer/current NPCs include all nodes",
+    "Checked accepted-damage receipts suppress stale and nested reactions",
+    "Required failure suspends NPC; lethal corpse/drop/gib services remain unavailable",
+    "No raw original pointers, DLL ABI or additional dependencies"
+  ]
+}

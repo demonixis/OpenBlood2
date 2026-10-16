@@ -52,6 +52,22 @@ class CDestructable : public Aggregate
     bool m_bGodMode = false;
     float m_fLastDamageAmount = 0;
     OpenBlood2::Damage last_damage;
+    // Production NPCs enable the original visible-node localization path after table initialization.
+    bool ai_hit_localization = false;
+    struct HitReport
+    {
+        bool valid = false, random_fallback = false, head_kill = false;
+        int raw_node = -1, node = -1, side = 0;
+        unsigned missing_nodes = 0;
+        float distance = 999, multiplier = 1;
+        DVector from{}, segment{};
+        std::string error;
+    } hit;
+    static int SetProperNode(int);
+    bool LocalizeHit(const OpenBlood2::Damage&, const class CAnim_Sound&);
+    std::uint64_t accepted_damage = 0, hit_queries = 0, hit_failures = 0;
+    int node_hit = 0, side_hit = 0;
+    OpenBlood2::DamageType reaction_damage_type = OpenBlood2::DamageType::Normal;
     bool can_damage = true, trigger_only = false, handling_damage = false;
     std::string damage_target, damage_message, death_target, death_message;
     void SendTrigger(const std::string& target, const std::string& message);

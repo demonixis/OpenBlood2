@@ -25,7 +25,19 @@ namespace OpenBlood2
             if (!g.objects.get(selection) || std::string_view(r->state.m_Name) == "spank")
                 selection = id;
         }
-        return cultists == 10 && civilians == 5 && updates >= 15;
+        // A diagnostic localization query against a real production pose; no damage
+        // or authored flags are changed. Repeat while hidden and after world reload.
+        auto* r = g.objects.get(selection);
+        auto* selected = r ? dynamic_cast<AI_Mgr*>(r->game.get()) : nullptr;
+        DVector torso{};
+        DRotation rotation;
+        if (!selected || !selected->AnimSound() ||
+            !g.server.GetModelNodeTransform(r->handle, "torso", &torso, &rotation))
+            return false;
+        Damage query{{0, 0, 1}, {torso.x, torso.y, torso.z - 1}, 0, DamageType::Normal, nullptr};
+        const bool localized = selected->m_damage.LocalizeHit(query, *selected->AnimSound()) &&
+                               selected->m_damage.hit.node == 2 && !selected->m_damage.hit.random_fallback;
+        return cultists == 10 && civilians == 5 && updates >= 15 && localized;
     }
     namespace
     {

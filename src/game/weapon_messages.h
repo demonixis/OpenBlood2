@@ -13,6 +13,7 @@ namespace OpenBlood2
     enum class DamageType : DBYTE
     {
         Normal = 0,
+        Fire = 1,
         Melee = 4,
         Explode = 5,
         Suffocate = 6,
