@@ -1,5 +1,9 @@
 # Original AI script preparation and state dispatch
 
+Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
+this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
+The existing action/service limitations remain unless explicitly superseded.
+
 [Source selections](M2_AI_SCRIPT_SOURCES.json) connect AI_Mgr's script list,
 UpdateScriptCommand and AI_STATE_Script to the existing [movement helpers](AI_FOLLOW_CONTRACTS.md),
 [target/state services](AI_STATE_CONTRACTS.md), animation clocks and WAV mixer.

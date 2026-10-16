@@ -614,3 +614,13 @@ source rules. [Contracts](AI_ESCAPE_CONTRACTS.md) separate safety adaptations,
 diagnostic hint flags and selected defaults from still-missing full NPC initialization.
 [Evidence](../../Documentation/Implementation/M2_AI_ESCAPE.md) records Linux checks.
 Reference repositories, commercial assets and pinned dependencies are unchanged.
+
+## M2 production NPC lifecycle
+
+Donor: `sources/blood2` at `006b4aabd3fb348f6846cad03799cf8df685ea95`.
+[Source ranges/hashes](M2_AI_RUNTIME_SOURCES.json) cover Cultist/Civilian construction,
+AI_Mgr initialization/AI_Update, player activation pings, inventory updates and
+damage factors. Another LithTech generation supplies only a linear Random reference.
+[Contracts](AI_RUNTIME_CONTRACTS.md) distinguish checked-lifetime/error adaptations,
+world-scoped tables, replacement visibility/physics and still-missing actions.
+No reference tree, commercial asset or dependency pin changed.

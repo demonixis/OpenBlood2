@@ -307,10 +307,13 @@ namespace
         for (int cycle = 0; cycle < 2; ++cycle)
         {
             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
-            CHECK(!g.objects.get(old) && !g.objects.find_class("CultistAI"));
+            CHECK(!g.objects.get(old) && g.objects.find_class("CultistAI"));
             auto* player = g.server_shell.Player(g.local_client);
             auto* a = actor(g);
             CHECK(player && a);
+            // Keep this single-listener hearing fixture isolated from the new authored NPCs.
+            // Production acquisition/update/contacts are exercised by ai_runtime.subway/arena.
+            g.objects.get(player->m_hObject)->state.m_Pos = {0, 10000, 0};
             DVector pos;
             CHECK(g.server.GetObjectPos(player->m_hObject, &pos) == DE_OK);
             g.objects.get(a->m_hObject)->state.m_Pos = vector_add(pos, {40, 0, 0});

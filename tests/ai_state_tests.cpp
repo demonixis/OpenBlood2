@@ -456,7 +456,7 @@ namespace
         for (int cycle = 0; cycle < 2; ++cycle)
         {
             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
-            CHECK(!g.objects.find_class("CivilianAI") && !g.objects.find_class("CultistAI"));
+            CHECK(g.objects.find_class("CivilianAI") && g.objects.find_class("CultistAI"));
             auto* a = actor<ScheduledCivilian>(g, "ScheduledCivilianProbe", {0, 10000, 0});
             CHECK(a && !g.objects.get(old));
             auto* r = g.objects.get(a->m_hObject);

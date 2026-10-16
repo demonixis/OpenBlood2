@@ -1,7 +1,7 @@
 #pragma once
 #include "AI_Mgr.h"
-// Selected original state rules only. Not registered for world creation:
-// full initialization, damage/trigger handling and AI_Update remain open.
+// Original selected Civilian rules, registered lifecycle and update loop.
+// Remaining damage/death actions are explicit limitations in AI_RUNTIME_CONTRACTS.md.
 class CivilianAI : public AI_Mgr
 {
   public:
@@ -17,6 +17,7 @@ class CivilianAI : public AI_Mgr
     {
         return EscapeHide();
     }
+    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
     bool m_bScared = false;
     bool ComputeState(int stimulus = -1) override;
     bool AI_STATE_Idle() override;

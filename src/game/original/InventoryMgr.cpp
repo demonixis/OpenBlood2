@@ -1,4 +1,5 @@
 #include "InventoryMgr.h"
+#include "AI_Mgr.h"
 #include "PlayerObj.h"
 #include <algorithm>
 #include <cmath>
@@ -50,6 +51,11 @@ CInventoryMgr::~CInventoryMgr()
 }
 DDWORD CInventoryMgr::EngineMessageFn(LPBASECLASS object, DDWORD message, void* data, DFLOAT fData)
 {
+    if (message == MID_UPDATE)
+        if (auto* ai = dynamic_cast<AI_Mgr*>(object);
+            ai && ai->npc_type != AI_Mgr::NPCType::Diagnostic && ai->RuntimeReady())
+            if (!UpdateHandModels())
+                ai->RuntimeFailure("NPC held weapon update failed");
     if (message == MID_LINKBROKEN && data == m_hMuzzleFlash)
     {
         // The engine notifies on either endpoint's removal. Release this owned

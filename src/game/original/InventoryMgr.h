@@ -56,6 +56,7 @@ class CInventoryMgr : public Aggregate
     std::array<DBYTE, 9> requested_weapons{};
     bool m_bInfiniteAmmo = false;
     DBYTE m_nCurWeaponSlot = 0, m_nAttribStrength = 1, m_nAttribMagic = 1;
+    float damage_multiplier = 1; // Original cumulative AddDamageMultiplier storage.
     std::uint64_t revision = 0;
 
   private:

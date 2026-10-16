@@ -327,3 +327,12 @@ dimensions, guard ledge order and residual velocity. Tracking is a checked non-o
 identity, not a new engine link. Diagnostic ray-hit hints do not change authored
 marker flags. Earlier escape/guard-body omissions are superseded; smell/recoil/death,
 full NPC initialization/AI_Update, required FX and ExitTrigger keep M2 incomplete.
+
+The [production NPC lifecycle continuation](../Documentation/Implementation/M2_AI_RUNTIME.md) registers CultistAI/CivilianAI and connects original initialization/AI_Update.
+Read [contracts](docs/AI_RUNTIME_CONTRACTS.md). Preserve class-specific property/table quirks,
+source update ordering, deferred child lifetime and independent clocks. Runtime
+failures suspend visibly; replacement center-ray activation is not retail PVS.
+SubwayA has 202 created source entries, 4 transferred sounds, 372 editor-only,
+2 unsupported and no creation failures. Remaining actions/death, Gideon, required
+FX and ExitTrigger keep M2 open. User-reported pink train glass and direct movement
+failure after intro are retained in the evidence for later investigation.

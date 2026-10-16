@@ -349,12 +349,12 @@ namespace
                     CHECK(v->clip->rate == 22050 && v->clip->frames() == 198623 && v->clip->channels == 1);
                 }
             }
-            CHECK(ids.size() == 4 && counts[EntryState::Created] == 187 && counts[EntryState::WorldSound] == 4 &&
-                  counts[EntryState::Unsupported] == 17 && counts[EntryState::EditorOnly] == 372 &&
+            CHECK(ids.size() == 4 && counts[EntryState::Created] == 202 && counts[EntryState::WorldSound] == 4 &&
+                  counts[EntryState::Unsupported] == 2 && counts[EntryState::EditorOnly] == 372 &&
                   !counts[EntryState::Failed]);
-            CHECK(g.objects.snapshot().size() == 194 && g.server.audio.voices().size() == 4 &&
+            CHECK(g.objects.snapshot().size() == 224 && g.server.audio.voices().size() == 4 &&
                   g.server.audio.cached_clips() == 1);
-            CHECK(g.enter_player(error) && g.objects.snapshot().size() == 197 && g.step(1.0 / 60));
+            CHECK(g.enter_player(error) && g.objects.snapshot().size() == 227 && g.step(1.0 / 60));
             // Advance actual sample clocks across a full retail clip without adding unrelated physics work.
             CHECK(g.server.advance_audio(20, {}, {}));
             for (auto id : ids)
@@ -366,7 +366,7 @@ namespace
             const auto pos = g.server.audio.get(ids.front())->position;
             CHECK(g.server.advance_audio(.02, pos, {}) && g.server.audio.peak > 0 &&
                   g.server.audio.mixed_frames == 960);
-            CHECK(!g.run_world(error) && error.find("17 uninstantiated") != std::string::npos);
+            CHECK(!g.run_world(error) && error.find("2 uninstantiated") != std::string::npos);
             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
                   !g.server.audio.cached_clips());
             for (auto id : ids)

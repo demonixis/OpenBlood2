@@ -88,15 +88,39 @@ namespace OpenBlood2
     };
 } // namespace OpenBlood2
 
-// Selective original AI_Mgr::InitStatics/OnStringKey port. No production AI class
-// registration or complete AI_Update or MC_Extra implementation yet.
-// Perception commands: AI_PERCEPTION_CONTRACTS.md; no automatic AI update loop.
+// Selected original AI services and production Cultist/Civilian lifecycle.
+// See AI_RUNTIME_CONTRACTS.md for remaining state/action failures.
 // Selected CanSee and explicit target/facing commands are documented in
 // AI_SIGHT_CONTRACTS.md and AI_TARGET_CONTRACTS.md.
 class AI_Mgr : public CBaseCharacter
 {
   public:
     AI_Mgr();
+    enum class NPCType
+    {
+        Diagnostic,
+        Cultist,
+        Civilian
+    };
+    static void ResetRuntimeTables();
+    void ConfigureRuntime(NPCType); // Original constructor defaults, selected by production factories only.
+    bool AI_Update();
+    bool RuntimeReady() const
+    {
+        return runtime_initialized && !runtime_failed;
+    }
+    NPCType npc_type = NPCType::Diagnostic;
+    bool runtime_initialized = false, runtime_failed = false, m_bSetShutdown = false, m_bRemoveMe = false;
+    bool npc_male = true, npc_labtech = false, npc_clown = false, npc_robe = false, npc_sorority = false;
+    float m_fLastUpdate = 0, npc_hp = 30, npc_random_hp = 0, npc_armor = 0;
+    std::array<std::string, 5> npc_weapons{"NONE", "NONE", "NONE", "NONE", "NONE"};
+    std::array<float, 10>
+        npc_ammo{}; // Source bullets, BMG, shells, grenades, rockets, flares, charges, cells, fuel, prox.
+    std::string spot_target, spot_message, runtime_error;
+    std::uint64_t runtime_updates = 0, runtime_failures = 0, runtime_camera_pauses = 0, runtime_desyncs = 0;
+    std::uint64_t runtime_target_losses = 0;
+    bool RuntimeFailure(std::string_view);
+
     ~AI_Mgr() override;
     bool InsertMe();
     static void InsertPlayer(CPlayerObj&);
@@ -229,7 +253,7 @@ class AI_Mgr : public CBaseCharacter
 
     bool MC_Talk();
     bool MC_Special(int);
-    // Only the original state-dispatch portion, not AI_Update/deactivation/retention.
+    // Original state dispatch, also used by the production AI_Update loop.
     bool DispatchState();
     virtual bool ComputeState(int stimulus = -1);
     virtual bool AI_STATE_Idle();
@@ -324,8 +348,8 @@ class AI_Mgr : public CBaseCharacter
         Failed
     };
     static bool ParseScript(std::string_view, DDWORD previous_flags, ScriptProgram&, std::string& error);
-    // Preparation is separate from the original trigger's forced AI_Update,
-    // which is not integrated. Explicit diagnostic callers drive this state.
+    // Diagnostic callers can prepare scripts separately; production triggers
+    // prepare them and force the original immediate AI_Update.
     bool PrepareScript(std::string_view);
     bool AI_STATE_Script(PathMgr&);
     std::span<const ScriptInstruction> ScriptCommands() const
@@ -414,6 +438,10 @@ class AI_Mgr : public CBaseCharacter
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
 
   private:
+    bool RuntimePrecreate(ObjectCreateStruct*, int);
+    bool RuntimeInitialize(int);
+    bool RuntimeUpdateStep();
+    bool runtime_busy = false;
     bool locomotion_busy = false;
     bool LocomotionReady();
     bool LocomotionFailure(std::string_view);

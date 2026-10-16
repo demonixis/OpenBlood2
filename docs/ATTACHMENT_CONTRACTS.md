@@ -1,5 +1,9 @@
 # Held models and attachments
 
+Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
+this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
+The existing action/service limitations remain unless explicitly superseded.
+
 This M2 increment connects the original CWeapon ShowHandModel/CreateHandModel,
 CInventoryMgr current-hand branch and held CHandWeaponModel lifecycle. It adds
 real attachment transforms through typed SDK methods. See the

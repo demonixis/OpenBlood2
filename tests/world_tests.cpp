@@ -1,4 +1,5 @@
 #include "audio_fixture.h"
+#include "game/original/AI_Mgr.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Key.h"
 #include "game/original/PathPoint.h"
@@ -648,13 +649,25 @@ namespace
         CHECK(game.world.version == 56);
         CHECK(game.world.objects.size() == 580);
         CHECK(game.world.models.size() == 116);
-        CHECK(game.objects.snapshot().size() == 194);
+        CHECK(game.objects.snapshot().size() == 224);
         CHECK(game.world.models[0].points.size() == 4996);
         CHECK(game.world.models[0].polygons.size() == 3367);
         CHECK(game.resources.find(game.world_path)->overrides == 1);
         CHECK(game.entries[0].state == EntryState::Created);
         CHECK(game.step(.016));
-        CHECK(game.server.service_calls["SetObjectDims"] == 30);
+        unsigned suspended = 0;
+        for (auto id : game.objects.snapshot())
+            if (const auto* a = dynamic_cast<const AI_Mgr*>(game.objects.get(id)->game.get()); a && a->runtime_failed)
+            {
+                // No player: original enemy-list fallback can sense self. The checked
+                // non-owning link contract rejects self; preserve the visible failure.
+                ++suspended;
+                CHECK(a->runtime_error.find("Target assignment requires distinct live objects") != std::string::npos);
+                CHECK(game.objects.get(id)->activity == OBJSTATE_INACTIVE);
+                std::cout << "No-player NPC " << game.objects.get(id)->state.m_Name << ": " << a->runtime_error << '\n';
+            }
+        CHECK(suspended == 3);
+        CHECK(game.server.service_calls["SetObjectDims"] == 53);
         CHECK(game.server.service_calls["GetPropGeneric"] > 0);
         for (const auto& [name, count] : game.server.service_calls)
             std::cout << "Service " << name << ": " << count << '\n';

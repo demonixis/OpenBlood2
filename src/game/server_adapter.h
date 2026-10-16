@@ -52,6 +52,15 @@ namespace OpenBlood2
         DRESULT FindAttachment(HOBJECT, HOBJECT, HATTACHMENT*) override;
         DRESULT GetAttachedModelNodeTransform(HATTACHMENT, const char*, DVector*, DRotation*) override;
         bool IsObjectAlive(HOBJECT) override;
+        bool SetDeactivationTime(HOBJECT, float) override;
+        bool PingObjects(HOBJECT) override;
+        bool ConfigureCharacterBody(HOBJECT, float mass, float friction) override;
+        bool ScaleObject(HOBJECT, DVector) override;
+        PathMgr* GetPathManager() override
+        {
+            return ai_paths;
+        }
+        PathMgr* ai_paths = nullptr;
         bool ValidateSpawnObject(std::string_view) override;
         void RecordSpawn(const SpawnReport&) override;
         void RecordPickup(HOBJECT, const PickupMessage&, std::string_view) override;
@@ -322,6 +331,7 @@ namespace OpenBlood2
             objects.world = &world;
             server.collision = &collision;
             server.client_resources = &resources;
+            server.ai_paths = &server_shell.paths;
             return server.bind() && register_original_classes(objects);
         }
         HOBJECT create_example(std::string_view class_name);

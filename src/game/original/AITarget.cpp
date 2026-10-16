@@ -114,6 +114,27 @@ bool AI_Mgr::MC_FacePos(DVector position)
 }
 DDWORD AI_Mgr::EngineMessageFn(DDWORD message, void* data, DFLOAT value)
 {
+    if (npc_type != NPCType::Diagnostic)
+    {
+        if (message == MID_PRECREATE)
+        {
+            // Base reads name, placement and aggregates before subclass model selection.
+            const auto accepted = CBaseCharacter::EngineMessageFn(message, data, value);
+            return accepted && RuntimePrecreate(static_cast<ObjectCreateStruct*>(data), int(value));
+        }
+        if (message == MID_INITIALUPDATE && !RuntimeInitialize(int(value)))
+        {
+            GetServerDE()->RemoveObject(m_hObject); // Creation rollback; children remain deferred.
+            return 0;
+        }
+        if (message == MID_UPDATE)
+        {
+            if (m_bRemoveMe)
+                GetServerDE()->RemoveObject(m_hObject);
+            else
+                AI_Update(); // Required failures retain an inspectable, quiescent actor.
+        }
+    }
     if (message == MID_LINKBROKEN && data == m_hTarget && m_hTarget)
     {
         m_hTarget = nullptr;

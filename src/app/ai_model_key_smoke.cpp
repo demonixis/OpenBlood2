@@ -7,6 +7,26 @@
 #include <limits>
 namespace OpenBlood2
 {
+    bool check_ai_runtime_smoke(GameSession& g, ObjectId& selection)
+    {
+        unsigned cultists = 0, civilians = 0;
+        std::uint64_t updates = 0;
+        for (auto id : g.objects.snapshot())
+        {
+            const auto* r = g.objects.get(id);
+            const auto* a = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+            if (!a || a->npc_type == AI_Mgr::NPCType::Diagnostic)
+                continue;
+            if (!a->RuntimeReady() || !r->model)
+                return false;
+            cultists += a->npc_type == AI_Mgr::NPCType::Cultist;
+            civilians += a->npc_type == AI_Mgr::NPCType::Civilian;
+            updates += a->runtime_updates;
+            if (!g.objects.get(selection) || std::string_view(r->state.m_Name) == "spank")
+                selection = id;
+        }
+        return cultists == 10 && civilians == 5 && updates >= 15;
+    }
     namespace
     {
         // Isolated original flee/hide driver. It stops scheduling once beg begins;

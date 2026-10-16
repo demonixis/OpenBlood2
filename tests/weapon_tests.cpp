@@ -165,8 +165,15 @@ namespace
         fire.alternate = true;
         CHECK(game.server_shell.OnMessage(game.local_client, fire) == FireResult::Fired);
         CHECK(weapon->last_shot.damage >= 10 && weapon->last_shot.damage <= 20);
+        const auto before_factor = victim->damage.m_fHitPoints;
+        inv.damage_multiplier = .125f; // Original easy Cultist: 0.5 * 0.25.
+        CHECK(game.server_shell.OnMessage(game.local_client, fire) == FireResult::Fired);
+        CHECK(std::abs(victim->damage.m_fHitPoints - (before_factor - weapon->last_shot.damage * .125f)) < .001f);
+        inv.damage_multiplier = std::numeric_limits<float>::quiet_NaN();
+        CHECK(game.server_shell.OnMessage(game.local_client, fire) == FireResult::Invalid);
+        inv.damage_multiplier = 1;
         fire.weapon = 17;
-        CHECK(game.server_shell.OnMessage(game.local_client, fire) == FireResult::Invalid && inv.GetAmmoCount(1) == 47);
+        CHECK(game.server_shell.OnMessage(game.local_client, fire) == FireResult::Invalid && inv.GetAmmoCount(1) == 46);
         fire.weapon = 1;
         fire.direction.x = std::numeric_limits<float>::quiet_NaN();
         CHECK(game.server_shell.OnMessage(game.local_client, fire) == FireResult::Invalid);

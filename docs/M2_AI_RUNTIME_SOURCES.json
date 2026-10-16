@@ -1,0 +1,167 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "b505e3399387a8180fcb2138e7cedf85830f5e3b",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          90,
+          207
+        ],
+        [
+          674,
+          751
+        ],
+        [
+          816,
+          866
+        ],
+        [
+          1150,
+          1237
+        ],
+        [
+          1985,
+          1993
+        ],
+        [
+          2022,
+          2299
+        ]
+      ],
+      "use": "Constructor/ReadProp/initialization/update, script entry, empty touch handler reference"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CultistAI.cpp",
+      "sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
+      "selected_lines": [
+        [
+          20,
+          266
+        ]
+      ],
+      "use": "Schema, constructor, model/skin and shared animation initialization"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
+      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
+      "selected_lines": [
+        [
+          20,
+          332
+        ]
+      ],
+      "use": "Schema, constructor, class-specific trigger/damage and model/table initialization"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          1822,
+          1870
+        ]
+      ],
+      "use": "Selected player/camera PingObjects scheduling"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "selected_lines": [
+        [
+          2538,
+          2539
+        ],
+        [
+          2654,
+          2685
+        ]
+      ],
+      "use": "Selected aggregate weapon-update chain"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/InventoryMgr.h",
+      "sha256": "a68853cfddeedae13bbf1203bc8bc791c57fbf82829771203ecdc8ffe51e0226",
+      "selected_lines": [
+        [
+          108,
+          108
+        ]
+      ],
+      "use": "Multiplicative damage factor"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "selected_lines": [
+        [
+          347,
+          353
+        ],
+        [
+          1751,
+          1753
+        ]
+      ],
+      "use": "Weapon damage multiplier at delivery"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "selected_lines": [
+        [
+          367,
+          384
+        ]
+      ],
+      "use": "Mass/friction formula; typed replacement character-body service"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "selected_lines": [
+        [
+          60,
+          65
+        ],
+        [
+          678,
+          684
+        ]
+      ],
+      "use": "Auto-deactivation/visibility service contracts"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/basetypes_de.h",
+      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
+      "selected_lines": [
+        [
+          360,
+          368
+        ]
+      ],
+      "use": "REMOVEIFOUTSIDE flag"
+    },
+    {
+      "path": "sources/lithtech/runtime/shared/src/impl_common.cpp",
+      "sha256": "f70aefefa9ee550d5d7fbc91dcefd6bce4846af21cfcdcb68e6b60ffcb8ef5ca",
+      "selected_lines": [
+        [
+          271,
+          277
+        ]
+      ],
+      "use": "Other-generation reference for linear Random interval formula; not retail-sequence evidence"
+    }
+  ],
+  "adaptations": [
+    "Checked typed lifecycle and bounded properties; explicit unavailable weapons/restore/add-on robe",
+    "Class/gender tables reset on world teardown with failure preflight and unique voice ownership",
+    "Simulation-time auto-deactivation with replacement center-ray visibility; retail PVS unavailable",
+    "Typed character-body mass/friction and world-bounds removal; replacement physics",
+    "Runtime failures retain a quiescent inspectable actor; initialization failures roll back",
+    "Checked civilian target link and current target/tracked lifetime; no dangling raw pointers"
+  ]
+}

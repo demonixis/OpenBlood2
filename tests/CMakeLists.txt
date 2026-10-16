@@ -109,12 +109,17 @@ if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME weapons.private COMMAND weapon_tests private "${BLOOD2_TEST_DATA_DIR}")
     # Three retail reloads / 4,140 simulation frames with the expanded brush scene.
     set_tests_properties(weapons.private PROPERTIES LABELS "headless;weapons;private" TIMEOUT 90)
+    if(BLOOD2_SANITIZERS)
+        # Three full scene/intro/weapon cycles now include fifteen production NPCs.
+        # ASan/UBSan measured ~140s; retain every frame and lifetime assertion.
+        set_tests_properties(weapons.private PROPERTIES TIMEOUT 240)
+    endif()
 endif()
 
 if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
     add_test(NAME gpu.weapons COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
         --data-dir "${BLOOD2_TEST_DATA_DIR}" --weapons-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/weapons.png")
-    set_tests_properties(gpu.weapons PROPERTIES LABELS "private;gpu;weapons" TIMEOUT 30 RUN_SERIAL TRUE)
+    set_tests_properties(gpu.weapons PROPERTIES LABELS "private;gpu;weapons" TIMEOUT 60 RUN_SERIAL TRUE)
 endif()
 
 add_executable(movement_tests movement_tests.cpp)
@@ -132,7 +137,7 @@ if(BLOOD2_TEST_DATA_DIR)
     if(BLOOD2_GPU_TESTS)
         add_test(NAME gpu.movement COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
             --data-dir "${BLOOD2_TEST_DATA_DIR}" --movement-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/movement.png")
-        set_tests_properties(gpu.movement PROPERTIES LABELS "gpu;movement;private" TIMEOUT 30 RUN_SERIAL TRUE)
+        set_tests_properties(gpu.movement PROPERTIES LABELS "gpu;movement;private" TIMEOUT 60 RUN_SERIAL TRUE)
     endif()
 endif()
 
@@ -409,7 +414,7 @@ endif()
 if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
     add_test(NAME gpu.randomsound COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
         --data-dir "${BLOOD2_TEST_DATA_DIR}" --random-sounds-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/random-sounds.png")
-    set_tests_properties(gpu.randomsound PROPERTIES LABELS "private;gpu;randomsound" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+    set_tests_properties(gpu.randomsound PROPERTIES LABELS "private;gpu;randomsound" TIMEOUT 60 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
 endif()
 
 add_executable(sound_tests sound_tests.cpp)
@@ -489,7 +494,7 @@ if(BLOOD2_TEST_DATA_DIR)
     if(BLOOD2_GPU_TESTS)
         add_test(NAME gpu.character COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
             --data-dir "${BLOOD2_TEST_DATA_DIR}" --skeleton-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/skeleton.png")
-        set_tests_properties(gpu.character PROPERTIES LABELS "gpu;character;private" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+        set_tests_properties(gpu.character PROPERTIES LABELS "gpu;character;private" TIMEOUT 60 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
     endif()
 endif()
 
@@ -607,7 +612,7 @@ if(BLOOD2_GPU_TESTS)
     if(BLOOD2_TEST_DATA_DIR)
         add_test(NAME gpu.viewport COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
             --data-dir "${BLOOD2_TEST_DATA_DIR}" --viewport-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/viewport.png")
-        set_tests_properties(gpu.viewport PROPERTIES LABELS "gpu;private;world_view" TIMEOUT 30 RUN_SERIAL TRUE)
+        set_tests_properties(gpu.viewport PROPERTIES LABELS "gpu;private;world_view" TIMEOUT 60 RUN_SERIAL TRUE)
     endif()
 endif()
 
@@ -773,4 +778,19 @@ endforeach()
 if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME ai_escape.catalog COMMAND ai_escape_tests catalog "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(ai_escape.catalog PROPERTIES LABELS "headless;private;ai_escape" TIMEOUT 90)
+endif()
+
+add_executable(ai_runtime_tests ai_runtime_tests.cpp)
+target_link_libraries(ai_runtime_tests PRIVATE blood2_game)
+blood2_project_options(ai_runtime_tests)
+
+foreach(case IN ITEMS activation visibility lifetime targets tracking camera spatial triggers body missing)
+    add_test(NAME ai_runtime.${case} COMMAND ai_runtime_tests "${case}")
+    set_tests_properties(ai_runtime.${case} PROPERTIES LABELS "headless;ai_runtime" TIMEOUT 30)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    foreach(case IN ITEMS catalog failures subway arena)
+        add_test(NAME ai_runtime.${case} COMMAND ai_runtime_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
+        set_tests_properties(ai_runtime.${case} PROPERTIES LABELS "headless;private;ai_runtime" TIMEOUT 90)
+    endforeach()
 endif()

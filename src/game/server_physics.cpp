@@ -426,7 +426,7 @@ namespace OpenBlood2
                 if (physics.gravity)
                     acceleration = vector_add(acceleration, gravity);
                 DVector displacement;
-                if (r->world_body)
+                if (r->world_body || r->character_body)
                 {
                     ++r->body_steps;
                     MovementState support;

@@ -1,7 +1,7 @@
 #pragma once
 #include "AI_Mgr.h"
-// Original decisions and close/far attack sequencing. Complete initialization,
-// AI_Update and remaining actions are missing; no production registration.
+// Original decisions/attacks and production lifecycle; remaining action failures
+// are documented in AI_RUNTIME_CONTRACTS.md.
 class CultistAI : public AI_Mgr
 {
   public:

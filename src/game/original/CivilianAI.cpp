@@ -72,3 +72,33 @@ bool CivilianAI::AI_STATE_Special(int special)
         return StateFailure("Civilian special random service unavailable");
     return MC_Special(index);
 }
+
+// Source CivilianAI::ObjectMessageFn, after class-specific state guards.
+DDWORD CivilianAI::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
+{
+    if (npc_type == NPCType::Civilian && message == 1000)
+    {
+        auto* s = GetServerDE();
+        auto string = s->ReadFromMessageHString(read);
+        const char* data = string ? s->GetStringData(string) : nullptr;
+        const bool trigger = data && std::string_view(data) == "TRIGGER";
+        if (string)
+            s->FreeString(string);
+        if (trigger && m_nState != StateEscapeHide && m_nState != StateScript &&
+            !(m_nState >= StateSpecial1 && m_nState <= StateSpecial9))
+        {
+            // Checked non-owning link replaces the source raw assignment.
+            if (!SetNewTarget(sender) || !SetNewState(npc_labtech ? StateEscapeHide : StateSpecial1))
+                RuntimeFailure("Civilian trigger target/state unavailable");
+        }
+    }
+    const auto result = AI_Mgr::ObjectMessageFn(sender, message, read);
+    if (npc_type == NPCType::Civilian && message == OpenBlood2::damage_message &&
+        GetServerDE()->IsObjectAlive(m_hObject))
+    {
+        if (!SetNewState(StateEscapeRun))
+            RuntimeFailure(state_error);
+        return 0;
+    }
+    return result;
+}

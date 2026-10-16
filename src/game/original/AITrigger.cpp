@@ -257,8 +257,13 @@ bool AI_Mgr::HandleTrigger(HOBJECT sender, std::string_view text)
             return true;
         }
         else if (same(command, "SCRIPT"))
-            return TriggerFailure(
-                "SCRIPT trigger requires the unported forced AI_Update; explicit script-state driver only");
+        {
+            if (npc_type == NPCType::Diagnostic)
+                return TriggerFailure("SCRIPT requires an initialized production AI_Update driver");
+            if (!RuntimeReady() || !PrepareScript(text) || !AI_Update())
+                return TriggerFailure("SCRIPT preparation or forced AI_Update failed");
+            return true;
+        }
         else
             return TriggerFailure("Unknown AI trigger command");
     }

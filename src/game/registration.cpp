@@ -3,8 +3,10 @@
 #include "game/original/CameraObj.h"
 #include "game/original/CameraSpot.h"
 #include "game/original/CinematicTrigger.h"
+#include "game/original/CivilianAI.h"
 #include "game/original/ClientExplosionSFX.h"
 #include "game/original/ClientLightFX.h"
+#include "game/original/CultistAI.h"
 #include "game/original/DetailSprite.h"
 #include "game/original/Door.h"
 #include "game/original/ExitHint.h"
@@ -260,6 +262,56 @@ namespace OpenBlood2
         const ClassInfo exit_hint{"ExitHint", &b2base, construct<ExitHint>, {}};
         const ClassInfo smell{"SmellHint", &b2base, construct<SmellHint>, {}};
         const ClassInfo character{"CBaseCharacter", &b2base, construct<CBaseCharacter>, {}};
+        template <class T, AI_Mgr::NPCType Type> std::unique_ptr<BaseClass> construct_npc()
+        {
+            auto actor = std::make_unique<T>();
+            actor->ConfigureRuntime(Type);
+            return actor;
+        }
+        const ClassInfo ai_manager{"AI_Mgr", &character, construct<AI_Mgr>, []
+                                   {
+                                       std::vector<PropertySpec> p{{"SpotTriggerTarget", std::string{}},
+                                                                   {"SpotTriggerMessage", std::string{}},
+                                                                   {"TriggerRelayTarget", std::string{}},
+                                                                   {"DamageTriggerTarget", std::string{}},
+                                                                   {"DamageTriggerMessage", std::string{}},
+                                                                   {"DeathTriggerTarget", std::string{}},
+                                                                   {"DeathTriggerMessage", std::string{}},
+                                                                   {"TriggerDestroyOnly", false},
+                                                                   {"SpawnObject", std::string{}},
+                                                                   {"SpawnObjectVel", DVector{}},
+                                                                   {"CanDamage", true}};
+                                       for (const auto* name :
+                                            {"Bullets", "BMG", "Shells", "Grenades", "Rockets", "Flares", "Charges",
+                                             "Cells", "Fuel", "Proximity_Bombs"})
+                                           p.push_back({name, 0.0f, false});
+                                       for (int i = 1; i <= 5; ++i)
+                                           p.push_back({"AIWeapon" + std::to_string(i), std::string{}, false, 31});
+                                       return p;
+                                   }()};
+        const ClassInfo cultist{"CultistAI",
+                                &ai_manager,
+                                construct_npc<CultistAI, AI_Mgr::NPCType::Cultist>,
+                                {{"RandomHitPoints", 0.0f},
+                                 {"AIState", std::string("IDLE"), true, 31},
+                                 {"AIWeapon1", std::string("BERETTA"), true, 31},
+                                 {"Bullets", 150.0f},
+                                 {"Flares", 20.0f},
+                                 {"Male", true},
+                                 {"Dims", DVector{19, 41, 14}},
+                                 {"ClownSkin", false},
+                                 {"RobeSkin", false}}};
+        const ClassInfo civilian{"CivilianAI",
+                                 &ai_manager,
+                                 construct_npc<CivilianAI, AI_Mgr::NPCType::Civilian>,
+                                 {{"RandomHitPoints", 0.0f},
+                                  {"AIState", std::string("IDLE"), true, 31},
+                                  {"AIWeapon1", std::string("NONE"), true, 31},
+                                  {"Male", true},
+                                  {"LabTech", false},
+                                  {"Scared", false},
+                                  {"Dims", DVector{21, 37, 21}},
+                                  {"SororitySkin", false}}};
         const ClassInfo player{"CPlayerObj", &character, construct<CPlayerObj>, {}};
         const ClassInfo world_properties{
             "WorldProperties",
@@ -590,23 +642,24 @@ namespace OpenBlood2
                objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(exit_hint) && objects.register_class(character) &&
-               objects.register_class(player) && objects.register_class(volume) && objects.register_class(water) &&
-               objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
-               objects.register_class(conveyor) && objects.register_class(damage) && objects.register_class(freefall) &&
-               objects.register_class(trigger) && objects.register_class(key_pickup) &&
-               objects.register_class(pickup) && objects.register_class(ammo_pickup) &&
-               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
-               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
-               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
-               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
-               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
-               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
-               objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
-               objects.register_class(necroward_pickup) && objects.register_class(objectives_trigger) &&
-               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
-               objects.register_class(door) && objects.register_class(rotating_door) &&
-               objects.register_class(destructable_brush) && objects.register_class(rotating_brush) &&
-               objects.register_class(hand_model);
+               objects.register_class(ai_manager) && objects.register_class(cultist) &&
+               objects.register_class(civilian) && objects.register_class(player) && objects.register_class(volume) &&
+               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
+               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
+               objects.register_class(freefall) && objects.register_class(trigger) &&
+               objects.register_class(key_pickup) && objects.register_class(pickup) &&
+               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+               objects.register_class(health_base) && objects.register_class(armor_base) &&
+               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
+               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
+               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
+               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
+               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
+               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
+               objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
+               objects.register_class(toggle_trigger) && objects.register_class(door) &&
+               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+               objects.register_class(rotating_brush) && objects.register_class(hand_model);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

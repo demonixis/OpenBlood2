@@ -268,6 +268,11 @@ namespace
         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_escape_smoke(game, smoke_ai_escape))
             return 4;
         const auto original_ai_escape = smoke_ai_escape;
+        OpenBlood2::ObjectId smoke_ai_runtime{};
+        if (options.skeleton_smoke)
+            OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
+        const auto original_ai_runtime = smoke_ai_runtime;
+        bool ai_runtime_hidden = false;
         bool ai_sight_hidden = false;
         bool ai_target_hidden = false;
         bool hand_hidden = false;
@@ -332,7 +337,7 @@ namespace
         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
         inspector.select_skeleton = options.skeleton_smoke;
         if (options.skeleton_smoke)
-            inspector.skeleton_selection = smoke_ai_escape;
+            inspector.skeleton_selection = smoke_ai_runtime;
         inspector.select_containers = options.containers_smoke;
         inspector.select_brushes = options.brushes_smoke;
         inspector.select_pickups = options.pickups_smoke;
@@ -437,7 +442,9 @@ namespace
             }
             if (done)
                 break;
-            if (smoke && SDL_GetTicks() - started > 15000)
+            // The populated viewport now deforms/renders fifteen NPCs and ten held weapons.
+            // Keep the same frame/event assertions; allow Debug CPU rendering more wall time.
+            if (smoke && SDL_GetTicks() - started > (extended_smoke ? 45000u : 15000u))
             {
                 spdlog::error("GPU smoke timed out before completing its frames/events");
                 return 4;
@@ -558,6 +565,8 @@ namespace
                 ai_follow_hidden |= OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
             if (options.skeleton_smoke && !inspector_visible)
                 ai_escape_hidden |= OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
+            if (options.skeleton_smoke && !inspector_visible)
+                ai_runtime_hidden |= OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
             if (options.skeleton_smoke && !inspector_visible)
                 ai_state_hidden |= OpenBlood2::check_ai_state_smoke(game, smoke_ai_state);
             if (options.skeleton_smoke && !inspector_visible)
@@ -1131,6 +1140,11 @@ namespace
                                      a->navigation_error);
                 if (!ai_follow_hidden || !reentered)
                     return 4;
+                const bool runtime_reentered = OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
+                spdlog::info("Original NPC AI_Update: hidden={}, reentered={}, old identity invalidated={}",
+                             ai_runtime_hidden, runtime_reentered, !game.objects.get(original_ai_runtime));
+                if (!ai_runtime_hidden || !runtime_reentered || game.objects.get(original_ai_runtime))
+                    return 4;
                 const bool escape_reentered = OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
                 spdlog::info("AI escape/beg: hidden={}, reentered={}, old identity invalidated={}", ai_escape_hidden,
                              escape_reentered, !game.objects.get(original_ai_escape));
@@ -1178,7 +1192,7 @@ namespace
                     "Model viewport: frames={}, world hidden={}, weapon hidden={}, instances={}, close={}, vertices={}",
                     model_frames, models_hidden, close_weapon_hidden, model_scene.world_draws.size(),
                     model_scene.close_draws.size(), model_scene.mesh.vertices.size());
-                if (!close_weapon_hidden || !model_scene.world_draws.empty() ||
+                if (!close_weapon_hidden || model_scene.world_draws.size() != 25 ||
                     model_frames != world_renderer.stats.frames)
                     return 4;
                 std::size_t decoded = 0, missing = 0;

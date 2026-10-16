@@ -1,5 +1,9 @@
 # Original AI escape, hiding and guard states
 
+Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
+this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
+The existing action/service limitations remain unless explicitly superseded.
+
 Selected CultistAI/CivilianAI Escape_RunAway and Escape_Hide, AI_Mgr GuardLocation
 and MC_Taunt_Beg execute through existing typed services. M2 remains incomplete;
 these classes are not registered as production NPCs. See [source selections](M2_AI_ESCAPE_SOURCES.json),

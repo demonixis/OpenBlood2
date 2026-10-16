@@ -1,5 +1,9 @@
 # Original AI trigger commands and hearing
 
+Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
+this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
+The existing action/service limitations remain unless explicitly superseded.
+
 This integrates selected `AI_Mgr::HandleTrigger`, `PlayAnimation`, its MID_TRIGGER
 message branch and `ObjectUtilities::SendSoundTrigger`. Player sound attempts now
 send the original alerts. Read [source selections](M2_AI_TRIGGER_SOURCES.json),

@@ -1,0 +1,405 @@
+// Selected original AI_Mgr construction/ReadProp/InitialUpdate/AI_Update and
+// CultistAI/CivilianAI construction/model/table initialization. See AI_RUNTIME_CONTRACTS.md.
+#include "AI_Mgr.h"
+#include "CameraObj.h"
+#include "CivilianAI.h"
+#include "engine/collision.h"
+#include <cmath>
+using namespace OpenBlood2;
+namespace
+{
+    std::array<std::shared_ptr<CAnim_Sound>, 4> tables; // Reset after world objects are destroyed.
+    bool weapon(std::string_view name, DBYTE& id)
+    {
+        if (name.starts_with("NONE"))
+            id = 0;
+        else if (name.starts_with("BERET"))
+            id = WEAP_BERETTA;
+        else if (name.starts_with("MELEE"))
+            id = WEAP_MELEE;
+        else
+            return false; // Other source weapon families are not implemented; never substitute Beretta.
+        return true;
+    }
+} // namespace
+void AI_Mgr::ResetRuntimeTables()
+{
+    tables = {};
+}
+void AI_Mgr::ConfigureRuntime(NPCType type)
+{
+    npc_type = type;
+    m_fHearingDist = m_fSeeingDist = type == NPCType::Cultist ? 1500 : 2000;
+    m_fSensingDist = 200;
+    m_fSmellingDist = 0;
+    m_fWalkSpeed = 75;
+    m_fRunSpeed = 180;
+    m_fRollSpeed = type == NPCType::Cultist ? 105 : 3.5f;
+    m_dwFlags = type == NPCType::Cultist ? 0x2f : 0x20;
+    m_bCabal = true;
+    npc_weapons[0] = type == NPCType::Cultist ? "BERETTA" : "NONE";
+    npc_ammo[0] = type == NPCType::Cultist ? 150 : 0;
+    npc_ammo[2] = type == NPCType::Cultist ? 60 : 0;
+    npc_ammo[5] = type == NPCType::Cultist ? 20 : 0;
+    npc_ammo[6] = type == NPCType::Civilian ? 100 : 0;
+}
+bool AI_Mgr::RuntimeFailure(std::string_view why)
+{
+    runtime_failed = true;
+    runtime_error = why;
+    ++runtime_failures;
+    auto* s = GetServerDE();
+    if (s && s->IsObjectAlive(m_hObject))
+    {
+        s->SetNextUpdate(m_hObject, 0);
+        DVector zero{};
+        s->SetVelocity(m_hObject, &zero);
+        s->SetObjectState(m_hObject, OBJSTATE_INACTIVE);
+    }
+    return false;
+}
+bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
+{
+    if (!state || reason == PRECREATE_SAVEGAME)
+        return RuntimeFailure("NPC save restoration is not implemented");
+    auto* s = GetServerDE();
+    GenericProp prop;
+    if (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP)
+    {
+        if (s->GetPropGeneric("RandomHitPoints", &prop) == DE_OK)
+            npc_random_hp = prop.m_Float;
+        auto text = [&](const char* key, std::string& out)
+        {
+            if (s->GetPropGeneric(key, &prop) == DE_OK && prop.m_String[0])
+                out = prop.m_String;
+        };
+        text("AIState", m_szAIState);
+        for (unsigned i = 0; i < npc_weapons.size(); ++i)
+            text(("AIWeapon" + std::to_string(i + 1)).c_str(), npc_weapons[i]);
+        constexpr const char* names[]{"Bullets", "BMG",     "Shells", "Grenades", "Rockets",
+                                      "Flares",  "Charges", "Cells",  "Fuel",     "Proximity_Bombs"};
+        for (unsigned i = 0; i < npc_ammo.size(); ++i)
+            if (s->GetPropGeneric(names[i], &prop) == DE_OK)
+                npc_ammo[i] = prop.m_Float;
+        text("SpotTriggerTarget", spot_target);
+        text("SpotTriggerMessage", spot_message);
+        text("TriggerRelayTarget", trigger_relay_target);
+    }
+    // Source subclass booleans are read only for world-file creation.
+    if (reason == PRECREATE_WORLDFILE)
+    {
+        auto flag = [&](const char* key, bool& out)
+        {
+            if (s->GetPropGeneric(key, &prop) == DE_OK)
+                out = prop.m_Bool;
+        };
+        flag("Male", npc_male);
+        if (npc_type == NPCType::Cultist)
+        {
+            flag("ClownSkin", npc_clown);
+            flag("RobeSkin", npc_robe);
+        }
+        else
+        {
+            flag("LabTech", npc_labtech);
+            flag("SororitySkin", npc_sorority);
+            if (auto* c = dynamic_cast<CivilianAI*>(this))
+                flag("Scared", c->m_bScared);
+        }
+    }
+    if (!std::isfinite(npc_random_hp) || npc_random_hp < 0 || npc_random_hp > 1e6f)
+        return RuntimeFailure("Invalid NPC random health");
+    for (float value : npc_ammo)
+        if (!std::isfinite(value) || value < 0 || value > 1e6f)
+            return RuntimeFailure("Invalid NPC ammunition");
+    if (npc_ammo[9] != 0)
+        return RuntimeFailure("NPC proximity inventory weapons are not integrated");
+    for (const auto& name : npc_weapons)
+    {
+        DBYTE id;
+        if (!weapon(name, id))
+            return RuntimeFailure("NPC authored weapon unavailable: " + name);
+    }
+    int initial;
+    if (!StateStrToInt(m_szAIState, initial))
+        return RuntimeFailure("Invalid NPC authored state");
+    std::string model, skin;
+    int variant = 1;
+    if (npc_type == NPCType::Cultist)
+    {
+        if (npc_robe)
+            return RuntimeFailure("Add-on robe Cultist initialization is not integrated");
+        if (npc_clown)
+            npc_male = true;
+        if (!s->RandomInt(1, 3, variant))
+            return RuntimeFailure("NPC skin RNG failed");
+        const std::string gender = npc_male ? "m" : "f";
+        model = "Models/Enemies/" + gender + "_Cultist1.abc";
+        skin = (npc_clown ? "Skins_ao/Enemies_ao/m_Cultist" : "Skins/Enemies/" + gender + "_Cultist") +
+               std::to_string(variant + (npc_clown ? 3 : 0)) + ".dtx";
+    }
+    else
+    {
+        std::string name;
+        if (initial == StateSpecial8)
+        {
+            name = "m_civilian";
+            variant = 4;
+        }
+        else if (npc_sorority)
+        {
+            name = "f_civilian";
+            variant = 3;
+        }
+        else
+        {
+            if (!s->RandomInt(1, 3, variant))
+                return RuntimeFailure("NPC skin RNG failed");
+            name = npc_labtech ? "labtech" : npc_male ? "m_civilian" : "f_civilian";
+            if (!npc_labtech && !npc_male)
+                variant = 1; // Source consumes a draw but always selects female skin 1.
+        }
+        model = "Models/Enemies/" + name + (name == "labtech" ? "" : "1") + ".abc";
+        skin = (npc_sorority && initial != StateSpecial8 ? "Skins_ao/Enemies_ao/" : "Skins/Enemies/") + name +
+               std::to_string(variant) + ".dtx";
+    }
+    state->m_ObjectType = OT_MODEL;
+    SAFE_STRCPY(state->m_Filename, model.c_str());
+    SAFE_STRCPY(state->m_SkinName, skin.c_str());
+    return true;
+}
+bool AI_Mgr::RuntimeInitialize(int reason)
+{
+    auto* s = GetServerDE();
+    if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
+        return RuntimeFailure("Invalid or repeated NPC initialization");
+    const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
+    const auto group = (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
+    auto initialize_table = [&](unsigned slot, bool refresh, const char* root)
+    {
+        if (!refresh)
+            return true;
+        auto candidate = std::make_shared<CAnim_Sound>();
+        if (!candidate->SetAnimationIndexes(m_hObject) || !candidate->GenerateHitSpheres(m_hObject) ||
+            !candidate->SetSoundRoot(root))
+            return false; // Failed creation must not poison a shared table.
+        if (!tables[slot])
+        {
+            tables[slot] = std::move(candidate);
+            return true;
+        }
+        // Preflight above is read-only. Rebuild existing shared indexes without
+        // copying/killing its independently owned voice (no callbacks in these queries).
+        return tables[slot]->SetAnimationIndexes(m_hObject) && tables[slot]->GenerateHitSpheres(m_hObject) &&
+               tables[slot]->SetSoundRoot(root);
+    };
+    if (npc_type == NPCType::Civilian)
+    {
+        // Preserve BOTH independent source branches, including female LabTech.
+        if ((npc_male || npc_labtech) && !initialize_table(2, npc_male || !tables[2], "sounds/enemies/civilian"))
+            return RuntimeFailure("NPC male animation table initialization failed");
+        if (!npc_male && !initialize_table(3, !tables[3], "sounds/enemies/f_civ"))
+            return RuntimeFailure("NPC female animation table initialization failed");
+    }
+    else if (!initialize_table(group, !tables[group],
+                               male_group ? "sounds/enemies/m_cultist" : "sounds/enemies/f_cultist"))
+        return RuntimeFailure("NPC shared animation table initialization failed");
+    auto table = tables[group];
+    if (!InitStatics(table) || !m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
+        return RuntimeFailure("NPC aggregates unavailable");
+    m_InventoryMgr.SetStrength(5);
+    std::array<bool, 18> obtained{};
+    for (const auto& name : npc_weapons)
+    {
+        DBYTE id;
+        if (!weapon(name, id))
+            return RuntimeFailure("NPC weapon unavailable");
+        if (id && !obtained[id])
+        {
+            if (m_InventoryMgr.ObtainWeapon(id) != InventoryResult::Ok)
+                return RuntimeFailure("NPC weapon acquisition failed");
+            obtained[id] = true;
+        }
+    }
+    DBYTE first;
+    weapon(npc_weapons[0], first);
+    if (first)
+    {
+        const auto result = m_InventoryMgr.ChangeWeapon(first);
+        if (result != InventoryResult::Ok && result != InventoryResult::Current)
+            return RuntimeFailure("NPC weapon selection failed");
+    }
+    constexpr DBYTE ammo[]{1, 3, 2, 5, 6, 4, 8, 8, 7};
+    for (unsigned i = 0; i < 9; ++i)
+        if (m_InventoryMgr.AddAmmo(ammo[i], npc_ammo[i]) == InventoryResult::Invalid)
+            return RuntimeFailure("NPC ammunition initialization failed");
+    m_InventoryMgr.AddAmmo(9, 200);
+    const float difficulty = GetGameDifficulty() == 0 ? .25f : GetGameDifficulty() == 2 ? 1.5f : 1;
+    m_InventoryMgr.damage_multiplier = (npc_type == NPCType::Cultist ? .5f : 1) * difficulty;
+    float unit;
+    if (!s->RandomFloat(0, 1, unit))
+        return RuntimeFailure("NPC health RNG failed");
+    // Source Random(1, RandomHitPoints) has reversed endpoints at the default zero.
+    const float hp = (npc_hp + 1 + (npc_random_hp - 1) * unit) * difficulty;
+    m_damage.SetHitPoints(hp);
+    m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = hp;
+    m_damage.SetArmorPoints(npc_armor * difficulty);
+    m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = npc_armor * difficulty;
+    m_damage.m_fMass = 250;
+    if (!s->ConfigureCharacterBody(m_hObject, 250, 10))
+        return RuntimeFailure("NPC mass/friction configuration failed");
+    if (!s->SetBlockingPriority(m_hObject, 50) || !m_MoveObj.Init(m_hObject) || !StateStrToInt(m_szAIState, m_nState))
+        return RuntimeFailure("NPC movement/state initialization failed");
+    if (m_nState == StateGuard && s->GetObjectPos(m_hObject, &m_vGuardPos) != DE_OK)
+        return RuntimeFailure("NPC guard position unavailable");
+    s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) | FLAG_VISIBLE | FLAG_SOLID | FLAG_TOUCH_NOTIFY |
+                                     FLAG_GRAVITY | FLAG_STAIRSTEP | FLAG_SHADOW | FLAG_MODELKEYS |
+                                     FLAG_REMOVEIFOUTSIDE);
+    if (!InsertMe())
+        return RuntimeFailure("NPC faction registration failed");
+    float scale;
+    if (!s->RandomFloat(-.05f, .1f, scale))
+        return RuntimeFailure("NPC scale RNG failed");
+    m_vScale = {1 - scale, 1 + scale, 1 - scale};
+    // Supply the model's initial centered bounds before the later foot-anchored clip resize.
+    DVector dims;
+    if (s->GetModelAnimUserDims(m_hObject, &dims, 0) != DE_OK || s->SetObjectDims(m_hObject, &dims) != DE_OK ||
+        !s->ScaleObject(m_hObject, m_vScale) || !SetAnimation(0))
+        return RuntimeFailure("NPC initial model dimensions/scale/animation failed: " + state_error);
+    s->SetNextUpdate(m_hObject, .001f);
+    m_bSetShutdown = false;
+    if (reason == INITIALUPDATE_WORLDFILE && s->MoveObjectToGround(m_hObject) != DE_OK)
+        return RuntimeFailure("NPC world ground placement failed");
+    m_fLastUpdate = s->GetTime();
+    runtime_initialized = true;
+    return true;
+}
+bool AI_Mgr::AI_Update()
+{
+    if (runtime_busy)
+        return RuntimeFailure("Reentrant AI_Update rejected");
+    if (!RuntimeReady())
+        return false;
+    runtime_busy = true;
+    ++runtime_updates;
+    const bool ok = RuntimeUpdateStep();
+    runtime_busy = false;
+    return ok && !runtime_failed;
+}
+bool AI_Mgr::RuntimeUpdateStep()
+{
+    auto* s = GetServerDE();
+    if (!s->IsObjectAlive(m_hObject) || m_bRemoveMe)
+        return false;
+    const float now = s->GetTime();
+    if (now - m_fLastUpdate >= 1 && m_bSetShutdown)
+    {
+        float delay;
+        if (!s->RandomFloat(.01f, .5f, delay))
+            return RuntimeFailure("NPC wake RNG failed");
+        m_fLastUpdate = now;
+        s->SetNextUpdate(m_hObject, delay);
+        ++runtime_desyncs;
+        return true;
+    }
+    m_fLastUpdate = now;
+    s->SetNextUpdate(m_hObject, .001f);
+    if (s->IsObjectAlive(g_hActiveCamera) && m_nState != StateScript && m_nState != StatePassive &&
+        m_nState != StateIdle)
+    {
+        const auto* camera = dynamic_cast<CameraObj*>(s->HandleToObject(g_hActiveCamera));
+        if (!camera)
+            return RuntimeFailure("Active camera has wrong class");
+        if (!camera->AllowPlayerMovement())
+        {
+            ++runtime_camera_pauses;
+            return StopVelocity() || RuntimeFailure(state_error);
+        }
+    }
+    if (!m_bSetShutdown)
+    {
+        if (!s->SetDeactivationTime(m_hObject, 3))
+            return RuntimeFailure("NPC deactivation timer failed");
+        s->SetObjectState(m_hObject, OBJSTATE_AUTODEACTIVATE_NOW);
+        m_bSetShutdown = true;
+    }
+    if (m_hTarget)
+    {
+        if (!s->IsObjectAlive(m_hTarget))
+        {
+            if (!SetNewTarget(nullptr))
+                return RuntimeFailure(target_error);
+            ++runtime_target_losses;
+        }
+        else
+        {
+            m_bHasTargeted = true;
+            if (m_fSeeingDist > m_fSensingDist && m_fSensingDist > 0)
+                m_fSensingDist = m_fSeeingDist;
+            if (!RefreshTargetPosition())
+                return RuntimeFailure(target_error);
+            auto* character = dynamic_cast<CBaseCharacter*>(s->HandleToObject(m_hTarget));
+            if (!character)
+                return RuntimeFailure("AI_Update target is not a character");
+            if (character->m_damage.IsDead())
+            {
+                if (!SetNewTarget(nullptr) || !SetNewState(StateIdle))
+                    return RuntimeFailure("Dead NPC target transition failed");
+                ++runtime_target_losses;
+            }
+            else if (!(m_dwFlags & 0x100u) && !CanSee(m_hTarget))
+            {
+                if (sight.outcome == AISightOutcome::Invalid || sight.outcome == AISightOutcome::Unavailable)
+                    return RuntimeFailure("NPC target visibility unavailable");
+                if (!SetNewTarget(nullptr))
+                    return RuntimeFailure(target_error);
+                ++runtime_target_losses;
+            }
+        }
+    }
+    if (m_hTrackObject && !RefreshTrackedPosition())
+        return RuntimeFailure(target_error);
+    if (m_damage.m_fHitPoints <= 0 && m_nState != StateDying && !SetNewState(StateDying))
+        return RuntimeFailure(state_error);
+    MovementState support;
+    if (!s->GetMovementState(m_hObject, support))
+        return RuntimeFailure("NPC support unavailable");
+    if (support.ground_object && s->IsObjectAlive(support.ground_object))
+    {
+        auto flags = s->GetObjectFlags(m_hObject);
+        if (s->IsKindOf(s->GetObjectClass(support.ground_object), s->GetClass("CBaseCharacter")))
+            flags |= FLAG_DONTFOLLOWSTANDING;
+        else
+            flags &= ~FLAG_DONTFOLLOWSTANDING;
+        s->SetObjectFlags(m_hObject, flags);
+    }
+    if (Metacmd <= 0)
+        Metacmd = 1;
+    const auto perception_failures_before = perception_failures;
+    bool ok;
+    if (m_nState == StateScript)
+    {
+        auto* paths = s->GetPathManager();
+        ok = paths && AI_STATE_Script(*paths);
+    }
+    else
+        ok = DispatchState();
+    if (!s->IsObjectAlive(m_hObject))
+        return false;
+    if (!ok || runtime_failed)
+    {
+        auto detail = !navigation_error.empty()   ? navigation_error
+                      : !locomotion_error.empty() ? locomotion_error
+                      : !script_error.empty()     ? script_error
+                      : !state_error.empty()      ? state_error
+                                                  : "state action failed";
+        if (perception_failures != perception_failures_before)
+        {
+            detail += "; " + perception_error;
+            if (perception_error == "Target link acquisition failed")
+                detail += "; " + target_error;
+        }
+        return RuntimeFailure("AI_Update: " + detail);
+    }
+    return true;
+}

@@ -29,6 +29,7 @@ class CSBase
     virtual void ResetRead(HMESSAGEREAD) = 0;
 };
 
+class PathMgr;
 class ServerDE : public CSBase
 {
   public:
@@ -48,6 +49,11 @@ class ServerDE : public CSBase
     virtual DRESULT FindAttachment(HOBJECT, HOBJECT, HATTACHMENT*) = 0;
     virtual DRESULT GetAttachedModelNodeTransform(HATTACHMENT, const char*, DVector*, DRotation*) = 0;
     virtual bool IsObjectAlive(HOBJECT) = 0;
+    virtual bool SetDeactivationTime(HOBJECT, float) = 0;
+    virtual bool PingObjects(HOBJECT) = 0;
+    virtual bool ConfigureCharacterBody(HOBJECT, float mass, float friction) = 0;
+    virtual bool ScaleObject(HOBJECT, DVector) = 0;
+    virtual PathMgr* GetPathManager() = 0;
     virtual bool ValidateSpawnObject(std::string_view) = 0;
     virtual void RecordSpawn(const OpenBlood2::SpawnReport&) = 0;
     virtual void RecordPickup(HOBJECT, const OpenBlood2::PickupMessage&, std::string_view sound) = 0;

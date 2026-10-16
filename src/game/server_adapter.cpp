@@ -200,12 +200,15 @@ namespace OpenBlood2
             active().trace_service("SetObjectState");
             auto& o = active().objects_;
             auto* r = o.get(h);
-            if (!r || state < 0 || static_cast<unsigned>(state) > OBJSTATE_INACTIVE_TOUCH)
+            if (!r || r->life != Life::Alive || state < 0 ||
+                static_cast<unsigned>(state) > OBJSTATE_AUTODEACTIVATE_NOW ||
+                (state == OBJSTATE_AUTODEACTIVATE_NOW && r->deactivation_period <= 0))
             {
-                o.fail(ObjectError::Unsupported, "Invalid object state; automatic deactivation is not implemented");
+                o.fail(ObjectError::Unsupported, "Invalid object state or missing positive deactivation period");
                 return;
             }
             r->activity = static_cast<DDWORD>(state);
+            r->auto_deactivate = r->deactivation_period > 0; // ACTIVE clears manual inactivity, not auto expiry.
         };
         GetPropGeneric = [](const char* name, GenericProp* out) -> DRESULT
         {

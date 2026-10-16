@@ -1,3 +1,4 @@
+#include "game/original/AI_Mgr.h"
 #include "game/original/DetailSprite.h"
 #include "game/original/Sound.h"
 #include "game/server_adapter.h"
@@ -102,6 +103,12 @@ namespace OpenBlood2
                     entry.state = server.audio.get(sound->sound) ? EntryState::WorldSound : EntryState::Failed;
                     entry.detail =
                         entry.sound ? "Original Sound removed after transferring its loop to the world" : sound->error;
+                }
+                else if (const auto* ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+                         ai && !ai->runtime_error.empty())
+                {
+                    entry.state = EntryState::Failed;
+                    entry.detail = ai->runtime_error;
                 }
                 else if (const auto* sprite = r ? dynamic_cast<const DetailSprite*>(r->game.get()) : nullptr;
                          sprite && !sprite->error.empty())
@@ -338,6 +345,8 @@ namespace OpenBlood2
         server.trace_enabled = was_tracing;
         if (!cleared)
             return false;
+        if (g_pServerDE == &server)
+            AI_Mgr::ResetRuntimeTables();
         server.reset_world_time();
         server_shell.PreStartWorld();
         models.clear();

@@ -3,6 +3,7 @@
 // complete 7,657-line PlayerObj gameplay implementation.
 #include "PlayerObj.h"
 #include "AI_Mgr.h"
+#include "CameraObj.h"
 #include "GameStartPoint.h"
 #include <algorithm>
 #include <cmath>
@@ -366,6 +367,13 @@ DBOOL CPlayerObj::Update(DVector*)
         m_bFirstUpdate = DFALSE;
     }
     UpdateSound();
+    if (server->GetTime() > m_fNextPingTime)
+    {
+        m_fNextPingTime = server->GetTime() + .5f;
+        const auto observer = server->IsObjectAlive(g_hActiveCamera) ? g_hActiveCamera : m_hObject;
+        if (!server->PingObjects(observer))
+            ++activation_ping_failures;
+    }
     return UpdateStats();
 }
 bool CPlayerObj::UpdateStats()

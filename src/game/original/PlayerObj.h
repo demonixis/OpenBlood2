@@ -57,6 +57,8 @@ class CPlayerObj : public CBaseCharacter
     }
     bool PlayPlayerSound(std::string_view, float radius, DBYTE volume, bool stream, DBYTE priority = 2);
     OpenBlood2::SoundId m_hCurSound = 0;
+    float m_fNextPingTime = 0;
+    std::uint64_t activation_ping_failures = 0;
     bool m_bDisableFootsteps = false, m_bNextFootstepLeft = true;
     SurfaceType m_eLastSurface = SURFTYPE_UNKNOWN, footstep_surface = SURFTYPE_UNKNOWN;
     ContainerCode footstep_container = CC_NOTHING;

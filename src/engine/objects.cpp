@@ -645,6 +645,17 @@ namespace OpenBlood2
         for (auto id : ids)
         {
             auto* r = get(id);
+            if (r && r->life == Life::Alive && (r->state.m_Flags & FLAG_REMOVEIFOUTSIDE) && world &&
+                !world->models.empty())
+            {
+                const auto p = r->state.m_Pos;
+                if (p.x < world->min.x || p.y < world->min.y || p.z < world->min.z || p.x > world->max.x ||
+                    p.y > world->max.y || p.z > world->max.z)
+                    remove(r->handle); // Deferred; checked identities become unavailable immediately.
+            }
+            if (r && r->life == Life::Alive && r->activity == OBJSTATE_ACTIVE && r->auto_deactivate &&
+                r->deactivation_period > 0 && time_ >= r->deactivate_at)
+                r->activity = OBJSTATE_AUTODEACTIVATE_NOW;
             if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE || !r->scheduled || r->due > time_)
                 continue;
             r->scheduled = false;
@@ -722,6 +733,8 @@ namespace OpenBlood2
         auto* r = get(receiver);
         if (!r || r->life != Life::Alive)
             return fail(ObjectError::InvalidHandle, "Engine event receiver is invalid or pending removal");
+        if (id == MID_TOUCHNOTIFY && r->activity != OBJSTATE_ACTIVE && r->activity != OBJSTATE_INACTIVE_TOUCH)
+            return false; // Manual/automatic inactivity suppresses contact callbacks, not object messages.
         if (callback_depth_ >= 128)
             return fail(ObjectError::Limit, "Engine event recursion limit");
         dispatch(*r, id, data, value);

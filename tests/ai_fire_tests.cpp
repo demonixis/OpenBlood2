@@ -480,7 +480,7 @@ namespace
         for (int cycle = 0; cycle < 2; ++cycle)
         {
             CHECK(g.request_world("01_SubwayA", e) && g.enter_player(e));
-            CHECK(!g.objects.find_class("CultistAI"));
+            CHECK(g.objects.find_class("CultistAI"));
             auto* a = actor(g);
             CHECK(armed(a) && !g.objects.get(old));
             auto* r = g.objects.get(a->m_hObject);

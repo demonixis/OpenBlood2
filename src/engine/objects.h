@@ -106,7 +106,7 @@ namespace OpenBlood2
         std::uint32_t contact_polygon = UINT32_MAX;
         HOBJECT contact_object = nullptr;
         bool grounded = false;
-        bool world_body = false;
+        bool world_body = false, character_body = false;
         WorldBodyProperties body_properties;
         DBYTE blocking_priority = 0;
         std::uint64_t body_steps = 0, body_pushes = 0;
@@ -129,6 +129,9 @@ namespace OpenBlood2
         std::string model_error;
         DDWORD user_flags = 0;
         DDWORD activity = OBJSTATE_ACTIVE;
+        bool auto_deactivate = false;
+        double deactivation_period = 0, deactivate_at = 0;
+        std::uint64_t activation_pings = 0;
         double due = 0;
         bool scheduled = false;
         std::uint64_t updates = 0;

@@ -1,5 +1,9 @@
 # Original AI state decisions and stationary actions
 
+Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
+this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
+The existing action/service limitations remain unless explicitly superseded.
+
 > Extended by [CMovement contracts](AI_NAVIGATION_CONTRACTS.md): original cached
 > transforms and obstacle-path calculation are available for explicitly initialized
 > actors. Current-transform adaptations below remain; full AI following is still absent.

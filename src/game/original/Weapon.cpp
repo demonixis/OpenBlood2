@@ -15,7 +15,9 @@ FireResult CWeapon::Fire(const WeaponFire& request)
 {
     auto* server = BaseClass::GetServerDE();
     if (!server || !m_pInventoryMgr || !server->IsObjectAlive(m_hOwner) || request.weapon != data.m_nType ||
-        request.left != m_bLeftHand || !physics_vector(request.position) || !physics_vector(request.direction))
+        request.left != m_bLeftHand || !physics_vector(request.position) || !physics_vector(request.direction) ||
+        !std::isfinite(m_pInventoryMgr->damage_multiplier) || m_pInventoryMgr->damage_multiplier < 0 ||
+        m_pInventoryMgr->damage_multiplier > 1000)
         return FireResult::Invalid;
     const auto length = std::sqrt(vector_dot(request.direction, request.direction));
     if (!std::isfinite(length) || length < 1e-6f)
@@ -94,7 +96,8 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     last_shot.result = FireResult::Fired;
     if (query == SegmentResult::Hit && last_shot.hit.object)
     {
-        Damage damage{direction, last_shot.hit.point, last_shot.damage, damage_type, m_hOwner};
+        Damage damage{direction, last_shot.hit.point, last_shot.damage * m_pInventoryMgr->damage_multiplier,
+                      damage_type, m_hOwner};
         auto message =
             server->StartMessageToObject(server->HandleToObject(m_hOwner), last_shot.hit.object, damage_message);
         if (!message)

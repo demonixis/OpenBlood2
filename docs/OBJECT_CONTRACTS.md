@@ -1,5 +1,9 @@
 # M1 Object Boundary
 
+Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
+this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
+The existing action/service limitations remain unless explicitly superseded.
+
 The later [player entry contracts](PLAYER_CONTRACTS.md) supersede this increment's statements that shell/player entry is entirely absent. Complete gameplay remains blocked; earlier limits below remain unless explicitly superseded.
 
 The authoritative source interface is in [src/game/legacy](../src/game/legacy/server_de.h). It is a **bounded source-level subset**, not an implementation of the entire 1998 SDK or its DLL ABI. Game and engine compile against the same `BaseClass`, callback signatures and scalar definitions. Read-only inputs use `const char*`; Windows-sized integers use fixed-width types. `ServerAdapter` is a normally constructed C++ object implementing virtual message methods and assigning compiler-checked callback thunks.

@@ -400,7 +400,7 @@ namespace
             CHECK(a);
             auto* r = g.objects.get(a->m_hObject);
             CHECK(g.models.load("models/enemies/m_cultist1.abc", r->model, error));
-            CHECK(AI_Mgr::m_dwNumCabal == 2 && AI_Mgr::m_dwNumMonster == 1);
+            CHECK(AI_Mgr::m_dwNumCabal == 17 && AI_Mgr::m_dwNumMonster == 1);
             a->m_fSensingDist = 200;
             CHECK(a->ComputeStimuli() == 4 && a->GetTarget() == p->m_hObject);
             CHECK(a->RefreshTargetPosition() && a->MC_FaceTarget());

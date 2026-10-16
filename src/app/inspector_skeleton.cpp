@@ -10,7 +10,7 @@ namespace OpenBlood2
         ImGui::TextWrapped("Current ABC node transforms and original CAnim_Sound tables. Spheres are the original "
                            "initialization radii, shown at live node positions; damage localization and complete AI "
                            "behavior remain unported.");
-        if (ImGui::CollapsingHeader("Live attachments", ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader("Live attachments"))
         {
             ImGui::TextWrapped("Held models follow current parent nodes. Physical/nested attachments and dropped "
                                "weapons remain unavailable.");
@@ -60,6 +60,25 @@ namespace OpenBlood2
         const auto* r = game.objects.get(skeleton_selection);
         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
+        if (target_ai && target_ai->npc_type != AI_Mgr::NPCType::Diagnostic &&
+            ImGui::CollapsingHeader("Original NPC lifecycle", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& a = *target_ai;
+            ImGui::Text("Initialization %s | update %s", a.runtime_initialized ? "complete" : "incomplete",
+                        a.runtime_failed ? "FAILED / suspended" : "ready");
+            ImGui::Text("AI_Update %llu | camera pauses %llu | wake delays %llu", (unsigned long long)a.runtime_updates,
+                        (unsigned long long)a.runtime_camera_pauses, (unsigned long long)a.runtime_desyncs);
+            ImGui::Text("Activity %u | pings %llu | timeout %.3f", r->activity, (unsigned long long)r->activation_pings,
+                        r->deactivate_at);
+            ImGui::Text("State %d | phase %d | targeted %s | target losses %llu", a.m_nState, a.Metacmd,
+                        a.m_bHasTargeted ? "yes" : "no", (unsigned long long)a.runtime_target_losses);
+            ImGui::Text("HP %.2f / %.2f | damage factor %.3f", a.m_damage.m_fHitPoints, a.m_damage.m_fMaxHitPoints,
+                        a.m_InventoryMgr.damage_multiplier);
+            ImGui::TextWrapped("Activation uses replacement center-ray visibility, not retail PVS. Remaining states "
+                               "may fail explicitly.");
+            if (!a.runtime_error.empty())
+                ImGui::TextWrapped("Failure: %s", a.runtime_error.c_str());
+        }
         if (target_ai && ImGui::CollapsingHeader("Original escape and guard", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& a = *target_ai;
@@ -78,7 +97,7 @@ namespace OpenBlood2
         if (target_ai && ImGui::CollapsingHeader("Original navigation and recovery", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& a = *target_ai;
-            ImGui::TextWrapped("Original jump/crouch/crawl and selected route states. Full AI_Update, smell following "
+            ImGui::TextWrapped("Original jump/crouch/crawl and selected route states. Smell following "
                                "and shade-based detours remain unavailable.");
             ImGui::Text("Last driven state %d | current %d | phase %d", a.navigation_state, a.m_nState, a.Metacmd);
             ImGui::Text("Updates %llu | arrivals %llu | failures %llu", (unsigned long long)a.navigation_updates,
@@ -97,8 +116,8 @@ namespace OpenBlood2
         if (target_ai && ImGui::CollapsingHeader("Original autonomous locomotion", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& a = *target_ai;
-            ImGui::TextWrapped("Original walk/run/moving fire and selected Cultist attack sequencing. Full AI_Update, "
-                               "shade recovery and full NPC initialization remain unavailable.");
+            ImGui::TextWrapped("Original walk/run/moving fire and selected Cultist attack sequencing. Remaining "
+                               "shade recovery and death actions remain unavailable.");
             ImGui::Text("Command %d | calls %llu | failures %llu", a.locomotion_command,
                         (unsigned long long)a.locomotion_calls, (unsigned long long)a.locomotion_failures);
             ImGui::Text("Obstruction %s | speed %.3f | cached vertical change %.4f | checks %llu",
@@ -144,7 +163,7 @@ namespace OpenBlood2
         {
             const auto& a = *target_ai;
             const char* outcomes[]{"None", "Prepared", "Running", "Completed", "State changed", "Failed"};
-            ImGui::TextWrapped("Explicit script-state driver. Production SCRIPT trigger / full AI_Update unavailable.");
+            ImGui::TextWrapped("Explicit script-state driver. Production SCRIPT triggers also enter AI_Update.");
             ImGui::Text("%s | flags %u | next index %zu | remaining %zu",
                         outcomes[static_cast<unsigned>(a.script_outcome)], a.m_dwScriptFlags, a.script_index,
                         a.ScriptCommands().size());
@@ -166,8 +185,8 @@ namespace OpenBlood2
             const auto& a = *target_ai;
             const char* commands[]{"None", "FOLLOWPATH", "MOVETOOBJECT"};
             const char* outcomes[]{"None", "Selected", "Moving", "Arrived", "Completed", "Failed"};
-            ImGui::TextWrapped(
-                "Original movement helpers; the enclosing driver owns command sequencing. Full AI_Update unavailable.");
+            ImGui::TextWrapped("Original movement helpers; the enclosing driver owns command sequencing. Runtime "
+                               "dispatch is enabled for Cultist/Civilian.");
             ImGui::Text("%s | %s | mode %s | Metacmd %d", commands[static_cast<unsigned>(a.script_motion_command)],
                         outcomes[static_cast<unsigned>(a.script_motion_outcome)],
                         a.m_eScriptMovement == AI_Mgr::SM_WALK  ? "WALK"
@@ -226,10 +245,9 @@ namespace OpenBlood2
                 ImGui::Text("%zu: %.2f %.2f %.2f", i, m.path()[i].x, m.path()[i].y, m.path()[i].z);
             if (!m.error.empty())
                 ImGui::TextWrapped("%s", m.error.c_str());
-            ImGui::TextWrapped(
-                "Two side rays only; partial paths are not usable success. Planning does not move an "
-                "actor. Player cache remains uninitialized, as in source. Production NPC initialization, shade-based "
-                "position selection and full AI_Update remain unavailable.");
+            ImGui::TextWrapped("Two side rays only; partial paths are not usable success. Planning does not move an "
+                               "actor. Player cache remains uninitialized, as in source. Shade-based "
+                               "position selection remains unavailable.");
         }
         if (target_ai && ImGui::CollapsingHeader("Original AI commands / hearing", ImGuiTreeNodeFlags_DefaultOpen))
         {
@@ -260,15 +278,15 @@ namespace OpenBlood2
                         (unsigned long long)ai.trigger_relays);
             if (!ai.trigger_error.empty())
                 ImGui::TextWrapped("%s", ai.trigger_error.c_str());
-            ImGui::TextWrapped("State selection does not execute missing search/dodge/attack actions. Full AI_Update "
-                               "and production SCRIPT entry remain unavailable.");
+            ImGui::TextWrapped("State selection does not execute missing search/dodge/attack actions. Complete combat "
+                               "and missing recovery/death actions remain unavailable.");
         }
         if (target_ai && ImGui::CollapsingHeader("Original AI weapon actions", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& ai = *target_ai;
             const auto* weapon = ai.m_InventoryMgr.CurrentWeapon();
-            ImGui::TextWrapped("Original standing fire and weapon choice. Diagnostic driver; full NPC update, attack "
-                               "states, navigation and death remain unavailable.");
+            ImGui::TextWrapped("Original standing fire and weapon choice, called by production Cultist updates. "
+                               "Complete combat reactions and death remain unavailable.");
             ImGui::Text("Weapon %u | last selection: alternative %u / distance %.2f", weapon ? weapon->data.m_nType : 0,
                         ai.best_weapon, ai.weapon_distance);
             ImGui::Text("Attempts %llu | shots %llu | dry %llu | blocked %llu | failures %llu",
@@ -317,8 +335,8 @@ namespace OpenBlood2
         if (target_ai && ImGui::CollapsingHeader("Original AI state actions", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& ai = *target_ai;
-            ImGui::TextWrapped("Selected original decisions and stationary actions. Full AI_Update, navigation, "
-                               "full combat/death and production NPC registration remain unavailable.");
+            ImGui::TextWrapped("Original decisions and registered Cultist/Civilian updates. Remaining actions and "
+                               "full combat/death remain unavailable.");
             ImGui::Text("State %d | last %d | requested %d | dispatched %d", ai.m_nState, ai.m_nLastState,
                         ai.requested_state, ai.dispatched_state);
             ImGui::Text("Authored %s | metacmd %d / current %d | animating %s", ai.m_szAIState.c_str(), ai.Metacmd,
