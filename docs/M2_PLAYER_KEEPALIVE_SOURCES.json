@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "8ec5efd4f167e8b2ffdca66e109168842aaab936",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "selected_lines": [
+        [
+          192,
+          245
+        ],
+        [
+          746,
+          803
+        ],
+        [
+          959,
+          977
+        ],
+        [
+          1142,
+          1212
+        ]
+      ],
+      "use": "Original saved-client branch, named entry for keep-alive, active player selection and type 1 load; no disk SaveObjects implementation"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          2156,
+          2300
+        ]
+      ],
+      "use": "Original single-player named start selection, fallback, yaw, trigger-before-teleport and grounding"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "selected_lines": [],
+      "use": "Existing type 1 Load key removal reused without changing aggregate semantics"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameStartPoint.cpp",
+      "sha256": "88194b2c13fba7e4bc30380e84b6f8e276690b32adfce4bce28c6e6ec67dc8c2",
+      "selected_lines": [],
+      "use": "Existing original SendTrigger ownership and authored values reused"
+    }
+  ],
+  "adaptations": [
+    "Explicit loaded-destination entry mode with owned snapshot/start name; no automatic level transaction",
+    "Checked callback lifetime, no-start failure and final body clearance",
+    "Staged player cleanup does not rewind destination trigger effects"
+  ],
+  "remaining": [
+    "Safe automatic NEW_LEVEL/world preparation",
+    "Full client/player saved state, other classes and required FX/services",
+    "Actual M2 exit criteria"
+  ]
+}

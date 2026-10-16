@@ -720,3 +720,12 @@ checked identities, current geometry and staged cleanup. It reuses the selected
 original Save/Load and model tail. First update now derives speeds without fresh
 attribute validation, matching source. See [contracts](PLAYER_RESTORE_CONTRACTS.md)
 for limits: no retail ABI, full client/world save or cross-world transfer claim.
+
+## Named keep-alive player entry
+
+The [source ledger](M2_PLAYER_KEEPALIVE_SOURCES.json) records original shell
+RespawnPlayer and CPlayerObj GoToStartPoint selections. Existing aggregate Load
+uses KeepAlive type 1 to discard keys. Explicit mode/start ownership, final body
+clearance and callback-lifetime checks are engine adaptations. No dependency,
+reference repository or commercial resource is imported. See
+[contracts](PLAYER_KEEPALIVE_CONTRACTS.md); automatic NEW_LEVEL remains refused.

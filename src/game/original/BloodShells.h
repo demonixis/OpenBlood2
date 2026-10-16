@@ -14,7 +14,7 @@ class CBloodServerShell
     void PreStartWorld();
     bool PostStartWorld();
     CPlayerObj* OnClientEnterWorld(HCLIENT);
-    CPlayerObj* OnRestoredClientEnterWorld(HCLIENT, HOBJECT);
+    CPlayerObj* OnRestoredClientEnterWorld(HCLIENT, HOBJECT, const char* start_name = nullptr);
     void OnClientExitWorld(HCLIENT);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerInit&);
     FireResult OnMessage(HCLIENT, const OpenBlood2::WeaponFire&);

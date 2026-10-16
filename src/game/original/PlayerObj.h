@@ -82,6 +82,8 @@ class CPlayerObj : public CBaseCharacter
     std::string restore_model_error;
     bool restore_initialization = false, restore_fields_loaded = false;
     bool GoToStartPoint(HSTRING start_name);
+    std::string entry_start_name; // Owned inspection of the actual selected marker.
+    bool entry_start_fallback = false;
     bool SetCharacter(DBYTE);
     bool OnSinglePlayerInit(const OpenBlood2::PlayerInit&);
     void ValidateAttributes();

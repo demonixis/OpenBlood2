@@ -6,17 +6,20 @@ namespace OpenBlood2
 {
     namespace
     {
-        bool validate_engine(GameSession& game, const PlayerRestoreState& s, std::string& error)
+        bool validate_engine(GameSession& game, const PlayerRestoreState& s, std::string& error,
+                             PlayerRestoreMode mode = PlayerRestoreMode::SavedPosition)
         {
             auto fail = [&](const char* why)
             {
                 error = why;
                 return false;
             };
-            if (s.world.empty() || s.world != game.world_path || !game.server.collision_ready ||
-                !game.server_shell.world_started ||
+            if (s.world.empty() || game.world_path.empty() ||
+                (mode == PlayerRestoreMode::SavedPosition && s.world != game.world_path) ||
+                !game.server.collision_ready || !game.server_shell.world_started ||
                 game.server.GetVarValueFloat(game.server.GetGameConVar("GAME_GAMETYPE")) != 0)
-                return fail("Player restoration requires the same loaded single-player world");
+                return fail("Player restoration requires a loaded single-player world; saved-position mode also "
+                            "requires the same world");
             if (s.name.size() > 100 || s.name.find('\0') != std::string::npos)
                 return fail("Invalid saved player object name");
             std::string model_path, skin_path;
@@ -86,7 +89,8 @@ namespace OpenBlood2
         output = std::move(s);
         return true;
     }
-    bool GameSession::restore_player(const PlayerRestoreState& s, std::string& error)
+    bool GameSession::restore_player(const PlayerRestoreState& s, std::string& error, PlayerRestoreMode mode,
+                                     std::string_view start_name)
     {
         error.clear();
         ++restoration.attempts;
@@ -100,7 +104,16 @@ namespace OpenBlood2
             error = "Leave the current player before restoring; callback/live-client replacement is unavailable";
             return failed();
         }
-        if (!validate_engine(*this, s, error))
+        if ((mode != PlayerRestoreMode::SavedPosition && mode != PlayerRestoreMode::KeepAlive) ||
+            start_name.size() > 100 || start_name.find('\0') != std::string_view::npos ||
+            (mode == PlayerRestoreMode::SavedPosition && !start_name.empty()))
+        {
+            error = "Invalid player restoration mode or start-point name";
+            return failed();
+        }
+        const bool keep_alive = mode == PlayerRestoreMode::KeepAlive;
+        const std::string owned_start(start_name);
+        if (!validate_engine(*this, s, error, mode))
             return failed();
         const auto before = objects.snapshot();
         auto rollback = [&]()
@@ -136,12 +149,13 @@ namespace OpenBlood2
             return rollback();
         record->animation = s.animation;
         record->hidden_nodes = s.hidden_nodes;
-        if (server.ResizeObject(object, s.dimensions) != ResizeResult::Resized)
+        if (!keep_alive && server.ResizeObject(object, s.dimensions) != ResizeResult::Resized)
         {
             error = "Saved player body is blocked in the current world";
             return rollback();
         }
-        if (!player->m_InventoryMgr.Load(s.inventory, InventoryLoadType::Restore, error) ||
+        if (!player->m_InventoryMgr.Load(
+                s.inventory, keep_alive ? InventoryLoadType::KeepAlive : InventoryLoadType::Restore, error) ||
             !player->m_damage.Load(s.damage, error) || !player->LoadFields(s.player, error) ||
             !player->RestoreModelState(error))
             return rollback();
@@ -152,8 +166,18 @@ namespace OpenBlood2
         record->due = objects.time() + s.next_update;
         record->scheduled = true;
         local_client = server.connect_client();
-        if (!local_client || !server_shell.OnRestoredClientEnterWorld(local_client, object) ||
-            !client_shell.OnEnterWorld(local_client, true) || !pump_player_messages(error) || !client_shell.Update() ||
+        if (!local_client ||
+            !server_shell.OnRestoredClientEnterWorld(local_client, object, keep_alive ? owned_start.c_str() : nullptr))
+        {
+            error = player->entry_error.empty() ? "Restored client/start-point entry failed" : player->entry_error;
+            return rollback();
+        }
+        if (keep_alive && server.ResizeObject(object, s.dimensions) != ResizeResult::Resized)
+        {
+            error = "Destination start-point body is blocked";
+            return rollback();
+        }
+        if (!client_shell.OnEnterWorld(local_client, true) || !pump_player_messages(error) || !client_shell.Update() ||
             !client_shell.SyncWeapons(models, resources, server_shell, error) ||
             !player->m_InventoryMgr.UpdateHandModels() || !objects.finish_frame() || !objects.refresh_attachments())
             return rollback();
@@ -163,11 +187,18 @@ namespace OpenBlood2
             error = "Restored player removed during child cleanup";
             return rollback();
         }
+        restoration.last_mode = mode;
+        restoration.destination_world = world_path;
+        restoration.requested_start = owned_start;
+        restoration.selected_start = player->entry_start_name;
+        restoration.start_fallback = player->entry_start_fallback;
         ++restoration.restored;
         restoration.last_player = record->id;
         restoration.error.clear();
-        trace.push_back("Restored player engine/aggregates -> original Load tail -> saved-client shell branch; no "
-                        "Respawn/start trigger");
+        trace.push_back(
+            keep_alive ? "Kept player -> inventory KeepAlive (keys discarded) -> original named start entry; no Respawn"
+                       : "Restored player engine/aggregates -> original Load tail -> saved-client shell branch; no "
+                         "Respawn/start trigger");
         return true;
     }
 } // namespace OpenBlood2

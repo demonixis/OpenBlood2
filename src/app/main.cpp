@@ -134,9 +134,22 @@ namespace
                 }
                 if (options.restore_smoke)
                 {
+                    if (options.keepalive_smoke)
+                    {
+                        auto* p = game.server_shell.Player(game.local_client);
+                        p->m_damage.SetHitPoints(73);
+                        p->m_InventoryMgr.SetAmmoCount(1, 17);
+                        if (p->m_InventoryMgr.AddKey({"keep-probe", "Diagnostic key", "icon", "selected", 1}) !=
+                            InventoryResult::Ok)
+                            return 6;
+                    }
                     OpenBlood2::PlayerRestoreState saved;
                     if (!game.capture_player(saved, error) || !game.leave_player() ||
-                        !game.request_world(options.world, error) || !game.restore_player(saved, error))
+                        !game.request_world(options.keepalive_smoke ? "02_cityhub" : options.world, error) ||
+                        !game.restore_player(saved, error,
+                                             options.keepalive_smoke ? OpenBlood2::PlayerRestoreMode::KeepAlive
+                                                                     : OpenBlood2::PlayerRestoreMode::SavedPosition,
+                                             options.keepalive_smoke ? "01_egressa" : ""))
                     {
                         spdlog::error("Restored player entry: {}", error);
                         return 6;
@@ -343,6 +356,8 @@ namespace
         inspector.world_mesh = &world_mesh;
         inspector.model_view = &model_scene;
         inspector.world_render = &world_renderer.stats;
+        if (options.keepalive_smoke)
+            SAFE_STRCPY(inspector.keep_start_name, "01_egressa");
         inspector.select_models =
             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
@@ -1049,19 +1064,27 @@ namespace
                     {
                         inspector.reload_request = true;
                         inspector.enter_player_request = options.player_smoke && !options.restore_smoke;
-                        inspector.restore_player_request = options.restore_smoke;
+                        inspector.restore_player_request = options.restore_smoke && !options.keepalive_smoke;
+                        inspector.keep_player_request = options.keepalive_smoke;
+                        if (options.keepalive_smoke)
+                            SAFE_STRCPY(inspector.keep_start_name, "01_egressa");
                     }
 #else
                     if (frames == unload_frame)
                         game.unload_world();
-                    else if (!game.request_world(options.world, error))
+                    else if (!game.request_world(options.keepalive_smoke ? "02_cityhub" : options.world, error))
                     {
                         spdlog::error("{}", error);
                         return 5;
                     }
                     else if (options.player_smoke &&
-                             !(options.restore_smoke ? game.restore_player(*game.restoration.saved, error)
-                                                     : game.enter_player(error)))
+                             !(options.restore_smoke
+                                   ? game.restore_player(*game.restoration.saved, error,
+                                                         options.keepalive_smoke
+                                                             ? OpenBlood2::PlayerRestoreMode::KeepAlive
+                                                             : OpenBlood2::PlayerRestoreMode::SavedPosition,
+                                                         options.keepalive_smoke ? "01_egressa" : "")
+                                   : game.enter_player(error)))
                     {
                         spdlog::error("{}", error);
                         return 6;
@@ -1288,6 +1311,12 @@ namespace
                   forward_frames != 55 || jump_frames != 10 || crouch_frames != 45 || run_frames != 20 ||
                   !skeleton_reentered || !skeleton_hidden || !crouched_hidden || !stood_after_crouch ||
                   !locomotion_pose || !saw_walk || !saw_run || !saw_jump)) ||
+                (options.keepalive_smoke &&
+                 (game.restoration.last_mode != OpenBlood2::PlayerRestoreMode::KeepAlive ||
+                  game.restoration.selected_start != "01_egressa" || game.restoration.start_fallback ||
+                  game.client_shell.stats.health != 73 || game.client_shell.stats.bullets != 17 ||
+                  !game.server_shell.Player(game.local_client) ||
+                  !game.server_shell.Player(game.local_client)->m_InventoryMgr.keys.empty())) ||
                 (options.restore_smoke && (game.restoration.restored != 2 || !game.client_shell.restored_entry ||
                                            !game.server_shell.Player(game.local_client) ||
                                            game.server_shell.Player(game.local_client)->respawns != 0)) ||
@@ -1418,6 +1447,7 @@ int main(int argc, char** argv)
                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled\n"
                      "  --gpu-smoke         Exercise GPU presentation, inspector toggle, resize and quit\n"
                      "  --world-smoke       GPU lifecycle with real world unload/reload assertions\n"
+                     "  --keepalive-smoke   GPU SubwayA capture / CityHub named entry, hidden updates and reload\n"
                      "  --restore-smoke     GPU saved-player entry, hidden updates and restore after reload\n"
                      "  --player-smoke      GPU shell/player entry, hidden updates and unload/re-entry\n"
                      "  --weapons-smoke     GPU Beretta/knife firing, hidden simulation and reload\n"

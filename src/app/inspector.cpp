@@ -317,11 +317,20 @@ namespace OpenBlood2
             }
             capture_player_request = false;
         }
-        if (restore_player_request)
+        if (keep_world_request)
         {
-            if (game.restoration.saved && game.restore_player(*game.restoration.saved, world_error))
+            if (!game.local_client)
+                game.request_world(keep_world_name, world_error);
+            keep_world_request = false;
+        }
+        if (restore_player_request || keep_player_request)
+        {
+            if (game.restoration.saved && game.restore_player(*game.restoration.saved, world_error,
+                                                              keep_player_request ? PlayerRestoreMode::KeepAlive
+                                                                                  : PlayerRestoreMode::SavedPosition,
+                                                              keep_player_request ? keep_start_name : ""))
                 selection.id = game.restoration.last_player;
-            restore_player_request = false;
+            restore_player_request = keep_player_request = false;
         }
         if (respawn_request)
         {
@@ -1033,7 +1042,7 @@ namespace OpenBlood2
         }
         if (!world_error.empty())
             ImGui::TextWrapped("%s", world_error.c_str());
-        ImGui::SeparatorText("Player restoration (same loaded world)");
+        ImGui::SeparatorText("Player restoration / keep-alive entry");
         ImGui::BeginDisabled(!player);
         if (ImGui::Button("Capture player state"))
             capture_player_request = true;
@@ -1043,15 +1052,38 @@ namespace OpenBlood2
         if (ImGui::Button("Restore captured player"))
             restore_player_request = true;
         ImGui::EndDisabled();
+        ImGui::InputText("Destination world", keep_world_name, sizeof(keep_world_name));
+        ImGui::BeginDisabled(player);
+        if (ImGui::Button("Load destination for inspection"))
+            keep_world_request = true;
+        ImGui::EndDisabled();
+        ImGui::TextWrapped(
+            "Leave the player before loading. Loading replaces the current world; the captured player is retained.");
+        ImGui::InputText("Destination start (empty = start)", keep_start_name, sizeof(keep_start_name));
+        ImGui::BeginDisabled(player || !game.restoration.saved || game.world_path.empty());
+        if (ImGui::Button("Enter loaded world with captured player"))
+            keep_player_request = true;
+        ImGui::EndDisabled();
         const auto& restore = game.restoration;
+        if (restore.restored)
+        {
+            ImGui::TextWrapped("Last success: %s | destination %s | requested start %s | selected %s | fallback %s",
+                               restore.last_mode == PlayerRestoreMode::KeepAlive ? "keep-alive" : "saved position",
+                               restore.destination_world.c_str(), restore.requested_start.c_str(),
+                               restore.selected_start.c_str(), restore.start_fallback ? "yes" : "no");
+        }
+        else
+            ImGui::TextDisabled("No completed restoration");
         ImGui::Text("Captures %llu | Restored %llu / %llu | Restored client: %s", (unsigned long long)restore.captures,
                     (unsigned long long)restore.restored, (unsigned long long)restore.attempts,
                     game.client_shell.restored_entry ? "yes" : "no");
         if (!restore.error.empty())
             ImGui::TextWrapped("%s", restore.error.c_str());
-        ImGui::TextWrapped("Capture, leave the player, then restore. Original Load resets velocity/standard node "
-                           "visibility; client force-position clears acceleration. World/NPC state, complete "
-                           "client saves and level transfer are not restored.");
+        ImGui::TextWrapped(
+            "Capture, leave the player, then restore. Original Load resets velocity/standard node "
+            "visibility; client force-position clears acceleration. Keep-alive enters the already loaded "
+            "destination at its named start and discards keys. Automatic level transfer, world/client saves "
+            "and rollback of start-trigger effects remain unavailable.");
         if (restore.saved && ImGui::TreeNode("Saved engine/player values"))
         {
             const auto& s = *restore.saved;

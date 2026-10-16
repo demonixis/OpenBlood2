@@ -1,5 +1,9 @@
 # Original level-exit contracts
 
+> Continued by [named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md): supported
+> captured players can enter an already loaded different world at a named start.
+> Automatic NEW_LEVEL still refuses; staged cleanup is not world rollback.
+
 > Continued by [player state contracts](PLAYER_STATE_CONTRACTS.md): selected player
 > values and the original savegame initialization early return now execute.
 > Earlier blanket player-field/initialization omissions are historical; full
@@ -68,10 +72,12 @@ replacement is accepted. Music/menu/loading-screen teardown and first-world stat
 changes from the rest of the original HandleExitWorld are deliberately deferred
 with the unavailable transfer, not represented as completed services.
 
-The next increment must port supported player/inventory/damage keep-alive state,
-original restored-client association and named start-point entry before enabling
-NEW_LEVEL. It must validate destination resources and lifetime rollback, preserve
-current state on refusal and retain explicit failure for unsupported saved fields.
+Supported captured-player restoration, restored-client association and named
+keep-alive entry into an already loaded destination are now implemented (see the
+continuation above). Before enabling NEW_LEVEL, destination preparation still must
+validate required resources/classes and protect the current session on refusal;
+staged player cleanup alone cannot roll back world initialization or start triggers.
+Unsupported saved fields must continue to fail explicitly.
 General saves, addon character swaps, multiplayer and demo EndGame handling remain
 outside this increment. The original commented-out world-revisit save is not active
 behavior to reintroduce.

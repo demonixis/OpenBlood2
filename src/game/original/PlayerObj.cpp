@@ -244,6 +244,8 @@ bool CPlayerObj::OnSinglePlayerInit(const OpenBlood2::PlayerInit& init)
 bool CPlayerObj::GoToStartPoint(HSTRING start_name)
 {
     auto* server = GetServerDE();
+    entry_start_name.clear();
+    entry_start_fallback = false;
     auto* list = server->FindNamedObjects("Blood2StartPoint");
     if (!list)
         return false;
@@ -267,7 +269,7 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name)
     for (auto* link = list->m_pFirstLink; link; link = link->m_pNext)
     {
         auto* candidate = dynamic_cast<GameStartPoint*>(server->HandleToObject(link->m_hObject));
-        if (candidate && !candidate->IsMultiplayer())
+        if (candidate && server->IsObjectAlive(link->m_hObject) && !candidate->IsMultiplayer())
         {
             fallback = candidate;
             if (server->CompareStringsUpper(start_name, candidate->GetName()))
@@ -280,18 +282,25 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name)
     if (remove_string)
         server->FreeString(start_name);
     if (!start)
+    {
         start = fallback;
+        entry_start_fallback = true;
+    }
     if (!start)
     {
         entry_error = "No single-player GameStartPoint";
         return false;
     }
+    const auto* selected_name = server->GetStringData(start->GetName());
+    entry_start_name = selected_name ? selected_name : "";
     m_fYaw = start->GetPitchYawRoll().y;
     m_fPitch = 0;
     DVector position;
-    server->GetObjectPos(start->m_hObject, &position);
+    if (server->GetObjectPos(start->m_hObject, &position) != DE_OK)
+        return false;
     start->SendTrigger();
-    if (server->TeleportObject(m_hObject, &position) != DE_OK ||
+    // Trigger delivery may remove this owner or the marker. No marker reads after it.
+    if (!server->IsObjectAlive(m_hObject) || server->TeleportObject(m_hObject, &position) != DE_OK ||
         server->SendToClient(m_hClient, OpenBlood2::PlayerRotation{m_fPitch, m_fYaw}) != DE_OK)
         return false;
     if (server->MoveObjectToGround(m_hObject) != DE_OK)

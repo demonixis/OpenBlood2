@@ -6,6 +6,12 @@
 
 namespace OpenBlood2
 {
+    enum class PlayerRestoreMode
+    {
+        SavedPosition,
+        KeepAlive
+    };
+
     // Owned values for the supported local player. No retail save format,
     // client token, source object, contact identity or borrowed resource.
     struct PlayerRestoreState

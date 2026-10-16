@@ -1,5 +1,9 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The [named keep-alive entry continuation](../Documentation/Implementation/M2_PLAYER_KEEPALIVE.md) preserves supported player stats/weapons into an explicitly loaded destination,
+discards keys and executes original named start entry. Session exposes its mode,
+selected marker and fallback. Automatic level transfer and the M2 gate remain open.
+
 Current continuation: [player engine restoration and client association](../Documentation/Implementation/M2_PLAYER_RESTORE.md)
 connects the supported same-world living-player snapshot to original restored entry,
 without fresh stats or start-trigger replay. Session inspection supports capture,

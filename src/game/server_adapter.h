@@ -327,13 +327,17 @@ namespace OpenBlood2
         bool run_world(std::string& error);
         bool enter_player(std::string& error);
         bool capture_player(PlayerRestoreState&, std::string&);
-        bool restore_player(const PlayerRestoreState&, std::string&);
+        bool restore_player(const PlayerRestoreState&, std::string&,
+                            PlayerRestoreMode = PlayerRestoreMode::SavedPosition, std::string_view start_name = {});
         struct Restoration
         {
             std::optional<PlayerRestoreState> saved;
             std::string error;
             std::uint64_t captures = 0, attempts = 0, restored = 0;
             ObjectId last_player{}; // Inspection only, never a restoration input.
+            PlayerRestoreMode last_mode = PlayerRestoreMode::SavedPosition;
+            std::string destination_world, requested_start, selected_start;
+            bool start_fallback = false;
         } restoration;
 
         bool select_weapon(DBYTE slot, std::string& error);

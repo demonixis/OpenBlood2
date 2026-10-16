@@ -1,5 +1,9 @@
 # Player engine restoration and restored client association
 
+> Continued by [named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md): supported
+> captured players can enter an already loaded different world at a named start.
+> Automatic NEW_LEVEL still refuses; staged cleanup is not world rollback.
+
 This is an owned, in-memory snapshot of the **supported living local player** in
 the same loaded single-player world. It combines selected original inventory,
 damage and player Save/Load paths with replacement engine state restoration and

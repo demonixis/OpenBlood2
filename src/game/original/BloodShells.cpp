@@ -134,7 +134,7 @@ CPlayerObj* CBloodServerShell::OnClientEnterWorld(HCLIENT client)
     }
     return player;
 }
-CPlayerObj* CBloodServerShell::OnRestoredClientEnterWorld(HCLIENT client, HOBJECT object)
+CPlayerObj* CBloodServerShell::OnRestoredClientEnterWorld(HCLIENT client, HOBJECT object, const char* start_name)
 {
     // Typed local equivalent of OnClientEnterWorld's saved HCLIENTREF branch.
     // The caller supplies a fully staged owner; never fall back to CreatePlayer.
@@ -147,11 +147,18 @@ CPlayerObj* CBloodServerShell::OnRestoredClientEnterWorld(HCLIENT client, HOBJEC
     if (server_.SetClientUserData(client, object) != DE_OK)
         return nullptr;
     player->SetClient(client);
-    // RespawnPlayer's saved-position branch: associate, initialize client,
-    // restore facing/eye; no Respawn or GoToStartPoint/start-trigger replay.
-    if (server_.SendToClient(client, OpenBlood2::PlayerInitRequest{}) != DE_OK ||
-        server_.SendToClient(client, OpenBlood2::PlayerRotation{player->m_fPitch, player->m_fYaw}) != DE_OK ||
-        !player->InitializeClientState())
+    // RespawnPlayer chooses named entry for keep-alive, saved facing otherwise.
+    // Neither branch calls CPlayerObj::Respawn or grants a fresh profile.
+    HSTRING name = start_name && *start_name ? server_.CreateString(start_name) : nullptr;
+    bool ok =
+        (!start_name || !*start_name || name) && server_.SendToClient(client, OpenBlood2::PlayerInitRequest{}) == DE_OK;
+    if (ok)
+        ok = start_name
+                 ? player->GoToStartPoint(name)
+                 : server_.SendToClient(client, OpenBlood2::PlayerRotation{player->m_fPitch, player->m_fYaw}) == DE_OK;
+    if (name)
+        server_.FreeString(name);
+    if (!ok || !server_.IsObjectAlive(object) || !player->InitializeClientState())
     {
         player->SetClient(nullptr);
         server_.SetClientUserData(client, nullptr);

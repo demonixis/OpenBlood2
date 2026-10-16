@@ -1,5 +1,9 @@
 # Resource, World and Session Contracts
 
+> Continued by [named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md): supported
+> captured players can enter an already loaded different world at a named start.
+> Automatic NEW_LEVEL still refuses; staged cleanup is not world rollback.
+
 > Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and
 > shell exit/load messages now execute. NEW_LEVEL still explicitly refuses missing
 > keep-alive transfer before teardown; this is not a completed level transition.

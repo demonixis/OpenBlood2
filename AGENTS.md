@@ -408,3 +408,9 @@ relative scheduling, raw attributes/caps and single MoveMgr integration. First u
 must derive speeds without ValidateAttributes. No live-client replacement or start
 trigger replay; current-world clearance may reject. Whole-world/client saves,
 dead/powered states and safe NEW_LEVEL transfer remain unavailable; M2 stays open.
+
+The [named keep-alive entry continuation](../Documentation/Implementation/M2_PLAYER_KEEPALIVE.md) connects supported captured players to already loaded destinations. Read [contracts](docs/PLAYER_KEEPALIVE_CONTRACTS.md).
+Preserve key removal, raw stats, case-insensitive solo marker selection/last fallback,
+trigger-before-teleport ordering, checked callback lifetime and one MoveMgr integrator.
+Failure cleans staged ownership, not destination trigger effects or an unloaded world.
+Automatic NEW_LEVEL still refuses before teardown; safe transfer and M2 remain open.

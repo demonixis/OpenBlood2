@@ -1,5 +1,9 @@
 # Original inventory Save/Load subset
 
+> Continued by [named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md): supported
+> captured players can enter an already loaded different world at a named start.
+> Automatic NEW_LEVEL still refuses; staged cleanup is not world rollback.
+
 > Continued by [player restore contracts](PLAYER_RESTORE_CONTRACTS.md): supported
 > engine state and original restored-client association now execute in the same
 > loaded world. Earlier blanket omissions below are historical. Full client/world
