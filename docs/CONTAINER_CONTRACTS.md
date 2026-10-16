@@ -1,5 +1,9 @@
 # Container, liquid and ladder boundary
 
+> The [scene explosion continuation](SCENE_EXPLOSION_CONTRACTS.md#hot-query-allocation-adjustment)
+> reduces hot-query copying to fresh snapshots of bound containers. Order,
+> lifetime, membership and source physics rules are unchanged.
+
 This extends [MOVEMENT_CONTRACTS.md](MOVEMENT_CONTRACTS.md) and
 [LOCOMOTION_CONTRACTS.md](LOCOMOTION_CONTRACTS.md). Source selections are recorded
 in [M2_CONTAINER_SOURCES.json](M2_CONTAINER_SOURCES.json); validation is in

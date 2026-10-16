@@ -403,3 +403,11 @@ properties, initialization and independent repeats. [Contracts](SPRITE_CONTRACTS
 separate original rules from bounded ray/parser/clock adaptations. Later-generation
 SPR references were consulted and checked against Blood II manifests; no donor
 reader or DTX decoder was imported. Save/restore and sprite rendering remain open.
+
+## Scene explosion continuation
+
+[Original source hashes/selections](M2_SCENE_EXPLOSION_SOURCES.json) document
+CClientExplosionSFX's authored server path, shared null-damager guard and
+PlaySoundFromPos descriptor. [Contracts](SCENE_EXPLOSION_CONTRACTS.md) distinguish
+actual server/audio behavior from unavailable client FX. No donor backend,
+dependency or guessed gameplay correction was imported.

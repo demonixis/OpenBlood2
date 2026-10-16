@@ -78,6 +78,22 @@ namespace OpenBlood2
 
     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
     {
+        if (scene_explosion_request)
+        {
+            if (const auto* r = game.objects.get(scene_explosion_request);
+                r && r->life == Life::Alive && r->type->name == "CClientExplosionSFX")
+            {
+                auto s = game.server.CreateString("TRIGGER");
+                auto m = game.server.StartMessageToObject(nullptr, r->handle, 1000);
+                if (m)
+                {
+                    game.server.WriteToMessageHString(m, s);
+                    game.server.EndMessage(m);
+                }
+                game.server.FreeString(s);
+            }
+            scene_explosion_request = {};
+        }
         if (random_sound_request)
         {
             if (const auto* r = game.objects.get(random_sound_request);
@@ -583,6 +599,13 @@ namespace OpenBlood2
                 {
                     select_lights = false;
                     draw_lights(game, selection);
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("Explosions", nullptr,
+                                        select_scene_explosions ? ImGuiTabItemFlags_SetSelected : 0))
+                {
+                    select_scene_explosions = false;
+                    draw_scene_explosions(game, selection);
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Sprites", nullptr, select_sprites ? ImGuiTabItemFlags_SetSelected : 0))

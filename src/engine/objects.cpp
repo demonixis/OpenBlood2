@@ -558,6 +558,17 @@ namespace OpenBlood2
                 ids.push_back(slot.object->id);
         return ids;
     }
+    std::vector<ObjectId> Objects::container_snapshot() const
+    {
+        // Same checked identities and slot order as snapshot(), freshly gathered
+        // for each query. Unrelated effects need no copied ID or subsequent lookup.
+        std::vector<ObjectId> ids;
+        ids.reserve(std::min<std::size_t>(8, slots_.size()));
+        for (const auto& slot : slots_)
+            if (slot.object && slot.object->container)
+                ids.push_back(slot.object->id);
+        return ids;
+    }
     HOBJECT Objects::next_alive(HOBJECT previous) const
     {
         std::size_t begin = 0;

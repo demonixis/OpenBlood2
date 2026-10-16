@@ -318,9 +318,9 @@ namespace
             std::map<EntryState, unsigned> counts;
             for (const auto& e : g.entries)
                 ++counts[e.state];
-            CHECK(counts[EntryState::Created] == 178 && counts[EntryState::Unsupported] == 26 &&
+            CHECK(counts[EntryState::Created] == 187 && counts[EntryState::Unsupported] == 17 &&
                   counts[EntryState::EditorOnly] == 372 && !counts[EntryState::Failed]);
-            CHECK(g.objects.snapshot().size() == 185 && g.enter_player(error) && g.objects.snapshot().size() == 188);
+            CHECK(g.objects.snapshot().size() == 194 && g.enter_player(error) && g.objects.snapshot().size() == 197);
             std::vector<HOBJECT> targets;
             for (auto id : g.objects.snapshot())
                 if (dynamic_cast<RandomSoundFX*>(g.objects.get(id)->game.get()))
@@ -346,7 +346,7 @@ namespace
                 std::cout << "cycle=" << cycle << " name=" << g.objects.get(h)->state.m_Name
                           << " sound=" << v->request.resource << '\n';
             }
-            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 179);
+            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 188);
             CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips() &&
                   !g.server.audio.get(last) && g.objects.snapshot().empty() && !g.server.message_count() &&
                   !g.server.string_count() && !g.server.list_count());

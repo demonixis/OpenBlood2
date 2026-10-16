@@ -3,6 +3,7 @@
 #include "game/original/CameraObj.h"
 #include "game/original/CameraSpot.h"
 #include "game/original/CinematicTrigger.h"
+#include "game/original/ClientExplosionSFX.h"
 #include "game/original/ClientLightFX.h"
 #include "game/original/DetailSprite.h"
 #include "game/original/Door.h"
@@ -140,6 +141,14 @@ namespace OpenBlood2
                                    {"StartActive", false},
                                    {"Looping", false}}};
         const ClassInfo client_sfx{"CClientSFX", &b2base, construct<CClientSFX>, {}};
+        const ClassInfo scene_explosion{"CClientExplosionSFX",
+                                        &client_sfx,
+                                        construct<CClientExplosionSFX>,
+                                        {{"ExplosionType", std::int32_t(0)},
+                                         {"Damage", 50.0f},
+                                         {"DamageRadius", 200.0f},
+                                         {"Direction", DVector{0, 1, 0}},
+                                         {"WaveFile", std::string("Sounds\\exp_tnt.wav")}}};
         const ClassInfo client_light{"ClientLightFX", &client_sfx, construct<ClientLightFX>, []
                                      {
                                          std::vector<PropertySpec> p{{"HitPoints", 1.0f},
@@ -563,18 +572,18 @@ namespace OpenBlood2
     bool register_original_classes(Objects& objects)
     {
         return objects.register_class(base) && objects.register_class(b2base) && objects.register_class(camera) &&
-               objects.register_class(client_sfx) && objects.register_class(client_light) &&
-               objects.register_class(light_SquareWaveLightFX) && objects.register_class(light_SawWaveLightFX) &&
-               objects.register_class(light_RampUpWaveLightFX) && objects.register_class(light_RampDownWaveLightFX) &&
-               objects.register_class(light_SineWaveLightFX) && objects.register_class(light_Flicker1WaveLightFX) &&
-               objects.register_class(light_Flicker2WaveLightFX) && objects.register_class(light_Flicker3WaveLightFX) &&
-               objects.register_class(light_Flicker4WaveLightFX) && objects.register_class(light_StrobeWaveLightFX) &&
-               objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
-               objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
-               objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
-               objects.register_class(detail_sprite) && objects.register_class(sound) &&
-               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
-               objects.register_class(game_start) && objects.register_class(path) &&
+               objects.register_class(client_sfx) && objects.register_class(scene_explosion) &&
+               objects.register_class(client_light) && objects.register_class(light_SquareWaveLightFX) &&
+               objects.register_class(light_SawWaveLightFX) && objects.register_class(light_RampUpWaveLightFX) &&
+               objects.register_class(light_RampDownWaveLightFX) && objects.register_class(light_SineWaveLightFX) &&
+               objects.register_class(light_Flicker1WaveLightFX) && objects.register_class(light_Flicker2WaveLightFX) &&
+               objects.register_class(light_Flicker3WaveLightFX) && objects.register_class(light_Flicker4WaveLightFX) &&
+               objects.register_class(light_StrobeWaveLightFX) && objects.register_class(light_SearchWaveLightFX) &&
+               objects.register_class(light_FlickerLight) && objects.register_class(light_GlowingLight) &&
+               objects.register_class(camera_object) && objects.register_class(cinematic_trigger) &&
+               objects.register_class(random_sound) && objects.register_class(detail_sprite) &&
+               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
+               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
                objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&

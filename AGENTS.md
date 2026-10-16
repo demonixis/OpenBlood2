@@ -186,3 +186,12 @@ SubwayA has 178 live-created entries, 4 transferred world sounds, 7 SelfTriggers
 185/188 before/after player entry, then 176/179 after nine Keys are consumed.
 M2 remains incomplete; earlier DetailSprite omissions are superseded only for
 this bounded subset.
+
+The latest [scene explosion evidence](../Documentation/Implementation/M2_SCENE_EXPLOSIONS.md) integrates original CClientExplosionSFX
+activation/removal and detached one-shot WAV playback. Read [scene explosion contracts](docs/SCENE_EXPLOSION_CONTRACTS.md).
+Preserve the original null-damager guard (zero deliveries), cached initial position,
+retrigger-before-update behavior and source-independent voice tails. Reports explicitly
+mark client FX unavailable; they are not successful FX services. SubwayA now has 187
+live-created entries, 4 transferred sounds, 372 editor-only and 17 unported, with no
+failures; runtime counts are 194/197 before/after player, then 185/188 after nine Keys.
+Required client FX, AI, ExitTrigger and other services keep M2 incomplete.

@@ -9,13 +9,16 @@ OpenBlood2::RadiusDamageReport DamageObjectsInRadius(HOBJECT responsible, LPBASE
     using namespace OpenBlood2;
     RadiusDamageReport report;
     auto* server = BaseClass::GetServerDE();
-    if (!server || !damager || damager->m_hObject != responsible || !server->IsObjectAlive(responsible) ||
-        !physics_vector(origin) || !std::isfinite(radius) || radius <= 0 || radius > 1e6f || !std::isfinite(damage) ||
-        damage < 0 || damage > 1e6f)
+    report.null_damager = damager == nullptr;
+    if (!server || (damager && damager->m_hObject != responsible) || !server->IsObjectAlive(responsible) ||
+        !physics_vector(origin) || !std::isfinite(radius) || std::abs(radius) > 1e6f || (damager && radius <= 0) ||
+        !std::isfinite(damage) || std::abs(damage) > 1e6f || (damager && damage < 0))
     {
         report.cancelled = true;
         return report;
     }
+    if (radius <= 0)
+        return report; // Original radius guard, including null-damager calls.
     // Snapshot original list order before callbacks. A death relay can remove
     // later targets or spawn aggregates; neither invalidates this traversal.
     std::vector<HOBJECT> targets;
@@ -51,6 +54,8 @@ OpenBlood2::RadiusDamageReport DamageObjectsInRadius(HOBJECT responsible, LPBASE
             continue;
         const auto amount = distance < half ? damage : damage - (distance - half) / half * damage;
         ++report.in_radius;
+        if (!damager)
+            continue; // Original DamageObject returns before constructing a message.
         auto message = server->StartMessageToObject(damager, target, damage_message);
         if (!message)
         {

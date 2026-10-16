@@ -159,6 +159,7 @@ namespace OpenBlood2
         const ObjectRecord* get(ObjectId id) const;
         HOBJECT handle_of(const BaseClass* instance) const;
         std::vector<ObjectId> snapshot() const;
+        std::vector<ObjectId> container_snapshot() const;
         HOBJECT next_alive(HOBJECT previous) const;
         const PropertyValue* property(std::string_view name) const;
         bool link(HOBJECT owner, HOBJECT target);

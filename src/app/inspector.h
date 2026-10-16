@@ -21,6 +21,9 @@ namespace OpenBlood2
         ObjectId trigger_selection{}, trigger_request{};
         std::string trigger_command;
         bool grant_key_request = false;
+        bool select_scene_explosions = false;
+        ObjectId scene_explosion_selection{}, scene_explosion_request{};
+        void draw_scene_explosions(GameSession&, ObjectSelection&);
         bool select_sprites = false;
         ObjectId sprite_selection{};
         void draw_sprites(GameSession&, ObjectSelection&);

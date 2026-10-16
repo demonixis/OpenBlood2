@@ -26,6 +26,20 @@ namespace OpenBlood2
         }
         return audio.play(*client_resources, owner, request, position, error);
     }
+    SoundId ServerAdapter::PlayDetachedSound(HOBJECT source, const SoundRequest& request, DVector position,
+                                             std::string& error)
+    {
+        trace_service("PlayDetachedSound");
+        if (request.loop || request.space != SoundSpace::Spatial)
+        {
+            error = "Detached sound requires a non-looping spatial request";
+            return 0;
+        }
+        const auto id = PlaySoundAt(source, request, position, error);
+        if (auto* voice = audio.get(id))
+            voice->world_owned = voice->auto_remove = true;
+        return id;
+    }
     SoundId ServerAdapter::PlayWorldSound(HOBJECT source, const SoundRequest& request, bool file_stream,
                                           std::string& error)
     {
@@ -91,6 +105,13 @@ namespace OpenBlood2
         }
         for (auto id : removed)
             audio.kill(id);
-        return audio.advance(seconds, listener, rotation);
+        const bool ok = audio.advance(seconds, listener, rotation);
+        removed.clear();
+        for (const auto& [id, entry] : audio.voices())
+            if (entry.auto_remove && entry.done)
+                removed.push_back(id);
+        for (auto id : removed)
+            audio.kill(id);
+        return ok;
     }
 } // namespace OpenBlood2

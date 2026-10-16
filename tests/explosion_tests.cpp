@@ -280,7 +280,9 @@ namespace
         for (float radius : {0.0f, -1.0f, 1e-30f, 1e7f, std::numeric_limits<float>::infinity()})
             CHECK(DamageObjectsInRadius(b->m_hObject, b, {}, radius, 10, DamageType::Explode).cancelled);
         CHECK(DamageObjectsInRadius(b->m_hObject, b, {}, 200, -1, DamageType::Explode).cancelled);
-        CHECK(DamageObjectsInRadius(b->m_hObject, nullptr, {}, 200, 1, DamageType::Explode).cancelled);
+        const auto suppressed = DamageObjectsInRadius(b->m_hObject, nullptr, {}, 200, 1, DamageType::Explode);
+        CHECK(suppressed.null_damager && !suppressed.cancelled && suppressed.candidates == 1 &&
+              suppressed.in_radius == 1 && suppressed.delivered == 0);
         for (int i = 0; i < 40; ++i)
             b->debris.Create({}, 0);
         CHECK(g.server.explosion_effects.size() == 32 && g.server.debris_effects.empty());

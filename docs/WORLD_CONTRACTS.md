@@ -1,5 +1,9 @@
 # Resource, World and Session Contracts
 
+> Extended by [scene explosion contracts](SCENE_EXPLOSION_CONTRACTS.md): original
+> CClientExplosionSFX activation/removal and detached audio, preserving its null
+> damager (zero delivered damage). Client FX and complete M2 remain unavailable.
+
 The later [sprite contracts](SPRITE_CONTRACTS.md) add original DetailSprite,
 strict SPR manifest/frame-reference binding and durable creation failures. DTX
 pixels remain undecoded; the complete M2 gate stays open.

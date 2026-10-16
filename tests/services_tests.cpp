@@ -2,6 +2,7 @@
 #include "game/original/WorldProperties.h"
 #include "game/server_adapter.h"
 #include "model_fixture.h"
+#include <algorithm>
 #include <bit>
 #include <fstream>
 #include <functional>
@@ -355,7 +356,16 @@ namespace
             game.server.SetModelAnimation(h, i);
             game.server.ResetModelAnimation(h);
             game.server.SetModelLooping(h, DFALSE);
-            CHECK(game.step(same->animations[i].duration / 1000.0 + .001));
+            // The loaded world now includes authored emitters overlapping conveyors.
+            // Preserve the entire clip/session duration while respecting the existing
+            // 0.5-second physics catch-up bound; do not raise the engine limit.
+            double remaining = same->animations[i].duration / 1000.0 + .001;
+            while (remaining > 0)
+            {
+                const double step = std::min(remaining, .5);
+                CHECK(game.step(step));
+                remaining -= step;
+            }
             CHECK(game.server.GetModelPlaybackState(h) == MS_PLAYDONE);
             CHECK(sample_pose(*same, i, same->animations[i].duration / 2.0, pose) && pose.size() == 20);
             std::vector<DVector> vertices;

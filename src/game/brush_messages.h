@@ -15,6 +15,18 @@ namespace OpenBlood2
     {
         unsigned candidates = 0, in_radius = 0, delivered = 0;
         bool cancelled = false;
+        bool null_damager = false; // Original DamageObject guard suppresses delivery.
+    };
+    struct SceneExplosionReport
+    {
+        std::string source, sound, sound_error;
+        DVector position{}, normal{};
+        DDWORD type = 0;
+        float damage = 0, radius = 0;
+        RadiusDamageReport targets;
+        std::uint64_t voice = 0;
+        // These requests cannot yet be consumed by the original client FX manager.
+        bool client_fx_available = false;
     };
     struct DebrisEffect
     {

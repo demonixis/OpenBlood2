@@ -14,6 +14,7 @@
 #include "objectives_smoke.h"
 #include "pickup_smoke.h"
 #include "random_sound_smoke.h"
+#include "scene_explosion_smoke.h"
 #include "sprite_smoke.h"
 #include "trigger_smoke.h"
 #include "world_sound_smoke.h"
@@ -74,12 +75,13 @@ namespace
             spdlog::error("Original game boundary initialization failed");
             return 4;
         }
-        if ((options.cinematics_smoke || options.world_sounds_smoke || options.random_sounds_smoke ||
-             (!options.gpu_smoke && !options.world_smoke)) &&
+        if ((options.scene_explosions_smoke || options.cinematics_smoke || options.world_sounds_smoke ||
+             options.random_sounds_smoke || (!options.gpu_smoke && !options.world_smoke)) &&
             !game.server.audio.open_output(error))
         {
             spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
-            if (options.cinematics_smoke || options.world_sounds_smoke || options.random_sounds_smoke)
+            if (options.scene_explosions_smoke || options.cinematics_smoke || options.world_sounds_smoke ||
+                options.random_sounds_smoke)
                 return 4;
         }
         HOBJECT key = nullptr;
@@ -187,6 +189,10 @@ namespace
                 return 4;
             selection.id = smoke_camera;
         }
+        OpenBlood2::ObjectId smoke_scene_explosion{};
+        bool scene_explosion_hidden = false;
+        if (options.scene_explosions_smoke && !OpenBlood2::prepare_scene_explosion_smoke(game, smoke_scene_explosion))
+            return 4;
         OpenBlood2::ObjectId smoke_random_sound{};
         bool random_sound_hidden = false, world_sound_hidden = false, sprite_hidden = false;
         if (options.random_sounds_smoke)
@@ -239,7 +245,7 @@ namespace
                                    !options.pickups_smoke && !options.objectives_smoke && !options.cameras_smoke &&
                                    !options.keyframes_smoke && !options.lights_smoke && !options.cinematics_smoke &&
                                    !options.random_sounds_smoke && !options.world_sounds_smoke &&
-                                   !options.sprites_smoke;
+                                   !options.sprites_smoke && !options.scene_explosions_smoke;
         inspector.select_weapons = options.weapons_smoke;
         inspector.select_movement = options.movement_smoke;
         inspector.select_containers = options.containers_smoke;
@@ -250,6 +256,8 @@ namespace
         inspector.select_random_sounds = options.random_sounds_smoke;
         inspector.select_world_sounds = options.world_sounds_smoke;
         inspector.select_sprites = options.sprites_smoke;
+        inspector.select_scene_explosions = options.scene_explosions_smoke;
+        inspector.scene_explosion_selection = smoke_scene_explosion;
         inspector.random_sound_selection = smoke_random_sound;
         inspector.select_cinematics = options.cinematics_smoke;
         inspector.cinematic_selection = smoke_cinematic;
@@ -368,6 +376,12 @@ namespace
             if (options.brushes_smoke && frames == reload_frame + 1)
                 if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
                     return 4;
+            if (options.scene_explosions_smoke && frames == reload_frame + 1)
+            {
+                if (!OpenBlood2::prepare_scene_explosion_smoke(game, smoke_scene_explosion) ||
+                    !OpenBlood2::activate_scene_explosion_smoke(game, smoke_scene_explosion) || !game.step(.11))
+                    return 4;
+            }
             if (options.random_sounds_smoke && frames == reload_frame + 1 &&
                 !OpenBlood2::prepare_random_sound_smoke(game, smoke_random_sound))
                 return 4;
@@ -506,8 +520,8 @@ namespace
                            : (options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
                               options.interaction_smoke || options.brushes_smoke || options.pickups_smoke ||
                               options.objectives_smoke || options.cameras_smoke || options.keyframes_smoke ||
-                              options.sprites_smoke || options.lights_smoke || options.cinematics_smoke ||
-                              options.world_sounds_smoke || options.random_sounds_smoke)
+                              options.scene_explosions_smoke || options.sprites_smoke || options.lights_smoke ||
+                              options.cinematics_smoke || options.world_sounds_smoke || options.random_sounds_smoke)
                                ? 14u
                                : 2u) &&
                 !captured && !options.capture_file.empty();
@@ -654,6 +668,11 @@ namespace
                     use.key.down = frames == hide_frame;
                     event_ok = SDL_PushEvent(&use);
                 }
+                if (options.scene_explosions_smoke && frames == hide_frame &&
+                    !OpenBlood2::activate_scene_explosion_smoke(game, smoke_scene_explosion))
+                    return 4;
+                if (options.scene_explosions_smoke && frames == show_frame - 1)
+                    scene_explosion_hidden = OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion);
                 if (options.sprites_smoke && frames == show_frame - 1)
                     sprite_hidden = OpenBlood2::check_sprite_smoke(game);
                 if (options.world_sounds_smoke && frames == show_frame - 1)
@@ -793,6 +812,8 @@ namespace
                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+                (options.scene_explosions_smoke &&
+                 (!scene_explosion_hidden || !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
                 (options.sprites_smoke && (!sprite_hidden || !OpenBlood2::check_sprite_smoke(game))) ||
                 (options.world_sounds_smoke && (!world_sound_hidden || !OpenBlood2::check_world_sound_smoke(game))) ||
                 (options.random_sounds_smoke &&
@@ -815,7 +836,8 @@ namespace
                                           !game.server_shell.Player(game.local_client))) ||
                 (options.world_smoke &&
                  (!world_unloaded || !model_advanced_hidden || !game.preview_model || !game.server.collision_ready ||
-                  game.world_path.empty() || game.objects.snapshot().size() != initial_objects ||
+                  game.world_path.empty() ||
+                  game.objects.snapshot().size() != initial_objects - (options.scene_explosions_smoke ? 1 : 0) ||
                   game.server.string_count() != initial_strings)))
             {
                 spdlog::error("GPU smoke failed its render/toggle/resize/quit assertions");
@@ -829,6 +851,9 @@ namespace
             if (options.lights_smoke)
                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
                              "and after reload; evaluated radius/color checked; world illumination unavailable");
+            if (options.scene_explosions_smoke)
+                spdlog::info("SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
+                             "audio verified hidden and after reload; client FX unavailable");
             if (options.sprites_smoke)
                 spdlog::info("SPRITES smoke: 12 original DetailSprites, SPR manifests, frame clocks, hidden UI and "
                              "unload/reload verified; textures indexed, not rendered");
@@ -927,6 +952,7 @@ int main(int argc, char** argv)
                      "  --interaction-smoke GPU original USE and rotating door inspection\n"
                      "  --pickups-smoke   GPU original ammo pickup, hidden collection and reload\n"
                      "  --objectives-smoke GPU original objectives and localized text, hidden delivery/reload\n"
+                     "  --scene-explosions-smoke  GPU original emitter, detached audio and reload\n"
                      "  --sprites-smoke    GPU original sprite placement, SPR clocks and reload\n"
                      "  --random-sounds-smoke  GPU original random sound, PCM output and reload\n"
                      "  --cinematics-smoke  GPU original cue, WAV mixing, SDL output and reload\n"

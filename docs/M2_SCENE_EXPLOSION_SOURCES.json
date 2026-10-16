@@ -1,0 +1,102 @@
+{
+  "baseline_commit": "f2d86f74d3cdfd64a35374ce019f2c58048986ba",
+  "date": "2026-10-16",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/ClientExplosionSFX.cpp",
+      "sha256": "fc51674223cf67456341d4529bc93acbe8df9365a8730b0491c7e22803c85a09",
+      "selected_lines": [
+        [
+          17,
+          23
+        ],
+        [
+          282,
+          300
+        ],
+        [
+          303,
+          417
+        ]
+      ],
+      "use": "Authored registration, SetupFX, callbacks, properties and trigger; save/restore and programmatic effect builders omitted"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ClientExplosionSFX.h",
+      "sha256": "8cb7b9c2bae10a0250cb1a2728e2c1bc8884f642cb34e9e24c0aef3023600523",
+      "selected_lines": [
+        [
+          36,
+          53
+        ],
+        [
+          85,
+          103
+        ]
+      ],
+      "use": "Constructor/state and authored callback declarations"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ClientSFX.cpp",
+      "sha256": "6e3731e0371a886cb02a22ba7aa5145f67b47080ed74805150d09206d41b6d54",
+      "selected_lines": [
+        [
+          16,
+          50
+        ]
+      ],
+      "use": "Existing ancestry and FORCECLIENTUPDATE callback"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "selected_lines": [
+        [
+          95,
+          125
+        ],
+        [
+          497,
+          591
+        ]
+      ],
+      "use": "Spatial sound descriptor and null-damager suppression in shared radius damage"
+    },
+    {
+      "path": "sources/blood2/Shared/SoundTypes.h",
+      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "selected_lines": [
+        [
+          12,
+          24
+        ]
+      ],
+      "use": "MISC_HIGH=2"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
+      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
+      "selected_lines": [
+        [
+          178,
+          180
+        ]
+      ],
+      "use": "Default DAMAGE_TYPE_NORMAL for emitter radius call; null sender prevents delivery"
+    }
+  ],
+  "adaptations": [
+    "Owned strings and bounded typed properties, explicit restore rejection",
+    "Null-damager helper support preserves zero source damage; existing non-null delivery unchanged",
+    "World-owned auto-released one-shot WAV voices; dry replacement mixer",
+    "Durable unavailable client-FX reports and queued inspection; no successful FX stub",
+    "Fresh container-only ID snapshots reduce hot-query copying/lookup cost without changing order, lifetime or original rules"
+  ],
+  "omitted": [
+    "Client explosion recipes/particles/models/sprites/lights/rendering",
+    "Programmatic effect Setup overloads",
+    "Save/restore, precache, reverb, priority arbitration",
+    "Complete M2 acceptance and retail parity"
+  ],
+  "status": "M2 incomplete; authored server/audio subset; client explosion FX unavailable"
+}

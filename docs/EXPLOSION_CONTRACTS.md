@@ -1,5 +1,9 @@
 # Original brush explosions and debris requests
 
+> Extended by [scene explosion contracts](SCENE_EXPLOSION_CONTRACTS.md): original
+> CClientExplosionSFX activation/removal and detached audio, preserving its null
+> damager (zero delivered damage). Client FX and complete M2 remain unavailable.
+
 > Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
 > pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
 

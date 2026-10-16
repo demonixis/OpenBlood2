@@ -13,7 +13,7 @@ namespace OpenBlood2
         if (!body || body->life != Life::Alive || !physics_vector(head))
             return false;
         bool head_found = false;
-        for (auto id : objects_.snapshot())
+        for (auto id : objects_.container_snapshot())
         {
             const auto* r = objects_.get(id);
             if (!r || r->life != Life::Alive || !r->container)
@@ -44,7 +44,7 @@ namespace OpenBlood2
         auto* body = objects_.get(object);
         if (!body || body->life != Life::Alive)
             return false;
-        for (auto id : objects_.snapshot())
+        for (auto id : objects_.container_snapshot())
         {
             auto* r = objects_.get(id);
             if (!r || r->life != Life::Alive || !r->container ||

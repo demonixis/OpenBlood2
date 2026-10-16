@@ -47,7 +47,8 @@ namespace OpenBlood2
         double cursor = 0;
         float left = 1, right = 1;
         bool done = false, speaker_lost = false;
-        bool world_owned = false; // Owner is provenance only for transferred, unattached loops.
+        bool world_owned = false; // Owner is provenance only for transferred, unattached sounds.
+        bool auto_remove = false; // Fire-and-forget one-shots release their voice on completion.
         std::uint64_t loops = 0;
     };
     class AudioMixer

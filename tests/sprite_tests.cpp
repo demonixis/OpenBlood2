@@ -380,10 +380,10 @@ namespace
                       !r->sprite->translucent);
                 weak = r->sprite;
             }
-            CHECK(sprites == 12 && counts[EntryState::Created] == 178 && counts[EntryState::WorldSound] == 4 &&
-                  counts[EntryState::Unsupported] == 26 && counts[EntryState::EditorOnly] == 372 &&
+            CHECK(sprites == 12 && counts[EntryState::Created] == 187 && counts[EntryState::WorldSound] == 4 &&
+                  counts[EntryState::Unsupported] == 17 && counts[EntryState::EditorOnly] == 372 &&
                   counts[EntryState::Failed] == 0);
-            CHECK(g.objects.snapshot().size() == 185 && g.enter_player(error) && g.objects.snapshot().size() == 188 &&
+            CHECK(g.objects.snapshot().size() == 194 && g.enter_player(error) && g.objects.snapshot().size() == 197 &&
                   g.step(.02));
             for (auto id : g.objects.snapshot())
             {
@@ -391,13 +391,13 @@ namespace
                 if (r->sprite)
                     CHECK(r->sprite_track.frame == 0 && std::abs(r->sprite_track.milliseconds - 20) < 1e-6);
             }
-            CHECK(g.objects.snapshot().size() == 179 && !g.run_world(error) &&
-                  error.find("26 uninstantiated") != std::string::npos);
+            CHECK(g.objects.snapshot().size() == 188 && !g.run_world(error) &&
+                  error.find("17 uninstantiated") != std::string::npos);
             CHECK(g.unload_world() && weak.expired() && g.objects.snapshot().empty() && g.server.string_count() == 0 &&
                   g.server.message_count() == 0 && g.server.list_count() == 0);
             std::cout << "cycle=" << cycle
                       << " 12 DetailSprite source instances, exact SPR frame resources, hidden-independent clocks and "
-                         "unload verified; M2 blocked (26)\n";
+                         "unload verified; M2 blocked (17)\n";
         }
         return true;
     }

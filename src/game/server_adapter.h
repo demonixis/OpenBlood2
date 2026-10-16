@@ -33,6 +33,7 @@ namespace OpenBlood2
       public:
         AudioMixer audio;
         SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
+        SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) override;
         SoundId PlaySoundAt(HOBJECT, const SoundRequest&, DVector, std::string&) override;
         SoundId PlayWorldSound(HOBJECT, const SoundRequest&, bool file_stream, std::string&) override;
         bool RandomInt(int, int, int&) override;
@@ -56,9 +57,11 @@ namespace OpenBlood2
         bool SetBlockingPriority(HOBJECT, DBYTE) override;
         void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE) override;
         void RecordDebrisEffect(const DebrisEffect&) override;
+        void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) override;
         void RecordExplosionEffect(const ExplosionEffect&) override;
         std::vector<DebrisEffect> debris_effects;
         std::vector<ExplosionEffect> explosion_effects;
+        std::vector<SceneExplosionReport> scene_explosions;
         std::vector<BrushDestruction> brush_destructions; // Latest 32, reset on unload.
         DRESULT WriteKeyMessage(HMESSAGEWRITE, const KeyMessage&) override;
         bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
@@ -78,6 +81,7 @@ namespace OpenBlood2
             brush_destructions.clear();
             debris_effects.clear();
             explosion_effects.clear();
+            scene_explosions.clear();
             spawn_reports.clear();
             pickup_reports.clear();
             camera_effects.clear();
