@@ -12,6 +12,7 @@ namespace OpenBlood2
         std::uint32_t range = UINT32_MAX;
         float alpha = 1;
         std::uint64_t client_effect = 0;
+        std::uint64_t fragment_effect = 0;
     };
     // Presentation-only snapshot. No original object pointer survives add().
     class ModelView

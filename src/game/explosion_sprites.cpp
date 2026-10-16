@@ -44,7 +44,7 @@ namespace OpenBlood2
                 : type == 1 ? 2.f
                             : 2.5f,
                 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
-            unavailable = type == 3 ? "fragments/trails, light illumination" : "light illumination";
+            unavailable = type == 3 ? "fragment smoke trails, light illumination" : "light illumination";
         }
         else if (type == 6)
         {

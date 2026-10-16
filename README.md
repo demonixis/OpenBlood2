@@ -1,5 +1,9 @@
 # Blood II Reconstruction aka OpenBlood2
 
+Current continuation: [original explosion metal fragments](../Documentation/Implementation/M2_EXPLOSION_FRAGMENTS.md) adds
+launch, collision/rest, fade, real model rendering and live inspection. Trails,
+remaining FX/illumination and safe NEW_LEVEL keep M2 incomplete.
+
 Current continuation: [original explosion particle rings](../Documentation/Implementation/M2_EXPLOSION_RINGS.md) adds
 fire/smoke particle motion, real DTX alpha rendering and per-particle inspection.
 Remaining composite FX, illumination and safe NEW_LEVEL keep M2 incomplete.

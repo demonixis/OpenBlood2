@@ -8,7 +8,8 @@ namespace OpenBlood2
         ImGui::TextWrapped(
             "Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
             "Spatial WAV playback and selected original sprite/model components are implemented. Composite "
-            "particle flames, fragments and surface illumination remain unavailable. Rings and light state are shown "
+            "particle flames, fragment trails and surface illumination remain unavailable. Fragment/ring/light state "
+            "is shown "
             "below.");
         ImGui::Text("Audio: %s | active voices %zu | submitted frames %llu",
                     game.server.audio.has_output() ? "SDL stream" : "offline clock", game.server.audio.voices().size(),
@@ -55,6 +56,47 @@ namespace OpenBlood2
             }
             ImGui::PopID();
         }
+        ImGui::Separator();
+        const auto& fragments = game.server.explosion_fragments;
+        ImGui::Text("Explosion fragments: %zu active / %llu started / %llu expired / %llu failed",
+                    fragments.active.size(), (unsigned long long)fragments.started,
+                    (unsigned long long)fragments.expired, (unsigned long long)fragments.failed);
+        if (!fragments.update_error.empty())
+            ImGui::TextWrapped("%s", fragments.update_error.c_str());
+        for (const auto& fx : fragments.active)
+        {
+            ImGui::Text("Fragment %llu / event %llu: elapsed %.3f, alpha %.3f, moving %s, impacts %llu",
+                        (unsigned long long)fx.id, (unsigned long long)fx.event, fx.last_time - fx.start_time, fx.alpha,
+                        fx.moving ? "yes" : "resting", (unsigned long long)fx.impacts);
+            ImGui::Text("Position %.2f %.2f %.2f / velocity per update %.2f %.2f %.2f", fx.position.x, fx.position.y,
+                        fx.position.z, fx.velocity.x, fx.velocity.y, fx.velocity.z);
+            ImGui::Text("Normal %.2f %.2f %.2f / last query %d / polygon %u / hit object %s", fx.last_normal.x,
+                        fx.last_normal.y, fx.last_normal.z, int(fx.last_query), fx.last_hit.polygon,
+                        fx.last_hit.object ? (game.objects.get(fx.last_hit.object) ? "live" : "removed")
+                                           : "none/world");
+            ImGui::TextWrapped("%s / %s", fx.model_path.c_str(), fx.skin_path.c_str());
+            if (!fx.trail_error.empty())
+                ImGui::TextWrapped("%s", fx.trail_error.c_str());
+            if (explosion_model_view)
+                for (const auto& e : explosion_model_view->entries)
+                    if (e.fragment_effect == fx.id)
+                    {
+                        ImGui::Text("%zu triangles / %s", e.triangles,
+                                    e.range == UINT32_MAX ? "not prepared" : "prepared");
+                        if (!e.error.empty())
+                            ImGui::TextWrapped("%s", e.error.c_str());
+                    }
+        }
+        if (ImGui::CollapsingHeader("Last 64 fragment deliveries / failures"))
+            for (const auto& r : fragments.reports)
+            {
+                ImGui::Text("Event %llu / type %u / %zu fragments", (unsigned long long)r.id, r.type,
+                            r.fragments.size());
+                if (!r.error.empty())
+                    ImGui::TextWrapped("%s", r.error.c_str());
+                if (!r.unavailable.empty())
+                    ImGui::TextWrapped("%s", r.unavailable.c_str());
+            }
         ImGui::Separator();
         const auto& rings = game.server.explosion_rings;
         ImGui::Text("Explosion rings: %zu active / %zu reserved particles / %llu started / %llu expired / %llu failed",
@@ -204,6 +246,9 @@ namespace OpenBlood2
                             r.targets.null_damager ? "yes (original guard)" : "no");
                 ImGui::Text("Model event %llu | sprite event %llu", (unsigned long long)r.model_event,
                             (unsigned long long)r.sprite_event);
+                ImGui::Text("Fragment event %llu", (unsigned long long)r.fragment_event);
+                if (!r.fragment_error.empty())
+                    ImGui::TextWrapped("%s", r.fragment_error.c_str());
                 ImGui::Text("Ring event %llu", (unsigned long long)r.ring_event);
                 if (!r.ring_error.empty())
                     ImGui::TextWrapped("%s", r.ring_error.c_str());

@@ -13,6 +13,15 @@ namespace OpenBlood2
                 return false;
             scene.entries.back().client_effect = fx.id;
         }
+        for (const auto& fx : game.server.explosion_fragments.active)
+        {
+            const auto scale = fx.settings.scale;
+            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.position, fx.rotation}, scale,
+                           scale.x > 0 && scale.y > 0 && scale.z > 0, false, {}, fx.model_path, game.resources, error,
+                           {}, fx.alpha, true))
+                return false;
+            scene.entries.back().fragment_effect = fx.id;
+        }
         const auto& camera = game.client_shell.view;
         const auto forward = rotate_vector(camera.rotation, {0, 0, 1});
         auto depth = [&](const WorldDraw& d)

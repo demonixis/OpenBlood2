@@ -447,3 +447,9 @@ Read [contracts](docs/EXPLOSION_RING_CONTRACTS.md). Preserve cached-right emissi
 ordered independent RNG and detached ownership. Particle stepping/quad sizing follow
 explicit later-engine reference policies, not verified retail parity. Keep missing
 fragments/flames/illumination and safe NEW_LEVEL explicit; M2 remains incomplete.
+
+The [explosion fragment continuation](../Documentation/Implementation/M2_EXPLOSION_FRAGMENTS.md) connects original metal launch, bounce/rest and fade with real model rendering.
+Read [contracts](docs/EXPLOSION_FRAGMENT_CONTRACTS.md). Preserve per-update motion, strict rest/fade gates,
+1.1-velocity rays, impact angular damping and per-condition random count draws.
+Use checked detached lifetime; unavailable collision must fail. Trails/child explosions
+are not implemented, and replacement collision is not retail parity. M2 stays open.

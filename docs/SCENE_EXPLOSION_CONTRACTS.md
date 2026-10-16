@@ -115,3 +115,7 @@ volumes, four-body limits, hidden/head precedence and callback timing are unchan
 The general object snapshot still includes all objects. Existing membership,
 mutation/lifetime and full movement/weapon scenarios validate this optimization;
 the full sanitizer suite must pass without increasing the timeout.
+
+Continuation: [original metal fragments](EXPLOSION_FRAGMENT_CONTRACTS.md) now supplies
+selected grenade fragment motion/collision and rendering. Earlier blanket fragment
+omissions are historical; smoke trails, other required services and M2 remain open.

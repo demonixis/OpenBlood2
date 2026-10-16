@@ -241,13 +241,26 @@ namespace
                 for (const auto& report : effects.reports)
                     std::cerr << report.error << "\n";
             CHECK(n == 9 && effects.started == 9 && effects.failed == 0 && g.step(.11));
-            CHECK(update_explosion_model_scene(g, scene, error) && scene.world_draws.size() == 9);
+            CHECK(update_explosion_model_scene(g, scene, error));
+            CHECK(scene.world_draws.size() == 9 + g.server.explosion_fragments.active.size());
+            unsigned model_count = 0, fragment_count = 0;
             for (const auto& e : scene.entries)
             {
                 std::cout << e.label << " triangles=" << e.triangles << " skin=" << e.skin << " alpha=" << e.alpha
                           << " error=" << e.error << "\n";
-                CHECK(e.error.empty() && e.triangles > 0 && e.alpha < .75f);
+                CHECK(e.error.empty() && e.triangles > 0);
+                if (e.fragment_effect)
+                {
+                    ++fragment_count;
+                    CHECK(e.alpha == 1);
+                }
+                else
+                {
+                    ++model_count;
+                    CHECK(e.client_effect && e.alpha < .75f);
+                }
             }
+            CHECK(model_count == 9 && fragment_count == g.server.explosion_fragments.active.size());
             CHECK(effects.active.front().id > previous);
             previous = effects.active.back().id;
             CHECK(g.step(.4) && effects.active.empty() && effects.expired == 9);

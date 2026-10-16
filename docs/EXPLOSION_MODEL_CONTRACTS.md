@@ -114,3 +114,7 @@ required FX/services keep the actual M2 gate open.
 Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
 selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
 are historical; fragments/flames, illumination and the full M2 gate remain open.
+
+Continuation: [original metal fragments](EXPLOSION_FRAGMENT_CONTRACTS.md) now supplies
+selected grenade fragment motion/collision and rendering. Earlier blanket fragment
+omissions are historical; smoke trails, other required services and M2 remain open.

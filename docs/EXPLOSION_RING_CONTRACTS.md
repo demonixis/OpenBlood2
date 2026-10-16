@@ -107,3 +107,7 @@ smoke also requires particle quads while the UI is hidden and after reload.
 SubwayA source counts stay 203 created / four transferred sounds / 372 editor-only /
 one unsupported Gideon / zero failures. Safe automatic NEW_LEVEL, remaining required
 FX/lighting and other services still block the unchanged M2 gate.
+
+Continuation: [original metal fragments](EXPLOSION_FRAGMENT_CONTRACTS.md) now supplies
+selected grenade fragment motion/collision and rendering. Earlier blanket fragment
+omissions are historical; smoke trails, other required services and M2 remain open.

@@ -348,7 +348,7 @@ namespace
         OpenBlood2::WorldRenderer world_renderer(runtime.gpu), model_renderer(runtime.gpu);
         OpenBlood2::ModelView model_scene, explosion_model_scene;
         OpenBlood2::WorldRenderer explosion_model_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
-        bool explosion_model_drawn_hidden = false;
+        bool explosion_model_drawn_hidden = false, explosion_fragments_drawn_hidden = false;
         OpenBlood2::SpriteView sprite_scene;
         OpenBlood2::WorldRenderer sprite_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
         bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false, explosion_rings_drawn_hidden = false;
@@ -836,9 +836,15 @@ namespace
                             return 3;
                         }
                         if (!inspector_visible && options.scene_explosions_smoke)
+                        {
                             for (const auto& entry : explosion_model_scene.entries)
-                                explosion_model_drawn_hidden |= entry.error.empty() && entry.range != UINT32_MAX &&
-                                                                entry.triangles > 0 && entry.alpha < .75f;
+                                explosion_fragments_drawn_hidden |=
+                                    entry.fragment_effect && entry.error.empty() && entry.range != UINT32_MAX;
+                            for (const auto& entry : explosion_model_scene.entries)
+                                explosion_model_drawn_hidden |= entry.client_effect && entry.error.empty() &&
+                                                                entry.range != UINT32_MAX && entry.triangles > 0 &&
+                                                                entry.alpha < .75f;
+                        }
                     }
                     if (!sprite_renderer.prepare(sprite_scene.mesh, sprite_scene.revision,
                                                  SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
@@ -1370,7 +1376,7 @@ namespace
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
                 (options.scene_explosions_smoke &&
                  (!scene_explosion_hidden || !explosion_sprites_drawn_hidden || !explosion_model_drawn_hidden ||
-                  !explosion_rings_drawn_hidden ||
+                  !explosion_rings_drawn_hidden || !explosion_fragments_drawn_hidden ||
                   !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
                 (options.sprites_smoke &&
                  (!sprite_hidden || !sprites_drawn_hidden || sprite_scene.draws.size() != 12 ||
@@ -1434,7 +1440,8 @@ namespace
                              "and after reload; evaluated radius/color checked; world illumination unavailable");
             if (options.scene_explosions_smoke)
                 spdlog::info("SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
-                             "audio plus original explosion models/sprites and evaluated point lights verified hidden "
+                             "audio plus original explosion models/sprites/rings/fragments and evaluated point lights "
+                             "verified hidden "
                              "and after reload; illumination/other composite "
                              "FX unavailable");
             if (options.sprites_smoke)

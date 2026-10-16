@@ -30,6 +30,15 @@ namespace OpenBlood2
         if (g.objects.get(selected) || g.server.scene_explosions.size() != 1)
             return false;
         const auto& report = g.server.scene_explosions.back();
+        const auto& fragments = g.server.explosion_fragments;
+        if (!report.fragment_event || !report.fragment_error.empty() || fragments.active.size() < 2 ||
+            fragments.active.size() > 5 || fragments.failed || !fragments.update_error.empty())
+            return false;
+        for (const auto& fx : fragments.active)
+            if (!fx.model || !fx.updates || fx.trail_error.empty() || !fx.error.empty() ||
+                (fx.position.x == fx.settings.position.x && fx.position.y == fx.settings.position.y &&
+                 fx.position.z == fx.settings.position.z))
+                return false;
         const auto& rings = g.server.explosion_rings;
         if (!report.ring_event || !report.ring_error.empty() || rings.active.size() != 4 || rings.started != 4 ||
             rings.failed || rings.reserved_particles() != 128 || !rings.update_error.empty())
