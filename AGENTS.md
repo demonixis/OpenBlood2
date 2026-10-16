@@ -465,3 +465,8 @@ Read [contracts](docs/EXPLOSION_FLAME_CONTRACTS.md). Preserve immediate bursts, 
 initial alpha 1 for fades, final emission and unused normal/ramp fields. Bulk sampling
 is a documented later-engine policy, not retail RNG parity. Keep bounded failures,
 detached lifetime and read-only rendering; illumination, safe NEW_LEVEL and M2 remain open.
+
+The [destination preparation continuation](../Documentation/Implementation/M2_DESTINATION.md) adds CPU-only DAT/collision/schema inspection while retaining the active world/player.
+Read [contracts](docs/DESTINATION_CONTRACTS.md). Preserve separate syntax/execution policy, const schema checks, one final-request scan per pump,
+owned report lifetime and callback refusal. Schema success never implies callback/resource readiness or authorizes teardown.
+Automatic NEW_LEVEL, required remaining services and M2 remain incomplete.

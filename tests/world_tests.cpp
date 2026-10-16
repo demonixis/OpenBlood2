@@ -103,7 +103,7 @@ namespace
         out.append(v);
         return out;
     }
-    Writer dat(bool gameplay = false, bool sounds = false, bool sprites = false)
+    Writer dat(bool gameplay = false, bool sounds = false, bool sprites = false, bool destination = false)
     {
         Writer w;
         w.u32(56);
@@ -122,8 +122,16 @@ namespace
         value.real(1.5);
         Writer yes;
         yes.byte(1);
-        w.u32(sprites ? 6 : gameplay || sounds ? 4 : 1);
-        if (sprites)
+        w.u32(destination ? 5 : sprites ? 6 : gameplay || sounds ? 4 : 1);
+        if (destination)
+        {
+            w.append(object("DestinationProbe", {string_prop("Name", "owned"), prop("Pos", 1, pos)}));
+            w.append(object("DirLight", {string_prop("Name", "spot")}));
+            w.append(object("NotPorted", {string_prop("Name", "unknown")}));
+            w.append(object("Sound", {prop("VoiceType", 6, integer)}));
+            w.append(object("GameStartPoint", {string_prop("Name", "arrival"), prop("Pos", 1, pos)}));
+        }
+        else if (sprites)
         {
             Writer no;
             no.byte(0);
@@ -185,7 +193,7 @@ namespace
         w.zero(8); // Surface packed payload may contain NaN bits.
         w.u16(0);
         w.u32(0);
-        w.u32(0);
+        w.u32(destination ? 1 : 0);
         w.u32(0);
         w.byte(0);
         w.u16(20); // Serialized material flags, independent of surface flags.
@@ -637,6 +645,271 @@ namespace
         CHECK(game.server.string_count() == 0);
         return true;
     }
+
+    bool destination_messages()
+    {
+        WorldMessage message;
+        WorldRequest request;
+        std::string error;
+        CHECK(original_world_request("Worlds\\02_CityHub.DAT", 0, LOADTYPE_NEW_LEVEL, 3, message));
+        CHECK(parse_world_request(message, request, error) && error.empty());
+        CHECK(request.filename == "worlds/02_cityhub.dat" && request.difficulty == 3 &&
+              request.load_type == LOADTYPE_NEW_LEVEL);
+        CHECK(!decode_world_request(message, request, error) && request.filename.empty());
+        CHECK(error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos);
+        for (std::size_t n = 0; n < message.bytes.size(); ++n)
+        {
+            auto truncated = message;
+            truncated.bytes.resize(n);
+            CHECK(!parse_world_request(truncated, request, error) && request.filename.empty());
+        }
+        auto bad = message;
+        bad.id = 0;
+        CHECK(!parse_world_request(bad, request, error));
+        bad = message;
+        bad.bytes.push_back(0);
+        CHECK(!parse_world_request(bad, request, error));
+        bad = message;
+        bad.bytes[3] = 0;
+        CHECK(!parse_world_request(bad, request, error));
+        for (auto name : {"../next", "worlds/../next", "/next"})
+        {
+            CHECK(original_world_request(name, 0, LOADTYPE_NEW_LEVEL, 1, bad));
+            CHECK(!parse_world_request(bad, request, error));
+        }
+        for (unsigned field = 0; field < 3; ++field)
+        {
+            bad = message;
+            bad.bytes[bad.bytes.size() - 3 + field] = 255;
+            CHECK(!parse_world_request(bad, request, error));
+        }
+        CHECK(original_world_request("next", 0, LOADTYPE_NEW_GAME, 0, message));
+        CHECK(parse_world_request(message, request, error) && decode_world_request(message, request, error));
+        return true;
+    }
+    unsigned destination_constructed = 0;
+    GameSession* destination_session = nullptr;
+    bool rejected_reentrant = false;
+    struct DestinationProbe : BaseClass
+    {
+        DestinationProbe()
+        {
+            ++destination_constructed;
+        }
+        DDWORD EngineMessageFn(DDWORD id, void*, float) override
+        {
+            if (id == MID_UPDATE && destination_session)
+            {
+                WorldMessage message;
+                std::string error;
+                original_world_request("destination", 0, LOADTYPE_NEW_LEVEL, 0, message);
+                const auto before = destination_session->destination_inspection.attempts;
+                rejected_reentrant = !destination_session->inspect_destination(message, "arrival", error) &&
+                                     error.find("callback") != std::string::npos &&
+                                     destination_session->destination_inspection.attempts == before;
+            }
+            return 1;
+        }
+    };
+    ClassInfo destination_type{"DestinationProbe",
+                               nullptr,
+                               []() -> std::unique_ptr<BaseClass> { return std::make_unique<DestinationProbe>(); },
+                               {{"Bounded", std::string{}, true, 4}}};
+    bool destination_schema()
+    {
+        GameSession game;
+        CHECK(game.initialize());
+        destination_type.parent = game.objects.find_class("BaseClass");
+        CHECK(game.objects.register_class(destination_type));
+        const auto type = &destination_type;
+        const auto diagnostic = game.objects.diagnostics();
+        const auto last_error = game.objects.error();
+        const auto before = destination_constructed;
+        std::string error;
+        CHECK(game.objects.validate_properties(type,
+                                               {{"name", std::string("inherited")},
+                                                {"Rotation", EulerAngles{{1, 2, 3}}},
+                                                {"Bounded", std::string("four")}},
+                                               error) == ObjectError::None);
+        CHECK(error.empty());
+        for (const auto& props : std::vector<Properties>{{{"Absent", true}},
+                                                         {{"Name", 1.f}},
+                                                         {{"Bounded", std::string("longer")}},
+                                                         {{"Bounded", std::string("a\0b", 3)}},
+                                                         {{"Pos", DVector{NAN, 0, 0}}},
+                                                         {{"Rotation", EulerAngles{{0, INFINITY, 0}}}}})
+            CHECK(game.objects.validate_properties(type, props, error) == ObjectError::InvalidProperty &&
+                  !error.empty());
+        const ClassInfo unknown{"NotRegistered", nullptr, nullptr, {}};
+        CHECK(game.objects.validate_properties(&unknown, {}, error) == ObjectError::UnknownClass);
+        CHECK(game.objects.validate_properties(nullptr, {}, error) == ObjectError::UnknownClass);
+        CHECK(destination_constructed == before && game.objects.snapshot().empty());
+        CHECK(game.objects.error() == last_error && game.objects.diagnostics() == diagnostic);
+        CHECK(!game.objects.create(type, {}, Creation::World, {{"Bounded", std::string("longer")}}));
+        CHECK(game.objects.error() == ObjectError::InvalidProperty && destination_constructed == before);
+        auto handle = game.objects.create(type, {}, Creation::World, {{"Bounded", std::string("four")}});
+        CHECK(handle && destination_constructed == before + 1 && game.objects.get(handle));
+        return true;
+    }
+    bool destination_lifetime(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(test_player::setup(game, root));
+        std::string error;
+        CHECK(game.enter_player(error));
+        destination_type.parent = game.objects.find_class("BaseClass");
+        CHECK(game.objects.register_class(destination_type));
+        test_player::Directory dir;
+        dir.children["worlds"].files["destination.dat"] = dat(false, false, false, true).data;
+        dir.children["worlds"].files["broken.dat"] = {56, 0, 0, 0};
+        auto invalid_collision = dat(false, false, false, true);
+        invalid_collision.patch(invalid_collision.data.size() - 64, std::bit_cast<std::uint32_t>(1e8f));
+        dir.children["worlds"].files["collision.dat"] = invalid_collision.data;
+        test_model::Writer archive;
+        archive.b.resize(168);
+        archive.b[0] = archive.b[62] = archive.b[124] = 13;
+        archive.b[1] = archive.b[63] = archive.b[125] = 10;
+        archive.b[126] = 26;
+        archive.patch(127, 1);
+        const auto [offset, size] = test_player::write_dir(archive, dir);
+        archive.patch(131, offset);
+        archive.patch(135, size);
+        CHECK(save(root / "destination.rez", archive.b));
+        CHECK(game.resources.mount(root / "destination.rez", error));
+        auto* player = game.server_shell.Player(game.local_client);
+        CHECK(player);
+        player->m_damage.m_fHitPoints = 73;
+        const auto ids = game.objects.snapshot();
+        const auto client = game.local_client;
+        const auto revision = game.world_revision;
+        const auto path = game.world_path;
+        const auto clock = game.objects.time();
+        const auto calls = game.server.service_calls;
+        const auto string_count = game.server.string_count();
+        const auto bullets = player->m_InventoryMgr.GetAmmoCount(1);
+        const auto construction = destination_constructed;
+        WorldMessage message;
+        CHECK(original_world_request("destination", 0, LOADTYPE_NEW_LEVEL, 0, message));
+        CHECK(game.inspect_destination(message, "arrival", error));
+        const auto& d = game.destination_inspection;
+        CHECK(d.scan_complete && d.attempts == 1 && d.entries.size() == 5);
+        CHECK(d.schema_checked == 2 && d.editor_only == 1 && d.unknown == 1 && d.invalid == 1);
+        CHECK(d.models == 1 && d.triangles == 1 && d.collision_nodes == 1);
+        CHECK(d.source_world == path && d.source_revision == revision && d.requested_start == "arrival");
+        CHECK(d.entries[0].has_position && d.entries[0].position.x == 5 && d.entries[0].name == "owned");
+        CHECK(d.entries[3].detail.find("VoiceType") != std::string::npos);
+        CHECK(destination_constructed == construction && game.server.service_calls == calls);
+        CHECK(game.objects.snapshot() == ids && game.local_client == client && game.world_revision == revision);
+        CHECK(game.objects.time() == clock && game.world_path == path && game.server.string_count() == string_count);
+        CHECK(player->m_damage.m_fHitPoints == 73 && player->m_InventoryMgr.GetAmmoCount(1) == bullets);
+        WorldRequest request;
+        PreparedWorld prepared;
+        CHECK(parse_world_request(message, request, error) && prepare_world(request, game.resources, prepared, error));
+        CHECK(prepared.world.objects.size() == 5 && prepared.collision.triangles() == 1);
+        request.filename = "worlds/collision.dat";
+        CHECK(!prepare_world(request, game.resources, prepared, error));
+        CHECK(error.find("primary collision") != std::string::npos);
+        CHECK(prepared.world.models.empty() && prepared.collision.triangles() == 0);
+        request.filename = "worlds/destination.dat";
+        CHECK(prepare_world(request, game.resources, prepared, error));
+        request.filename = "worlds/broken.dat";
+        CHECK(!prepare_world(request, game.resources, prepared, error));
+        CHECK(prepared.world.objects.empty() && prepared.world.models.empty() && prepared.collision.triangles() == 0);
+        CHECK(original_world_request("broken", 0, LOADTYPE_NEW_GAME, 0, message));
+        CHECK(!game.load_world(message, error) && game.objects.snapshot() == ids && game.local_client == client);
+        CHECK(!game.inspect_destination(message, "arrival", error) && !d.scan_complete && d.entries.empty());
+        CHECK(!game.inspect_destination(message, std::string("x\0y", 3), error));
+        CHECK(!game.inspect_destination(message, std::string(101, 'x'), error));
+        const auto attempts = d.attempts;
+        for (unsigned i = 0; i < 256; ++i)
+            CHECK(game.server.SendWorldExit({i == 255 ? "destination" : "broken"}, "arrival") == DE_OK);
+        CHECK(game.pump_player_messages(error));
+        CHECK(game.client_shell.world_exit.blocked == 256 && game.client_shell.world_exit.received == 256);
+        CHECK(d.attempts == attempts + 1 && d.scan_complete && d.destination == "worlds/destination.dat");
+        CHECK(game.pump_player_messages(error) && d.attempts == attempts + 1);
+        CHECK(game.objects.snapshot() == ids && game.client_shell.player == player->m_hObject);
+        auto handle = game.objects.create(&destination_type);
+        CHECK(handle);
+        destination_session = &game;
+        CHECK(game.objects.engine_message(handle, MID_UPDATE, nullptr));
+        destination_session = nullptr;
+        CHECK(rejected_reentrant && d.attempts == attempts + 1 && d.entries.size() == 5);
+        CHECK(game.unload_world() && game.objects.snapshot().empty());
+        CHECK(game.server.string_count() == 0 && game.server.client_count() == 0);
+        CHECK(d.scan_complete && d.source_revision != game.world_revision && d.entries[0].name == "owned");
+        return true;
+    }
+    bool destination_private(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(game.initialize());
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(game.resources.mount_game(config, error));
+        for (unsigned cycle = 0; cycle < 3; ++cycle)
+        {
+            CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error));
+            CHECK(game.step(.016));
+            auto* player = game.server_shell.Player(game.local_client);
+            CHECK(player);
+            const auto ids = game.objects.snapshot();
+            const auto revision = game.world_revision;
+            const auto time = game.objects.time();
+            const auto path = game.world_path;
+            const auto client = game.local_client;
+            const auto calls = game.server.service_calls;
+            const auto voices = game.server.audio.voices().size();
+            const auto strings = game.server.string_count();
+            const auto ammo = player->m_InventoryMgr.GetAmmoCount(1);
+            const auto hp = player->m_damage.m_fHitPoints;
+            std::vector<std::pair<HOBJECT, std::uint64_t>> updates;
+            for (auto id : ids)
+                updates.emplace_back(game.objects.get(id)->handle, game.objects.get(id)->updates);
+            for (auto destination : {"01_SubwayA", "02_CityHub"})
+            {
+                WorldMessage message;
+                CHECK(original_world_request(destination, 0, LOADTYPE_NEW_LEVEL, 0, message));
+                CHECK(game.inspect_destination(message, "01_egressa", error));
+                const auto& d = game.destination_inspection;
+                std::cout << "Cycle " << cycle << ": " << d.destination << ": " << d.entries.size() << " entries / "
+                          << d.schema_checked << " schema / " << d.editor_only << " editor / " << d.unknown
+                          << " unknown / " << d.invalid << " invalid / " << d.models << " models / " << d.triangles
+                          << " triangles / " << d.collision_nodes << " collision nodes\n";
+                CHECK(d.scan_complete && d.source_world == path && d.source_revision == revision);
+                if (d.destination == "worlds/01_subwaya.dat")
+                    CHECK(d.entries.size() == 580 && d.schema_checked == 207 && d.editor_only == 372 &&
+                          d.unknown == 1 && d.invalid == 0 && d.models == 116);
+                else
+                {
+                    CHECK(d.entries.size() == 1026 && d.schema_checked == 247 && d.editor_only == 541 &&
+                          d.unknown == 207 && d.invalid == 31 && d.models == 100 && d.triangles == 39724);
+                    for (const auto& e : d.entries)
+                        if (e.state == DestinationEntryState::InvalidProperties)
+                            std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+                                      << '\n';
+                }
+                CHECK(game.objects.snapshot() == ids && game.world_revision == revision && game.local_client == client);
+                CHECK(game.objects.time() == time && game.world_path == path && game.server.service_calls == calls);
+                CHECK(game.server.audio.voices().size() == voices && game.server.string_count() == strings);
+                CHECK(game.client_shell.player == player->m_hObject && player->m_damage.m_fHitPoints == hp &&
+                      player->m_InventoryMgr.GetAmmoCount(1) == ammo);
+                for (const auto& [handle, count] : updates)
+                    CHECK(game.objects.get(handle) && game.objects.get(handle)->updates == count);
+                CHECK(!game.load_world(message, error) &&
+                      error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos);
+            }
+            WorldMessage broken;
+            CHECK(original_world_request("16_bridge", 0, LOADTYPE_NEW_LEVEL, 0, broken));
+            CHECK(!game.inspect_destination(broken, "start", error));
+            CHECK(game.objects.snapshot() == ids && game.world_revision == revision && game.objects.time() == time);
+            CHECK(!game.destination_inspection.scan_complete && game.destination_inspection.entries.empty());
+            std::cout << "Malformed destination preserves source: " << error << '\n';
+            CHECK(!game.run_world(error));
+            CHECK(game.unload_world() && game.server.client_count() == 0 && game.server.string_count() == 0);
+        }
+        return true;
+    }
     bool private_world(const std::filesystem::path& root)
     {
         GameSession game;
@@ -698,6 +971,8 @@ int main(int argc, char** argv)
     std::filesystem::path root = argc > 2 ? path_from_utf8(argv[2]) : std::filesystem::path{};
     if (name == "private")
         ok = private_world(root);
+    else if (name == "destination_private")
+        ok = destination_private(root);
     else
     {
         std::error_code ec;
@@ -705,7 +980,13 @@ int main(int argc, char** argv)
             std::filesystem::create_directories(root, ec);
         if (ec)
             return 2;
-        if (name == "rez_structure")
+        if (name == "destination_messages")
+            ok = destination_messages();
+        else if (name == "destination_schema")
+            ok = destination_schema();
+        else if (name == "destination_lifetime")
+            ok = destination_lifetime(root);
+        else if (name == "rez_structure")
             ok = rez_structure();
         else if (name == "rez_rejection")
             ok = rez_rejection();

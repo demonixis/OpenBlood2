@@ -15,6 +15,54 @@ namespace OpenBlood2
             ImGui::TextWrapped("%s", display.c_str());
         }
     } // namespace
+    void Inspector::draw_destination(const GameSession& game)
+    {
+        const auto& d = game.destination_inspection;
+        if (!d.attempts)
+            return;
+        if (!ImGui::TreeNodeEx("Destination preflight (read-only)", ImGuiTreeNodeFlags_DefaultOpen))
+            return;
+        ImGui::TextWrapped("%s -> %s | requested start: %s | attempt %llu", d.source_world.c_str(),
+                           d.destination.c_str(), d.requested_start.c_str(), (unsigned long long)d.attempts);
+        ImGui::Text("Source revision %llu / current %llu", (unsigned long long)d.source_revision,
+                    (unsigned long long)game.world_revision);
+        if (!d.error.empty())
+            ImGui::TextWrapped("Scan failed: %s", d.error.c_str());
+        if (d.scan_complete)
+        {
+            ImGui::Text("Parsed %zu models / primary collision %zu triangles / %zu nodes", d.models, d.triangles,
+                        d.collision_nodes);
+            ImGui::Text("%zu schema checked / %zu editor-only / %zu unknown / %zu invalid properties", d.schema_checked,
+                        d.editor_only, d.unknown, d.invalid);
+            ImGui::TextWrapped("No destination objects were created. Resources requested by original callbacks, "
+                               "difficulty filtering, movers, start triggers and player clearance remain unverified. "
+                               "This is not a ready or completed transfer.");
+            if (ImGui::TreeNode("Destination source entries"))
+            {
+                ImGuiListClipper clip;
+                clip.Begin((int)d.entries.size());
+                while (clip.Step())
+                    for (int i = clip.DisplayStart; i < clip.DisplayEnd; ++i)
+                    {
+                        const auto& e = d.entries[i];
+                        ImGui::Text("%d: %s / %s / %s", i, e.class_name.c_str(), e.name.c_str(),
+                                    destination_entry_state_name(e.state));
+                        if (ImGui::IsItemHovered())
+                        {
+                            ImGui::BeginTooltip();
+                            if (e.has_position)
+                                ImGui::Text("Authored position %.2f %.2f %.2f", e.position.x, e.position.y,
+                                            e.position.z);
+                            if (!e.detail.empty())
+                                ImGui::TextWrapped("%s", e.detail.c_str());
+                            ImGui::EndTooltip();
+                        }
+                    }
+                ImGui::TreePop();
+            }
+        }
+        ImGui::TreePop();
+    }
     void Inspector::draw_objectives(GameSession& game, ObjectSelection& selection)
     {
         if (ImGui::CollapsingHeader("Original level exits", ImGuiTreeNodeFlags_DefaultOpen))
@@ -24,8 +72,9 @@ namespace OpenBlood2
                         (unsigned long long)exit.ignored_dead, (unsigned long long)exit.blocked);
             ImGui::TextWrapped("Requested world: %s / type %u / server start: %s", exit.request.next_world.c_str(),
                                static_cast<unsigned>(exit.request.type), game.server_shell.start_point_name.c_str());
-            ImGui::TextWrapped("%s", exit.error.empty() ? "No transfer attempted; KeepAliveSave/Load unavailable."
+            ImGui::TextWrapped("%s", exit.error.empty() ? "No transfer attempted; safe NEW_LEVEL transfer unavailable."
                                                         : exit.error.c_str());
+            draw_destination(game);
             const auto& fields = game.server_shell.player_capture;
             ImGui::Text("Player fields: %llu / %llu captures; %s", (unsigned long long)fields.captures,
                         (unsigned long long)fields.attempts, fields.valid ? "owned subset" : "unavailable");

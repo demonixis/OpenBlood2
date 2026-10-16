@@ -289,6 +289,28 @@ namespace OpenBlood2
         --callback_depth_;
         return result;
     }
+    ObjectError Objects::validate_properties(HCLASS type, const Properties& properties, std::string& error) const
+    {
+        error.clear();
+        if (!knows(type))
+        {
+            error = "Create: unregistered class";
+            return ObjectError::UnknownClass;
+        }
+        for (const auto& [name, value] : properties)
+        {
+            const auto* def = spec(type, name);
+            if (!def ||
+                (def->value.index() != value.index() &&
+                 !(std::holds_alternative<DRotation>(def->value) && std::holds_alternative<EulerAngles>(value))) ||
+                !valid(value, def->max_string))
+            {
+                error = type->name + ": invalid property " + name;
+                return ObjectError::InvalidProperty;
+            }
+        }
+        return ObjectError::None;
+    }
     HOBJECT Objects::create(HCLASS type, ObjectCreateStruct state, Creation reason, const Properties& properties)
     {
         if (!knows(type))
@@ -303,19 +325,15 @@ namespace OpenBlood2
         }
         auto record = std::make_unique<ObjectRecord>();
         defaults(type, record->properties);
-        for (const auto& [name, value] : properties)
+        std::string property_error;
+        const auto checked = validate_properties(type, properties, property_error);
+        if (checked != ObjectError::None)
         {
-            const auto* def = spec(type, name);
-            if (!def ||
-                (def->value.index() != value.index() &&
-                 !(std::holds_alternative<DRotation>(def->value) && std::holds_alternative<EulerAngles>(value))) ||
-                !valid(value, def->max_string))
-            {
-                fail(ObjectError::InvalidProperty, type->name + ": invalid property " + name);
-                return nullptr;
-            }
-            record->properties.insert_or_assign(def->name, value);
+            fail(checked, std::move(property_error));
+            return nullptr;
         }
+        for (const auto& [name, value] : properties)
+            record->properties.insert_or_assign(spec(type, name)->name, value);
         if (!valid_state(state) || static_cast<unsigned>(reason) > 3)
         {
             fail(ObjectError::InvalidProperty, "Invalid creation structure/reason");

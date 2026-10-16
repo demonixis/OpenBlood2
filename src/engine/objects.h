@@ -155,6 +155,7 @@ namespace OpenBlood2
         static bool is_kind_of(HCLASS type, HCLASS parent);
         HOBJECT create(HCLASS type, ObjectCreateStruct state = {}, Creation reason = Creation::Runtime,
                        const Properties& properties = {});
+        ObjectError validate_properties(HCLASS, const Properties&, std::string&) const;
         bool parse_properties(HCLASS, std::string_view, Properties&);
         HOBJECT create_props(HCLASS type, ObjectCreateStruct state, std::string_view text);
         bool remove(HOBJECT handle);

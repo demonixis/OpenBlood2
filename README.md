@@ -515,3 +515,6 @@ independent falling Beretta, original pickup and player collection. Corpse/gib
 services, player drop controls and the full M2 exit gate remain open.
 
 The [original explosion flame continuation](../Documentation/Implementation/M2_EXPLOSION_FLAMES.md) adds selected Tesla particles with actual texture/color/alpha rendering and in-game inspection. M2 remains incomplete.
+
+The [destination preparation continuation](../Documentation/Implementation/M2_DESTINATION.md) inspects destination DAT geometry, primary collision and property schemas without leaving the current session.
+Original callbacks/resources/start triggers are still unverified; this prerequisite does not enable automatic NEW_LEVEL or close M2.

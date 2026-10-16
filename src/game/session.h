@@ -53,5 +53,7 @@ namespace OpenBlood2
     // complete client shell. See original/session_load.cpp and the provenance ledger.
     bool original_world_request(const char* world, DBYTE game_type, DBYTE load_type, DBYTE difficulty,
                                 WorldMessage& message);
+    // Parses NEW_GAME/NEW_LEVEL syntax only; this never authorizes a world replacement.
+    bool parse_world_request(const WorldMessage& message, WorldRequest& request, std::string& error);
     bool decode_world_request(const WorldMessage& message, WorldRequest& request, std::string& error);
 } // namespace OpenBlood2

@@ -103,3 +103,7 @@ runs with the UI hidden and after reload, preserving player, inventory and world
 revision. This isolates the exit dispatch; it does not claim the upstream level
 completion chain or a real transfer. Diagnostic rearming is labelled, not an
 original reset rule. See [evidence](../../Documentation/Implementation/M2_EXITS.md).
+
+The [destination preparation continuation](DESTINATION_CONTRACTS.md) shares const property validation and structural CPU preparation with fresh loading.
+Blocked exits now perform read-only destination lookup after refusing transfer; earlier blanket resource-lookup omissions are historical.
+No destination callbacks run and no active session is discarded; safe automatic NEW_LEVEL and M2 remain incomplete.

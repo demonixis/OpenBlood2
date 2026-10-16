@@ -785,3 +785,9 @@ See [source selections and hashes](M2_EXPLOSION_FLAME_SOURCES.json) and
 three-zone bursts, clocks/fades and unused ramps, with the high-detail Tesla recipe.
 Owned typed state, explicit bounds, later-engine six-sample bulk service and existing
 particle rendering are documented adaptations, not a retail engine/RNG parity claim.
+
+## Destination preparation
+
+The [source ledger](M2_DESTINATION_SOURCES.json) records the original shell ordering and selected preprocessor-only classes.
+The [read-only preparation](DESTINATION_CONTRACTS.md) is new engine code using existing DAT/collision readers and exact property schemas;
+no new original method, reference engine dependency or commercial asset is imported. Original NEW_LEVEL execution remains refused.

@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "36cccd3dd6d764e18ece5403932255a751882168",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "selected_lines": [
+        [
+          828,
+          1000
+        ]
+      ],
+      "use": "Original request order and KeepAliveSave -> LoadWorld -> KeepAliveLoad -> RunWorld dependencies; commented revisit save stays inactive"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "selected_lines": [
+        [
+          6222,
+          6330
+        ]
+      ],
+      "use": "Original exit NEW_LEVEL request and message order retained"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/engineobjects.c",
+      "sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
+      "selected_lines": [
+        [
+          447,
+          561
+        ]
+      ],
+      "use": "Existing selected CF_NORUNTIME class classification retained"
+    }
+  ],
+  "adaptations": [
+    "New CPU-only destination preparation and owned read-only inspection; no new original methods or reference-engine code imported",
+    "Separate request syntax from unchanged NEW_LEVEL execution refusal",
+    "Share exact creation property checks without constructing original instances",
+    "One last-request scan per drained message pump; no live-world mutation"
+  ],
+  "remaining": [
+    "Original destination callback/resource/player clearance validation and safe transaction",
+    "Gideon, required services/FX and actual M2 acceptance"
+  ]
+}

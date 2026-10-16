@@ -94,3 +94,7 @@ The [explicit target/facing continuation](AI_TARGET_CONTRACTS.md) adds original
 AI_Mgr named target/link commands and deferred target clearing. GetObjectPos now
 returns a typed status; target sampling and CanSee reject unresolved poses.
 Autonomous acquisition/retention and full AI behavior remain unavailable.
+
+The [destination preparation continuation](DESTINATION_CONTRACTS.md) shares const property validation and structural CPU preparation with fresh loading.
+Blocked exits now perform read-only destination lookup after refusing transfer; earlier blanket resource-lookup omissions are historical.
+No destination callbacks run and no active session is discarded; safe automatic NEW_LEVEL and M2 remain incomplete.

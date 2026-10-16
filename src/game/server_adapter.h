@@ -13,6 +13,7 @@
 #include "game/original/LightFX.h"
 #include "game/player_restore.h"
 #include "game/session.h"
+#include "game/world_preparation.h"
 #include <array>
 #include <optional>
 #include <random>
@@ -346,6 +347,8 @@ namespace OpenBlood2
         {
             unload_world();
         }
+        DestinationInspection destination_inspection;
+        bool inspect_destination(const WorldMessage&, std::string_view start, std::string& error);
         bool load_world(const WorldMessage& message, std::string& error);
         bool request_world(std::string_view name, std::string& error);
         bool run_world(std::string& error);

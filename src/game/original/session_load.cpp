@@ -34,7 +34,7 @@ namespace OpenBlood2
         message.WriteToMessageByte(nDifficulty); // Difficulty level
         return true;
     }
-    bool decode_world_request(const WorldMessage& message, WorldRequest& request, std::string& error)
+    bool parse_world_request(const WorldMessage& message, WorldRequest& request, std::string& error)
     {
         request = {};
         Reader reader(message.bytes);
@@ -49,14 +49,10 @@ namespace OpenBlood2
             error = "Malformed CMSG_LOADWORLD";
             return false;
         }
-        if (next.game_type == 0 && next.load_type == LOADTYPE_NEW_LEVEL && next.difficulty <= 3)
+        if (next.game_type != 0 || (next.load_type != LOADTYPE_NEW_GAME && next.load_type != LOADTYPE_NEW_LEVEL) ||
+            next.difficulty > 3)
         {
-            error = "LOADTYPE_NEW_LEVEL requires original KeepAliveSave/KeepAliveLoad; player transfer is unavailable";
-            return false;
-        }
-        if (next.game_type != 0 || next.load_type != LOADTYPE_NEW_GAME || next.difficulty > 3)
-        {
-            error = "Only a fresh single-player world request is supported; saves/multiplayer are unimplemented";
+            error = "Only single-player NEW_GAME/NEW_LEVEL syntax is supported; saves/multiplayer are unimplemented";
             return false;
         }
         // Keep the original Worlds prefix, but reject traversal instead of stripping
@@ -74,6 +70,21 @@ namespace OpenBlood2
         next.filename = std::move(path);
         request = std::move(next);
         error.clear();
+        return true;
+    }
+    bool decode_world_request(const WorldMessage& message, WorldRequest& request, std::string& error)
+    {
+        request = {};
+        WorldRequest next;
+        if (!parse_world_request(message, next, error))
+            return false;
+        if (next.load_type == LOADTYPE_NEW_LEVEL)
+        {
+            error = "LOADTYPE_NEW_LEVEL requires original KeepAliveSave/KeepAliveLoad; safe player/world transfer is "
+                    "unavailable";
+            return false;
+        }
+        request = std::move(next);
         return true;
     }
 } // namespace OpenBlood2

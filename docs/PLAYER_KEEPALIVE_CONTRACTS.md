@@ -65,3 +65,7 @@ and [source ledger](M2_PLAYER_KEEPALIVE_SOURCES.json).
 Full client state (objectives/cinematics/music), missing player powers/death state,
 automatic safe transfer, remaining world classes and required FX/services still
 keep M2 incomplete. CityHub inspection does not imply all of its classes work.
+
+The [destination preparation continuation](DESTINATION_CONTRACTS.md) shares const property validation and structural CPU preparation with fresh loading.
+Blocked exits now perform read-only destination lookup after refusing transfer; earlier blanket resource-lookup omissions are historical.
+No destination callbacks run and no active session is discarded; safe automatic NEW_LEVEL and M2 remain incomplete.

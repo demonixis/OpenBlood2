@@ -43,6 +43,7 @@ namespace OpenBlood2
         const auto old_bullets = player->m_InventoryMgr.GetAmmoCount(1);
         const auto received = g.client_shell.world_exit.received;
         const auto blocked = g.client_shell.world_exit.blocked;
+        const auto scans = g.destination_inspection.attempts;
         const auto captures = g.server_shell.inventory_capture.captures;
         const auto field_captures = g.server_shell.player_capture.captures;
         const auto damage_captures = g.server_shell.damage_capture.captures;
@@ -88,6 +89,12 @@ namespace OpenBlood2
                g.server_shell.player_capture.state.air == player->m_fAirLevel &&
                g.server_shell.player_capture.state.name == std::optional<std::string>("") &&
                g.client_shell.world_exit.error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos &&
+               g.destination_inspection.scan_complete && g.destination_inspection.attempts == scans + 1 &&
+               g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
+               g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+               g.destination_inspection.source_revision == old_revision &&
+               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 247 &&
+               g.destination_inspection.unknown == 207 && g.destination_inspection.invalid == 31 &&
                old_player == g.client_shell.player && old_revision == g.world_revision &&
                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
     }

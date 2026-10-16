@@ -45,25 +45,20 @@ namespace OpenBlood2
             return objects.fail(ObjectError::Busy, error);
         }
         WorldRequest request;
-        World next;
-        CollisionWorld next_collision;
-        std::vector<std::uint8_t> bytes;
-        // Validate everything before replacing the current inspectable world.
-        if (!decode_world_request(message, request, error) || !resources.read(request.filename, bytes, error) ||
-            !read_world(bytes, next, error))
-            return false;
-        if (next.models.empty() || !next_collision.build(next.models.front(), error))
+        PreparedWorld next;
+        // Structural CPU preparation is shared with read-only destination inspection.
+        if (!decode_world_request(message, request, error) || !prepare_world(request, resources, next, error))
             return false;
         if (!unload_world())
         {
             error = "World replacement during a callback is forbidden";
             return false;
         }
-        collision = std::move(next_collision);
+        collision = std::move(next.collision);
         server.collision_ready = true;
         server.service_calls.clear();
         server.trace_enabled = true;
-        world = std::move(next);
+        world = std::move(next.world);
         world_path = request.filename;
         server.SetGameConVar("GAME_WORLDNAME", world_path.c_str());
         server_shell.PreStartWorld();
@@ -79,9 +74,7 @@ namespace OpenBlood2
             WorldEntry entry;
             // CF_NORUNTIME in original AppHeaders/engineobjects.c: these feed the
             // preprocessor and are not runtime classes missing from the adapter.
-            if (source.class_name == "DirLight" || source.class_name == "Light" || source.class_name == "OutsideDef" ||
-                source.class_name == "ObjectLight" || source.class_name == "LightAnimator" ||
-                source.class_name == "GlobalDirLight")
+            if (editor_only_world_class(source.class_name))
             {
                 entry.state = EntryState::EditorOnly;
                 entry.detail = "Original CF_NORUNTIME; source properties retained";
@@ -179,6 +172,7 @@ namespace OpenBlood2
             error = "Player message pump during object callback rejected";
             return false;
         }
+        bool inspect_exit = false;
         for (unsigned pass = 0; pass < 8; ++pass)
         {
             std::vector<PlayerEvent> events;
@@ -188,7 +182,20 @@ namespace OpenBlood2
                 return false;
             }
             if (events.empty())
+            {
+                if (inspect_exit)
+                {
+                    // At most one bounded destination scan per pump: inspect the final
+                    // owned request, while preserving each source exit/capture/refusal.
+                    auto& exit = client_shell.world_exit;
+                    std::string diagnostic;
+                    if (!inspect_destination(exit.load, server_shell.start_point_name, diagnostic))
+                        exit.error += "; destination scan: " + diagnostic;
+                    else
+                        exit.error += "; destination scan completed without running original creation/start callbacks";
+                }
                 return true;
+            }
             for (const auto& event : events)
             {
                 if (!client_shell.OnMessage(event, server_shell))
@@ -207,7 +214,10 @@ namespace OpenBlood2
                     // selected fields/aggregates are not complete KeepAliveSave/Load.
                     WorldRequest request;
                     if (!decode_world_request(exit.load, request, exit.error))
+                    {
                         ++exit.blocked;
+                        inspect_exit = true;
+                    }
                     else
                         return objects.fail(ObjectError::Unsupported, "World exit transfer is unavailable");
                 }

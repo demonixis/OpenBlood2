@@ -96,3 +96,7 @@ rasterization: existing player/scripted cameras now drive depth-tested geometry 
 letterbox presentation. Materials, lighting, models/FX and complete M2 remain open.
 
 The [DTX continuation](TEXTURE_CONTRACTS.md) supersedes the absence of world textures: opaque unlit base colors now render, with named rejection diagnostics and bounded cache ownership. World vertices are now 32 bytes; the three-million-vertex payload limit is 96 MB. Earlier geometry limits, current transforms and the M2 gate remain unchanged.
+
+The [destination preparation continuation](DESTINATION_CONTRACTS.md) shares const property validation and structural CPU preparation with fresh loading.
+Blocked exits now perform read-only destination lookup after refusing transfer; earlier blanket resource-lookup omissions are historical.
+No destination callbacks run and no active session is discarded; safe automatic NEW_LEVEL and M2 remain incomplete.

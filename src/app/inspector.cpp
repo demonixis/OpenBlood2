@@ -317,6 +317,15 @@ namespace OpenBlood2
             }
             capture_player_request = false;
         }
+        if (inspect_destination_request)
+        {
+            WorldMessage message;
+            if (original_world_request(keep_world_name, 0, LOADTYPE_NEW_LEVEL, 0, message))
+                game.inspect_destination(message, keep_start_name, world_error);
+            else
+                world_error = "Invalid destination request";
+            inspect_destination_request = false;
+        }
         if (keep_world_request)
         {
             if (!game.local_client)
@@ -1053,6 +1062,9 @@ namespace OpenBlood2
             restore_player_request = true;
         ImGui::EndDisabled();
         ImGui::InputText("Destination world", keep_world_name, sizeof(keep_world_name));
+        if (ImGui::Button("Inspect destination without leaving"))
+            inspect_destination_request = true;
+        draw_destination(game);
         ImGui::BeginDisabled(player);
         if (ImGui::Button("Load destination for inspection"))
             keep_world_request = true;
