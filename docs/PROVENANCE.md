@@ -583,3 +583,14 @@ bounded parsing, overflow/lifetime guards and explicit service errors replace
 legacy unsafe storage/ignored failures. Source quirks are retained and tested.
 No other repository dependency or commercial asset was imported. See
 [contracts](AI_SCRIPT_CONTRACTS.md) and [evidence](../../Documentation/Implementation/M2_AI_SCRIPT.md).
+
+## M2 autonomous locomotion and Cultist attack states
+
+Donor: `sources/blood2` at `006b4aabd3fb348f6846cad03799cf8df685ea95`.
+[Selected source ranges/hashes](M2_AI_LOCOMOTION_SOURCES.json) cover AI_Mgr and CultistAI.
+Four parallel command bodies are consolidated with source differences preserved;
+checked existing services, owned diagnostics and callback guards are adaptations.
+Shade-dependent recovery fails explicitly; no production class or complete AI_Update
+is claimed. See [contracts](AI_LOCOMOTION_CONTRACTS.md) and
+[evidence](../../Documentation/Implementation/M2_AI_LOCOMOTION.md). No reference
+repository, dependency revision or commercial asset was changed/imported.

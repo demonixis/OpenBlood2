@@ -1,4 +1,5 @@
 #include "game/original/AI_Mgr.h"
+#include "game/original/CultistAI.h"
 #include "inspector.h"
 #include <algorithm>
 #include <imgui.h>
@@ -59,6 +60,52 @@ namespace OpenBlood2
         const auto* r = game.objects.get(skeleton_selection);
         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
+        if (target_ai && ImGui::CollapsingHeader("Original autonomous locomotion", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& a = *target_ai;
+            ImGui::TextWrapped("Original walk/run/moving fire and selected Cultist attack sequencing. Full AI_Update, "
+                               "shade recovery and crawl/jump state execution remain unavailable.");
+            ImGui::Text("Command %d | calls %llu | failures %llu", a.locomotion_command,
+                        (unsigned long long)a.locomotion_calls, (unsigned long long)a.locomotion_failures);
+            ImGui::Text("Obstruction %s | speed %.3f | cached vertical change %.4f | checks %llu",
+                        a.obstructed ? "yes" : "no", a.obstruction_velocity, a.obstruction_vertical,
+                        (unsigned long long)a.obstruction_checks);
+            ImGui::Text("Block flags 0x%02x | nine-ray queries %llu", a.block_flags,
+                        (unsigned long long)a.obstacle_queries);
+            auto ray = [&](const char* name, const AI_Mgr::ObstacleRay& q)
+            {
+                const auto* hit = game.objects.get(q.hit.object);
+                const char* status = q.result == SegmentResult::Hit       ? "hit"
+                                     : q.result == SegmentResult::Miss    ? "miss"
+                                     : q.result == SegmentResult::Invalid ? "invalid"
+                                                                          : "unavailable/not queried";
+                ImGui::Text("%s: %s | (%.1f %.1f %.1f) -> (%.1f %.1f %.1f)", name, status, q.from.x, q.from.y, q.from.z,
+                            q.to.x, q.to.y, q.to.z);
+                if (q.result == SegmentResult::Hit)
+                    ImGui::Text("Hit %s | polygon %u",
+                                hit            ? hit->state.m_Name
+                                : q.hit.object ? "removed object"
+                                               : "world",
+                                q.hit.polygon);
+            };
+            const char* names[]{"Right upper",  "Right middle", "Right lower", "Center upper", "Center middle",
+                                "Center lower", "Left upper",   "Left middle", "Left lower"};
+            if (ImGui::TreeNode("Nine obstruction rays"))
+            {
+                for (unsigned i = 0; i < a.obstacle_rays.size(); ++i)
+                    ray(names[i], a.obstacle_rays[i]);
+                ImGui::TreePop();
+            }
+            ImGui::Text("Last ledge %s | sampled on last call %s | time %.3f | queries %llu", a.ledge ? "yes" : "no",
+                        a.ledge_sampled ? "yes" : "no", a.last_ledge_check, (unsigned long long)a.ledge_queries);
+            ray("Ledge", a.ledge_ray);
+            if (const auto* cultist = dynamic_cast<const CultistAI*>(target_ai))
+                ImGui::Text("Cultist attack: updates %llu | distance %.2f / threshold %.2f | height %.2f",
+                            (unsigned long long)cultist->attack_updates, cultist->attack_distance,
+                            cultist->attack_threshold, cultist->attack_height);
+            if (!a.locomotion_error.empty())
+                ImGui::TextWrapped("Last failure: %s", a.locomotion_error.c_str());
+        }
         if (target_ai && ImGui::CollapsingHeader("Original AI script interpreter", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& a = *target_ai;

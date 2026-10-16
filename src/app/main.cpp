@@ -326,7 +326,7 @@ namespace
         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
         inspector.select_skeleton = options.skeleton_smoke;
         if (options.skeleton_smoke)
-            inspector.skeleton_selection = smoke_ai_follow;
+            inspector.skeleton_selection = smoke_ai_fire;
         inspector.select_containers = options.containers_smoke;
         inspector.select_brushes = options.brushes_smoke;
         inspector.select_pickups = options.pickups_smoke;

@@ -108,3 +108,8 @@ FindPosAroundObj remains excluded because its required GetPointShade service is
 missing. Original debug-line object spawning, save/restore, autonomous following,
 full AI initialization/update/deactivation, production CivilianAI/CultistAI/Gideon,
 required FX and ExitTrigger remain open. No authored class counts change.
+
+The [autonomous locomotion continuation](AI_LOCOMOTION_CONTRACTS.md) now supplies
+walk/run/moving fire, obstruction/ledge probes and Cultist close/far attack sequencing.
+Earlier blanket omissions are superseded only for this subset. Full initialization,
+AI_Update/deactivation, remaining states and shade recovery stay unavailable.

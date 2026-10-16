@@ -2,6 +2,7 @@
 #include "engine/collision.h"
 #include "game/original/AI_Mgr.h"
 #include "game/original/CivilianAI.h"
+#include "game/original/CultistAI.h"
 #include <cmath>
 #include <limits>
 namespace OpenBlood2
@@ -25,7 +26,9 @@ namespace OpenBlood2
                 return AI_Mgr::EngineMessageFn(m, d, f);
             }
         };
-        class AIFireProbe : public AI_Mgr
+        // Diagnostic sequence: original Cultist close attack through one completed
+        // standing animation, then original moving fire. This is not AI_Update.
+        class AIFireProbe : public CultistAI
         {
           public:
             HOBJECT diagnostic_target = nullptr;
@@ -36,7 +39,7 @@ namespace OpenBlood2
                 if (message == MID_UPDATE)
                 {
                     GetServerDE()->SetNextUpdate(m_hObject, .001f);
-                    if (!MC_Fire_Stand())
+                    if (!(animation_finishes ? MC_Fire_Run() : DispatchState()))
                         GetServerDE()->SetNextUpdate(m_hObject, 0);
                 }
                 return AI_Mgr::EngineMessageFn(message, data, value);
@@ -142,7 +145,7 @@ namespace OpenBlood2
         state.m_ObjectType = OT_MODEL;
         state.m_Pos = {1000, 10000, 0};
         state.m_Flags = FLAG_MODELKEYS;
-        SAFE_STRCPY(state.m_Name, "AI weapon probe (no full AI_Update)");
+        SAFE_STRCPY(state.m_Name, "Cultist attack/movement probe (no full AI_Update)");
         SAFE_STRCPY(state.m_Filename, "models/enemies/m_cultist1.abc");
         auto h = g.objects.create(&type, state);
         auto* r = g.objects.get(h);
@@ -171,6 +174,11 @@ namespace OpenBlood2
         ai->m_fHearingDist = 1000;
         if (!ai->HandleTrigger(victim, "SOUND_TRIGGER 2"))
             return false;
+        ai->m_fSeeingDist = 2000;
+        ai->m_fRunSpeed = 10;
+        if (!ai->SetAnimation(table->m_nAnim_FIRE_STAND[TYPE_PISTOL]) || !ai->m_MoveObj.Update() ||
+            !ai->SetNewState(AI_Mgr::StateAttackClose) || ai->CalculateObstruction() < 0)
+            return false;
         ai->diagnostic_target = victim;
         g.server.SetNextUpdate(h, .001f);
         id = r->id;
@@ -186,8 +194,10 @@ namespace OpenBlood2
                ai->m_MoveObj.outcome == CMovement::Outcome::Direct && ai->m_MoveObj.path().size() == 1 &&
                ai->m_MoveObj.failures == 0 && ai->hearing_reactions == 1 && ai->trigger_failures == 0 &&
                ai->trigger_outcome == AI_Mgr::TriggerOutcome::Heard && ai->fire_shots > 2 &&
-               ai->animation_finishes > 0 && ai->fire_failures == 0 && ai->state_failures == 0 &&
-               ai->key_failures == 0 && ai->audio_starts > 0 && target->damage.m_fHitPoints < 10000 &&
+               ai->animation_finishes > 0 && ai->attack_updates > 2 && ai->locomotion_calls > 2 &&
+               ai->locomotion_failures == 0 && ai->obstacle_queries > 0 && ai->obstruction_checks > 0 &&
+               r->state.m_Pos.z > 0 && ai->fire_failures == 0 && ai->state_failures == 0 && ai->key_failures == 0 &&
+               ai->audio_starts > 0 && target->damage.m_fHitPoints < 10000 &&
                ai->m_InventoryMgr.GetAmmoCount(AMMO_BULLET) < 100;
     }
     bool prepare_ai_state_smoke(GameSession& g, ObjectId& id)

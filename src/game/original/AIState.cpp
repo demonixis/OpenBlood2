@@ -250,6 +250,10 @@ bool AI_Mgr::DispatchState()
     dispatched_state = m_nState;
     if (Metacmd <= 0)
         Metacmd = 1;
+    if (m_nState == StateAttackClose)
+        return AI_STATE_AttackClose();
+    if (m_nState == StateAttackFar)
+        return AI_STATE_AttackFar();
     if (m_nState == StateIdle)
         return AI_STATE_Idle();
     if (m_nState == StatePassive)
@@ -259,4 +263,13 @@ bool AI_Mgr::DispatchState()
     if (m_nState == StateInactive)
         return true;
     return StateFailure("Selected AI action is not integrated");
+}
+
+bool AI_Mgr::AI_STATE_AttackClose()
+{
+    return StateFailure("Subclass close attack is not integrated");
+}
+bool AI_Mgr::AI_STATE_AttackFar()
+{
+    return StateFailure("Subclass far attack is not integrated");
 }

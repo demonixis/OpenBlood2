@@ -96,3 +96,8 @@ The inspector reads live state and errors, including hidden/inactive/missing
 models, without advancing actions. Diagnostic drivers in tests and the GPU smoke
 call this command explicitly; they are not AI_Update. Removal in a damage callback
 is deferred through the animation batch; no later marker uses the pending actor.
+
+The [autonomous locomotion continuation](AI_LOCOMOTION_CONTRACTS.md) now supplies
+walk/run/moving fire, obstruction/ledge probes and Cultist close/far attack sequencing.
+Earlier blanket omissions are superseded only for this subset. Full initialization,
+AI_Update/deactivation, remaining states and shade recovery stay unavailable.

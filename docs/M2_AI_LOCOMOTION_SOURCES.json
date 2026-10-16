@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "2ceb37380e263dccb40fe75481852cfb376ede1d",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          2580,
+          2692
+        ],
+        [
+          2858,
+          2920
+        ],
+        [
+          3663,
+          3694
+        ],
+        [
+          4029,
+          4103
+        ],
+        [
+          4179,
+          4234
+        ],
+        [
+          4534,
+          4619
+        ],
+        [
+          4748,
+          4828
+        ]
+      ],
+      "use": "Obstruction/ledge probes, recovery selection and four autonomous movement commands"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CultistAI.cpp",
+      "sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
+      "selected_lines": [
+        [
+          331,
+          454
+        ]
+      ],
+      "use": "Original close/far attack state sequencing"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "selected_lines": [
+        [
+          47,
+          96
+        ],
+        [
+          110,
+          176
+        ]
+      ],
+      "use": "Original command/state/obstruction flags"
+    }
+  ],
+  "adaptations": [
+    "Consolidated four parallel command bodies with original branch differences retained",
+    "Checked existing typed rays/support and explicit missing shade recovery",
+    "Required service, finite-domain, counter overflow, pending-owner and reentrancy guards",
+    "Diagnostic scheduling only; production initialization/AI_Update/death and registration remain absent",
+    "Failed typed ledge queries do not consume the throttle interval; same-tick retry remains failure until service recovers"
+  ]
+}

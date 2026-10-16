@@ -303,3 +303,11 @@ PLAYANIMATIONLOOPING fallthrough, double DONE decisions and owned callback lifet
 Production SCRIPT entry still requires its unported forced AI_Update; diagnostics
 must not count as registered NPCs. Required initialization/update/death, client FX
 and ExitTrigger/session services keep M2 incomplete. Source counts are unchanged.
+
+The [autonomous locomotion continuation](../Documentation/Implementation/M2_AI_LOCOMOTION.md) adds original obstruction/ledge probes,
+walk/run/moving-fire commands and Cultist close/far attack sequencing. Read
+[contracts](docs/AI_LOCOMOTION_CONTRACTS.md). Preserve first-hit self exclusion, false-on-throttled ledge
+queries, injury/support timing, independent fire/completion increments and cached
+attack thresholds. Missing shade recovery and crawl/jump execution remain explicit
+failures. Diagnostic drivers are not production AI_Update; NPC initialization,
+remaining states, required FX and ExitTrigger keep M2 incomplete. Counts are unchanged.

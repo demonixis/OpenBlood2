@@ -374,3 +374,15 @@ and ExitTrigger/session services keep M2 incomplete. Source counts are unchanged
 Script interpreter-state verification: 422/422 Debug and inspector-free Release
 checks (27 GPU each), plus 97 targeted ASan/UBSan/leak checks.
 See [evidence](../Documentation/Implementation/M2_AI_SCRIPT.md).
+
+The [autonomous locomotion continuation](../Documentation/Implementation/M2_AI_LOCOMOTION.md) adds original obstruction/ledge probes,
+walk/run/moving-fire commands and Cultist close/far attack sequencing. Read
+[contracts](docs/AI_LOCOMOTION_CONTRACTS.md). Preserve first-hit self exclusion, false-on-throttled ledge
+queries, injury/support timing, independent fire/completion increments and cached
+attack thresholds. Missing shade recovery and crawl/jump execution remain explicit
+failures. Diagnostic drivers are not production AI_Update; NPC initialization,
+remaining states, required FX and ExitTrigger keep M2 incomplete. Counts are unchanged.
+
+Autonomous locomotion/attack verification: 433/433 Debug and inspector-free Release
+checks (27 GPU each), plus 120 targeted ASan/UBSan/leak checks.
+See [evidence](../Documentation/Implementation/M2_AI_LOCOMOTION.md).

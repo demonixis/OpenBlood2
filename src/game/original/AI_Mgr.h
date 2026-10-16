@@ -158,6 +158,31 @@ class AI_Mgr : public CBaseCharacter
     bool SetNewState(int);
     bool StopVelocity();
     bool SetAnimation(DDWORD);
+    bool MC_Walk();
+    bool MC_Run();
+    bool MC_Fire_Walk();
+    bool MC_Fire_Run();
+    bool CheckObstructed(DVector direction, float speed, bool&);
+    int CalculateObstruction(); // Flags, or -1 for a required query failure.
+    bool NavigateObstacle();
+    bool IsLedge(DVector direction, bool&);
+    virtual bool AI_STATE_AttackClose();
+    virtual bool AI_STATE_AttackFar();
+    struct ObstacleRay
+    {
+        DVector from{}, to{};
+        OpenBlood2::SegmentHit hit;
+        OpenBlood2::SegmentResult result = OpenBlood2::SegmentResult::Unavailable;
+    };
+    std::array<ObstacleRay, 9> obstacle_rays;
+    ObstacleRay ledge_ray;
+    unsigned block_flags = 0;
+    float last_ledge_check = 0, obstruction_velocity = 0, obstruction_vertical = 0;
+    bool obstructed = false, ledge = false, ledge_sampled = false;
+    std::uint64_t obstruction_checks = 0, obstacle_queries = 0, ledge_queries = 0;
+    std::uint64_t locomotion_calls = 0, locomotion_failures = 0;
+    int locomotion_command = 0;
+    std::string locomotion_error;
     bool MC_Idle();
     bool MC_BestWeapon();
     bool MC_Fire_Stand();
@@ -357,6 +382,10 @@ class AI_Mgr : public CBaseCharacter
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
 
   private:
+    bool locomotion_busy = false;
+    bool LocomotionReady();
+    bool LocomotionFailure(std::string_view);
+    bool Locomotion(bool run, bool fire);
     bool script_busy = false;
     std::vector<ScriptInstruction> script_commands;
     ScriptInstruction script_current;

@@ -142,3 +142,8 @@ SubwayA stays 187 created, 4 transferred sounds, 372 editor-only, 17 unsupported
 ten CultistAI, Gideon and ExitTrigger. Required client FX and the complete session
 also remain open. --start-game continues to return 6. Other platforms, XR and
 retail behavior are not validated by these Linux tests.
+
+The [autonomous locomotion continuation](AI_LOCOMOTION_CONTRACTS.md) now supplies
+walk/run/moving fire, obstruction/ledge probes and Cultist close/far attack sequencing.
+Earlier blanket omissions are superseded only for this subset. Full initialization,
+AI_Update/deactivation, remaining states and shade recovery stay unavailable.
