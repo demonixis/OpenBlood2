@@ -101,6 +101,10 @@ namespace OpenBlood2
         if (!victim || g.server.SetObjectDims(victim, &dimensions) != DE_OK || !ai->SetNewTarget(victim) ||
             !ai->RefreshTargetPosition())
             return false;
+        // Original cache/path service, exercised outside UI. This isolated diagnostic
+        // placement is not a claim of authored NPC navigation or path following.
+        if (!ai->m_MoveObj.Init(h) || !ai->m_MoveObj.CalculatePath({1100, 10000, 0}))
+            return false;
         ai->m_fHearingDist = 1000;
         if (!ai->HandleTrigger(victim, "SOUND_TRIGGER 2"))
             return false;
@@ -115,7 +119,9 @@ namespace OpenBlood2
         const auto* ai = r ? dynamic_cast<const AIFireProbe*>(r->game.get()) : nullptr;
         const auto* target =
             ai ? dynamic_cast<const AIFireTarget*>(g.server.HandleToObject(ai->diagnostic_target)) : nullptr;
-        return ai && target && ai->hearing_reactions == 1 && ai->trigger_failures == 0 &&
+        return ai && target && ai->m_MoveObj.sampled && ai->m_MoveObj.samples > 2 &&
+               ai->m_MoveObj.outcome == CMovement::Outcome::Direct && ai->m_MoveObj.path().size() == 1 &&
+               ai->m_MoveObj.failures == 0 && ai->hearing_reactions == 1 && ai->trigger_failures == 0 &&
                ai->trigger_outcome == AI_Mgr::TriggerOutcome::Heard && ai->fire_shots > 2 &&
                ai->animation_finishes > 0 && ai->fire_failures == 0 && ai->state_failures == 0 &&
                ai->key_failures == 0 && ai->audio_starts > 0 && target->damage.m_fHitPoints < 10000 &&

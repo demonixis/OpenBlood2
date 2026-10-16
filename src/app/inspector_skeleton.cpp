@@ -58,6 +58,38 @@ namespace OpenBlood2
         ImGui::TableNextColumn();
         const auto* r = game.objects.get(skeleton_selection);
         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+        const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
+        if (character && ImGui::CollapsingHeader("Original CMovement cache / path", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& m = character->m_MoveObj;
+            const char* outcomes[]{"None",
+                                   "Direct path",
+                                   "Detour path",
+                                   "Blocked / partial path",
+                                   "Invalid",
+                                   "Unavailable",
+                                   "Budget exhausted / partial path",
+                                   "Clear side rays",
+                                   "Obstructed side ray"};
+            ImGui::Text("Initialized: %s | sampled: %s | %s", m.initialized ? "yes" : "no", m.sampled ? "yes" : "no",
+                        outcomes[static_cast<unsigned>(m.outcome)]);
+            const auto p = m.GetPos(), last = m.GetLastPos(), f = m.GetForwardVector();
+            ImGui::Text("Cache %.2f %.2f %.2f | previous %.2f %.2f %.2f", p.x, p.y, p.z, last.x, last.y, last.z);
+            ImGui::Text("Forward %.2f %.2f %.2f | samples %llu / failed %llu", f.x, f.y, f.z,
+                        (unsigned long long)m.samples, (unsigned long long)m.sample_failures);
+            ImGui::Text("Plans %llu | failures %llu | rays %u / iterations %u", (unsigned long long)m.calculations,
+                        (unsigned long long)m.failures, m.rays, m.iterations);
+            ImGui::Text("Remaining points %zu | source accumulated %u", m.path().size(), m.added_points);
+            ImGui::Text("Requested destination %.2f %.2f %.2f", m.requested_destination.x, m.requested_destination.y,
+                        m.requested_destination.z);
+            for (std::size_t i = 0; i < m.path().size(); ++i)
+                ImGui::Text("%zu: %.2f %.2f %.2f", i, m.path()[i].x, m.path()[i].y, m.path()[i].z);
+            if (!m.error.empty())
+                ImGui::TextWrapped("%s", m.error.c_str());
+            ImGui::TextWrapped("Two side rays only; partial paths are not usable success. Planning does not move an "
+                               "actor. Player cache remains uninitialized, as in source. NPC following, shade-based "
+                               "position selection and full AI_Update remain unavailable.");
+        }
         if (target_ai && ImGui::CollapsingHeader("Original AI commands / hearing", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& ai = *target_ai;

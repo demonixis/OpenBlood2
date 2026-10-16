@@ -101,6 +101,7 @@ namespace OpenBlood2
         }
         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
+        SegmentResult CastRay(DVector, DVector, SegmentHit&) override;
         SegmentResult CastWorldRay(DVector, DVector, SegmentHit&) override;
         SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false,
                                        SegmentObjects objects = SegmentObjects::SolidOnly,

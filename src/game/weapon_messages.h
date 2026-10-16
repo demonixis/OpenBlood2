@@ -47,7 +47,8 @@ namespace OpenBlood2
     enum class SegmentFilter
     {
         None,
-        AIVisibility // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
+        AIVisibility,    // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
+        IgnoreCharacters // Original CMovement clearance filter.
     };
     enum class SegmentResult
     {

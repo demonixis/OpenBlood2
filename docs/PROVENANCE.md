@@ -552,3 +552,11 @@ ObjectUtilities SendSoundTrigger are integrated, including the original player
 sound caller. See [source hashes/ranges](M2_AI_TRIGGER_SOURCES.json) and
 [bounded contracts/adaptations](AI_TRIGGER_CONTRACTS.md). Scripts and full NPCs
 remain unported; checked snapshots replace mutable callback list traversal.
+
+## M2 original movement aggregate and navigation
+
+Selected ObjectDLL movement.cpp/h cache, clearance, obstacle turns and consolidation
+are integrated with the original CBaseCharacter aggregate order. [Source selections](M2_AI_NAVIGATION_SOURCES.json)
+and [contracts](AI_NAVIGATION_CONTRACTS.md) record initial-sample safety, value
+ownership, bounds and explicit omissions. Full NPC initialization, following and
+shade queries remain unavailable; collision is the existing replacement solver.

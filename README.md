@@ -343,3 +343,10 @@ is inspectable but their complete NPC actions and the M2 gate remain unavailable
 Command/hearing verification: 393/393 Debug and inspector-free Release checks
 (27 GPU each), 145 targeted ASan/UBSan/leak checks, and 19/19 final Debug hearing/audio
 checks after numeric-validation refinements. See the [evidence](../Documentation/Implementation/M2_AI_TRIGGERS.md).
+
+The [CMovement continuation](docs/AI_NAVIGATION_CONTRACTS.md) adds original transform caching and obstacle
+path planning, with inspectable partial failures and bounded searches. Following,
+production NPCs and the actual M2 session gate remain incomplete.
+
+CMovement verification: 402/402 Debug and inspector-free Release checks (27 GPU
+each), plus 162 targeted ASan/UBSan/leak checks. See [evidence](../Documentation/Implementation/M2_AI_NAVIGATION.md).

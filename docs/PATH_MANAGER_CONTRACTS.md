@@ -1,5 +1,9 @@
 # Original AI path snapshots and selection
 
+> Extended by [CMovement contracts](AI_NAVIGATION_CONTRACTS.md): original cached
+> transforms and obstacle-path calculation are available for explicitly initialized
+> actors. Current-transform adaptations below remain; full AI following is still absent.
+
 M2 remains incomplete. Selected PathMgr::BuildPathList/GetPath and
 PathListData::Copy now replace the shell's earlier ad hoc snapshot. They provide
 original path selection for future AI callers, not path following, navigation or

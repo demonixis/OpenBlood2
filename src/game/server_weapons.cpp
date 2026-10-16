@@ -1,6 +1,7 @@
 #include "engine/world_model.h"
 #include "game/original/DestructableBrush.h"
 #include "game/original/Door.h"
+#include "game/original/PlayerObj.h"
 #include "game/original/SurfaceTypes.h"
 #include "game/original/VolumeBrush.h"
 #include "game/server_adapter.h"
@@ -14,7 +15,8 @@ namespace OpenBlood2
         trace_service("IntersectSegment");
         out = {};
         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
-        if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility) ||
+        if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility &&
+             filter != SegmentFilter::IgnoreCharacters) ||
             (objects != SegmentObjects::SolidOnly && objects != SegmentObjects::SolidOrRayHit &&
              objects != SegmentObjects::All) ||
             !physics_vector(from) || !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
@@ -46,6 +48,8 @@ namespace OpenBlood2
             if (filter == SegmentFilter::AIVisibility &&
                 (dynamic_cast<const VolumeBrush*>(record->game.get()) ||
                  (brush && brush->destructable && brush->GetSurfaceType() == SURFTYPE_GLASS)))
+                continue;
+            if (filter == SegmentFilter::IgnoreCharacters && dynamic_cast<const CBaseCharacter*>(record->game.get()))
                 continue;
             if (fire_through && ((door && door->fire_through) || (brush && brush->fire_through)))
                 continue;

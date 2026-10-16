@@ -11,7 +11,7 @@ CBaseCharacter::CBaseCharacter() : B2BaseClass(OT_MODEL)
 {
     AddAggregate(&m_damage);
     AddAggregate(&m_InventoryMgr);
-    // Original m_MoveObj (steering/AI movement) is not imported in this subset.
+    AddAggregate(&m_MoveObj); // Source order; only explicitly initialized owners sample transforms.
 }
 DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
 {

@@ -1,5 +1,9 @@
 # Original AI state decisions and stationary actions
 
+> Extended by [CMovement contracts](AI_NAVIGATION_CONTRACTS.md): original cached
+> transforms and obstacle-path calculation are available for explicitly initialized
+> actors. Current-transform adaptations below remain; full AI following is still absent.
+
 > Extended by [AI command/hearing contracts](AI_TRIGGER_CONTRACTS.md): player sound
 > alerts, original hearing reactions and selected trigger commands now execute.
 > Complete production NPCs and M2 remain open.

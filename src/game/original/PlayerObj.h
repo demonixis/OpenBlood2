@@ -4,6 +4,7 @@
 #include "B2BaseClass.h"
 #include "Destructable.h"
 #include "InventoryMgr.h"
+#include "Movement.h"
 #include "SurfaceTypes.h"
 #include "dlink.h"
 #include <array>
@@ -21,6 +22,7 @@ class CBaseCharacter : public B2BaseClass
     CBaseCharacter();
     CInventoryMgr m_InventoryMgr;
     CDestructable m_damage;
+    CMovement m_MoveObj;
     CAnim_Sound m_Anim_Sound;
     std::uint64_t motion_keys = 0, motion_actions = 0, motion_failures = 0;
     unsigned motion_applied = 0; // RotY, ForwVel, RightVel, UpVel, AddXYZ, DimsXYZ bits.

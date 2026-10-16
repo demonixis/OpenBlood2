@@ -280,3 +280,10 @@ source command early returns, exact hearing boundaries, reversed gunfire class t
 impact guards, two-faction order/duplicates and alert-after-playback-failure. Snapshot
 checked identities across callbacks; delivery is not reaction. Scripts and full NPC
 initialization/AI_Update/deactivation remain unavailable; M2 stays open.
+
+The [CMovement continuation](../Documentation/Implementation/M2_AI_NAVIGATION.md) adds the original cached transform aggregate
+and obstacle-path calculation. Read [contracts](docs/AI_NAVIGATION_CONTRACTS.md). Preserve two side rays,
+character-only filtering, zero lateral range on misses, source offsets/partial paths
+and accumulated point count. Planning never integrates motion; players do not initialize
+this cache. Bounded searches and value ownership are adaptations. Full NPC initialization,
+following/actions, shade queries and the actual M2 gate remain open.

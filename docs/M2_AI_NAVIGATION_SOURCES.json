@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "f71a2d390234e383d4bc38c52eaefd7df7128d5a",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/movement.cpp",
+      "sha256": "673a1f1bfe0f341b94fcb6b24a51a2ba5d817ffc7ef215839b82ab684ee2be26",
+      "selected_lines": [
+        [
+          29,
+          195
+        ],
+        [
+          245,
+          534
+        ]
+      ],
+      "use": "Selected aggregate update, transform cache, two-side clearance, obstacle-turn search and optional consolidation"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/movement.h",
+      "sha256": "ec77ae305932f01b125ec441f148cb7a0a0807ae1c46618d5da8bf99f606d5de",
+      "selected_lines": [
+        [
+          29,
+          114
+        ]
+      ],
+      "use": "Aggregate members, getters, route consumption and lifetime; value ownership replaces leaked vector allocations"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BaseCharacter.cpp",
+      "sha256": "0002f599c46971e006829e2c41405d872e8fbb08d8ff7590cadd50d91e14aa95",
+      "selected_lines": [
+        [
+          32,
+          36
+        ]
+      ],
+      "use": "Original damage/inventory/movement aggregate order"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BaseCharacter.h",
+      "sha256": "40160424f0b03f38b2513ba34e9abb44bc27d8a92b5735470d9d995f01d1face",
+      "selected_lines": [
+        [
+          60,
+          68
+        ]
+      ],
+      "use": "Owned original movement aggregate"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "selected_lines": [
+        [
+          412,
+          477
+        ]
+      ],
+      "use": "GlobalFilterFn IGNORE_CHARACTER, separate from visibility filters"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selected_lines": [
+        [
+          2088,
+          2100
+        ]
+      ],
+      "use": "Reference-only initialization dependency; full AI InitialUpdate remains unavailable"
+    }
+  ],
+  "adaptations": [
+    "Explicit valid initial pose, checked identity and sample failures",
+    "Owned bounded path values, safe empty consumption",
+    "Operation-wide loop/ray budgets and finite-domain collision queries",
+    "Degenerate axes and unavailable services fail instead of uninitialized results",
+    "Inspector replaces debug object allocation; shade-based positioning, save/load and full AI initialization remain excluded"
+  ]
+}
