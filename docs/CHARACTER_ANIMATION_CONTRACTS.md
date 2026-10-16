@@ -1,5 +1,11 @@
 # Original character animations and node queries
 
+> Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
+> original named resets now affect rendering/hit candidates, and the selected Load
+> model/flags/velocity tail is available before client association. Earlier blanket
+> node-hide/Load-tail omissions are historical. Full engine/client restore, limb/gib
+> behavior and the M2 transfer gate remain incomplete.
+
 > Extended by [NPC hit/recoil contracts](AI_HIT_CONTRACTS.md): original visible-node
 > localization, region damage and nonlethal reactions now execute for initialized
 > Cultist/Civilian NPCs. Earlier blanket localization/recoil omissions are historical;

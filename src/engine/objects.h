@@ -126,6 +126,7 @@ namespace OpenBlood2
         std::uint64_t mover_moves = 0, mover_blocks = 0, mover_pushes = 0, mover_riders = 0;
         HOBJECT mover_blocker = nullptr;
         AnimationTrack animation;
+        std::vector<std::uint8_t> hidden_nodes; // Empty means all visible; otherwise one byte per model node.
         std::string model_error;
         DDWORD user_flags = 0;
         DDWORD activity = OBJSTATE_ACTIVE;

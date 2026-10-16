@@ -1,4 +1,5 @@
 #include "character_motion_smoke.h"
+#include "game/original/CharacterNodes.h"
 namespace OpenBlood2
 {
     bool prepare_character_motion_smoke(GameSession& g, ObjectId& id)
@@ -29,7 +30,16 @@ namespace OpenBlood2
     {
         const auto* r = g.objects.get(id);
         const auto* c = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
-        return c && c->motion_keys > 0 && c->motion_actions == c->motion_keys * 4 && c->motion_applied == 51 &&
+        if (!c)
+            return false;
+        std::string error;
+        DBOOL hidden = false;
+        if (!hide_character_node(r->handle, 0, true, error) ||
+            g.server.GetModelNodeHideStatus(r->handle, "head", &hidden) != DE_OK || !hidden ||
+            !reset_character_nodes(r->handle, error) ||
+            g.server.GetModelNodeHideStatus(r->handle, "head", &hidden) != DE_OK || hidden)
+            return false;
+        return c->motion_keys > 0 && c->motion_actions == c->motion_keys * 4 && c->motion_applied == 51 &&
                c->motion_failures == 0 && c->motion_error.empty() && r->dimensions.y == 3 &&
                r->state.m_Pos.x > 100000 && r->state.m_Pos.y == 100000;
     }

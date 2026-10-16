@@ -439,10 +439,11 @@ namespace OpenBlood2
                         if (ImGui::TreeNode("Model visibility and skin diagnostics"))
                         {
                             for (const auto& entry : model_view->entries)
-                                ImGui::TextWrapped("%s: %s, %zu triangles, skin %s%s%s", entry.label.c_str(),
-                                                   entry.visible ? "visible" : "hidden", entry.triangles,
-                                                   entry.skin.c_str(), entry.error.empty() ? "" : " / ",
-                                                   entry.error.c_str());
+                                ImGui::TextWrapped(
+                                    "%s: %s, %zu triangles / %zu hidden triangles / %zu hidden nodes, skin %s%s%s",
+                                    entry.label.c_str(), entry.visible ? "visible" : "hidden", entry.triangles,
+                                    entry.hidden_triangles, entry.hidden_nodes, entry.skin.c_str(),
+                                    entry.error.empty() ? "" : " / ", entry.error.c_str());
                             ImGui::TreePop();
                         }
                     }

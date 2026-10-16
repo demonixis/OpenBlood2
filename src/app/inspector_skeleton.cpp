@@ -59,6 +59,13 @@ namespace OpenBlood2
         }
         ImGui::TableNextColumn();
         const auto* r = game.objects.get(skeleton_selection);
+        if (r && r->model)
+        {
+            const auto hidden =
+                std::count_if(r->hidden_nodes.begin(), r->hidden_nodes.end(), [](auto value) { return value != 0; });
+            ImGui::Text("Model nodes: %zu total / %zu hidden (geometry and hit candidates)", r->model->nodes.size(),
+                        static_cast<std::size_t>(hidden));
+        }
         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
         if (const auto* corpse = r ? dynamic_cast<const CCorpse*>(r->game.get()) : nullptr)
@@ -85,11 +92,14 @@ namespace OpenBlood2
         {
             ImGui::Text("Player restore initialization %d / selected fields loaded %d / associated %d",
                         player->restore_initialization, player->restore_fields_loaded, player->GetClient() != nullptr);
+            ImGui::Text("Load model/flags/velocity tail: %s", player->restore_model_loaded ? "applied" : "not applied");
+            if (!player->restore_model_error.empty())
+                ImGui::TextWrapped("%s", player->restore_model_error.c_str());
             ImGui::Text("Air %.2f | smell timestamp %.3f / delay %.3f", player->m_fAirLevel, player->m_fSmellTime,
                         player->m_fSmellDelay);
             if (player->restore_initialization)
                 ImGui::TextWrapped(
-                    "Restore initialization and value fields only; this is not a completed player restore.");
+                    "Selected restore operations only; body, scheduling and client restoration remain incomplete.");
         }
         if (target_ai && ImGui::CollapsingHeader("Original NPC death"))
         {
@@ -630,7 +640,9 @@ namespace OpenBlood2
                     const auto parent = model.nodes[i].parent;
                     if (parent >= 0)
                         draw->AddLine(point, project(pose[parent].position), IM_COL32(130, 200, 220, 255));
-                    draw->AddCircleFilled(point, 2, IM_COL32(200, 235, 255, 255));
+                    const bool hidden = r->hidden_nodes.size() == model.nodes.size() && r->hidden_nodes[i];
+                    draw->AddCircleFilled(point, 2,
+                                          hidden ? IM_COL32(130, 130, 130, 255) : IM_COL32(200, 235, 255, 255));
                     if (anim && anim->hit_spheres_valid)
                         for (unsigned j = 0; j < NUM_STD_NODES; ++j)
                             if (anim->hit_nodes_found[j] && model.nodes[i].name == szNodes[j])
@@ -638,13 +650,14 @@ namespace OpenBlood2
                 }
                 draw->PopClipRect();
             }
-            ImGui::TextWrapped(
-                "Local front projection. Orange radii are initialization measurements, not collision geometry.");
+            ImGui::TextWrapped("Local front projection includes hidden nodes (gray). Orange radii are initialization "
+                               "measurements, not collision geometry.");
             if (ImGui::CollapsingHeader("World node positions and rotations", ImGuiTreeNodeFlags_DefaultOpen))
             {
-                if (ImGui::BeginTable("Nodes", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_ScrollY, ImVec2(0, 135)))
+                if (ImGui::BeginTable("Nodes", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_ScrollY, ImVec2(0, 135)))
                 {
                     ImGui::TableSetupColumn("Node");
+                    ImGui::TableSetupColumn("Visibility");
                     ImGui::TableSetupColumn("World position");
                     ImGui::TableSetupColumn("Quaternion x y z w");
                     ImGui::TableHeadersRow();
@@ -656,6 +669,11 @@ namespace OpenBlood2
                         ImGui::TableNextRow();
                         ImGui::TableNextColumn();
                         ImGui::TextUnformatted(node.name.c_str());
+                        ImGui::TableNextColumn();
+                        DBOOL hidden = DFALSE;
+                        const auto visibility =
+                            game.server.GetModelNodeHideStatus(r->handle, node.name.c_str(), &hidden);
+                        ImGui::TextUnformatted(visibility == DE_OK ? (hidden ? "hidden" : "visible") : "unavailable");
                         ImGui::TableNextColumn();
                         if (found)
                             ImGui::Text("%.2f %.2f %.2f", p.x, p.y, p.z);

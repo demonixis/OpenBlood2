@@ -32,7 +32,7 @@ namespace OpenBlood2
             }
             if (!scene.add(record->model.get(), record->animation, record->state.m_SkinName,
                            {record->state.m_Pos, record->state.m_Rotation}, record->state.m_Scale, visible, false, id,
-                           record->state.m_Filename, game.resources, error))
+                           record->state.m_Filename, game.resources, error, record->hidden_nodes))
                 return false;
             if (unresolved)
                 scene.entries.back().error = "Unresolved attachment pose";

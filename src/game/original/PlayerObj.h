@@ -77,6 +77,9 @@ class CPlayerObj : public CBaseCharacter
     bool Respawn();
     bool SaveFields(OpenBlood2::PlayerState&, std::string&) const;
     bool LoadFields(const OpenBlood2::PlayerState&, std::string&);
+    bool RestoreModelState(std::string&);
+    bool restore_model_loaded = false;
+    std::string restore_model_error;
     bool restore_initialization = false, restore_fields_loaded = false;
     bool GoToStartPoint(HSTRING start_name);
     bool SetCharacter(DBYTE);

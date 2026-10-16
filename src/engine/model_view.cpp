@@ -23,7 +23,7 @@ namespace OpenBlood2
     }
     bool ModelView::add(const Model* model, const AnimationTrack& track, std::string_view skin, NodePose pose,
                         DVector scale, bool visible, bool close, ObjectId object, std::string_view label,
-                        const Resources& resources, std::string& error)
+                        const Resources& resources, std::string& error, std::span<const std::uint8_t> hidden_nodes)
     {
         error.clear();
         auto fail = [&](const char* reason)
@@ -43,6 +43,10 @@ namespace OpenBlood2
             entry.error = "Model is missing or not decoded";
             return true;
         }
+        if (!hidden_nodes.empty() && hidden_nodes.size() != model->nodes.size())
+            return fail("Invalid model node visibility mask");
+        for (auto hidden : hidden_nodes)
+            entry.hidden_nodes += hidden != 0;
         std::uint32_t material = 0;
         std::string key;
         if (!resource_path(skin, key))
@@ -86,6 +90,17 @@ namespace OpenBlood2
         {
             return fail("Invalid model presentation transform");
         }
+        std::array<int, 256> node_slots;
+        node_slots.fill(-1);
+        if (model->nodes.size() > 256)
+            return fail("Invalid model node count");
+        for (std::size_t i = 0; i < model->nodes.size(); ++i)
+        {
+            const auto index = model->nodes[i].index;
+            if (index >= node_slots.size() || node_slots[index] != -1)
+                return fail("Invalid model node index");
+            node_slots[index] = static_cast<int>(i);
+        }
         if (!sample_vertices(*model, track.animation, track.time, sampled_))
         {
             entry.error = "Model animation pose is unavailable";
@@ -96,6 +111,19 @@ namespace OpenBlood2
         range.name = entry.label;
         const DVector color = material ? DVector{1, 1, 1} : DVector{1, 0, 1};
         for (const auto& face : model->faces)
+        {
+            bool hidden = false;
+            for (auto vertex : face.vertices)
+            {
+                if (vertex >= model->vertices.size() || node_slots[model->vertices[vertex].node] < 0)
+                    return fail("Invalid model face node index");
+                hidden |= !hidden_nodes.empty() && hidden_nodes[node_slots[model->vertices[vertex].node]] != 0;
+            }
+            if (hidden)
+            {
+                ++entry.hidden_triangles;
+                continue;
+            }
             for (unsigned corner = 0; corner < 3; ++corner)
             {
                 if (face.vertices[corner] >= sampled_.size())
@@ -112,9 +140,12 @@ namespace OpenBlood2
                 }
                 mesh.vertices.push_back({scaled, color, uv});
             }
+        }
         range.count = static_cast<std::uint32_t>(mesh.vertices.size()) - range.first;
         range.batches.push_back({range.first, range.count, material});
         entry.triangles = range.count / 3;
+        if (!range.count)
+            return true;
         entry.range = draw.range;
         mesh.ranges.push_back(std::move(range));
         (close ? close_draws : world_draws).push_back(draw);

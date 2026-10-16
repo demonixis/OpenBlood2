@@ -4,6 +4,51 @@
 
 namespace OpenBlood2
 {
+    namespace
+    {
+        DRESULT node_index(const ObjectRecord* r, const char* name, std::size_t& index)
+        {
+            if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL || !r->model || !name || !*name ||
+                r->model->nodes.size() > 256 ||
+                (!r->hidden_nodes.empty() && r->hidden_nodes.size() != r->model->nodes.size()))
+                return DE_INVALIDPARAMS;
+            index = r->model->nodes.size();
+            for (std::size_t i = 0; i < r->model->nodes.size(); ++i)
+                if (!CaseLess{}(name, r->model->nodes[i].name) && !CaseLess{}(r->model->nodes[i].name, name))
+                {
+                    if (index != r->model->nodes.size())
+                        return DE_ERROR;
+                    index = i;
+                }
+            return index == r->model->nodes.size() ? DE_NOTFOUND : DE_OK;
+        }
+    } // namespace
+    DRESULT ServerAdapter::GetModelNodeHideStatus(HOBJECT h, const char* name, DBOOL* hidden)
+    {
+        trace_service("GetModelNodeHideStatus");
+        if (!hidden)
+            return DE_INVALIDPARAMS;
+        const auto* r = objects_.get(h);
+        std::size_t index;
+        auto result = node_index(r, name, index);
+        if (result == DE_OK)
+            *hidden = !r->hidden_nodes.empty() && r->hidden_nodes[index] != 0;
+        return result;
+    }
+    DRESULT ServerAdapter::SetModelNodeHideStatus(HOBJECT h, const char* name, DBOOL hidden)
+    {
+        trace_service("SetModelNodeHideStatus");
+        auto* r = objects_.get(h);
+        std::size_t index;
+        auto result = node_index(r, name, index);
+        if (result != DE_OK)
+            return result;
+        if (r->hidden_nodes.empty() && hidden)
+            r->hidden_nodes.resize(r->model->nodes.size());
+        if (!r->hidden_nodes.empty())
+            r->hidden_nodes[index] = hidden != 0;
+        return DE_OK; // Idempotent assignments still allow original _extra traversal.
+    }
     void ServerAdapter::initialize_model_services()
     {
         GetAnimIndex = [](HOBJECT h, const char* name) -> HMODELANIM

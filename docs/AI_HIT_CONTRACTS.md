@@ -1,5 +1,11 @@
 # Original NPC hit localization and recoil
 
+> Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
+> original named resets now affect rendering/hit candidates, and the selected Load
+> model/flags/velocity tail is available before client association. Earlier blanket
+> node-hide/Load-tail omissions are historical. Full engine/client restore, limb/gib
+> behavior and the M2 transfer gate remain incomplete.
+
 > Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
 > transfer ordinary deaths. Earlier blanket corpse omissions are historical;
 > fire/gibs, corpse damage, required FX and complete M2 remain unavailable.

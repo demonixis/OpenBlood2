@@ -1,5 +1,11 @@
 # Original Player Entry Boundary
 
+> Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
+> original named resets now affect rendering/hit candidates, and the selected Load
+> model/flags/velocity tail is available before client association. Earlier blanket
+> node-hide/Load-tail omissions are historical. Full engine/client restore, limb/gib
+> behavior and the M2 transfer gate remain incomplete.
+
 > Continued by [player state contracts](PLAYER_STATE_CONTRACTS.md): selected player
 > values and the original savegame initialization early return now execute.
 > Earlier blanket player-field/initialization omissions are historical; full

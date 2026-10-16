@@ -394,3 +394,10 @@ smell clocks, nullable strings, raw attributes, separate player death and zeroed
 stat caches. Restore initialization grants no fresh stats/scent/scheduling. Active
 powers refuse missing timer preservation. These are partial fields, not full player
 or client/engine restoration; NEW_LEVEL and M2 remain open.
+
+The [node visibility/Load-tail continuation](../Documentation/Implementation/M2_CHARACTER_NODES.md) connects original named resets,
+per-instance rendering/hit masks and selected player model/flags/velocity restoration.
+Read [contracts](docs/CHARACTER_NODE_CONTRACTS.md). Preserve contiguous extras, missing-name retained status,
+sparse node IDs, source random fallback and Load's absent SHADOW flag. Tail failures
+may leave partial setup: discard staged owners, never claim active-player rollback.
+Engine/client restoration, safe destination entry, required FX and M2 remain open.

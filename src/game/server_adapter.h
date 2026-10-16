@@ -151,6 +151,8 @@ namespace OpenBlood2
         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
         bool GetModelFilenames(HOBJECT, std::string&, std::string&) override;
         DRESULT SetModelFilenames(HOBJECT, const char*, const char*) override;
+        DRESULT GetModelNodeHideStatus(HOBJECT, const char*, DBOOL*) override;
+        DRESULT SetModelNodeHideStatus(HOBJECT, const char*, DBOOL) override;
         DRESULT GetObjectDims(HOBJECT, DVector*) override;
         DRESULT SetObjectRotation(HOBJECT, const DRotation*) override;
         DRESULT MoveObjectToGround(HOBJECT) override;

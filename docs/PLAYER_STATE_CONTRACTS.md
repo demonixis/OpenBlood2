@@ -1,5 +1,11 @@
 # Selected original player fields and restore initialization
 
+> Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
+> original named resets now affect rendering/hit candidates, and the selected Load
+> model/flags/velocity tail is available before client association. Earlier blanket
+> node-hide/Load-tail omissions are historical. Full engine/client restore, limb/gib
+> behavior and the M2 transfer gate remain incomplete.
+
 `CPlayerObj::SaveFields/LoadFields` now preserve the implemented part of the
 original Save/Load value block. `INITIALUPDATE_SAVEGAME` binds the original
 aggregates/faction lists and takes the original early return. These are

@@ -75,6 +75,86 @@ int main(int argc, char** argv)
             CHECK(capture.save(argv[1]));
         CHECK(correct);
     }
+    // Render two rigid node groups through ModelView, then hide each and restore.
+    // Pixels, not only counters, prove the visibility mask reaches SDL_GPU.
+    {
+        Model model;
+        ModelAnimation animation;
+        animation.duration = 100;
+        animation.keys.resize(2);
+        animation.keys[1].time = 100;
+        for (unsigned side = 0; side < 2; ++side)
+        {
+            ModelNode node;
+            node.name = side ? "right" : "left";
+            node.index = side;
+            model.nodes.push_back(node);
+            NodeAnimation track;
+            track.frames.resize(2);
+            animation.nodes.push_back(track);
+            auto mesh = quad(3, .75f, {1, 1, 1}, side ? 1.5f : -1.5f);
+            for (const auto& v : mesh.vertices)
+            {
+                ModelVertex vertex;
+                vertex.position = v.position;
+                vertex.node = side;
+                model.vertices.push_back(vertex);
+            }
+            for (unsigned triangle = 0; triangle < 2; ++triangle)
+            {
+                ModelFace face;
+                for (unsigned c = 0; c < 3; ++c)
+                    face.vertices[c] = side * 6 + triangle * 3 + c;
+                model.faces.push_back(face);
+            }
+        }
+        model.animations.push_back(animation);
+        Resources resources;
+        ModelView scene;
+        models.clear_geometry();
+        for (unsigned frame = 0; frame < 4; ++frame)
+        {
+            const std::array<std::uint8_t, 2> hidden{std::uint8_t(frame == 1 || frame == 2), std::uint8_t(frame == 2)};
+            scene.begin_frame();
+            CHECK(scene.add(&model, {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "node pixel probe", resources,
+                            error, hidden));
+            CHECK(scene.entries[0].hidden_triangles == (frame == 1 ? 2 : frame == 2 ? 4 : 0));
+            Capture capture;
+            CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240));
+            CHECK(models.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error,
+                                 true));
+            auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
+            CHECK(commands &&
+                  models.draw(commands, capture.texture, scene.mesh, scene.world_draws, {}, {}, false, error));
+            auto* copy = SDL_BeginGPUCopyPass(commands);
+            CHECK(copy);
+            SDL_GPUTextureRegion region{};
+            region.texture = capture.texture;
+            region.w = 320;
+            region.h = 240;
+            region.d = 1;
+            SDL_GPUTextureTransferInfo target{};
+            target.transfer_buffer = capture.transfer;
+            target.pixels_per_row = 320;
+            target.rows_per_layer = 240;
+            SDL_DownloadFromGPUTexture(copy, &region, &target);
+            SDL_EndGPUCopyPass(copy);
+            CHECK(SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(runtime.gpu));
+            auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
+            CHECK(pixels);
+            bool valid = true;
+            for (unsigned side = 0; side < 2; ++side)
+            {
+                const auto* pixel = pixels + (120 * 320 + (side ? 240 : 80)) * 4;
+                valid &= hidden[side] ? pixel[0] == 6 && pixel[1] == 9 && pixel[2] == 13
+                                      : pixel[0] == 255 && pixel[1] == 0 && pixel[2] == 255;
+            }
+            SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
+            CHECK(valid);
+        }
+        std::cout << "Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without "
+                     "texture revision\n";
+    }
     if (argc == 3)
     {
         GameSession game;

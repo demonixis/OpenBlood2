@@ -173,6 +173,7 @@ namespace OpenBlood2
         if (r->model != next)
         {
             r->model = std::move(next);
+            r->hidden_nodes.clear();
             r->animation.animation = 0;
             r->animation.reset();
         }

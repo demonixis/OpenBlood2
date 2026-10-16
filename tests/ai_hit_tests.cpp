@@ -161,6 +161,39 @@ namespace
         CHECK(!a->m_damage.LocalizeHit(d, *a->AnimSound()) && !a->m_damage.hit.valid);
         return true;
     }
+    bool hidden(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        std::shared_ptr<Model> m;
+        auto* a = actor(g, m);
+        CHECK(a);
+        auto h = a->m_hObject;
+        auto packet = shot(sender(g), 0);
+        CHECK(a->m_damage.LocalizeHit(packet, *a->AnimSound()) && !a->m_damage.hit.random_fallback);
+        CHECK(g.server.SetModelNodeHideStatus(h, "head", true) == DE_OK);
+        CHECK(a->m_damage.LocalizeHit(packet, *a->AnimSound()) && a->m_damage.hit.random_fallback);
+        CHECK(g.server.SetModelNodeHideStatus(h, "head", false) == DE_OK);
+        CHECK(a->m_damage.LocalizeHit(packet, *a->AnimSound()) && a->m_damage.hit.raw_node == 0 &&
+              !a->m_damage.hit.random_fallback);
+        // Missing later names retain preceding hide status, just as they retain pose.
+        CHECK(g.server.SetModelNodeHideStatus(h, "ll_leg", true) == DE_OK);
+        m->nodes[12].name = "absent_ankle";
+        CHECK(a->m_damage.LocalizeHit(shot(packet.attacker, 11), *a->AnimSound()) &&
+              a->m_damage.hit.missing_nodes == 0);
+        CHECK(g.server.SetModelNodeHideStatus(h, "ll_leg", false) == DE_OK);
+        CHECK(a->m_damage.LocalizeHit(shot(packet.attacker, 11), *a->AnimSound()) &&
+              a->m_damage.hit.missing_nodes == 1);
+        // All hidden still reaches original random fallback, not artificial immunity.
+        for (const auto& n : m->nodes)
+            CHECK(g.server.SetModelNodeHideStatus(h, n.name.c_str(), true) == DE_OK);
+        CHECK(a->m_damage.LocalizeHit(packet, *a->AnimSound()) && a->m_damage.hit.random_fallback);
+        m->nodes[1].name = "HEAD";
+        CHECK(!a->m_damage.LocalizeHit(packet, *a->AnimSound()) && !a->m_damage.hit.valid);
+        const auto hp = a->m_damage.m_fHitPoints;
+        CHECK(send(g, h, packet) && a->m_damage.m_fHitPoints == hp && a->m_damage.accepted_damage == 0);
+        return true;
+    }
     bool query(const char*)
     {
         GameSession g;
@@ -447,9 +480,9 @@ namespace
 int main(int argc, char** argv)
 {
     const std::map<std::string, std::function<bool(const char*)>> tests{
-        {"geometry", geometry},   {"query", query},   {"modifiers", modifiers},
-        {"reactions", reactions}, {"recoil", recoil}, {"guards", guards},
-        {"lifetime", lifetime},   {"sides", sides},   {"catalog", catalog}};
+        {"hidden", hidden},       {"geometry", geometry}, {"query", query},   {"modifiers", modifiers},
+        {"reactions", reactions}, {"recoil", recoil},     {"guards", guards}, {"lifetime", lifetime},
+        {"sides", sides},         {"catalog", catalog}};
     if (argc < 2)
         return 2;
     auto t = tests.find(argv[1]);

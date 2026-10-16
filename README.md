@@ -1,5 +1,10 @@
 # Blood II Reconstruction aka OpenBlood2
 
+Latest restoration continuation: [character node visibility and selected player Load tail](../Documentation/Implementation/M2_CHARACTER_NODES.md)
+connects original named resets to real rendering/hit state and restores model/flags/
+velocity without fresh player grants. Full engine/client restoration and safe level
+transfer remain unavailable; **M2 stays open**.
+
 Latest player-preservation continuation: [selected original player fields](../Documentation/Implementation/M2_PLAYER_STATE.md)
 adds owned strings, raw attributes/air/movement values and relative clock rebasing,
 plus the original restore-initialization early return. Full player/client/engine

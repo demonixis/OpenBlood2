@@ -102,6 +102,8 @@ class ServerDE : public CSBase
     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;
     virtual bool GetModelFilenames(HOBJECT, std::string&, std::string&) = 0;
     virtual DRESULT SetModelFilenames(HOBJECT, const char*, const char*) = 0;
+    virtual DRESULT GetModelNodeHideStatus(HOBJECT, const char*, DBOOL*) = 0;
+    virtual DRESULT SetModelNodeHideStatus(HOBJECT, const char*, DBOOL) = 0;
     virtual DRESULT GetObjectDims(HOBJECT, DVector*) = 0;
     virtual DRESULT SetObjectRotation(HOBJECT, const DRotation*) = 0;
     virtual DRESULT MoveObjectToGround(HOBJECT) = 0;

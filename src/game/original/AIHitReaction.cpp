@@ -57,16 +57,23 @@ bool CDestructable::LocalizeHit(const OpenBlood2::Damage& damage, const CAnim_So
         return fail("NPC hit segment invalid");
     DVector node{};
     DRotation node_rotation;
+    DBOOL hidden = DFALSE; // Source retains this value when a name is absent.
+    bool have_pose = false;
     for (unsigned i = 0; i < NUM_STD_NODES; ++i)
     {
         if (!std::isfinite(table.m_fHitSpheres[i]) || table.m_fHitSpheres[i] < 0)
             return fail("NPC hit sphere invalid");
-        // No limb hiding is implemented; current actors render all model nodes.
+        const auto visibility = s->GetModelNodeHideStatus(m_hObject, szNodes[i], &hidden);
+        if (visibility != DE_OK && visibility != DE_NOTFOUND)
+            return fail("NPC hit node visibility unavailable");
+        if (hidden)
+            continue;
         // Missing later names preserve the preceding transform, as the source's
         // ignored GetModelNodeTransform result does. Pose errors never do.
         const auto result = s->QueryModelNodeTransform(m_hObject, szNodes[i], &node, &node_rotation);
-        if (result == ServerDE::NodeQuery::Unavailable || (i == 0 && result != ServerDE::NodeQuery::Found))
+        if (result == ServerDE::NodeQuery::Unavailable || (!have_pose && result != ServerDE::NodeQuery::Found))
             return fail("NPC hit node pose unavailable");
+        have_pose = true;
         hit.missing_nodes += result == ServerDE::NodeQuery::Missing;
         if (squared == 0)
             continue; // Source zero/tied direction yields NaN: no candidate.

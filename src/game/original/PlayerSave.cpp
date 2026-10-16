@@ -1,5 +1,6 @@
-// Selected value assignments from PlayerObj.cpp:6541-6865. The engine/model,
-// client-data and unported gameplay sections are deliberately not claimed here.
+// Selected PlayerObj.cpp:6541-6865 values and model/flag/velocity Load tail.
+// Complete engine, client-data and unported gameplay restoration remain unavailable.
+#include "CharacterNodes.h"
 #include "PlayerObj.h"
 #include <algorithm>
 #include <cmath>
@@ -163,6 +164,47 @@ bool CPlayerObj::LoadFields(const OpenBlood2::PlayerState& state, std::string& e
     move_state = static_cast<MoveState>(state.move_state);
     last_sent_stats_ = {0, 0, 0}; // Source invalidates its last-sent stat caches without changing actual stats.
     restore_fields_loaded = true;
+    restore_model_loaded = false;
+    restore_model_error.clear();
     // No Respawn, ValidateAttributes, initialization payload or aggregate load here.
+    return true;
+}
+
+// Selected original Load tail (PlayerObj.cpp:6838-6857). Separate from value
+// restoration: failure can leave a partially configured, unassociated owner.
+bool CPlayerObj::RestoreModelState(std::string& error)
+{
+    error.clear();
+    restore_model_loaded = false;
+    auto fail = [&](const char* why)
+    {
+        error = restore_model_error = why;
+        return false;
+    };
+    if (!available(*this, error))
+    {
+        restore_model_error = error;
+        return false;
+    }
+    if (!restore_initialization || !restore_fields_loaded || m_hClient || m_InventoryMgr.m_hClient)
+        return fail("Player model restore requires loaded fields and an unassociated savegame owner");
+    if (!SetCharacter(m_nCharacter))
+        return fail("Saved player character model/animation setup failed");
+    if (!OpenBlood2::reset_character_nodes(m_hObject, error))
+    {
+        restore_model_error = error;
+        return false;
+    }
+    auto* server = GetServerDE();
+    const DDWORD flags = FLAG_VISIBLE | FLAG_MODELKEYS | FLAG_YROTATION | FLAG_ANIMTRANSITION | FLAG_TOUCH_NOTIFY |
+                         FLAG_SOLID | FLAG_STAIRSTEP; // Source Load does not add SHADOW.
+    server->SetObjectFlags(m_hObject, flags);
+    DVector velocity{};
+    if (server->SetVelocity(m_hObject, &velocity) != DE_OK)
+        return fail("Saved player velocity reset failed");
+    restore_model_loaded = true;
+    restore_model_error.clear();
+    // Source resets zoom next; zoom is not implemented. No Respawn, teleport,
+    // dimension/animation-clock reconstruction, scheduling or client association.
     return true;
 }

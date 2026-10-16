@@ -1,5 +1,15 @@
 # Source and Dependency Provenance
 
+## Character node visibility and player Load model setup
+
+Selected AI_Shared named/extra reset loops, Destructable hide filtering and PlayerObj
+Load/Respawn reset sites are connected through checked typed services. Engine mask,
+sparse-ID triangle filtering and inspection are new code; any-hidden-vertex omission
+is a replacement presentation rule, not retail parity. OpenBlood2's 64-bit storage
+was consulted but not imported. Full player transfer remains unavailable. See
+[ledger](M2_CHARACTER_NODES_SOURCES.json), [contracts](CHARACTER_NODE_CONTRACTS.md)
+and [validation](../../Documentation/Implementation/M2_CHARACTER_NODES.md).
+
 ## Original player fields and restore initialization
 
 Selected PlayerObj Save/Load values retain raw fields, relative smell time,

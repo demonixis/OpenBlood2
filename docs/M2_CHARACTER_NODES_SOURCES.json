@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "cbec6ee3d24cee2ee5dcee9b1393ad3cdc976203",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Shared.CPP",
+      "sha256": "a9ebccf2ae68c1b6256e699991658e6a9aab54714fda3ad7748f9de7c4aa955f",
+      "selected_lines": [
+        [
+          1749,
+          1786
+        ]
+      ],
+      "use": "Selected named base/consecutive extra visibility and ResetNodes loops"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          2077,
+          2095
+        ],
+        [
+          6838,
+          6865
+        ]
+      ],
+      "use": "Respawn reset and selected Load model/flag/velocity tail; zoom and full restore remain absent"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "selected_lines": [
+        [
+          764,
+          843
+        ]
+      ],
+      "use": "Persistent hide-status and visible-node hit candidate selection"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "selected_lines": [
+        [
+          785,
+          789
+        ]
+      ],
+      "use": "Original node-hide API/default visibility contract"
+    },
+    {
+      "path": "OpenBlood2/OpenLithTech/src/core/game_interface.cpp",
+      "sha256": "c31ab8f6157bb1b9d4be90de2c7b615af0affd716b8af6db4bf835d6d67a9dbe",
+      "selected_lines": [
+        [
+          741,
+          781
+        ]
+      ],
+      "use": "Read-only comparison of 64-bit prototype mask; not imported"
+    }
+  ],
+  "adaptations": [
+    "Typed checked name/status API; bounded per-instance mask and preflight",
+    "Sparse node-ID mapping and conservative any-hidden-vertex triangle omission (replacement rendering)",
+    "Explicit selected Load tail before client association; no whole-player restore claim"
+  ],
+  "remaining": [
+    "Engine/client restoration and safe level transfer",
+    "Limb/gib/corpse visibility transfer and required FX",
+    "Gideon and actual M2 acceptance"
+  ]
+}

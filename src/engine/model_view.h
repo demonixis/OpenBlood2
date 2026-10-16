@@ -8,6 +8,7 @@ namespace OpenBlood2
         std::string label, skin, error;
         bool visible = false, close = false;
         std::size_t triangles = 0;
+        std::size_t hidden_nodes = 0, hidden_triangles = 0;
         std::uint32_t range = UINT32_MAX;
     };
     // Presentation-only snapshot. No original object pointer survives add().
@@ -21,7 +22,8 @@ namespace OpenBlood2
         void clear();
         void begin_frame();
         bool add(const Model*, const AnimationTrack&, std::string_view skin, NodePose, DVector scale, bool visible,
-                 bool close, ObjectId, std::string_view label, const Resources&, std::string&);
+                 bool close, ObjectId, std::string_view label, const Resources&, std::string&,
+                 std::span<const std::uint8_t> hidden_nodes = {});
         WorldMesh mesh;
         std::vector<WorldDraw> world_draws, close_draws;
         std::vector<ModelViewEntry> entries;

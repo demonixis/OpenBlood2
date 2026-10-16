@@ -4,6 +4,7 @@
 #include "PlayerObj.h"
 #include "AI_Mgr.h"
 #include "CameraObj.h"
+#include "CharacterNodes.h"
 #include "GameStartPoint.h"
 #include <algorithm>
 #include <cmath>
@@ -132,6 +133,8 @@ bool CPlayerObj::Respawn()
         return false;
     }
     if (!SetCharacter(m_nCharacter))
+        return false;
+    if (!OpenBlood2::reset_character_nodes(m_hObject, entry_error))
         return false;
     const DDWORD flags = FLAG_VISIBLE | FLAG_MODELKEYS | FLAG_YROTATION | FLAG_ANIMTRANSITION | FLAG_TOUCH_NOTIFY |
                          FLAG_SOLID | FLAG_STAIRSTEP | FLAG_SHADOW;

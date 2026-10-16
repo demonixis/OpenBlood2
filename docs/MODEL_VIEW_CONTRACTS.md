@@ -1,5 +1,11 @@
 # Animated model presentation
 
+> Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
+> original named resets now affect rendering/hit candidates, and the selected Load
+> model/flags/velocity tail is available before client association. Earlier blanket
+> node-hide/Load-tail omissions are historical. Full engine/client restore, limb/gib
+> behavior and the M2 transfer gate remain incomplete.
+
 This M2 continuation renders existing ABC objects, held attachments and first-person
 Beretta/knife tracks through SDL_GPU. It adds no NPC class, AI behavior or successful
 missing service. The 17 unsupported SubwayA entries and M2 gate remain unchanged.
