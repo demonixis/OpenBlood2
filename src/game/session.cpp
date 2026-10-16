@@ -412,7 +412,8 @@ namespace OpenBlood2
                 ? client_shell.view.rotation
                 : rotation_from_euler({client_shell.rotation.pitch, client_shell.rotation.yaw, 0});
         bool ok = server.advance_audio(seconds, listener, listener_rotation) && objects.advance(seconds) &&
-                  server.advance_physics(seconds) && server.advance_models(seconds);
+                  server.advance_physics(seconds) && server.advance_projectiles(seconds) &&
+                  server.advance_models(seconds);
         if (local_client)
         {
             if (!server.GetClientUserData(local_client))

@@ -13,6 +13,7 @@
 #include "game/original/BloodShells.h"
 #include "game/original/LightFX.h"
 #include "game/player_restore.h"
+#include "game/projectile_report.h"
 #include "game/session.h"
 #include "game/weapon_sprites.h"
 #include "game/world_preparation.h"
@@ -125,6 +126,7 @@ namespace OpenBlood2
             debris_effects.clear();
             explosion_effects.clear();
             scene_explosions.clear();
+            projectile_reports.clear();
             explosion_sprites.clear();
             weapon_sprites.clear();
             explosion_models.clear();
@@ -237,6 +239,9 @@ namespace OpenBlood2
         DRESULT GetAcceleration(HOBJECT, DVector*) override;
         DRESULT SetAcceleration(HOBJECT, DVector*) override;
         bool advance_physics(double seconds);
+        bool advance_projectiles(double seconds);
+        void RecordProjectile(const ProjectileReport&) override;
+        std::vector<ProjectileReport> projectile_reports;
         CollisionWorld* collision = nullptr;
         bool collision_ready = false;
         bool advance_models(double seconds);

@@ -54,10 +54,11 @@ namespace OpenBlood2
     enum class SegmentFilter
     {
         None,
-        AIVisibility,     // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
-        IgnoreCharacters, // Original CMovement clearance filter.
-        IgnoreVolumes,    // Original LiquidFilterFn excludes every VolumeBrush subclass.
-        IgnoreOwnerClass  // Original IgnoreTypeFilterFn: owner class and derived classes, visual beam only.
+        AIVisibility,      // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
+        IgnoreCharacters,  // Original CMovement clearance filter.
+        IgnoreVolumes,     // Original LiquidFilterFn excludes every VolumeBrush subclass.
+        ProjectileContact, // Original projectile ignores its shooter and exact projectile class.
+        IgnoreOwnerClass   // Original IgnoreTypeFilterFn: owner class and derived classes, visual beam only.
     };
     enum class SegmentResult
     {

@@ -846,3 +846,7 @@ specification. See [ledger](M2_WORLD_ALPHA_SOURCES.json),
 ## Naga eye weapon and red beam
 
 Original CNagaEyes, complete Naga Eye Beam definition, AI name/head-node branches and selected CLaserBeamFX are integrated as a Gideon dependency. See [source ledger](M2_NAGA_WEAPON_SOURCES.json) and [contracts](NAGA_WEAPON_CONTRACTS.md). The original eye impact composite and Gideon class remain unavailable; no generic replacement is claimed.
+
+## Energy projectile dependency
+
+Selected original CEnergyBlast/CProjectile/CEnergyBlastProjectile methods and complete Energy Blast definition are integrated with typed checked transport and replacement point flight. See [ledger](M2_ENERGY_PROJECTILE_SOURCES.json) and [contracts](ENERGY_PROJECTILE_CONTRACTS.md). Zealot variants, trail/Tesla-primary composite and Gideon remain unavailable.

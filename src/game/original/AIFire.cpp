@@ -124,11 +124,18 @@ bool AI_Mgr::Fire(bool alternate)
     if (!weapon)
         return fail(FireResult::Unavailable, "AI has no current weapon");
     if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_MELEE &&
-        weapon->data.m_nType != WEAP_NAGA_EYEBEAM)
+        weapon->data.m_nType != WEAP_NAGA_EYEBEAM && weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST)
         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
     DRotation rotation;
     const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM;
-    fire_gun_node = server->GetModelNodeTransform(m_hObject, naga ? "head_gun" : "r_gun", &fire_origin, &rotation);
+    const bool energy = weapon->data.m_nType == WEAP_ZEALOT_ENERGYBLAST;
+    fire_gun_node = server->GetModelNodeTransform(m_hObject,
+                                                  energy ? "r_hand_extra2"
+                                                  : naga ? "head_gun"
+                                                         : "r_gun",
+                                                  &fire_origin, &rotation);
+    if (energy && !fire_gun_node)
+        return fail(FireResult::Unavailable, "Energy blast r_hand_extra2 node unavailable");
     if (naga && !fire_gun_node)
         return fail(FireResult::Unavailable, "Naga beam head_gun node unavailable");
     if (fire_gun_node)
@@ -142,7 +149,7 @@ bool AI_Mgr::Fire(bool alternate)
     }
     if (!normalize(fire_direction))
         return fail(FireResult::Invalid, "AI aim direction is degenerate or invalid");
-    if (!CheckClearShot(fire_origin, fire_direction, alternate))
+    if (!energy && !CheckClearShot(fire_origin, fire_direction, alternate))
     {
         if (clear_shot.outcome == AIClearOutcome::Invalid || clear_shot.outcome == AIClearOutcome::Unavailable)
             return fail(FireResult::Unavailable, "AI clearance query failed");

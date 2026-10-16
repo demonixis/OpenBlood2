@@ -7,6 +7,7 @@
 #include "game/original/Door.h"
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
+#include "game/original/Projectile.h"
 #include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
 #include "game/original/Trigger.h"
@@ -604,6 +605,22 @@ namespace OpenBlood2
                                     object->velocity.z, object->grounded ? "yes" : "no");
                         ImGui::Text("Contact normal %.2f %.2f %.2f / Polygon %u", object->contact_normal.x,
                                     object->contact_normal.y, object->contact_normal.z, object->contact_polygon);
+                        if (const auto* projectile = dynamic_cast<const CProjectile*>(object->game.get()))
+                        {
+                            ImGui::Text("Original energy projectile | configured %s | contact %s | steps %llu",
+                                        projectile->configured ? "yes" : "no", projectile->m_bExplode ? "yes" : "no",
+                                        (unsigned long long)projectile->flight_steps);
+                            ImGui::Text("Damage %.2f / radius %d / HP %.2f / start %.3f / lifetime %.2f",
+                                        projectile->m_fDamage, projectile->m_nRadius, projectile->m_damage.m_fHitPoints,
+                                        projectile->m_fStartTime, projectile->m_fLifeTime);
+                            ImGui::Text("Shooter alive %s / hit alive %s / contact polygon %u",
+                                        game.server.IsObjectAlive(projectile->m_hFiredFrom) ? "yes" : "no",
+                                        game.server.IsObjectAlive(projectile->m_hHitObject) ? "yes" : "no",
+                                        projectile->contact.polygon);
+                            ImGui::TextWrapped("Pending: %s", projectile->trail_error.c_str());
+                            if (!projectile->error.empty())
+                                ImGui::TextWrapped("Failure: %s", projectile->error.c_str());
+                        }
                         if (const auto* key = dynamic_cast<const Key*>(object->game.get()))
                         {
                             ImGui::Text("Original Key: timestamp %.3f  |  sound radius %.1f  |  loop %s",
@@ -698,6 +715,18 @@ namespace OpenBlood2
                         "Most recent contract failures (up to 32). Unknown classes and properties are rejected.");
                     for (const auto& item : game.trace)
                         ImGui::TextWrapped("%s", item.c_str());
+                    if (ImGui::TreeNode("Projectile terminal history"))
+                    {
+                        for (const auto& report : game.server.projectile_reports)
+                        {
+                            ImGui::Text("%.3f %s: %s at %.2f %.2f %.2f / delivered %u", report.time,
+                                        report.source.c_str(), report.outcome.c_str(), report.position.x,
+                                        report.position.y, report.position.z, report.delivered);
+                            if (!report.error.empty())
+                                ImGui::TextWrapped("Failure: %s", report.error.c_str());
+                        }
+                        ImGui::TreePop();
+                    }
                     ImGui::SeparatorText("Reached engine services (original object callbacks / teardown)");
                     for (const auto& [name, count] : game.server.service_calls)
                         ImGui::Text("%s: %llu", name.c_str(), static_cast<unsigned long long>(count));
@@ -1531,6 +1560,13 @@ namespace OpenBlood2
 {
     void Inspector::draw_weapon_sound(const CWeapon& weapon, const GameSession& game)
     {
+        if (const auto* energy = dynamic_cast<const CEnergyBlast*>(&weapon))
+        {
+            ImGui::Text("Energy projectile alive: %s",
+                        BaseClass::GetServerDE()->IsObjectAlive(energy->projectile) ? "yes" : "no");
+            if (!energy->projectile_error.empty())
+                ImGui::TextWrapped("Projectile: %s", energy->projectile_error.c_str());
+        }
         if (const auto* naga = dynamic_cast<const CNagaEyes*>(&weapon))
         {
             ImGui::Text("Original Naga beam: %llu | visual ray %d | endpoint %.2f %.2f %.2f",

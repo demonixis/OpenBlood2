@@ -542,3 +542,5 @@ NPC attack and train-glass reports remain unresolved; M2 is still incomplete.
 [Train-window correction](../Documentation/Implementation/M2_WORLD_ALPHA.md): the 31 transparent SubwayA faces now bind the original dirtyglass texture and blend its decoded alpha. Hidden-UI/reload/GPU checks cover the shared-depth pass; missing resources remain explicit. Lighting, global FX transparency ordering, required services and M2 remain incomplete.
 
 The [Naga weapon continuation](../Documentation/Implementation/M2_NAGA_WEAPON.md) connects original eye-beam damage, AI fire-key aiming and the real red beam model as a prerequisite for Gideon. Its impact composite, Gideon itself and the actual M2 exit gate remain incomplete.
+
+The [energy projectile continuation](../Documentation/Implementation/M2_ENERGY_PROJECTILES.md) adds original moving flare projectiles, deferred explosion damage, checked shooter attribution and real sprite/WAV presentation. This is a Gideon prerequisite; its remaining weapons/state lifecycle, missing FX and safe NEW_LEVEL keep M2 incomplete.

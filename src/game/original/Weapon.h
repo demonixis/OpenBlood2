@@ -77,6 +77,8 @@ class CWeapon
     }
     float CheckAmmo() const;
     FireResult Fire(const OpenBlood2::WeaponFire&);
+    virtual const char* FireSound(bool alternate) const;
+    virtual FireResult FireProjectile();
     virtual FireResult FireVector();
     std::vector<WeaponImpact> impacts; // Latest validated shot attempt, bounded to 64 contacts.
     std::string impact_error;
@@ -103,6 +105,15 @@ class CNagaEyes final : public CWeapon
     OpenBlood2::SegmentHit beam_hit;
     std::uint64_t beam = 0;
     std::string beam_error, explosion_error;
+};
+class CEnergyBlast final : public CWeapon
+{
+  public:
+    CEnergyBlast() : CWeapon(WEAP_ZEALOT_ENERGYBLAST) {}
+    const char* FireSound(bool alternate) const override;
+    FireResult FireProjectile() override;
+    HOBJECT projectile = nullptr; // Checked, independent runtime child.
+    std::string projectile_error;
 };
 class CBeretta final : public CWeapon
 {

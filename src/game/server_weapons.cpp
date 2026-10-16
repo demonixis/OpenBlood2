@@ -2,6 +2,7 @@
 #include "game/original/DestructableBrush.h"
 #include "game/original/Door.h"
 #include "game/original/PlayerObj.h"
+#include "game/original/Projectile.h"
 #include "game/original/SurfaceTypes.h"
 #include "game/original/VolumeBrush.h"
 #include "game/server_adapter.h"
@@ -18,13 +19,16 @@ namespace OpenBlood2
         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
         if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility &&
              filter != SegmentFilter::IgnoreCharacters && filter != SegmentFilter::IgnoreVolumes &&
-             filter != SegmentFilter::IgnoreOwnerClass) ||
+             filter != SegmentFilter::IgnoreOwnerClass && filter != SegmentFilter::ProjectileContact) ||
             (start != SegmentStart::IncludeInterior && start != SegmentStart::SkipInterior) ||
             (objects != SegmentObjects::SolidOnly && objects != SegmentObjects::SolidOrRayHit &&
              objects != SegmentObjects::All) ||
             (filter == SegmentFilter::IgnoreOwnerClass && !owner) || !physics_vector(from) || !physics_vector(to) ||
             (ignore && (!owner || owner->life != Life::Alive)) ||
             vector_dot(vector_subtract(to, from), vector_subtract(to, from)) < 1e-12f)
+            return SegmentResult::Invalid;
+        const auto* projectile = owner ? dynamic_cast<const CProjectile*>(owner->game.get()) : nullptr;
+        if (filter == SegmentFilter::ProjectileContact && !projectile)
             return SegmentResult::Invalid;
         if (!collision || !collision_ready)
             return SegmentResult::Unavailable;
@@ -58,6 +62,9 @@ namespace OpenBlood2
             if (filter == SegmentFilter::IgnoreCharacters && dynamic_cast<const CBaseCharacter*>(record->game.get()))
                 continue;
             if (filter == SegmentFilter::IgnoreOwnerClass && Objects::is_kind_of(record->type, owner->type))
+                continue;
+            if (filter == SegmentFilter::ProjectileContact &&
+                (record->type == owner->type || record->handle == projectile->m_hFiredFrom))
                 continue;
             if (fire_through && ((door && door->fire_through) || (brush && brush->fire_through)))
                 continue;
@@ -99,10 +106,15 @@ namespace OpenBlood2
         if (!m)
             return DE_INVALIDPARAMS;
         auto* attacker = objects_.get(value.attacker);
-        if (m->id != damage_message || !m->bytes.empty() || m->damage || m->key || m->pickup || !attacker ||
-            attacker->life != Life::Alive || m->sender != value.attacker || !physics_vector(value.position) ||
-            !physics_vector(value.direction) || !std::isfinite(value.amount) || value.amount < 0 ||
-            value.amount > 1e6f ||
+        const auto* sender = objects_.get(m->sender);
+        const auto* projectile = sender ? dynamic_cast<const CProjectile*>(sender->game.get()) : nullptr;
+        const bool attribution = sender && sender->life == Life::Alive &&
+                                 ((attacker && attacker->life == Life::Alive && m->sender == value.attacker) ||
+                                  (projectile && projectile->configured && projectile->m_hFiredFrom == value.attacker &&
+                                   (!value.attacker || (attacker && attacker->life == Life::Alive))));
+        if (m->id != damage_message || !m->bytes.empty() || m->damage || m->key || m->pickup || !attribution ||
+            !physics_vector(value.position) || !physics_vector(value.direction) || !std::isfinite(value.amount) ||
+            value.amount < 0 || value.amount > 1e6f ||
             (value.type != DamageType::Fire && value.type != DamageType::Normal && value.type != DamageType::Melee &&
              value.type != DamageType::Explode && value.type != DamageType::Suffocate &&
              value.type != DamageType::Death && value.type != DamageType::FreeFall && value.type != DamageType::Blind &&
@@ -123,7 +135,8 @@ namespace OpenBlood2
             return false;
         auto& m = it->second;
         auto* attacker = m.damage ? objects_.get(m.damage->attacker) : nullptr;
-        if (!m.borrowed || m.bad || m.id != damage_message || !m.damage || !attacker || attacker->life != Life::Alive)
+        if (!m.borrowed || m.bad || m.id != damage_message || !m.damage ||
+            (m.damage->attacker && (!attacker || attacker->life != Life::Alive)))
         {
             m.bad = true;
             return false;

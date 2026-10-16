@@ -10,7 +10,8 @@ OpenBlood2::RadiusDamageReport DamageObjectsInRadius(HOBJECT responsible, LPBASE
     RadiusDamageReport report;
     auto* server = BaseClass::GetServerDE();
     report.null_damager = damager == nullptr;
-    if (!server || (damager && damager->m_hObject != responsible) || !server->IsObjectAlive(responsible) ||
+    if (!server || (damager && !server->IsObjectAlive(damager->m_hObject)) ||
+        (responsible && !server->IsObjectAlive(responsible)) || (!damager && !server->IsObjectAlive(responsible)) ||
         !physics_vector(origin) || !std::isfinite(radius) || std::abs(radius) > 1e6f || (damager && radius <= 0) ||
         !std::isfinite(damage) || std::abs(damage) > 1e6f || (damager && damage < 0))
     {
@@ -35,7 +36,8 @@ OpenBlood2::RadiusDamageReport DamageObjectsInRadius(HOBJECT responsible, LPBASE
     }
     for (auto target : targets)
     {
-        if (!server->IsObjectAlive(responsible))
+        if ((damager && !server->IsObjectAlive(damager->m_hObject)) ||
+            (responsible && !server->IsObjectAlive(responsible)))
         {
             report.cancelled = true;
             break;

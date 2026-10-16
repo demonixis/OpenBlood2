@@ -15,6 +15,8 @@ namespace
             id = 0;
         else if (name.starts_with("BERET"))
             id = WEAP_BERETTA;
+        else if (name.starts_with("ENERGY_BLAST"))
+            id = WEAP_ZEALOT_ENERGYBLAST;
         else if (name.starts_with("NAGA_BLAST"))
             id = WEAP_NAGA_EYEBEAM;
         else if (name.starts_with("MELEE"))

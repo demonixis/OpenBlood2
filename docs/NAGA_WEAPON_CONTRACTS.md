@@ -75,3 +75,5 @@ Gideon shield/wind/projectiles, eye-impact composite, lighting, safe NEW_LEVEL a
 the actual M2 gate remain open. Portable RNG, current hit shapes and rendering are
 replacement-engine policies, not verified retail parity. No commercial resource
 is copied into either repository.
+
+[Energy projectiles](ENERGY_PROJECTILE_CONTRACTS.md) subsequently implement the non-Zealot energy weapon dependency. Other Gideon weapons, boss lifecycle and required FX remain unavailable.

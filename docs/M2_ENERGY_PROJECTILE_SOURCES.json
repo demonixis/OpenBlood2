@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "49aec13de30da9e22e158780143b3c5f619eb531",
+  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "use": "Selected FireSpread projectile dispatch and FireProjectile create/setup order"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameWeapons.cpp",
+      "sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd",
+      "use": "CEnergyBlast primary sound override and cleared gravity"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameWeapons.h",
+      "sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19",
+      "use": "CEnergyBlast constructor and overrides"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Projectile.cpp",
+      "sha256": "52b805c67775579b5703e0ad1099a8ea44d76b245349c8f6d1fac0a1b3b74ef2",
+      "use": "Selected constructor, precreate, initial/update, Setup, touch/link, Explode, AddImpact and radius damage"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Projectile.h",
+      "sha256": "dfeae082078f7cf5b0332c08f15ca8b024f7dc58424a8e7ef65ae5fb0c0d0715",
+      "use": "Fields and lifecycle contracts; other projectile families excluded"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameProjectiles.cpp",
+      "sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f",
+      "use": "Non-Zealot CEnergyBlastProjectile constructor/Setup/InitialUpdate/Update/AddExplosion"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "use": "Distinct responsible handle versus damage sender; existing radius rule"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "ENERGY_BLAST name, r_hand_extra2 aiming and bypassed clearance"
+    },
+    {
+      "path": "sources/blood2/Shared/WeaponDefs.cpp",
+      "sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
+      "use": "Complete original Energy Blast WeaponData entry"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "use": "Base-game weapon ID27"
+    },
+    {
+      "path": "sources/blood2/Shared/ClientServerShared.h",
+      "sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
+      "use": "SAVEABLE and SINGULARITY_ATTRACT flags"
+    },
+    {
+      "path": "sources/blood2/Shared/SFXMsgIds.h",
+      "sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f",
+      "use": "EXP_TESLA_PRIMARY=7; no alternate composite substitution"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/basetypes_de.h",
+      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
+      "use": "POINTCOLLIDE and NOSLIDING flags"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
+      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
+      "use": "Dependency review only; no boss registration/behavior claimed"
+    }
+  ],
+  "adaptations": [
+    "Checked typed projectile/attacker attribution and value-owned reports",
+    "Independent continuous point flight with half-second bound; no verified retail parity",
+    "Sprite zero scale supported; model contract unchanged",
+    "Runtime-only non-Zealot variant; explicit missing trail/Tesla-primary composite",
+    "No new mutable process globals; existing isolated destination trial contract preserved"
+  ],
+  "remaining": [
+    "Gideon initialization/states/rr_gun override/shield/wind",
+    "Zealot/divine variants and other projectile families",
+    "Projectile save/restore and full physics parity",
+    "Required impact/trail/illumination services",
+    "Safe NEW_LEVEL and complete M2 gate"
+  ]
+}

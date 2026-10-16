@@ -6,6 +6,10 @@
 #include <random>
 
 using namespace OpenBlood2;
+FireResult CWeapon::FireProjectile()
+{
+    return last_shot.result = FireResult::Unavailable;
+}
 float CWeapon::CheckAmmo() const
 {
     return data.m_nAmmoType == AMMO_NONE ? 1.0f
@@ -130,5 +134,6 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     // callbacks, resolve the final ray again rather than damage a stale/moved target.
     if (fire_sound_alert.eligible && !trace())
         return last_shot.result;
-    return FireVector();
+    return (request.alternate ? data.m_szAltProjectileClass : data.m_szProjectileClass) ? FireProjectile()
+                                                                                        : FireVector();
 }

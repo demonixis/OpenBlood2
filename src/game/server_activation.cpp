@@ -21,7 +21,8 @@ namespace OpenBlood2
         auto* r = objects_.get(h);
         if (!r || r->life != Life::Alive || r->attachment ||
             (r->state.m_ObjectType != OT_MODEL && r->state.m_ObjectType != OT_SPRITE) || !physics_vector(scale) ||
-            scale.x <= 0 || scale.y <= 0 || scale.z <= 0)
+            scale.x < 0 || scale.y < 0 || scale.z < 0 ||
+            (r->state.m_ObjectType == OT_MODEL && (scale.x == 0 || scale.y == 0 || scale.z == 0)))
             return false;
         r->state.m_Scale = scale;
         return true;

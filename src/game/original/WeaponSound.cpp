@@ -3,10 +3,14 @@
 #include "Weapon.h"
 #include <cmath>
 using namespace OpenBlood2;
+const char* CWeapon::FireSound(bool alternate) const
+{
+    return alternate ? data.m_szAltFireSound : data.m_szFireSound;
+}
 void CWeapon::PlayFireSound(bool alternate, DVector position)
 {
     auto* server = BaseClass::GetServerDE();
-    const auto* path = alternate ? data.m_szAltFireSound : data.m_szFireSound;
+    const auto* path = FireSound(alternate);
     fire_sound_resource = path ? path : "";
     fire_sound_error.clear();
     fire_sound_alert = {};
