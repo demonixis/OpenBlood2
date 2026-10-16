@@ -71,6 +71,7 @@ void CClientExplosionSFX::SetupFX()
     report.damage = damage;
     report.radius = radius;
     report.sound = sound;
+    report.sprite_event = g_pServerDE->PublishExplosionSprites(m_hObject, type, position, normal, report.sprite_error);
     // IMPORTANT: the source passes NULL, so DamageObject's null-damager guard
     // suppresses every delivery. Do not silently "repair" this gameplay behavior.
     targets = DamageObjectsInRadius(m_hObject, nullptr, position, radius, damage, DamageType::Normal);
@@ -88,6 +89,6 @@ void CClientExplosionSFX::SetupFX()
     }
     report.voice = voice;
     report.sound_error = sound_error;
-    // Durable inspection only: no successful client-FX service is claimed.
+    // Durable inspection distinguishes actual sprite components from missing composite FX.
     g_pServerDE->RecordSceneExplosion(report);
 }

@@ -1,5 +1,7 @@
 # Sprite presentation contracts
 
+Continuation: [original explosion sprites](EXPLOSION_SPRITE_CONTRACTS.md). Client explosion sprites now join the same read-only scene and use per-instance alpha multiplied by decoded DTX alpha. This supersedes the blanket alpha-service omission only for typed client FX state, not generic object tint/alpha or other composite services.
+
 M2 remains incomplete. This extends [original sprite placement/clocks](SPRITE_CONTRACTS.md)
 and the [DTX decoder](TEXTURE_CONTRACTS.md). See [evidence](../../Documentation/Implementation/M2_SPRITE_VIEW.md).
 
@@ -26,7 +28,7 @@ therefore does not remove RGB black (or any guessed key color). SPR transparency
 translucency and color-key metadata remain inspectable; the current presentation
 policy uses actual decoded DTX alpha for all supported sprites. Glow, view bias,
 no-Z and sky modes are explicitly unavailable; those sprites do not silently render
-with ordinary semantics. Object tint/alpha services, lighting, polygon clipping,
+with ordinary semantics. Generic object tint/alpha services, lighting, polygon clipping,
 additive/multiply effects and retail blending parity are not implemented here.
 
 ## Cache, alpha and lifetime
@@ -42,7 +44,7 @@ between presented frames. SDL deferred release owns in-flight GPU lifetimes.
 
 `WorldRenderer` has an explicit SpriteAlpha style; the opaque world/model default
 is unchanged. A separate fragment shader discards zero-alpha texels and emits DTX
-RGBA. The pipeline uses straight source-alpha blending, depth LESS against shared
+RGBA with optional typed client-effect alpha modulation. The pipeline uses straight source-alpha blending, depth LESS against shared
 world/model depth, **no depth writes**, nearest mip-zero sampling and clamp-to-edge.
 Sprites sort stably from far to near by center camera depth. This handles ordinary
 separate quads; intersecting translucent surfaces are not order-independent.
@@ -60,7 +62,7 @@ geometry is not proof that a quad lies in the camera frustum.
 SubwayA has 12 supported DetailSprites sharing 128x128 bloodsplat3.dtx: 14,828
 zero-alpha and 1,556 partial-alpha pixels. They retain source scale .5 and Y=129.
 Source accounting stays 203 created / 4 transferred sounds / 372 editor-only /
-1 unsupported Gideon / 0 failed. Required FX emitters, safe automatic NEW_LEVEL,
+1 unsupported Gideon / 0 failed. Remaining required FX components, safe automatic NEW_LEVEL,
 other required services and the observable M2 gate remain open.
 
 CPU checks cover orientation, original half extents, UVs, stable depth sorting,

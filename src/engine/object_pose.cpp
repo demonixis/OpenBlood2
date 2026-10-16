@@ -1,7 +1,17 @@
 #include "engine/collision.h"
 #include "engine/objects.h"
+#include <cmath>
 namespace OpenBlood2
 {
+    bool align_rotation(DVector forward, DRotation& rotation)
+    {
+        if (!physics_vector(forward) || vector_dot(forward, forward) < 1e-12f)
+            return false;
+        const float horizontal = std::hypot(forward.x, forward.z);
+        rotation = rotation_from_euler(
+            {std::atan2(-forward.y, horizontal), horizontal > 1e-6f ? std::atan2(forward.x, forward.z) : 0, 0});
+        return true;
+    }
     bool object_node_transform(const ObjectRecord& input, const char* name, DVector* position, DRotation* rotation)
     {
         const auto* record = &input;

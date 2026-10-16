@@ -4,6 +4,18 @@ namespace OpenBlood2
 {
     // These copied, bounded records expose pending client FX/audio. They do not
     // enqueue gameplay and never retain a pointer into an original object.
+    std::uint64_t ServerAdapter::PublishExplosionSprites(HOBJECT source, DDWORD type, DVector position, DVector normal,
+                                                         std::string& error)
+    {
+        trace_service("PublishExplosionSprites (partial high-detail composite)");
+        if (!IsObjectAlive(source) || !objects_.sprites)
+        {
+            error = "Explosion source or sprite store unavailable";
+            return 0;
+        }
+        return explosion_sprites.publish(type, position, normal, GetObjectName(source), *objects_.sprites,
+                                         objects_.time(), error);
+    }
     void ServerAdapter::RecordSceneExplosion(const SceneExplosionReport& effect)
     {
         trace_service("RecordSceneExplosion");

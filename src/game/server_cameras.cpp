@@ -39,13 +39,7 @@ namespace OpenBlood2
     DRESULT ServerAdapter::AlignRotation(DRotation& rotation, DVector forward)
     {
         trace_service("AlignRotation (world Y up)");
-        if (!physics_vector(forward) || vector_dot(forward, forward) < 1e-12f)
-            return DE_INVALIDPARAMS;
-        // Source CameraObj always supplies world Y up. Vertical forward has a
-        // deterministic zero yaw. Coincident targets retain their old rotation.
-        const float horizontal = std::hypot(forward.x, forward.z);
-        rotation = rotation_from_euler(
-            {std::atan2(-forward.y, horizontal), horizontal > 1e-6f ? std::atan2(forward.x, forward.z) : 0, 0});
-        return DE_OK;
+        // Shared original +Y-up convention, with deterministic vertical fallback.
+        return align_rotation(forward, rotation) ? DE_OK : DE_INVALIDPARAMS;
     }
 } // namespace OpenBlood2

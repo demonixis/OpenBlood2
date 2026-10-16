@@ -2,6 +2,7 @@
 #include "engine/shaders/sprite_frag.h"
 #include "engine/shaders/world_frag.h"
 #include "engine/shaders/world_vert.h"
+#include <cmath>
 #include <cstring>
 
 namespace OpenBlood2
@@ -52,7 +53,7 @@ namespace OpenBlood2
         info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
         info.code = reinterpret_cast<const Uint8*>(style_ == DrawStyle::SpriteAlpha ? sprite_frag : world_frag);
         info.code_size = style_ == DrawStyle::SpriteAlpha ? sizeof(sprite_frag) : sizeof(world_frag);
-        info.num_uniform_buffers = 0;
+        info.num_uniform_buffers = style_ == DrawStyle::SpriteAlpha ? 1 : 0;
         info.num_samplers = 1;
         auto* fragment = SDL_CreateGPUShader(device_, &info);
         if (!vertex || !fragment)
@@ -354,6 +355,11 @@ namespace OpenBlood2
         WorldViewUniform uniform;
         for (const auto& d : draws)
         {
+            if (style_ == DrawStyle::SpriteAlpha && (!std::isfinite(d.alpha) || d.alpha < 0 || d.alpha > 1))
+            {
+                error = "Invalid sprite draw alpha";
+                return false;
+            }
             if (d.range >= mesh.ranges.size() || !world_view_uniform(eye, view, aspect, d, uniform))
             {
                 error = "Invalid diagnostic draw/camera";
@@ -419,6 +425,11 @@ namespace OpenBlood2
                     uniform.projection[3] = -near * far / (far - near);
                 }
                 SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
+                if (style_ == DrawStyle::SpriteAlpha)
+                {
+                    const std::array<float, 4> modulation{d.alpha, 0, 0, 0};
+                    SDL_PushGPUFragmentUniformData(commands, 0, modulation.data(), sizeof(modulation));
+                }
                 auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material)
                 {
                     SDL_GPUTextureSamplerBinding texture{textures_[material], sampler_};

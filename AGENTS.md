@@ -421,3 +421,10 @@ Read [contracts](docs/SPRITE_VIEW_CONTRACTS.md). Preserve read-only clocks, disa
 unsupported modes, stable depth order and world-revision cache ownership. Missing
 textures emit diagnostics, not guessed quads. Required FX and safe NEW_LEVEL still
 keep M2 incomplete; source-class counts are unchanged.
+
+The [explosion sprite continuation](../Documentation/Implementation/M2_EXPLOSION_SPRITES.md) connects selected original CExplosionSpriteFX methods and high-detail CExplosionFX sprite recipes.
+Read [contracts](docs/EXPLOSION_SPRITE_CONTRACTS.md). Preserve normal offsets, source fade/scale formulas,
+1 ms effect cadence, detached lifetime, sibling failures and null-damager behavior.
+Per-instance alpha only extends the sprite pass. Reports explicitly retain missing
+composite components; these sprites do not complete the FX service or M2 gate.
+Safe NEW_LEVEL and other required services remain open; source counts are unchanged.

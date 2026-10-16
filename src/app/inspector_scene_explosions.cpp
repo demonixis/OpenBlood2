@@ -5,9 +5,9 @@ namespace OpenBlood2
 {
     void Inspector::draw_scene_explosions(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextWrapped(
-            "Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
-            "Spatial WAV playback is implemented; client explosion FX and their rendering are UNAVAILABLE.");
+        ImGui::TextWrapped("Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
+                           "Spatial WAV playback and selected original sprite components are implemented. Composite "
+                           "models, particles and lights remain unavailable.");
         ImGui::Text("Audio: %s | active voices %zu | submitted frames %llu",
                     game.server.audio.has_output() ? "SDL stream" : "offline clock", game.server.audio.voices().size(),
                     (unsigned long long)game.server.audio.submitted_frames);
@@ -54,6 +54,35 @@ namespace OpenBlood2
             ImGui::PopID();
         }
         ImGui::Separator();
+        const auto& effects = game.server.explosion_sprites;
+        ImGui::Text("Client explosion sprites: %zu active / %llu started / %llu expired / %llu failed",
+                    effects.active.size(), (unsigned long long)effects.started, (unsigned long long)effects.expired,
+                    (unsigned long long)effects.failed);
+        for (const auto& fx : effects.active)
+        {
+            ImGui::Text("FX %llu / event %llu: frame %u / %.3f s, alpha %.3f, scale %.3f %.3f %.3f",
+                        (unsigned long long)fx.id, (unsigned long long)fx.event, fx.track.frame,
+                        fx.last_time - fx.start_time, fx.alpha, fx.scale.x, fx.scale.y, fx.scale.z);
+            ImGui::TextWrapped("%s", fx.settings.resource.value_or("Sprites\\Explosn.spr").c_str());
+            if (sprite_view)
+                for (const auto& entry : sprite_view->entries)
+                    if (entry.client_effect == fx.id)
+                    {
+                        ImGui::Text("Decoded %u x %u | %s", entry.width, entry.height,
+                                    entry.range == UINT32_MAX ? "not drawn" : "quad prepared");
+                        if (!entry.error.empty())
+                            ImGui::TextWrapped("%s", entry.error.c_str());
+                    }
+        }
+        if (ImGui::CollapsingHeader("Last 64 client sprite deliveries / missing composite components"))
+            for (const auto& delivery : effects.reports)
+            {
+                ImGui::Text("Event %llu / type %u / %zu sprites created", (unsigned long long)delivery.id,
+                            delivery.type, delivery.sprites.size());
+                ImGui::TextWrapped("Unavailable (high-detail preset): %s", delivery.unavailable.c_str());
+                if (!delivery.error.empty())
+                    ImGui::TextWrapped("%s", delivery.error.c_str());
+            }
         ImGui::TextUnformatted("Last 32 activation reports (retained after emitter removal)");
         for (size_t i = 0; i < game.server.scene_explosions.size(); ++i)
         {
@@ -64,8 +93,11 @@ namespace OpenBlood2
                 ImGui::Text("Type %u | position %.1f %.1f %.1f", r.type, r.position.x, r.position.y, r.position.z);
                 ImGui::Text("Configured %.1f / %.1f | candidates %u / in radius %u / delivered %u", r.damage, r.radius,
                             r.targets.candidates, r.targets.in_radius, r.targets.delivered);
-                ImGui::Text("Null damager: %s | client FX unavailable",
+                ImGui::Text("Null damager: %s | complete composite unavailable",
                             r.targets.null_damager ? "yes (original guard)" : "no");
+                ImGui::Text("Sprite delivery event %llu", (unsigned long long)r.sprite_event);
+                if (!r.sprite_error.empty())
+                    ImGui::TextWrapped("%s", r.sprite_error.c_str());
                 if (const auto* v = game.server.audio.get(r.voice))
                 {
                     ImGui::Text("Voice %llu: %.3f / %.3f s | %u Hz / %u channels", (unsigned long long)v->id,

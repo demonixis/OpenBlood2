@@ -739,3 +739,13 @@ SDL_GPU alpha style reuse existing readers and shaders without importing that
 renderer. Actual DTX alpha, bounded owned caches and stable sorting are replacement
 presentation; retail size/blending parity remains unverified. See
 [contracts](SPRITE_VIEW_CONTRACTS.md). No dependency or commercial asset was added.
+
+## Original explosion sprite effects
+
+[Source ledger](M2_EXPLOSION_SPRITE_SOURCES.json) identifies CExplosionSpriteFX
+Init/CreateObject/Update, selected high-detail CExplosionFX sprite recipes, original
+CSFXMgr timing and server delivery order. Owned typed state replaces client ABI
+handles; bounded capacity, explicit resource failures and initialized scale state
+are adaptations. Shared alignment and per-draw SDL_GPU alpha extend the existing
+small engine. Composite components and random alignment are not replaced with
+placeholders. See [contracts](EXPLOSION_SPRITE_CONTRACTS.md); references/assets stay external.

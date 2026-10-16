@@ -35,7 +35,7 @@ namespace OpenBlood2
         return true;
     }
     bool SpriteView::add(const Sprite* sprite, const SpriteTrack& track, NodePose pose, DVector scale, DDWORD flags,
-                         ObjectId object, const Resources& resources, std::string& error)
+                         ObjectId object, const Resources& resources, std::string& error, float alpha)
     {
         error.clear();
         if (!camera_valid_ || entries.size() >= 4096)
@@ -50,6 +50,12 @@ namespace OpenBlood2
         entries.push_back({});
         auto& entry = entries.back();
         entry.object = object;
+        entry.alpha = alpha;
+        if (!std::isfinite(alpha) || alpha < 0 || alpha > 1)
+        {
+            entry.error = "Invalid sprite alpha";
+            return true;
+        }
         entry.frame = track.frame;
         entry.visible = (flags & FLAG_VISIBLE) != 0;
         entry.rotatable = (flags & FLAG_ROTATEABLESPRITE) != 0;
@@ -109,7 +115,7 @@ namespace OpenBlood2
             return true;
         }
         WorldDraw draw{static_cast<std::uint32_t>(mesh.ranges.size()), pose.position,
-                       entry.rotatable ? pose.rotation : camera_};
+                       entry.rotatable ? pose.rotation : camera_, alpha};
         WorldViewUniform uniform;
         if (!world_view_uniform(eye_, camera_, 1, draw, uniform) || !physics_vector(scale) || scale.x < 0 ||
             scale.y < 0 || scale.z < 0)

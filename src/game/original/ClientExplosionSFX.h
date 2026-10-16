@@ -1,7 +1,7 @@
 #pragma once
 #include "ClientSFX.h"
 #include "game/brush_messages.h"
-// Original authored explosion emitter. Client FX rendering remains unavailable.
+// Original authored explosion emitter; selected sprite components, incomplete composite FX.
 class CClientExplosionSFX : public CClientSFX
 {
   public:

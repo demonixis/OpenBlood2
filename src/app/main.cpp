@@ -349,7 +349,7 @@ namespace
         OpenBlood2::ModelView model_scene;
         OpenBlood2::SpriteView sprite_scene;
         OpenBlood2::WorldRenderer sprite_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
-        bool sprites_drawn_hidden = false;
+        bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false;
         bool models_hidden = false, close_weapon_hidden = false;
         std::uint64_t model_frames = 0;
         std::vector<OpenBlood2::WorldDraw> world_draws;
@@ -822,6 +822,15 @@ namespace
                         return 3;
                     }
                     sprites_drawn_hidden |= !inspector_visible && sprite_scene.draws.size() == 12;
+                    if (!inspector_visible && options.scene_explosions_smoke)
+                    {
+                        unsigned prepared = 0;
+                        for (const auto& entry : sprite_scene.entries)
+                            if (entry.client_effect && entry.error.empty() && entry.range != UINT32_MAX &&
+                                entry.alpha < 1)
+                                ++prepared;
+                        explosion_sprites_drawn_hidden |= prepared == 2;
+                    }
                     if (!model_scene.close_draws.empty() &&
                         !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
                                              model_scene.close_draws, view.position, view.rotation, false, error,
@@ -1323,7 +1332,8 @@ namespace
                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
                 (options.scene_explosions_smoke &&
-                 (!scene_explosion_hidden || !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
+                 (!scene_explosion_hidden || !explosion_sprites_drawn_hidden ||
+                  !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
                 (options.sprites_smoke &&
                  (!sprite_hidden || !sprites_drawn_hidden || sprite_scene.draws.size() != 12 ||
                   sprite_renderer.stats.uploads < 2 || !OpenBlood2::check_sprite_smoke(game))) ||
@@ -1386,7 +1396,8 @@ namespace
                              "and after reload; evaluated radius/color checked; world illumination unavailable");
             if (options.scene_explosions_smoke)
                 spdlog::info("SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
-                             "audio verified hidden and after reload; client FX unavailable");
+                             "audio plus original explosion sprites verified hidden and after reload; other composite "
+                             "FX unavailable");
             if (options.sprites_smoke)
                 spdlog::info("SPRITES smoke: 12 original DetailSprites, SPR manifests, frame clocks, hidden UI and "
                              "unload/reload verified; 12 alpha-textured quads submitted with shared world depth");

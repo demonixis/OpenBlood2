@@ -30,6 +30,14 @@ namespace OpenBlood2
         if (g.objects.get(selected) || g.server.scene_explosions.size() != 1)
             return false;
         const auto& report = g.server.scene_explosions.back();
+        const auto& sprites = g.server.explosion_sprites;
+        if (!report.sprite_event || !report.sprite_error.empty() || sprites.active.size() != 2 ||
+            sprites.started != 2 || sprites.failed || sprites.reports.size() != 1)
+            return false;
+        for (const auto& fx : sprites.active)
+            if (fx.event != report.sprite_event || !fx.sprite || !fx.updates || fx.track.milliseconds <= 0 ||
+                fx.alpha >= fx.settings.alpha || !fx.error.empty())
+                return false;
         const auto* v = g.server.audio.get(report.voice);
         return report.targets.null_damager && !report.targets.cancelled && report.targets.delivered == 0 &&
                !report.client_fx_available && report.sound_error.empty() && v && v->world_owned && v->auto_remove &&

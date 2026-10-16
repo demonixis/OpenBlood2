@@ -29,6 +29,7 @@ namespace OpenBlood2
         DVector radians;
     };
     DRotation rotation_from_euler(DVector radians);
+    bool align_rotation(DVector forward, DRotation&);
     using PropertyValue = std::variant<std::string, float, bool, std::int32_t, DVector, DRotation, EulerAngles>;
     using Properties = std::map<std::string, PropertyValue, CaseLess>;
     struct PropertySpec

@@ -58,14 +58,14 @@ int main(int argc, char** argv)
     CHECK(test_sprite_view::mount(resources, argv[1], error));
     auto sprite = test_sprite_view::manifest();
     SpriteView scene;
-    for (unsigned frame = 0; frame < 5; ++frame)
+    for (unsigned frame = 0; frame < 6; ++frame)
     {
         const unsigned width = frame == 4 ? 400 : 320, height = frame == 4 ? 300 : 240;
         Capture capture;
         CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, width, height));
         CHECK(scene.begin_frame({}, {}, error));
         CHECK(scene.add(&sprite, {}, {{0, 0, frame == 1 ? 6.f : 2.f}, {}}, {.25f, .5f, 1},
-                        FLAG_VISIBLE | FLAG_SPRITECHROMAKEY, {}, resources, error));
+                        FLAG_VISIBLE | FLAG_SPRITECHROMAKEY, {}, resources, error, frame == 5 ? .5f : 1.f));
         if (frame == 2)
         {
             // Deliberately append farther sprite last, scaled to the same screen extent.
@@ -94,10 +94,10 @@ int main(int argc, char** argv)
         for (unsigned col = 0; col < 4; ++col)
         {
             const auto* pixel = pixels + (height / 2 * width + width * (5 + 2 * col) / 16) * 4;
-            const int green = frame == 2 ? 199 : 136, blue = frame == 2 ? 56 : 119;
-            const int red = frame == 3 ? 255 : (frame != 1 && col == 2 ? 255 : 0);
+            const int green = frame == 2 ? 199 : frame == 5 ? 68 : 136, blue = frame == 2 ? 56 : frame == 5 ? 187 : 119;
+            const int red = frame == 3 ? 255 : (frame != 1 && col == 2 ? (frame == 5 ? 128 : 255) : 0);
             const int g = frame == 3 ? 255 : (frame != 1 && col == 1 ? green : 0);
-            const int b = frame == 1 || col == 0 ? 255 : (col == 1 ? blue : 0);
+            const int b = frame == 1 || col == 0 ? 255 : (col == 1 ? blue : frame == 5 ? 128 : 0);
             const int expected_b = frame == 3 ? 0 : b;
             if (std::abs(int(pixel[0]) - red) > 1 || std::abs(int(pixel[1]) - g) > 1 ||
                 std::abs(int(pixel[2]) - expected_b) > 1 || pixel[3] != 255)
@@ -109,10 +109,11 @@ int main(int argc, char** argv)
         }
         SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
         CHECK(valid);
-        CHECK(sprites.stats.uploads == (frame == 4 ? 2 : 1));
+        CHECK(sprites.stats.uploads == (frame >= 4 ? 2 : 1));
         CHECK(capture.save((std::filesystem::path(argv[1]) / "alpha.png").c_str()));
     }
-    std::cout << "Pixels: zero/partial/opaque/opaque-black DTX alpha, overlap sort, world occlusion, no depth writes, "
+    std::cout << "Pixels: zero/partial/opaque/opaque-black DTX alpha, per-instance opacity, overlap sort, world "
+                 "occlusion, no depth writes, "
                  "resize and reupload passed\n";
     if (argc == 3)
     {

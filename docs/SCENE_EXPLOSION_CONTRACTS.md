@@ -1,5 +1,7 @@
 # Original scene explosion emitters
 
+Continuation: [original explosion sprites](EXPLOSION_SPRITE_CONTRACTS.md). Selected original fire/smoke components now render and outlive their emitter. The complete-composite flag remains false; model/particle/light/fragment services are still unavailable. Original null-damager damage and audio behavior stay unchanged.
+
 M2 remains incomplete. This extends [object contracts](OBJECT_CONTRACTS.md),
 [brush explosion contracts](EXPLOSION_CONTRACTS.md) and [audio contracts](CINEMATIC_CONTRACTS.md).
 Read the [source ledger](M2_SCENE_EXPLOSION_SOURCES.json) and
@@ -40,7 +42,7 @@ targets, actual deliveries and cancellation. Nonpositive radii produce no traver
 malformed inputs reject, including underflow of a positive squared radius.
 This source observation has not been compared to the retail executable.
 
-## Sound lifetime and missing client FX
+## Sound lifetime and partial client FX
 
 The source PlaySoundFromPos request becomes a typed PlayDetachedSound call:
 fixed cached position, spatial, one shot, volume 100%, inner radius **100**, outer
@@ -60,13 +62,14 @@ within existing budgets until unload. Existing source-owned cinematic/random
 voices and persistent world loops keep their distinct lifetime contracts. Unload
 clears all voices, caches and event records; stale IDs cannot address a new voice.
 
-The original client explosion packet is **not implemented**. Up to 32 owned
+Typed delivery now routes selected high-detail sprite branches to original
+CExplosionSpriteFX methods; see [sprite contracts](EXPLOSION_SPRITE_CONTRACTS.md).
+The original binary client packet/complete manager is not recreated. Up to 32 owned
 SceneExplosionReports retain type, initial position/direction, configured damage,
-actual radius-delivery counters, sound ID and playback failure. They are explicitly
-unavailable client-FX requests, not successful service calls, simulated explosions,
-particles, dynamic flashes or rendered effects. A loaded emitter is a functional
-server/audio subset, not a completed explosion system. Required client FX keep M2
-open; no readiness gate is weakened by registering this class.
+actual radius-delivery counters, sound ID/failure and client sprite event ID/failure.
+Sprite success does not set complete-composite availability. Models, particles,
+fragments and dynamic illumination remain absent. A loaded emitter is still a
+partial system; required missing services keep M2 open.
 
 ## Inspection and verification
 
@@ -87,11 +90,10 @@ reader rejection. Two SubwayA/player cycles verify all nine emitters, independen
 voices, removal and cleanup. The GPU scenario checks original activation/removal
 and dry SDL sample submission while hidden and after reload.
 
-SubwayA: 187 live-created source entries, 4 transferred world sounds, 372 editor-only,
-17 unported, zero failed; 7 SelfTriggers give 194/197 runtime instances before/after
-player entry, then 185/188 after nine Keys are consumed. Remaining sources are
-5 CivilianAI, 10 CultistAI, 1 Gideon and 1 ExitTrigger, in addition to required missing
-services. No retail parity, other-platform or XR claim is made.
+Current SubwayA source accounting is 203 created, four transferred world sounds,
+372 editor-only, one unsupported Gideon and zero failed. Client sprites are owned
+visuals, not additional world-source entries. Full composite effects and safe
+NEW_LEVEL remain unavailable. No retail parity, other-platform or XR claim is made.
 
 ## Hot-query allocation adjustment
 

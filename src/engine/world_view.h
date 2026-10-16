@@ -43,6 +43,7 @@ namespace OpenBlood2
         std::uint32_t range = 0;
         DVector position{};
         DRotation rotation;
+        float alpha = 1; // SpriteAlpha style only; opaque passes retain their existing policy.
     };
     struct WorldViewStats
     {

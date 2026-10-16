@@ -11,6 +11,8 @@ namespace OpenBlood2
         std::size_t zero_alpha = 0, partial_alpha = 0;
         bool visible = false, rotatable = false;
         std::uint32_t range = UINT32_MAX;
+        float alpha = 1;
+        std::uint64_t client_effect = 0;
     };
     // Read-only presentation snapshot: owned textures/values, never a retained game pointer.
     class SpriteView
@@ -23,7 +25,7 @@ namespace OpenBlood2
         void clear();
         bool begin_frame(DVector eye, DRotation camera, std::string& error);
         bool add(const Sprite*, const SpriteTrack&, NodePose, DVector scale, DDWORD flags, ObjectId, const Resources&,
-                 std::string& error);
+                 std::string& error, float alpha = 1);
         void sort();
         WorldMesh mesh;
         std::vector<WorldDraw> draws;

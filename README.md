@@ -1,5 +1,10 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The [explosion sprite continuation](../Documentation/Implementation/M2_EXPLOSION_SPRITES.md) connects original fire/smoke
+recipes and lifecycle to real alpha-textured rendering and in-game inspection.
+Nine SubwayA emitters are exercised through creation, removal and reload. Composite
+models/particles/lights, safe automatic level transfer and M2 remain incomplete.
+
 The [sprite presentation continuation](../Documentation/Implementation/M2_SPRITE_VIEW.md) renders the 12 original SubwayA
 blood splats with decoded alpha and in-game resource/mode diagnostics. Hidden UI,
 world depth and unload/reload are tested. This is a prerequisite for client FX;

@@ -15,6 +15,13 @@ namespace OpenBlood2
                            record->state.m_Scale, record->state.m_Flags, id, game.resources, error))
                 return false;
         }
+        for (const auto& fx : game.server.explosion_sprites.active)
+        {
+            if (!scene.add(fx.sprite.get(), fx.track, {fx.settings.position, fx.rotation}, fx.scale, fx.flags, {},
+                           game.resources, error, fx.alpha))
+                return false;
+            scene.entries.back().client_effect = fx.id;
+        }
         scene.sort();
         return true;
     }

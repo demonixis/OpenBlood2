@@ -3,6 +3,7 @@
 #include "engine/model_store.h"
 #include "engine/objects.h"
 #include "engine/string_resources.h"
+#include "game/explosion_sprites.h"
 #include "game/original/BloodShells.h"
 #include "game/original/LightFX.h"
 #include "game/player_restore.h"
@@ -73,6 +74,8 @@ namespace OpenBlood2
         bool SetBlockingPriority(HOBJECT, DBYTE) override;
         void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE) override;
         void RecordDebrisEffect(const DebrisEffect&) override;
+        std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+        ExplosionSprites explosion_sprites;
         void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) override;
         void RecordExplosionEffect(const ExplosionEffect&) override;
         std::vector<DebrisEffect> debris_effects;
@@ -99,6 +102,7 @@ namespace OpenBlood2
             debris_effects.clear();
             explosion_effects.clear();
             scene_explosions.clear();
+            explosion_sprites.clear();
             spawn_reports.clear();
             pickup_reports.clear();
             camera_effects.clear();
