@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "a4d010c588830a606163a84be3d98d803158a012",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "FindObjectInRadius empty-opponent-list fallback; left unchanged"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "use": "Existing OnClientEnterWorld original entry path, no new import"
+    }
+  ],
+  "adaptations": [
+    "New application-only pre-player playback policy; no new original method imported.",
+    "GameSession::step and original AI/faction/link/activation rules remain unchanged.",
+    "Explicit encounter placement is test-only; no forced attack state, target, weapon or NPC movement."
+  ],
+  "remaining": [
+    "broader interactive combat and retail activation parity",
+    "train-window material",
+    "required services and safe NEW_LEVEL",
+    "M2 acceptance"
+  ]
+}

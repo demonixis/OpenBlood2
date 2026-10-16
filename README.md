@@ -536,3 +536,5 @@ Other impact components remain unavailable. User playtest fixes (mouse look/fire
 
 The [keyboard/mouse continuation](../Documentation/Implementation/M2_PLAYER_CONTROLS.md) adds F/G primary/alternate fire, F3 mouse capture, mouse look and left/right button fire. Escape releases the cursor for inspection.
 NPC attack and train-glass reports remain unresolved; M2 is still incomplete.
+
+[Interactive entry correction](../Documentation/Implementation/M2_NPC_ENTRY.md): a loaded world now waits for player entry instead of advancing NPCs without a player. Use **Enter player** in the header, or launch `--view-world` for immediate entry. Session exposes NPC ready/failed/active counts. Autonomous fire/damage is verified in a labelled SubwayA encounter; train glass and complete M2 remain open.

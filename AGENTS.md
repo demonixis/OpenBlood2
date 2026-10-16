@@ -492,3 +492,5 @@ Other impact components remain unavailable. User playtest fixes (mouse look/fire
 The [keyboard/mouse control fix](../Documentation/Implementation/M2_PLAYER_CONTROLS.md) connects F/G and captured mouse firing plus relative mouse look to existing original gameplay.
 Read [contracts](docs/PLAYER_CONTROL_CONTRACTS.md). Preserve UI-only uncaptured clicks, one-time delta consumption, focus/player-change resets and original FIRE_KEY/camera gates.
 F3 captures, Escape releases; --view-world requests capture initially. Next priorities are non-attacking NPCs and train glass, before further cosmetic FX. M2 remains open.
+
+The [NPC entry correction](../Documentation/Implementation/M2_NPC_ENTRY.md) holds interactive simulation until original player entry. Read [contracts](docs/SESSION_PLAYBACK_CONTRACTS.md). Preserve explicit diagnostic stepping, deferred removal while waiting, original intro/AI rules and visible runtime failures. Tests prove authored Cultist fire/damage after delayed application entry without forced AI targets. Broader combat remains unverified; train glass is next before more FX. M2 stays open.

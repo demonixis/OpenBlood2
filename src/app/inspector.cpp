@@ -2,6 +2,7 @@
 #include "build_info.h"
 #include "engine/container.h"
 #include "engine/world_model.h"
+#include "game/original/AI_Mgr.h"
 #include "game/original/ClientLightFX.h"
 #include "game/original/Door.h"
 #include "game/original/Key.h"
@@ -426,7 +427,16 @@ namespace OpenBlood2
             ImGui::Text("Mouse: %s", mouse_captured ? "captured" : "released for UI");
             if (!mouse_error.empty())
                 ImGui::TextWrapped("Mouse capture failed: %s", mouse_error.c_str());
-            if (!game.client_shell.m_bInWorld)
+            if (waiting_for_player)
+            {
+                ImGui::TextWrapped(
+                    "Simulation waiting for player entry. NPCs and world clocks are held at their current state.");
+                if (ImGui::Button("Enter player"))
+                    enter_player_request = true;
+                if (!world_error.empty())
+                    ImGui::TextWrapped("Player entry: %s", world_error.c_str());
+            }
+            else if (!game.client_shell.m_bInWorld)
                 ImGui::TextDisabled("Enter the player in Session to use game controls.");
             else if (game.client_shell.view.object && !game.client_shell.view.settings.player_movement)
                 ImGui::TextDisabled("The original cinematic currently blocks movement. Controls return when it ends.");
@@ -1049,6 +1059,23 @@ namespace OpenBlood2
         ImGui::TextWrapped(
             "Original shell/player state and copied AI paths. Complete AI behavior, remaining combat/FX, audio "
             "callers and save support are still unavailable.");
+        unsigned ready = 0, failed = 0, active = 0;
+        for (auto id : game.objects.snapshot())
+        {
+            const auto* r = game.objects.get(id);
+            const auto* ai = dynamic_cast<const AI_Mgr*>(r->game.get());
+            if (!ai || ai->npc_type == AI_Mgr::NPCType::Diagnostic)
+                continue;
+            ready += ai->RuntimeReady();
+            failed += ai->runtime_failed;
+            active += r->activity == OBJSTATE_ACTIVE;
+        }
+        ImGui::Text("NPCs: %u ready / %u failed / %u active", ready, failed, active);
+        ImGui::TextWrapped("%s", waiting_for_player ? "Simulation waits for player entry; no world time is consumed."
+                                                    : "Simulation runs independently of inspector visibility.");
+        if (failed)
+            ImGui::TextWrapped("Failed NPCs remain suspended. Select them in Skeleton to inspect the cause; entry does "
+                               "not reset failures.");
         auto* player = game.server_shell.Player(game.local_client);
         if (!player)
         {

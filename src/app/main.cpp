@@ -1,6 +1,7 @@
 #include "ai_model_key_smoke.h"
 #include "app/model_scene.h"
 #include "app/movement_controls.h"
+#include "app/session_playback.h"
 #include "app/sprite_scene.h"
 #include "brush_smoke.h"
 #include "build_info.h"
@@ -422,7 +423,7 @@ namespace
         bool quit_received = false;
         bool captured = false;
         std::uint32_t toggles = 0;
-        std::uint64_t frames = 0, ui_frames = 0, hidden_frames = 0;
+        std::uint64_t frames = 0, ui_frames = 0, hidden_frames = 0, waiting_frames = 0;
         const auto started = SDL_GetTicks();
         auto previous_tick = SDL_GetTicksNS();
         double hidden_model_time = 0;
@@ -634,7 +635,12 @@ namespace
                 inspector.container_selection = game.objects.get(player->containers.body[0].object)->id;
 #endif
             }
-            if (!game.step(delta))
+            const bool waiting = OpenBlood2::waiting_for_player(game, smoke);
+            waiting_frames += waiting;
+#if BLOOD2_INSPECTOR
+            inspector.waiting_for_player = waiting;
+#endif
+            if (!OpenBlood2::step_app_session(game, delta, smoke))
             {
                 spdlog::error("Object simulation step failed");
                 return 4;
@@ -1264,6 +1270,18 @@ namespace
         }
         spdlog::info("Shutdown: frames={}, UI frames={}, hidden frames={}, toggles={}, resize={}, quit={}", frames,
                      ui_frames, hidden_frames, toggles, resized, quit_received);
+        unsigned npc_ready = 0, npc_failed = 0;
+        std::uint64_t npc_updates = 0;
+        for (auto id : game.objects.snapshot())
+            if (const auto* a = dynamic_cast<const AI_Mgr*>(game.objects.get(id)->game.get());
+                a && a->npc_type != AI_Mgr::NPCType::Diagnostic)
+            {
+                npc_ready += a->RuntimeReady();
+                npc_failed += a->runtime_failed;
+                npc_updates += a->runtime_updates;
+            }
+        spdlog::info("Session playback: waiting={} time={} npc-ready={} npc-failed={} npc-updates={}", waiting_frames,
+                     game.objects.time(), npc_ready, npc_failed, npc_updates);
         if (smoke)
         {
             int width = 0, height = 0;

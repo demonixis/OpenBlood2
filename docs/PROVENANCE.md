@@ -828,3 +828,7 @@ The [application controls](PLAYER_CONTROL_CONTRACTS.md) are new SDL mapping/curs
 ownership code. They feed the already ported original weapon state machine, FIRE_KEY
 and player rotation; no new game method or reference engine is imported.
 See [ledger](M2_PLAYER_CONTROL_SOURCES.json).
+
+## Interactive NPC entry preservation
+
+The [application playback policy](SESSION_PLAYBACK_CONTRACTS.md) holds a loaded world until original player entry. No new original method is imported or AI/faction rule altered; see [source context](M2_NPC_ENTRY_SOURCES.json).

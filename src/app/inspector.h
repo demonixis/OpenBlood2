@@ -29,7 +29,7 @@ namespace OpenBlood2
         bool select_session = false;
         bool select_movement = false, keyboard_movement = true, mouse_captured = false;
         std::string mouse_error;
-        bool collapsed = false;
+        bool collapsed = false, waiting_for_player = false;
         bool select_containers = false;
         bool select_triggers = false;
         ObjectId trigger_selection{}, trigger_request{};
