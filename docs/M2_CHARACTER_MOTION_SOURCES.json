@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-16",
+  "baseline_commit": "9dc89ec673be67d0ecc31044983b27019c8ce41b",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/BaseCharacter.cpp",
+      "sha256": "0002f599c46971e006829e2c41405d872e8fbb08d8ff7590cadd50d91e14aa95",
+      "selected_lines": [
+        [
+          108,
+          219
+        ]
+      ],
+      "use": "Original model-key motion rule order and operations"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Sparam.cpp",
+      "sha256": "40e8649ee44134c528154cc4224be32ec492efc3b2173c7a32921c08f01d8962",
+      "selected_lines": [
+        [
+          1,
+          78
+        ]
+      ],
+      "use": "Original case-sensitive first bracket parameter lookup, bounded adaptation"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Sparam.h",
+      "sha256": "bd225fd9b2096c22afe0d1ee9cc43f6f7c923257a85066e870a6d15154956d24",
+      "selected_lines": [
+        [
+          1,
+          35
+        ]
+      ],
+      "use": "Original lookup declaration; unused writer functions not imported"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          3114,
+          3144
+        ]
+      ],
+      "use": "Player sound override does not forward base motion keys"
+    },
+    {
+      "path": "sources/lithtech/runtime/shared/src/mathlt_impl.cpp",
+      "sha256": "d629bcbede04219aa9d9486491aa37f2233ba714b674517a6cc9d6c57a874564",
+      "selected_lines": [
+        [
+          107,
+          144
+        ]
+      ],
+      "use": "Later engine local Euler rotation semantics only, no engine code import"
+    },
+    {
+      "path": "sources/lithtech/sdk/inc/ltmatrix.h",
+      "sha256": "d832d4191bc156bc61d54ad5c4424f4df4e01626dab89530dcbee58709e9bb21",
+      "selected_lines": [
+        [
+          470,
+          505
+        ]
+      ],
+      "use": "Later engine positive axis-angle matrix reference"
+    }
+  ],
+  "adaptations": [
+    "Bounded borrowed Sparam values, explicit missing/invalid status, no Windows API",
+    "Strict finite locale-independent numbers and prevalidation of complete XYZ groups",
+    "Existing centralized quaternion/vector math replaces old SDK math calls",
+    "Checked SetObjectDims result, range and pending-object rejection",
+    "Explicit partial service failure and per-character inspection"
+  ],
+  "not_implemented": [
+    "CMovement path steering and AI_Mgr behavior",
+    "AI sound/hearing, fire and extra callbacks",
+    "Attachments, ExitTrigger, client FX and full M2 gate"
+  ]
+}

@@ -241,3 +241,11 @@ ExitTrigger, client FX and the actual M2 exit gate remain incomplete.
 Latest M2 continuation: [original character audio and footsteps](../Documentation/Implementation/M2_CHARACTER_AUDIO.md)
 adds attached voices, original animation-key playback and material/liquid selection.
 AI hearing, remaining classes/services and the M2 acceptance gate are still open.
+
+Latest M2 continuation: [original character motion keys](../Documentation/Implementation/M2_CHARACTER_MOTION.md)
+adds bounded bracket parameters, source-ordered rotation/velocity/displacement/dimensions
+and truthful inspection. Synthetic motion and actual private-key coverage are
+separate; remaining AI/classes/services keep M2 incomplete.
+
+This increment passed 290/290 tests in both Debug and inspector-free Release,
+and 267/267 sequential headless tests with Clang ASan/UBSan/leak checks on Linux.

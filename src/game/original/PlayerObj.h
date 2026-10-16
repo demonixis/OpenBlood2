@@ -21,15 +21,15 @@ class CBaseCharacter : public B2BaseClass
     CInventoryMgr m_InventoryMgr;
     CDestructable m_damage;
     CAnim_Sound m_Anim_Sound;
-    // Retain commands outside the selected original player sound-key path.
+    std::uint64_t motion_keys = 0, motion_actions = 0, motion_failures = 0;
+    unsigned motion_applied = 0; // RotY, ForwVel, RightVel, UpVel, AddXYZ, DimsXYZ bits.
+    std::string motion_key, motion_error;
+    // Retain commands outside the selected original character/player key paths.
     // Recording a key never claims its missing service was executed.
     std::vector<std::string> pending_model_commands;
 
   protected:
-    virtual bool OnStringKey(ArgList*)
-    {
-        return false;
-    }
+    virtual bool OnStringKey(ArgList*);
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
 };
 class CPlayerObj : public CBaseCharacter

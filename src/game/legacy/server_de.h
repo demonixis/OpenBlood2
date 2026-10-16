@@ -105,7 +105,7 @@ class ServerDE : public CSBase
     HOBJECT (*ObjectToHandle)(LPBASECLASS) = nullptr;
     DDWORD (*GetObjectFlags)(HOBJECT) = nullptr;
     void (*SetObjectFlags)(HOBJECT, DDWORD) = nullptr;
-    void (*SetObjectDims)(HOBJECT, DVector*) = nullptr;
+    DRESULT (*SetObjectDims)(HOBJECT, DVector*) = nullptr;
     void (*SetObjectUserFlags)(HOBJECT, DDWORD) = nullptr;
     HOBJECT (*GetNextObject)(HOBJECT) = nullptr;
     char* (*GetObjectName)(HOBJECT) = nullptr;

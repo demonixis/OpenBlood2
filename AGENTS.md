@@ -212,3 +212,11 @@ player interrupt-before-failure, source 3D speed threshold and left/right altern
 raw first-container liquid precedence and distinct baked material flags. Typed
 movement keeps stale surface messages rejected. AI sound alerts remain explicitly
 unavailable; no new AI class or complete M2 gate is claimed.
+
+The latest [character motion evidence](../Documentation/Implementation/M2_CHARACTER_MOTION.md) connects original BaseCharacter model-key motion
+and bounded Sparam lookup. Read [motion-key contracts](docs/CHARACTER_MOTION_CONTRACTS.md). Preserve local-up yaw,
+source overwrite/order, world-space AddXYZ, centered raw dimensions and the player's
+base-handler exclusion. Validate complete numeric groups before mutation; stop on
+service failure and preserve deferred touch removal. The seven examined character
+assets contain no motion keys; synthetic probes are explicitly labelled, not AI.
+AI states/hearing/fire, ExitTrigger, client FX and the actual M2 gate remain open.

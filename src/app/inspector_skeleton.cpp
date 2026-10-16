@@ -54,6 +54,22 @@ namespace OpenBlood2
             }
             else
                 ImGui::TextUnformatted("No original character animation table on this object");
+            if (character && ImGui::CollapsingHeader("Character motion keys", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Text("Keys %llu | applied actions %llu | failures %llu | last mask 0x%02x",
+                            (unsigned long long)character->motion_keys, (unsigned long long)character->motion_actions,
+                            (unsigned long long)character->motion_failures, character->motion_applied);
+                ImGui::TextWrapped("Last key: %s", character->motion_key.c_str());
+                ImGui::Text("Position %.2f %.2f %.2f | velocity %.2f %.2f %.2f", r->state.m_Pos.x, r->state.m_Pos.y,
+                            r->state.m_Pos.z, r->velocity.x, r->velocity.y, r->velocity.z);
+                ImGui::Text("Half dimensions %.2f %.2f %.2f", r->dimensions.x, r->dimensions.y, r->dimensions.z);
+                if (!character->motion_error.empty())
+                    ImGui::TextWrapped("%s", character->motion_error.c_str());
+                ImGui::TextWrapped(dynamic_cast<const CPlayerObj*>(character)
+                                       ? "Player override excludes base motion keys, as in the source."
+                                       : "Source order: local yaw, forward/right/up velocity overwrite, world delta, "
+                                         "centered dimensions.");
+            }
             if (anim && ImGui::CollapsingHeader("Character audio", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 ImGui::TextWrapped("Root: %s | silent flag: %s (source helper does not test it)",

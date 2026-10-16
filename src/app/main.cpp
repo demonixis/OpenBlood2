@@ -2,6 +2,7 @@
 #include "brush_smoke.h"
 #include "build_info.h"
 #include "camera_smoke.h"
+#include "character_motion_smoke.h"
 #include "cinematic_smoke.h"
 #include "engine/capture.h"
 #include "engine/config.h"
@@ -231,6 +232,11 @@ namespace
         // and consume their Key objects on the first normal simulation update.
         if (options.world_smoke && !game.step(1.0 / 60))
             return 4;
+        OpenBlood2::ObjectId smoke_motion{};
+        bool character_motion_hidden = false;
+        if (options.skeleton_smoke && !OpenBlood2::prepare_character_motion_smoke(game, smoke_motion))
+            return 4;
+        const auto original_motion = smoke_motion;
         bool interaction_hidden = false;
         const auto original_selection = selection.id;
         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
@@ -251,6 +257,8 @@ namespace
         inspector.select_weapons = options.weapons_smoke;
         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke;
         inspector.select_skeleton = options.skeleton_smoke;
+        if (options.skeleton_smoke)
+            inspector.skeleton_selection = smoke_motion;
         inspector.select_containers = options.containers_smoke;
         inspector.select_brushes = options.brushes_smoke;
         inspector.select_pickups = options.pickups_smoke;
@@ -463,6 +471,11 @@ namespace
                 spdlog::error("Object simulation step failed");
                 return 4;
             }
+            if (options.skeleton_smoke && !inspector_visible)
+                if (const auto* r = game.objects.get(smoke_motion))
+                    if (const auto* c = dynamic_cast<const CBaseCharacter*>(r->game.get()))
+                        character_motion_hidden |=
+                            c->motion_keys >= 2 && OpenBlood2::check_character_motion_smoke(game, smoke_motion);
             if (options.movement_smoke && game.local_client)
             {
                 const auto* player = game.server_shell.Player(game.local_client);
@@ -695,6 +708,12 @@ namespace
                     use.key.down = frames == hide_frame;
                     event_ok = SDL_PushEvent(&use);
                 }
+                if (options.skeleton_smoke && frames == hide_frame)
+                {
+                    const auto* r = game.objects.get(smoke_motion);
+                    if (!r || game.server.ResetModelAnimation(r->handle) != DE_OK)
+                        return 4;
+                }
                 if (options.scene_explosions_smoke && frames == hide_frame &&
                     !OpenBlood2::activate_scene_explosion_smoke(game, smoke_scene_explosion))
                     return 4;
@@ -841,6 +860,16 @@ namespace
                     skeleton_reentered = player->m_Anim_Sound.hit_spheres_valid &&
                                          game.server.GetModelNodeTransform(player->m_hObject, "head", &head, &rotation);
                 }
+            bool character_motion_reentered = !options.skeleton_smoke;
+            if (options.skeleton_smoke)
+            {
+                if (game.objects.get(original_motion) ||
+                    !OpenBlood2::prepare_character_motion_smoke(game, smoke_motion) || !game.server.advance_models(0))
+                    return 4;
+                character_motion_reentered = OpenBlood2::check_character_motion_smoke(game, smoke_motion);
+                spdlog::info("Character motion probe: hidden={}, reentered={}, old handle invalidated={}",
+                             character_motion_hidden, character_motion_reentered, !game.objects.get(original_motion));
+            }
             bool character_audio_reentered = !options.skeleton_smoke;
             if (options.skeleton_smoke)
             {
@@ -864,7 +893,8 @@ namespace
                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
                 !selection_cleared ||
-                (options.skeleton_smoke && (!character_audio_hidden || !character_audio_reentered)) ||
+                (options.skeleton_smoke && (!character_audio_hidden || !character_audio_reentered ||
+                                            !character_motion_hidden || !character_motion_reentered)) ||
                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||

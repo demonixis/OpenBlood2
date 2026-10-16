@@ -425,3 +425,8 @@ AI callers, damage localization, attachments and blending remain unimplemented.
 Character audio continuation: [source ledger](M2_CHARACTER_AUDIO_SOURCES.json),
 [contracts](CHARACTER_AUDIO_CONTRACTS.md). Original Anim_Sound and PlayerObj sound
 rules are integrated selectively; no reference repository is a build dependency.
+
+Character motion continuation: [source ledger](M2_CHARACTER_MOTION_SOURCES.json),
+[contracts](CHARACTER_MOTION_CONTRACTS.md). BaseCharacter and Sparam rules are
+selectively adapted; existing math services replace SDK calls. Later LithTech
+rotation code informs semantics only. No reference repository is a dependency.

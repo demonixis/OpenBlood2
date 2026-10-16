@@ -122,18 +122,19 @@ namespace OpenBlood2
             active().trace_service("GetNextObject");
             return active().objects_.next_alive(previous);
         };
-        SetObjectDims = [](HOBJECT h, DVector* dims)
+        SetObjectDims = [](HOBJECT h, DVector* dims) -> DRESULT
         {
             active().trace_service("SetObjectDims");
             auto& o = active().objects_;
             auto* r = o.get(h);
-            if (!r || (r->container || r->world_model) || !dims || !std::isfinite(dims->x) || !std::isfinite(dims->y) ||
-                !std::isfinite(dims->z) || dims->x < 0 || dims->y < 0 || dims->z < 0)
+            if (!r || r->life != Life::Alive || (r->container || r->world_model) || !dims || !physics_vector(*dims) ||
+                dims->x < 0 || dims->y < 0 || dims->z < 0)
             {
                 o.fail(ObjectError::InvalidProperty, "Invalid object dimensions");
-                return;
+                return DE_INVALIDPARAMS;
             }
             r->dimensions = *dims;
+            return DE_OK;
         };
         SetObjectUserFlags = [](HOBJECT h, DDWORD flags)
         {
