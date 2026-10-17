@@ -1,0 +1,79 @@
+{
+  "baseline_commit": "7799556cc4bc4bde4ddc2dd874b38b0e98fcbce5",
+  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/GameWeapons.cpp",
+      "sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd",
+      "use": "CGideonShield constructor/Fire/FireVector, lines2098\u20132163"
+    },
+    {
+      "path": "sources/blood2/Shared/WeaponDefs.cpp",
+      "sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
+      "use": "Complete base-game Gideon Shield WeaponData entry, lines2504\u20132564"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "GIDEON_SHIELD name selection and generic r_gun/body Fire"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
+      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
+      "use": "Dependency review: MC_Fire_Stand adds armor separately; MagicPowerup emits recipe36"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ObjectFX.cpp",
+      "sha256": "1af815cdb07c8e0fcd56bebb723e78b539cd3398221a78e3b3fcf977bf109c48",
+      "use": "CObjectParticleFX lifecycle/emission/color and high-detail Shield1133\u20131154/Powerup1538\u20131559"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ObjectFX.h",
+      "sha256": "f10854489408e05859507a3b73cfbbd1ba3514988aa7caf93ec48d992bbfaffe",
+      "use": "Zeroed OBJECTPARTICLEFXCS defaults, flags, shape/ramp constants"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
+      "sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13",
+      "use": "Identity system creation, alpha defaults"
+    },
+    {
+      "path": "sources/blood2/Shared/SFXMsgIds.h",
+      "sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f",
+      "use": "OBJFX_SHIELD_1=19, OBJFX_POWERUP_1=36"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "use": "Base-game shield ID41/TYPE_RIFLE0"
+    },
+    {
+      "path": "sources/lithtech/runtime/shared/src/mathlt_impl.cpp",
+      "sha256": "d629bcbede04219aa9d9486491aa37f2233ba714b674517a6cc9d6c57a874564",
+      "use": "Later engine local-axis EulerRotateX/Y/Z reference; not retail-parity evidence"
+    },
+    {
+      "path": "sources/lithtech/runtime/shared/src/geomroutines.cpp",
+      "sha256": "6e613e26d9be3d8a91f66bcea93e4a531816fa0abcd6d5a1a00d7f73ac9ddf20",
+      "use": "Later engine rotation-vector order right/up/forward"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
+      "sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
+      "use": "Float GetRandom always draws rand(), including min=max=0; lines46\u201351"
+    }
+  ],
+  "adaptations": [
+    "Typed publication of only original19/36 recipes, copied checked pose and bounded owned arrays",
+    "Existing original smoke class extended; local deterministic RNG rather than original global CRT bits",
+    "Explicit omission of unused uninitialized non-stream offset addition",
+    "Later-engine local-axis Euler rotation, particle stepping and billboard sizing remain replacement policies",
+    "No damage-ray preflight for the pure-visual shield branch; no invented armor mutation",
+    "Deferred checked source lifetime, independent session state and monotonic effect identities"
+  ],
+  "remaining": [
+    "Gideon production initialization/actions/rr_gun and extra-key caller",
+    "Required missing FX/lighting and safe NEW_LEVEL",
+    "Actual M2 gate"
+  ]
+}

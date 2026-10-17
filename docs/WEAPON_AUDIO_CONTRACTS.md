@@ -68,3 +68,5 @@ and retail audio/backend parity are not implemented by this change. A diagnostic
 direct `PlayFireSound` call bypasses shot input by definition and must not be counted
 as gameplay through an active cinematic. Required world services, Gideon, safe
 NEW_LEVEL and actual M2 acceptance remain open.
+
+The [shield continuation](SHIELD_WEAPON_CONTRACTS.md) reuses retained original WAV/hearing for both modes. Its visual-only FireVector has no damage ray or collision preflight; armor remains a separate boss action. All checked hearing/voice lifetime rules remain in force.

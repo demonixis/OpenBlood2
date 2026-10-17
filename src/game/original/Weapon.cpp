@@ -99,6 +99,11 @@ FireResult CWeapon::Fire(const WeaponFire& request)
         }
         last_shot.direction = aim_direction;
         last_shot.end = vector_add(request.position, vector_scale(aim_direction, range));
+        if (data.m_nType == WEAP_GIDEON_SHIELD)
+        {
+            last_shot.collision = SegmentResult::Unavailable; // Visual-only source branch: no damage ray.
+            return true;
+        }
         const auto query =
             server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, false,
                                      SegmentObjects::SolidOrRayHit, SegmentFilter::None, SegmentStart::SkipInterior);

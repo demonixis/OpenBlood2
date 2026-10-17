@@ -10,6 +10,7 @@
 #include "game/explosion_rings.h"
 #include "game/explosion_sprites.h"
 #include "game/laser_beams.h"
+#include "game/object_particles.h"
 #include "game/original/BloodShells.h"
 #include "game/original/LightFX.h"
 #include "game/player_restore.h"
@@ -90,6 +91,8 @@ namespace OpenBlood2
         std::uint64_t PublishWeaponSprites(HOBJECT, const WeaponSpriteSettings&, std::string&) override;
         ExplosionModels explosion_models;
         LaserBeams laser_beams;
+        ObjectParticles object_particles;
+        std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) override;
         std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&) override;
         ExplosionLights explosion_lights;
         ExplosionRings explosion_rings;
@@ -131,6 +134,7 @@ namespace OpenBlood2
             weapon_sprites.clear();
             explosion_models.clear();
             laser_beams.clear();
+            object_particles.clear();
             explosion_lights.clear();
             explosion_rings.clear();
             explosion_flames.clear();

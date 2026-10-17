@@ -243,6 +243,64 @@ namespace
         },
 
         {
+            "Models\\Weapons\\knifec_pv.abc",      // Model
+            "Models\\Weapons\\knifec_pv.abc",      // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",     // Skin
+            nullptr,                               // Model
+            nullptr,                               // Skin
+            WEAP_GIDEON_SHIELD,                    // Type
+            TYPE_RIFLE,                            // Fire type
+            AMMO_NONE,                             // Ammo type
+            1,                                     // Ammo Use
+            1,                                     // Alt Ammo Use
+            10.0f,                                 // Min Damage
+            20.0f,                                 // Max Damage
+            10.0f,                                 // Min Alt damage
+            20.0f,                                 // Max Alt damage
+            1.00f,                                 // Reload time
+            0.0f,                                  // Alt reload time
+            {0.0f, 0.0f},                          // Spread
+            {0.0f, 0.0f},                          // Alt Spread
+            0.0f,                                  // Projectile Velocity
+            0.0f,                                  // Alt Projectile Velocity
+            75.0f,                                 // Range
+            75.0f,                                 // Alt Range
+            1,                                     // Shots per fire
+            1,                                     // Alt Shots per fire
+            1,                                     // Strength or Magic required
+            0,                                     // Two-handed Strength or Magic required
+            0,                                     // Damage Radius (projectiles)
+            0,                                     // Alt Damage Radius (projectiles)
+            DFALSE,                                // Alt fire zoom
+            DFALSE,                                // Semi-auto
+            "Sounds\\Enemies\\Gideon\\shield.wav", // Fire sound
+            "Sounds\\Enemies\\Gideon\\shield.wav", // Alt Fire sound
+            "Sounds\\Enemies\\Gideon\\shield.wav", // Empty weapon sound
+            "Sounds\\Enemies\\Gideon\\shield.wav", // Alt Empty weapon sound
+            nullptr,                               // Projectile class
+            nullptr,                               // Alt Projectile class
+            0,                                     // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                    // Muzzle Flash color
+            "Gideon_Shield",                       // Name
+            0,                                     // Name ID (resource)
+            "",                                    // flash sprite name
+            "",                                    // alt flash Sprite name
+            0.25f,                                 // Flash duration
+            0.10f,                                 // Flash scale
+            {0.0f, 0.0f, 0.0f},                    // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                   // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                    // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                 // Recoil
+            {0.0f, 0.0f, 0.1f},                    // Flash position
+            0.625f,                                // Eject interval
+            0.0f,                                  // View kick
+            DFALSE,                                // View kick is Cumulative
+            DFALSE,                                // Animation looping
+            DFALSE,                                // Alt anim looping
+            nullptr,                               // Icon for status bar
+            nullptr,                               // Highlighted icon for status bar
+        },
+        {
             "Models\\Weapons\\knifec_pv.abc",        // Model
             "Models\\Weapons\\knifec_pv.abc",        // Model
             "Skins\\Weapons\\knifec_pv_t.dtx",       // Skin

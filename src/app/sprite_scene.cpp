@@ -66,6 +66,20 @@ namespace OpenBlood2
                 scene.entries.back().particle_system = 0;
                 scene.entries.back().flame_system = fx.id;
             }
+        for (const auto& instance : game.server.object_particles.active)
+        {
+            const auto& fx = instance.effect;
+            for (unsigned i = 0; i < fx.particles.size(); ++i)
+            {
+                const auto& particle = fx.particles[i];
+                const auto position = vector_add(fx.position, rotate_vector(fx.system_rotation, particle.position));
+                if (!scene.add_particle(fx.texture, position, fx.radius / 640.f, particle.color, fx.alpha, fx.id, i,
+                                        game.resources, error))
+                    return false;
+                scene.entries.back().particle_system = 0;
+                scene.entries.back().object_effect = fx.id;
+            }
+        }
         scene.sort();
         return true;
     }

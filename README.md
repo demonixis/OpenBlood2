@@ -546,3 +546,5 @@ The [Naga weapon continuation](../Documentation/Implementation/M2_NAGA_WEAPON.md
 The [energy projectile continuation](../Documentation/Implementation/M2_ENERGY_PROJECTILES.md) adds original moving flare projectiles, deferred explosion damage, checked shooter attribution and real sprite/WAV presentation. This is a Gideon prerequisite; its remaining weapons/state lifecycle, missing FX and safe NEW_LEVEL keep M2 incomplete.
 
 The [wind weapon continuation](../Documentation/Implementation/M2_WIND_WEAPON.md) connects the original one-shot shockwave, full-radius damage and actual model/WAV presentation. The repaired ground query and checked callback lifetime are explicit. Gideon state/shield integration, required services and safe NEW_LEVEL keep M2 incomplete.
+
+The [shield/powerup dependency](../Documentation/Implementation/M2_SHIELD_WEAPON.md) adds the original visual-only shield weapon, actual WAV and owner-bound sphere/ring particles with inspection. Armor remains the responsibility of the pending boss action. Gideon, required services and safe NEW_LEVEL still keep M2 incomplete.

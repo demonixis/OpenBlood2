@@ -1,6 +1,7 @@
 #include "ObjectParticleFX.h"
 #include "engine/collision.h"
 #include <cmath>
+#include <numbers>
 using namespace OpenBlood2;
 namespace
 {
@@ -10,6 +11,14 @@ namespace
                std::isfinite(pose.rotation.m_Spin) &&
                std::abs(vector_dot(pose.rotation.m_Vec, pose.rotation.m_Vec) +
                         pose.rotation.m_Spin * pose.rotation.m_Spin - 1) < .001f;
+    }
+    void around(DRotation& rotation, DVector axis, float angle)
+    {
+        const float sine = std::sin(angle / 2) / std::sqrt(vector_dot(axis, axis));
+        DRotation turn;
+        turn.m_Vec = vector_scale(axis, sine);
+        turn.m_Spin = std::cos(angle / 2);
+        rotation = compose_rotation(turn, rotation);
     }
     float draw(std::minstd_rand& random, float lo, float hi)
     {
@@ -30,6 +39,41 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::string& fa
     initialized_ = true;
     return true;
 }
+bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_rand& random, std::string& failure)
+{
+    if (type == 1)
+        return Init(type, owner, failure);
+    failure.clear();
+    *this = {};
+    if ((type != 19 && type != 36) || !owner)
+    {
+        failure = "Unsupported object particle recipe or absent parent";
+        return false;
+    }
+    recipe = type;
+    parent = owner;
+    const bool shield = type == 19;
+    radius = shield ? 500.f : 1750.f;
+    gravity = shield ? 0.f : 150.f;
+    duration = shield ? 5.f : 2.5f;
+    density = 0;
+    add_delay = .1f;
+    requested_alpha = shield ? 1.f : .5f;
+    min_life = shield ? .5f : .75f;
+    max_life = shield ? .75f : 1.f;
+    authored_count = shield ? 24 : 18;
+    flags = 0;
+    ramp_down = .25f;
+    position_radius = shield ? 45.f : 25.f;
+    offset = shield ? DVector{} : DVector{-25, 0, 0};
+    rotations =
+        shield ? DVector{draw(random, 0, .01f), draw(random, 0, .015f), draw(random, 0, .01f)} : DVector{0, .025f, 0};
+    min_color = shield ? DVector{192, 192, 0} : DVector{0, 0, 255};
+    max_color = shield ? DVector{255, 255, 255} : DVector{196, 196, 255};
+    texture = shield ? "SpriteTextures\\Lensflare_1.dtx" : "SpriteTextures\\smoke64_2.dtx";
+    initialized_ = true;
+    return true;
+}
 bool CObjectParticleFX::CreateObject(const Resources& resources, NodePose pose, double now, std::string& failure)
 {
     failure.clear();
@@ -40,7 +84,7 @@ bool CObjectParticleFX::CreateObject(const Resources& resources, NodePose pose, 
     }
     if (!resources.find(texture))
     {
-        failure = "Smoke-trail texture is not indexed: " + texture;
+        failure = "Object particle texture is not indexed: " + texture;
         return false;
     }
     origin = position = last_position = last_object_position = pose.position;
@@ -52,6 +96,8 @@ bool CObjectParticleFX::CreateObject(const Resources& resources, NodePose pose, 
 }
 bool CObjectParticleFX::AddParticles(std::minstd_rand& random, std::size_t budget)
 {
+    if (recipe != 1)
+        return AddShellParticles(random, budget);
     const auto delta = vector_subtract(last_position, position);
     const float distance = std::sqrt(vector_dot(delta, delta));
     const float samples = distance / (density * radius / 1000.f);
@@ -90,12 +136,41 @@ bool CObjectParticleFX::AddParticles(std::minstd_rand& random, std::size_t budge
     emitted += count;
     return true;
 }
+bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t budget)
+{
+    if (particles.size() > budget || authored_count > budget - particles.size() ||
+        particles.size() + authored_count > 2048)
+    {
+        error = "Object particle burst capacity exceeded";
+        return false;
+    }
+    auto basis = source_rotation;
+    particles.reserve(particles.size() + authored_count);
+    for (unsigned i = 0; i < authored_count; ++i)
+    {
+        // Cache axes BEFORE rotating. The source uses the preceding right axis
+        // for this particle, and carries the rotated basis into the next one.
+        auto right = rotate_vector(basis, {1, 0, 0});
+        const auto forward = rotate_vector(basis, {0, 0, 1});
+        around(basis, forward, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
+        if (recipe == 19)
+            around(basis, right, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
+        right = vector_scale(right, 1 / std::sqrt(vector_dot(right, right)));
+        const float speed = draw(random, 0, 0); // Original zero-speed draw still consumes RNG.
+        const auto color = vector_scale(
+            vector_add(min_color, vector_scale(vector_subtract(max_color, min_color), draw(random, 0, 1))), 1 / 255.f);
+        particles.push_back({vector_scale(right, position_radius), vector_scale(right, speed),
+                             draw(random, min_life, max_life), color});
+    }
+    emitted += authored_count;
+    return true;
+}
 bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_rand& random, std::size_t budget)
 {
     error.clear();
     if (!created_ || !std::isfinite(now) || now < last_time || (owner && !pose_valid(*owner)))
     {
-        error = "Invalid smoke-trail state, parent pose or clock";
+        error = "Invalid object particle state, parent pose or clock";
         return false;
     }
     if (!owner)
@@ -110,7 +185,7 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
     const float elapsed = static_cast<float>(now - start_time);
     if (!std::isfinite(elapsed))
     {
-        error = "Smoke-trail elapsed time overflow";
+        error = "Object particle elapsed time overflow";
         return false;
     }
     if (first_update)
@@ -134,9 +209,35 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         } // Zero ramp-down time; never resumes in single player.
         last_object_position = owner->position;
     }
-    if (moving)
-        position = owner->position;    // Recipe offset is zero.
-    source_rotation = owner->rotation; // ALIGNROTATION influences forward emission, not the fixed system transform.
+    if (recipe == 1)
+    {
+        if (moving)
+            position = owner->position;
+        // ALIGNROTATION affects emission, not the fixed smoke system transform.
+        source_rotation = owner->rotation;
+    }
+    else
+    {
+        position = vector_add(owner->position, rotate_vector(owner->rotation, {offset.y, offset.x, offset.z}));
+        if (!physics_vector(position))
+        {
+            error = "Object particle offset exceeds bounds";
+            return false;
+        }
+        source_rotation = system_rotation;
+        // Later-engine EulerRotate reference: recalculate each local axis in XYZ order.
+        if (rotations.x)
+            around(source_rotation, rotate_vector(source_rotation, {1, 0, 0}), rotations.x * std::numbers::pi_v<float>);
+        if (rotations.y)
+            around(source_rotation, rotate_vector(source_rotation, {0, 1, 0}), rotations.y * std::numbers::pi_v<float>);
+        if (rotations.z)
+            around(source_rotation, rotate_vector(source_rotation, {0, 0, 1}), rotations.z * std::numbers::pi_v<float>);
+        system_rotation = source_rotation;
+        ramping = elapsed >= duration - ramp_down;
+        ramp_ratio = ramping ? std::max(0.f, (duration - elapsed) / ramp_down) : 1.f;
+        if (ramping)
+            alpha = requested_alpha * ramp_ratio;
+    }
     if (now - last_add_time >= add_delay)
     {
         last_add_time = now;

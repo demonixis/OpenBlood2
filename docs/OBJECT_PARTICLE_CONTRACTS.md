@@ -107,3 +107,5 @@ NEW_LEVEL and other required services keep the observable M2 exit gate open.
 Continuation: [original explosion flame particles](EXPLOSION_FLAME_CONTRACTS.md)
 now implements the selected Tesla component. Earlier blanket flame omissions are
 historical for that recipe; surface illumination and the actual M2 gate remain open.
+
+The [shield/powerup continuation](SHIELD_WEAPON_CONTRACTS.md) now implements original CGideonShield and owner-bound ObjectFX19/36. Earlier blanket shield/ramp/object-particle omissions are superseded only for these selected recipes. Boss actions, required remaining services and M2 stay open.

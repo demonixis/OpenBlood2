@@ -86,3 +86,5 @@ cleans its temporary original lists. Unload clears reports, voices, models and l
 High-detail visual recipes, unlit alpha rendering and the replacement ray policy
 are not retail renderer/physics parity. Gideon initialization/states/shield/powerup,
 remaining required FX/services, safe NEW_LEVEL and the actual M2 gate remain open.
+
+The [shield/powerup continuation](SHIELD_WEAPON_CONTRACTS.md) now implements original CGideonShield and owner-bound ObjectFX19/36. Earlier blanket shield/ramp/object-particle omissions are superseded only for these selected recipes. Boss actions, required remaining services and M2 stay open.

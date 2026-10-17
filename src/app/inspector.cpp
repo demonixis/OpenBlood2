@@ -1579,6 +1579,13 @@ namespace OpenBlood2
             if (!weapon.projectile_error.empty())
                 ImGui::TextWrapped("Projectile: %s", weapon.projectile_error.c_str());
         }
+        if (const auto* shield = dynamic_cast<const CGideonShield*>(&weapon))
+        {
+            ImGui::Text("Shield particle effect %llu (historical); no weapon armor mutation",
+                        (unsigned long long)shield->effect);
+            if (!shield->effect_error.empty())
+                ImGui::TextWrapped("Shield: %s", shield->effect_error.c_str());
+        }
         if (const auto* naga = dynamic_cast<const CNagaEyes*>(&weapon))
         {
             ImGui::Text("Original Naga beam: %llu | visual ray %d | endpoint %.2f %.2f %.2f",

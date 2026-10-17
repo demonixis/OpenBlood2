@@ -854,3 +854,7 @@ Selected original CEnergyBlast/CProjectile/CEnergyBlastProjectile methods and co
 ## Original Gideon wind and shockwave
 
 Selected original Gideon Wind definition, projectile Update and high-detail model/light recipe are integrated. See [ledger](M2_WIND_WEAPON_SOURCES.json) and [contracts](WIND_WEAPON_CONTRACTS.md). The undefined ray endpoint is repaired, typed callback/lifetime checks are explicit, and production Gideon remains unported.
+
+## Original Gideon shield / spell particles
+
+Selected original CGideonShield, complete WeaponData41, AI name/generic firing branch, and ObjectFX19/36 recipe/lifecycle/ring/sphere emission extend the existing CObjectParticleFX. [Source hashes and adaptations](M2_SHIELD_WEAPON_SOURCES.json), [contracts](SHIELD_WEAPON_CONTRACTS.md) and [verification](../../Documentation/Implementation/M2_SHIELD_WEAPON.md) distinguish source gameplay from the typed lifetime, bounded arrays and later-engine rotation/particle policies. No new dependency or commercial resource is imported. Gideon itself remains pending.

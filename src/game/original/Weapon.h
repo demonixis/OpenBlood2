@@ -114,6 +114,14 @@ class CEnergyBlast final : public CWeapon
     CEnergyBlast() : CWeapon(WEAP_ZEALOT_ENERGYBLAST) {}
     const char* FireSound(bool alternate) const override;
 };
+class CGideonShield final : public CWeapon
+{
+  public:
+    CGideonShield() : CWeapon(WEAP_GIDEON_SHIELD) {}
+    FireResult FireVector() override;
+    std::uint64_t effect = 0;
+    std::string effect_error;
+};
 class CGideonWind final : public CWeapon
 {
   public:

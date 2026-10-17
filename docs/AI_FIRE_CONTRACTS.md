@@ -103,3 +103,5 @@ Earlier blanket omissions are superseded only for this subset. Full initializati
 AI_Update/deactivation, remaining states and shade recovery stay unavailable.
 
 The [Naga weapon continuation](NAGA_WEAPON_CONTRACTS.md) extends the supported NPC weapon subset with original eye-beam damage, head_gun aiming and red-small beam presentation. Gideon and the eye impact composite remain unavailable; earlier blanket weapon omissions are superseded only for this subset.
+
+The [shield continuation](SHIELD_WEAPON_CONTRACTS.md) also permits original GIDEON_SHIELD selection and generic r_gun/body aiming through FIRE_KEY. This supplies the visual-only weapon, not Gideon's own fire-node override or boss state loop.

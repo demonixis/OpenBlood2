@@ -70,6 +70,7 @@ class ServerDE : public CSBase
     virtual bool SetBlockingPriority(HOBJECT, DBYTE) = 0;
     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
+    virtual std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) = 0;
     virtual std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&) = 0;
     virtual std::uint64_t PublishExplosionFragments(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
     virtual std::uint64_t PublishExplosionFlames(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;

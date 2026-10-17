@@ -122,7 +122,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         return InventoryResult::NotAvailable;
     if (!m_hOwner || !BaseClass::GetServerDE()->HandleToObject(m_hOwner) || slot < -1 || slot >= 10)
         return InventoryResult::Invalid;
-    if ((type == WEAP_NAGA_EYEBEAM || type == WEAP_ZEALOT_ENERGYBLAST || type == WEAP_GIDEON_WIND) &&
+    if ((type == WEAP_NAGA_EYEBEAM || type == WEAP_ZEALOT_ENERGYBLAST || type == WEAP_GIDEON_WIND ||
+         type == WEAP_GIDEON_SHIELD) &&
         dynamic_cast<CPlayerObj*>(BaseClass::GetServerDE()->HandleToObject(m_hOwner)))
         return InventoryResult::NotAvailable; // Player view/save support is a separate contract.
     int empty = -1;
@@ -172,6 +173,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         weapon = std::make_unique<CNagaEyes>();
     else if (type == WEAP_ZEALOT_ENERGYBLAST)
         weapon = std::make_unique<CEnergyBlast>();
+    else if (type == WEAP_GIDEON_SHIELD)
+        weapon = std::make_unique<CGideonShield>();
     else if (type == WEAP_GIDEON_WIND)
         weapon = std::make_unique<CGideonWind>();
     else

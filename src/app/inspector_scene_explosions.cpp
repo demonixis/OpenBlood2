@@ -250,6 +250,59 @@ namespace OpenBlood2
                                    r.source.c_str(), r.lights.size(),
                                    r.error.empty() ? "created; illumination unavailable" : r.error.c_str());
         ImGui::Separator();
+        const auto& spells = game.server.object_particles;
+        if (ImGui::TreeNode("Original shield / powerup particles"))
+        {
+            ImGui::Text("Active %zu | particles %zu | started %llu | expired %llu | failed %llu", spells.active.size(),
+                        spells.particle_count(), (unsigned long long)spells.started, (unsigned long long)spells.expired,
+                        (unsigned long long)spells.failed);
+            for (const auto& instance : spells.active)
+            {
+                const auto& fx = instance.effect;
+                if (!ImGui::TreeNode((void*)(uintptr_t)fx.id, "%llu / recipe %u", (unsigned long long)fx.id, fx.recipe))
+                    continue;
+                ImGui::Text("Owner %s | updates %llu | bursts %llu | live %zu / emitted %llu",
+                            game.server.IsObjectAlive(instance.owner) ? "alive" : "removed",
+                            (unsigned long long)fx.updates, (unsigned long long)fx.bursts, fx.particles.size(),
+                            (unsigned long long)fx.emitted);
+                ImGui::Text("Time %.3f / %.3f | alpha %.3f (authored %.3f) | ramp %s %.3f",
+                            fx.last_time - fx.start_time, fx.duration, fx.alpha, fx.requested_alpha,
+                            fx.ramping ? "down" : "none", fx.ramp_ratio);
+                ImGui::Text("System %.2f %.2f %.2f | rotation %.3f %.3f %.3f %.3f", fx.position.x, fx.position.y,
+                            fx.position.z, fx.system_rotation.m_Vec.x, fx.system_rotation.m_Vec.y,
+                            fx.system_rotation.m_Vec.z, fx.system_rotation.m_Spin);
+                ImGui::TextWrapped("%s", fx.texture.c_str());
+                if (sprite_view)
+                {
+                    unsigned prepared = 0;
+                    for (const auto& entry : sprite_view->entries)
+                        if (entry.object_effect == fx.id)
+                        {
+                            prepared += entry.range != UINT32_MAX;
+                            if (!entry.error.empty())
+                                ImGui::TextWrapped("%s", entry.error.c_str());
+                        }
+                    ImGui::Text("Prepared particles: %u", prepared);
+                }
+                if (ImGui::TreeNode("Local particle state"))
+                {
+                    for (const auto& particle : fx.particles)
+                        ImGui::Text("p %.2f %.2f %.2f | v %.2f %.2f %.2f | life %.3f | RGB %.2f %.2f %.2f",
+                                    particle.position.x, particle.position.y, particle.position.z, particle.velocity.x,
+                                    particle.velocity.y, particle.velocity.z, particle.lifetime, particle.color.x,
+                                    particle.color.y, particle.color.z);
+                    ImGui::TreePop();
+                }
+                ImGui::TreePop();
+            }
+            for (const auto& report : spells.reports)
+                ImGui::TextWrapped("%llu recipe %u [%s]: %s", (unsigned long long)report.id, report.recipe,
+                                   report.source.c_str(),
+                                   report.error.empty() ? "created (historical)" : report.error.c_str());
+            if (!spells.update_error.empty())
+                ImGui::TextWrapped("%s", spells.update_error.c_str());
+            ImGui::TreePop();
+        }
         const auto& beams = game.server.laser_beams;
         if (ImGui::TreeNode("Original laser beams"))
         {

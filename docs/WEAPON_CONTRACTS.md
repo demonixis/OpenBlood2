@@ -170,3 +170,5 @@ attachments, client visibility SFX and complete M2 remain unavailable.
 The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.
 
 The [Naga weapon continuation](NAGA_WEAPON_CONTRACTS.md) extends the supported NPC weapon subset with original eye-beam damage, head_gun aiming and red-small beam presentation. Gideon and the eye impact composite remain unavailable; earlier blanket weapon omissions are superseded only for this subset.
+
+The [shield/powerup continuation](SHIELD_WEAPON_CONTRACTS.md) now implements original CGideonShield and owner-bound ObjectFX19/36. Earlier blanket shield/ramp/object-particle omissions are superseded only for these selected recipes. Boss actions, required remaining services and M2 stay open.

@@ -2,6 +2,11 @@
 #include <cmath>
 namespace OpenBlood2
 {
+    std::uint64_t ServerAdapter::PublishObjectParticles(HOBJECT owner, unsigned type, std::string& error)
+    {
+        trace_service("PublishObjectParticles (original shield/powerup)");
+        return object_particles.publish(owner, type, *this, client_resources, objects_.time(), error);
+    }
     std::uint64_t ServerAdapter::PublishLaserBeam(HOBJECT source, DVector from, DVector to, std::string& error)
     {
         trace_service("PublishLaserBeam (original red small beam)");
