@@ -1,5 +1,7 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The [M16 continuation](../Documentation/Implementation/M2_ASSAULT.md) connects original primary fire, alternate grenade charges, pickup/drop, independent grenade lifetime and inspection. CityHub has 433 created / 31 transferred sounds / 20 unsupported / one failed. Finite inverted ABC key bounds remain visible metadata warnings. The original Cultist lacks rifle animations; direct AI firing is tested separately from unavailable autonomous M16 combat. Replacement grenade physics, required services and safe NEW_LEVEL keep M2 open.
+
 The [world-model debris continuation](../Documentation/Implementation/M2_WORLD_DEBRIS.md) connects original named-fragment activation, gravity, rotation and independent lifetime, with rendered geometry and inspection. CityHub now has 432 created / 31 transferred sounds / 21 unsupported / one failed entry. Conservative moving bounds are replacement physics; missing geometry, required services and safe NEW_LEVEL keep M2 incomplete.
 
 The [Flare Gun continuation](../Documentation/Implementation/M2_FLARES.md) connects original primary sticking/burn damage, alternate fragments, both player hands, pickup/drop and autonomous Cultist fire. CityHub now has 422 created / 31 transferred sounds / 31 unsupported / one failed entry; earlier counts below are historical. Missing geometry, required services and safe NEW_LEVEL keep M2 incomplete.

@@ -55,6 +55,7 @@ class ServerDE : public CSBase
     virtual DRESULT RemoveAttachment(HATTACHMENT) = 0;
     virtual DRESULT FindAttachment(HOBJECT, HOBJECT, HATTACHMENT*) = 0;
     virtual DRESULT GetAttachedModelNodeTransform(HATTACHMENT, const char*, DVector*, DRotation*) = 0;
+    virtual bool AdvanceGrenade(HOBJECT, double seconds) = 0;
     virtual void RecordProjectile(const OpenBlood2::ProjectileReport&) = 0;
     virtual bool IsObjectAlive(HOBJECT) = 0;
     virtual bool SetDeactivationTime(HOBJECT, float) = 0;

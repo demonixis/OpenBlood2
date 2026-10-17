@@ -75,7 +75,11 @@ class CWeapon
         m_pInventoryMgr = inventory;
         m_bLeftHand = left;
     }
-    float CheckAmmo() const;
+    virtual DBYTE GetAmmoType(bool = false) const
+    {
+        return data.m_nAmmoType;
+    }
+    float CheckAmmo(bool alternate = false) const;
     FireResult Fire(const OpenBlood2::WeaponFire&);
     virtual const char* FireSound(bool alternate) const;
     virtual FireResult FireProjectile();
@@ -137,6 +141,15 @@ class CBeretta final : public CWeapon
 {
   public:
     CBeretta() : CWeapon(WEAP_BERETTA) {}
+};
+class CAssaultRifle final : public CWeapon
+{
+  public:
+    CAssaultRifle() : CWeapon(WEAP_ASSAULTRIFLE) {}
+    DBYTE GetAmmoType(bool alternate = false) const override
+    {
+        return alternate ? AMMO_DIEBUGDIE : data.m_nAmmoType;
+    }
 };
 class CFlareGun final : public CWeapon
 {

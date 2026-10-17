@@ -1,5 +1,7 @@
 # Original Ingram Mac-10
 
+The [M16/grenade continuation](ASSAULT_CONTRACTS.md) adds ID 9 and mode-specific ammo, original grenade callbacks and explicit finite key-bound metadata warnings. Earlier supported-weapon limits are historical; remaining services and M2 stay open.
+
 Read the [source ledger](M2_MAC10_SOURCES.json), [weapon](WEAPON_CONTRACTS.md),
 [fire audio](WEAPON_AUDIO_CONTRACTS.md), [impact](WEAPON_IMPACT_CONTRACTS.md),
 [drop](WEAPON_DROP_CONTRACTS.md), [inventory-state](INVENTORY_STATE_CONTRACTS.md)

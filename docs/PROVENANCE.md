@@ -925,3 +925,13 @@ original callbacks. The enclosing-bound motion and primary-world angular envelop
 are explicit replacement engine policies, not recovered retail physics. The terminal
 empty-list leak is fixed and traversal is bounded. See [ledger](M2_WORLD_DEBRIS_SOURCES.json)
 and [contracts](WORLD_DEBRIS_CONTRACTS.md). Reference repositories/assets are unchanged.
+
+## Original M16 and grenade
+
+The original complete M16 definition, alternate ammo override, pickup and CGrenade
+callbacks are selected from Blood II. Existing typed inventory/weapon services are
+extended; bounded box flight is explicit replacement physics. The source sequential
+explosion repetition is retained with reentrant guards. Finite inverted unused ABC
+key bounds are preserved and diagnosed, following read-only donor analysis rather
+than changing private content. See [ledger](M2_ASSAULT_SOURCES.json),
+[contracts](ASSAULT_CONTRACTS.md) and [evidence](../../Documentation/Implementation/M2_ASSAULT.md).

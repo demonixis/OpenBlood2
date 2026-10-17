@@ -1,0 +1,100 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "f790803891661f64d7871ae8ea4047147e4a2fe0",
+  "status": "M2 incomplete; original M16, grenade and finite key-bound diagnostics",
+  "references": [
+    {
+      "source": "sources/blood2/Shared/WeaponDefs.cpp",
+      "source_sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
+      "purpose": "Complete original M16 WeaponData."
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "purpose": "Weapon ID 9, TYPE_AUTORIFLE 1 and ammo pool 5."
+    },
+    {
+      "source": "sources/blood2/Shared/ClientRes.h",
+      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
+      "purpose": "Resource ID 353."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameWeapons.h",
+      "source_sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19",
+      "purpose": "CAssaultRifle alternate ammo override; unavailable chrome/multiplayer boost."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/GameWeapons.h",
+      "source_sha256": "c5f9176a2f6ad7c28dedb5ec24c710a16f1c2f4957d1efb793cf77e42e8378e0",
+      "purpose": "Client assault rifle alternate ammo override."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "source_sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "purpose": "Alternate ammo selection, Fire and FireSpread, existing vector/audio rules."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
+      "source_sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
+      "purpose": "Mode-specific CheckAmmo and original animation transitions."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/WeaponPickups.cpp",
+      "source_sha256": "116eac417209ee2cc523044e02ff615406b597164df9df5d5f2e0be80cfbc1d4",
+      "purpose": "AssaultRiflePU definition and SpawnWeaponPickup selection."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "purpose": "Original acquisition, drop and constructor dispatch."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameProjectiles.cpp",
+      "source_sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f",
+      "purpose": "CGrenade constructor, Update and HandleTouch including sequential duplicate explosion."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameProjectiles.h",
+      "source_sha256": "9acd38645c28d90b508a0a55a02760bcea5c6c40318b6266635711d2ba1f1bc0",
+      "purpose": "CGrenade inheritance and bounce count."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Projectile.cpp",
+      "source_sha256": "52b805c67775579b5703e0ad1099a8ea44d76b245349c8f6d1fac0a1b3b74ef2",
+      "purpose": "Model initialization, setup, lifetime, explosion, radius damage and default explosion effects."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "purpose": "ASSAULTR prefix and generic Fire path."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Anim_Sound.cpp",
+      "source_sha256": "238744b904e32e418188bfdc2f74d970bb544f1a027fab1c2ae9dca2b2d9aa4f",
+      "purpose": "Strict original rifle/automatic rifle animation mapping; no fabricated pistol fallback."
+    },
+    {
+      "source": "OpenBlood2/OpenLithTech/src/formats/abc_parser.cpp",
+      "source_sha256": "f63d5312ae28d2061a9641971bb845c142f435110bf2e42bebeb93bdde870426",
+      "purpose": "Reference only: consumes/discards per-key bounds metadata."
+    },
+    {
+      "source": "NoMadEngine/tools/Research/convert_abc.py",
+      "source_sha256": "2b4e792691324a498930f4ac05ff99ee1bc0c9d79d72d44fe3a5df0ddff620b3",
+      "purpose": "Independent reference only: consumes/discards per-key bounds metadata."
+    }
+  ],
+  "adaptations": [
+    "Typed alternate ammo boundary and owned resources",
+    "Bounded 1-unit box gravity integration, projected contacts and exponential ground friction; not retail physics",
+    "Finite inverted per-key metadata retained and warned, never used for gameplay bounds",
+    "Separate repeated sequential explosion permission and reentrant guard",
+    "No new global, dependency or modified reference/commercial file"
+  ],
+  "unsupported": [
+    "Autonomous M16 Cultist firing: original rifle animation missing",
+    "Object-bound smoke trail and source screen shake",
+    "Complete composite, chrome/multiplayer boost/recoil/view-key audio",
+    "Required services, missing geometry and safe NEW_LEVEL"
+  ]
+}

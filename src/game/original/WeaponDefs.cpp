@@ -2,6 +2,66 @@
 namespace
 {
     constexpr WeaponData definitions[] = {
+        // M16 Assault Rifle
+        {
+            "Models\\Weapons\\M16_pv.abc",              // Model
+            "Models\\Weapons\\lh_M16_pv.abc",           // Model
+            "Skins\\Weapons\\C_M16_pv_t.dtx",           // Skin
+            "Models\\Powerups\\M16_pu.abc",             // 3rd person model
+            "Skins\\Powerups\\M16_pu.dtx",              // 3rd person skin
+            WEAP_ASSAULTRIFLE,                          // Type
+            TYPE_AUTORIFLE,                             // Fire type
+            AMMO_BULLET,                                // Ammo type
+            1,                                          // Ammo Use
+            5,                                          // Alt Ammo Use
+            10.0f,                                      // Min Damage
+            16.0f,                                      // Max Damage
+            100.0f,                                     // Min Alt damage
+            140.0f,                                     // Max Alt damage
+            0.1f,                                       // Reload time
+            0.0f,                                       // Alt reload time
+            {75.0f, 25.0f},                             // Spread
+            {50.0f, 50.0f},                             // Alt Spread
+            0.0f,                                       // Projectile Velocity
+            1500.0f,                                    // Alt Projectile Velocity
+            3500.0f,                                    // Range
+            400.0f,                                     // Alt Range
+            1,                                          // Shots per fire
+            1,                                          // Alt Shots per fire
+            3,                                          // Strength or Magic required
+            0,                                          // Two-handed Strength or Magic required
+            0,                                          // Damage Radius (projectiles)
+            200,                                        // Alt Damage Radius (projectiles)
+            DFALSE,                                     // Alt fire zoom
+            DFALSE,                                     // Semi-auto
+            "Sounds\\Weapons\\assault\\fire.wav",       // Fire sound
+            "Sounds\\Weapons\\assault\\alt.wav",        // Alt Fire sound
+            "",                                         // Empty weapon sound
+            "",                                         // Alt Empty weapon sound
+            NULL,                                       // Projectile class
+            "CGrenade",                                 // Alt Projectile class
+            100,                                        // Muzzle Flash radius
+            {1.0f, 0.68f, 0.35f},                       // Muzzle Flash color
+            "M16 Assault Rifle",                        // Name
+            IDS_WEAPON_M16,                             // Name ID (resource)
+            "Sprites\\m16flare.spr",                    // flash sprite name
+            "Sprites\\m16altflare.spr",                 // alt flash Sprite name
+            0.1f,                                       // Flash duration
+            0.125f,                                     // Flash scale
+            {0.0f, 0.0f, 0.0f},                         // 3rd person gun offset
+            {0.7f, -0.9f, 1.7f},                        // Gun Offset
+            {0.0f, 0.275f, 3.0f},                       // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                      // Recoil
+            {5.25f, -5.8f, 30.0f},                      // Flash position
+            0.625f,                                     // Eject interval
+            0.5f,                                       // View kick
+            DFALSE,                                     // View kick is Cumulative
+            DTRUE,                                      // Animation looping
+            DFALSE,                                     // Alt anim looping
+            "interface\\statusbar\\weapons\\m16.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\m16_h.pcx", // Highlighted icon for status bar
+        },
+
         // Original Flare Gun (complete definition).
         {
             "Models\\Weapons\\Flarepistol_pv.abc",           // Model

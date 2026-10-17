@@ -8,6 +8,7 @@
 #include "game/original/DestructableModel.h"
 #include "game/original/Door.h"
 #include "game/original/FlareProjectile.h"
+#include "game/original/Grenade.h"
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
 #include "game/original/Projectile.h"
@@ -379,6 +380,10 @@ namespace OpenBlood2
                 player->m_InventoryMgr.ObtainWeapon(WEAP_FLAREGUN);
             if (add_flares_request)
                 player->m_InventoryMgr.AddAmmo(AMMO_FLARE, 20);
+            if (add_assault_request)
+                player->m_InventoryMgr.ObtainWeapon(WEAP_ASSAULTRIFLE);
+            if (add_charges_request)
+                player->m_InventoryMgr.AddAmmo(AMMO_DIEBUGDIE, 20);
             if (add_mac10_request)
                 player->m_InventoryMgr.ObtainWeapon(WEAP_SUBMACHINEGUN);
             if (add_ammo_request)
@@ -390,7 +395,8 @@ namespace OpenBlood2
             if (movement_input_request)
                 game.client_shell.movement_input = *movement_input_request;
         }
-        add_beretta_request = add_mac10_request = add_flare_request = add_flares_request = add_ammo_request = false;
+        add_beretta_request = add_mac10_request = add_flare_request = add_flares_request = add_ammo_request =
+            add_assault_request = add_charges_request = false;
         weapon_input_request.reset();
         weapon_aim_request.reset();
         movement_input_request.reset();
@@ -701,6 +707,9 @@ namespace OpenBlood2
                             ImGui::Text("Decoded ABC: %zu nodes / %zu animations; clip %u at %.1f ms",
                                         object->model->nodes.size(), object->model->animations.size(),
                                         object->animation.animation, object->animation.time);
+                        if (object->model && object->model->invalid_key_bounds)
+                            ImGui::Text("ABC warning: %u unused key bounds have inverted ordering",
+                                        object->model->invalid_key_bounds);
                         if (!object->model_error.empty())
                             ImGui::TextWrapped("Model unavailable: %s", object->model_error.c_str());
                         ImGui::Text("Velocity %.2f %.2f %.2f / Grounded: %s", object->velocity.x, object->velocity.y,
@@ -719,6 +728,17 @@ namespace OpenBlood2
                                         game.server.IsObjectAlive(projectile->m_hFiredFrom) ? "yes" : "no",
                                         game.server.IsObjectAlive(projectile->m_hHitObject) ? "yes" : "no",
                                         projectile->contact.polygon);
+                            if (const auto* grenade = dynamic_cast<const CGrenade*>(projectile))
+                            {
+                                ImGui::Text("Grenade: bounces left %d / contacts %llu / pitch %.3f / yaw %.3f",
+                                            grenade->bounces_left, (unsigned long long)grenade->contacts,
+                                            grenade->pitch, grenade->yaw);
+                                ImGui::Text("Loop %llu / bounce sounds %u / spin %.3f %.3f",
+                                            (unsigned long long)grenade->sound, grenade->bounce_sounds,
+                                            grenade->pitch_velocity, grenade->yaw_velocity);
+                                if (!grenade->sound_error.empty())
+                                    ImGui::TextWrapped("Audio: %s", grenade->sound_error.c_str());
+                            }
                             if (const auto* flare = dynamic_cast<const CFlareProjectile*>(projectile))
                             {
                                 ImGui::Text("Flare tracking %s / start %.3f / last tick %.3f / damage deliveries %u",
@@ -839,6 +859,10 @@ namespace OpenBlood2
                             ImGui::Text("%.3f %s: %s at %.2f %.2f %.2f / delivered %u", report.time,
                                         report.source.c_str(), report.outcome.c_str(), report.position.x,
                                         report.position.y, report.position.z, report.delivered);
+                            if (report.grenade)
+                                ImGui::Text("Grenade: contacts %llu / bounces left %d / explosion passes %u",
+                                            (unsigned long long)report.contacts, report.bounces_left,
+                                            report.explosions);
                             if (report.flare)
                                 ImGui::Text("Flare: tracking %s / burn deliveries %u / burst children %u",
                                             report.tracked ? "yes" : "no", report.burn_ticks, report.burst_children);
@@ -1818,7 +1842,7 @@ namespace OpenBlood2
     }
     void Inspector::draw_weapons(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextUnformatted("Original inventory / Beretta 92F / Ingram Mac-10 / Flare Gun / Chosen Knife");
+        ImGui::TextUnformatted("Original inventory / Beretta 92F / Ingram Mac-10 / Flare Gun / M16 / Chosen Knife");
         auto* player = game.server_shell.Player(game.local_client);
         if (!player)
         {
@@ -1888,13 +1912,18 @@ namespace OpenBlood2
                 add_beretta_request = true;
             if (ImGui::Button("Obtain Mac-10 (inspection)"))
                 add_mac10_request = true;
+            if (ImGui::Button("Obtain M16 (inspection)"))
+                add_assault_request = true;
+            ImGui::SameLine();
+            if (ImGui::Button("Add 20 M16 alternate charges (inspection)"))
+                add_charges_request = true;
             if (ImGui::Button("Obtain Flare Gun (inspection)"))
                 add_flare_request = true;
             ImGui::SameLine();
             if (ImGui::Button("Add 20 flares (inspection)"))
                 add_flares_request = true;
             ImGui::TextWrapped(
-                "These diagnostic grants call inventory directly. Beretta/Mac-10/Flare Gun world pickups also use "
+                "These diagnostic grants call inventory directly. Beretta/Mac-10/Flare Gun/M16 world pickups also use "
                 "original collection rules; chrome and muzzle flashes remain unavailable.");
         }
         auto aim = game.client_shell.rotation;
@@ -1932,6 +1961,10 @@ namespace OpenBlood2
                     definition.m_bAltLoopAnim ? "yes" : "no");
         if (view.model && animation_index(*view.model, "alt_fire") == no_animation)
             ImGui::TextUnformatted("Original alternate animation fallback: primary start/fire/end clips.");
+        ImGui::Text("Ammo pools: primary %u (%.0f) / alternate %u (%.0f)", weapon->GetAmmoType(), weapon->CheckAmmo(),
+                    weapon->GetAmmoType(true), weapon->CheckAmmo(true));
+        if (view.model && view.model->invalid_key_bounds)
+            ImGui::Text("ABC warning: %u unused key bounds have inverted ordering", view.model->invalid_key_bounds);
         draw_weapon_sound(*weapon, game);
         if (view.model && view.animation.animation < view.model->animations.size())
         {

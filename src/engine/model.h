@@ -39,6 +39,7 @@ namespace OpenBlood2
         std::uint32_t time = 0;
         DVector min, max;
         std::string text;
+        bool bounds_valid = true; // Optional per-key metadata; never used as collision/pose bounds.
     };
     struct NodeAnimation
     {
@@ -61,6 +62,7 @@ namespace OpenBlood2
         std::string command;
         DVector min, max;
         std::uint32_t main_vertices = 0;
+        std::uint32_t invalid_key_bounds = 0;
         std::vector<std::uint16_t> lod_starts;
         std::vector<ModelVertex> vertices;
         std::vector<ModelFace> faces;

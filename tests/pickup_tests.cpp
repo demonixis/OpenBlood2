@@ -396,6 +396,13 @@ namespace
                               gun->value.amount == 8 && gun->resource_id == IDS_WEAPON_FLAREGUN);
                         std::cout << "Authored FlareGunPU: " << path << '\n';
                     }
+                    if (source.class_name == "AssaultRiflePU")
+                    {
+                        auto* gun = dynamic_cast<PickupObject*>(g.objects.get(h)->game.get());
+                        CHECK(gun && gun->value.kind == PickupKind::Weapon && gun->value.type == WEAP_ASSAULTRIFLE &&
+                              gun->value.amount == 50 && gun->resource_id == IDS_WEAPON_M16);
+                        std::cout << "Authored AssaultRiflePU: " << path << '\n';
+                    }
                     missing += !g.objects.get(h)->model;
                 }
                 CHECK(g.objects.clear() && AmmoPickup::m_dwNumPickups == 0);
@@ -426,8 +433,9 @@ namespace
             CHECK(reason.ends_with("invalid property TypeAction"));
             rejected += n;
         }
-        CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2);
-        CHECK(worlds == 57 && created == 1265 && missing == 0 && rejected == 176 && spawns == 60);
+        CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2 &&
+              counts["AssaultRiflePU"] == 5);
+        CHECK(worlds == 57 && created == 1270 && missing == 0 && rejected == 176 && spawns == 60);
         return true;
     }
 } // namespace

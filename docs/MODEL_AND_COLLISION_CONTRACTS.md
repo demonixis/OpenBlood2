@@ -1,5 +1,7 @@
 # M2 Model and Collision Services
 
+The [M16/grenade continuation](ASSAULT_CONTRACTS.md) adds ID 9 and mode-specific ammo, original grenade callbacks and explicit finite key-bound metadata warnings. Earlier supported-weapon limits are historical; remaining services and M2 stay open.
+
 > Extended by [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md): original multi-hit
 > material rules, selected impact audio and automatic impact hearing now execute.
 > Earlier impact-audio omissions are historical; visuals and the M2 gate remain open.

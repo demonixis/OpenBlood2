@@ -22,6 +22,11 @@ class SubMachineGunPU : public WeaponPickup
   public:
     SubMachineGunPU();
 };
+class AssaultRiflePU : public WeaponPickup
+{
+  public:
+    AssaultRiflePU();
+};
 class FlareGunPU : public WeaponPickup
 {
   public:

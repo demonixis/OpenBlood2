@@ -15,6 +15,13 @@ SubMachineGunPU::SubMachineGunPU()
     display_name = "Sub-machine Gun";
     resource_id = IDS_WEAPON_MAC10;
 }
+AssaultRiflePU::AssaultRiflePU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_ASSAULTRIFLE, 50};
+    file = "m16_pu";
+    display_name = "Assault Rifle";
+    resource_id = IDS_WEAPON_M16;
+}
 FlareGunPU::FlareGunPU()
 {
     value = {OpenBlood2::PickupKind::Weapon, WEAP_FLAREGUN, 8};
@@ -30,6 +37,8 @@ const char* WeaponPickupClass(DDWORD type)
             return "BerettaPU";
         case WEAP_SUBMACHINEGUN:
             return "SubMachineGunPU";
+        case WEAP_ASSAULTRIFLE:
+            return "AssaultRiflePU";
         case WEAP_FLAREGUN:
             return "FlareGunPU";
         default:

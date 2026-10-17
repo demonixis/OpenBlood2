@@ -1,4 +1,5 @@
 #include "engine/world_model.h"
+#include "game/original/Projectile.h"
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
@@ -435,7 +436,7 @@ namespace OpenBlood2
         {
             auto* r = objects_.get(id);
             if (!r || r->life != Life::Alive || r->attachment || r->activity != OBJSTATE_ACTIVE || r->client_movement ||
-                r->container || (r->world_model && !r->world_body) ||
+                r->container || dynamic_cast<CProjectile*>(r->game.get()) || (r->world_model && !r->world_body) ||
                 (!r->world_body && r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
                 continue;
             ContainerState containers;

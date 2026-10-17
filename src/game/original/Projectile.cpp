@@ -1,6 +1,7 @@
 // Original ObjectDLL/Projectile.cpp and GameProjectiles.cpp, selected non-Zealot energy path.
 #include "Projectile.h"
 #include "FlareProjectile.h"
+#include "Grenade.h"
 #include "SurfaceTypes.h"
 #include "engine/collision.h"
 #include "engine/objects.h"
@@ -35,6 +36,14 @@ void CProjectile::Finish(const char* outcome)
         report.query = wave->ground_result;
         report.blast_position = wave->blast_position;
         report.blast_normal = wave->blast_normal;
+    }
+    if (const auto* grenade = dynamic_cast<const CGrenade*>(this))
+    {
+        report.grenade = true;
+        report.bounces_left = grenade->bounces_left;
+        report.contacts = grenade->contacts;
+        report.explosions = grenade->explosion_passes;
+        report.delivered = grenade->damage_deliveries;
     }
     if (const auto* flare = dynamic_cast<const CFlareProjectile*>(this))
     {
@@ -123,7 +132,7 @@ bool CProjectile::Setup(DVector direction, DBYTE type, float damage, float speed
     if (g_pServerDE->SetObjectRotation(m_hObject, &rotation) != DE_OK ||
         g_pServerDE->SetVelocity(m_hObject, &velocity) != DE_OK)
         return Fail("Projectile transform/velocity failed");
-    g_pServerDE->SetObjectFlags(m_hObject, flags & ~FLAG_GRAVITY); // Original CEnergyBlast override.
+    g_pServerDE->SetObjectFlags(m_hObject, flags); // Concrete classes retain their original gravity policy.
     configured = true;
     return true;
 }
@@ -202,10 +211,19 @@ bool CProjectile::AdvanceFlight(double seconds)
     }
     return !failed;
 }
-void CProjectile::Explode()
+void CProjectile::Explode(bool repeat)
 {
-    if (exploded || failed)
+    if ((exploded && !repeat) || exploding_ || failed || !g_pServerDE->IsObjectAlive(m_hObject))
         return;
+    exploding_ = true;
+    struct Reset
+    {
+        bool& value;
+        ~Reset()
+        {
+            value = false;
+        }
+    } reset{exploding_};
     exploded = true;
     DVector position;
     g_pServerDE->GetObjectPos(m_hObject, &position);
@@ -227,6 +245,8 @@ void CProjectile::Explode()
         else
             targets.cancelled = true;
     }
+    if (auto* grenade = dynamic_cast<CGrenade*>(this))
+        grenade->damage_deliveries += targets.delivered;
     if (targets.cancelled)
         error = "Projectile damage traversal interrupted or unavailable";
     if (m_hHitObject)
@@ -243,7 +263,7 @@ bool CProjectile::AddImpact(DVector position)
     m_vDir = vector_scale(m_vDir, 20);
     SegmentHit impact;
     auto normal = vector_scale(m_vDir, -1), point = position;
-    if (m_hHitObject || (!contact.object && contact.polygon != UINT32_MAX))
+    if (m_hHitObject || (!dynamic_cast<CGrenade*>(this) && !contact.object && contact.polygon != UINT32_MAX))
     {
         const auto query = g_pServerDE->IntersectSegment(from, vector_add(position, m_vDir), nullptr, impact);
         if (query != SegmentResult::Hit && query != SegmentResult::Miss)

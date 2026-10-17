@@ -82,7 +82,8 @@ namespace OpenBlood2
         std::optional<DVector> player_position_request;
         std::optional<MovementInput> movement_input_request;
         bool select_weapons = false, add_beretta_request = false, add_mac10_request = false, add_flare_request = false,
-             add_flares_request = false, add_ammo_request = false;
+             add_flares_request = false, add_ammo_request = false, add_assault_request = false,
+             add_charges_request = false;
         int weapon_slot_request = -1;
         bool weapon_left = false;
         std::optional<WeaponInput> weapon_input_request;

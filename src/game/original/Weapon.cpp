@@ -6,10 +6,11 @@
 #include <random>
 
 using namespace OpenBlood2;
-float CWeapon::CheckAmmo() const
+float CWeapon::CheckAmmo(bool alternate) const
 {
-    return data.m_nAmmoType == AMMO_NONE ? 1.0f
-                                         : (m_pInventoryMgr ? m_pInventoryMgr->GetAmmoCount(data.m_nAmmoType) : 0.0f);
+    return GetAmmoType(alternate) == AMMO_NONE
+               ? 1.0f
+               : (m_pInventoryMgr ? m_pInventoryMgr->GetAmmoCount(GetAmmoType(alternate)) : 0.0f);
 }
 FireResult CWeapon::Fire(const WeaponFire& request)
 {
@@ -55,7 +56,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     last_shot.damage = request.alternate ? sample(data.m_fMinAltDamage, data.m_fMaxAltDamage)
                                          : sample(data.m_fMinDamage, data.m_fMaxDamage);
     const auto use = request.alternate ? data.m_nAltAmmoUse : data.m_nAmmoUse;
-    const auto ammo = CheckAmmo();
+    const auto ammo = CheckAmmo(request.alternate);
     if (ammo < use)
     {
         last_shot.result = FireResult::Dry;
@@ -77,7 +78,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
             server->GetObjectPos(m_hOwner, &eye);
             eye.y += player->eye_level;
             last_shot.request.position = request.position;
-            if (data.m_nType == WEAP_FLAREGUN)
+            if (data.m_nType == WEAP_FLAREGUN || (data.m_nType == WEAP_ASSAULTRIFLE && request.alternate))
             {
                 SegmentHit close_hit;
                 const auto close = server->IntersectSegment(eye, vector_add(eye, vector_scale(forward, 60)), m_hOwner,
@@ -133,7 +134,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     if (!trace())
         return last_shot.result;
     // Selected definitions emit one shot; alternate Flare Gun consumes eight rounds.
-    m_pInventoryMgr->SetAmmoCount(data.m_nAmmoType, ammo - use);
+    m_pInventoryMgr->SetAmmoCount(GetAmmoType(request.alternate), ammo - use);
     m_fLastShotTime = server->GetTime();
     m_bLastFireAlt = request.alternate;
     ++shots;

@@ -90,7 +90,7 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
         return false;
     }
     const auto& data = weapon->data;
-    auto ammo = [&] { return weapon->CheckAmmo(); };
+    auto ammo = [&](bool alt) { return weapon->CheckAmmo(alt); };
     auto fire = [&]()
     {
         if (!server.Player(client))
@@ -143,9 +143,9 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
             }
             if (time - last_shot_time_ > (last_alt_ ? data.m_fAltReloadTime : data.m_fReloadTime))
             {
-                const int mode = primary && ammo() >= data.m_nAmmoUse        ? 0
-                                 : alternate && ammo() >= data.m_nAltAmmoUse ? 1
-                                                                             : -1;
+                const int mode = primary && ammo(false) >= data.m_nAmmoUse       ? 0
+                                 : alternate && ammo(true) >= data.m_nAltAmmoUse ? 1
+                                                                                 : -1;
                 if (mode >= 0)
                 {
                     last_shot_time_ = time;
@@ -197,19 +197,19 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
             const auto use = alt ? data.m_nAltAmmoUse : data.m_nAmmoUse;
             if (fire_[alt] == no_animation && !looping)
             {
-                if (ammo() >= use && !fire())
+                if (ammo(alt) >= use && !fire())
                     return false;
                 state = next;
             }
             else if (looping)
             {
-                if (!firing || ammo() < use)
+                if (!firing || ammo(alt) < use)
                 {
                     state = next;
                     animation.looping = false;
                 }
             }
-            else if (data.m_bSemiAuto && !alt && !last_firing_ && firing && ammo() >= use)
+            else if (data.m_bSemiAuto && !alt && !last_firing_ && firing && ammo(alt) >= use)
                 animation.reset();
             else if (!PlayAnimation(fire_[alt]))
                 state = next;

@@ -241,9 +241,15 @@ namespace OpenBlood2
                 key.min = a.vec();
                 key.max = a.vec();
                 key.text = a.string();
-                if (!a.good() || !bounds(key.min, key.max) || key.time > anim.duration ||
+                if (!a.good() || !coordinate(key.min) || !coordinate(key.max) || key.time > anim.duration ||
                     (j && key.time < anim.keys.back().time))
-                    return fail("invalid animation key");
+                    return fail(("invalid animation key: clip=" + anim.name + " key=" + std::to_string(j)).c_str());
+                // M16's end_alt_fire_craig includes finite inverted per-key bounds.
+                // Donor readers discard this unused metadata. Retain it and expose
+                // its invalid ordering; animation dimensions and all pose data keep
+                // their strict validation. Never use these bounds for collision.
+                key.bounds_valid = bounds(key.min, key.max);
+                model.invalid_key_bounds += !key.bounds_valid;
                 anim.keys.push_back(std::move(key));
             }
             for (const auto& node : model.nodes)

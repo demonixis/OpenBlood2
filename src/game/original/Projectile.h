@@ -11,7 +11,7 @@ class CProjectile : public BaseClass
     bool Setup(DVector, DBYTE, float damage, float speed, int radius, HOBJECT);
     virtual bool AdvanceFlight(double seconds);
     virtual void HandleContact(const OpenBlood2::SegmentHit&);
-    void Explode();
+    void Explode(bool repeat = false);
     bool contacted = false;
     OpenBlood2::DamageType damage_type = OpenBlood2::DamageType::Explode;
     CDestructable m_damage;
@@ -36,6 +36,7 @@ class CProjectile : public BaseClass
     virtual bool Update();
     virtual void AddExplosion(DVector, DVector) = 0;
     bool AddImpact(DVector);
+    bool exploding_ = false;
     void Finish(const char*);
     bool Fail(const char*);
 };

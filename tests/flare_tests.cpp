@@ -413,7 +413,7 @@ namespace
         }
         std::cout << "CityHub created=" << created << " unsupported=" << unknown << " failed=" << failed
                   << " flare NPCs=" << flare << '\n';
-        CHECK(created == 432 && unknown == 21 && failed == 1 && flare == 1);
+        CHECK(created == 433 && unknown == 20 && failed == 1 && flare == 1);
         CHECK(g.unload_world());
         return true;
     }
