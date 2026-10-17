@@ -235,6 +235,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     boss_health = {};
     boss_health_messages = 0;
     boss_health_visible = false;
+    communication.Reset(server_);
     objectives = {};
     objectives_error.clear();
     objective_messages = 0;
@@ -270,6 +271,7 @@ void CBloodClientShell::OnExitWorld()
     boss_health = {};
     boss_health_messages = 0;
     boss_health_visible = false;
+    communication.Reset(server_);
     objectives = {};
     objectives_error.clear();
     objective_messages = 0;
@@ -343,6 +345,10 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         // Original SMSG_BOSSHEALTH hides the bar at full health or zero.
         boss_health_visible = value->fraction > 0 && value->fraction < 1;
     }
+    else if (const auto* value = std::get_if<OpenBlood2::Conversation>(&event))
+    {
+        communication.Start(server_, *value); // Original ignores COMM_BUSY.
+    }
     else if (const auto* value = std::get_if<OpenBlood2::MissionObjectives>(&event))
     {
         // SMSG_OBJECTIVES: single/custom only; resource IDs override authored strings.
@@ -370,6 +376,7 @@ bool CBloodClientShell::Update()
     if (!m_bInWorld || server_.GetClientUserData(client_) != player)
         return false;
     ++updates;
+    communication.Update(server_, player);
     server_.GetObjectPos(player, &position);
     const auto* owner = dynamic_cast<CPlayerObj*>(server_.HandleToObject(player));
     if (!owner)

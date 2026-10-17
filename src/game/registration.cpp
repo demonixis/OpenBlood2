@@ -7,6 +7,7 @@
 #include "game/original/CivilianAI.h"
 #include "game/original/ClientExplosionSFX.h"
 #include "game/original/ClientLightFX.h"
+#include "game/original/ConversationTrigger.h"
 #include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
 #include "game/original/DestructableModel.h"
@@ -539,6 +540,18 @@ namespace OpenBlood2
              {"TouchActivate", false},
              {"AIActivate", false},
              {"TriggerRelayActivate", false}}};
+        const ClassInfo conversation_trigger{
+            "ConversationTrigger", &trigger, construct<ConversationTrigger>, []
+            {
+                std::vector<PropertySpec> p{
+                    {"CharacterType", std::int32_t(0)}, {"RepeatLastMessage", false}, {"LoopToFirstMessage", false},
+                    {"TouchActivate", false},           {"AIActivate", false},        {"ObjectActivate", false},
+                    {"TriggerRelayActivate", false}};
+                for (unsigned i = 0; i < 8; ++i)
+                    p.push_back({std::string("WaveFile") + (i ? std::to_string(i + 1) : ""),
+                                 std::string(i ? "" : "default.wav"), true, 199});
+                return p;
+            }()};
         const ClassInfo big_trigger{"BigTrigger", &trigger, construct<BigTrigger>, {}};
         const ClassInfo toggle_trigger{"ToggleTrigger", &trigger, construct<ToggleTrigger>, []
                                        {
@@ -772,15 +785,15 @@ namespace OpenBlood2
                objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
                objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
                objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
-               objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
-               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
-               objects.register_class(world_debris) && objects.register_class(hand_model) &&
-               objects.register_class(corpse) && objects.register_class(grenade) &&
-               objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
-               objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
-               objects.register_class(shockwave_projectile);
+               objects.register_class(objectives_trigger) && objects.register_class(conversation_trigger) &&
+               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+               objects.register_class(door) && objects.register_class(rotating_door) &&
+               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
+               objects.register_class(rotating_brush) && objects.register_class(world_debris) &&
+               objects.register_class(hand_model) && objects.register_class(corpse) &&
+               objects.register_class(grenade) && objects.register_class(flare_projectile) &&
+               objects.register_class(flare_alt) && objects.register_class(flare_burst) &&
+               objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

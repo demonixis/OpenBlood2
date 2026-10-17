@@ -935,3 +935,16 @@ explosion repetition is retained with reentrant guards. Finite inverted unused A
 key bounds are preserved and diagnosed, following read-only donor analysis rather
 than changing private content. See [ledger](M2_ASSAULT_SOURCES.json),
 [contracts](ASSAULT_CONTRACTS.md) and [evidence](../../Documentation/Implementation/M2_ASSAULT.md).
+
+## Original conversation sequencing and communication
+
+ConversationTrigger properties/precreate/SendMessages and all 119 filename/text
+pairs come from the original ObjectDLL sources. The numeric-character CCommLink
+StartCommunication and tab/text/sound portions of Draw come from ClientShellDLL,
+with its original SMSG_CONVERSATION dispatch and PlaySoundLocal argument semantics.
+Owned bounded events replace HSTRING/wire storage; timing runs in client simulation
+so inspection visibility cannot freeze it. HUD drawing and VoiceMgr arbitration
+remain explicitly unavailable. No authored missing cue is remapped or synthesized.
+See [ledger](M2_CONVERSATION_SOURCES.json), [contracts](CONVERSATION_CONTRACTS.md)
+and [evidence](../../Documentation/Implementation/M2_CONVERSATIONS.md). No dependency,
+mutable game global, reference edit or commercial asset import is introduced.

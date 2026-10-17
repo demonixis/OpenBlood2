@@ -85,6 +85,9 @@ namespace OpenBlood2
                 else if constexpr (std::is_same_v<T, WorldExit>)
                     return value.next_world.size() <= 100 && value.next_world.find('\0') == std::string::npos &&
                            static_cast<DBYTE>(value.type) <= static_cast<DBYTE>(WorldExitType::Episode);
+                else if constexpr (std::is_same_v<T, Conversation>)
+                    return !value.file.empty() && value.file.size() < 200 && value.text.size() < 500 &&
+                           value.file.find('\0') == std::string::npos && value.text.find('\0') == std::string::npos;
                 else if constexpr (std::is_same_v<T, MissionObjectives>)
                     return value.resource <= 65535 - 6000 + 1 && value.title.size() <= MAX_GP_STRING_LEN &&
                            value.text.size() <= MAX_GP_STRING_LEN && value.title.find('\0') == std::string::npos &&

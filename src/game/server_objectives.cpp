@@ -1,6 +1,17 @@
 #include "game/server_adapter.h"
 namespace OpenBlood2
 {
+    DRESULT ServerAdapter::SendConversation(const Conversation& value)
+    {
+        trace_service("SendConversation");
+        for (const auto& [client, state] : clients_)
+        {
+            (void)state;
+            if (GetClientUserData(client))
+                return SendToClient(client, value);
+        }
+        return DE_NOTFOUND;
+    }
     DRESULT ServerAdapter::SendObjectives(const MissionObjectives& value)
     {
         trace_service("SendObjectives");

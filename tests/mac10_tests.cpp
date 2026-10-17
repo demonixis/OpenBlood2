@@ -263,7 +263,7 @@ namespace
         }
         std::cout << "CityHub created=" << created << " unknown=" << unknown << " failed=" << failed << " Mac10=" << mac
                   << '\n';
-        CHECK(mac == 1 && created == 433 && unknown == 20 && failed == 1);
+        CHECK(mac == 1 && created == 434 && unknown == 19 && failed == 1);
         for (auto id : g.objects.snapshot())
             if (auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(g.objects.get(id)->handle));
                 a && a->runtime_failed)

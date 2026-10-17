@@ -1,5 +1,7 @@
 # Original triggers, door SelfTrigger and keys
 
+> Extended by [conversation contracts](CONVERSATION_CONTRACTS.md): original dialogue sequencing and typed client communication are connected; authored missing mappings remain failures.
+
 > Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and
 > shell exit/load messages now execute. NEW_LEVEL still explicitly refuses missing
 > keep-alive transfer before teardown; this is not a completed level transition.

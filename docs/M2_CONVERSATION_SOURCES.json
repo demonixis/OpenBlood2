@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "18752f58a367073030dc9dbed916f9862bbb9743",
+  "status": "M2 incomplete; original ConversationTrigger and bounded CCommLink timing/audio",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/ConversationTrigger.cpp",
+      "source_sha256": "37db64a11c634bb7b1b91e06782db30adefa71b73c3304ed4e1e04bafb175ce3",
+      "purpose": "Original registration/defaults, precreate order, wave sequence and typed broadcast selection; save/load omitted explicitly."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ConversationTrigger.h",
+      "source_sha256": "9061ade6236bb36ebe0946d76b9c4f619e9eb97fd7b40576e26b0212478bbe59",
+      "purpose": "Trigger inheritance and delayed SendMessage forwarding."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ConversationStrings.h",
+      "source_sha256": "f165040474094b206d4e4d10f9c6ed5afa3dba61b2cdffa3a68cf1884946521f",
+      "purpose": "Complete immutable filename/text table and backslash-only first-match lookup."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Trigger.cpp",
+      "source_sha256": "373658121f86b4d792eeb986a0e093291af3e1205b831385f142cf2ea445198c",
+      "purpose": "Inherited activation/filter/reset/delayed callback rules."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/CommLink.cpp",
+      "source_sha256": "d870df0e5486ea70ee88c6f9829bb8257dbe8566c26905f1c56734ae50300e92",
+      "purpose": "Numeric-character StartCommunication and original tab/text timing and sound lifecycle from Draw."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/CommLink.h",
+      "source_sha256": "d6dea2ec6fff1abeb7f4ca0f63c851f4bb468bbc4b615f21cc7fcbd3a740f702",
+      "purpose": "Character constants, buffer bounds and scroll duration."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "purpose": "SMSG_CONVERSATION dispatch and ignored COMM_BUSY."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
+      "source_sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
+      "purpose": "PlaySoundLocal argument order: retained timed buffered local audio, not streaming."
+    },
+    {
+      "source": "sources/blood2/Shared/SoundTypes.h",
+      "source_sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "purpose": "SOUNDPRIORITY_MISC_HIGH intent."
+    }
+  ],
+  "adaptations": [
+    "Owned bounded strings/events replace HSTRING and old wire serialization.",
+    "Client timing runs in simulation instead of Draw, including inspector-free builds.",
+    "Original immutable table uses ASCII case-insensitive comparisons and retains backslash-only basename lookup.",
+    "Unmapped authored paths stay failures; real playback probes are separately labelled diagnostics.",
+    "Original portrait/font rendering and VoiceMgr stop/delay arbitration are explicitly unavailable."
+  ]
+}

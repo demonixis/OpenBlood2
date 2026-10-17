@@ -193,6 +193,7 @@ namespace OpenBlood2
         CBloodServerShell* session_shell = nullptr;
         DRESULT SendWorldExit(const WorldExit&, const std::string&) override;
         DRESULT SendBossHealth(const BossHealth&) override;
+        DRESULT SendConversation(const Conversation&) override;
         DRESULT SendObjectives(const MissionObjectives&) override;
         bool GetClientResourceString(std::uint32_t, std::string&) override;
         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;

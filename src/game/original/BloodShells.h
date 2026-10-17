@@ -1,4 +1,5 @@
 #pragma once
+#include "CommLink.h"
 #include "MoveMgr.h"
 #include "PathMgr.h"
 #include "PlayerObj.h"
@@ -103,6 +104,7 @@ class CBloodClientShell
     OpenBlood2::BossHealth boss_health;
     std::uint64_t boss_health_messages = 0;
     bool boss_health_visible = false;
+    CCommLink communication;
     OpenBlood2::MissionObjectives objectives;
     std::string objectives_error;
     std::uint64_t objective_messages = 0;

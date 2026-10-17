@@ -1,4 +1,5 @@
 #include "game/original/CinematicTrigger.h"
+#include "game/original/ConversationTrigger.h"
 #include "inspector.h"
 #include <imgui.h>
 namespace OpenBlood2
@@ -23,6 +24,56 @@ namespace OpenBlood2
         if (!audio.mixed.empty())
             ImGui::PlotLines("Left PCM", audio.mixed.data(), int(audio.mixed.size() / 2), 0, nullptr, -1, 1,
                              ImVec2(0, 40), 2 * sizeof(float));
+        ImGui::Separator();
+        const auto& comm = game.client_shell.communication;
+        ImGui::Text("Conversation client: tab %u / text %u / received %llu / started %llu / busy drops %llu",
+                    comm.level, comm.text_level, (unsigned long long)comm.received, (unsigned long long)comm.started,
+                    (unsigned long long)comm.busy);
+        ImGui::TextWrapped("%s", comm.message.text.c_str());
+        ImGui::TextWrapped("WAV: %s | portrait: %s", comm.message.file.c_str(), comm.portrait.c_str());
+        ImGui::Text("Voice %llu / attempts %llu / failures %llu / text-based duration %.3f s",
+                    (unsigned long long)comm.voice, (unsigned long long)comm.sound_attempts,
+                    (unsigned long long)comm.sound_failures, comm.length);
+        ImGui::Text("Scroll tab/text %.3f / %.3f | VoiceMgr requests %llu / requested delay %.3f", comm.ratio,
+                    comm.text_ratio, (unsigned long long)comm.voice_manager_requests, comm.voice_manager_delay);
+        ImGui::TextWrapped("Original portrait/font HUD and client VoiceMgr stop/delay arbitration are unavailable. "
+                           "These are inspected requests, not successful services.");
+        if (!comm.error.empty())
+            ImGui::TextWrapped("Conversation audio: %s", comm.error.c_str());
+        for (auto id : game.objects.snapshot())
+        {
+            const auto* record = game.objects.get(id);
+            const auto* conversation = dynamic_cast<const ConversationTrigger*>(record->game.get());
+            if (!conversation)
+                continue;
+            ImGui::PushID(int(id.slot));
+            if (ImGui::TreeNode(record->state.m_Name))
+            {
+                ImGui::Text("Current %u / count %u / character %u / active %s / repeat %s / loop %s",
+                            conversation->current, conversation->count, conversation->character,
+                            conversation->active ? "yes" : "no", conversation->repeat_last ? "yes" : "no",
+                            conversation->loop ? "yes" : "no");
+                ImGui::Text("Attempts %llu / queued %llu / unmapped %llu / last result %d",
+                            (unsigned long long)conversation->attempts, (unsigned long long)conversation->queued,
+                            (unsigned long long)conversation->unmapped, int(conversation->last_delivery));
+                if (ImGui::Button("Send conversation TRIGGER"))
+                {
+                    trigger_request = id;
+                    trigger_command = "TRIGGER";
+                }
+                if (!conversation->error.empty())
+                    ImGui::TextWrapped("%s", conversation->error.c_str());
+                for (unsigned n = 0; n < conversation->waves.size(); ++n)
+                {
+                    const auto& file = conversation->waves[n];
+                    const auto* text = conversation_text(file);
+                    ImGui::TextWrapped("%u: %s [%s] %s", n + 1, file.c_str(),
+                                       game.resources.find(file) ? "indexed" : "absent", text ? text : "[unmapped]");
+                }
+                ImGui::TreePop();
+            }
+            ImGui::PopID();
+        }
         ImGui::Separator();
         for (auto id : game.objects.snapshot())
         {
