@@ -109,3 +109,5 @@ Dynamic polygon collision, rigid stacks, recursive pushes/crushing, SpawnObject,
 WorldModelDebris, player impulses, client FX/audio, full player/AI/combat, portals,
 world transitions and save/restore remain pending. M2 is not a playable session.
 No retail executable comparison, additional platform or XR validation is claimed.
+
+The [player damage-impulse continuation](player_impulse_contracts.md) supersedes the player-impulse omission for the admitted local single-player body only. NPC/trapped impulses, dedicated pusher/body contact forces and retail physics parity remain separate.

@@ -88,6 +88,7 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
     m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = 100;
     m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = 100;
     m_damage.m_fMass = 250;
+    m_damage.apply_damage_physics = true; // Original CDestructable default for the player.
     // Original SetMass(PA_DEFAULT_MASS), followed by player friction zero.
     if (!server->ConfigureCharacterBody(m_hObject, m_damage.m_fMass, 0))
         return DFALSE;

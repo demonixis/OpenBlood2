@@ -1750,6 +1750,11 @@ namespace OpenBlood2
                             player->fall_damage_speed, player->fall_damage_amount);
                 if (!player->fall_damage_error.empty())
                     ImGui::TextWrapped("%s", player->fall_damage_error.c_str());
+                const auto& damage = player->m_damage;
+                ImGui::Text("Damage impulses: enabled %d | accepted %llu | last %s (%.2f, %.2f, %.2f)",
+                            damage.apply_damage_physics, static_cast<unsigned long long>(damage.damage_impulses),
+                            damage.last_impulse_ok ? (damage.damage_impulses ? "accepted" : "none") : "rejected",
+                            damage.last_impulse.x, damage.last_impulse.y, damage.last_impulse.z);
                 if (!player->landing_error.empty())
                     ImGui::TextWrapped("%s", player->landing_error.c_str());
             }

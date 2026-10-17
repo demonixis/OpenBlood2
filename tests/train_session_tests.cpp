@@ -310,6 +310,11 @@ namespace
             CHECK(slot.sent == 1);
         CHECK(g.client_shell.weapons.front().fire_keys > 0 && p->fade_messages == 1);
         CHECK(p->unsupported_triggers == 1 && p->last_unsupported_player_trigger == "MUSIC LEVEL 3");
+        CHECK(p->m_damage.apply_damage_physics && p->m_damage.last_impulse_ok);
+        // The 30 Hz driver takes enemy hits; the 60 Hz route can finish unhurt.
+        if (hz == 30)
+            CHECK(p->m_damage.damage_impulses > 0);
+        std::cout << "Player damage impulses=" << p->m_damage.damage_impulses << '\n';
         CHECK(trace_services(g, "SubwayA", error));
         const float health = p->m_damage.m_fHitPoints, ammo = p->m_InventoryMgr.GetAmmoCount(1);
         const auto revision = g.world_revision;
@@ -331,6 +336,7 @@ namespace
         CHECK(game->level_change.selected_start == "01_egressa" && !game->level_change.start_fallback);
         p = game->server_shell.Player(game->local_client);
         CHECK(p && p->m_damage.m_fHitPoints == health && p->m_InventoryMgr.GetAmmoCount(1) == ammo);
+        CHECK(p->m_damage.apply_damage_physics && p->m_damage.damage_impulses == 0);
         CHECK(game->client_shell.fade.Scale() == 1 && !game->client_shell.fade.messages);
         controls.player_changed();
         if (gpu)

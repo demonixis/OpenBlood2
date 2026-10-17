@@ -125,7 +125,7 @@ void CDestructable::SendTrigger(const std::string& target, const std::string& me
         server->FreeString(text);
 }
 // Shared damage; production NPC localization is in AIHitReaction.cpp.
-// Player/NPC impulses, powerups and complete death reactions remain bounded separately.
+// NPC impulses, powerups and complete death reactions remain bounded separately.
 DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD message, HMESSAGEREAD read)
 {
     if (message == 1000)
@@ -184,7 +184,11 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
             if (damage.type != OpenBlood2::DamageType::Death && m_bNighInvulnerable &&
                 dynamic_cast<CBaseCharacter*>(owner))
                 amount *= .05f; // Original character modifier, before impulses and armor.
-            if (apply_damage_physics && damage.type != OpenBlood2::DamageType::Death)
+            // Original single-player exclusion: self damage changes health, not velocity.
+            // The local player shares the MoveMgr body, so SetVelocity is consumed once;
+            // replaying the donor's second client-body ADDVELOCITY would double the impulse.
+            const bool self_player = dynamic_cast<CPlayerObj*>(owner) && damage.attacker == m_hObject;
+            if (apply_damage_physics && damage.type != OpenBlood2::DamageType::Death && !self_player)
                 ApplyDamagePhysics(amount, damage.direction);
             if (m_fArmorPoints > 0 && damage.type != OpenBlood2::DamageType::Suffocate)
             {

@@ -155,7 +155,7 @@ namespace
             CHECK(p->m_InventoryMgr.AddKey({"second", "Second", "a", "b", 1}) == InventoryResult::Ok);
             CHECK(p->m_InventoryMgr.AddInventoryWeapon(7, 2) == InventoryResult::Ok);
             CHECK(p->m_InventoryMgr.AddInventoryWeapon(8, 2) == InventoryResult::Ok);
-            // Settle the live body before testing that held movement cannot move it after death.
+            // Settle the live body before the lethal hit; death retains its damage impulse.
             for (int i = 0; i < 60; ++i)
                 CHECK(g.step(1. / 60));
             const auto before = g.objects.snapshot();
@@ -202,12 +202,24 @@ namespace
             const auto start = g.objects.get(p->m_hObject)->state.m_Pos;
             const auto ammo = p->m_InventoryMgr.GetAmmoCount(1);
             for (int i = 0; i < 90; ++i)
+            {
                 CHECK(g.step(1. / 60));
+                CHECK(g.client_shell.move_mgr.m_dwControlFlags == 0);
+            }
             const auto finish = g.objects.get(p->m_hObject)->state.m_Pos;
             std::cout << "death type=" << static_cast<int>(type) << " position " << start.x << "," << start.y << ","
                       << start.z << " -> " << finish.x << "," << finish.y << "," << finish.z
                       << " controls=" << g.client_shell.move_mgr.m_dwControlFlags << "\n";
-            CHECK(p->deaths == 1 && close(finish, start, .05f));
+            CHECK(p->deaths == 1 && close(g.objects.get(p->m_hObject)->velocity, {}, .05f));
+            if (type == DamageType::Death)
+                CHECK(close(finish, start, .05f) && p->m_damage.damage_impulses == 0);
+            else
+                CHECK(!close(finish, start, .05f) && p->m_damage.damage_impulses == 1);
+            // Keep forward/fire held after passive momentum has stopped. No second
+            // impulse, movement command or repeated death may restart the body.
+            for (int i = 0; i < 90; ++i)
+                CHECK(g.step(1. / 60));
+            CHECK(p->deaths == 1 && close(g.objects.get(p->m_hObject)->state.m_Pos, finish, .05f));
             CHECK(p->m_InventoryMgr.GetAmmoCount(1) == ammo && g.client_shell.death_camera.fraction == 1);
             if (corpse)
                 CHECK(corpse->animation_done);

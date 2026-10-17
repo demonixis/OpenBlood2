@@ -1,0 +1,100 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "implementation_parent": "711893eb55c7dcd994413474c6c3e9597c8dfbc0",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "source_line_ranges": [
+        [
+          42,
+          46
+        ],
+        [
+          395,
+          416
+        ],
+        [
+          510,
+          513
+        ],
+        [
+          558,
+          560
+        ],
+        [
+          888,
+          924
+        ]
+      ],
+      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "target": "src/game/original/Destructable.cpp",
+      "target_sha256": "5af14475a362e8406ce45e3a63aee33054eb549305ddcf6a37afc82bc757f3ea",
+      "selection": "Original impulse formula, resistance/armor ordering and single-player self-hit exclusion. Existing bounded damage gates remain; already-dead ordering and NPC impulses are not completed."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "source_line_ranges": [
+        [
+          42,
+          46
+        ]
+      ],
+      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "target": "src/game/original/PlayerObj.cpp",
+      "target_sha256": "0cac3e0590f0a70bb9de0694ab2ebf8f6d94351d0d7c92265b31669a41746cd4",
+      "selection": "Enable the original damage-physics default for the admitted fresh local player; saved flag is already restored by the typed aggregate state."
+    }
+  ],
+  "transport_references": [
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          6290,
+          6304
+        ],
+        [
+          6366,
+          6369
+        ],
+        [
+          7386,
+          7510
+        ]
+      ],
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MoveMgr.cpp",
+      "source_line_ranges": [
+        [
+          130,
+          135
+        ],
+        [
+          962,
+          1020
+        ],
+        [
+          1403,
+          1410
+        ]
+      ],
+      "source_sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PhysicalAttributes.h",
+      "source_line_ranges": [
+        [
+          30,
+          30
+        ]
+      ],
+      "source_sha256": "bb58c0afd5e3175a9007063a64fbe31089a1a595851c61e3bfee7a19f72dda55",
+      "selection": "Original damage velocity multiplier 2500; reused existing calculation."
+    }
+  ],
+  "adaptation": "The server and MoveMgr share one checked body; the original SetVelocity therefore applies exactly once without replaying a separate-body ADDVELOCITY message. Existing MoveMgr drag/caps/collision integrate it. No new network or pending save state is introduced."
+}

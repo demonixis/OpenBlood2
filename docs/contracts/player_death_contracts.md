@@ -103,3 +103,5 @@ encounters on a diagnostic floor, not a retail playthrough.
 The NVIDIA death-effects test additionally rasterizes the real player corpse from
 the computed death camera, checks unchanged repeated readback and teardown.
 See the implementation report for exact configurations/results and limitations.
+
+With [player damage impulses](player_impulse_contracts.md) enabled, lethal hits can leave passive motion after death; original DoDeath does not zero velocity. Dead controls remain suppressed while existing drag/collision settle the body. The regression checks both this decay and continued immobility after settling; instant Death damage adds no impulse.

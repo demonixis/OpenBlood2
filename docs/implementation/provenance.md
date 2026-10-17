@@ -1170,3 +1170,5 @@ engine. See [source ledger](sources/m2_fall_damage_sources.json) and
 [contracts](../contracts/fall_damage_contracts.md). Later LithTech supplies formula
 and callback-order evidence only; its engine modules were not imported and retail
 physics parity is not claimed.
+
+Original player damage impulses: [source selections](sources/m2_player_impulse_sources.json) record the original default, formula/order and single-player self-hit exclusion. The shared-body adaptation replaces duplicate server/client transport, not the original damage rule. See [contracts](../contracts/player_impulse_contracts.md).
