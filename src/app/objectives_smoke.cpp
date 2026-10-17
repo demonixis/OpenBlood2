@@ -81,8 +81,8 @@ namespace OpenBlood2
         const auto trial_before = g.destination_trial.attempts;
         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
-            !g.destination_trial.player_entered || g.destination_trial.created != 443 ||
-            g.destination_trial.unknown != 10 || g.destination_trial.failed != 1 ||
+            !g.destination_trial.player_entered || g.destination_trial.created != 448 ||
+            g.destination_trial.unknown != 5 || g.destination_trial.failed != 1 ||
             g.destination_trial.selected_start != "01_egressa")
             return false;
         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
@@ -100,8 +100,8 @@ namespace OpenBlood2
                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
                g.destination_inspection.source_revision == old_revision &&
-               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 475 &&
-               g.destination_inspection.unknown == 10 && g.destination_inspection.invalid == 0 &&
+               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 480 &&
+               g.destination_inspection.unknown == 5 && g.destination_inspection.invalid == 0 &&
                old_player == g.client_shell.player && old_revision == g.world_revision &&
                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
     }

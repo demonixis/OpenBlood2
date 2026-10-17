@@ -34,6 +34,7 @@ namespace OpenBlood2
         bool translucent = false;
         DVector center{};                // One local-space center per translucent polygon, for sorting.
         std::array<double, 2> uv_rate{}; // Cycles/second; independent of the shared texture.
+        bool sky_portal = false;
     };
     struct WorldRange
     {
@@ -67,6 +68,8 @@ namespace OpenBlood2
         std::uint64_t uploads = 0, frames = 0, alpha_frames = 0;
         std::size_t alpha_batches = 0, pan_batches = 0, alpha_pan_batches = 0;
         double surface_time = 0;
+        std::uint64_t sky_frames = 0;
+        std::size_t sky_batches = 0;
     };
     // Never creates objects or advances simulation; current checked identities only.
     bool world_draws(const WorldMesh&, const Objects&, std::vector<WorldDraw>&, WorldViewStats&, std::string&);

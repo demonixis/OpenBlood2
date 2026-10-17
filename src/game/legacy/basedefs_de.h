@@ -38,6 +38,7 @@ using HMODELANIM = DDWORD;
 using HATTACHMENT = std::uint64_t; // Checked, non-reused session identity; no DLL ABI.
 inline constexpr DRESULT DE_NODENOTFOUND = 59;
 inline constexpr DDWORD MS_PLAYDONE = 1;
+inline constexpr DDWORD FLAG_SKYOBJECT = 1u << 12, FLAG_FORCEOPTIMIZEOBJECT = 1u << 28;
 struct ArgList
 {
     char** argv;

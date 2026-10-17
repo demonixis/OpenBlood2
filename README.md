@@ -1,5 +1,7 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The [original sky continuation](../Documentation/Implementation/M2_SKY.md) connects DemoSkyWorldModel and deferred SkyPointer lookup to checked sky slots, parallax and SDL_GPU world-model background rendering. CityHub now has 448 created / 31 transferred sounds / 541 editor-only / five unsupported / one failed entry; four pointers remove themselves on their first update. Earlier counts below are historical. Missing pickups and `fallengrills` geometry still reject CityHub NEW_LEVEL; M2 remains incomplete.
+
 The [authored particle-stream continuation](../Documentation/Implementation/M2_PARTICLE_STREAMS.md) connects original server toggles and client ramps, current-owner emission and SDL_GPU particle rendering, with inspection. All eight CityHub streams create; the level now has 443 created / 31 transferred sounds / 541 editor-only / 10 unsupported / one failed entry. Original unread sound fields remain metadata. CityHub NEW_LEVEL still refuses; M2 remains incomplete.
 
 The [safe NEW_LEVEL continuation](../Documentation/Implementation/M2_LEVEL_CHANGE.md) prepares an isolated destination, restores the supported player and client, then replaces ownership at a frame boundary. Failed preparation retains the current session. Real SubwayA transfers and NVIDIA rendering/audio are tested; CityHub now refuses with 10 unsupported and one failed entry after the particle-stream continuation. M2 remains incomplete; earlier blanket transfer omissions below are historical.

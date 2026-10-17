@@ -142,7 +142,12 @@ namespace
             else
                 w.append(object(trial == 5 ? "NotPorted" : "CameraObj", {string_prop("Name", "entry-camera")}));
             w.append(object("PathPoint", {string_prop("Name", "WALK0"), prop("Pos", 1, arrival)}));
-            w.append(object("SmellHint", {string_prop("Name", "scent")}));
+            if (trial == 7 || trial == 8)
+                w.append(
+                    object("SkyPointer", {string_prop("Name", "sky-reference"),
+                                          string_prop("SkyObjectName", trial == 7 ? "missing-sky" : "entry-camera")}));
+            else
+                w.append(object("SmellHint", {string_prop("Name", "scent")}));
             w.append(object("ExitHint", {string_prop("Name", "exit")}));
             w.append(object("BulletAmmoPU", {string_prop("Name", "bullets"), prop("Pos", 1, arrival)}));
             w.append(object("Sound", {string_prop("Filename", trial == 4 ? "absent.wav" : "cue.wav")}));
@@ -983,8 +988,8 @@ namespace
                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
                 else
                 {
-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 475 && d.editor_only == 541 &&
-                          d.unknown == 10 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                    CHECK(d.entries.size() == 1026 && d.schema_checked == 480 && d.editor_only == 541 &&
+                          d.unknown == 5 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
                     for (const auto& e : d.entries)
                         if (e.state == DestinationEntryState::InvalidProperties)
                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
@@ -1056,7 +1061,7 @@ namespace
     {
         CHECK(test_player::setup(game, root, true, true, true));
         test_player::Directory dir;
-        for (unsigned i = 1; i <= 6; ++i)
+        for (unsigned i = 1; i <= 8; ++i)
             dir.children["worlds"].files["trial" + std::to_string(i) + ".dat"] =
                 dat(false, false, false, false, i).data;
         dir.children["worlds"].files["broken.dat"] = {56, 0, 0, 0};
@@ -1245,6 +1250,17 @@ namespace
             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::None);
         }
         CHECK(transition_images(*game, root));
+        for (const auto* name : {"trial7", "trial8"})
+        {
+            CHECK(original_world_request(name, 0, LOADTYPE_NEW_LEVEL, 0, message));
+            CHECK(game->queue_level_change(message, "arrival", error));
+            CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+            CHECK(error == (std::string_view(name) == "trial7" ? "Invalid sky object/index"
+                                                               : "Only bound world models are supported in the sky"));
+            CHECK(game.get() == owner && game->objects.snapshot() == ids && game->objects.time() == time);
+            CHECK(game->level_change.cleanup_complete && globals.unchanged() && g_pServerDE == &game->server);
+            CHECK(game->server.list_count() == 0 && game->level_change.unknown == 0 && game->level_change.failed == 0);
+        }
         CHECK(original_world_request("missing", 0, LOADTYPE_NEW_LEVEL, 0, message));
         CHECK(game->queue_level_change(message, "unused", error));
         CHECK(original_world_request("trial1", 0, LOADTYPE_NEW_LEVEL, 0, message));
@@ -1259,7 +1275,7 @@ namespace
             std::cout << "Commit " << cycle << ": " << error << '\n';
             CHECK(result == LevelChangeResult::Committed && error.empty() && game.get() != owner);
             CHECK(game->world_revision == before_revision + 1 && game->objects.time() == 0);
-            CHECK(game->level_change.committed == cycle + 1 && game->level_change.rejected == 8);
+            CHECK(game->level_change.committed == cycle + 1 && game->level_change.rejected == 10);
             CHECK(game->level_change.cleanup_complete && !game->level_change.source_retained);
             CHECK(game->level_change.checked_textures >= 5 && game->level_change.selected_start == "arrival");
             CHECK(g_pServerDE == &game->server && game->client_shell.m_bInWorld);
@@ -1309,7 +1325,7 @@ namespace
             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
             std::cout << "CityHub refusal " << cycle << ": " << error << '\n';
             CHECK(game.get() == owner && game->objects.snapshot() == ids && globals.unchanged());
-            CHECK(game->level_change.unknown == 10 && game->level_change.failed == 1);
+            CHECK(game->level_change.unknown == 5 && game->level_change.failed == 1);
             CHECK(game->level_change.cleanup_complete && game->level_change.source_retained);
             CHECK(game->world_revision == revision && game->objects.time() == time);
             CHECK(game->server.audio.voices().size() == voices.size());
@@ -1410,7 +1426,7 @@ namespace
                 {
                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
                     if (std::string_view(name) == "02_cityhub")
-                        CHECK(d.created == 443 && d.unknown == 10 && d.failed == 1);
+                        CHECK(d.created == 448 && d.unknown == 5 && d.failed == 1);
                     else
                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
                 }

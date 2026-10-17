@@ -61,3 +61,11 @@ This is not a human walkthrough, a recreation of the retail server pause mechani
 or proof of all combat. Center-ray activation (rather than retail PVS), missing
 states/services and safe NEW_LEVEL remain documented limitations. The train-window
 material report remains unresolved and is the next playtest priority before more FX.
+
+The [sky integration check](SKY_CONTRACTS.md) exposed a slow-frame feedback failure
+in actual variable-frame CityHub execution. The interactive frontend now caps one
+frame at 100 ms and reports discarded wall time in the inspector/log. It excludes
+resource/capture work from catch-up. Explicit diagnostic stepping and the core
+physics limit remain unchanged; slow execution can slow simulation time. Tests
+cover bounded lag, recovery on the next ordinary frame, diagnostic time, and invalid
+deltas, plus repeated NVIDIA application starts with actual capture and simulation.

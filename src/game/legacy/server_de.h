@@ -35,11 +35,15 @@ namespace OpenBlood2
 {
     struct WeaponSpriteSettings;
     struct ParticleStreamSettings;
+    struct SkyDefinition;
 } // namespace OpenBlood2
 class PathMgr;
 class ServerDE : public CSBase
 {
   public:
+    virtual bool SetSkyDefinition(const OpenBlood2::SkyDefinition&) = 0;
+    virtual bool AddSkyObject(HOBJECT, unsigned) = 0;
+    virtual void ReportSkyFailure(std::string_view) = 0;
     virtual OpenBlood2::SoundId PlayCharacterSound(HOBJECT, const OpenBlood2::SoundRequest&, bool retain,
                                                    std::string&) = 0;
     virtual OpenBlood2::SoundId PlayCinematicSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;

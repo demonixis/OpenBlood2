@@ -1,6 +1,7 @@
 #include "app/session_playback.h"
 #include "game/original/AI_Mgr.h"
 #include <iostream>
+#include <limits>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
     do                                                                                                                 \
@@ -27,6 +28,12 @@ namespace
         CHECK(h && g.objects.remove(h) && g.objects.get(h));
         CHECK(step_app_session(g, .1) && !g.objects.get(h) && g.objects.time() == .1);
         CHECK(!waiting_for_player(g, true) && step_app_session(g, .1, true) && g.objects.time() == .2);
+        g.world_path.clear();
+        CHECK(step_app_session(g, app_frame_delta(2)) && std::abs(g.objects.time() - .3) < 1e-9);
+        CHECK(step_app_session(g, app_frame_delta(.02)) && std::abs(g.objects.time() - .32) < 1e-9);
+        CHECK(step_app_session(g, app_frame_delta(2, true), true) && std::abs(g.objects.time() - 2.32) < 1e-9);
+        CHECK(!step_app_session(g, app_frame_delta(-1)) && std::abs(g.objects.time() - 2.32) < 1e-9);
+        CHECK(!step_app_session(g, app_frame_delta(std::numeric_limits<double>::quiet_NaN())));
         return true;
     }
     bool npcs_ready(GameSession& g, bool untouched)

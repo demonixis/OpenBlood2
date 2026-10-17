@@ -80,3 +80,8 @@ compositing after two actual loads; full scene captures remain local. Applicatio
 smoke requires 31 prepared/submitted faces through hidden UI and reload with no
 extra world upload. Other platforms, retail pixel parity and human playthroughs
 are not claimed.
+
+The [sky continuation](SKY_CONTRACTS.md) supersedes blanket sky-rendering omissions
+for registered world-model skies. Valid visible skies render behind the world and
+replace bit-4 portal markers; unavailable skies retain diagnostics. No retail
+lighting, fog or complete M2 acceptance is implied.

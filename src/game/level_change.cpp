@@ -1,4 +1,5 @@
 #include "engine/world_view.h"
+#include "game/original/SkyObjects.h"
 #include "game/original_globals.h"
 #include "game/server_adapter.h"
 #include <cmath>
@@ -82,11 +83,25 @@ namespace OpenBlood2
                 checked.insert(std::move(normalized));
                 return true;
             };
+            auto pending_sky = game.server.sky;
             for (auto id : game.objects.snapshot())
             {
                 const auto& object = *game.objects.get(id);
                 if (object.life != Life::Alive)
                     continue;
+                if (const auto* pointer = dynamic_cast<const SkyPointer*>(object.game.get()))
+                {
+                    // Preflight without consuming the original first update or advancing simulation.
+                    auto* names = game.server.FindNamedObjects(pointer->target.c_str());
+                    const auto h = names && names->m_pFirstLink ? names->m_pFirstLink->m_hObject : nullptr;
+                    const bool valid = pending_sky.add(game.objects, h, unsigned(pointer->index));
+                    if (!valid)
+                        error = pending_sky.error;
+                    if (names)
+                        game.server.RelinquishList(names);
+                    if (!valid)
+                        return false;
+                }
                 if (!object.model_error.empty())
                 {
                     error = "Destination object " + std::string(object.state.m_Name) + ": " + object.model_error;

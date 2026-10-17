@@ -360,7 +360,8 @@ namespace
              explosion_trails_drawn_hidden = false;
         bool models_hidden = false, close_weapon_hidden = false;
         std::uint64_t model_frames = 0;
-        std::vector<OpenBlood2::WorldDraw> world_draws;
+        std::vector<OpenBlood2::WorldDraw> world_draws, sky_draws;
+        DVector sky_eye{};
         std::uint64_t mesh_revision = UINT64_MAX;
         bool viewport_hidden = false, viewport_reloaded = false, viewport_unloaded = false;
 #if BLOOD2_INSPECTOR
@@ -430,7 +431,8 @@ namespace
         std::uint64_t frames = 0, ui_frames = 0, hidden_frames = 0, waiting_frames = 0;
         const auto started = SDL_GetTicks();
         auto previous_tick = SDL_GetTicksNS();
-        double hidden_model_time = 0;
+        double hidden_model_time = 0, discarded_wall_time = 0;
+        std::uint64_t limited_frames = 0;
         bool model_advanced_hidden = false;
         std::uint64_t hidden_player_updates = 0;
         bool player_advanced_hidden = false;
@@ -520,7 +522,10 @@ namespace
                 return 4;
             }
             const auto tick = SDL_GetTicksNS();
-            const double delta = smoke ? 1.0 / 60.0 : static_cast<double>(tick - previous_tick) / 1e9;
+            const double wall_delta = smoke ? 1.0 / 60.0 : static_cast<double>(tick - previous_tick) / 1e9;
+            const double delta = OpenBlood2::app_frame_delta(wall_delta, smoke);
+            discarded_wall_time += wall_delta - delta;
+            limited_frames += wall_delta > delta;
             previous_tick = tick;
             game->client_shell.movement_input = {};
             game->client_shell.weapon_input = {};
@@ -666,10 +671,19 @@ namespace
             waiting_frames += waiting;
 #if BLOOD2_INSPECTOR
             inspector.waiting_for_player = waiting;
+            inspector.limited_frames = limited_frames;
+            inspector.discarded_wall_time = discarded_wall_time;
 #endif
             if (!OpenBlood2::step_app_session(*game, delta, smoke))
             {
-                spdlog::error("Object simulation step failed");
+                spdlog::error("Object simulation step failed (frame={}, delta={}, time={})", frames, delta,
+                              game->objects.time());
+                for (const auto& diagnostic : game->objects.diagnostics())
+                    spdlog::error("Object: {}", diagnostic);
+                for (const auto& diagnostic : game->trace)
+                    spdlog::error("Session: {}", diagnostic);
+                if (!game->server.particle_streams.update_error.empty())
+                    spdlog::error("Particle streams: {}", game->server.particle_streams.update_error);
                 return 4;
             }
             const auto change = OpenBlood2::GameSession::process_level_change(game_owner, error);
@@ -765,7 +779,11 @@ namespace
                 }
             }
             selection.refresh(game->objects);
-            if (mesh_revision != game->world_revision)
+            const bool world_preparing = mesh_revision != game->world_revision;
+            const auto previous_model_revision = model_scene.revision;
+            const auto previous_effect_revision = explosion_model_scene.revision;
+            const auto previous_sprite_revision = sprite_scene.revision;
+            if (world_preparing)
             {
                 world_renderer.clear_geometry();
                 model_renderer.clear_geometry();
@@ -789,6 +807,13 @@ namespace
             if (!OpenBlood2::world_draws(world_mesh, game->objects, world_draws, world_renderer.stats, error))
             {
                 spdlog::error("World draw bindings: {}", error);
+                return 5;
+            }
+
+            if (!game->server.sky.draws(game->world, world_mesh, game->objects, game->client_shell.view.position,
+                                        sky_draws, sky_eye, error))
+            {
+                spdlog::error("Sky presentation: {}", error);
                 return 5;
             }
 
@@ -888,10 +913,17 @@ namespace
                     if (!world_renderer.prepare(world_mesh, mesh_revision,
                                                 SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
                                                 height, error) ||
-                        !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
-                                             world_draws, view.position, view.rotation,
-                                             view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Clear,
-                                             nullptr, OpenBlood2::WorldPass::Opaque, game->server.world_time()))
+                        (!sky_draws.empty() &&
+                         !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
+                                              sky_draws, sky_eye, view.rotation, view.object && view.settings.type == 1,
+                                              error, OpenBlood2::DrawLoad::Clear, nullptr, OpenBlood2::WorldPass::Sky,
+                                              game->server.world_time())) ||
+                        !world_renderer.draw(
+                            commands, capture_frame ? capture.texture : swapchain, world_mesh, world_draws,
+                            view.position, view.rotation, view.object && view.settings.type == 1, error,
+                            sky_draws.empty() ? OpenBlood2::DrawLoad::Clear : OpenBlood2::DrawLoad::Load, nullptr,
+                            sky_draws.empty() ? OpenBlood2::WorldPass::Opaque : OpenBlood2::WorldPass::OpaqueWithSky,
+                            game->server.world_time()))
                     {
                         spdlog::error("World viewport: {}", error);
                         SDL_SubmitGPUCommandBuffer(commands);
@@ -1335,15 +1367,20 @@ namespace
                     return 4;
                 }
             }
-            // Preparation and first presentation upload are paused loading time,
-            // not a physics/audio delta for the retained or newly entered world.
-            if (change != OpenBlood2::LevelChangeResult::None)
+            // Resource preparation/upload and diagnostic GPU readback/PNG encoding
+            // are paused loading/tool time, not a later physics/audio catch-up delta.
+            if (change != OpenBlood2::LevelChangeResult::None || world_preparing || capture_frame ||
+                previous_model_revision != model_scene.revision ||
+                previous_effect_revision != explosion_model_scene.revision ||
+                previous_sprite_revision != sprite_scene.revision)
                 previous_tick = SDL_GetTicksNS();
             if (options.frame_limit != 0 && frames >= options.frame_limit)
                 done = true;
         }
         spdlog::info("Shutdown: frames={}, UI frames={}, hidden frames={}, toggles={}, resize={}, quit={}", frames,
                      ui_frames, hidden_frames, toggles, resized, quit_received);
+        spdlog::info("Interactive clock: limited frames={}, discarded wall seconds={}", limited_frames,
+                     discarded_wall_time);
         unsigned npc_ready = 0, npc_failed = 0;
         std::uint64_t npc_updates = 0;
         for (auto id : game->objects.snapshot())

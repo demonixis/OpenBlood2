@@ -2,6 +2,7 @@
 #include "game/original/ClientParticleStreamSFX.h"
 #include "game/original/DestructableModel.h"
 #include "game/original/DetailSprite.h"
+#include "game/original/SkyObjects.h"
 #include "game/original/Sound.h"
 #include "game/server_adapter.h"
 #include <algorithm>
@@ -99,6 +100,12 @@ namespace OpenBlood2
                     entry.detail =
                         entry.sound ? "Original Sound removed after transferring its loop to the world" : sound->error;
                 }
+                else if (const auto* sky = r ? dynamic_cast<const SkyObject*>(r->game.get()) : nullptr;
+                         sky && !sky->error.empty())
+                {
+                    entry.state = EntryState::Failed;
+                    entry.detail = sky->error;
+                }
                 else if (const auto* ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
                          ai && !ai->runtime_error.empty())
                 {
@@ -175,7 +182,9 @@ namespace OpenBlood2
         for (auto id : objects.snapshot())
         {
             const auto& r = *objects.get(id);
-            if (!r.container && !r.world_model)
+            // Normal objects can retain a source filename that is a name, not a resource
+            // (notably SkyPointer). Only model/sprite types consume this asset field.
+            if (r.state.m_ObjectType == OT_MODEL || r.state.m_ObjectType == OT_SPRITE)
                 use(r.state.m_Filename, "Original object model");
             use(r.state.m_SkinName, "Original object skin");
         }

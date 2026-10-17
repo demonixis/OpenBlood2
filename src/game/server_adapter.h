@@ -2,6 +2,7 @@
 #include "engine/collision.h"
 #include "engine/model_store.h"
 #include "engine/objects.h"
+#include "engine/sky.h"
 #include "engine/string_resources.h"
 #include "game/explosion_flames.h"
 #include "game/explosion_fragments.h"
@@ -96,6 +97,10 @@ namespace OpenBlood2
         ExplosionModels explosion_models;
         LaserBeams laser_beams;
         ObjectParticles object_particles;
+        SkyState sky;
+        bool SetSkyDefinition(const SkyDefinition&) override;
+        bool AddSkyObject(HOBJECT, unsigned) override;
+        void ReportSkyFailure(std::string_view) override;
         ParticleStreams particle_streams;
         std::uint64_t PublishParticleStream(HOBJECT, const ParticleStreamSettings&, std::string&) override;
         std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) override;
@@ -147,6 +152,7 @@ namespace OpenBlood2
             laser_beams.clear();
             object_particles.clear();
             particle_streams.clear();
+            sky = {};
             explosion_lights.clear();
             explosion_rings.clear();
             explosion_flames.clear();

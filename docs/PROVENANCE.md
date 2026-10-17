@@ -973,3 +973,18 @@ original Blood II baseline, with typed ownership, checked resources and the exis
 particle renderer. See [source hashes](M2_PARTICLE_STREAM_SOURCES.json) and
 [contracts](PARTICLE_STREAM_CONTRACTS.md). Original ramp/color/trigger rules and the
 unread audio tail are retained. CityHub still refuses NEW_LEVEL; M2 is incomplete.
+
+## Original sky callbacks and replacement presentation
+
+`SkyObjects.cpp` adapts Blood II AppHeaders/engineobjects.c's DemoSkyWorldModel and
+SkyPointer callbacks. [Source hashes](M2_SKY_SOURCES.json) distinguish this original
+game baseline from the later LithTech engine reference used for projection and
+depth/order behavior. [Contracts](SKY_CONTRACTS.md) document typed checked slots,
+rejected duplicate indices/types, leak repair, deferred lifetime and the simple
+background pass. No reference tree, commercial asset or dependency pin changed.
+
+The variable-frame CityHub integration test also required an explicit 100 ms
+interactive-frame bound, paused resource/capture work and visible discarded time.
+This is new frontend scheduling policy, not an imported original gameplay rule;
+see [session playback](SESSION_PLAYBACK_CONTRACTS.md). Diagnostic/core timing and
+physics rejection bounds remain unchanged.

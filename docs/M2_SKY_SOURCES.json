@@ -1,0 +1,60 @@
+{
+  "sources": [
+    {
+      "path": "sources/blood2/AppHeaders/engineobjects.c",
+      "repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
+      "role": "original Blood II callbacks/API"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/basetypes_de.h",
+      "repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
+      "role": "original Blood II callbacks/API"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/server_de.h",
+      "repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "role": "original Blood II callbacks/API"
+    },
+    {
+      "path": "sources/lithtech/runtime/render_a/src/sys/d3d/common_draw.cpp",
+      "repository_commit": "0eab18289bed72879eddb648d3311075b108cf46",
+      "sha256": "827e16cc382478f05a4f73692f561afa5613fa94a754c564a65e773aab3d5cb1",
+      "role": "later-generation engine reference, not a retail parity claim"
+    },
+    {
+      "path": "sources/lithtech/runtime/render_a/src/sys/d3d/d3d_drawsky.cpp",
+      "repository_commit": "0eab18289bed72879eddb648d3311075b108cf46",
+      "sha256": "2c908cdf585ae077c635ad4eaea02bf568c39d2e1a054cf0d945d7ee15c45c53",
+      "role": "later-generation engine reference, not a retail parity claim"
+    },
+    {
+      "path": "sources/lithtech/runtime/render_a/src/sys/d3d/drawsky.cpp",
+      "repository_commit": "0eab18289bed72879eddb648d3311075b108cf46",
+      "sha256": "d76510f9691893bd509400475d69d05d04f10e174cc597fb259e57d4b356eb6e",
+      "role": "later-generation engine reference, not a retail parity claim"
+    },
+    {
+      "path": "sources/lithtech/runtime/server/src/serverde_impl.cpp",
+      "repository_commit": "0eab18289bed72879eddb648d3311075b108cf46",
+      "sha256": "5e1973f36bea781f23f99d7e0bb32ddb474ebf83c142c6877b15c157ba2fd53f",
+      "role": "later-generation engine reference, not a retail parity claim"
+    },
+    {
+      "path": "sources/lithtech/runtime/server/src/servermgr.cpp",
+      "repository_commit": "0eab18289bed72879eddb648d3311075b108cf46",
+      "sha256": "021b651f6d93a426ee9b1150bc1c17a2f57987c2f1f9f9c4a69c2abbae413e5f",
+      "role": "later-generation default sky bounds; not a retail parity claim"
+    }
+  ],
+  "imports": [
+    "src/game/original/SkyObjects.cpp",
+    "src/game/original/SkyObjects.h"
+  ],
+  "engine_adaptations": [
+    "src/engine/sky.cpp",
+    "src/engine/world_renderer.cpp"
+  ]
+}

@@ -513,9 +513,42 @@ namespace OpenBlood2
                         "the player in Session first, or launch --view-world.");
                     ImGui::TextWrapped(
                         "World textures/models, glass and alpha sprites are unlit. Lightmaps, liquid surfaces "
-                        "and sky rendering remain unavailable. World alpha uses sorted faces; FX sort separately.");
+                        "remain unavailable. Bound sky world models render in index order. World alpha uses sorted "
+                        "faces; FX sort separately.");
+                    ImGui::Text("Interactive clock: %llu limited frames / %.3f discarded wall seconds",
+                                (unsigned long long)limited_frames, discarded_wall_time);
                     if (world_mesh && world_render)
                     {
+                        if (ImGui::TreeNode("Original sky objects and projection"))
+                        {
+                            const auto& sky = game.server.sky;
+                            const auto& d = sky.definition;
+                            ImGui::Text("Definitions: %llu / additions: %llu / submitted: %zu batches, %llu passes",
+                                        (unsigned long long)sky.definitions, (unsigned long long)sky.additions,
+                                        world_render->sky_batches, (unsigned long long)world_render->sky_frames);
+                            ImGui::Text("Bounds: (%.3f %.3f %.3f) to (%.3f %.3f %.3f)", d.min.x, d.min.y, d.min.z,
+                                        d.max.x, d.max.y, d.max.z);
+                            ImGui::Text("View box: (%.3f %.3f %.3f) to (%.3f %.3f %.3f)", d.view_min.x, d.view_min.y,
+                                        d.view_min.z, d.view_max.x, d.view_max.y, d.view_max.z);
+                            DVector eye;
+                            if (OpenBlood2::sky_view_position(d, game.world.min, game.world.max,
+                                                              game.client_shell.view.position, eye))
+                                ImGui::Text("Sky eye: %.4f %.4f %.4f", eye.x, eye.y, eye.z);
+                            for (unsigned i = 0; i < sky.objects.size(); ++i)
+                                if (sky.objects[i])
+                                {
+                                    const auto* r = game.objects.get(sky.objects[i]);
+                                    ImGui::Text("%u: %s / %s", i, r ? r->state.m_Name : "removed",
+                                                r && r->life == Life::Alive
+                                                    ? ((r->state.m_Flags & FLAG_VISIBLE) ? "visible" : "hidden")
+                                                    : "stale or pending");
+                                }
+                            if (!sky.error.empty())
+                                ImGui::TextWrapped("Last error: %s", sky.error.c_str());
+                            ImGui::TextWrapped("World-model skies only; no fog/lightmaps or retail pixel parity. "
+                                               "Empty/failed skies retain portal markers.");
+                            ImGui::TreePop();
+                        }
                         ImGui::Text("GPU: %llu frames / %llu world uploads", (unsigned long long)world_render->frames,
                                     (unsigned long long)world_render->uploads);
                         ImGui::Text("Prepared: %zu triangles / %zu instances / %zu hidden instances",
@@ -523,7 +556,7 @@ namespace OpenBlood2
                         ImGui::Text("Unbound models: %zu / excluded containers: %zu", world_render->unbound,
                                     world_render->containers);
                         ImGui::Text(
-                            "Faces: %zu invisible / %zu degenerate / %zu authored transparent / %zu sky markers",
+                            "Faces: %zu invisible / %zu degenerate / %zu authored transparent / %zu authored sky",
                             world_mesh->invisible, world_mesh->degenerate, world_mesh->transparent, world_mesh->sky);
                         ImGui::Text("Alpha: %zu prepared faces / %zu submitted batches / %llu passes",
                                     world_mesh->blended, world_render->alpha_batches,

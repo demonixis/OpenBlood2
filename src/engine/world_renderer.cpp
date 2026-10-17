@@ -16,6 +16,10 @@ namespace OpenBlood2
             SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
         if (alpha_pipeline_)
             SDL_ReleaseGPUGraphicsPipeline(device_, alpha_pipeline_);
+        if (sky_pipeline_)
+            SDL_ReleaseGPUGraphicsPipeline(device_, sky_pipeline_);
+        if (sky_alpha_pipeline_)
+            SDL_ReleaseGPUGraphicsPipeline(device_, sky_alpha_pipeline_);
     }
     void WorldRenderer::clear_geometry()
     {
@@ -33,9 +37,10 @@ namespace OpenBlood2
         revision_ = UINT64_MAX;
         stats.triangles = stats.draws = stats.alpha_batches = stats.pan_batches = stats.alpha_pan_batches = 0;
         stats.surface_time = 0;
+        stats.sky_batches = 0;
         alpha_order_.clear();
     }
-    bool WorldRenderer::pipeline(SDL_GPUTextureFormat format, std::string& error, bool translucent)
+    bool WorldRenderer::pipeline(SDL_GPUTextureFormat format, std::string& error, bool translucent, bool sky)
     {
         if (color_format_ != format)
         {
@@ -43,10 +48,16 @@ namespace OpenBlood2
                 SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
             if (alpha_pipeline_)
                 SDL_ReleaseGPUGraphicsPipeline(device_, alpha_pipeline_);
+            if (sky_pipeline_)
+                SDL_ReleaseGPUGraphicsPipeline(device_, sky_pipeline_);
+            if (sky_alpha_pipeline_)
+                SDL_ReleaseGPUGraphicsPipeline(device_, sky_alpha_pipeline_);
+            sky_pipeline_ = sky_alpha_pipeline_ = nullptr;
             pipeline_ = alpha_pipeline_ = nullptr;
             color_format_ = format;
         }
-        auto*& selected = translucent ? alpha_pipeline_ : pipeline_;
+        auto*& selected =
+            sky ? (translucent ? sky_alpha_pipeline_ : sky_pipeline_) : (translucent ? alpha_pipeline_ : pipeline_);
         if (selected)
             return true;
         const bool alpha = translucent || style_ == DrawStyle::SpriteAlpha;
@@ -104,8 +115,8 @@ namespace OpenBlood2
         create.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
         create.rasterizer_state.enable_depth_clip = true;
         create.multisample_state.sample_count = SDL_GPU_SAMPLECOUNT_1;
-        create.depth_stencil_state.enable_depth_test = true;
-        create.depth_stencil_state.enable_depth_write = !alpha;
+        create.depth_stencil_state.enable_depth_test = !sky;
+        create.depth_stencil_state.enable_depth_write = !alpha && !sky;
         create.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
         create.target_info.color_target_descriptions = &target;
         create.target_info.num_color_targets = 1;
@@ -364,6 +375,16 @@ namespace OpenBlood2
         }
         std::size_t pan_batches = 0;
         const bool translucent = world_pass == WorldPass::Translucent;
+        const bool sky = world_pass == WorldPass::Sky;
+        if (sky && (style_ != DrawStyle::Opaque || load != DrawLoad::Clear ||
+                    !pipeline(color_format_, error, false, true) || !pipeline(color_format_, error, true, true)))
+        {
+            if (error.empty())
+                error = "Sky requires an opaque renderer and clear pass";
+            return false;
+        }
+        if (sky || world_pass == WorldPass::Opaque)
+            stats.sky_batches = 0;
         if (translucent && (style_ != DrawStyle::Opaque || load != DrawLoad::Load))
         {
             error = "Transparent world pass requires loaded opaque depth";
@@ -377,7 +398,7 @@ namespace OpenBlood2
         WorldViewUniform uniform;
         for (const auto& d : draws)
         {
-            if ((translucent || style_ == DrawStyle::SpriteAlpha) &&
+            if ((sky || translucent || style_ == DrawStyle::SpriteAlpha) &&
                 (!std::isfinite(d.alpha) || d.alpha < 0 || d.alpha > 1))
             {
                 error = "Invalid sprite draw alpha";
@@ -431,7 +452,7 @@ namespace OpenBlood2
         }
         SDL_GPUViewport viewport{0, float(top), float(width_), float(height), 0, 1};
         SDL_SetGPUViewport(pass, &viewport);
-        SDL_BindGPUGraphicsPipeline(pass, translucent ? alpha_pipeline_ : pipeline_);
+        SDL_BindGPUGraphicsPipeline(pass, sky ? sky_pipeline_ : (translucent ? alpha_pipeline_ : pipeline_));
         if (vertices_)
         {
             SDL_GPUBufferBinding binding{vertices_, 0};
@@ -442,13 +463,13 @@ namespace OpenBlood2
                 if (!r.count)
                     return;
                 world_view_uniform(eye, view, aspect, d, uniform);
-                if (load == DrawLoad::ClearDepth)
+                if (sky || load == DrawLoad::ClearDepth)
                 {
                     constexpr float near = .01f, far = 65536;
                     uniform.projection[2] = far / (far - near);
                     uniform.projection[3] = -near * far / (far - near);
                 }
-                if (translucent || style_ == DrawStyle::SpriteAlpha)
+                if (sky || translucent || style_ == DrawStyle::SpriteAlpha)
                 {
                     const std::array<float, 4> modulation{d.alpha, 0, 0, 0};
                     SDL_PushGPUFragmentUniformData(commands, 0, modulation.data(), sizeof(modulation));
@@ -466,11 +487,27 @@ namespace OpenBlood2
                 if (face)
                     batch(face->first, face->count, face->material, face->uv_rate);
                 else if (r.batches.empty())
+                {
+                    if (sky)
+                    {
+                        SDL_BindGPUGraphicsPipeline(pass, sky_pipeline_);
+                        ++stats.sky_batches;
+                    }
                     batch(r.first, r.count, 0, {});
+                }
                 else
                     for (const auto& b : r.batches)
-                        if (style_ == DrawStyle::SpriteAlpha || !b.translucent)
+                    {
+                        if (sky)
+                        {
+                            SDL_BindGPUGraphicsPipeline(pass, b.translucent ? sky_alpha_pipeline_ : sky_pipeline_);
                             batch(b.first, b.count, b.material, b.uv_rate);
+                            ++stats.sky_batches;
+                        }
+                        else if ((style_ == DrawStyle::SpriteAlpha || !b.translucent) &&
+                                 !(world_pass == WorldPass::OpaqueWithSky && b.sky_portal))
+                            batch(b.first, b.count, b.material, b.uv_rate);
+                    }
             };
             if (translucent)
                 for (const auto& ordered : alpha_order_)
@@ -483,7 +520,9 @@ namespace OpenBlood2
                     emit(d, nullptr);
         }
         SDL_EndGPURenderPass(pass);
-        if (translucent)
+        if (sky)
+            ++stats.sky_frames;
+        else if (translucent)
         {
             ++stats.alpha_frames;
             stats.alpha_batches = alpha_order_.size();

@@ -32,6 +32,7 @@
 #include "game/original/RandomSoundFX.h"
 #include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
+#include "game/original/SkyObjects.h"
 #include "game/original/SmellHint.h"
 #include "game/original/Sound.h"
 #include "game/original/SoundFX.h"
@@ -74,6 +75,21 @@ namespace OpenBlood2
                               {"Gravity", false, false},
                               {"TouchNotify", false, false},
                               {"Rayhit", false, false}}};
+        const ClassInfo sky_model{"DemoSkyWorldModel",
+                                  &base,
+                                  construct<DemoSkyWorldModel>,
+                                  {{"SkyDims", DVector{}},
+                                   {"Flags", std::int32_t(1)},
+                                   {"Index", std::int32_t(0)},
+                                   {"InnerPercentX", .1f},
+                                   {"InnerPercentY", .1f},
+                                   {"InnerPercentZ", .1f}}};
+        const ClassInfo sky_pointer{"SkyPointer", &base, construct<SkyPointer>, []
+                                    {
+                                        auto p = sky_model.properties;
+                                        p.push_back({"SkyObjectName", std::string{}, true, 98});
+                                        return p;
+                                    }()};
         const ClassInfo builtin_model{
             "Model",
             &base,
@@ -784,7 +800,8 @@ namespace OpenBlood2
     } // namespace
     bool register_original_classes(Objects& objects)
     {
-        return objects.register_class(base) && objects.register_class(builtin_model) &&
+        return objects.register_class(base) && objects.register_class(sky_model) &&
+               objects.register_class(sky_pointer) && objects.register_class(builtin_model) &&
                objects.register_class(b2base) && objects.register_class(camera) && objects.register_class(client_sfx) &&
                objects.register_class(particle_stream) && objects.register_class(scene_explosion) &&
                objects.register_class(client_light) && objects.register_class(light_SquareWaveLightFX) &&

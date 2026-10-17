@@ -96,3 +96,8 @@ weapons. Earlier blanket sprite-rendering omissions are superseded for this boun
 subset. World/model opacity policy is unchanged; required FX and M2 remain open.
 
 The [world-alpha correction](WORLD_ALPHA_CONTRACTS.md) supersedes earlier blanket world-opacity/transparent-marker statements for resolved bit-3 surfaces. Sky and rejected resources remain opaque markers; ordinary surfaces still ignore alpha. The new sorted world pass precedes the separately sorted translucent FX passes. M2 remains incomplete.
+
+The [sky continuation](SKY_CONTRACTS.md) supersedes blanket sky-rendering omissions
+for registered world-model skies. Valid visible skies render behind the world and
+replace bit-4 portal markers; unavailable skies retain diagnostics. No retail
+lighting, fog or complete M2 acceptance is implied.

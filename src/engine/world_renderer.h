@@ -18,7 +18,9 @@ namespace OpenBlood2
     enum class WorldPass
     {
         Opaque,
-        Translucent
+        Translucent,
+        Sky,
+        OpaqueWithSky
     };
     class WorldRenderer
     {
@@ -55,6 +57,8 @@ namespace OpenBlood2
         DrawStyle style_;
         SDL_GPUGraphicsPipeline* pipeline_ = nullptr;
         SDL_GPUGraphicsPipeline* alpha_pipeline_ = nullptr;
+        SDL_GPUGraphicsPipeline* sky_pipeline_ = nullptr;
+        SDL_GPUGraphicsPipeline* sky_alpha_pipeline_ = nullptr;
         std::vector<WorldAlphaBatch> alpha_order_;
         SDL_GPUBuffer* vertices_ = nullptr;
         SDL_GPUTransferBuffer* vertex_transfer_ = nullptr;
@@ -67,6 +71,6 @@ namespace OpenBlood2
         SDL_GPUTextureFormat color_format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
         Uint32 width_ = 0, height_ = 0;
         std::uint64_t revision_ = UINT64_MAX;
-        bool pipeline(SDL_GPUTextureFormat, std::string&, bool translucent = false);
+        bool pipeline(SDL_GPUTextureFormat, std::string&, bool translucent = false, bool sky = false);
     };
 } // namespace OpenBlood2

@@ -246,10 +246,11 @@ namespace OpenBlood2
                         continue;
                     }
                     if (range.batches.empty() || range.batches.back().material != material ||
-                        range.batches.back().translucent != translucent || range.batches.back().uv_rate != uv_rate ||
-                        (translucent && first_triangle))
-                        range.batches.push_back(
-                            {static_cast<std::uint32_t>(vertices.size()), 0, material, translucent, center, uv_rate});
+                        range.batches.back().translucent != translucent ||
+                        range.batches.back().sky_portal != bool(surface.flags & (1u << 4)) ||
+                        range.batches.back().uv_rate != uv_rate || (translucent && first_triangle))
+                        range.batches.push_back({static_cast<std::uint32_t>(vertices.size()), 0, material, translucent,
+                                                 center, uv_rate, bool(surface.flags & (1u << 4))});
                     if (translucent && first_triangle)
                         ++blended;
                     first_triangle = false;
@@ -370,6 +371,8 @@ namespace OpenBlood2
                 return false;
             }
             bound[match] = true;
+            if (r->state.m_Flags & FLAG_SKYOBJECT)
+                continue;
             if (!(r->state.m_Flags & FLAG_VISIBLE))
             {
                 ++stats.hidden;
