@@ -6,6 +6,7 @@
 class KeyFramer : public B2BaseClass
 {
   public:
+    ~KeyFramer() override;
     struct Target
     {
         HOBJECT object = nullptr;
@@ -32,6 +33,12 @@ class KeyFramer : public B2BaseClass
     std::vector<KeyData> keys;
     std::vector<Target> targets;
     std::uint64_t processed = 0, sound_requests = 0, print_requests = 0, message_keys = 0, unresolved_messages = 0;
+    OpenBlood2::SoundId sound_voice = 0;
+    std::uint64_t sound_starts = 0, sound_failures = 0;
+    std::string sound_error;
+    HOBJECT sound_target = nullptr;
+    float sound_radius = 0;
+    bool sound_loop = false;
     std::size_t last_message_matches = 0;
 
   protected:

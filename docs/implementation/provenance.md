@@ -1127,3 +1127,7 @@ not an upstream commit or an original-game adaptation. See the
 ## M2 Trigger Audio Continuation
 
 [m2_trigger_audio_sources.json](sources/m2_trigger_audio_sources.json) records original Trigger activation, lock/explicit-unlock decisions and ObjectUtilities attached one-shot defaults. Speaker/radius/priority differ by branch; successful key replies deliberately remain silent. Existing checked audio services replace legacy PlaySoundInfo. See [contracts](../contracts/trigger_audio_contracts.md).
+
+## Original KeyFramer audio
+
+[m2_keyframe_audio_sources.json](sources/m2_keyframe_audio_sources.json) records original ProcessKey sound-before-message ordering, one retained handle across all controlled targets, and destructor cleanup. Existing attached loop/retained-one-shot services replace PlaySoundInfo while preserving authored radii and loop intent. See [contracts](../contracts/keyframe_audio_contracts.md).

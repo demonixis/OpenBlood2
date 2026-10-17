@@ -1,5 +1,9 @@
 # Original keyframed paths
 
+The later [key audio contracts](keyframe_audio_contracts.md) supersede the request-only
+sound statements below: retained attached loops/one-shots now play, with source
+replacement and destruction rules. Print presentation remains unavailable.
+
 > The later [train path contracts](worldpath_contracts.md) supersede blanket
 > world-path/without-GOTHRUWORLD omissions below for static BoxPhysics translation.
 > Angular paths and moving containers remain unavailable; M2 stays open.

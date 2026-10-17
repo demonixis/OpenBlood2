@@ -9,7 +9,7 @@ namespace OpenBlood2
     {
         ImGui::TextWrapped("Original KeyFramer timelines. Keys are copied, then their source objects are removed. "
                            "Camera, ordinary-object and translating BoxPhysics brush paths run. Angular brush paths, "
-                           "moving containers and key audio remain unavailable.");
+                           "moving containers remain unavailable. Sound keys replace one retained attached voice.");
         if (!ImGui::BeginTable("Keyframe inspection", 2, ImGuiTableFlags_Resizable))
             return;
         ImGui::TableSetupColumn("Controllers", ImGuiTableColumnFlags_WidthFixed, 270);
@@ -57,6 +57,26 @@ namespace OpenBlood2
                     ImGui::SameLine();
                 }
                 ImGui::NewLine();
+                ImGui::TextWrapped("Last sound key: %s", f->last_sound.c_str());
+                ImGui::Text("Sound attempts %llu / starts %llu / failures %llu", (unsigned long long)f->sound_requests,
+                            (unsigned long long)f->sound_starts, (unsigned long long)f->sound_failures);
+                const auto* speaker = game.objects.get(f->sound_target);
+                ImGui::Text("Last attempt target %s / radius %.1f / loop %d / retained voice %llu",
+                            speaker ? speaker->state.m_Name : "none/removed", f->sound_radius, f->sound_loop,
+                            (unsigned long long)f->sound_voice);
+                if (const auto* voice = game.server.audio.get(f->sound_voice))
+                {
+                    ImGui::Text("Decoded frames %llu / cursor %.1f / loops %llu / done %d",
+                                (unsigned long long)(voice->clip ? voice->clip->frames() : 0), voice->cursor,
+                                (unsigned long long)voice->loops, voice->done);
+                    ImGui::Text("Last mixed position %.1f %.1f %.1f", voice->position.x, voice->position.y,
+                                voice->position.z);
+                }
+                else
+                    ImGui::TextUnformatted("No live retained voice (not started, failed, or owner removed).");
+                if (!f->sound_error.empty())
+                    ImGui::TextWrapped("Sound failure: %s", f->sound_error.c_str());
+                ImGui::TextUnformatted("Dry playback; reverb and priority arbitration unavailable.");
                 ImGui::Text("Targets %zu / copied keys %zu", f->targets.size(), f->keys.size());
                 for (const auto& t : f->targets)
                 {
@@ -130,8 +150,6 @@ namespace OpenBlood2
                 ImGui::Text("Message keys %llu / last matches %zu / unresolved %llu",
                             (unsigned long long)f->message_keys, f->last_message_matches,
                             (unsigned long long)f->unresolved_messages);
-                ImGui::TextWrapped("Sound requests %llu (not played): %s", (unsigned long long)f->sound_requests,
-                                   f->last_sound.c_str());
                 ImGui::TextWrapped("Print requests %llu: %s", (unsigned long long)f->print_requests,
                                    f->last_print.c_str());
                 if (ImGui::CollapsingHeader("Owned original key values"))

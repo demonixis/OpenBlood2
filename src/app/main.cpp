@@ -92,14 +92,14 @@ namespace
         }
         if ((options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
              options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke ||
-             options.pickups_smoke || options.doors_smoke || options.triggers_smoke ||
+             options.pickups_smoke || options.doors_smoke || options.triggers_smoke || options.keyframes_smoke ||
              (!options.gpu_smoke && !options.world_smoke)) &&
             !game->server.audio.open_output(error))
         {
             spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
             if (options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
                 options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke ||
-                options.doors_smoke || options.pickups_smoke || options.triggers_smoke)
+                options.doors_smoke || options.pickups_smoke || options.triggers_smoke || options.keyframes_smoke)
                 return 4;
         }
         HOBJECT key = nullptr;

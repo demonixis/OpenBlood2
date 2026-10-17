@@ -6,6 +6,11 @@
 #include <algorithm>
 #include <cmath>
 using namespace OpenBlood2;
+KeyFramer::~KeyFramer()
+{
+    if (sound_voice && g_pServerDE)
+        g_pServerDE->KillSound(sound_voice);
+}
 DDWORD KeyFramer::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
     if (message == MID_PRECREATE)
@@ -167,8 +172,33 @@ void KeyFramer::ProcessKey(const KeyData& key)
         last_sound = key.sound;
         for (const auto& t : targets)
             if (g_pServerDE->IsObjectAlive(t.object))
+            {
+                // The source retains ONE handle for the entire target list. Each
+                // target replaces the preceding target's sound, even on failure.
+                if (sound_voice)
+                    g_pServerDE->KillSound(sound_voice);
+                sound_voice = 0;
                 ++sound_requests;
-        // Original sound replacement/handle playback is unavailable; inspection is a request only.
+                sound_target = t.object;
+                sound_radius = key.sound_radius;
+                sound_loop = key.loop_sound;
+                sound_error.clear();
+                SoundRequest request;
+                request.resource = key.sound;
+                request.speaker = t.object;
+                request.space = SoundSpace::Spatial;
+                request.inner_radius = key.sound_radius * .1f;
+                request.outer_radius = key.sound_radius;
+                request.loop = key.loop_sound;
+                request.priority = 1; // SOUNDPRIORITY_MISC_MEDIUM
+                request.reverb_requested = true;
+                sound_voice = key.loop_sound ? g_pServerDE->PlayObjectLoopSound(t.object, request, sound_error)
+                                             : g_pServerDE->PlayCharacterSound(t.object, request, true, sound_error);
+                if (sound_voice)
+                    ++sound_starts;
+                else
+                    ++sound_failures; // Original messages/motion still follow a failed sound start.
+            }
     }
     if (!key.message_target.empty() && !key.message.empty())
     {

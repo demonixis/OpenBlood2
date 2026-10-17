@@ -407,6 +407,22 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
     add_test(NAME gpu.keyframes COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
         --data-dir "${BLOOD2_TEST_DATA_DIR}" --keyframes-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/keyframes.png")
     set_tests_properties(gpu.keyframes PROPERTIES LABELS "private;gpu;keyframes" TIMEOUT 30 RUN_SERIAL TRUE)
+    add_test(NAME gpu.keyframe_audio COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+        --data-dir "${BLOOD2_TEST_DATA_DIR}" --keyframes-smoke --world 12_Train_Station
+        --capture "${CMAKE_CURRENT_BINARY_DIR}/keyframe-audio.png")
+    set_tests_properties(gpu.keyframe_audio PROPERTIES LABELS "private;gpu;keyframes;audio" TIMEOUT 60 RUN_SERIAL TRUE)
+endif()
+
+add_executable(keyframe_audio_tests keyframe_audio_tests.cpp)
+target_link_libraries(keyframe_audio_tests PRIVATE blood2_game)
+blood2_project_options(keyframe_audio_tests)
+foreach(case IN ITEMS timeline replacement lifetime failures)
+    add_test(NAME keyframe_audio.${case} COMMAND keyframe_audio_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/keyframe-audio-fixtures/${case}")
+    set_tests_properties(keyframe_audio.${case} PROPERTIES LABELS "headless;keyframes;audio" TIMEOUT 30)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME keyframe_audio.private COMMAND keyframe_audio_tests private "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(keyframe_audio.private PROPERTIES LABELS "headless;private;keyframes;audio" TIMEOUT 120)
 endif()
 
 add_executable(light_tests light_tests.cpp)

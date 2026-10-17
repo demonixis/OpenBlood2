@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete; original KeyFramer retained audio connected",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/KeyFramer.cpp",
+      "source_line_ranges": [
+        [
+          75,
+          99
+        ],
+        [
+          335,
+          376
+        ]
+      ],
+      "selection": "Original single retained sound handle, replacement inside target loop, sound-before-message order and destructor cleanup.",
+      "source_sha256": "31489c8f6891fdce061548ac4903b80c90c73d94049da14698ec34a559ecbf67",
+      "target": "src/game/original/KeyFramer.cpp",
+      "target_sha256": "baa298c8631ffffe9cf7dae9a4be3b58e04dab08d1cf2049bb03eaac34d46f6a"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "source_line_ranges": [
+        [
+          38,
+          82
+        ]
+      ],
+      "selection": "Attached playback, retained handle and duration request; authored loop/radius, inner radius R*0.1, volume and reverb.",
+      "source_sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "target": "src/game/original/KeyFramer.cpp",
+      "target_sha256": "baa298c8631ffffe9cf7dae9a4be3b58e04dab08d1cf2049bb03eaac34d46f6a"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectUtilities.h",
+      "source_line_ranges": [
+        [
+          25,
+          27
+        ]
+      ],
+      "selection": "Default full volume, no streaming or instant-position mode.",
+      "source_sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
+      "target": "src/game/original/KeyFramer.cpp",
+      "target_sha256": "baa298c8631ffffe9cf7dae9a4be3b58e04dab08d1cf2049bb03eaac34d46f6a"
+    },
+    {
+      "source": "sources/blood2/Shared/SoundTypes.h",
+      "source_line_ranges": [
+        [
+          14,
+          24
+        ]
+      ],
+      "selection": "SOUNDPRIORITY_MISC_MEDIUM=1.",
+      "source_sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "target": "src/game/original/KeyFramer.cpp",
+      "target_sha256": "baa298c8631ffffe9cf7dae9a4be3b58e04dab08d1cf2049bb03eaac34d46f6a"
+    }
+  ],
+  "adaptations": [
+    "Existing typed PlayObjectLoopSound and retained PlayCharacterSound replace PlaySoundInfo without new services or dependencies.",
+    "Checked non-reused voice IDs, existing target lifetime links and mixer owner sweep replace raw legacy handles.",
+    "Owned inspection values distinguish attempts, starts, failures, completed retained voices and stale owner-removed IDs.",
+    "Playback failures preserve source motion/message progression; reverb and priority arbitration remain unavailable.",
+    "Private Train Station activation uses unmodified keys and actual Damage target; moving-container physics remains unavailable."
+  ]
+}
