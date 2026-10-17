@@ -1,8 +1,14 @@
+add_executable(sdl_properties_tests sdl_properties_tests.cpp)
+target_link_libraries(sdl_properties_tests PRIVATE SDL3::SDL3)
+blood2_project_options(sdl_properties_tests)
+add_test(NAME platform.destroyed_properties COMMAND sdl_properties_tests)
+set_tests_properties(platform.destroyed_properties PROPERTIES LABELS "headless;platform" TIMEOUT 10)
+
 add_executable(object_contract_tests object_contract_tests.cpp)
 target_link_libraries(object_contract_tests PRIVATE blood2_game)
 blood2_project_options(object_contract_tests)
 foreach(case IN ITEMS builtin_model original_objects nested_creation reasons_properties scheduling deferred_removal
-        aggregate_dispatch handles_selection links_lists messages_strings unsupported_teardown creation_failures)
+        aggregate_dispatch handles_selection links_lists messages_strings message_churn message_limit unsupported_teardown creation_failures)
     add_test(NAME objects.${case} COMMAND object_contract_tests "${case}")
     set_tests_properties(objects.${case} PROPERTIES LABELS "headless;objects" TIMEOUT 10)
 endforeach()
@@ -1866,6 +1872,22 @@ set_tests_properties(coverage.catalog coverage.observations PROPERTIES LABELS "h
 if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME coverage.private COMMAND service_coverage_tests private "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(coverage.private PROPERTIES LABELS "headless;private;services" TIMEOUT 180)
+endif()
+
+add_executable(train_session_tests train_session_tests.cpp ../src/app/model_scene.cpp)
+target_link_libraries(train_session_tests PRIVATE blood2_game)
+blood2_project_options(train_session_tests)
+if(BLOOD2_TEST_DATA_DIR)
+    foreach(rate IN ITEMS 30 60)
+        add_test(NAME train_session.private_${rate} COMMAND train_session_tests "${BLOOD2_TEST_DATA_DIR}" ${rate})
+        set_tests_properties(train_session.private_${rate} PROPERTIES LABELS "headless;train_session;private" TIMEOUT 240)
+    endforeach()
+    if(BLOOD2_GPU_TESTS)
+        add_test(NAME gpu.train_session COMMAND train_session_tests "${BLOOD2_TEST_DATA_DIR}" 60
+            "${CMAKE_CURRENT_BINARY_DIR}/train-session-gpu")
+        set_tests_properties(gpu.train_session PROPERTIES LABELS "gpu;train_session;private" TIMEOUT 240
+            RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+    endif()
 endif()
 
 add_executable(screen_fade_tests screen_fade_tests.cpp ../src/app/sprite_scene.cpp)

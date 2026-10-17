@@ -1097,3 +1097,25 @@ survives teardown. See [contracts](SERVICE_COVERAGE_CONTRACTS.md) and
 ## Original player exit fades and measured smoke budgets
 
 Selected PlayerObj ProcessTriggerMsg/SendFadeMsg and BloodClientShell screen-fade message/update rules now use owned local events and simulation-owned state. The full authored train exit exposed a 2,048-particle smoke cap; bounded capacity now covers its measured 10,240-particle peak without changing original emission. See [contracts](SCREEN_FADE_CONTRACTS.md), [source selections](M2_SCREEN_FADE_SOURCES.json) and [evidence](../../Documentation/Implementation/M2_SCREEN_FADE.md). Composed darkening is a replacement presentation; Music/VoiceMgr/flag commands and full lighting remain separate.
+
+## Transient message identities and continuous train traversal
+
+The replacement adapter now uses typed 64-bit message identities instead of retaining
+a pointer token after every release. Original callback and payload semantics remain;
+Blood II AppHeaders/CSBase.h:83–84 and server_de.h:370–372 describe release ownership.
+No original implementation or new dependency was imported. The new route joins
+existing original entry, movement, weapons, pickups, triggers and exit services
+through synthetic SDL input. See [contracts](MESSAGE_LIFETIME_CONTRACTS.md) and
+[evidence](../../Documentation/Implementation/M2_MESSAGE_LIFETIME.md).
+
+### Pinned SDL property assignment correction
+
+The continuous-train NVIDIA shutdown core exposed a null dereference in SDL
+`6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1`, `src/SDL_properties.c:354`.
+`cmake/PatchSdlProperties.cmake` changes only `!properties` to `!*properties`
+in `SDL_SetupPropertyAssignment`, with exact original/patched hash checks.
+The archive and revision pins remain unchanged, as does SDL's zlib notice.
+`platform.destroyed_properties` reproduces the stale-ID crash before the patch
+and verifies graceful refusal afterward. This is a local dependency correction,
+not an upstream commit or an original-game adaptation. See the
+[execution evidence](../../Documentation/Implementation/M2_MESSAGE_LIFETIME.md).

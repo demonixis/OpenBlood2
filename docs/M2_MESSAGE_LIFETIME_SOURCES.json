@@ -1,0 +1,31 @@
+{
+  "purpose": "Release ownership reference for replacement message identities; no new original implementation imported",
+  "sources": [
+    {
+      "path": "sources/blood2/AppHeaders/CSBase.h",
+      "lines": [
+        83,
+        89
+      ],
+      "sha256": "e07e05c7a94ae38c68329293ed3d45a8ad4361c805b6471aaff07ca7a597610b"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/server_de.h",
+      "lines": [
+        359,
+        372
+      ],
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945"
+    }
+  ],
+  "dependency_correction": {
+    "repository": "https://github.com/libsdl-org/SDL",
+    "revision": "6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1",
+    "path": "src/SDL_properties.c",
+    "original_sha256": "67cc7103a51b067a767a2fa8c78154f1cd89b46809c045ded0db1651876171d9",
+    "patched_sha256": "b4f13bce3c6f5aa33f96ad5b23fd94f701a39e7618d8f6111be8489f5f4e995f",
+    "change": "SDL_SetupPropertyAssignment validates *properties after lookup, not the output pointer itself",
+    "local_patch": "cmake/PatchSdlProperties.cmake",
+    "license": "SDL zlib notice unchanged"
+  }
+}

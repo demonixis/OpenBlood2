@@ -1,6 +1,7 @@
 #pragma once
 // Source-level subset of Blood II AppHeaders/basedefs_de.h, basetypes_de.h
 // and de_codes.h. No retail DLL ABI is exposed. See docs/PROVENANCE.md.
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 
@@ -18,19 +19,38 @@ class Aggregate;
 class ServerDE;
 struct DObject;
 struct StringHandle;
-struct LMessage;
 struct ConsoleVariable;
 struct ClientHandle;
 namespace OpenBlood2
 {
     struct ClassInfo;
-}
+    // Source-level identity, not a pointer or a retail packet/DLL ABI. A released
+    // value is never reused, even by another adapter; only live payloads remain.
+    struct MessageHandle
+    {
+        std::uint64_t value = 0;
+        constexpr MessageHandle(std::nullptr_t = nullptr) {}
+        explicit constexpr MessageHandle(std::uint64_t identity) : value(identity) {}
+        explicit constexpr operator bool() const
+        {
+            return value != 0;
+        }
+        bool operator==(const MessageHandle&) const = default;
+    };
+    struct MessageHandleHash
+    {
+        std::size_t operator()(MessageHandle handle) const noexcept
+        {
+            return static_cast<std::size_t>(handle.value ^ (handle.value >> 32));
+        }
+    };
+} // namespace OpenBlood2
 using LPBASECLASS = BaseClass*;
 using LPAGGREGATE = Aggregate*;
 using HOBJECT = DObject*;
 using HSTRING = StringHandle*;
-using HMESSAGEREAD = LMessage*;
-using HMESSAGEWRITE = LMessage*;
+using HMESSAGEREAD = OpenBlood2::MessageHandle;
+using HMESSAGEWRITE = OpenBlood2::MessageHandle;
 using HCLASS = const OpenBlood2::ClassInfo*;
 using HCONVAR = ConsoleVariable*;
 using HCLIENT = ClientHandle*;

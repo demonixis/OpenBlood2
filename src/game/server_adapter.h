@@ -34,9 +34,6 @@
 struct StringHandle
 {
 };
-struct LMessage
-{
-};
 struct ConsoleVariable
 {
     std::string text;
@@ -271,6 +268,12 @@ namespace OpenBlood2
         {
             return messages_.size();
         }
+        static constexpr std::size_t max_live_messages = 65536;
+        struct MessageStats
+        {
+            std::uint64_t created = 0, released = 0, refused = 0;
+            std::size_t peak_live = 0;
+        } message_stats; // Adapter lifetime; inspecting or unloading does not reset history.
         std::size_t list_count() const
         {
             return lists_.size();
@@ -375,8 +378,7 @@ namespace OpenBlood2
         bool models_advancing_ = false, physics_advancing_ = false;
         std::vector<std::unique_ptr<StringHandle>> string_tokens_;
         std::unordered_map<HSTRING, String> strings_;
-        std::vector<std::unique_ptr<LMessage>> message_tokens_;
-        std::unordered_map<HMESSAGEWRITE, Message> messages_;
+        std::unordered_map<HMESSAGEWRITE, Message, MessageHandleHash> messages_;
         std::vector<std::unique_ptr<ObjectList>> list_tokens_;
         std::unordered_set<ObjectList*> lists_;
         // Only synchronous destination preparation/commit may temporarily suspend this binding.

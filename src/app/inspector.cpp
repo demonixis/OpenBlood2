@@ -634,6 +634,13 @@ namespace OpenBlood2
                     const auto ids = game.objects.snapshot();
                     ImGui::Text("%zu live records  |  Time %.3f s  |  Strings %zu  |  Messages %zu", ids.size(),
                                 game.objects.time(), game.server.string_count(), game.server.message_count());
+                    const auto& messages = game.server.message_stats;
+                    ImGui::Text(
+                        "Messages, adapter lifetime: %llu created / %llu released / %llu refused; peak %zu / %zu live",
+                        static_cast<unsigned long long>(messages.created),
+                        static_cast<unsigned long long>(messages.released),
+                        static_cast<unsigned long long>(messages.refused), messages.peak_live,
+                        ServerAdapter::max_live_messages);
                     if (ImGui::Button("Spawn CameraSpot"))
                         spawn_request = "CameraSpot";
                     ImGui::SameLine();

@@ -1,5 +1,6 @@
 #include "game/server_adapter.h"
 #include <algorithm>
+#include <atomic>
 #include <charconv>
 #include <cmath>
 #include <limits>
@@ -7,6 +8,20 @@
 ServerDE* g_pServerDE = nullptr;
 namespace OpenBlood2
 {
+    namespace
+    {
+        // Shared only for unique identities. No payloads or original game state
+        // cross sessions, including a suspended source and prepared destination.
+        std::atomic<std::uint64_t> next_message_identity{1};
+        MessageHandle allocate_message_identity()
+        {
+            auto identity = next_message_identity.load(std::memory_order_relaxed);
+            while (identity != UINT64_MAX)
+                if (next_message_identity.compare_exchange_weak(identity, identity + 1, std::memory_order_relaxed))
+                    return MessageHandle{identity};
+            return nullptr; // Exhaustion never wraps to a previous/stale identity.
+        }
+    } // namespace
     ServerAdapter* ServerAdapter::active_ = nullptr;
     ServerAdapter& ServerAdapter::active()
     {
@@ -572,14 +587,22 @@ namespace OpenBlood2
     HMESSAGEWRITE ServerAdapter::StartHMessageWrite()
     {
         trace_service("StartHMessageWrite");
-        if (message_tokens_.size() >= 65536)
+        if (messages_.size() >= max_live_messages)
         {
-            objects_.fail(ObjectError::Limit, "Session message token limit");
+            ++message_stats.refused;
+            objects_.fail(ObjectError::Limit, "Concurrent message limit");
             return nullptr;
         }
-        message_tokens_.push_back(std::make_unique<LMessage>());
-        auto h = message_tokens_.back().get();
+        const auto h = allocate_message_identity();
+        if (!h)
+        {
+            ++message_stats.refused;
+            objects_.fail(ObjectError::Limit, "Message identity exhausted");
+            return nullptr;
+        }
         messages_.emplace(h, Message{});
+        ++message_stats.created;
+        message_stats.peak_live = std::max(message_stats.peak_live, messages_.size());
         return h;
     }
     ServerAdapter::Message* ServerAdapter::writable(HMESSAGEWRITE h)
@@ -706,6 +729,7 @@ namespace OpenBlood2
             return;
         }
         messages_.erase(it);
+        ++message_stats.released;
     }
     void ServerAdapter::EndHMessageRead(HMESSAGEREAD)
     {
@@ -754,6 +778,7 @@ namespace OpenBlood2
             ok = ok && !m.bad;
         }
         messages_.erase(h);
+        ++message_stats.released;
         return ok ? DE_OK : DE_ERROR;
     }
 } // namespace OpenBlood2

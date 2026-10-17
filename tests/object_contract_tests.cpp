@@ -448,6 +448,72 @@ namespace
         base->EndHMessageWrite(write);
         return true;
     }
+    bool message_churn()
+    {
+        HMESSAGEWRITE previous = nullptr;
+        for (unsigned cycle = 0; cycle < 2; ++cycle)
+        {
+            GameSession s;
+            CHECK(setup(s));
+            auto target = probe(s);
+            bool nested_ok = true;
+            unsigned delivered = 0;
+            context.message = [&](Probe&, DDWORD, HMESSAGEREAD read)
+            {
+                const auto value = s.server.ReadFromMessageDWord(read);
+                auto nested = s.server.StartHMessageWrite();
+                nested_ok &= nested && nested != read && s.server.WriteToMessageDWord(nested, value) == DE_OK;
+                s.server.EndHMessageWrite(read); // Borrowed callback cannot release its outer payload.
+                nested_ok &= s.server.message_count() == 2;
+                s.server.EndHMessageWrite(nested);
+                ++delivered;
+            };
+            for (unsigned i = 0; i < 100000; ++i)
+            {
+                auto message = s.server.StartMessageToObject(nullptr, target, 20);
+                CHECK(message && message != previous);
+                CHECK(s.server.WriteToMessageDWord(previous, 1) == DE_INVALIDPARAMS);
+                s.server.EndHMessageWrite(previous); // Never releases the current payload.
+                CHECK(s.server.message_count() == 1);
+                CHECK(s.server.WriteToMessageDWord(message, i) == DE_OK && s.server.EndMessage(message) == DE_OK);
+                CHECK(s.server.EndMessage(message) == DE_INVALIDPARAMS && s.server.message_count() == 0);
+                previous = message; // Also rejected by the next independent adapter.
+            }
+            CHECK(nested_ok && delivered == 100000 && s.server.message_stats.created == 200000);
+            CHECK(s.server.message_stats.released == 200000 && s.server.message_stats.peak_live == 2 &&
+                  s.server.message_stats.refused == 0);
+        }
+        return true;
+    }
+    bool message_limit()
+    {
+        GameSession s;
+        CHECK(setup(s));
+        std::vector<HMESSAGEWRITE> live;
+        for (std::size_t i = 0; i < ServerAdapter::max_live_messages; ++i)
+        {
+            auto message = s.server.StartHMessageWrite();
+            CHECK(message && s.server.WriteToMessageDWord(message, static_cast<DDWORD>(i)) == DE_OK);
+            live.push_back(message);
+        }
+        CHECK(!s.server.StartHMessageWrite() && s.server.message_stats.refused == 1);
+        const auto stale = live.back();
+        s.server.EndHMessageWrite(stale);
+        live.pop_back();
+        auto replacement = s.server.StartHMessageWrite();
+        CHECK(replacement && replacement != stale && s.server.WriteToMessageDWord(stale, 0) == DE_INVALIDPARAMS);
+        s.server.EndHMessageWrite(stale);
+        CHECK(s.server.message_count() == ServerAdapter::max_live_messages);
+        for (std::size_t i = 0; i < live.size(); ++i)
+        {
+            CHECK(s.server.ReadFromMessageDWord(live[i]) == i);
+            s.server.EndHMessageWrite(live[i]);
+        }
+        s.server.EndHMessageWrite(replacement);
+        CHECK(s.server.message_count() == 0 && s.server.message_stats.peak_live == ServerAdapter::max_live_messages);
+        CHECK(s.server.message_stats.created == s.server.message_stats.released);
+        return true;
+    }
     bool unsupported_teardown()
     {
         CHECK(g_pServerDE == nullptr);
@@ -568,6 +634,8 @@ int main(int argc, char** argv)
                                                         {"handles_selection", handles_selection},
                                                         {"links_lists", links_lists},
                                                         {"messages_strings", messages_strings},
+                                                        {"message_churn", message_churn},
+                                                        {"message_limit", message_limit},
                                                         {"unsupported_teardown", unsupported_teardown},
                                                         {"creation_failures", creation_failures}};
     if (argc != 2)
