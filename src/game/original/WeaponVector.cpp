@@ -88,6 +88,8 @@ FireResult CWeapon::FireVector()
             impact.effect.m_vDestPos = vector_add(impact.hit.point, vector_scale(impact.hit.normal, 1.25f));
             impact.effect.SelectBloodSpurt(last_shot.damage, impact_random);
             impact.effect.CreateSprites(*server, m_hOwner, impact.hit.normal, impact_random);
+            impact.effect.CreateSparks(*server, m_hOwner, impact.hit.normal, last_shot.damage,
+                                       data.m_nType == WEAP_MELEE, impact_random);
             if (!impact.effect.PlayImpactSound(*server, m_hOwner, impact_random))
                 ++impact_sound_failures;
             if (impact.effect.sound)

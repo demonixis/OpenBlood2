@@ -1967,6 +1967,10 @@ namespace OpenBlood2
                         "Blood roll %d / requested %d | events %llu, %llu | %s", impact.effect.blood_roll,
                         impact.effect.blood_requested, (unsigned long long)impact.effect.blood_events[0],
                         (unsigned long long)impact.effect.blood_events[1], impact.effect.blood_error.c_str());
+                    ImGui::TextWrapped("Sparks requested %d / large metal %d | event %llu | %s",
+                                       impact.effect.sparks_requested, impact.effect.sparks_big,
+                                       (unsigned long long)impact.effect.spark_event,
+                                       impact.effect.spark_error.c_str());
                     ImGui::Text("Impact hearing: %u deliveries / %s", impact.alert.delivered,
                                 impact.alert.complete ? "complete" : "not completed");
                     if (!impact.alert.error.empty())

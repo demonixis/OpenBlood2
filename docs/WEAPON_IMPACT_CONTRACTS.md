@@ -89,3 +89,5 @@ NEW_LEVEL still keep the actual M2 exit gate open.
 Continuation: [weapon impact flash/smoke](WEAPON_SPRITE_CONTRACTS.md) supersedes the earlier blanket impact-visual omission for wood/stone bullet sprites only. Other composite components and M2 remain open.
 
 The [blood-spurt continuation](BLOOD_SPURT_CONTRACTS.md) extends the selected original weapon/fragment/limb callers and impact splats. Earlier blanket omissions are historical; separate flesh sparks, generic debris and M2 remain incomplete.
+
+The [original impact sparks](SPARK_CONTRACTS.md) continuation supersedes the flesh/metal spark omission only. Underwater bubbles, generic recipes and remaining M2 services stay unavailable.

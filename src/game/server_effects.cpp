@@ -2,6 +2,17 @@
 #include <cmath>
 namespace OpenBlood2
 {
+    std::uint64_t ServerAdapter::PublishSparks(HOBJECT source, const SparkSettings& settings, std::string& error)
+    {
+        trace_service("PublishSparks (original weapon impact)");
+        error.clear();
+        if (!IsObjectAlive(source) || !client_resources)
+        {
+            error = "Spark source/resources unavailable";
+            return 0;
+        }
+        return sparks.publish(settings, GetObjectName(source), *client_resources, objects_.time(), error);
+    }
     std::uint64_t ServerAdapter::PublishClientBloodSplat(const BloodSplatSettings& settings, std::string_view source,
                                                          std::string& error)
     {

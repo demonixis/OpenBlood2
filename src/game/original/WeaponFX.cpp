@@ -1,6 +1,7 @@
 // Original WeaponFX.cpp PlayImpactSound (977-992), GetImpactSound (1104-1152).
 #include "WeaponFX.h"
 #include "ParticleExplosionFX.h"
+#include "SparksFX.h"
 #include "engine/collision.h"
 #include "game/original/Weapon.h"
 #include "game/weapon_sprites.h"
@@ -174,4 +175,58 @@ bool CWeaponFX::CreateBloodSpurt(ServerDE& server, HOBJECT source, DVector norma
     if (!second_error.empty())
         blood_error = second_error;
     return blood_error.empty();
+}
+
+// Original UpdateWeaponFX flags and CreateSparks recipes. No liquid substitution in this branch.
+bool CWeaponFX::CreateSparks(ServerDE& server, HOBJECT source, DVector normal, float damage, bool melee,
+                             std::minstd_rand& random)
+{
+    spark_event = 0;
+    spark_error.clear();
+    sparks_big = false;
+    sparks_requested = melee || m_eSurfaceType == SURFTYPE_FLESH ||
+                       (m_eSurfaceType == SURFTYPE_METAL &&
+                        (m_nAmmoType == AMMO_BULLET || m_nAmmoType == AMMO_SHELL || m_nAmmoType == AMMO_BMG));
+    if (!sparks_requested)
+        return true;
+    if (m_eSurfaceType != SURFTYPE_FLESH && m_eSurfaceType != SURFTYPE_METAL)
+    {
+        spark_error = "Original melee spark recipe has zero duration/count for this surface";
+        return false;
+    }
+    if (!physics_vector(normal) || vector_dot(normal, normal) < 1e-12f || !std::isfinite(damage) || damage < 0)
+    {
+        spark_error = "Invalid spark impact normal/damage";
+        return false;
+    }
+    normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+    SparkSettings s;
+    s.position = m_vDestPos;
+    s.gravity = -150;
+    if (m_eSurfaceType == SURFTYPE_FLESH)
+    {
+        s.direction = vector_scale(normal, 50);
+        s.color1 = {192, 0, 0};
+        s.color2 = {255, 0, 0};
+        s.texture = "spritetextures/particles/blooddrop_" +
+                    std::to_string(std::uniform_int_distribution<int>(1, 3)(random)) + ".dtx";
+        s.count = damage < 50 ? static_cast<unsigned>(damage * 4) : 200;
+        s.duration = 2;
+        s.emission_radius = 5;
+        s.radius = 200;
+    }
+    else
+    {
+        sparks_big = std::uniform_int_distribution<int>(0, 19)(random) == 0;
+        s.direction = vector_scale(normal, 75);
+        s.color1 = {255, 255, 0};
+        s.color2 = {255, 255, 255};
+        s.texture = "spritetextures/particles/particle2.dtx";
+        s.count = damage < 50 ? static_cast<unsigned>(damage * (sparks_big ? 5 : 2)) : (sparks_big ? 250 : 100);
+        s.duration = sparks_big ? 2 : .5f;
+        s.emission_radius = .3f;
+        s.radius = 175;
+    }
+    spark_event = server.PublishSparks(source, s, spark_error);
+    return spark_event && spark_error.empty();
 }

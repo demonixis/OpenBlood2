@@ -1062,3 +1062,7 @@ No reference source, dependency, shader or commercial asset is modified.
 
 
 The [original blood-pool continuation](../../Documentation/Implementation/M2_BLOOD_SPLATS.md) connects CClientSplatFX/CBloodSplatFX with corpse ground-hit publication, persistent oriented sprites and inspection. Read [source hashes](M2_BLOOD_SPLAT_SOURCES.json) and [contracts](BLOOD_SPLAT_CONTRACTS.md). Preserve eleven-existing-neighbor reuse, nearest-prefix/tie order, state-preserving relocation, delta-squared growth, uncapped Term clocks and detached lifetime. Blood spurts/gib impact callers, shared-list eviction and the actual M2 gate remain incomplete.
+
+## Original weapon impact sparks
+
+Selected Weapon.cpp flags, WeaponFX.cpp flesh/metal recipes and SparksFX.cpp burst/clock behavior are ported from Blood II. [Source hashes](M2_SPARK_SOURCES.json) and [contracts](SPARK_CONTRACTS.md) document typed ownership, bounded storage, isolated cosmetic RNG, later-engine particle interpolation and invisible exhausted-system reclamation. Reference sources, assets, shaders and pinned dependencies are unchanged.

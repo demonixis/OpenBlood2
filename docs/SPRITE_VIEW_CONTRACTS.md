@@ -94,3 +94,5 @@ The [world-alpha correction](WORLD_ALPHA_CONTRACTS.md) supersedes earlier blanke
 
 
 Continuation: [original corpse blood pools](BLOOD_SPLAT_CONTRACTS.md) supersedes the pool omission for corpse ground hits. Blood-spurt particles, gib impact callers, shared SFX eviction and other required services remain incomplete. The M2 exit gate is unchanged.
+
+The [original impact sparks](SPARK_CONTRACTS.md) continuation supersedes the flesh/metal spark omission only. Underwater bubbles, generic recipes and remaining M2 services stay unavailable.

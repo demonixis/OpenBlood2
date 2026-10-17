@@ -9,6 +9,7 @@ namespace OpenBlood2
         ImGui::TextWrapped("Original DetailSprite placement and SPR clock; decoded DTX alpha on world-depth quads. "
                            "Rotatable sprites use their object pose; others face the camera. Unlit replacement "
                            "presentation: glow, view bias, no-Z and sky modes remain unavailable.");
+        draw_sparks(game);
         draw_blood_spurts(game);
         draw_blood_splats(game);
         draw_weapon_sprites(game);
@@ -245,7 +246,7 @@ namespace OpenBlood2
                     effects.active.size(), effects.live_particles(), (unsigned long long)effects.started,
                     (unsigned long long)effects.expired, (unsigned long long)effects.failed);
         ImGui::TextWrapped("Six samples/two drops, half-gravity emitter, one impact then fade. Detached from actors. "
-                           "Outside-world classification and separate flesh sparks remain unavailable.");
+                           "Outside-world classification remains unavailable.");
         ImGui::TextWrapped("%s", effects.update_error.c_str());
         for (const auto& fx : effects.active)
         {
@@ -277,5 +278,51 @@ namespace OpenBlood2
                                r.ended, (unsigned long long)r.emitted, (unsigned long long)r.impacts,
                                (unsigned long long)r.splat_event, r.error.c_str(), r.splat_error.c_str(),
                                r.sound_error.c_str());
+    }
+} // namespace OpenBlood2
+
+namespace OpenBlood2
+{
+    void Inspector::draw_sparks(const GameSession& game)
+    {
+        if (!ImGui::CollapsingHeader("Original impact sparks / blood burst"))
+            return;
+        const auto& store = game.server.sparks;
+        ImGui::Text("Systems %zu / 128 | particles %zu / 16384 | started %llu / retired %llu / failed %llu",
+                    store.active.size(), store.live_particles(), (unsigned long long)store.started,
+                    (unsigned long long)store.retired, (unsigned long long)store.failed);
+        ImGui::TextWrapped(
+            "One original burst, outgoing component bounds, gravity -150. Detached; particles have no collision. Empty "
+            "systems are reclaimed after duration; shared SFX eviction is unavailable. %s",
+            store.update_error.c_str());
+        for (const auto& fx : store.active)
+        {
+            ImGui::PushID(static_cast<int>(fx.id));
+            if (ImGui::TreeNode("Spark", "#%llu %s", (unsigned long long)fx.id, fx.settings.texture.c_str()))
+            {
+                ImGui::Text("Position %.2f %.2f %.2f | count %zu / %u | alpha %.3f", fx.settings.position.x,
+                            fx.settings.position.y, fx.settings.position.z, fx.particles.size(), fx.settings.count,
+                            fx.alpha);
+                ImGui::Text("Velocity min %.3f %.3f %.3f / max %.3f %.3f %.3f", fx.min_velocity.x, fx.min_velocity.y,
+                            fx.min_velocity.z, fx.max_velocity.x, fx.max_velocity.y, fx.max_velocity.z);
+                ImGui::Text("Duration %.2f | emission radius %.2f | draw radius %.2f / 640 | updates %llu",
+                            fx.settings.duration, fx.settings.emission_radius, fx.settings.radius,
+                            (unsigned long long)fx.updates);
+                ImGui::TextWrapped("%s", fx.error.c_str());
+                if (sprite_view)
+                    for (const auto& entry : sprite_view->entries)
+                        if (entry.spark_system == fx.id && !entry.error.empty())
+                        {
+                            ImGui::TextWrapped("Texture: %s", entry.error.c_str());
+                            break;
+                        }
+                ImGui::TreePop();
+            }
+            ImGui::PopID();
+        }
+        for (const auto& r : store.reports)
+            ImGui::TextWrapped("Event %llu %s -> #%llu | particles %u / duration %.2f | ended %d | %s",
+                               (unsigned long long)r.id, r.source.c_str(), (unsigned long long)r.effect,
+                               r.settings.count, r.settings.duration, r.ended, r.error.c_str());
     }
 } // namespace OpenBlood2

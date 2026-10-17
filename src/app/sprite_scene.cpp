@@ -1,4 +1,5 @@
 #include "app/sprite_scene.h"
+#include <algorithm>
 namespace OpenBlood2
 {
     bool update_sprite_scene(const GameSession& game, SpriteView& scene, std::string& error)
@@ -23,6 +24,17 @@ namespace OpenBlood2
                 return false;
             scene.entries.back().client_effect = fx.id;
         }
+        for (const auto& fx : game.server.sparks.active)
+            for (unsigned i = 0; i < fx.particles.size(); ++i)
+            {
+                const auto& p = fx.particles[i];
+                if (!scene.add_particle(fx.settings.texture, vector_add(fx.settings.position, p.position),
+                                        fx.settings.radius / 640.f, p.color, std::max(0.f, fx.alpha), fx.id, i,
+                                        game.resources, error))
+                    return false;
+                scene.entries.back().particle_system = 0;
+                scene.entries.back().spark_system = fx.id;
+            }
         for (const auto& fx : game.server.blood_spurts.active)
             for (unsigned i = 0; i < fx.particles.size(); ++i)
             {

@@ -43,6 +43,7 @@ namespace OpenBlood2
         bool select_sprites = false;
         ObjectId sprite_selection{};
         void draw_sprites(GameSession&, ObjectSelection&);
+        void draw_sparks(const GameSession&);
         void draw_blood_spurts(const GameSession&);
         void draw_blood_splats(const GameSession&);
         void draw_weapon_sprites(const GameSession&);

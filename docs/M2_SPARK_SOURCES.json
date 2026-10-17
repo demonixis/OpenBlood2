@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "a52344adc5076b6c354f17c20316d6545c0ce582",
+  "status": "M2 incomplete; selected original flesh/metal impact sparks",
+  "references": [
+    {
+      "source": "sources/blood2/ClientShellDLL/SparksFX.cpp",
+      "source_sha256": "ef8bba235a666cf00977a121de267edb57e41024f8cffdb60dc7823171c1478f",
+      "purpose": "Init, single burst, component velocity limits and conditional removal/fade."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/SparksFX.h",
+      "source_sha256": "c29f0e0dc62b91cab056b8ec4438ff3939e08e83a8ed82265a7bc8dd3c72a18c",
+      "purpose": "Defaults, settings and WantRemove inheritance."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/WeaponFX.cpp",
+      "source_sha256": "95230fcffd888751528e1a9f1d4353844ebfce5dbf5ef0a46cb0cf0a8a1b0e25",
+      "purpose": "Original flesh/metal recipes and component creation order."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "source_sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "purpose": "Flesh/melee/ammunition selection and raw damage payload."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
+      "source_sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13",
+      "purpose": "Particle radius/640, origin and texture setup."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/SpecialFX.h",
+      "source_sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
+      "purpose": "Original removal state and 1ms update interval."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
+      "source_sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
+      "purpose": "Dynamic shared-list ownership and child creation."
+    },
+    {
+      "source": "sources/lithtech/runtime/client/src/particlesystem.cpp",
+      "source_sha256": "1efc6713379529f2a840cb15243ca4b8bdf846092ac5e7c67427df0ecbcf0d44",
+      "purpose": "Later-engine AddParticles interpolation and particle integration; not retail Blood II parity."
+    }
+  ]
+}

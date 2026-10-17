@@ -21,6 +21,7 @@
 #include "game/player_restore.h"
 #include "game/projectile_report.h"
 #include "game/session.h"
+#include "game/sparks.h"
 #include "game/weapon_sprites.h"
 #include "game/world_preparation.h"
 #include <array>
@@ -96,6 +97,8 @@ namespace OpenBlood2
         void RecordDebrisEffect(const DebrisEffect&) override;
         std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         ExplosionSprites explosion_sprites;
+        Sparks sparks;
+        std::uint64_t PublishSparks(HOBJECT, const SparkSettings&, std::string&) override;
         BloodSpurts blood_spurts;
         std::uint64_t PublishClientBloodSplat(const BloodSplatSettings&, std::string_view, std::string&) override;
         std::uint64_t PublishClientBloodSpurt(const BloodSpurtSettings&, std::string_view, bool, std::string&) override;
@@ -159,6 +162,7 @@ namespace OpenBlood2
             scene_explosions.clear();
             projectile_reports.clear();
             explosion_sprites.clear();
+            sparks.clear();
             blood_spurts.clear();
             blood_splats.clear();
             weapon_sprites.clear();
