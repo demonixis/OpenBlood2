@@ -1211,3 +1211,16 @@ full-precision pan equation, not the original internal integer quantization.
 See [source ledger](sources/m2_music_legacy_pan_sources.json),
 [contracts](../contracts/music_sampler_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_legacy_pan.md).
+
+
+## IMA pattern-note data
+
+The independent `src/engine/ima_style.*` reader decodes the installed AASY
+pattern/grid/note layout. Read-only examination and an isolated emulated probe
+of the external original IMUSIC25.DLL establish the 18-byte note record and
+ordering; no DLL bytes or executable dependency are imported. The reader adds
+strict record/header budgets and transactional owned output. Event fields remain
+inputs to an unavailable sequencer, not final MIDI messages.
+See the [source ledger](sources/m2_music_notes_sources.json),
+[contracts](../contracts/music_note_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_notes.md).

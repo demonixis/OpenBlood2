@@ -92,3 +92,7 @@ incomplete.
 The [DLS continuation](music_dls_contracts.md) now decodes a bounded instrument-data
 subset alongside the structural survey. Earlier blanket DLS opacity statements
 are superseded only for that subset; synthesis and music playback remain absent.
+
+The [IMA note continuation](music_note_contracts.md) now decodes a bounded AASY
+pattern/grid/note profile alongside this structural survey. Its separate failures,
+opaque fields and read-only data do not implement sequence playback or MUSIC.

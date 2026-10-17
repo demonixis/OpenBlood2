@@ -186,6 +186,8 @@ namespace
         CHECK(std::all_of(catalog.assets.begin(), catalog.assets.end(),
                           [](const auto& a) { return a.container_valid && a.error.empty(); }));
         CHECK(!catalog.assets.front().bank && !catalog.assets.front().bank_error.empty());
+        CHECK(!catalog.assets[1].style && !catalog.assets[1].style_error.empty()); // Structural-only fake style.
+
         const auto initial = catalog.bytes_read;
         catalog.inspect(root, props);
         CHECK(catalog.bytes_read == initial);
@@ -280,14 +282,36 @@ namespace
             const auto& bank = *catalog.assets.front().bank;
             CHECK(bank.waves.size() == 35 && bank.instruments.size() == 14);
             const std::weak_ptr<const DlsBank> bank_lifetime = catalog.assets.front().bank;
+            std::weak_ptr<const ImaStyle> style_lifetime;
+            const ImaNote* first_note = nullptr;
+            std::size_t style_index = 0, style_notes = 0;
+            for (std::size_t i = 0; i < catalog.assets.size(); ++i)
+            {
+                const auto& asset = catalog.assets[i];
+                if (asset.kind != MusicAssetKind::Style)
+                    continue;
+                CHECK(asset.style && asset.style_error.empty());
+                style_notes += asset.style->notes;
+                if (asset.style->notes && !first_note)
+                    for (const auto& p : asset.style->patterns)
+                        for (const auto& g : p.grids)
+                            if (!g.notes.empty() && !first_note)
+                            {
+                                first_note = g.notes.data();
+                                style_index = i;
+                                style_lifetime = asset.style;
+                            }
+            }
+            CHECK(style_notes == 3049 && first_note && !style_lifetime.expired());
             const auto* samples = bank.waves.front().samples.data();
             const auto observed = catalog.bytes_read;
             CHECK(game.enter_player(error) && game.step(1.0 / 60));
             CHECK(game.music_catalog.bytes_read == observed &&
                   game.music_catalog.assets.front().bank->waves.front().samples.data() ==
                       samples); // No per-frame/UI-dependent file work.
+            CHECK(catalog.assets[style_index].style.get() == style_lifetime.lock().get());
             CHECK(game.unload_world() && game.music_catalog.assets.empty() && game.music_catalog.plan.requests.empty());
-            CHECK(bank_lifetime.expired());
+            CHECK(bank_lifetime.expired() && style_lifetime.expired());
             CHECK(game.objects.snapshot().empty() && !game.server.message_count() && !game.server.string_count());
         }
         return true;

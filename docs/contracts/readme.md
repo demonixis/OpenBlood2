@@ -172,3 +172,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [DLS instrument data](music_dls_contracts.md)
 
 - [DLS diagnostic voices](music_sampler_contracts.md): bounded synthesis, graph selection, shared output, lifetime and explicit unsupported music.
+
+- [IMA pattern-note data](music_note_contracts.md): original record order, signed fields, opaque events and inspected world ownership.

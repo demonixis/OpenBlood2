@@ -10,6 +10,16 @@ namespace OpenBlood2
         if (!music.error.empty() || music.assets.empty() || !music.assets.front().bank ||
             !music.assets.front().bank_error.empty())
             return false;
+        std::size_t pattern_notes = 0;
+        for (const auto& asset : music.assets)
+            if (asset.kind == MusicAssetKind::Style)
+            {
+                if (!asset.style || !asset.style_error.empty())
+                    return false;
+                pattern_notes += asset.style->notes;
+            }
+        if (pattern_notes != 3049)
+            return false;
         const auto& bank = *music.assets.front().bank;
         if (bank.instruments.size() != 14 || bank.waves.size() != 35 || bank.decoded_bytes != 913403 * sizeof(float) ||
             !bank.waves[8].settings || bank.waves[8].settings->loop_in_bounds)

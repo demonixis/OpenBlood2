@@ -28,3 +28,5 @@ the original log or patch.
 - [DLS diagnostic voice synthesis](../../../Documentation/Implementation/m2_music_sampler.md): sample/envelope auditions, shared audio clock and Cabal refusals; M2 remains incomplete.
 
 - [Legacy DLS pan compatibility](../../../Documentation/Implementation/m2_music_legacy_pan.md): all 38 Cabal region auditions, isolated original-dispatch evidence and explicit remaining music gaps.
+
+- [IMA pattern-note decoding](../../../Documentation/Implementation/m2_music_notes.md): original loader equivalence, 7,030 inspected note records and explicit remaining sequencing gaps.

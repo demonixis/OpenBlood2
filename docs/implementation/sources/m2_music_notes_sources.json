@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "980c842858f493b2312cba08374c21d08434d9a1",
+  "status": "M2 incomplete; bounded original IMA note data, no sequence playback",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/IMUSIC25.DLL",
+      "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "image_base": "0x35440000",
+      "pattern_loader_rva": "0x85ab",
+      "grid_loader_rva": "0x8900",
+      "note_loader_rva": "0x8d5f",
+      "consumer_rvas": [
+        "0x55d20..0x56167",
+        "0x57103..0x57595"
+      ],
+      "use": "Read-only static examination and bounded isolated original note-reader emulation, with intercepted in-memory stream/allocation facilities. No native DLL loading or bytes imported."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/Music.cpp",
+      "sha256": "1024e355e8da92ba670b96fc7cec5a57f301ea45e18f0a43f910a914f6e24ee0",
+      "use": "Original request plan and remaining engine playlist calls; unchanged in this increment"
+    }
+  ],
+  "observations": {
+    "styles": 39,
+    "patterns": 131,
+    "grids": 7166,
+    "notes": 7030,
+    "note_chunks": 2836,
+    "opaque_curve_chunks": 42,
+    "original_decoded_note_sha256": "23d6f84dff7cdd029ced2daf540b80af2205c1e15d216bec874653c5718db4e3"
+  },
+  "replacement_code": [
+    "Independent typed little-endian reader; no compiler ABI structs",
+    "Strict installed header/stride profile, bounded atomic errors and owned raw ranges",
+    "Immutable once-per-world catalogue and read-only clipped in-game inspection"
+  ],
+  "deliberate_limits": [
+    "All note bit patterns retained; a future scheduler must reject unsupported semantics before use",
+    "Only ASCII terminated fixed-width names; note extensions above 18 explicitly rejected",
+    "Header tails, band, personality, curve and section events remain opaque",
+    "No musical time conversion, variations, humanization, pitch conversion, MIDI channel routing or new audio playback",
+    "Optional Unicorn probe is not a build/runtime dependency; no retail performance/audio parity claim"
+  ],
+  "target_sha256": {
+    "CMakeLists.txt": "435807d236c1fe74409b5e4a4a8c40f34fdeaad3d1443668db060aea49dcc51c",
+    "src/engine/ima_style.h": "032ff2eabc10c848a2eef803620c23103b3552e8c9801446ab9967006e720ca2",
+    "src/engine/ima_style.cpp": "d417cb962c5a342c4dcf280109c8361a6484a060921e68c7a84356a4d2aef0a8",
+    "src/game/music_catalog.h": "2f25d8b495efdd600d6a6e85f53b0bf2075af5447d318afef51fbf22b16e336f",
+    "src/game/music_catalog.cpp": "4dda5e656cb6fef47f32c9e16105f8de42e7017ba2d584192ac1b949dcea3c09",
+    "src/app/inspector_world_sounds.cpp": "0962d8254aa03e7217914fd53df0eefb7670e4c3a4f29d748952e7e509beb5b0",
+    "src/app/world_sound_smoke.cpp": "860c7ed10eced1f776ef69510442f51ca1a031ed39535a8e7b66bebb695e600a",
+    "tests/music_asset_tests.cpp": "e66d3f484646237c03f59dd4d4ef17b10e5eb05ea1f8f6a701679e5d3f6f981b",
+    "tests/ima_style_tests.cpp": "a671654597019832bc399be85edf29103078b51a82bfd6d10151b5e80dc46f56",
+    "tests/CMakeLists.txt": "2c610b830c6d776b4ee6c57c260a963e1274092c8620bb96f3a86ec29e008d70"
+  }
+}

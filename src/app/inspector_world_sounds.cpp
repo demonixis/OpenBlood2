@@ -140,10 +140,10 @@ namespace OpenBlood2
                                music.plan.directory.c_str(), music.plan.requests.size(), music.assets.size(),
                                music.bytes_read);
             ImGui::TextWrapped(
-                "RIFF structure, section-to-style filenames and decoded DLS sample/region data. Pattern "
-                "events, personality "
+                "Decoded IMA pattern note records and DLS sample/region data. Pattern "
+                "selection, curves, personality "
                 "records and playlist playback are not implemented. MUSIC commands "
-                "still report unsupported. Explicit DLS diagnostic notes below use the existing audio output.");
+                "still report unsupported. Explicit DLS diagnostic notes above use the existing audio output.");
             if (!music.error.empty())
                 ImGui::TextWrapped("Music inspection: %s", music.error.c_str());
             if (ImGui::TreeNode("Original request order"))
@@ -174,11 +174,63 @@ namespace OpenBlood2
                                     asset.bank->waves.size());
                     ImGui::TableNextColumn();
                     ImGui::TextWrapped("%s", asset.error.empty() ? asset.style_reference.c_str() : asset.error.c_str());
+                    if (!asset.style_error.empty())
+                        ImGui::TextWrapped("IMA note decoding failed: %s", asset.style_error.c_str());
                     if (!asset.bank_error.empty())
                         ImGui::TextWrapped("DLS decoding failed: %s", asset.bank_error.c_str());
                 }
                 ImGui::EndTable();
             }
+        }
+        if (ImGui::TreeNode("IMA pattern notes (data only)"))
+        {
+            ImGui::TextWrapped("File order and raw timing/variation/pitch fields; these are not final MIDI notes. "
+                               "Curves, header tails, bands and personality rules remain undecoded. No playback.");
+            for (const auto& asset : music.assets)
+            {
+                if (!asset.style || !ImGui::TreeNode(asset.filename.c_str()))
+                    continue;
+                const auto& style = *asset.style;
+                ImGui::Text("%s: %zu patterns / %zu grids / %zu notes / %zu opaque curves", style.name.c_str(),
+                            style.patterns.size(), style.grids, style.notes, style.curve_chunks);
+                for (const auto& pattern : style.patterns)
+                {
+                    ImGui::PushID(static_cast<int>(pattern.offset));
+                    if (ImGui::TreeNode("pattern", "%s (offset %u)", pattern.name.c_str(), pattern.offset))
+                    {
+                        ImGui::Text("Length %d | raw word0 %08x / flags %08x | timing %d, %d, %d, %d", pattern.length,
+                                    pattern.word0, pattern.flags, pattern.timing[0], pattern.timing[1],
+                                    pattern.timing[2], pattern.timing[3]);
+                        for (const auto& grid : pattern.grids)
+                        {
+                            ImGui::PushID(static_cast<int>(grid.offset));
+                            if (ImGui::TreeNode("grid", "Grid %d: %zu notes / %zu opaque curves", grid.index,
+                                                grid.notes.size(), grid.curve_chunks))
+                            {
+                                ImGuiListClipper clipper;
+                                clipper.Begin(static_cast<int>(grid.notes.size()),
+                                              ImGui::GetTextLineHeightWithSpacing());
+                                while (clipper.Step())
+                                    for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
+                                    {
+                                        const auto& n = grid.notes[i];
+                                        ImGui::Text("%d: type %u ch %u offset %+d dur %d var %04x MIDI %u vel %u "
+                                                    "music %04x pitch %02x byte7 %02x ranges %u/%u/%u mode %02x",
+                                                    i, n.type, n.channel, n.time_offset, n.duration, n.variations,
+                                                    n.midi_note, n.velocity, n.music_value, n.pitch_modifier, n.byte7,
+                                                    n.time_range, n.duration_range, n.velocity_range, n.play_mode);
+                                    }
+                                ImGui::TreePop();
+                            }
+                            ImGui::PopID();
+                        }
+                        ImGui::TreePop();
+                    }
+                    ImGui::PopID();
+                }
+                ImGui::TreePop();
+            }
+            ImGui::TreePop();
         }
         const auto& audio = game.server.audio;
         ImGui::TextWrapped("Original Sound starts an unattached loop and removes its source object. "
