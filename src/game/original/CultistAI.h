@@ -18,6 +18,7 @@ class CultistAI : public AI_Mgr
         return EscapeHide();
     }
     bool ComputeState(int stimulus = -1) override;
+    bool AI_STATE_Dodge() override;
     bool AI_STATE_AttackClose() override;
     bool AI_STATE_AttackFar() override;
     float attack_distance = 0, attack_height = 0, attack_threshold = 0;

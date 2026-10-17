@@ -322,8 +322,41 @@ namespace
         CHECK(w.place_body({4, 4, 0}, {0, 1, 1}, {}, {1, 1, 1}).result == BodyPlacementResult::Invalid);
         CHECK(w.place_body({4, 4, 0}, {1, 1, 1}, {}, {-1, 1, 1}).result == BodyPlacementResult::Invalid);
         CHECK(w.build(placement_corner(true), error));
+        // An exact-width corridor permits touching faces, just like sweep().
+        // The old extra .001 skin oscillated between its opposite walls.
+        p = w.place_body({2.5f, 4, 0}, {1, 1, 1}, {2.5f, 4, 0}, {2, 1, 1});
+        CHECK(p.result == BodyPlacementResult::Adjusted && p.touching_fit && p.corrections == 1 && p.distance == .5 &&
+              p.candidate.x == 2);
+        CHECK(w.sweep(p.candidate, p.candidate, {2, 1, 1}, hit) == CollisionQuery::Miss);
+        CHECK(w.sweep(p.anchor, p.candidate, {}, hit) == CollisionQuery::Miss);
+        // Multiple constraints: solve the tight corridor before the lower floor
+        // polygon. An exact fit must still resolve every other overlapping face.
+        auto tight = placement_corner(true);
+        std::rotate(tight.polygons.begin(), tight.polygons.begin() + 1, tight.polygons.end());
+        CHECK(w.build(tight, error));
+        p = w.place_body({2.5f, 4, 0}, {1, 1, 1}, {2.5f, .5f, 0}, {2, 1, 1});
+        CHECK(p.result == BodyPlacementResult::Adjusted && p.touching_fit && p.corrections == 2 && p.candidate.x == 2 &&
+              p.candidate.y == 1);
+        CHECK(w.sweep(p.candidate, p.candidate, {2, 1, 1}, hit) == CollisionQuery::Miss);
+        CHECK(w.sweep(p.anchor, p.candidate, {}, hit) == CollisionQuery::Miss);
+        // Even slight real overlap must still fail; never shrink the original body.
+        p = w.place_body({2, 4, 0}, {1, 1, 1}, {2, 4, 0}, {2.0001f, 1, 1});
+        CHECK(p.result == BodyPlacementResult::Blocked && !p.touching_fit);
         p = w.place_body({2, 4, 0}, {1, 1, 1}, {2, 4, 0}, {3, 1, 1});
         CHECK(p.result == BodyPlacementResult::Blocked && p.corrections <= 16 && p.distance <= 3);
+        CHECK(p.candidates <= 145);
+        // Short seat backs admit a wider corpse above them. The shortest X
+        // corrections oscillate; the source-side Y separation resolves both.
+        auto seats = placement_corner(true);
+        for (auto& point : seats.points)
+            if (point.y == 100)
+                point.y = 2;
+        CHECK(w.build(seats, error));
+        p = w.place_body({2, 4, 0}, {1, 1, 1}, {2, 1, 0}, {3, 1, 1});
+        CHECK(p.result == BodyPlacementResult::Adjusted && p.touching_fit && p.candidate.y >= 3 &&
+              p.corrections <= 16 && p.distance <= 3 && p.candidates <= 145);
+        CHECK(w.sweep(p.candidate, p.candidate, {3, 1, 1}, hit) == CollisionQuery::Miss);
+        CHECK(w.sweep(p.anchor, p.candidate, {}, hit) == CollisionQuery::Miss);
         return true;
     }
     bool placement_service()

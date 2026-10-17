@@ -252,6 +252,8 @@ bool AI_Mgr::DispatchState()
         Metacmd = 1;
     switch (m_nState)
     {
+        case StateDodge:
+            return AI_STATE_Dodge();
         case StateTeleport:
             return AI_STATE_Teleport();
         case StateDying:
@@ -307,4 +309,9 @@ bool AI_Mgr::AI_STATE_AttackClose()
 bool AI_Mgr::AI_STATE_AttackFar()
 {
     return StateFailure("Subclass far attack is not integrated");
+}
+
+bool AI_Mgr::AI_STATE_Dodge()
+{
+    return StateFailure("Subclass dodge action is not integrated");
 }

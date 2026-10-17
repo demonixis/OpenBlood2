@@ -15,6 +15,7 @@ namespace OpenBlood2
             if (p.result == BodyPlacementResult::Unqueried)
                 return;
             ImGui::Text("Corrections %u | distance %.3f", p.corrections, p.distance);
+            ImGui::Text("Candidates tested %u | zero-margin search: %s", p.candidates, p.touching_fit ? "yes" : "no");
             if (p.polygon != UINT32_MAX)
                 ImGui::Text("Last queried polygon %u", p.polygon);
             ImGui::Text("Source anchor %.2f %.2f %.2f", p.anchor.x, p.anchor.y, p.anchor.z);
@@ -251,6 +252,11 @@ namespace OpenBlood2
             const auto& a = *target_ai;
             ImGui::TextWrapped("Original walk/run/moving fire and selected Cultist attack sequencing. Remaining "
                                "shade recovery and death actions remain unavailable.");
+            ImGui::Text("Dodge flags 0x%x | state updates %llu | queries %llu | ray %d", a.m_nDodgeFlags,
+                        (unsigned long long)a.dodge_updates, (unsigned long long)a.dodge_queries,
+                        int(a.dodge_ray.result));
+            ImGui::Text("Dodge ray %.2f %.2f %.2f -> %.2f %.2f %.2f", a.dodge_ray.from.x, a.dodge_ray.from.y,
+                        a.dodge_ray.from.z, a.dodge_ray.to.x, a.dodge_ray.to.y, a.dodge_ray.to.z);
             ImGui::Text("Command %d | calls %llu | failures %llu", a.locomotion_command,
                         (unsigned long long)a.locomotion_calls, (unsigned long long)a.locomotion_failures);
             ImGui::Text("Obstruction %s | speed %.3f | cached vertical change %.4f | checks %llu",

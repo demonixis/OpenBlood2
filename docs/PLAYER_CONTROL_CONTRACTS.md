@@ -10,13 +10,19 @@ and [provenance](M2_PLAYER_CONTROL_SOURCES.json). **M2 remains incomplete.**
 
 Physical WASD/ZQSD, Shift, Space, Ctrl, arrows and E retain walk/run/jump/crouch/look/USE.
 F fires primary; G fires alternate. F2 enables/disables these game controls.
-F3 toggles SDL relative mouse mode for an entered player; success hides the inspector.
+Entering a player through the inspector now requests play automatically: game controls
+are enabled and SDL relative mouse capture hides the inspector once the window gains
+focus. The explicit Play / resume button does the same. Hiding inspection with F1
+returns to play. F3 still toggles relative mouse mode for an entered player.
 Mouse motion changes yaw/pitch, left button fires primary and right fires alternate.
 Uncaptured mouse buttons belong to the UI and never fire. Escape releases a captured
 mouse without quitting; release restores the inspector in development builds. F1 opens
 inspection and releases the mouse if captured. Otherwise its existing hide/show action
 preserves keyboard controls. Native title-arrow folding and resizing remain available.
-`--view-world` initially requests capture; Session entry offers F3 after the player enters.
+`--view-world` initially requests capture. A request waits for the first focus event
+instead of being discarded while the compositor is still presenting the window.
+An explicit focus-loss event cancels it; focus gain alone never resumes a released
+session. See the [playtest correction](../../Documentation/Implementation/M2_PLAYTEST_INPUT.md).
 The inspector displays bindings, actual capture state and SDL capture failures.
 
 Relative motion accumulates per frame and is consumed once, independent of frame
@@ -54,8 +60,9 @@ a human playthrough. Pure tests cover foreign windows, repeat keys, focus/text/c
 gates, finite mouse bounds and player-change reset. Existing collapse/movement/UI-free
 Release paths remain checked. No reference source, commercial asset or dependency changed.
 
-Non-attacking NPCs and the missing train-window material remain next playtest priorities.
-This input fix does not prove NPC combat, all required services, safe NEW_LEVEL or M2.
+The later playtest correction also checks primary/secondary mouse fire against an
+authored Cultist, including original damage, corpse transfer and checked reload.
+This is bounded encounter evidence, not all required services, safe NEW_LEVEL or M2.
 
 The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisition,
 CInvMedkit recharge/healing, H direct-item input, local activation audio and owned

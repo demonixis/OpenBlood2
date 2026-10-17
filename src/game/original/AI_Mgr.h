@@ -225,6 +225,12 @@ class AI_Mgr : public CBaseCharacter
     int CalculateObstruction(); // Flags, or -1 for a required query failure.
     bool NavigateObstacle();
     bool IsLedge(DVector direction, bool&);
+    virtual bool AI_STATE_Dodge();
+    int CalculateDodge(DVector);
+    bool MC_Roll_Left();
+    bool MC_Roll_Right();
+    int m_nDodgeFlags = 0;
+    std::uint64_t dodge_updates = 0, dodge_queries = 0;
     virtual bool AI_STATE_AttackClose();
     virtual bool AI_STATE_AttackFar();
     struct ObstacleRay
@@ -233,6 +239,7 @@ class AI_Mgr : public CBaseCharacter
         OpenBlood2::SegmentHit hit;
         OpenBlood2::SegmentResult result = OpenBlood2::SegmentResult::Unavailable;
     };
+    ObstacleRay dodge_ray;
     std::array<ObstacleRay, 9> obstacle_rays;
     ObstacleRay ledge_ray;
     unsigned block_flags = 0;
@@ -476,6 +483,7 @@ class AI_Mgr : public CBaseCharacter
     bool locomotion_busy = false;
     bool LocomotionReady();
     bool TauntMovement(unsigned slot, int command);
+    bool RollMovement(bool right);
     bool LocomotionFailure(std::string_view);
     bool Locomotion(bool run, bool fire, bool crawl = false);
     bool navigation_busy = false;

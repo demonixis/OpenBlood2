@@ -32,16 +32,27 @@ namespace OpenBlood2
             mouse_x = mouse_y = 0;
             fire_suppressed = {keys[SDL_SCANCODE_F], keys[SDL_SCANCODE_G]};
         }
-        void player_changed()
+        void request_play()
+        {
+            enabled = true;
+            mouse_requested = true;
+        }
+        void player_changed(bool play = false)
         {
             keys = {};
             use_suppressed = medkit_suppressed = false;
             release_mouse();
+            if (play)
+                request_play();
         }
         bool sync_mouse(SDL_Window* window, bool player_ready, bool text_editing, std::string& error)
         {
-            if (!focused || !enabled || !player_ready || text_editing)
+            if (!enabled || !player_ready || text_editing || (!focused && mouse_captured))
                 release_mouse();
+            // The window may not have received its first focus event yet. Keep
+            // an explicit play request pending; a real focus-loss event cancels it.
+            if (!focused && mouse_requested)
+                return true;
             if (mouse_requested == mouse_captured)
                 return true;
             if (!SDL_SetWindowRelativeMouseMode(window, mouse_requested))
@@ -135,7 +146,7 @@ namespace OpenBlood2
                         if (mouse_requested)
                             release_mouse();
                         else
-                            mouse_requested = true;
+                            request_play();
                     }
                     if (code == SDL_SCANCODE_ESCAPE || (code == SDL_SCANCODE_F1 && (mouse_requested || mouse_captured)))
                         release_mouse();

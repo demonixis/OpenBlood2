@@ -93,12 +93,23 @@ namespace OpenBlood2
         constexpr std::array<DVector, 3> axes{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}};
         // Swept separating-axis intervals. An already touching face permits movement
         // parallel to or away from it; genuine initial penetration is reported.
+        struct Separation
+        {
+            DVector normal{};
+            double distance = 0;
+        };
+        struct Separations
+        {
+            std::array<Separation, 13> values{};
+            unsigned count = 0;
+        };
         struct Sweep
         {
             DVector from, delta, half, normal{}, penetration_normal{};
             double enter = -std::numeric_limits<double>::infinity(), leave = 1,
                    penetration = std::numeric_limits<double>::infinity();
             const PlacementAnchor* anchor = nullptr;
+            Separations* alternatives = nullptr;
             bool axis(DVector axis, double low, double high)
             {
                 const double length = std::sqrt(precise_dot(axis, axis));
@@ -133,6 +144,8 @@ namespace OpenBlood2
                 const double depth = sign < 0   ? origin - low
                                      : sign > 0 ? high - origin
                                                 : std::numeric_limits<double>::infinity();
+                if (alternatives && sign != 0 && std::isfinite(depth) && depth > 0)
+                    alternatives->values[alternatives->count++] = {vector_scale(axis, static_cast<float>(sign)), depth};
                 if (depth < penetration)
                 {
                     penetration = depth;
@@ -169,10 +182,11 @@ namespace OpenBlood2
             }
         };
         bool triangle_hit(const std::array<DVector, 3>& p, DVector from, DVector to, DVector half, CollisionHit& hit,
-                          const PlacementAnchor* anchor = nullptr)
+                          const PlacementAnchor* anchor = nullptr, Separations* alternatives = nullptr)
         {
             Sweep s{from, vector_subtract(to, from), half};
             s.anchor = anchor;
+            s.alternatives = alternatives;
             const std::array<DVector, 3> edges{
                 {vector_subtract(p[1], p[0]), vector_subtract(p[2], p[1]), vector_subtract(p[0], p[2])}};
             auto test = [&](DVector axis)
@@ -287,15 +301,15 @@ namespace OpenBlood2
         return index;
     }
     void CollisionWorld::query(std::uint32_t index, DVector from, DVector to, DVector half, CollisionHit& hit,
-                               bool& found, const PlacementAnchor* anchor) const
+                               bool& found, const PlacementAnchor* anchor, const Triangle** selected) const
     {
         const auto& n = nodes_[index];
         if (!broadphase(from, to, half, n.min, n.max))
             return;
         if (n.left)
         {
-            query(n.left, from, to, half, hit, found, anchor);
-            query(n.right, from, to, half, hit, found, anchor);
+            query(n.left, from, to, half, hit, found, anchor, selected);
+            query(n.right, from, to, half, hit, found, anchor, selected);
             return;
         }
         for (auto i = n.begin; i < n.end; ++i)
@@ -309,6 +323,8 @@ namespace OpenBlood2
                 hit.polygon = triangles_[i].polygon;
                 hit.texture_flags = triangles_[i].texture_flags;
                 found = true;
+                if (selected)
+                    *selected = &triangles_[i];
             }
         }
     }
@@ -358,44 +374,118 @@ namespace OpenBlood2
             report.polygon = hit.polygon;
             return report;
         }
-        // Bounded replacement spawn placement, not a retail depenetration solver.
-        // Keep an owned candidate until the complete shape AND its center path from
-        // the clear source fit. Never tunnel across a wall to the nearer empty side.
+        // Keep each candidate on the clear source side, with bounded work/distance.
+        // First prefer the existing nearest-axis corrections with a small skin.
+        // A blocked search may try other source-side axes with the ordinary
+        // touching policy; neither path shrinks the body or skips final checks.
         const double limit = std::min(256.f, std::max({half.x, half.y, half.z}));
         const PlacementAnchor reference{anchor, anchor_half};
-        for (unsigned attempt = 0; attempt <= 16; ++attempt)
+        const auto solve = [&](double margin)
         {
-            if (!physics_vector(report.candidate))
-                return report;
-            hit = {};
+            auto candidate = report;
+            for (unsigned attempt = 0; attempt <= 16; ++attempt)
+            {
+                if (!physics_vector(candidate.candidate))
+                    return candidate;
+                ++candidate.candidates;
+                CollisionHit contact;
+                bool found = false;
+                if (!nodes_.empty())
+                    query(0, candidate.candidate, candidate.candidate, half, contact, found, &reference);
+                if (!found)
+                {
+                    if (sweep(anchor, candidate.candidate, {}, contact) != CollisionQuery::Miss)
+                    {
+                        candidate.result = BodyPlacementResult::Blocked;
+                        candidate.polygon = contact.polygon;
+                        return candidate;
+                    }
+                    candidate.result =
+                        candidate.corrections ? BodyPlacementResult::Adjusted : BodyPlacementResult::Placed;
+                    candidate.touching_fit = margin == 0;
+                    return candidate;
+                }
+                candidate.polygon = contact.polygon;
+                if (!contact.start_solid || !std::isfinite(contact.penetration) || contact.penetration <= 0 ||
+                    !physics_vector(contact.normal))
+                    return candidate;
+                const auto distance = contact.penetration + margin;
+                if (attempt == 16 || candidate.distance + distance > limit)
+                {
+                    candidate.result = BodyPlacementResult::Blocked;
+                    return candidate;
+                }
+                candidate.candidate =
+                    vector_add(candidate.candidate, vector_scale(contact.normal, static_cast<float>(distance)));
+                candidate.distance += distance;
+                ++candidate.corrections;
+            }
+            return candidate;
+        };
+        auto padded = solve(.001);
+        if (padded.result != BodyPlacementResult::Blocked || !padded.corrections)
+            return padded;
+        // Greedy nearest-face correction can oscillate between seats while a
+        // different source-side separation (above or along them) remains clear.
+        // Explore only the separating axes of the actual blocking triangles.
+        // Keep both work and displacement bounded; no grid search or body shrink.
+        constexpr unsigned max_candidates = 128;
+        std::array<BodyPlacement, max_candidates> pending;
+        std::array<DVector, max_candidates> visited;
+        unsigned count = 1, visited_count = 0;
+        pending[0] = report;
+        while (count && visited_count < max_candidates)
+        {
+            auto candidate = pending[--count];
+            bool repeated = false;
+            for (unsigned i = 0; i < visited_count; ++i)
+            {
+                const auto d = vector_subtract(candidate.candidate, visited[i]);
+                repeated |= std::abs(d.x) < 1e-5f && std::abs(d.y) < 1e-5f && std::abs(d.z) < 1e-5f;
+            }
+            if (repeated || !physics_vector(candidate.candidate))
+                continue;
+            visited[visited_count++] = candidate.candidate;
+            ++padded.candidates;
+            CollisionHit contact;
             bool found = false;
-            if (!nodes_.empty())
-                query(0, report.candidate, report.candidate, half, hit, found, &reference);
+            const Triangle* triangle = nullptr;
+            query(0, candidate.candidate, candidate.candidate, half, contact, found, &reference, &triangle);
             if (!found)
             {
-                if (sweep(anchor, report.candidate, {}, hit) != CollisionQuery::Miss)
-                {
-                    report.result = BodyPlacementResult::Blocked;
-                    report.polygon = hit.polygon;
-                    return report;
-                }
-                report.result = report.corrections ? BodyPlacementResult::Adjusted : BodyPlacementResult::Placed;
-                return report;
+                if (sweep(anchor, candidate.candidate, {}, contact) != CollisionQuery::Miss)
+                    continue;
+                candidate.result = BodyPlacementResult::Adjusted;
+                candidate.touching_fit = true;
+                candidate.candidates = padded.candidates;
+                return candidate;
             }
-            report.polygon = hit.polygon;
-            if (!hit.start_solid || !std::isfinite(hit.penetration) || hit.penetration <= 0 ||
-                !physics_vector(hit.normal))
-                return report;
-            const auto distance = hit.penetration + .001;
-            if (attempt == 16 || report.distance + distance > limit)
+            if (!triangle || !contact.start_solid || candidate.corrections == 16)
+                continue;
+            Separations alternatives;
+            if (!triangle_hit(triangle->points, candidate.candidate, candidate.candidate, half, contact, &reference,
+                              &alternatives))
+                continue;
+            std::stable_sort(alternatives.values.begin(), alternatives.values.begin() + alternatives.count,
+                             [](const auto& a, const auto& b) { return a.distance < b.distance; });
+            // LIFO explores the shortest correction first; larger source-side
+            // choices remain available when it reaches a previously seen position.
+            unsigned eligible = 0;
+            while (eligible < alternatives.count &&
+                   candidate.distance + alternatives.values[eligible].distance <= limit)
+                ++eligible;
+            for (unsigned i = std::min(eligible, max_candidates - count); i > 0; --i)
             {
-                report.result = BodyPlacementResult::Blocked;
-                return report;
+                const auto& separation = alternatives.values[i - 1];
+                auto next = candidate;
+                next.candidate = vector_add(candidate.candidate,
+                                            vector_scale(separation.normal, static_cast<float>(separation.distance)));
+                next.distance += separation.distance;
+                ++next.corrections;
+                next.polygon = triangle->polygon;
+                pending[count++] = next;
             }
-            report.candidate = vector_add(report.candidate, vector_scale(hit.normal, static_cast<float>(distance)));
-            report.distance += distance;
-            ++report.corrections;
         }
-        return report;
+        return padded;
     }
 } // namespace OpenBlood2

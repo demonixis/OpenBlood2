@@ -1,0 +1,31 @@
+{
+  "baseline_commit": "da04d37d58eb5df489dd175bb23e22c04e0738e1",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/CultistAI.cpp",
+      "sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
+      "use": "AI_STATE_Dodge, lines 562-590: CalculateDodge, lateral roll-only action, ComputeState."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "CalculateDodge, lines 3594-3651; MC_Roll_Left/Right, lines 5185-5280; existing CreateCorpse raw dimensions and cached transform."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "use": "Original dodge direction/action bits, command values 15/16 and state 10."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "use": "Existing FireVector/AlignFireVector source retained; tests drive original FIRE_KEY and damage, with no direct health writes."
+    }
+  ],
+  "adaptations": [
+    "Application play intent survives initial missing focus, inspector player entry requests capture, explicit release/focus loss cancels it.",
+    "Bounded alternative separating-axis corpse placement retains original dimensions, clear source side, distance and final collision checks. It is replacement physics, not verified retail parity.",
+    "CalculateDodge uses the existing entry-face segment policy with all objects; coincident/vertical-only undefined original endpoints fail before query.",
+    "Original Cultist dodge and roll sequencing use checked model/cache/support services, overflow and lifetime guards; no new mutable global."
+  ]
+}

@@ -21,8 +21,9 @@ namespace OpenBlood2
     {
         BodyPlacementResult result = BodyPlacementResult::Unqueried;
         DVector anchor{}, requested{}, candidate{};
-        unsigned corrections = 0;
+        unsigned corrections = 0, candidates = 0;
         double distance = 0;
+        bool touching_fit = false; // Bounded alternative-axis search used no extra clearance margin.
         std::uint32_t polygon = UINT32_MAX;
     };
     inline bool placement_succeeded(const BodyPlacement& p)

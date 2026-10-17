@@ -953,3 +953,7 @@ The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisitio
 CInvMedkit recharge/healing, H direct-item input, local activation audio and owned
 charge preservation through Restore/KeepAlive. Other items, original inventory HUD,
 pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.
+
+## Playtest input and Cultist combat correction
+
+[Source ledger](M2_PLAYTEST_INPUT_SOURCES.json) records original CultistAI::AI_STATE_Dodge and AI_Mgr::CalculateDodge/MC_Roll_Left/Right. Typed queries, undefined-input failures and checked lifetime are adaptations; mouse ownership and alternative-axis corpse placement are new engine/application policy. See [contracts](PLAYTEST_INPUT_CONTRACTS.md). Original fire/damage and commercial content remain unchanged.

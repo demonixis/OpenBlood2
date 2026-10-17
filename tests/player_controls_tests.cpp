@@ -3,6 +3,7 @@
 #include "engine/runtime.h"
 #include "game/original/AI_Mgr.h"
 #include "game/original/Corpse.h"
+#include "game/original/CultistAI.h"
 #include <cmath>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
@@ -153,6 +154,219 @@ namespace
         CHECK(!c.mouse_requested && !c.sample_fire(false).primary && !c.sample_use(false));
         return true;
     }
+    bool entry()
+    {
+        MovementControls c;
+        std::string error;
+        c.enabled = false;
+        c.keys[SDL_SCANCODE_F] = true;
+        c.player_changed(true); // Ordinary inspector entry, not an F3 shortcut.
+        CHECK(c.enabled && c.mouse_requested && !c.mouse_captured && !c.keys[SDL_SCANCODE_F]);
+        // No native call while focus is pending: startup must not lose play intent.
+        CHECK(c.sync_mouse(nullptr, true, false, error) && c.mouse_requested);
+        CHECK(c.sync_mouse(nullptr, true, false, error) && c.mouse_requested);
+        c.event(focus(false), window);
+        CHECK(!c.mouse_requested); // Explicit loss cancels even a pending capture.
+        c.event(focus(true), window);
+        CHECK(!c.mouse_requested);
+        c.enabled = false;
+        c.event(key(SDL_SCANCODE_F3, true), window);
+        CHECK(c.enabled && c.mouse_requested);
+        c.player_changed(); // Leave/unload must not carry input to the next player.
+        CHECK(!c.mouse_requested);
+        c.request_play();
+        CHECK(c.sync_mouse(nullptr, false, false, error) && !c.mouse_requested);
+        c.request_play();
+        CHECK(c.sync_mouse(nullptr, true, true, error) && !c.mouse_requested);
+        return true;
+    }
+    bool combat(const std::filesystem::path& root, bool gpu)
+    {
+        Runtime runtime;
+        std::string error;
+        if (gpu)
+            CHECK(runtime.initialize(true, error));
+        GameSession g;
+        Config config;
+        config.data_dir = root;
+        CHECK(g.initialize() && g.resources.mount_game(config, error));
+        ObjectId previous_target{}, previous_player{}, previous_corpse{};
+        for (bool alternate : {false, true})
+        {
+            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+            CHECK(!g.objects.get(previous_target) && !g.objects.get(previous_player) &&
+                  !g.objects.get(previous_corpse));
+            auto* p = g.server_shell.Player(g.local_client);
+            CHECK(p && test_camera::complete_subway_intro(g));
+            auto* w = p->m_InventoryMgr.GetWeapon(1);
+            CHECK(w);
+            const auto id = gpu ? SDL_GetWindowID(runtime.window) : window;
+            MovementControls controls;
+            controls.player_changed(true); // Same entry action as the interactive application.
+            CHECK(!controls.focused && controls.mouse_requested);
+            CHECK(controls.sync_mouse(gpu ? runtime.window : nullptr, true, false, error));
+            CHECK(controls.mouse_requested && !controls.mouse_captured);
+            auto event = [&](SDL_Event e)
+            {
+                if (gpu)
+                    return SDL_PushEvent(&e);
+                controls.event(e, id);
+                return true;
+            };
+            auto pump = [&]()
+            {
+                if (gpu)
+                {
+                    SDL_Event e{};
+                    while (SDL_PollEvent(&e))
+                        controls.event(e, id);
+                    if (!controls.sync_mouse(runtime.window, true, false, error))
+                        return false;
+                }
+                else
+                    controls.mouse_captured = controls.mouse_requested; // Headless mapping only.
+                controls.look(g.client_shell.rotation, 1. / 60, false);
+                const auto fire = controls.sample_fire(false);
+                g.client_shell.weapon_input = {fire.primary, fire.alternate, false};
+                g.client_shell.movement_input = controls.sample(false);
+                g.client_shell.use_down = controls.sample_use(false);
+                return g.step(1. / 60);
+            };
+            CHECK(event(focus(true, id)) && pump() && controls.mouse_captured);
+            if (gpu)
+                CHECK(SDL_GetWindowRelativeMouseMode(runtime.window));
+            // Walk from the actual spawn into the first carriage, using original
+            // player USE and door rules. Never teleport or alter an authored NPC.
+            CHECK(event(key(SDL_SCANCODE_W, true, id)));
+            for (int frame = 0; frame < 720 && g.objects.get(p->m_hObject)->state.m_Pos.z < -2200; ++frame)
+            {
+                if (frame % 60 == 0 || frame % 60 == 1)
+                    CHECK(event(key(SDL_SCANCODE_E, frame % 60 == 0, id)));
+                CHECK(pump() && !p->m_damage.IsDead());
+            }
+            CHECK(event(key(SDL_SCANCODE_W, false, id)) && event(key(SDL_SCANCODE_E, false, id)) && pump());
+            CHECK(g.objects.get(p->m_hObject)->state.m_Pos.z >= -2200);
+            std::cout << "Walked from spawn to z=" << g.objects.get(p->m_hObject)->state.m_Pos.z << '\n';
+            // Select an actual visible authored Cultist. No NPC health, flags, pose,
+            // target, activation or inventory are changed.
+            ObjectId target{};
+            float distance = 1e9f;
+            for (auto identity : g.objects.snapshot())
+            {
+                const auto* record = g.objects.get(identity);
+                const auto* npc = record ? dynamic_cast<const CultistAI*>(record->game.get()) : nullptr;
+                if (!npc || !npc->RuntimeReady() || npc->m_damage.IsDead())
+                    continue;
+                DVector head;
+                DRotation rotation;
+                CHECK(g.server.GetModelNodeTransform(record->handle, "head", &head, &rotation));
+                SegmentHit hit;
+                const auto ray = g.server.IntersectSegment(g.client_shell.view.position, head, p->m_hObject, hit, false,
+                                                           SegmentObjects::SolidOrRayHit, SegmentFilter::IgnoreVolumes,
+                                                           SegmentStart::SkipInterior);
+                const auto delta = vector_subtract(head, g.client_shell.view.position);
+                const auto d = vector_dot(delta, delta);
+                if (ray == SegmentResult::Hit && hit.object == record->handle && d < distance)
+                {
+                    distance = d;
+                    target = identity;
+                }
+            }
+            CHECK(target);
+            const auto* record = g.objects.get(target);
+            const std::string name = record->state.m_Name;
+            const auto target_handle = record->handle;
+            const auto initial_hp = dynamic_cast<const CultistAI*>(record->game.get())->m_damage.m_fHitPoints;
+            const float ammo = p->m_InventoryMgr.GetAmmoCount(1);
+            bool damaged = false, dead = false, player_attributed = false;
+            HOBJECT corpse = nullptr;
+            std::uint64_t dodges = 0;
+            CHECK(event(button(alternate ? SDL_BUTTON_RIGHT : SDL_BUTTON_LEFT, true, id)));
+            for (int frame = 0; frame < 600 && g.objects.get(target); ++frame)
+            {
+                auto* actor = dynamic_cast<CultistAI*>(g.objects.get(target)->game.get());
+                CHECK(actor && !actor->runtime_failed && !p->m_damage.IsDead());
+                DVector head;
+                DRotation pose;
+                CHECK(g.server.GetModelNodeTransform(target_handle, "head", &head, &pose));
+                const auto delta = vector_subtract(head, g.client_shell.view.position);
+                const float yaw = std::atan2(delta.x, delta.z);
+                const float pitch = -std::atan2(delta.y, std::hypot(delta.x, delta.z));
+                CHECK(event(motion(std::remainder(yaw - g.client_shell.rotation.yaw, 6.28318530718f) / .0025f,
+                                   (pitch - g.client_shell.rotation.pitch) / .0025f, id)));
+                CHECK(pump()); // Only SDL mouse motion/buttons feed view and original FIRE_KEY.
+                if (auto* current = g.objects.get(target))
+                {
+                    actor = dynamic_cast<CultistAI*>(current->game.get());
+                    dodges = std::max(dodges, actor->dodge_updates);
+                    damaged |= actor->m_damage.m_fHitPoints < initial_hp;
+                    dead |= actor->m_damage.IsDead();
+                    player_attributed |= actor->m_damage.GetLastDamager() == p->m_hObject;
+                    if (actor->last_corpse)
+                        corpse = actor->last_corpse;
+                    if (actor->runtime_failed)
+                        std::cerr << name << ": " << actor->runtime_error << " " << actor->death_error
+                                  << " state=" << actor->m_nState << " last=" << actor->m_nLastState
+                                  << " phase=" << actor->Metacmd << " command=" << actor->m_nCurMetacmd
+                                  << " placement=" << body_placement_name(actor->corpse_placement.result)
+                                  << " corrections=" << actor->corpse_placement.corrections
+                                  << " distance=" << actor->corpse_placement.distance
+                                  << " anchor=" << actor->corpse_placement.anchor.x << ','
+                                  << actor->corpse_placement.anchor.y << ',' << actor->corpse_placement.anchor.z
+                                  << " requested=" << actor->corpse_placement.requested.x << ','
+                                  << actor->corpse_placement.requested.y << ',' << actor->corpse_placement.requested.z
+                                  << " candidate=" << actor->corpse_placement.candidate.x << ','
+                                  << actor->corpse_placement.candidate.y << ',' << actor->corpse_placement.candidate.z
+                                  << " polygon=" << actor->corpse_placement.polygon << '\n';
+                    CHECK(!actor->runtime_failed);
+                }
+            }
+            CHECK(damaged && dead && player_attributed && !g.objects.get(target) && corpse);
+            CHECK(!alternate || dodges > 0);
+            const auto* body = g.objects.get(corpse);
+            const auto* dead_body = body ? dynamic_cast<const CCorpse*>(body->game.get()) : nullptr;
+            CHECK(dead_body && placement_succeeded(dead_body->placement));
+            CHECK(w->shots > 0 && w->m_bLastFireAlt == alternate && w->sounds_played == w->shots &&
+                  p->m_InventoryMgr.GetAmmoCount(1) < ammo && g.client_shell.weapons.front().fire_keys > 0);
+            CHECK(event(button(alternate ? SDL_BUTTON_RIGHT : SDL_BUTTON_LEFT, false, id)) && pump());
+            std::cout << "Mouse " << (alternate ? "secondary" : "primary") << " killed authored " << name << ": HP "
+                      << initial_hp << " -> 0, shots=" << w->shots << ", ammo=" << p->m_InventoryMgr.GetAmmoCount(1)
+                      << ", independent corpse verified, native=" << gpu << '\n';
+            std::cout << "Dodge updates=" << dodges << ", corpse candidates=" << dead_body->placement.candidates
+                      << ", zero-margin search=" << dead_body->placement.touching_fit << '\n';
+            CHECK(event(motion(-g.client_shell.rotation.yaw / .0025f, -g.client_shell.rotation.pitch / .0025f, id)) &&
+                  event(key(SDL_SCANCODE_W, true, id)));
+            for (int frame = 0; frame < 240 && g.objects.get(p->m_hObject)->state.m_Pos.z < -1870; ++frame)
+            {
+                if (frame % 60 == 0 || frame % 60 == 1)
+                    CHECK(event(key(SDL_SCANCODE_E, frame % 60 == 0, id)));
+                CHECK(pump() && !p->m_damage.IsDead());
+            }
+            CHECK(event(key(SDL_SCANCODE_W, false, id)) && event(key(SDL_SCANCODE_E, false, id)) && pump());
+            const auto end_position = g.objects.get(p->m_hObject)->state.m_Pos;
+            std::cout << "Post-kill position=" << end_position.x << ',' << end_position.y << ',' << end_position.z
+                      << " camera=" << bool(g.client_shell.view.object) << " yaw=" << g.client_shell.rotation.yaw
+                      << '\n';
+            CHECK(g.objects.get(p->m_hObject)->state.m_Pos.z >= -1870);
+            body = g.objects.get(corpse);
+            CHECK(body);
+            CollisionHit overlap;
+            CHECK(g.collision.sweep(body->state.m_Pos, body->state.m_Pos, body->dimensions, overlap) ==
+                  CollisionQuery::Miss);
+            std::cout << "Walked past killed Cultist to z=" << g.objects.get(p->m_hObject)->state.m_Pos.z << '\n';
+            previous_target = target;
+            previous_player = g.objects.get(p->m_hObject)->id;
+            previous_corpse = body->id;
+            controls.player_changed();
+            if (gpu)
+                CHECK(controls.sync_mouse(runtime.window, false, false, error) &&
+                      !SDL_GetWindowRelativeMouseMode(runtime.window));
+            CHECK(!controls.sample_fire(false).primary && !controls.sample_fire(false).alternate);
+            CHECK(g.leave_player() && g.unload_world() && g.objects.snapshot().empty() && !g.server.string_count() &&
+                  !g.server.message_count() && !g.server.client_count());
+        }
+        return true;
+    }
     bool private_input(const std::filesystem::path& root, bool gpu)
     {
         Runtime runtime;
@@ -293,6 +507,10 @@ int main(int argc, char** argv)
         return mouse() ? 0 : 1;
     if (mode == "gates")
         return gates() ? 0 : 1;
+    if (mode == "entry")
+        return entry() ? 0 : 1;
+    if (argc == 3 && (mode == "combat" || mode == "gpu_combat"))
+        return combat(argv[2], mode == "gpu_combat") ? 0 : 1;
     if (argc == 3 && (mode == "private" || mode == "gpu"))
         return private_input(argv[2], mode == "gpu") ? 0 : 1;
     return 2;

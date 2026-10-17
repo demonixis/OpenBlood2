@@ -469,7 +469,9 @@ namespace
                     (event.type == SDL_EVENT_WINDOW_FOCUS_LOST || event.type == SDL_EVENT_WINDOW_FOCUS_GAINED))
                     spdlog::info("Movement smoke focus at frame {}: {}", frames, controls.focused);
 #if BLOOD2_INSPECTOR
-                if (event.type == SDL_EVENT_KEY_DOWN && event.key.scancode == SDL_SCANCODE_F2 && !event.key.repeat)
+                if (event.type == SDL_EVENT_KEY_DOWN &&
+                    (event.key.scancode == SDL_SCANCODE_F2 || event.key.scancode == SDL_SCANCODE_F3) &&
+                    !event.key.repeat)
                     inspector.keyboard_movement = controls.enabled;
 #endif
 #if BLOOD2_INSPECTOR
@@ -492,6 +494,11 @@ namespace
                     if (event.key.key == SDLK_F1)
                     {
                         inspector_visible = !inspector_visible;
+                        if (!inspector_visible && game.client_shell.m_bInWorld && !smoke)
+                        {
+                            controls.request_play();
+                            inspector.keyboard_movement = controls.enabled;
+                        }
                         ++toggles;
                     }
                     if (event.key.key == SDLK_ESCAPE && !escape_releases_mouse && !ImGui::GetIO().WantCaptureKeyboard)
@@ -566,13 +573,24 @@ namespace
             const auto current_player = controlled ? controlled->id : OpenBlood2::ObjectId{};
             if (current_player != controlled_player)
             {
-                controls.player_changed();
+                controls.player_changed(current_player && !smoke);
                 controlled_player = current_player;
                 game.client_shell.weapon_input = {};
             }
+#if BLOOD2_INSPECTOR
+            if (std::exchange(inspector.play_request, false) && game.client_shell.m_bInWorld)
+                controls.request_play();
+            // Explicit play actions also restore controls disabled through F2/UI.
+            inspector.keyboard_movement = controls.enabled;
+#endif
             const bool was_captured = controls.mouse_captured;
             if (!controls.sync_mouse(runtime.window, game.client_shell.m_bInWorld, text_editing, mouse_error))
                 spdlog::error("Mouse capture: {}", mouse_error);
+            if (was_captured != controls.mouse_captured)
+                spdlog::info("Player mouse: {} ({})",
+                             controls.mouse_captured ? "captured; look / left fire / right alt"
+                                                     : "released for inspection",
+                             SDL_GetCurrentVideoDriver());
 #if BLOOD2_INSPECTOR
             inspector.mouse_captured = controls.mouse_captured;
             inspector.mouse_error = mouse_error;
@@ -794,7 +812,13 @@ namespace
             if (check_inspector_controls)
                 inspector_controls_smoke.before_frame(frames);
             ImGui::NewFrame();
+            const bool inspector_was_visible = inspector_visible;
             inspector.draw(config, data, inspector_visible, frames, game, selection);
+            if (inspector_was_visible && !inspector_visible && game.client_shell.m_bInWorld && !smoke)
+            {
+                controls.request_play(); // The window close button resumes just like F1.
+                inspector.keyboard_movement = controls.enabled;
+            }
             if (check_inspector_controls && !inspector_controls_smoke.after_draw(frames, game, inspector))
                 return 4;
             ImGui::Render();

@@ -64,3 +64,32 @@ bool CultistAI::Attack(bool far)
             return true; // Original switch has no other command action.
     }
 }
+
+// Original CultistAI.cpp:562-590. Impact hearing already selects StateDodge.
+bool CultistAI::AI_STATE_Dodge()
+{
+    ++dodge_updates;
+    switch (Metacmd)
+    {
+        case 1:
+            m_nDodgeFlags = CalculateDodge(m_vTrackObjPos);
+            if (m_nDodgeFlags < 0)
+                return StateFailure(locomotion_error.c_str());
+            ++Metacmd;
+            return true;
+        case 2:
+            if (m_nDodgeFlags & 0x10)
+            {
+                if (m_nDodgeFlags & 4)
+                    return MC_Roll_Right();
+                if (m_nDodgeFlags & 8)
+                    return MC_Roll_Left();
+            }
+            ++Metacmd; // Source has no forward/backward or obstructed-roll action.
+            return true;
+        case 3:
+            return ComputeState();
+        default:
+            return true;
+    }
+}

@@ -543,3 +543,9 @@ Read the [contracts](docs/MEDKIT_CONTRACTS.md) before extending inventory items:
 versus actual healing, integer charge/return quirks, run/death/camera gates,
 checked action delivery and keep-alive retention. Other items/HUD and safe
 NEW_LEVEL remain unavailable; M2 is still incomplete.
+
+The [playtest input/combat correction](../Documentation/Implementation/M2_PLAYTEST_INPUT.md) makes player entry capture the mouse, retains startup capture until focus, and connects original Cultist dodge/roll actions. It also adds bounded alternative-axis corpse placement for train seats. Read [contracts](docs/PLAYTEST_INPUT_CONTRACTS.md). Preserve UI input ownership, original impact direction/roll sequencing, unchanged body dimensions and checked death/removal. Mouse-driven authored encounter tests do not close safe NEW_LEVEL or M2.
+
+For GPU validation on this developer machine, select the NVIDIA GPU (for example with `VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json`) and verify the actual device name in the run log. Keep this a local test/launch choice, not a hardcoded production device requirement.
+
+Next reported visual issue: SubwayA tunnel/track `pan` surface effects are currently discarded, explaining missing apparent train motion. Read the [playtest follow-up](../Documentation/Implementation/M2_PLAYTEST_INPUT.md) before choosing the next increment; do not activate the unrelated happytrain path to simulate the intro.

@@ -450,15 +450,21 @@ namespace OpenBlood2
             {
                 ImGui::TextWrapped(
                     "Simulation waiting for player entry. NPCs and world clocks are held at their current state.");
-                if (ImGui::Button("Enter player"))
+                if (ImGui::Button("Enter player and play"))
                     enter_player_request = true;
                 if (!world_error.empty())
                     ImGui::TextWrapped("Player entry: %s", world_error.c_str());
             }
             else if (!game.client_shell.m_bInWorld)
                 ImGui::TextDisabled("Enter the player in Session to use game controls.");
-            else if (game.client_shell.view.object && !game.client_shell.view.settings.player_movement)
-                ImGui::TextDisabled("The original cinematic currently blocks movement. Controls return when it ends.");
+            else
+            {
+                if (ImGui::Button("Play / resume (mouse + keyboard)"))
+                    play_request = true;
+                if (game.client_shell.view.object && !game.client_shell.view.settings.player_movement)
+                    ImGui::TextWrapped("The original cinematic currently blocks movement and firing. Controls return "
+                                       "when it ends.");
+            }
             ImGui::Separator();
             if (ImGui::BeginTabBar("Inspection"))
             {
@@ -1278,7 +1284,7 @@ namespace OpenBlood2
         auto* player = game.server_shell.Player(game.local_client);
         if (!player)
         {
-            if (ImGui::Button("Enter player inspection"))
+            if (ImGui::Button("Enter player and play"))
                 enter_player_request = true;
         }
         else
@@ -1847,7 +1853,7 @@ namespace OpenBlood2
         auto* player = game.server_shell.Player(game.local_client);
         if (!player)
         {
-            if (ImGui::Button("Enter player inspection"))
+            if (ImGui::Button("Enter player and play"))
                 enter_player_request = true;
             return;
         }

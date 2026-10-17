@@ -94,15 +94,18 @@ connects independent animated corpses and real model-key sounds. Earlier blanket
 corpse omissions below are historical. Fire/gibs, corpse damage, required FX,
 Gideon and ExitTrigger still keep M2 incomplete.
 
-The inspector is now **collapsible and resizable**: click the title arrow to fold
-or unfold it, drag its borders to resize, or use F1 to hide/show it. After entering
-the player in Session, keyboard movement is enabled by default: **WASD/ZQSD**,
-**Shift** run, **Space** jump, **Ctrl** crouch, **arrows** look, **E** USE. **F2** toggles
-game controls. **F/G** fire primary/alternate; **F3** captures the mouse and hides inspection;
-**mouse** looks and **left/right buttons** fire. **Escape** releases the cursor for the inspector.
-SubwayA's original intro temporarily blocks movement/fire; wait for it to end.
-See [input/UI evidence](../Documentation/Implementation/M2_CONTROLS.md) and
-[keyboard/mouse evidence](../Documentation/Implementation/M2_PLAYER_CONTROLS.md).
+The inspector is **collapsible and resizable**. Click **Enter player and play** to
+start: the window captures the mouse and hides inspection when focused. Move the
+mouse to look; **left click fires**, **right click fires secondary**. **Escape**
+releases the cursor and opens inspection; **Play / resume** or **F1** returns to
+play. **F3** also toggles capture. The first click that focuses/captures the window
+is not a shot. The original SubwayA intro blocks movement/fire for about 12 seconds.
+
+Keyboard controls remain **WASD/ZQSD**, **Shift** run, **Space** jump, **Ctrl** crouch,
+**arrows** look, **E** USE, **F/G** primary/secondary fire and **H** medkit. **F2**
+toggles game controls; a new play request enables them again. Inspection can still
+be folded with its title arrow and resized by dragging its borders.
+See [playtest fixes and validation](../Documentation/Implementation/M2_PLAYTEST_INPUT.md).
 
 Previous death prerequisite: [original NPC weapon drops](../Documentation/Implementation/M2_WEAPON_DROPS.md)
 connects detached Beretta physics, original pickups and player collection. Corpses/gibs,

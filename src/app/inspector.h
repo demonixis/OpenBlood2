@@ -89,6 +89,7 @@ namespace OpenBlood2
         std::optional<WeaponInput> weapon_input_request;
         std::optional<PlayerRotation> weapon_aim_request;
         bool enter_player_request = false, leave_player_request = false, respawn_request = false;
+        bool play_request = false;
         bool capture_player_request = false, restore_player_request = false, keep_player_request = false;
         char keep_start_name[101]{};
         char keep_world_name[256]{"02_cityhub"};

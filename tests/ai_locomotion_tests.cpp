@@ -56,7 +56,7 @@ namespace
             return nullptr;
         auto clip = model->animations.front();
         model->animations.clear();
-        for (unsigned i = 0; i < 41; ++i)
+        for (unsigned i = 0; i < 43; ++i)
         {
             model->animations.push_back(clip);
             auto& c = model->animations.back();
@@ -79,6 +79,8 @@ namespace
             table->m_nAnim_FIRE_RUN[i] = 31 + i;
             table->m_nAnim_FIRE_STAND[i] = 40;
         }
+        table->m_nAnim_ROLL_LEFT = 41;
+        table->m_nAnim_ROLL_RIGHT = 42;
         table->m_nAnim_WALK_INJURED_LLEG_PISTOL = 18;
         table->m_nAnim_WALK_INJURED_RLEG_PISTOL = 19;
         table->m_nAnim_WALK_INJURED_LLEG_RIFLE = 20;
@@ -108,6 +110,67 @@ namespace
     {
         CHECK(a && a->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA, 0) == InventoryResult::Ok);
         a->m_InventoryMgr.SetAmmoCount(AMMO_BULLET, 100);
+        return true;
+    }
+    bool dodge(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto* a = actor(g);
+        CHECK(a);
+        CHECK(a->CalculateDodge({10, 10, 0}) == (8 | 0x10));
+        CHECK(a->CalculateDodge({-10, 10, 0}) == (4 | 0x10));
+        CHECK(a->CalculateDodge({0, 10, 10}) == (2 | 0x10));
+        CHECK(a->CalculateDodge({0, 10, -10}) == (1 | 0x10));
+        CHECK(a->CalculateDodge({10, 10, 10}) == (8 | 0x10)); // Strict forward test retains lateral ties.
+        const auto obstacle = object(g, "nonsolid dodge obstacle", {-20, 10, 0}, {1, 1, 1});
+        CHECK(obstacle);
+        g.objects.get(obstacle)->state.m_Flags = 0;
+        CHECK(a->CalculateDodge({10, 10, 0}) == (8 | 0x20) && a->dodge_ray.hit.object == obstacle);
+        CHECK(a->SetNewState(AI_Mgr::StateDodge));
+        a->m_vTrackObjPos = {10, 10, 0};
+        CHECK(a->DispatchState() && a->Metacmd == 2 && a->m_nDodgeFlags == (8 | 0x20));
+        CHECK(a->DispatchState() && a->Metacmd == 3 && !a->m_bAnimating); // Source skips obstructed rolls.
+        CHECK(g.objects.remove(obstacle) && g.objects.finish_frame());
+        a->m_vTrackObjPos = {0, 10, 10};
+        CHECK(a->SetNewState(AI_Mgr::StateDodge) && a->DispatchState() && a->m_nDodgeFlags == (2 | 0x10));
+        CHECK(a->DispatchState() && a->Metacmd == 3); // Forward/backward has no Cultist roll action.
+        CHECK(a->CalculateDodge({0, 10, 0}) == -1 && a->CalculateDodge({0, 20, 0}) == -1);
+        CHECK(a->CalculateDodge({NAN, 10, 0}) == -1);
+        g.server.collision_ready = false;
+        CHECK(a->CalculateDodge({10, 10, 0}) == -1);
+        g.server.collision_ready = true;
+        CHECK(g.objects.remove(a->m_hObject) && a->CalculateDodge({10, 10, 0}) == -1);
+        return true;
+    }
+    bool rolls(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        for (bool right : {false, true})
+        {
+            auto* a = actor(g, {0, -8, 0});
+            CHECK(a);
+            auto* r = g.objects.get(a->m_hObject);
+            a->m_vTrackObjPos = {right ? -10.f : 10.f, -8, 0};
+            CHECK(a->SetNewState(AI_Mgr::StateDodge) && a->DispatchState() && a->DispatchState());
+            CHECK(a->Metacmd == 2 && a->m_nCurMetacmd == (right ? 16 : 15) && a->m_bAnimating);
+            CHECK(r->animation.animation == (right ? 42u : 41u) && !r->animation.looping);
+            CHECK(near(r->velocity.x, right ? 105.f : -105.f));
+            r->state.m_Flags |= FLAG_GRAVITY;
+            r->velocity.x = 20; // Supported continuation refreshes lateral motion.
+            CHECK(a->DispatchState() && near(r->velocity.x, right ? 105.f : -105.f) && a->Metacmd == 2);
+            CHECK(g.server.advance_models(1));
+            r->velocity = {}; // Obstruction and completion independently advance the phase.
+            CHECK(a->DispatchState() && a->Metacmd == 4 && !a->m_bAnimating && r->velocity.x == 0);
+            a->Metacmd = std::numeric_limits<int>::max();
+            CHECK(!a->MC_Roll_Right());
+            a->Metacmd = 1;
+            auto table = std::make_shared<CAnim_Sound>();
+            table->m_nAnim_ROLL_RIGHT = no_animation;
+            CHECK(a->InitStatics(table) && !a->MC_Roll_Right());
+            CHECK(g.objects.remove(a->m_hObject) && !a->MC_Roll_Left() && g.objects.finish_frame());
+        }
         return true;
     }
     bool obstruction(const char*)
@@ -469,9 +532,11 @@ int main(int argc, char** argv)
     if (argc < 2)
         return 2;
     const std::map<std::string, std::function<bool(const char*)>> tests{
-        {"obstruction", obstruction}, {"rays", rays},       {"navigate", navigate},       {"ledges", ledges},
-        {"walking", walking},         {"physics", physics}, {"moving_fire", moving_fire}, {"keys", keys},
-        {"lifetime", lifetime},       {"attacks", attacks}, {"catalog", catalog}};
+        {"dodge", dodge},     {"rolls", rolls},       {"obstruction", obstruction},
+        {"rays", rays},       {"navigate", navigate}, {"ledges", ledges},
+        {"walking", walking}, {"physics", physics},   {"moving_fire", moving_fire},
+        {"keys", keys},       {"lifetime", lifetime}, {"attacks", attacks},
+        {"catalog", catalog}};
     auto t = tests.find(argv[1]);
     return t != tests.end() && t->second(argc > 2 ? argv[2] : "") ? 0 : 1;
 }

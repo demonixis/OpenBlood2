@@ -62,7 +62,7 @@ namespace OpenBlood2
         std::vector<Node> nodes_;
         std::uint32_t partition(std::uint32_t begin, std::uint32_t end);
         void query(std::uint32_t node, DVector from, DVector to, DVector half, CollisionHit& hit, bool& found,
-                   const PlacementAnchor* anchor = nullptr) const;
+                   const PlacementAnchor* anchor = nullptr, const Triangle** selected = nullptr) const;
     };
     DVector rotate_vector(DVector, DRotation);
     DRotation multiply_rotation(DRotation, DRotation);
