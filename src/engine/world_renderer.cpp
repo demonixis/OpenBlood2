@@ -33,7 +33,8 @@ namespace OpenBlood2
                 SDL_ReleaseGPUTexture(device_, texture);
         textures_.clear();
         revision_ = UINT64_MAX;
-        stats.triangles = stats.draws = stats.alpha_batches = 0;
+        stats.triangles = stats.draws = stats.alpha_batches = stats.pan_batches = stats.alpha_pan_batches = 0;
+        stats.surface_time = 0;
         alpha_order_.clear();
     }
     bool WorldRenderer::pipeline(SDL_GPUTextureFormat format, std::string& error, bool translucent)
@@ -355,13 +356,21 @@ namespace OpenBlood2
     }
     bool WorldRenderer::draw(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target, const WorldMesh& mesh,
                              std::span<const WorldDraw> draws, DVector eye, DRotation view, bool letterbox,
-                             std::string& error, DrawLoad load, SDL_GPUTexture* shared_depth, WorldPass world_pass)
+                             std::string& error, DrawLoad load, SDL_GPUTexture* shared_depth, WorldPass world_pass,
+                             double surface_time)
     {
         if (!pipeline_ || !depth_ || (!vertices_ && !mesh.vertices.empty()))
         {
             error = "Diagnostic renderer not prepared";
             return false;
         }
+        std::array<float, 4> texture_offset{};
+        if (!world_texture_offset({}, surface_time, texture_offset))
+        {
+            error = "Invalid surface effect clock";
+            return false;
+        }
+        std::size_t pan_batches = 0;
         const bool translucent = world_pass == WorldPass::Translucent;
         if (translucent && (style_ != DrawStyle::Opaque || load != DrawLoad::Load))
         {
@@ -391,7 +400,8 @@ namespace OpenBlood2
             for (const auto& b : r.batches)
             {
                 if (b.material >= textures_.size() || !textures_[b.material] || b.first < r.first ||
-                    b.first > std::size_t(r.first) + r.count || b.count > std::size_t(r.first) + r.count - b.first)
+                    b.first > std::size_t(r.first) + r.count || b.count > std::size_t(r.first) + r.count - b.first ||
+                    !world_texture_offset(b.uv_rate, surface_time, texture_offset))
                 {
                     error = "Invalid diagnostic GPU material batch";
                     return false;
@@ -446,26 +456,29 @@ namespace OpenBlood2
                     uniform.projection[2] = far / (far - near);
                     uniform.projection[3] = -near * far / (far - near);
                 }
-                SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
                 if (translucent || style_ == DrawStyle::SpriteAlpha)
                 {
                     const std::array<float, 4> modulation{d.alpha, 0, 0, 0};
                     SDL_PushGPUFragmentUniformData(commands, 0, modulation.data(), sizeof(modulation));
                 }
-                auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material)
+                auto batch =
+                    [&](std::uint32_t first, std::uint32_t count, std::uint32_t material, std::array<double, 2> rate)
                 {
+                    world_texture_offset(rate, surface_time, uniform.texture_offset);
+                    SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
+                    pan_batches += rate[0] != 0 || rate[1] != 0;
                     SDL_GPUTextureSamplerBinding texture{textures_[material], sampler_};
                     SDL_BindGPUFragmentSamplers(pass, 0, &texture, 1);
                     SDL_DrawGPUPrimitives(pass, count, 1, first, 0);
                 };
                 if (face)
-                    batch(face->first, face->count, face->material);
+                    batch(face->first, face->count, face->material, face->uv_rate);
                 else if (r.batches.empty())
-                    batch(r.first, r.count, 0);
+                    batch(r.first, r.count, 0, {});
                 else
                     for (const auto& b : r.batches)
                         if (style_ == DrawStyle::SpriteAlpha || !b.translucent)
-                            batch(b.first, b.count, b.material);
+                            batch(b.first, b.count, b.material, b.uv_rate);
             };
             if (translucent)
                 for (const auto& ordered : alpha_order_)
@@ -482,9 +495,14 @@ namespace OpenBlood2
         {
             ++stats.alpha_frames;
             stats.alpha_batches = alpha_order_.size();
+            stats.alpha_pan_batches = pan_batches;
         }
         else
+        {
             ++stats.frames;
+            stats.pan_batches = pan_batches;
+        }
+        stats.surface_time = surface_time;
         return true;
     }
 } // namespace OpenBlood2

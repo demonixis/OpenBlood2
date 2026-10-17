@@ -5,7 +5,7 @@ layout(location=2) in vec2 uv;
 layout(location=0) out vec3 faceColor;
 layout(location=1) out vec2 texCoord;
 layout(set=1,binding=0,std140) uniform View {
-    vec4 eye, right, up, forward, projection, translation, quaternion;
+    vec4 eye, right, up, forward, projection, translation, quaternion, textureOffset;
 } u;
 void main() {
     vec3 q=u.quaternion.xyz;
@@ -16,5 +16,5 @@ void main() {
                      dot(relative,u.up.xyz)*u.projection.y,
                      z*u.projection.z+u.projection.w,z);
     faceColor=color;
-    texCoord=uv;
+    texCoord=uv+u.textureOffset.xy;
 }

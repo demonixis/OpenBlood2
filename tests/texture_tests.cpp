@@ -138,7 +138,7 @@ namespace
         model.translation = {500, 600, 700};
         model.points = {{8, 2, 4}, {12, 2, 4}, {12, 4, 4}};
         model.planes = {{{0, 0, 1}, 4}};
-        model.surfaces = {{{4, 0, 4}, {2, 0, 0}, {0, -1, 0}, 0, 0, 0, 0}};
+        model.surfaces = {{{4, 0, 4}, {2, 0, 0}, {0, -1, 0}, 0, 0, 0, 0, false, {}, {}}};
         model.polygons = {{0, {0, 1, 2}}};
         model.textures = {"A.DTX"};
         world.models = {model, model};
@@ -148,6 +148,30 @@ namespace
         CHECK(mesh.vertices[0].uv[0] == 2 && mesh.vertices[0].uv[1] == -1);
         CHECK(mesh.vertices[3].uv == mesh.vertices[0].uv && mesh.vertices[3].position.x == -492);
         CHECK(mesh.ranges[0].batches.size() == 1 && mesh.ranges[1].batches[0].material == 1);
+        auto& animated = world.models[0];
+        animated.surfaces.push_back(animated.surfaces[0]);
+        animated.surfaces.back().has_effect = true;
+        animated.surfaces.back().effect_name = "Pan";
+        animated.surfaces.back().effect_parameters = "2 -4";
+        animated.polygons.push_back({1, {0, 1, 2}});
+        CHECK(mesh.build(world, error, &resources));
+        CHECK(mesh.effects.size() == 1 && mesh.effects[0].error.empty());
+        CHECK(mesh.materials.size() == 2 && mesh.texture_bytes == 36);
+        CHECK(mesh.ranges[0].batches.size() == 2 && mesh.ranges[1].batches.size() == 1);
+        CHECK(mesh.ranges[0].batches[0].uv_rate == (std::array<double, 2>{}));
+        CHECK(mesh.ranges[0].batches[1].uv_rate == (std::array<double, 2>{-2, 2}));
+        CHECK(mesh.vertices[0].uv == mesh.vertices[3].uv); // Original mapping/geometry never advances.
+        animated.surfaces[1].flags = 4;
+        CHECK(mesh.build(world, error, &resources) && mesh.effects.size() == 1 && mesh.invisible == 1);
+        CHECK(mesh.ranges[0].batches.size() == 1); // Hidden surface remains inspectable, never submitted.
+        animated.surfaces[1].flags = 8;
+        CHECK(mesh.build(world, error, &resources) && mesh.ranges[0].batches[1].translucent);
+        CHECK(mesh.ranges[0].batches[1].uv_rate[1] == 2);
+        animated.surfaces[1].effect_name = "Warble";
+        CHECK(mesh.build(world, error, &resources) && !mesh.effects[0].error.empty());
+        CHECK(mesh.ranges[0].batches[1].uv_rate == (std::array<double, 2>{}));
+        animated.surfaces.pop_back();
+        animated.polygons.pop_back();
         world.models[0].surfaces[0].flags = 8;
         // Shared material with opaque faces does not imply a shared blend mode.
         world.models[0].polygons.push_back(world.models[0].polygons[0]);

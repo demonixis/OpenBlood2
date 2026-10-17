@@ -1,3 +1,4 @@
+#include "app/session_playback.h"
 #include "engine/collision.h"
 #include "engine/container.h"
 #include "engine/world_view.h"
@@ -96,6 +97,9 @@ namespace
         GameSession g;
         CHECK(g.initialize());
         auto w = fixture();
+        w.models[0].surfaces[0].has_effect = true;
+        w.models[0].surfaces[0].effect_name = "Pan";
+        w.models[0].surfaces[0].effect_parameters = "0 32";
         w.models.push_back(w.models[0]);
         w.models[1].name = "moving";
         w.models[1].translation = {10, 20, 30};
@@ -123,7 +127,7 @@ namespace
         CHECK(draws[1].position.x == 30 && draws[1].rotation.m_Spin == r->state.m_Rotation.m_Spin);
         r->state.m_Flags &= ~FLAG_VISIBLE;
         CHECK(world_draws(mesh, g.objects, draws, stats, error));
-        CHECK(draws.size() == 1 && stats.hidden == 1);
+        CHECK(draws.size() == 1 && stats.hidden == 1 && mesh.effects.size() == 2);
         CHECK(world_alpha_order(mesh, draws, {}, {}, order, error) && order.empty());
         r->state.m_Flags |= FLAG_VISIBLE;
         mesh.ranges.push_back(mesh.ranges[1]);
@@ -132,7 +136,7 @@ namespace
         mesh.ranges.pop_back();
         CHECK(g.objects.remove(h));
         CHECK(world_draws(mesh, g.objects, draws, stats, error));
-        CHECK(draws.size() == 1 && stats.unbound == 1);
+        CHECK(draws.size() == 1 && stats.unbound == 1 && mesh.effects.size() == 2);
         CHECK(world_alpha_order(mesh, draws, {}, {}, order, error) && order.empty());
         CHECK(g.objects.finish_frame());
         CHECK(!g.objects.get(h));
@@ -194,6 +198,26 @@ namespace
             CHECK(mesh.build(g.world, error, &g.resources));
             CHECK(mesh.ranges.size() == 116 && mesh.vertices.size() > 1000);
             CHECK(mesh.transparent == 31 && mesh.blended == 31);
+            CHECK(mesh.effects.size() == 60);
+            std::size_t positive_q = 0, negative_q = 0, pan_batches = 0;
+            for (const auto& effect : mesh.effects)
+            {
+                CHECK(effect.model == 0 && effect.error.empty() && effect.speed[0] == 0);
+                CHECK(std::abs(effect.origin_velocity.x) < .001 && std::abs(effect.origin_velocity.y) < .001 &&
+                      std::abs(effect.origin_velocity.z + 1024) < .001);
+                if (effect.speed[1] == 1024)
+                    ++positive_q;
+                else if (effect.speed[1] == -1024)
+                    ++negative_q;
+            }
+            for (const auto& range : mesh.ranges)
+                for (const auto& batch : range.batches)
+                    pan_batches += batch.uv_rate[0] != 0 || batch.uv_rate[1] != 0;
+            CHECK(positive_q == 18 && negative_q == 42 && pan_batches > 0);
+            CHECK(g.server.world_time() == 0);
+            CHECK(step_app_session(g, 1.) && g.server.world_time() == 0); // Waiting for entry never advances Pan.
+            std::cout << "SubwayA Pan: 60 effects, 42 negative/18 positive Q speeds; all origins move -Z at 1024/s; "
+                      << pan_batches << " prepared batches\n";
             std::size_t glass_faces = 0;
             for (const auto& range : mesh.ranges)
                 for (const auto& batch : range.batches)
@@ -218,8 +242,13 @@ namespace
             for (const auto& material : mesh.materials)
                 if (!material.error.empty())
                     std::cout << material.path << ": " << material.error << '\n';
+            const auto source_origin = g.world.models[0].surfaces[mesh.effects[0].surface].origin;
             CHECK(g.enter_player(error));
             CHECK(g.step(1. / 60));
+            std::array<float, 4> pan_offset{}, repeated{};
+            CHECK(world_texture_offset({0, 8}, g.server.world_time(), pan_offset) && pan_offset[1] > .1f);
+            CHECK(world_texture_offset({0, 8}, g.server.world_time(), repeated) && repeated == pan_offset);
+            CHECK(g.world.models[0].surfaces[mesh.effects[0].surface].origin.z == source_origin.z);
             CHECK(world_draws(mesh, g.objects, draws, stats, error));
             CHECK(stats.draws > 50 && stats.triangles > 1000);
             std::vector<WorldAlphaBatch> order;

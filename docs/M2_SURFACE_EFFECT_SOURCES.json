@@ -1,0 +1,42 @@
+{
+  "baseline_commit": "4b1675cdd4efbeb1ae3006417cb95a3736764952",
+  "source_files": [
+    {
+      "path": "sources/blood2/AppHeaders/client_de.h",
+      "sha256": "d4bd76f15d1689a0314f832bcba0877d2bbabcdf830a8a44da9d662b4aa534e1",
+      "use": "SurfaceEffectDesc callbacks at lines 71-83 and AddSurfaceEffect registration interface."
+    },
+    {
+      "path": "sources/blood2/AppHeaders/basetypes_de.h",
+      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
+      "use": "SurfaceData O/P/Q and effect parameter; basis layout for the compatible engine interface."
+    }
+  ],
+  "external_reference": {
+    "file": "Client.exe (user-configured external Blood II installation)",
+    "sha256": "edf7442f26dcbef72c3b69b4560d0fa41d6c9dafa45e603fb12bd32fe6eb2dd7",
+    "bytes": 602624,
+    "method": "Read-only objdump analysis of PE32 code/data; no binary payload or disassembly imported",
+    "addresses": {
+      "effect_table": "0x487710",
+      "Pan_name": "0x487750",
+      "Pan_init": "0x422aa0",
+      "common_init": "0x422af0",
+      "Pan_update": "0x422c50",
+      "Pan_term": "0x422d10",
+      "zeroing_allocator": "0x41c6c0",
+      "numeric_conversion": "0x46cba0",
+      "builtin_registration": "0x423120"
+    },
+    "observations": [
+      "Pan arguments are numeric P/Q speeds (atof); authored directional words therefore convert to zero.",
+      "Missing arguments and accumulators start at zero; update integrates frame delta times speed.",
+      "Surface O = original O + P*accumP + Q*accumQ; basis vectors remain unchanged."
+    ]
+  },
+  "adaptations": [
+    "Bounded finite complete numeric subset plus four observed labels; malformed/unknown effects remain explicit static records.",
+    "Absolute session-clock phase and modulo-one UV offsets replace incremental float state without mutating authored geometry or simulation.",
+    "Exact-path material sharing remains independent of per-surface batch UV rates; original engine rendering source is unavailable, so renderer parity is not claimed."
+  ]
+}

@@ -27,6 +27,8 @@ namespace OpenBlood2
         std::uint16_t texture = 0;
         std::uint32_t plane = 0, flags = 0;
         std::uint16_t texture_flags = 0; // Serialized v56 surface material, not render flags.
+        bool has_effect = false;
+        std::string effect_name, effect_parameters; // Raw DAT metadata, including unsupported effects.
     };
     struct Polygon
     {

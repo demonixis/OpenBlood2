@@ -590,3 +590,5 @@ Read the [contracts](docs/MEDKIT_CONTRACTS.md) before extending inventory items:
 versus actual healing, integer charge/return quirks, run/death/camera gates,
 checked action delivery and keep-alive retention. Other items/HUD and safe
 NEW_LEVEL remain unavailable; M2 is still incomplete.
+
+The [surface panning correction](../Documentation/Implementation/M2_SURFACE_EFFECTS.md) renders SubwayA's authored tunnel/rail motion from session time, with retained metadata and inspection. Original object/collision motion is unchanged; required services and safe NEW_LEVEL keep M2 incomplete.

@@ -119,10 +119,14 @@ namespace OpenBlood2
         bool GetPointContainerCode(DVector, ContainerCode&, bool visible_only = false) override;
         bool GetContainers(HOBJECT, DVector head, ContainerState&) override;
         bool damage_containers();
+        double world_time() const
+        {
+            return objects_.time() - world_time_origin_;
+        }
         float GetWorldTime() override
         {
             trace_service("GetWorldTime");
-            return static_cast<float>(objects_.time() - world_time_origin_);
+            return static_cast<float>(world_time());
         }
         void reset_world_time()
         {

@@ -108,7 +108,7 @@ namespace
         return out;
     }
     Writer dat(bool gameplay = false, bool sounds = false, bool sprites = false, bool destination = false,
-               unsigned trial = 0)
+               unsigned trial = 0, const Surface* effect = nullptr, unsigned surface_count = 1)
     {
         Writer w;
         w.u32(56);
@@ -192,7 +192,7 @@ namespace
         w.u32(0);
         w.str("SyntheticTriangle");
         w.u32(0);
-        for (unsigned n : {3, 1, 1, 0, 1, 0, 3, 0, 0, 0})
+        for (unsigned n : {3u, 1u, surface_count, 0u, 1u, 0u, 3u, 0u, 0u, 0u})
             w.u32(n);
         w.u32(0);
         w.vec();
@@ -205,6 +205,7 @@ namespace
         w.byte(0); // Polygon vertex counts.
         w.vec(0, 1, 0);
         w.real(0); // Plane.
+        const auto surface_begin = w.data.size();
         w.vec();
         w.vec(1, 0, 0);
         w.vec(0, 0, 1);
@@ -215,8 +216,16 @@ namespace
         w.u32(0);
         w.u32(destination || trial ? 1 : 0);
         w.u32(0);
-        w.byte(0);
+        w.byte(effect ? 1 : 0);
+        if (effect)
+        {
+            w.str(effect->effect_name);
+            w.str(effect->effect_parameters);
+        }
         w.u16(20); // Serialized material flags, independent of surface flags.
+        const Bytes surface_bytes(w.data.begin() + surface_begin, w.data.end());
+        for (unsigned i = 1; i < surface_count; ++i)
+            w.data.insert(w.data.end(), surface_bytes.begin(), surface_bytes.end());
         w.zero(12);
         w.u32(0);
         for (unsigned i = 0; i < 3; ++i)
@@ -241,6 +250,41 @@ namespace
         w.vec(trial ? -2000 : -10, trial ? -2000 : -10, trial ? -2000 : -10);
         w.vec(trial ? 2000 : 10, trial ? 2000 : 10, trial ? 2000 : 10);
         return w;
+    }
+    bool surface_effects()
+    {
+        Surface source;
+        source.effect_name = "Pan";
+        source.effect_parameters = "up -1024";
+        World world;
+        std::string error;
+        auto bytes = dat(false, false, false, false, 0, &source).data;
+        CHECK(read_world(bytes, world, error));
+        const auto& surface = world.models[0].surfaces[0];
+        CHECK(surface.has_effect && surface.effect_name == "Pan" && surface.effect_parameters == "up -1024");
+        CHECK(surface.texture_flags == 20 && surface.u.x == 1 && surface.v.z == 1);
+        for (std::size_t size = 0; size < bytes.size(); ++size)
+            CHECK(!read_world(std::span(bytes).first(size), world, error) && world.models.empty());
+        source.effect_name = "Unknown ";
+        source.effect_parameters = " raw\tparameters\n";
+        CHECK(read_world(dat(false, false, false, false, 0, &source).data, world, error));
+        CHECK(world.models[0].surfaces[0].effect_name == source.effect_name &&
+              world.models[0].surfaces[0].effect_parameters == source.effect_parameters);
+        source.effect_name = "";
+        source.effect_parameters = "";
+        CHECK(read_world(dat(false, false, false, false, 0, &source).data, world, error));
+        CHECK(world.models[0].surfaces[0].has_effect && world.models[0].surfaces[0].effect_name.empty());
+        source.effect_name = "Pan";
+        source.effect_parameters = std::string(4096, '0');
+        CHECK(read_world(dat(false, false, false, false, 0, &source, 2046).data, world, error));
+        CHECK(world.models[0].surfaces.size() == 2046);
+        CHECK(!read_world(dat(false, false, false, false, 0, &source, 2047).data, world, error) &&
+              world.models.empty());
+        source.effect_parameters = std::string(4097, 'x');
+        CHECK(!read_world(dat(false, false, false, false, 0, &source).data, world, error) && world.models.empty());
+        source.effect_parameters = std::string("1\0 2", 4);
+        CHECK(!read_world(dat(false, false, false, false, 0, &source).data, world, error) && world.models.empty());
+        return true;
     }
     Writer rez(const Bytes& payload, std::string_view name = "sample", std::uint32_t extension = 0x444154)
     {
@@ -1269,7 +1313,9 @@ int main(int argc, char** argv)
             std::filesystem::create_directories(root, ec);
         if (ec)
             return 2;
-        if (name == "destination_trials")
+        if (name == "surface_effects")
+            ok = surface_effects();
+        else if (name == "destination_trials")
             ok = destination_trials(root);
         else if (name == "destination_messages")
             ok = destination_messages();

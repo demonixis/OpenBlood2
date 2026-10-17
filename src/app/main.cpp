@@ -873,7 +873,8 @@ namespace
                                                 height, error) ||
                         !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
                                              world_draws, view.position, view.rotation,
-                                             view.object && view.settings.type == 1, error))
+                                             view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Clear,
+                                             nullptr, OpenBlood2::WorldPass::Opaque, game.server.world_time()))
                     {
                         spdlog::error("World viewport: {}", error);
                         SDL_SubmitGPUCommandBuffer(commands);
@@ -895,7 +896,7 @@ namespace
                         !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
                                              world_draws, view.position, view.rotation,
                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
-                                             nullptr, OpenBlood2::WorldPass::Translucent))
+                                             nullptr, OpenBlood2::WorldPass::Translucent, game.server.world_time()))
                     {
                         spdlog::error("Transparent world viewport: {}", error);
                         SDL_SubmitGPUCommandBuffer(commands);
@@ -1502,6 +1503,12 @@ namespace
                              missing, world_mesh.texture_bytes, world_renderer.stats.batches);
                 spdlog::info("World alpha: prepared={}, submitted={}, passes={}", world_mesh.blended,
                              world_renderer.stats.alpha_batches, world_renderer.stats.alpha_frames);
+                spdlog::info("World Pan: {} authored effects, {} opaque / {} alpha submitted batches, session clock {}",
+                             world_mesh.effects.size(), world_renderer.stats.pan_batches,
+                             world_renderer.stats.alpha_pan_batches, world_renderer.stats.surface_time);
+                if (world_mesh.effects.size() != 60 || !world_renderer.stats.pan_batches ||
+                    world_renderer.stats.surface_time != game.server.world_time())
+                    return 3;
                 if (world_mesh.blended != 31 || world_renderer.stats.alpha_batches != 31 ||
                     world_renderer.stats.alpha_frames != world_renderer.stats.frames)
                     return 4;

@@ -1,6 +1,7 @@
 #include "engine/world_view.h"
 #include "engine/collision.h"
 #include <algorithm>
+#include <charconv>
 #include <cmath>
 
 namespace OpenBlood2
@@ -22,6 +23,89 @@ namespace OpenBlood2
             return {v.x, v.y, v.z, 0};
         }
     } // namespace
+    bool world_surface_effect(const Surface& surface, WorldSurfaceEffect& out)
+    {
+        out = {};
+        auto fail = [&](const char* why)
+        {
+            out.error = why;
+            out.speed = {};
+            out.origin_velocity = {};
+            out.texel_rate = {};
+            return false;
+        };
+        if (surface.effect_name.size() > 4096 || surface.effect_parameters.size() > 4096)
+            return fail("Surface effect text exceeds limits");
+        out.name = surface.effect_name;
+        out.parameters = surface.effect_parameters;
+        if (!surface.has_effect || CaseLess{}(out.name, "Pan") || CaseLess{}("Pan", out.name))
+            return fail("Unsupported surface effect");
+        std::string_view remaining = out.parameters;
+        for (std::size_t axis = 0; !remaining.empty();)
+        {
+            const auto start = remaining.find_first_not_of(" \t\r\n\v\f");
+            if (start == std::string_view::npos)
+                break;
+            remaining.remove_prefix(start);
+            const auto length = remaining.find_first_of(" \t\r\n\v\f");
+            auto token = remaining.substr(0, length);
+            remaining.remove_prefix(token.size());
+            if (axis == 2)
+                return fail("Pan supports at most two parameters");
+            // Retail uses atof, not directional keywords. These authored labels
+            // convert to zero; they must never select an axis or change the sign.
+            bool label = false;
+            for (auto name : {"up", "down", "left", "right"})
+                label |= !CaseLess{}(token, name) && !CaseLess{}(name, token);
+            if (!label)
+            {
+                if (!token.empty() && token.front() == '+')
+                {
+                    token.remove_prefix(1);
+                    if (!token.empty() && token.front() == '-')
+                        return fail("Invalid Pan sign");
+                }
+                float value = 0;
+                const auto result = std::from_chars(token.data(), token.data() + token.size(), value);
+                if (token.empty() || result.ec != std::errc{} || result.ptr != token.data() + token.size() ||
+                    !std::isfinite(value) || std::abs(value) > 65536)
+                    return fail("Unsupported or excessive Pan parameter");
+                out.speed[axis] = value;
+            }
+            ++axis;
+        }
+        if (!physics_vector(surface.u) || !physics_vector(surface.v))
+            return fail("Invalid Pan basis");
+        out.origin_velocity = vector_add(vector_scale(surface.u, out.speed[0]), vector_scale(surface.v, out.speed[1]));
+        const auto velocity = out.origin_velocity;
+        for (std::size_t axis = 0; axis < 2; ++axis)
+        {
+            const auto basis = axis ? surface.v : surface.u;
+            const double rate =
+                -(double(velocity.x) * basis.x + double(velocity.y) * basis.y + double(velocity.z) * basis.z);
+            if (!std::isfinite(rate) || std::abs(rate) > 1e9)
+                return fail("Pan coordinate rate exceeds limits");
+            out.texel_rate[axis] = rate;
+        }
+        return true;
+    }
+    bool world_texture_offset(std::array<double, 2> rate, double time, std::array<float, 4>& out)
+    {
+        out = {};
+        if (!std::isfinite(time) || time < 0)
+            return false;
+        for (std::size_t axis = 0; axis < 2; ++axis)
+        {
+            const double distance = rate[axis] * time;
+            if (!std::isfinite(rate[axis]) || std::abs(rate[axis]) > 1e9 || !std::isfinite(distance))
+            {
+                out = {};
+                return false;
+            }
+            out[axis] = static_cast<float>(std::fmod(distance, 1.));
+        }
+        return true;
+    }
     bool WorldMesh::build(const World& world, std::string& error, const Resources* resources)
     {
         *this = {};
@@ -38,10 +122,31 @@ namespace OpenBlood2
         materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}});
         texture_bytes = 4;
         std::map<std::string, std::uint32_t> material_ids;
+        std::size_t effect_bytes = 0;
         for (const auto& model : world.models)
         {
             if (model.polygons.size() > 65536 || model.points.size() > 65536 || !physics_vector(model.translation))
                 return fail("Diagnostic model exceeds geometry limits");
+            if (model.surfaces.size() > 2000000)
+                return fail("World surface count exceeds limits");
+            std::vector<std::uint32_t> effect_ids(model.surfaces.size(), UINT32_MAX);
+            for (std::size_t i = 0; i < model.surfaces.size(); ++i)
+            {
+                const auto& surface = model.surfaces[i];
+                if (!surface.has_effect)
+                    continue;
+                const auto bytes = surface.effect_name.size() + surface.effect_parameters.size();
+                if (surface.effect_name.size() > 4096 || surface.effect_parameters.size() > 4096 ||
+                    bytes > 8 * 1024 * 1024 - effect_bytes || effects.size() >= 65536)
+                    return fail("World surface effect budget exceeded");
+                effect_bytes += bytes;
+                WorldSurfaceEffect effect;
+                world_surface_effect(surface, effect);
+                effect.model = static_cast<std::uint32_t>(ranges.size());
+                effect.surface = static_cast<std::uint32_t>(i);
+                effect_ids[i] = static_cast<std::uint32_t>(effects.size());
+                effects.push_back(std::move(effect));
+            }
             WorldRange range;
             range.first = static_cast<std::uint32_t>(vertices.size());
             range.name = model.name;
@@ -112,6 +217,14 @@ namespace OpenBlood2
                             color = {1, 0, 1}; // Explicit unresolved material marker.
                     }
                 }
+                std::array<double, 2> uv_rate{};
+                if (material && effect_ids[polygon.surface] != UINT32_MAX)
+                {
+                    const auto& effect = effects[effect_ids[polygon.surface]];
+                    const auto& image = materials[material].image;
+                    if (effect.error.empty())
+                        uv_rate = {effect.texel_rate[0] / image.width, effect.texel_rate[1] / image.height};
+                }
                 if ((count - 2) * 3 > max_vertices - vertices.size())
                     return fail("Diagnostic triangle budget exceeded");
                 const bool translucent = material && (surface.flags & (1u << 3)) && !(surface.flags & (1u << 4));
@@ -133,9 +246,10 @@ namespace OpenBlood2
                         continue;
                     }
                     if (range.batches.empty() || range.batches.back().material != material ||
-                        range.batches.back().translucent != translucent || (translucent && first_triangle))
+                        range.batches.back().translucent != translucent || range.batches.back().uv_rate != uv_rate ||
+                        (translucent && first_triangle))
                         range.batches.push_back(
-                            {static_cast<std::uint32_t>(vertices.size()), 0, material, translucent, center});
+                            {static_cast<std::uint32_t>(vertices.size()), 0, material, translucent, center, uv_rate});
                     if (translucent && first_triangle)
                         ++blended;
                     first_triangle = false;

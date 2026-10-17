@@ -548,4 +548,5 @@ The [playtest input/combat correction](../Documentation/Implementation/M2_PLAYTE
 
 For GPU validation on this developer machine, select the NVIDIA GPU (for example with `VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json`) and verify the actual device name in the run log. Keep this a local test/launch choice, not a hardcoded production device requirement.
 
-Next reported visual issue: SubwayA tunnel/track `pan` surface effects are currently discarded, explaining missing apparent train motion. Read the [playtest follow-up](../Documentation/Implementation/M2_PLAYTEST_INPUT.md) before choosing the next increment; do not activate the unrelated happytrain path to simulate the intro.
+
+The [surface panning correction](../Documentation/Implementation/M2_SURFACE_EFFECTS.md) connects authored Pan effects and restores the missing tunnel/rail motion cue. Read [contracts](docs/SURFACE_EFFECT_CONTRACTS.md). Preserve original P/Q origin speeds (direction labels convert to zero), independent shared-material rates, session-only clocks, bounded raw metadata and explicit unsupported effects. Do not move happytrain or the collision world to imitate the intro. GPU tests use NVIDIA on this machine; required services and safe NEW_LEVEL keep M2 incomplete.

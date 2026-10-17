@@ -501,6 +501,42 @@ namespace OpenBlood2
                                                     batch.count / 3);
                             ImGui::TreePop();
                         }
+                        ImGui::Text("Surface effects: %zu authored / %zu opaque + %zu alpha Pan batches submitted",
+                                    world_mesh->effects.size(), world_render->pan_batches,
+                                    world_render->alpha_pan_batches);
+                        ImGui::Text("Surface clock: %.4f seconds (session time)", world_render->surface_time);
+                        if (ImGui::TreeNode("Surface effects (including invisible/hidden/unbound surfaces)"))
+                        {
+                            for (const auto& effect : world_mesh->effects)
+                            {
+                                ImGui::TextWrapped("%s / surface %u: [%s] [%s]",
+                                                   world_mesh->ranges[effect.model].name.c_str(), effect.surface,
+                                                   effect.name.c_str(), effect.parameters.c_str());
+                                if (!effect.error.empty())
+                                    ImGui::TextWrapped("Unavailable: %s; authored mapping remains static",
+                                                       effect.error.c_str());
+                                else
+                                    ImGui::Text(
+                                        "P/Q speeds %.3f / %.3f; origin velocity %.3f %.3f %.3f; UV texels/s %.3f %.3f",
+                                        effect.speed[0], effect.speed[1], effect.origin_velocity.x,
+                                        effect.origin_velocity.y, effect.origin_velocity.z, effect.texel_rate[0],
+                                        effect.texel_rate[1]);
+                            }
+                            ImGui::TextUnformatted(
+                                "Prepared animated batches (preparation does not imply visibility):");
+                            for (const auto& range : world_mesh->ranges)
+                                for (const auto& batch : range.batches)
+                                    if (batch.uv_rate[0] || batch.uv_rate[1])
+                                    {
+                                        std::array<float, 4> offset{};
+                                        if (world_texture_offset(batch.uv_rate, game.server.world_time(), offset))
+                                            ImGui::Text("%s: %s; cycles/s %.4f %.4f; UV offset %.4f %.4f",
+                                                        range.name.c_str(),
+                                                        world_mesh->materials[batch.material].path.c_str(),
+                                                        batch.uv_rate[0], batch.uv_rate[1], offset[0], offset[1]);
+                                    }
+                            ImGui::TreePop();
+                        }
                         std::size_t decoded = 0, failed = 0;
                         for (std::size_t i = 1; i < world_mesh->materials.size(); ++i)
                             world_mesh->materials[i].error.empty() ? ++decoded : ++failed;

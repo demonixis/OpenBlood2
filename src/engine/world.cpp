@@ -60,7 +60,7 @@ namespace OpenBlood2
             }
             return r.good() && p.good() && !p.remaining() && !out.name.empty();
         }
-        bool bsp(Reader& file, WorldModel& out, std::size_t& budget)
+        bool bsp(Reader& file, WorldModel& out, std::size_t& budget, std::size_t& effect_bytes)
         {
             const auto start = file.position();
             const auto next = file.u32();
@@ -151,13 +151,18 @@ namespace OpenBlood2
                 const auto effect = r.u8();
                 if (effect == 1)
                 {
-                    r.string();
-                    r.string();
+                    s.has_effect = true;
+                    s.effect_name = r.string();
+                    s.effect_parameters = r.string();
+                    const auto bytes = s.effect_name.size() + s.effect_parameters.size();
+                    if (!r.require(bytes <= 8 * 1024 * 1024 - effect_bytes))
+                        return false;
+                    effect_bytes += bytes;
                 }
                 s.texture_flags = r.u16();
                 if (!r.require(effect <= 1 && s.texture < textures && s.plane < planes))
                     return false;
-                out.surfaces.push_back(s);
+                out.surfaces.push_back(std::move(s));
             }
             std::size_t total_vertices = 0;
             for (auto [base, count] : sizes)
@@ -257,9 +262,9 @@ namespace OpenBlood2
         }
         if (!list.good() || list.remaining())
             return fail("object section");
-        std::size_t budget = 0;
+        std::size_t budget = 0, effect_bytes = 0;
         WorldModel root;
-        if (!bsp(r, root, budget))
+        if (!bsp(r, root, budget, effect_bytes))
             return fail("root BSP");
         if (root.name.empty())
             root.name = "Root";
@@ -270,7 +275,7 @@ namespace OpenBlood2
         for (std::uint32_t i = 0; i < models; ++i)
         {
             WorldModel model;
-            if (!bsp(r, model, budget))
+            if (!bsp(r, model, budget, effect_bytes))
                 return fail("world-model BSP");
             next.models.push_back(std::move(model));
         }
