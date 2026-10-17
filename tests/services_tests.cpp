@@ -286,6 +286,79 @@ namespace
         CHECK(!game.server.collision_ready);
         return true;
     }
+    WorldModel placement_corner(bool cage = false)
+    {
+        auto w = floor_model();
+        w.points.insert(w.points.end(), {{0, 0, -100}, {0, 100, -100}, {0, 100, 100}, {0, 0, 100}});
+        w.polygons.push_back({0, {4, 5, 6, 7}});
+        if (cage)
+        {
+            w.points.insert(w.points.end(), {{4, 0, -100}, {4, 100, -100}, {4, 100, 100}, {4, 0, 100}});
+            w.polygons.push_back({0, {8, 9, 10, 11}});
+        }
+        return w;
+    }
+    bool placement_queries()
+    {
+        CollisionWorld w;
+        std::string error;
+        CHECK(w.build(placement_corner(), error));
+        auto p = w.place_body({4, 4, 0}, {1, 1, 1}, {4, 2, 0}, {3, 2, 1});
+        CHECK(p.result == BodyPlacementResult::Placed && !p.corrections && p.candidate.y == 2);
+        p = w.place_body({4, 4, 0}, {1, 1, 1}, {2, 1, 0}, {3, 2, 1});
+        CHECK(p.result == BodyPlacementResult::Adjusted && p.corrections == 2 && p.distance < 2.01);
+        CHECK(std::abs(p.candidate.x - 3.001) < .0001 && std::abs(p.candidate.y - 2.001) < .0001);
+        CollisionHit hit;
+        CHECK(w.sweep(p.candidate, p.candidate, {3, 2, 1}, hit) == CollisionQuery::Miss);
+        CHECK(w.sweep({4, 4, 0}, p.candidate, {}, hit) == CollisionQuery::Miss);
+        // The nearest escape is below the floor. Retain the clear source side instead.
+        p = w.place_body({4, 4, 0}, {1, 1, 1}, {2, -.25f, 0}, {3, 2, 4});
+        CHECK(p.result == BodyPlacementResult::Adjusted && p.candidate.y > 2 && p.candidate.x > 3);
+        CHECK(w.sweep(p.candidate, p.candidate, {3, 2, 4}, hit) == CollisionQuery::Miss);
+        CHECK(w.sweep({4, 4, 0}, p.candidate, {}, hit) == CollisionQuery::Miss);
+        CHECK(w.place_body({4, 4, 0}, {1, 1, 1}, {-4, 2, 0}, {1, 1, 1}).result == BodyPlacementResult::Blocked);
+        CHECK(w.place_body({.5, 4, 0}, {1, 1, 1}, {4, 2, 0}, {1, 1, 1}).result == BodyPlacementResult::Blocked);
+        CHECK(w.place_body({NAN, 4, 0}, {1, 1, 1}, {}, {1, 1, 1}).result == BodyPlacementResult::Invalid);
+        CHECK(w.place_body({4, 4, 0}, {0, 1, 1}, {}, {1, 1, 1}).result == BodyPlacementResult::Invalid);
+        CHECK(w.place_body({4, 4, 0}, {1, 1, 1}, {}, {-1, 1, 1}).result == BodyPlacementResult::Invalid);
+        CHECK(w.build(placement_corner(true), error));
+        p = w.place_body({2, 4, 0}, {1, 1, 1}, {2, 4, 0}, {3, 1, 1});
+        CHECK(p.result == BodyPlacementResult::Blocked && p.corrections <= 16 && p.distance <= 3);
+        return true;
+    }
+    bool placement_service()
+    {
+        GameSession g;
+        CHECK(setup(g));
+        std::string error;
+        CHECK(g.collision.build(placement_corner(), error));
+        g.server.collision_ready = true;
+        auto h = probe(g);
+        auto* r = g.objects.get(h);
+        CHECK(r);
+        r->state.m_ObjectType = OT_MODEL;
+        r->state.m_Flags = FLAG_GRAVITY;
+        r->state.m_Pos = {4, 4, 0};
+        r->dimensions = {3, 2, 1};
+        CHECK(g.server.ConfigureCharacterBody(h, 200, 9));
+        BodyPlacement p;
+        CHECK(g.server.PlaceNonSolidModel(h, {2, 1, 0}, {4, 4, 0}, {1, 1, 1}, p));
+        CHECK(p.result == BodyPlacementResult::Adjusted && r->state.m_Pos.x == p.candidate.x && r->dimensions.x == 3 &&
+              r->dimensions.y == 2 && g.objects.time() == 0);
+        CHECK(g.server.advance_physics(.01)); // Corrected body survives ordinary single gravity integration.
+        const auto before = r->state.m_Pos;
+        CHECK(!g.server.PlaceNonSolidModel(h, {-4, 2, 0}, {4, 4, 0}, {1, 1, 1}, p));
+        CHECK(p.result == BodyPlacementResult::Blocked && r->state.m_Pos.x == before.x && r->state.m_Pos.y == before.y);
+        g.server.collision_ready = false;
+        CHECK(!g.server.PlaceNonSolidModel(h, {}, {}, {1, 1, 1}, p) && p.result == BodyPlacementResult::Unavailable);
+        g.server.collision_ready = true;
+        r->state.m_Flags |= FLAG_SOLID;
+        CHECK(!g.server.PlaceNonSolidModel(h, {}, {}, {1, 1, 1}, p) && p.result == BodyPlacementResult::Invalid);
+        r->state.m_Flags &= ~FLAG_SOLID;
+        CHECK(g.objects.remove(h) && !g.server.PlaceNonSolidModel(h, {}, {}, {1, 1, 1}, p));
+        CHECK(g.objects.finish_frame() && !g.server.PlaceNonSolidModel(h, {}, {}, {1, 1, 1}, p));
+        return true;
+    }
     bool original_services()
     {
         GameSession game;
@@ -423,6 +496,10 @@ int main(int argc, char** argv)
         ok = collision_queries();
     else if (name == "movement_contacts")
         ok = movement_contacts();
+    else if (name == "placement_queries")
+        ok = placement_queries();
+    else if (name == "placement_service")
+        ok = placement_service();
     else if (name == "original_services")
         ok = original_services();
     else if (name == "private" && argc == 3)

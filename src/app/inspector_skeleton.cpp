@@ -7,6 +7,23 @@
 #include <imgui.h>
 namespace OpenBlood2
 {
+    namespace
+    {
+        void draw_placement(const BodyPlacement& p)
+        {
+            ImGui::Text("Initial body placement: %s", body_placement_name(p.result));
+            if (p.result == BodyPlacementResult::Unqueried)
+                return;
+            ImGui::Text("Corrections %u | distance %.3f", p.corrections, p.distance);
+            if (p.polygon != UINT32_MAX)
+                ImGui::Text("Last queried polygon %u", p.polygon);
+            ImGui::Text("Source anchor %.2f %.2f %.2f", p.anchor.x, p.anchor.y, p.anchor.z);
+            ImGui::Text("Requested %.2f %.2f %.2f | candidate %.2f %.2f %.2f", p.requested.x, p.requested.y,
+                        p.requested.z, p.candidate.x, p.candidate.y, p.candidate.z);
+            ImGui::TextWrapped(
+                "Bounded primary-world clearance; original dimensions retained. Not retail physics parity.");
+        }
+    } // namespace
     void Inspector::draw_skeleton(GameSession& game, ObjectSelection& selection)
     {
         ImGui::TextWrapped(
@@ -79,6 +96,7 @@ namespace OpenBlood2
                         double(r->animation.time), c.remove_time);
             ImGui::Text("Raw dimensions %.2f %.2f %.2f | visual scale %.2f %.2f %.2f", r->dimensions.x, r->dimensions.y,
                         r->dimensions.z, r->state.m_Scale.x, r->state.m_Scale.y, r->state.m_Scale.z);
+            draw_placement(c.placement);
             ImGui::Text("Sound keys %llu / starts %llu | last voice %llu", (unsigned long long)c.sound_attempts,
                         (unsigned long long)c.sound_starts, (unsigned long long)c.last_sound);
             ImGui::TextWrapped("%s | %s", c.sound_resource.c_str(), c.sound_error.c_str());
@@ -110,6 +128,7 @@ namespace OpenBlood2
             ImGui::Text("Frame damage fraction %.3f | optional kill-voice requests %llu (unavailable)",
                         a.m_damage.m_fLastDamagePercent, (unsigned long long)a.kill_voice_requests);
             ImGui::TextWrapped("%s", a.death_error.c_str());
+            draw_placement(a.corpse_placement);
         }
         if (target_ai && target_ai->npc_type != AI_Mgr::NPCType::Diagnostic &&
             ImGui::CollapsingHeader("Original NPC lifecycle", ImGuiTreeNodeFlags_DefaultOpen))

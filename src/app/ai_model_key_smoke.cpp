@@ -46,8 +46,8 @@ namespace OpenBlood2
                 "Corpse diagnostic: present={}, setup={}, complete={}, sounds={}, updates={}, time={}, error={}",
                 c != nullptr, c && c->configured, c && c->animation_done, c ? c->sound_starts : 0, c ? c->updates : 0,
                 r ? r->animation.time : 0, c ? c->error : "removed");
-        return c && c->configured && c->error.empty() && c->animation_done && c->sound_starts > 0 && r->model &&
-               (r->state.m_Flags & FLAG_VISIBLE) && !r->attachment;
+        return c && c->configured && placement_succeeded(c->placement) && c->error.empty() && c->animation_done &&
+               c->sound_starts > 0 && r->model && (r->state.m_Flags & FLAG_VISIBLE) && !r->attachment;
     }
     bool check_ai_runtime_smoke(GameSession& g, ObjectId& selection)
     {

@@ -1,6 +1,8 @@
 #include "app/movement_controls.h"
 #include "camera_fixture.h"
 #include "engine/runtime.h"
+#include "game/original/AI_Mgr.h"
+#include "game/original/Corpse.h"
 #include <cmath>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
@@ -246,6 +248,34 @@ namespace
         }
         CHECK(w->sounds_played == w->shots && !w->sound_failures);
         CHECK(g.client_shell.weapons.front().fire_keys > 0);
+        unsigned corrected_corpses = 0;
+        for (auto identity : g.objects.snapshot())
+        {
+            const auto* body = g.objects.get(identity);
+            const auto* npc = body ? dynamic_cast<const AI_Mgr*>(body->game.get()) : nullptr;
+            if (npc && !npc->death_error.empty())
+                std::cout << "Death placement failure: " << body_placement_name(npc->corpse_placement.result)
+                          << " corrections=" << npc->corpse_placement.corrections
+                          << " distance=" << npc->corpse_placement.distance
+                          << " candidate=" << npc->corpse_placement.candidate.x << ','
+                          << npc->corpse_placement.candidate.y << ',' << npc->corpse_placement.candidate.z
+                          << " polygon=" << npc->corpse_placement.polygon << " error=" << npc->death_error << '\n';
+            const auto* corpse = body ? dynamic_cast<const CCorpse*>(body->game.get()) : nullptr;
+            if (!corpse)
+                continue;
+            CHECK(placement_succeeded(corpse->placement));
+            corrected_corpses += corpse->placement.result == BodyPlacementResult::Adjusted;
+            CollisionHit hit;
+            CHECK(g.collision.sweep(body->state.m_Pos, body->state.m_Pos, body->dimensions, hit) ==
+                  CollisionQuery::Miss);
+            std::cout << "Corpse placement: " << body_placement_name(corpse->placement.result)
+                      << " corrections=" << corpse->placement.corrections << " distance=" << corpse->placement.distance
+                      << " requested=" << corpse->placement.requested.x << ',' << corpse->placement.requested.y << ','
+                      << corpse->placement.requested.z << " fitted=" << corpse->placement.candidate.x << ','
+                      << corpse->placement.candidate.y << ',' << corpse->placement.candidate.z << '\n';
+        }
+        if (!gpu)
+            CHECK(corrected_corpses > 0); // Actual keyboard-fire encounter; no health/aim/AI override.
         std::cout << "Original FIRE_KEY: shots=" << w->shots << " ammo=" << p->m_InventoryMgr.GetAmmoCount(1)
                   << " voices=" << w->sounds_played << " mouse=" << gpu << "\n";
         CHECK(g.leave_player() && g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);

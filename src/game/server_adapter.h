@@ -150,6 +150,8 @@ namespace OpenBlood2
             client_strings_attempted = false;
         }
         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
+        bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
+                                BodyPlacement&) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
         SegmentResult CastRay(DVector, DVector, SegmentHit&) override;
         SegmentResult CastWorldRay(DVector, DVector, SegmentHit&) override;

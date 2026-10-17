@@ -252,6 +252,7 @@ class AI_Mgr : public CBaseCharacter
     int death_slot = -1, kill_voice_roll = -1;
     std::uint64_t death_starts = 0, corpses_created = 0, kill_voice_requests = 0;
     HOBJECT last_corpse = nullptr; // Non-owning; the corpse survives its original actor.
+    OpenBlood2::BodyPlacement corpse_placement;
     std::string death_error;
     virtual bool AI_STATE_Recoil();
     std::uint64_t damage_reactions = 0, recoil_starts = 0;

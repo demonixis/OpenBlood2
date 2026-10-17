@@ -13,6 +13,7 @@ class CCorpse : public B2BaseClass
     bool OnStringKey(ArgList*);
     bool initialized = false, configured = false, animation_done = false;
     bool limb_loss = true;
+    OpenBlood2::BodyPlacement placement;
     float remove_time = 0;
     CDestructable m_damage;
     CAnim_Sound measurements;

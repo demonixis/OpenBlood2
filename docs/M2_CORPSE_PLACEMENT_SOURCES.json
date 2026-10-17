@@ -1,0 +1,28 @@
+{
+  "baseline_commit": "24f7f74215d7b80956424d22e5111077a59db143",
+  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "Original CreateCorpse cached transform, raw dimensions, scale and foot-offset formula (3761-3860); existing selective port, no new wholesale import."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/corpse.cpp",
+      "sha256": "f92ec5bd0e4175f61461aae1f5fe498b0a1d21b5f0ee7d889573d02480543fdd",
+      "use": "Original corpse flags, setup, animation and lifetime retained by existing port."
+    },
+    {
+      "path": "sources/blood2/AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "use": "Original SetObjectDims2 interface contract; retail engine implementation is not available here."
+    }
+  ],
+  "adaptations": [
+    "Keep original CreateCorpse cached anchor, raw animation box, visual scale and requested Y offset.",
+    "New bounded same-source-side separating-axis placement against primary-world triangles; at most 16 corrections and cumulative distance <= min(256, largest new half dimension).",
+    "Check clear anchor, final full box and anchor-to-final center segment before atomic commit. No retail depenetration or BSP contents parity claimed.",
+    "Value-owned placement reports survive source removal; failed setup retains source and defers child cleanup.",
+    "Actual SubwayA keyboard-fire regression without modified health, aim, damage, NPC state or commercial data."
+  ]
+}

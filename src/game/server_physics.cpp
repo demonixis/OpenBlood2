@@ -57,6 +57,35 @@ namespace OpenBlood2
         r->state.m_Pos = position;
         return ResizeResult::Resized;
     }
+    bool ServerAdapter::PlaceNonSolidModel(HOBJECT h, DVector requested, DVector anchor, DVector anchor_half,
+                                           BodyPlacement& report)
+    {
+        trace_service("PlaceNonSolidModel");
+        report = {};
+        report.anchor = anchor;
+        report.requested = report.candidate = requested;
+        report.result = BodyPlacementResult::Invalid;
+        auto* r = objects_.get(h);
+        if (!r || r->life != Life::Alive || moving_ || r->attachment || r->container || r->world_model ||
+            r->state.m_ObjectType != OT_MODEL || !r->character_body || (r->state.m_Flags & FLAG_SOLID))
+            return false;
+        if (!collision || !collision_ready)
+        {
+            report.result = BodyPlacementResult::Unavailable;
+            return false;
+        }
+        report = collision->place_body(anchor, anchor_half, requested, r->dimensions);
+        if (!placement_succeeded(report))
+            return false;
+        // No callbacks or partial motion. Nonsolid corpses use primary-world
+        // collision only, like their subsequent ordinary gravity integration.
+        r->state.m_Pos = report.candidate;
+        r->grounded = false;
+        r->contact_normal = {};
+        r->contact_object = nullptr;
+        r->contact_polygon = UINT32_MAX;
+        return true;
+    }
     bool ServerAdapter::GetMovementState(HOBJECT h, MovementState& state)
     {
         trace_service("GetMovementState");

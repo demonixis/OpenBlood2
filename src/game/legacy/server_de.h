@@ -1,6 +1,7 @@
 #pragma once
 #include "basedefs_de.h"
 #include "engine/audio.h"
+#include "engine/body_placement.h"
 #include "game/brush_messages.h"
 #include "game/camera_messages.h"
 #include "game/container_messages.h"
@@ -88,6 +89,8 @@ class ServerDE : public CSBase
     virtual bool GetPointContainerCode(DVector, ContainerCode&, bool visible_only = false) = 0;
     virtual bool GetContainers(HOBJECT, DVector head, OpenBlood2::ContainerState&) = 0;
     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
+    virtual bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
+                                    OpenBlood2::BodyPlacement&) = 0;
     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
     virtual float GetWorldTime() = 0;
     virtual OpenBlood2::SegmentResult CastRay(DVector, DVector, OpenBlood2::SegmentHit&) = 0;

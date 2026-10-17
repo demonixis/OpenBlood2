@@ -1,6 +1,6 @@
 # Ordinary original NPC death and CCorpse
 
-> Extended by [Gideon runtime integration](GIDEON_RUNTIME_CONTRACTS.md): corpse setup now checks primary-world placement before accepting transfer. Penetrating bodies fail visibly and roll back deferred, retaining the source; depenetration is still unavailable.
+> Extended by [initial placement contracts](CORPSE_PLACEMENT_CONTRACTS.md): the original raw body now receives bounded source-side clearance before transfer. Impossible placements fail visibly and roll back deferred, retaining the source; general/retail depenetration remains unavailable.
 
 Selected original `AI_Mgr::HandleDamage`, `MC_Dead`, `AI_STATE_Dying`,
 `CreateCorpse` and `CCorpse` now handle ordinary Cultist/Civilian death.
@@ -39,8 +39,8 @@ CMovement's cached position/rotation and m_vDims, including the source's timing.
 The sanity fallback draws a death clip if the selected clip precedes death[0].
 Visual scale is copied, but collision dimensions remain the raw death-clip
 user dimensions. Y placement subtracts `(oldDims.y - corpseDims.y) - 0.001`.
-This uses checked teleport and the existing replacement physics, not proven retail
-SetObjectDims2/collision parity. A failed setup removes the partial child deferred
+This now uses the bounded atomic initial-placement service described above, not
+proven retail SetObjectDims2/collision parity. A failed setup removes the partial child deferred
 and retains the visible source; the unchecked original could hide it anyway.
 Spawn reports retain checked child identities and outcomes after source removal.
 
@@ -87,8 +87,9 @@ real sound attempts, blood-pool result and damage refusal. NPCs expose death slo
 clip, accumulated fraction, transfer count and unavailable optional voice requests.
 The normal model renderer samples corpse animation independently of the inspector.
 
-SubwayA remains 202 created / 4 transferred sounds / 372 editor-only / 2 unsupported
-(Gideon, ExitTrigger) / 0 failed source entries. Corpses are dynamic instances,
-not extra authored coverage. Required FX, further AI actions, corpse/fire/gib
-services and complete original session acceptance keep M2 open. Linux-only tests
-and synthetic diagnostics do not establish original-executable or platform parity.
+After subsequent Gideon/ExitTrigger integration, SubwayA has 204 created / four
+transferred sounds / 372 editor-only / zero unsupported / zero failed source entries.
+Corpses are dynamic instances, not extra authored coverage. Required FX,
+corpse/fire/gib services, safe NEW_LEVEL and complete original session acceptance
+keep M2 open. Linux-only tests and synthetic diagnostics do not establish
+original-executable or platform parity.

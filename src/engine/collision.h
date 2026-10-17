@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/body_placement.h"
 #include "engine/world.h"
 #include <array>
 
@@ -11,6 +12,7 @@ namespace OpenBlood2
         std::uint32_t polygon = UINT32_MAX;
         HOBJECT object = nullptr;
         bool start_solid = false;
+        double penetration = 0;
         std::uint16_t texture_flags = 0;
     };
     enum class CollisionQuery
@@ -33,6 +35,7 @@ namespace OpenBlood2
             nodes_.clear();
         }
         CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit& hit) const;
+        BodyPlacement place_body(DVector anchor, DVector anchor_half, DVector requested, DVector half) const;
         std::size_t triangles() const
         {
             return triangles_.size();
@@ -58,7 +61,8 @@ namespace OpenBlood2
         std::vector<Triangle> triangles_;
         std::vector<Node> nodes_;
         std::uint32_t partition(std::uint32_t begin, std::uint32_t end);
-        void query(std::uint32_t node, DVector from, DVector to, DVector half, CollisionHit& hit, bool& found) const;
+        void query(std::uint32_t node, DVector from, DVector to, DVector half, CollisionHit& hit, bool& found,
+                   const PlacementAnchor* anchor = nullptr) const;
     };
     DVector rotate_vector(DVector, DRotation);
     DRotation multiply_rotation(DRotation, DRotation);

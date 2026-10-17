@@ -876,3 +876,7 @@ The [production Gideon continuation](../../Documentation/Implementation/M2_GIDEO
 ## NPC activation visibility correction
 
 See [contracts](ACTIVATION_VISIBILITY_CONTRACTS.md) and [source ledger](M2_ACTIVATION_VISIBILITY_SOURCES.json). The original ServerDE activation contract and player/AI scheduling are retained. Existing original CanSee glass/volume filtering is reused for replacement PingObjects center rays after diagnosing SubwayA nglass1; no retail PVS implementation is claimed. Added bounded historical inspection and authored-script/lifetime regressions. No reference source, commercial resource or dependency revision was changed.
+
+## Initial corpse placement
+
+The [source ledger](M2_CORPSE_PLACEMENT_SOURCES.json) records original CreateCorpse/CCorpse references. Cached transforms, raw death dimensions, scale and foot offset remain source-driven. [Bounded initial placement](CORPSE_PLACEMENT_CONTRACTS.md) is new replacement-engine SAT clearance, not imported or recovered retail physics. No reference file or commercial asset was changed.

@@ -131,6 +131,8 @@ namespace
               !g.server.GetModelLooping(h));
         CHECK(near(r->state.m_Pos.y, 41.001f) && near(r->state.m_Pos.x, 0) && r->dimensions.y == 41 &&
               r->state.m_Scale.y == 2);
+        CHECK(c->placement.result == BodyPlacementResult::Placed && c->placement.corrections == 0 &&
+              c->placement.anchor.y == 60 && near(c->placement.requested.y, 41.001f));
         CHECK(c->m_damage.m_fHitPoints == 50 && c->m_damage.m_fMass == 200 && !(r->state.m_Flags & FLAG_SOLID));
         CHECK(g.objects.remove(source) && g.objects.finish_frame() && g.server.IsObjectAlive(h));
         CHECK(g.server.advance_models(.2) && g.objects.advance(.2) && c->animation_done);
@@ -156,6 +158,8 @@ namespace
         CHECK(!a->DispatchState() && !a->m_bRemoveMe && (g.server.GetObjectFlags(h) & FLAG_VISIBLE));
         CHECK(g.objects.finish_frame() && g.objects.snapshot().size() == before && a->corpses_created == 0);
         CHECK(!a->death_error.empty() && !a->last_corpse);
+        CHECK(a->corpse_placement.result == BodyPlacementResult::Blocked && a->corpse_placement.corrections == 0 &&
+              a->corpse_placement.anchor.y == 59);
         DVector clear{0, 60, 0};
         CHECK(g.server.TeleportObject(h, &clear) == DE_OK && a->m_MoveObj.Update());
         a->m_nCorpseType = 9999;
@@ -254,6 +258,7 @@ namespace
         auto m = g.server.StartMessageToObject(a, c->m_hObject, damage_message);
         CHECK(g.server.WriteDamage(m, {{0, 0, 1}, {0, 30, 0}, 100, DamageType::Death, a->m_hObject}) == DE_OK &&
               g.server.EndMessage(m) == DE_OK);
+        CHECK(c->placement.result == BodyPlacementResult::Unqueried); // Direct diagnostic construction, no transfer.
         CHECK(c->m_damage.m_fHitPoints == 50 && c->damage_refusals == 1 && !c->damage_error.empty() &&
               c->error.empty());
         CHECK(g.server.advance_models(.2) && g.objects.advance(.2) && c->animation_done);

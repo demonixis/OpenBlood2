@@ -61,6 +61,7 @@ bool AI_Mgr::CreateCorpse()
     using namespace OpenBlood2;
     auto* s = GetServerDE();
     SpawnReport report;
+    corpse_placement = {};
     report.source = "AI_Mgr::CreateCorpse";
     report.request = "CCorpse";
     auto fail = [&](const char* why)
@@ -113,21 +114,23 @@ bool AI_Mgr::CreateCorpse()
         s->SetModelAnimation(h, m_nCorpseType);
         s->SetModelLooping(h, false);
     }
-    // A stationary move checks the corpse's actual primary-world body before
-    // accepting transfer. Raw death dimensions may overlap a wall/floor even
-    // when the live actor fitted. Preserve explicit failure and deferred rollback;
-    // never leave a penetrating child to abort an unrelated player's next tick.
+    // Keep the original cached anchor, raw death dimensions and requested foot
+    // position. The replacement engine fits this new nonsolid body locally without
+    // changing dimensions, crossing a wall or accepting a penetrating source.
     if (!configured || s->GetModelAnimation(h) != m_nCorpseType || s->GetModelLooping(h) ||
         !s->ScaleObject(h, m_vScale) || s->SetObjectDims(h, &dims) != DE_OK ||
-        s->TeleportObject(h, &position) != DE_OK || s->MoveObject(h, &position) != DE_OK)
+        !s->PlaceNonSolidModel(h, position, state.m_Pos, m_vDims, corpse_placement))
     {
+        report.position =
+            corpse_placement.result == BodyPlacementResult::Unqueried ? position : corpse_placement.candidate;
         s->RemoveObject(h); // Deferred rollback; source remains inspectable.
         return fail("Corpse setup failed; incomplete child removed");
     }
+    corpse->placement = corpse_placement;
     // All supported NPC nodes are visible; per-limb hiding remains unavailable.
     last_corpse = h;
     ++corpses_created;
-    report.position = position;
+    report.position = corpse_placement.candidate;
     report.outcome = "Original ordinary corpse initialized; independent animation/lifetime";
     s->RecordSpawn(report);
     return true;
