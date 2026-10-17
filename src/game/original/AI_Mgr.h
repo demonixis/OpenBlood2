@@ -276,6 +276,7 @@ class AI_Mgr : public CBaseCharacter
     virtual bool ComputeState(int stimulus = -1);
     virtual bool AI_STATE_Idle();
     bool AI_STATE_Passive();
+    virtual bool AI_STATE_Teleport();
     virtual bool AI_STATE_Special(int); // Consolidates the eight original virtual handlers.
     int m_nLastState = StateIdle, m_nCurMetacmd = 1, m_nTrapped = 0;
     DDWORD m_nCurAnimation = 999;
@@ -416,6 +417,10 @@ class AI_Mgr : public CBaseCharacter
     bool CanSee(HOBJECT);
     OpenBlood2::AISight sight;
     std::uint64_t sight_queries = 0;
+    CAnim_Sound* AnimSound()
+    {
+        return m_pAnim_Sound.get();
+    }
     const CAnim_Sound* AnimSound() const
     {
         return m_pAnim_Sound.get();

@@ -420,7 +420,7 @@ namespace OpenBlood2
         if (const auto* boss = dynamic_cast<const Gideon*>(target_ai);
             boss && ImGui::CollapsingHeader("Original Gideon combat actions", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            ImGui::TextWrapped("Selected original combat methods; diagnostic actor. Boss initialization, fade/teleport "
+            ImGui::TextWrapped("Selected original combat/fade/teleport methods; diagnostic actor. Boss initialization "
                                "and full AI_Update remain unavailable.");
             ImGui::Text("Node %s | selected weapon %u | chance draw %d", boss->m_szFireNode.c_str(),
                         boss->selected_weapon, boss->attack_roll);
@@ -434,6 +434,19 @@ namespace OpenBlood2
                         int(boss->completion_selection));
             ImGui::TextWrapped("No timed firing or generic clearance query. Actual weapon shots retain their own "
                                "collision and lifetime checks.");
+            ImGui::Text("Fade calls %llu | completed moves %llu | ray result %d", (unsigned long long)boss->fade_calls,
+                        (unsigned long long)boss->teleport_moves, int(boss->teleport_ray));
+            ImGui::Text("Teleport requested %.2f %.2f %.2f", boss->teleport_requested.x, boss->teleport_requested.y,
+                        boss->teleport_requested.z);
+            if (boss->teleport_position_valid)
+                ImGui::Text("Teleport achieved %.2f %.2f %.2f", boss->teleport_actual.x, boss->teleport_actual.y,
+                            boss->teleport_actual.z);
+            else
+                ImGui::TextUnformatted("Teleport achieved position: unavailable");
+            ImGui::Text("Teleport playback started: %s (unretained voice)",
+                        boss->teleport_sound_started ? "yes" : "no");
+            if (!boss->teleport_sound_error.empty())
+                ImGui::TextWrapped("Teleport sound: %s", boss->teleport_sound_error.c_str());
             if (!boss->powerup_error.empty())
                 ImGui::TextWrapped("Powerup failed: %s", boss->powerup_error.c_str());
         }

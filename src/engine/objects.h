@@ -100,6 +100,8 @@ namespace OpenBlood2
         Properties properties;
         Creation reason = Creation::Runtime;
         Life life = Life::Constructing;
+        DVector color{}; // Original model additive-light RGB; shading is not implemented yet.
+        float alpha = 1;
         DVector dimensions{};
         std::uint64_t stair_attempts = 0, stair_steps = 0;
         float last_step_height = 0;

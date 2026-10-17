@@ -87,3 +87,5 @@ safe cross-world keep-alive entry remain unavailable. Restored engine animation 
 preserved at entry; subsequent original commands can select/reset its clip. No
 retail physics or binary-save compatibility is claimed. NEW_LEVEL still refuses
 before teardown; Gideon and required FX/services keep M2 incomplete.
+
+The [Gideon fade/teleport continuation](GIDEON_TELEPORT_CONTRACTS.md) adds the original selected states, live model color/alpha, real transparent model presentation and supported player color preservation. Earlier blanket omissions are historical; production boss lifecycle and M2 remain incomplete.

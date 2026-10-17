@@ -102,3 +102,5 @@ No destination callbacks run and no active session is discarded; safe automatic 
 The [destination initialization rehearsal](DESTINATION_TRIAL_CONTRACTS.md) extends the structural scan with temporary original callbacks and copied-player named entry.
 It isolates the current original globals, destroys the temporary session and resumes the unchanged source gameplay state.
 Ordinary second-session binding remains forbidden; no automatic transfer or completed M2 acceptance is claimed.
+
+The [Gideon fade/teleport continuation](GIDEON_TELEPORT_CONTRACTS.md) adds checked live-model RGBA storage with the SDK black/opaque default and actual alpha presentation. Additive RGB shading remains unavailable. Supported player engine snapshots preserve these fields; non-model color mutation rejects.

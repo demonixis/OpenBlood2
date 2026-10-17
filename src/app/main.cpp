@@ -869,6 +869,16 @@ namespace
                         SDL_SubmitGPUCommandBuffer(commands);
                         return 3;
                     }
+                    if (model_scene.mesh.blended &&
+                        !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
+                                             model_scene.world_draws, view.position, view.rotation,
+                                             view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
+                                             world_renderer.depth_target(), OpenBlood2::WorldPass::Translucent))
+                    {
+                        spdlog::error("Transparent model viewport: {}", error);
+                        SDL_SubmitGPUCommandBuffer(commands);
+                        return 3;
+                    }
                     if (!explosion_model_scene.world_draws.empty())
                     {
                         if (!explosion_model_renderer.prepare(

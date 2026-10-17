@@ -209,3 +209,146 @@ bool Gideon::Fire(bool alternate)
         return fail(fire_result, "Gideon weapon shot service failed");
     return true; // Original ignores the inventory return; dry attempts are accepted.
 }
+
+// Original Gideon.cpp:602-768. Color and collision are checked engine services;
+// per-call alpha, unnormalized rays and the unused miss offset are preserved.
+bool Gideon::MC_FadeOut()
+{
+    state_error.clear();
+    auto* s = GetServerDE();
+    DVector color;
+    float alpha;
+    if (teleport_busy || !s || !s->IsObjectAlive(m_hObject) || !s->GetObjectColor(m_hObject, color, alpha))
+        return StateFailure("Gideon fade owner/color unavailable or teleport callback active");
+    ++fade_calls;
+    if (!m_bAnimating || m_nCurMetacmd != 101)
+    {
+        m_bAnimating = true;
+        m_nCurMetacmd = 101;
+        s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) & ~FLAG_SOLID);
+        return true; // Original first call changes solidity, not opacity or animation.
+    }
+    const float next = std::max(0.f, alpha - 1.f / 16);
+    if (next == 0 && Metacmd == std::numeric_limits<int>::max())
+        return StateFailure("Gideon fade Metacmd overflow");
+    if (!s->SetObjectColor(m_hObject, color, next))
+        return StateFailure("Gideon fade color update failed");
+    if (next == 0)
+    {
+        m_bAnimating = false;
+        ++Metacmd;
+    }
+    return true;
+}
+
+bool Gideon::AI_STATE_Teleport()
+{
+    return TeleportStep(false);
+}
+bool Gideon::AI_STATE_Special(int index)
+{
+    if (index != 1)
+        return AI_Mgr::AI_STATE_Special(index);
+    if (teleport_busy)
+        return StateFailure("Reentrant Gideon teleport refused");
+    // Original changes the state but deliberately continues this callback.
+    if (!GetTarget() && !SetNewState(StateTeleport))
+        return false;
+    return TeleportStep(true);
+}
+bool Gideon::TeleportStep(bool special)
+{
+    state_error.clear();
+    auto* s = GetServerDE();
+    if (teleport_busy || !s || !s->IsObjectAlive(m_hObject))
+        return StateFailure("Gideon teleport owner unavailable or reentrant callback");
+    switch (Metacmd)
+    {
+        case 1:
+            return MC_FadeOut();
+        case 2:
+            teleport_sound_started = false;
+            teleport_sound_error.clear();
+            if (!special)
+            {
+                auto* table = AnimSound();
+                if (!table)
+                    return StateFailure("Gideon teleport sound table unavailable");
+                const auto starts = table->sound_starts;
+                table->PlaySound(m_hObject, "teleport.wav", 1000, 100);
+                teleport_sound_started = table->sound_starts != starts; // No GETHANDLE: zero return even on success.
+                teleport_sound_error = table->sound_error;
+                // Original advances even if playback fails; retain the actual failure.
+            }
+            ++Metacmd;
+            return true;
+        case 3:
+        {
+            teleport_ray = SegmentResult::Unavailable;
+            teleport_position_valid = false;
+            teleport_from = teleport_to = teleport_requested = teleport_actual = {};
+            teleport_direction = {0, special ? .2f : 0, 0};
+            if (!s->RandomFloat(-1, 1, teleport_direction.x) || !s->RandomFloat(-1, 1, teleport_direction.z))
+                return StateFailure("Gideon teleport direction randomness unavailable");
+            if (special)
+            {
+                if (!GetTarget() || !s->IsObjectAlive(GetTarget()) ||
+                    s->GetObjectPos(GetTarget(), &teleport_from) != DE_OK)
+                    return StateFailure("Gideon special teleport target unavailable");
+            }
+            else
+            {
+                if (!m_MoveObj.initialized || !m_MoveObj.sampled)
+                    return StateFailure("Gideon teleport cached movement unavailable");
+                teleport_from = m_MoveObj.GetPos();
+            }
+            float distance = 1500;
+            s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) | FLAG_SOLID);
+            if (special && !s->RandomFloat(400, 600, distance))
+                return StateFailure("Gideon special teleport distance randomness unavailable");
+            teleport_to = vector_add(teleport_from, vector_scale(teleport_direction, distance));
+            SegmentHit hit;
+            teleport_ray = s->IntersectSegment(teleport_from, teleport_to, nullptr, hit, false, SegmentObjects::All);
+            if (teleport_ray != SegmentResult::Hit && teleport_ray != SegmentResult::Miss)
+                return StateFailure("Gideon teleport ray unavailable");
+            teleport_requested = teleport_ray == SegmentResult::Hit
+                                     ? vector_subtract(hit.point, vector_scale(teleport_direction, special ? 300 : 100))
+                                     : teleport_to;
+            // Source miss branch computes an offset into unused IInfo, then moves to m_To.
+            teleport_busy = true;
+            struct Reset
+            {
+                bool& value;
+                ~Reset()
+                {
+                    value = false;
+                }
+            } reset{teleport_busy};
+            const int before = m_nState;
+            const auto moved = s->MoveObject(m_hObject, &teleport_requested);
+            if (!s->IsObjectAlive(m_hObject) || moved != DE_OK || Metacmd != 3 || m_nState != before ||
+                (special && (!GetTarget() || !s->IsObjectAlive(GetTarget()))) ||
+                s->GetObjectPos(m_hObject, &teleport_actual) != DE_OK)
+                return StateFailure("Gideon teleport move failed or owner/state/target changed during contact");
+            teleport_position_valid = true;
+            ++teleport_moves;
+            ++Metacmd;
+            return true;
+        }
+        case 4:
+        {
+            DVector color;
+            float alpha;
+            if (!s->GetObjectColor(m_hObject, color, alpha) || !s->SetObjectColor(m_hObject, color, 1))
+                return StateFailure("Gideon teleport color restoration failed");
+            ++Metacmd;
+            return true;
+        }
+        case 5:
+            return MC_FaceTarget();
+        case 6:
+            return ComputeState();
+        default:
+            return true; // Original switch has no default action.
+    }
+}

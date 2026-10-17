@@ -194,5 +194,7 @@ class ServerDE : public CSBase
     DRESULT (*RestoreObjects)(const char*, DDWORD, DDWORD) = nullptr;
     virtual HMESSAGEWRITE StartMessageToObject(LPBASECLASS, HOBJECT, DDWORD) = 0;
     virtual DRESULT EndMessage(HMESSAGEWRITE) = 0;
+    virtual bool GetObjectColor(HOBJECT, DVector&, float&) = 0;
+    virtual bool SetObjectColor(HOBJECT, DVector, float) = 0;
     virtual DRESULT MoveObject(HOBJECT, DVector*) = 0;
 };

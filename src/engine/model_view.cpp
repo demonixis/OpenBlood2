@@ -15,6 +15,7 @@ namespace OpenBlood2
     }
     void ModelView::begin_frame()
     {
+        mesh.blended = 0;
         mesh.vertices.clear();
         mesh.ranges.clear();
         world_draws.clear();

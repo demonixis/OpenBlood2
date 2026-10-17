@@ -1,0 +1,34 @@
+{
+  "baseline_commit": "f11f13657e6a932394b4f71f4a530e2d340ac80e",
+  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
+      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
+      "use": "MC_FadeOut 602-635, AI_STATE_Teleport 637-696, AI_STATE_Special1 698-768"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Gideon.h",
+      "sha256": "5a1c49b5d7e8cfd89b851955a0bc64d5f07c2718b2b911ab40a45f0b745e57c9",
+      "use": "Original virtual state/fade declarations and MC_FADEOUT=101"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Anim_Sound.cpp",
+      "sha256": "238744b904e32e418188bfdc2f74d970bb544f1a027fab1c2ae9dca2b2d9aa4f",
+      "use": "PlaySound 580-609; attached unretained WAV semantics"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "use": "GetObjectColor/SetObjectColor source contract at 638-642"
+    }
+  ],
+  "adaptations": [
+    "Selected original state methods only; no production boss registration, new shared table or successful missing state.",
+    "Checked typed model RGB/alpha services; unsupported object types and nonfinite/out-of-range writes reject.",
+    "Existing all-object entry-face rays and collision-aware MoveObject are replacement policies, not verified retail parity.",
+    "Explicit X/Z/distance portable RNG order, bounded failures, contact reentrancy and pending lifetime guards.",
+    "No-GETHANDLE playback uses actual helper start/error and mixer state, not zero return as failure.",
+    "Original black-default additive RGB is stored and inspected while model lighting remains unavailable; alpha rendering and player engine snapshot preservation are engine integration."
+  ]
+}

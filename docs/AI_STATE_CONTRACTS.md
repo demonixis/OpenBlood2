@@ -162,3 +162,5 @@ escape/hide/guard and beg bodies, plus checked non-owning tracking. Earlier blan
 omissions for those bodies are superseded; full NPC initialization/update remains open.
 
 The [Gideon combat continuation](GIDEON_COMBAT_CONTRACTS.md) supersedes the selected-method omissions for boss decisions, shield armor, node firing and extra-key powerup. Production boss lifecycle remains unavailable. Sparse supported NPC weapon IDs now use value-based duplicate suppression.
+
+The [Gideon fade/teleport continuation](GIDEON_TELEPORT_CONTRACTS.md) adds the original selected states, live model color/alpha, real transparent model presentation and supported player color preservation. Earlier blanket omissions are historical; production boss lifecycle and M2 remain incomplete.

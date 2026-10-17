@@ -376,7 +376,8 @@ namespace OpenBlood2
         WorldViewUniform uniform;
         for (const auto& d : draws)
         {
-            if (style_ == DrawStyle::SpriteAlpha && (!std::isfinite(d.alpha) || d.alpha < 0 || d.alpha > 1))
+            if ((translucent || style_ == DrawStyle::SpriteAlpha) &&
+                (!std::isfinite(d.alpha) || d.alpha < 0 || d.alpha > 1))
             {
                 error = "Invalid sprite draw alpha";
                 return false;
@@ -448,7 +449,7 @@ namespace OpenBlood2
                 SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
                 if (translucent || style_ == DrawStyle::SpriteAlpha)
                 {
-                    const std::array<float, 4> modulation{translucent ? 1.f : d.alpha, 0, 0, 0};
+                    const std::array<float, 4> modulation{d.alpha, 0, 0, 0};
                     SDL_PushGPUFragmentUniformData(commands, 0, modulation.data(), sizeof(modulation));
                 }
                 auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material)

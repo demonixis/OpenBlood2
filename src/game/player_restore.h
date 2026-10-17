@@ -18,6 +18,8 @@ namespace OpenBlood2
     {
         std::string world, name, model, skin;
         DVector position{}, scale{1, 1, 1}, dimensions{}, velocity{}, acceleration{};
+        DVector color{};
+        float alpha = 1;
         DRotation rotation;
         AnimationTrack animation;
         std::vector<std::uint8_t> hidden_nodes;

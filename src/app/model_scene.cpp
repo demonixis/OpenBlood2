@@ -71,8 +71,14 @@ namespace OpenBlood2
             }
             if (!scene.add(record->model.get(), record->animation, record->state.m_SkinName,
                            {record->state.m_Pos, record->state.m_Rotation}, record->state.m_Scale, visible, false, id,
-                           record->state.m_Filename, game.resources, error, record->hidden_nodes))
+                           record->state.m_Filename, game.resources, error, record->hidden_nodes, record->alpha))
                 return false;
+            if (record->alpha < 1 && scene.entries.back().range != UINT32_MAX)
+            {
+                auto& range = scene.mesh.ranges[scene.entries.back().range];
+                range.batches.front().translucent = true;
+                ++scene.mesh.blended;
+            }
             if (unresolved)
                 scene.entries.back().error = "Unresolved attachment pose";
         }

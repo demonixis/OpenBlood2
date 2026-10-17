@@ -107,3 +107,5 @@ The [sprite presentation continuation](SPRITE_VIEW_CONTRACTS.md) now draws suppo
 original sprites with actual DTX alpha and shared world/model depth, before view
 weapons. Earlier blanket sprite-rendering omissions are superseded for this bounded
 subset. World/model opacity policy is unchanged; required FX and M2 remain open.
+
+The [Gideon fade/teleport continuation](GIDEON_TELEPORT_CONTRACTS.md) adds the original selected states, live model color/alpha, real transparent model presentation and supported player color preservation. Earlier blanket omissions are historical; production boss lifecycle and M2 remain incomplete.

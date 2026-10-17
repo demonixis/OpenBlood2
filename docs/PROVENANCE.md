@@ -862,3 +862,7 @@ Selected original CGideonShield, complete WeaponData41, AI name/generic firing b
 ## Original Gideon combat methods
 
 Selected ComputeState, MC_Fire_Stand, Fire, MC_Extra and MagicPowerup are directly adapted from the original subclass, with typed failures and existing lifetime rules. See [source ledger](M2_GIDEON_COMBAT_SOURCES.json) and [contracts](GIDEON_COMBAT_CONTRACTS.md). No production boss constructor/registration or mutable shared table is introduced. The NPC initialization ID-bound repair is engine integration, not a gameplay rule change.
+
+## Gideon fade and teleport
+
+Selected MC_FadeOut, AI_STATE_Teleport and Special1 are directly adapted from the original subclass. See [source ledger](M2_GIDEON_TELEPORT_SOURCES.json) and [contracts](GIDEON_TELEPORT_CONTRACTS.md). Color storage/rendering, snapshot preservation, checked callbacks and replacement ray/movement policies are explicit engine adaptations. No production boss or new global is introduced.

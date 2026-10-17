@@ -550,3 +550,5 @@ The [wind weapon continuation](../Documentation/Implementation/M2_WIND_WEAPON.md
 The [shield/powerup dependency](../Documentation/Implementation/M2_SHIELD_WEAPON.md) adds the original visual-only shield weapon, actual WAV and owner-bound sphere/ring particles with inspection. Armor remains the responsibility of the pending boss action. Gideon, required services and safe NEW_LEVEL still keep M2 incomplete.
 
 The [Gideon combat continuation](../Documentation/Implementation/M2_GIDEON_COMBAT.md) connects original decision thresholds, shield armor, animation-driven fire and extra-key/node aiming. It also fixes sparse NPC weapon-ID initialization. Production boss lifecycle/fade/teleport, required services and safe NEW_LEVEL remain open; M2 is incomplete.
+
+The [Gideon fade/teleport continuation](../Documentation/Implementation/M2_GIDEON_TELEPORT.md) adds original disappearance/reappearance, checked collision-aware teleport states, stored model color and rendered alpha and inspection. Production boss lifecycle/attack sequencing, required services and safe NEW_LEVEL remain open; M2 is incomplete.

@@ -35,6 +35,9 @@ namespace OpenBlood2
                 !std::isfinite(s.next_update) || s.next_update < 0 || s.next_update > 3600 ||
                 s.eye_level != (s.crouched ? 12.0f : 36.0f))
                 return fail("Invalid saved player transform, body, eye or update deadline");
+            auto channel = [](float v) { return std::isfinite(v) && v >= 0 && v <= 1; };
+            if (!channel(s.color.x) || !channel(s.color.y) || !channel(s.color.z) || !channel(s.alpha))
+                return fail("Invalid saved player color/alpha");
             if (s.player.dead || s.damage.dead || s.damage.death_delay != 0)
                 return fail("Dead/dying player restoration requires unported player death state");
             std::shared_ptr<const Model> model;
@@ -75,6 +78,8 @@ namespace OpenBlood2
         s.dimensions = record->dimensions;
         s.velocity = record->velocity;
         s.acceleration = record->acceleration;
+        s.color = record->color;
+        s.alpha = record->alpha;
         s.animation = record->animation;
         s.hidden_nodes = record->hidden_nodes;
         s.flags = record->state.m_Flags;
@@ -147,6 +152,8 @@ namespace OpenBlood2
         if (server.SetModelFilenames(object, s.model.c_str(), s.skin.c_str()) != DE_OK ||
             server.SetObjectRotation(object, &s.rotation) != DE_OK)
             return rollback();
+        record->color = s.color;
+        record->alpha = s.alpha;
         record->animation = s.animation;
         record->hidden_nodes = s.hidden_nodes;
         if (!keep_alive && server.ResizeObject(object, s.dimensions) != ResizeResult::Resized)

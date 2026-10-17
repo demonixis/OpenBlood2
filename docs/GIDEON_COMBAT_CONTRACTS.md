@@ -103,3 +103,5 @@ SubwayA remains 203 created / 4 transferred sounds / 372 editor-only / 1 unsuppo
 Gideon / 0 creation failures. Required FX, production boss services, safe NEW_LEVEL
 and the unchanged M2 acceptance gate remain open. No retail playthrough, other
 platform or XR validation is claimed.
+
+The [Gideon fade/teleport continuation](GIDEON_TELEPORT_CONTRACTS.md) adds the original selected states, live model color/alpha, real transparent model presentation and supported player color preservation. Earlier blanket omissions are historical; production boss lifecycle and M2 remain incomplete.

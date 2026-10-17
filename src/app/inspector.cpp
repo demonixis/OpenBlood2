@@ -592,6 +592,9 @@ namespace OpenBlood2
                         ImGui::Text("Type %u  |  Flags 0x%08X  |  Activity %u  |  Links %zu",
                                     static_cast<unsigned>(state.m_ObjectType), state.m_Flags, object->activity,
                                     game.objects.link_count(object->handle));
+                        if (state.m_ObjectType == OT_MODEL)
+                            ImGui::Text("Model additive RGB (lighting pending) %.3f %.3f %.3f | alpha %.3f",
+                                        object->color.x, object->color.y, object->color.z, object->alpha);
                         if (state.m_Filename[0] || state.m_SkinName[0])
                             ImGui::TextWrapped("Model: %s / Skin (decode status in 3D view): %s", state.m_Filename,
                                                state.m_SkinName);

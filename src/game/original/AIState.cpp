@@ -252,6 +252,8 @@ bool AI_Mgr::DispatchState()
         Metacmd = 1;
     switch (m_nState)
     {
+        case StateTeleport:
+            return AI_STATE_Teleport();
         case StateDying:
             return AI_STATE_Dying();
         case StateRecoil:
@@ -294,6 +296,10 @@ bool AI_Mgr::DispatchState()
     return StateFailure("Selected AI action is not integrated");
 }
 
+bool AI_Mgr::AI_STATE_Teleport()
+{
+    return StateFailure("Subclass teleport is not integrated");
+}
 bool AI_Mgr::AI_STATE_AttackClose()
 {
     return StateFailure("Subclass close attack is not integrated");

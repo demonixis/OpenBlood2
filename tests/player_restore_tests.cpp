@@ -23,6 +23,7 @@ namespace
         CHECK(test_player::setup(g, root) && g.enter_player(e));
         auto* p = g.server_shell.Player(g.local_client);
         auto* r = g.objects.get(p->m_hObject);
+        CHECK(g.server.SetObjectColor(p->m_hObject, {.2f, .4f, .6f}, .5f));
         auto old = p->m_hObject;
         auto old_client = g.local_client;
         // Deliberately non-default state; source Load and first Update must not Respawn/ValidateAttributes.
@@ -67,6 +68,7 @@ namespace
         p = g.server_shell.Player(g.local_client);
         r = g.objects.get(p->m_hObject);
         CHECK(p->m_hObject != old && g.local_client != old_client && g.client_shell.player == p->m_hObject);
+        CHECK(r->color.x == .2f && r->color.y == .4f && r->color.z == .6f && r->alpha == .5f);
         CHECK(p->restore_initialization && p->restore_engine_loaded && p->restore_model_loaded && !p->m_bFirstUpdate);
         CHECK(p->respawns == 0 && p->updates == 0 && p->attributes_received && r->client_movement);
         CHECK(r->state.m_Pos.x == 100 && r->state.m_Pos.y == 21 && r->dimensions.y == 20);
@@ -122,6 +124,8 @@ namespace
             const auto count = g.objects.snapshot().size(), strings = g.server.string_count();
             const auto factions = AI_Mgr::m_dwNumCabal;
             const std::vector<std::function<void(PlayerRestoreState&)>> corrupt{
+                [](auto& x) { x.color.x = NAN; },
+                [](auto& x) { x.alpha = 1.1f; },
                 [](auto& v) { v.world = "other.dat"; },
                 [](auto& v) { v.model = "missing.abc"; },
                 [](auto& v) { v.skin = "missing.dtx"; },

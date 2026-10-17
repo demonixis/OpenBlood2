@@ -231,6 +231,8 @@ namespace OpenBlood2
         void ResetRead(HMESSAGEREAD) override;
         HMESSAGEWRITE StartMessageToObject(LPBASECLASS, HOBJECT, DDWORD) override;
         DRESULT EndMessage(HMESSAGEWRITE) override;
+        bool GetObjectColor(HOBJECT, DVector&, float&) override;
+        bool SetObjectColor(HOBJECT, DVector, float) override;
         DRESULT MoveObject(HOBJECT, DVector*) override;
         DRESULT GetModelAnimUserDims(HOBJECT, DVector*, HMODELANIM) override;
         NodeQuery QueryModelNodeTransform(HOBJECT, const char*, DVector*, DRotation*) override;

@@ -13,6 +13,29 @@ namespace OpenBlood2
         return *active_;
     }
 
+    bool ServerAdapter::GetObjectColor(HOBJECT h, DVector& color, float& alpha)
+    {
+        trace_service("GetObjectColor");
+        const auto* r = objects_.get(h);
+        if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL)
+            return false;
+        color = r->color;
+        alpha = r->alpha;
+        return true;
+    }
+    bool ServerAdapter::SetObjectColor(HOBJECT h, DVector color, float alpha)
+    {
+        trace_service("SetObjectColor");
+        auto* r = objects_.get(h);
+        auto channel = [](float v) { return std::isfinite(v) && v >= 0 && v <= 1; };
+        if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL || !channel(color.x) ||
+            !channel(color.y) || !channel(color.z) || !channel(alpha))
+            return false;
+        r->color = color;
+        r->alpha = alpha;
+        return true;
+    }
+
     ServerAdapter::ServerAdapter(Objects& objects) : objects_(objects)
     {
         // Noncapturing thunks are checked against each declared callback type.
