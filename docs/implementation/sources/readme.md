@@ -19,3 +19,5 @@ Runtime test logs and measurements belong in the
 - [Original music asset preparation](m2_music_asset_sources.json)
 
 - [DLS decoding references and private format quirks](m2_music_dls_sources.json)
+
+- [Legacy DLS pan source ledger](m2_music_legacy_pan_sources.json): installed binary observations, independent implementation and validation limits.

@@ -17,10 +17,12 @@ namespace OpenBlood2
         // An explicit diagnostic note, not a MUSIC/playlist success. It shares the real SDL stream.
         auto& sampler = g.server.audio.instruments;
         std::string note_error;
-        const auto& region = bank.instruments[2].regions[0];
+        // This authored region used to refuse its paired legacy/standard pan records.
+        const auto& region = bank.instruments[6].regions[4];
         const auto note =
-            sampler.play(music.assets.front().bank, 2, (region.key_low + region.key_high) / 2, 100, 1, .2, note_error);
-        if (!note || !note_error.empty())
+            sampler.play(music.assets.front().bank, 6, (region.key_low + region.key_high) / 2, 100, 1, .2, note_error);
+        if (!note || !note_error.empty() || !sampler.voices().back().legacy_pan || sampler.voices().back().pan != 6 ||
+            sampler.voices().back().pan_destination != 4)
             return false;
         const auto before_note = g.server.audio.submitted_frames;
         if (!g.server.advance_audio(.02, {}, {}) || sampler.voices().size() != 1 || sampler.voices()[0].frames != 960 ||

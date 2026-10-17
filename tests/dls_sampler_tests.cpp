@@ -210,8 +210,8 @@ namespace
         CHECK(!a.play(bank, 0, 60, 127, 1, 1, error) && a.voices().size() == 32);
         CHECK(a.advance(48000, {}) && a.voices().empty() && a.completed == 32);
         auto malformed = fixture();
-        connection(*malformed, 0, 2, 6); // Raw legacy-looking record, not aliased to pan.
-        CHECK(!a.play(malformed, 0, 60, 127, 1, 1, error) && error.find("destination 2") != std::string::npos);
+        connection(*malformed, 0, 0x208, 6); // A different legacy code still has no supported semantics.
+        CHECK(!a.play(malformed, 0, 60, 127, 1, 1, error) && error.find("destination 520") != std::string::npos);
         malformed = fixture();
         connection(*malformed, 0, 4, 0);
         connection(*malformed, 0, 4, 0);
@@ -256,10 +256,81 @@ namespace
                      "world cleanup verified\n";
         return true;
     }
+    bool legacy_pan()
+    {
+        std::string error;
+        const double gain = std::pow(100.0 / 127, 2);
+        // Independently check output gains, not just successful graph loading or field equality.
+        auto check_pan = [&](std::vector<DlsConnection> connections, double expected, unsigned destination, bool legacy)
+        {
+            auto bank = fixture();
+            bank->waves[0].samples.assign(4, 1);
+            bank->instruments[0].articulation = {true, std::move(connections)};
+            DlsSampler sampler;
+            CHECK(sampler.play(bank, 0, 60, 127, 1, 1, error));
+            const auto& voice = sampler.voices()[0];
+            CHECK(voice.pan == expected && voice.pan_destination == destination && voice.legacy_pan == legacy);
+            std::vector<float> out(2);
+            CHECK(sampler.advance(1, out));
+            const double p = std::clamp(64.0 / 127 + expected / 1000, 0.0, 1.0);
+            CHECK(near(out[0], gain * std::sqrt(1 - p)) && near(out[1], gain * std::sqrt(p)));
+            return true;
+        };
+        for (int pan : {-500, -406, -400, -300, -200, -6, 0, 6, 200, 306, 354, 400, 500})
+        {
+            const DlsConnection legacy{0, 0, 2, 0, pan}, standard{0, 0, 4, 0, pan * 65536};
+            CHECK(check_pan({legacy}, pan, 2, true));
+            CHECK(check_pan({standard}, pan, 4, false));
+            CHECK(check_pan({legacy, standard}, pan, 4, true)); // Aliases overwrite, never sum.
+            CHECK(check_pan({standard, legacy}, pan, 2, true));
+        }
+        CHECK(check_pan({{0, 0, 2, 0, -500}, {0, 0, 4, 0, 500 * 65536}}, 500, 4, true));
+        CHECK(check_pan({{0, 0, 4, 0, 500 * 65536}, {0, 0, 2, 0, -500}}, -500, 2, true));
+        CHECK(check_pan({{0, 0, 4, 0, 32768}}, .5, 4, false)); // Existing fractional standard pan remains.
+        DlsSampler sampler;
+        auto good = fixture();
+        const auto first = sampler.play(good, 0, 60, 127, 1, 1, error);
+        CHECK(first && sampler.advance(3, {}));
+        const double cursor = sampler.voices()[0].cursor;
+        for (const DlsConnection bad : {DlsConnection{0, 0, 2, 0, -501},
+                                        {0, 0, 2, 0, 501},
+                                        {0, 0, 2, 0, 6 * 65536},
+                                        {0, 0, 2, 0, std::numeric_limits<std::int32_t>::min()},
+                                        {0, 0, 2, 0, std::numeric_limits<std::int32_t>::max()},
+                                        {1, 0, 2, 0, 6},
+                                        {0, 1, 2, 0, 6},
+                                        {0, 0, 2, 1, 6},
+                                        {0, 0, 127, 0, 6}})
+        {
+            auto bank = fixture();
+            // A later valid standard pan must not conceal an invalid legacy record.
+            bank->instruments[0].articulation = {true, {bad, {0, 0, 4, 0, 0}}};
+            CHECK(!sampler.play(bank, 0, 60, 127, 1, 1, error));
+            CHECK(sampler.voices().size() == 1 && sampler.voices()[0].id == first &&
+                  sampler.voices()[0].cursor == cursor);
+        }
+        auto bank = fixture();
+        bank->instruments[0].articulation = {true, {{0, 0, 2, 0, 6}, {0, 0, 2, 0, 6}}};
+        CHECK(!sampler.play(bank, 0, 60, 127, 1, 1, error)); // Identical-edge duplication still fails.
+        bank->instruments[0].articulation = {true, {{0, 0, 2, 0, 6}}};
+        sampler.clear();
+        CHECK(sampler.play(bank, 0, 60, 127, 1, 1, error) && sampler.voices()[0].legacy_pan);
+        sampler.clear();
+        bank->instruments[0].regions[0].articulation = {true, {}};
+        CHECK(sampler.play(bank, 0, 60, 127, 1, 1, error));
+        CHECK(!sampler.voices()[0].legacy_pan && sampler.voices()[0].pan_destination == 0);
+        sampler.clear();
+        bank->instruments[0].regions[0].articulation = {true, {{0, 0, 2, 0, -300}}};
+        CHECK(sampler.play(bank, 0, 60, 127, 1, 1, error));
+        CHECK(sampler.voices()[0].legacy_pan && sampler.voices()[0].pan == -300);
+        std::cout << "Legacy integer/standard fixed pan, signed PCM gains, ordered aliases, invalid graphs, "
+                     "failure atomicity and local precedence verified\n";
+        return true;
+    }
     bool private_data(const std::filesystem::path& root)
     {
         std::string error;
-        unsigned accepted = 0, refused = 0, audible = 0;
+        unsigned accepted = 0, audible = 0, legacy = 0;
         std::ifstream in(root / "Music/Cabal/Cabal.dls", std::ios::binary);
         CHECK(in.good());
         std::vector<std::uint8_t> bytes((std::istreambuf_iterator<char>(in)), {});
@@ -271,13 +342,13 @@ namespace
                 DlsSampler s, hidden;
                 const unsigned key = (r.key_low + r.key_high) / 2;
                 const auto id = s.play(bank, i, key, 100, 1, .2, error);
-                if (!id)
-                {
-                    CHECK(error.find("destination 2") != std::string::npos);
-                    ++refused;
-                    continue;
-                }
+                CHECK(id);
                 ++accepted;
+                if (s.voices()[0].legacy_pan)
+                {
+                    ++legacy;
+                    CHECK(s.voices()[0].pan_destination == 4);
+                }
                 CHECK(hidden.play(bank, i, key, 100, 1, .2, error));
                 bool nonzero = false;
                 for (unsigned frame = 0; frame < 60; ++frame)
@@ -297,9 +368,9 @@ namespace
                     ++audible;
                 CHECK(s.advance(48000 * 30, {}) && s.voices().empty());
             }
-        CHECK(accepted == 33 && accepted == audible && refused == 5);
-        std::cout << "Cabal region notes: " << accepted << " synthesized/nonzero, " << refused
-                  << " refused for unknown destination 2; hidden clocks and release cleanup verified\n";
+        CHECK(accepted == 38 && accepted == audible && legacy == 5);
+        std::cout << "Cabal region notes: " << accepted << " synthesized/nonzero, " << legacy
+                  << " with legacy pan; no refused regions; hidden clocks and release cleanup verified\n";
         return true;
     }
 } // namespace
@@ -309,6 +380,7 @@ int main(int argc, char** argv)
     const bool ok = test == "pcm"                    ? pcm()
                     : test == "envelopes"            ? envelopes()
                     : test == "lifetime"             ? lifetime()
+                    : test == "legacy_pan"           ? legacy_pan()
                     : test == "private" && argc == 3 ? private_data(argv[2])
                                                      : false;
     return ok ? 0 : 1;

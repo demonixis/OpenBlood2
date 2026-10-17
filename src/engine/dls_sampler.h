@@ -15,6 +15,9 @@ namespace OpenBlood2
         std::size_t instrument = 0, region = 0;
         unsigned key = 0, velocity = 0;
         double cursor = 0, base_step = 0, gain = 0, left = 0, right = 0;
+        double pan = 0;               // Constant offset in 0.1-percent units, before CC10 and clamping.
+        unsigned pan_destination = 0; // Last constant-pan writer: 2 (integer legacy), 4 (16.16 DLS), or none.
+        bool legacy_pan = false;      // The selected graph contained a validated legacy pan record.
         double lfo_hz = 5, lfo_delay = .01, lfo_pitch = 0, lfo_gain = 0, envelope_pitch = 0;
         DlsEnvelope amplitude, pitch;
     };

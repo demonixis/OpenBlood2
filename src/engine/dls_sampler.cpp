@@ -31,7 +31,6 @@ namespace OpenBlood2
         bool configure(const DlsArticulation& art, DlsVoice& voice, std::string& error)
         {
             EnvelopeSettings amplitude, pitch;
-            double pan = 0;
             std::set<std::tuple<unsigned, unsigned, unsigned, unsigned>> seen;
             for (const auto& c : art.connections)
             {
@@ -101,8 +100,21 @@ namespace OpenBlood2
                     else
                         supported = false;
                 }
-                else if (supported && c.source == 0 && c.destination == 4)
-                    pan = value;
+                else if (supported && c.source == 0 && (c.destination == 2 || c.destination == 4))
+                {
+                    // Installed MSynth25 uses integer 0.1-percent pan for destination 2,
+                    // and 16.16 for destination 4. Both overwrite the same field in file order.
+                    // Keep our existing full-precision DLS pan law, not that synth's internal quantization.
+                    const double pan = c.destination == 2 ? c.scale : value;
+                    if (std::abs(pan) > 500)
+                    {
+                        error = "DLS constant pan exceeds -500..500";
+                        return false;
+                    }
+                    voice.pan = pan;
+                    voice.pan_destination = c.destination;
+                    voice.legacy_pan = voice.legacy_pan || c.destination == 2;
+                }
                 else if (supported && c.source == 0 && c.destination == 0x104)
                     voice.lfo_hz = 440 * std::exp2((value - 6900) / 1200);
                 else if (supported && c.source == 0 && c.destination == 0x105)
@@ -124,15 +136,15 @@ namespace OpenBlood2
                 }
             }
             if (!envelope(amplitude, voice.key, voice.velocity, voice.amplitude) ||
-                !envelope(pitch, voice.key, voice.velocity, voice.pitch) || std::abs(pan) > 500 || voice.lfo_hz < .1 ||
-                voice.lfo_hz > 10 || voice.lfo_delay > 10 || std::abs(voice.lfo_pitch) > 1200 ||
-                std::abs(voice.envelope_pitch) > 1200 || voice.lfo_gain < -120 || voice.lfo_gain > 0)
+                !envelope(pitch, voice.key, voice.velocity, voice.pitch) || voice.lfo_hz < .1 || voice.lfo_hz > 10 ||
+                voice.lfo_delay > 10 || std::abs(voice.lfo_pitch) > 1200 || std::abs(voice.envelope_pitch) > 1200 ||
+                voice.lfo_gain < -120 || voice.lfo_gain > 0)
             {
                 error = "DLS articulation exceeds the supported level-1 parameter range";
                 return false;
             }
             // DLS equal-power pan: CC10/127 plus the constant offset in 0.1 percent units.
-            const double position = std::clamp(64.0 / 127 + pan / 1000, 0.0, 1.0);
+            const double position = std::clamp(64.0 / 127 + voice.pan / 1000, 0.0, 1.0);
             voice.left = std::sqrt(1 - position);
             voice.right = std::sqrt(position);
             return true;

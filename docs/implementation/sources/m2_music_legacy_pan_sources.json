@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "ee0cd4a78b49d75e050db606bbfb11177265cbcf",
+  "status": "M2 incomplete; legacy constant-pan compatibility, no original MUSIC playback",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/MSynth25.dll",
+      "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+      "image_base": "0x35490000",
+      "routine_rva": "0x8020",
+      "source_dispatch_rva": "0x80b1",
+      "legacy_pan_rva": "0x813d",
+      "standard_pan_rva": "0x8154",
+      "loop_rva": "0x86c7",
+      "use": "Read-only static inspection and isolated bounded original-dispatch emulation; no code/binary/PCM imported",
+      "observations": [
+        "Connection source at +0, destination at +4, signed scale at +8; records advance by 12 bytes in input order",
+        "Source 0 destination 2 scales integer pan by 16/125, signed division truncates toward zero, writes the same 16-bit field at object+0x40",
+        "Source 0 destination 4 arithmetic-shifts fixed scale by 12 then divides by 125 into object+0x40",
+        "Equivalent integer/16.16 values produce identical internal values; the later record overwrites the former"
+      ]
+    },
+    {
+      "url": "https://midi.org/dls-level-1",
+      "use": "Existing DLS 0.1-percent pan unit and full-precision square-root stereo pan law remain; standard destination 4 is not replaced with the legacy representation"
+    }
+  ],
+  "replacement_code": [
+    "src/engine/dls_sampler.cpp: checked integer-pan interpretation and ordered overwrite using the existing pan equation",
+    "src/engine/dls_sampler.h: inspected pan value, last destination and presence of a legacy record",
+    "src/app/inspector_world_sounds.cpp: effective pan and raw legacy-record explanation"
+  ],
+  "deliberate_limits": [
+    "Original synth internal 1/128 pan quantization is observed, not reproduced; full-precision DLS rendering remains",
+    "Individual +/-500 bounds, source/control/transform zero and duplicate-edge rejection remain strict; no generic unknown-edge ignoring",
+    "Isolated original-dispatch execution is not a complete synth or audible retail comparison",
+    "Unicorn 2.1.4 is a separate optional evidence tool, not a build/runtime dependency",
+    "Other legacy records, MIDI controllers, note exclusivity, authored IMA sequences and original playlist services remain incomplete",
+    "Crudux/Track1 invalid effective sample loops remain refused"
+  ],
+  "target_sha256": {
+    "src/engine/dls_sampler.cpp": "764913f790473d2b8ac77147f5e8ebe78e0789f64349fe366d26295a6494db3f",
+    "src/engine/dls_sampler.h": "7c71b05d1fca504beeab38c36338482e30d40bfdb93cfbcc903a2fffa9b28410",
+    "src/app/inspector_world_sounds.cpp": "f43f4b4fa0275977ef74a2645abcf2935df667df465fe7daa291bde56004e82e",
+    "src/app/world_sound_smoke.cpp": "5768da16ae055e42f347d9f701fe5741e2533910f12e7775b2c4d8bd83951bf4",
+    "tests/dls_sampler_tests.cpp": "af78639db1f4687e76bf9ff2cb31cf2a35ae3f480a67dd517898d67620e48184",
+    "tests/CMakeLists.txt": "00b90a5a84ed238bd16feff03e15e9c569a8f74a3e92f95d435b7a44d2aa21f2"
+  }
+}

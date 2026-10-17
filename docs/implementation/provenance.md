@@ -1200,3 +1200,14 @@ No original music command is marked successful. See
 [contracts](../contracts/music_sampler_contracts.md),
 [source ledger](sources/m2_music_sampler_sources.json) and
 [evidence](../../../Documentation/Implementation/m2_music_sampler.md).
+
+## Legacy DLS constant pan (M2)
+
+Read-only inspection and bounded isolated emulation of the installed MSynth25
+articulation dispatcher identify integer destination 2 and its ordered overwrite
+with fixed-point destination 4. No binary, disassembly, SDK code or additional
+runtime dependency is imported. The portable sampler retains its existing
+full-precision pan equation, not the original internal integer quantization.
+See [source ledger](sources/m2_music_legacy_pan_sources.json),
+[contracts](../contracts/music_sampler_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_legacy_pan.md).

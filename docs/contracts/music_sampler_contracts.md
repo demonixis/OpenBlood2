@@ -20,10 +20,25 @@ of the 1998 executable. No instrument/drum bank bit is rewritten.
 
 The independent implementation supports constant amplitude/pitch ADSR parameters,
 velocity-to-attack and key-to-decay scaling, pitch-envelope depth, constant pan,
-LFO frequency/delay and direct LFO pitch/gain depths. Other connections, transforms,
-control sources and duplicate edges refuse the complete note. Unknown destination
-2 is not guessed to be pan or silently discarded, even where the same installed
-graph also contains standard destination 4. The bank reader retains these records.
+LFO frequency/delay and direct LFO pitch/gain depths. Constant pan supports both
+standard destination 4 (signed 16.16, in 0.1-percent units) and the installed
+MSynth25 legacy destination 2 (signed integer, in the same units). Both require
+source/control/transform zero. They overwrite the same parameter in authored
+connection order; they are not added or unconditionally given standard precedence.
+Every individual pan value must lie in -500..500 before assignment, including a
+value subsequently overwritten. Identical-edge duplicates still refuse the note.
+Other connections, transforms and control sources refuse the complete note.
+The bank reader preserves raw records, including both pan forms.
+
+The legacy interpretation is supported by a bounded isolated execution of the
+installed MSynth25 constant-pan dispatch. See the
+[compatibility evidence](../../../Documentation/Implementation/m2_music_legacy_pan.md)
+and [source ledger](../implementation/sources/m2_music_legacy_pan_sources.json).
+This is not a whole-synth/retail playback comparison. The replacement keeps its
+existing full-precision DLS pan equation: it does not reproduce the old synth's
+internal truncation to a 1/128 offset, which maps both integer and fixed-point
+representations to the same stored value. Unknown legacy destinations such as
+0x208 remain unsupported; one identified alias is not permission to ignore others.
 
 The implementation follows DLS Level 1 with its 1.1 errata: signed fixed-point
 centibel gain, fractional timecents, absorbing absolute-zero time, `/128` time
@@ -71,15 +86,17 @@ notes remain with the old mixer and are cleared on unload. The existing unload
 clears queued PCM and releases banks independently of inspector visibility.
 
 World sounds exposes note IDs, instrument/region, key/velocity, cursor, loops,
-age, envelope parameters, LFO frequency, start/completion/refusal counts and the
+age, envelope parameters, LFO frequency, effective constant pan, its last-writing
+destination, presence of a legacy pan record, stereo gains, start/completion/refusal counts and the
 last failure. The region audition button starts a one-second midpoint-key note;
 Release shortens that diagnostic gate. Drawing never advances or reloads audio.
 Counters clear with their world; they are not inferred from visible widgets.
 
 ## Explicit gaps
 
-Five Cabal regions currently refuse unknown articulation destination 2; 33 produce
-nonzero PCM in private tests. Full MIDI state/exclusivity, authored note events,
+All 38 Cabal regions now produce finite nonzero PCM at midpoint key/velocity 100;
+five use the legacy pan alias. This supersedes the earlier 33 accepted/five refused
+sampler evidence, not its historical results. Full MIDI state/exclusivity, authored note events,
 styles/personality semantics, original playlists/transitions, reverb and retail
 listening comparisons remain absent. Crudux/Track1 effective-loop failures remain
 unchanged. Do not turn `MUSIC` into success on the strength of these auditions.

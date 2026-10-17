@@ -29,6 +29,8 @@ namespace OpenBlood2
                 ImGui::Text("Amplitude A/D/S/R %.3f / %.3f / %.3f / %.3f | pitch EG %.1f cents | LFO %.2f Hz",
                             v.amplitude.attack, v.amplitude.decay, v.amplitude.sustain, v.amplitude.release,
                             v.envelope_pitch, v.lfo_hz);
+                ImGui::Text("Constant pan %.3f (0.1%% units) | last destination %u | legacy record %s | L/R %.3f/%.3f",
+                            v.pan, v.pan_destination, v.legacy_pan ? "yes" : "no", v.left, v.right);
                 if (ImGui::SmallButton("Release note"))
                     sampler.release(v.id);
                 ImGui::PopID();
@@ -49,9 +51,13 @@ namespace OpenBlood2
                 ImGui::Text("Articulation graph: %s / %zu raw connections", art.present ? "present" : "absent",
                             art.connections.size());
                 for (const auto& c : art.connections)
+                {
                     ImGui::Text("  src 0x%x / control 0x%x -> dest 0x%x / transform 0x%x / scale %d",
                                 unsigned(c.source), unsigned(c.control), unsigned(c.destination), unsigned(c.transform),
                                 c.scale);
+                    if (c.source == 0 && c.control == 0 && c.transform == 0 && c.destination == 2)
+                        ImGui::TextUnformatted("    Legacy integer pan (0.1% units); later pan records overwrite it.");
+                }
             };
             for (const auto& asset : music.assets)
             {
