@@ -1,4 +1,5 @@
 #include "game/original/AI_Mgr.h"
+#include "game/original/ClientParticleStreamSFX.h"
 #include "game/original/DestructableModel.h"
 #include "game/original/DetailSprite.h"
 #include "game/original/Sound.h"
@@ -109,6 +110,13 @@ namespace OpenBlood2
                 {
                     entry.state = EntryState::Failed;
                     entry.detail = sprite->error;
+                }
+                else if (const auto* stream =
+                             r ? dynamic_cast<const CClientParticleStreamSFX*>(r->game.get()) : nullptr;
+                         stream && !stream->error.empty())
+                {
+                    entry.state = EntryState::Failed;
+                    entry.detail = stream->error;
                 }
                 else if (const auto* model = r ? dynamic_cast<const CDestructableModel*>(r->game.get()) : nullptr;
                          model && !model->error.empty())
@@ -460,6 +468,7 @@ namespace OpenBlood2
         ok = server.explosion_flames.advance(objects.time()) && ok;
         ok = server.explosion_fragments.advance(objects.time(), server) && ok;
         ok = server.object_particles.advance(objects.time(), server) && ok;
+        ok = server.particle_streams.advance(objects.time(), server) && ok;
         if (ok && preview_model && preview_playing &&
             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
             preview_playing = false;

@@ -965,3 +965,11 @@ pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.
 ## Playtest input and Cultist combat correction
 
 [Source ledger](M2_PLAYTEST_INPUT_SOURCES.json) records original CultistAI::AI_STATE_Dodge and AI_Mgr::CalculateDodge/MC_Roll_Left/Right. Typed queries, undefined-input failures and checked lifetime are adaptations; mouse ownership and alternative-axis corpse placement are new engine/application policy. See [contracts](PLAYTEST_INPUT_CONTRACTS.md). Original fire/damage and commercial content remain unchanged.
+
+## Original authored particle streams
+
+`CClientParticleStreamSFX` and `CParticleStreamFX` are selective imports from the
+original Blood II baseline, with typed ownership, checked resources and the existing
+particle renderer. See [source hashes](M2_PARTICLE_STREAM_SOURCES.json) and
+[contracts](PARTICLE_STREAM_CONTRACTS.md). Original ramp/color/trigger rules and the
+unread audio tail are retained. CityHub still refuses NEW_LEVEL; M2 is incomplete.

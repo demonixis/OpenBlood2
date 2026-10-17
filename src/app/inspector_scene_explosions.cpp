@@ -131,6 +131,68 @@ namespace OpenBlood2
             }
             ImGui::PopID();
         }
+        const auto& streams = game.server.particle_streams;
+        if (ImGui::CollapsingHeader("Original particle streams"))
+        {
+            if (!streams.update_error.empty())
+                ImGui::TextWrapped("Latest update failure: %s", streams.update_error.c_str());
+            ImGui::Text("%zu systems / %zu particles / %llu started / %llu removed / %llu failed",
+                        streams.active.size(), streams.particle_count(), (unsigned long long)streams.started,
+                        (unsigned long long)streams.expired, (unsigned long long)streams.failed);
+            for (const auto& instance : streams.active)
+            {
+                const auto& fx = instance.effect;
+                const auto* owner = game.objects.get(instance.owner);
+                ImGui::PushID((int)fx.id);
+                if (ImGui::TreeNode("Stream", "%s / stream %llu / state %u",
+                                    owner ? owner->state.m_Name : "removed owner", (unsigned long long)fx.id, fx.state))
+                {
+                    ImGui::Text("Owner alive %s / visible flag %s / %zu particles / %llu bursts / %llu emitted",
+                                owner && owner->life == Life::Alive ? "yes" : "no",
+                                owner && (owner->user_flags & 1) ? "on" : "off", fx.particles.size(),
+                                (unsigned long long)fx.bursts, (unsigned long long)fx.emitted);
+                    ImGui::Text("Origin %.1f %.1f %.1f / direction %.3f %.3f %.3f", fx.position.x, fx.position.y,
+                                fx.position.z, fx.direction.x, fx.direction.y, fx.direction.z);
+                    ImGui::Text("Last burst %.3f / delay %.3f / trigger %.3f / ramp %.3f flags %u", fx.last_add,
+                                fx.settings.delay, fx.trigger_time, fx.settings.ramp_time, fx.settings.ramp_flags);
+                    ImGui::TextWrapped("%s / half-size %.3f / alpha %.3f / gravity %.2f", fx.texture.c_str(),
+                                       fx.settings.radius / 640.f, fx.settings.alpha, fx.settings.gravity);
+                    ImGui::Text("Count %u / offset %.2f / velocity %.2f..%.2f / spread %.2f / life %.2f..%.2f",
+                                fx.settings.count, fx.settings.position_radius, fx.settings.min_velocity,
+                                fx.settings.max_velocity, fx.settings.spread, fx.settings.min_life,
+                                fx.settings.max_life);
+                    unsigned prepared = 0;
+                    if (sprite_view)
+                        for (const auto& e : sprite_view->entries)
+                            if (e.stream_system == fx.id)
+                            {
+                                prepared += e.range != UINT32_MAX && e.error.empty();
+                                if (!e.error.empty())
+                                    ImGui::TextWrapped("%s", e.error.c_str());
+                            }
+                    ImGui::Text("Prepared quads %u (presentation only)", prepared);
+                    ImGui::TextWrapped("Original SFXMgr does not read this stream's sound tail (radius %.1f):",
+                                       fx.settings.sound_radius);
+                    for (const auto& sound : fx.settings.sounds)
+                        ImGui::TextWrapped("%s", sound.empty() ? "(empty)" : sound.c_str());
+                    if (ImGui::TreeNode("Particles"))
+                    {
+                        for (const auto& p : fx.particles)
+                            ImGui::Text(
+                                "Local %.2f %.2f %.2f / velocity %.2f %.2f %.2f / life %.3f / RGB %.3f %.3f %.3f",
+                                p.position.x, p.position.y, p.position.z, p.velocity.x, p.velocity.y, p.velocity.z,
+                                p.lifetime, p.color.x, p.color.y, p.color.z);
+                        ImGui::TreePop();
+                    }
+                    ImGui::TreePop();
+                }
+                ImGui::PopID();
+            }
+            for (const auto& r : streams.reports)
+                if (!r.error.empty() || r.removed)
+                    ImGui::TextWrapped("%s / stream %llu / %s", r.source.c_str(), (unsigned long long)r.id,
+                                       r.error.empty() ? "owner removed" : r.error.c_str());
+        }
         const auto& flames = game.server.explosion_flames;
         ImGui::Text("Explosion flames: %zu systems / %zu particles / %llu started / %llu expired / %llu failed",
                     flames.active.size(), flames.live_particles(), (unsigned long long)flames.started,

@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "e55601320386d604546367cca6402a69f33d0647",
+  "status": "M2 incomplete; selected original authored streams",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/ClientParticleStreamSFX.cpp",
+      "sha256": "1471bf63a677a68dbfa7ea6efb909dcf45a2cf2c1ae231cc840ea9aa2b7b287f",
+      "purpose": "Original defaults, property reading, initial flags, trigger prefixes and server sound tail."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ClientParticleStreamSFX.h",
+      "sha256": "358b38ee00eaff5fd975cdd048b2ddbce7affbf582cc7c1e3ea61c6831594436",
+      "purpose": "Original state fields and string ownership; owned values replace strings."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ParticleStreamFX.cpp",
+      "sha256": "3ee43cbf08fda7abc3697cd9b6b8811f3fed9bde7bd82cd3af5d3556007404c0",
+      "purpose": "Original Init/CreateObject/Update/AddParticles, state transitions and RNG order."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ParticleStreamFX.h",
+      "sha256": "e516dc9b20acbc5f16a526c97f679fa41f6572c6743b3817f81b38058c2edf40",
+      "purpose": "Original settings, states, ramp flags; uninitialized clocks set to zero."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
+      "sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13",
+      "purpose": "Identity system rotation, radius/640 and exact color range formula."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
+      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
+      "purpose": "PARTICLESTREAM delivery reads only through texture; sound tail never reaches client."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/SpecialFX.h",
+      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
+      "purpose": "Original .001 second effect cadence."
+    }
+  ],
+  "adaptations": [
+    "Typed value-owned descriptor replaces packet/HSTRING ownership.",
+    "World creation only; unsupported creation reasons reject explicitly.",
+    "Deterministic zero clocks and zero-vector normalization, checked bounded numeric/resource budgets.",
+    "Existing replacement particle integration and SDL_GPU alpha billboards; independent RNG.",
+    "Original sound tail remains unconsumed client metadata."
+  ],
+  "original_reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95"
+}

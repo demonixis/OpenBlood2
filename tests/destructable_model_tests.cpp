@@ -313,7 +313,7 @@ namespace
             std::cout << "CityHub model initialization: " << count << " models / " << pushable << " pushable / "
                       << gravity << " gravity / " << ground_misses << " ground misses\n";
             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
-            CHECK(created == 435 && unknown == 18 && failed == 1);
+            CHECK(created == 443 && unknown == 10 && failed == 1);
             CHECK(update_model_scene(g, scene, error));
             unsigned skin_failures = 0, triangles = 0;
             for (auto id : ids)

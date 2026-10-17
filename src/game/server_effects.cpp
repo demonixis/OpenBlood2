@@ -2,6 +2,12 @@
 #include <cmath>
 namespace OpenBlood2
 {
+    std::uint64_t ServerAdapter::PublishParticleStream(HOBJECT owner, const ParticleStreamSettings& settings,
+                                                       std::string& error)
+    {
+        trace_service("PublishParticleStream (original authored emitter)");
+        return particle_streams.publish(owner, settings, *this, client_resources, objects_.time(), error);
+    }
     std::uint64_t ServerAdapter::PublishObjectParticles(HOBJECT owner, unsigned type, std::string& error)
     {
         trace_service("PublishObjectParticles (original shield/powerup)");

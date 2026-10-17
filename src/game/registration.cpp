@@ -7,6 +7,7 @@
 #include "game/original/CivilianAI.h"
 #include "game/original/ClientExplosionSFX.h"
 #include "game/original/ClientLightFX.h"
+#include "game/original/ClientParticleStreamSFX.h"
 #include "game/original/ConversationTrigger.h"
 #include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
@@ -187,6 +188,33 @@ namespace OpenBlood2
                                    {"StartActive", false},
                                    {"Looping", false}}};
         const ClassInfo client_sfx{"CClientSFX", &b2base, construct<CClientSFX>, {}};
+        const ClassInfo particle_stream{"CClientParticleStreamSFX",
+                                        &client_sfx,
+                                        construct<CClientParticleStreamSFX>,
+                                        {{"SystemRadius", 1000.f},
+                                         {"PositionRadius", 1.f},
+                                         {"MinVelocity", 0.f},
+                                         {"MaxVelocity", 25.f},
+                                         {"NumParticles", std::int32_t(1)},
+                                         {"VelSpread", 0.f},
+                                         {"MinColor", DVector{255, 255, 255}},
+                                         {"MaxColor", DVector{255, 255, 255}},
+                                         {"SystemAlpha", 1.f},
+                                         {"MinLifetime", 1.f},
+                                         {"MaxLifetime", 2.f},
+                                         {"RampTime", 0.f},
+                                         {"AddDelay", .1f},
+                                         {"Gravity", 15.f},
+                                         {"RampAmount", false},
+                                         {"RampOffset", false},
+                                         {"RampVelocity", false},
+                                         {"RampLifetime", false},
+                                         {"InitiallyOn", false},
+                                         {"ParticleFile", std::string("SpriteTextures\\drop32_1.dtx")},
+                                         {"SoundRadius", 200.f},
+                                         {"RampUpSound", std::string{}},
+                                         {"LoopSound", std::string{}},
+                                         {"RampDownSound", std::string{}}}};
         const ClassInfo scene_explosion{"CClientExplosionSFX",
                                         &client_sfx,
                                         construct<CClientExplosionSFX>,
@@ -758,18 +786,19 @@ namespace OpenBlood2
     {
         return objects.register_class(base) && objects.register_class(builtin_model) &&
                objects.register_class(b2base) && objects.register_class(camera) && objects.register_class(client_sfx) &&
-               objects.register_class(scene_explosion) && objects.register_class(client_light) &&
-               objects.register_class(light_SquareWaveLightFX) && objects.register_class(light_SawWaveLightFX) &&
-               objects.register_class(light_RampUpWaveLightFX) && objects.register_class(light_RampDownWaveLightFX) &&
-               objects.register_class(light_SineWaveLightFX) && objects.register_class(light_Flicker1WaveLightFX) &&
-               objects.register_class(light_Flicker2WaveLightFX) && objects.register_class(light_Flicker3WaveLightFX) &&
-               objects.register_class(light_Flicker4WaveLightFX) && objects.register_class(light_StrobeWaveLightFX) &&
-               objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
-               objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
-               objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
-               objects.register_class(sound_fx) && objects.register_class(detail_sprite) &&
-               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
-               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
+               objects.register_class(particle_stream) && objects.register_class(scene_explosion) &&
+               objects.register_class(client_light) && objects.register_class(light_SquareWaveLightFX) &&
+               objects.register_class(light_SawWaveLightFX) && objects.register_class(light_RampUpWaveLightFX) &&
+               objects.register_class(light_RampDownWaveLightFX) && objects.register_class(light_SineWaveLightFX) &&
+               objects.register_class(light_Flicker1WaveLightFX) && objects.register_class(light_Flicker2WaveLightFX) &&
+               objects.register_class(light_Flicker3WaveLightFX) && objects.register_class(light_Flicker4WaveLightFX) &&
+               objects.register_class(light_StrobeWaveLightFX) && objects.register_class(light_SearchWaveLightFX) &&
+               objects.register_class(light_FlickerLight) && objects.register_class(light_GlowingLight) &&
+               objects.register_class(camera_object) && objects.register_class(cinematic_trigger) &&
+               objects.register_class(random_sound) && objects.register_class(sound_fx) &&
+               objects.register_class(detail_sprite) && objects.register_class(sound) &&
+               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
+               objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(exit_hint) && objects.register_class(character) &&
                objects.register_class(ai_manager) && objects.register_class(cultist) &&

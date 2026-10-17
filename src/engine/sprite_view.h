@@ -13,7 +13,7 @@ namespace OpenBlood2
         std::uint32_t range = UINT32_MAX;
         float alpha = 1;
         std::uint64_t client_effect = 0, particle_system = 0, trail_system = 0, flame_system = 0, weapon_effect = 0,
-                      object_effect = 0;
+                      object_effect = 0, stream_system = 0;
         unsigned particle_index = 0;
     };
     // Read-only presentation snapshot: owned textures/values, never a retained game pointer.

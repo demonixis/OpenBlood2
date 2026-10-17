@@ -99,6 +99,9 @@ namespace OpenBlood2
                         if (!image(frame))
                             return false;
             }
+            for (const auto& instance : game.server.particle_streams.active)
+                if (game.server.IsObjectAlive(instance.owner) && !image(instance.effect.texture))
+                    return false;
             // First-person models are client-owned, outside the server object table.
             for (const auto& weapon : game.client_shell.weapons)
                 if (weapon.model)
