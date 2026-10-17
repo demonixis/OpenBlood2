@@ -872,3 +872,7 @@ Selected MC_FadeOut, AI_STATE_Teleport and Special1 are directly adapted from th
 Selected original close/far states, dodge commands, inline Recoil and shared Bold taunt are adapted directly from original sources. See [source ledger](M2_GIDEON_ATTACK_SOURCES.json) and [contracts](GIDEON_ATTACK_CONTRACTS.md). Typed failures, inspection and shared Beg/Bold implementation are explicit adaptations; no production boss or new global is introduced.
 
 The [production Gideon continuation](../../Documentation/Implementation/M2_GIDEON_RUNTIME.md) adds original initialization, AI_Update, typed boss-health delivery and inspection. The fifth shared table is isolated during destination rehearsals. It supersedes the earlier blanket production-Gideon omission; complete boss encounter/death parity, required remaining services and safe NEW_LEVEL still keep M2 incomplete.
+
+## NPC activation visibility correction
+
+See [contracts](ACTIVATION_VISIBILITY_CONTRACTS.md) and [source ledger](M2_ACTIVATION_VISIBILITY_SOURCES.json). The original ServerDE activation contract and player/AI scheduling are retained. Existing original CanSee glass/volume filtering is reused for replacement PingObjects center rays after diagnosing SubwayA nglass1; no retail PVS implementation is claimed. Added bounded historical inspection and authored-script/lifetime regressions. No reference source, commercial resource or dependency revision was changed.

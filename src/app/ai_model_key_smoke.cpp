@@ -4,6 +4,7 @@
 #include "game/original/CivilianAI.h"
 #include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
+#include "game/original/Gideon.h"
 #include <cmath>
 #include <limits>
 #include <spdlog/spdlog.h>
@@ -79,6 +80,31 @@ namespace OpenBlood2
         const bool localized = selected->m_damage.LocalizeHit(query, *selected->AnimSound()) &&
                                selected->m_damage.hit.node == 2 && !selected->m_damage.hit.random_fallback;
         return cultists == 10 && civilians == 5 && updates >= 15 && localized;
+    }
+    bool check_gideon_intro_smoke(GameSession& g, const char* phase)
+    {
+        unsigned bosses = 0;
+        for (auto id : g.objects.snapshot())
+        {
+            const auto* r = g.objects.get(id);
+            const auto* a = r ? dynamic_cast<const Gideon*>(r->game.get()) : nullptr;
+            if (!a)
+                continue;
+            ++bosses;
+            spdlog::info("Authored Gideon intro {}: updates={}, pings={}, probes={}, state={}, selections={}, "
+                         "script updates={}, command={}, failures={}",
+                         phase, a->runtime_updates, r->activation_pings, r->activation_probe.checks, a->m_nState,
+                         a->script_selections, a->script_updates, a->CurrentScriptCommand().argument,
+                         a->script_failures);
+            if (!a->RuntimeReady() || a->m_nState != AI_Mgr::StatePassive || !r->activation_pings ||
+                !r->activation_probe.checks || a->script_selections != 2 || !a->script_updates || a->script_failures ||
+                a->CurrentScriptCommand().command != AI_Mgr::ScriptCommand::SetState ||
+                a->CurrentScriptCommand().argument != "PASSIVE")
+                return false;
+        }
+        const auto* player = g.server_shell.Player(g.local_client);
+        return bosses == 1 && player && !player->camera_movement_blocked && !player->activation_ping_failures &&
+               !g.client_shell.view.object;
     }
     namespace
     {

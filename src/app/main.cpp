@@ -134,6 +134,8 @@ namespace
                     spdlog::error("Authored intro camera did not release player control");
                     return 4;
                 }
+                if (options.viewport_smoke && !OpenBlood2::check_gideon_intro_smoke(game, "initial"))
+                    return 4;
                 if (options.restore_smoke)
                 {
                     if (options.keepalive_smoke)
@@ -522,6 +524,9 @@ namespace
             if (frames == reload_frame + 1 &&
                 (options.weapons_smoke || options.movement_smoke || options.interaction_smoke) &&
                 !OpenBlood2::finish_camera_intro_for_smoke(game))
+                return 4;
+            if (frames == reload_frame + 1 && options.viewport_smoke &&
+                !OpenBlood2::check_gideon_intro_smoke(game, "reload"))
                 return 4;
             if (options.interaction_smoke && frames == reload_frame + 1)
                 if (!OpenBlood2::prepare_interaction_smoke(game, smoke_door))

@@ -1,5 +1,8 @@
 # Original AI visibility queries
 
+> Extended by [activation visibility contracts](ACTIVATION_VISIBILITY_CONTRACTS.md): replacement player/camera pings now reuse the original glass/volume object filter, with atomic refresh, checked inspection and authored Gideon intro acceptance. This is not retail PVS; M2 remains incomplete.
+
+
 > Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
 > candidate lists and stimulus/target selection now execute. Automatic NPC states
 > and complete M2 remain unavailable; earlier acquisition omissions are historical.

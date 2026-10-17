@@ -1,0 +1,32 @@
+{
+  "baseline_commit": "365e3b5c74978859eec190d985286cd189dbf98e",
+  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "use": "Object-state priority and SetDeactivationTime/PingObjects interface (54-65,678-684)"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "use": "Original player/camera observer and strict half-second ping cadence (1830-1870)"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "AI_Update deactivation initialization and CanSee filter (2150-2195,3080-3130)"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "use": "GlobalFilterFn volume/glass rules (412-483)"
+    }
+  ],
+  "adaptations": [
+    "Reuse original AI glass/volume object filter for replacement PingObjects center rays; not recovered retail PVS or Ping implementation.",
+    "Preserve manual inactivity, original player cadence/observer, AI deactivation deadlines and atomic refresh.",
+    "Bounded per-object historical query diagnostics with checked IDs and separate committed refresh flag; read-only inspector.",
+    "Authored SubwayA script/camera acceptance without forced targets, state, health, timings or edited assets."
+  ]
+}

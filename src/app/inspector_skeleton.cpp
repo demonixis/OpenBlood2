@@ -121,6 +121,42 @@ namespace OpenBlood2
                         (unsigned long long)a.runtime_camera_pauses, (unsigned long long)a.runtime_desyncs);
             ImGui::Text("Activity %u | pings %llu | timeout %.3f", r->activity, (unsigned long long)r->activation_pings,
                         r->deactivate_at);
+            const auto& ping = r->activation_probe;
+            const char* visibility = "not queried";
+            switch (ping.visibility)
+            {
+                case ActivationVisibility::Visible:
+                    visibility = "visible";
+                    break;
+                case ActivationVisibility::Blocked:
+                    visibility = "blocked";
+                    break;
+                case ActivationVisibility::Invalid:
+                    visibility = "invalid query";
+                    break;
+                case ActivationVisibility::Unavailable:
+                    visibility = "unavailable collision";
+                    break;
+                case ActivationVisibility::Unqueried:
+                    break;
+            }
+            ImGui::Text("Activation checks %llu | %s | refreshed %s | time %.3f", (unsigned long long)ping.checks,
+                        visibility, ping.refreshed ? "yes" : "no", ping.time);
+            if (ping.checks)
+            {
+                const auto* observer = game.objects.get(ping.observer);
+                const auto* blocker = game.objects.get(ping.hit_object);
+                ImGui::Text("Observer %s | hit %s | polygon %u | fraction %.3f",
+                            observer ? observer->state.m_Name : "removed",
+                            blocker           ? blocker->state.m_Name
+                            : ping.hit_object ? "removed"
+                                              : "world / none",
+                            ping.polygon, ping.fraction);
+                ImGui::Text("Ray %.1f %.1f %.1f -> %.1f %.1f %.1f", ping.from.x, ping.from.y, ping.from.z, ping.to.x,
+                            ping.to.y, ping.to.z);
+            }
+            ImGui::TextWrapped(
+                "Activation uses center rays with the original AI glass/volume filter; retail PVS is not implemented.");
             ImGui::Text("State %d | phase %d | targeted %s | target losses %llu", a.m_nState, a.Metacmd,
                         a.m_bHasTargeted ? "yes" : "no", (unsigned long long)a.runtime_target_losses);
             ImGui::Text("HP %.2f / %.2f | damage factor %.3f", a.m_damage.m_fHitPoints, a.m_damage.m_fMaxHitPoints,

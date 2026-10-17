@@ -1,4 +1,6 @@
 #include "game/game_settings.h"
+#include "game/original/CameraObj.h"
+#include "game/original/DestructableBrush.h"
 #include "gideon_fixture.h"
 #include <functional>
 #include <limits>
@@ -329,9 +331,38 @@ namespace
             CHECK(g.server.GetAnimIndex(boss->m_hObject, "TALKING_02") == 19);
             CHECK(g.enter_player(error));
             std::cout << "Entered objects=" << g.objects.snapshot().size() << '\n';
-            for (unsigned tick = 0; tick < 600; ++tick)
+            bool visible_through_glass = false, passive_before_camera_change = false;
+            for (unsigned tick = 0; tick < 780; ++tick)
             {
                 CHECK(g.step(1. / 60));
+                // Allow the source's initial desynchronization and half-second
+                // player pings to run before inspecting the still-active camera1.
+                if (tick == 120)
+                {
+                    const auto* r = g.objects.get(previous);
+                    const auto* observer = g.objects.get(g_hActiveCamera);
+                    CHECK(observer && std::string_view(observer->state.m_Name) == "camera1");
+                    SegmentHit hit;
+                    CHECK(g.server.IntersectSegment(observer->state.m_Pos, r->state.m_Pos, observer->handle, hit) ==
+                          SegmentResult::Hit);
+                    const auto* obstruction = g.objects.get(hit.object);
+                    const auto* glass =
+                        obstruction ? dynamic_cast<const CDestructableBrush*>(obstruction->game.get()) : nullptr;
+                    CHECK(glass && glass->destructable && glass->GetSurfaceType() == SURFTYPE_GLASS &&
+                          std::string_view(obstruction->state.m_Name) == "nglass1");
+                    std::cout << "Glass probe observer=" << (r->activation_probe.observer == observer->id)
+                              << " visibility=" << int(r->activation_probe.visibility)
+                              << " refreshed=" << r->activation_probe.refreshed << " pings=" << r->activation_pings
+                              << " script updates=" << boss->script_updates << '\n';
+                    CHECK(r->activation_probe.observer == observer->id &&
+                          r->activation_probe.visibility == ActivationVisibility::Visible &&
+                          r->activation_probe.refreshed && r->activation_pings > 0 && boss->script_updates > 10);
+                    visible_through_glass = true;
+                }
+                if (tick == 390)
+                    passive_before_camera_change =
+                        boss->m_nState == AI_Mgr::StatePassive && g_hActiveCamera &&
+                        std::string_view(g.objects.get(g_hActiveCamera)->state.m_Name) == "camera1";
                 if (!tick)
                     std::cout << "First tick objects=" << g.objects.snapshot().size()
                               << " attachments=" << g.objects.attachments().size() << '\n';
@@ -343,6 +374,10 @@ namespace
             std::cout << "Boss updates=" << boss->runtime_updates << " state=" << boss->m_nState
                       << " health messages=" << g.client_shell.boss_health_messages << " error=" << boss->runtime_error
                       << '\n';
+            std::cout << "Intro glass visibility=" << visible_through_glass
+                      << " passive before camera switch=" << passive_before_camera_change
+                      << " selections=" << boss->script_selections << " script updates=" << boss->script_updates
+                      << " current=" << boss->CurrentScriptCommand().argument << '\n';
             if (boss->runtime_failed)
             {
                 auto* r = g.objects.get(boss->m_hObject);
@@ -356,6 +391,11 @@ namespace
                 std::cerr << '\n';
             }
             CHECK(boss->RuntimeReady() && boss->runtime_updates > 0 && g.client_shell.boss_health_messages > 0);
+            CHECK(visible_through_glass && passive_before_camera_change && boss->m_nState == AI_Mgr::StatePassive &&
+                  boss->CurrentScriptCommand().command == AI_Mgr::ScriptCommand::SetState &&
+                  boss->CurrentScriptCommand().argument == "PASSIVE" && boss->script_selections == 2 &&
+                  boss->script_failures == 0 && !g_hActiveCamera && !g.client_shell.view.object &&
+                  !g.server_shell.Player(g.local_client)->activation_ping_failures);
             CHECK(!g.run_world(error));
             CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.objects.get(previous));
             CHECK(!AI_Mgr::m_dwNumMonster && !AI_Mgr::m_dwNumCabal && !CDestructable::m_dwNumDestructables);

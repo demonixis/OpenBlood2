@@ -48,8 +48,8 @@ namespace OpenBlood2
         if (!source || source->life != Life::Alive || !collision || !collision_ready)
             return false;
         const auto from = source->state.m_Pos;
-        // Replacement visibility selection: checked center rays, independent of render/UI.
-        // Retail PVS-based activation is not reproduced by the DAT reader yet.
+        // Replacement visibility selection: checked center rays using the original
+        // AI glass/volume filter, independent of render/UI. This is not retail PVS.
         std::vector<ObjectId> visible;
         for (auto id : objects_.snapshot())
         {
@@ -58,10 +58,27 @@ namespace OpenBlood2
                 (r->activity != OBJSTATE_ACTIVE && r->activity != OBJSTATE_AUTODEACTIVATE_NOW))
                 continue;
             SegmentHit hit;
-            auto result = IntersectSegment(from, r->state.m_Pos, observer, hit);
+            auto result = IntersectSegment(from, r->state.m_Pos, observer, hit, false, SegmentObjects::SolidOnly,
+                                           SegmentFilter::AIVisibility);
+            auto& probe = r->activation_probe;
+            ++probe.checks;
+            probe.time = objects_.time();
+            probe.observer = source->id;
+            probe.from = from;
+            probe.to = r->state.m_Pos;
+            const auto* blocker = objects_.get(hit.object);
+            probe.hit_object = blocker ? blocker->id : ObjectId{};
+            probe.polygon = hit.polygon;
+            probe.fraction = hit.fraction;
+            probe.refreshed = false;
+            probe.visibility = result == SegmentResult::Invalid       ? ActivationVisibility::Invalid
+                               : result == SegmentResult::Unavailable ? ActivationVisibility::Unavailable
+                               : result == SegmentResult::Miss || hit.object == r->handle
+                                   ? ActivationVisibility::Visible
+                                   : ActivationVisibility::Blocked;
             if (result == SegmentResult::Invalid || result == SegmentResult::Unavailable)
                 return false; // No partial refresh on failed queries.
-            if (result == SegmentResult::Miss || (result == SegmentResult::Hit && hit.object == r->handle))
+            if (probe.visibility == ActivationVisibility::Visible)
                 visible.push_back(id);
         }
         for (auto id : visible)
@@ -72,6 +89,7 @@ namespace OpenBlood2
             r->activity = OBJSTATE_ACTIVE;
             r->deactivate_at = objects_.time() + r->deactivation_period;
             ++r->activation_pings;
+            r->activation_probe.refreshed = true;
         }
         return true;
     }

@@ -1,5 +1,8 @@
 # Original scripted cameras
 
+> Extended by [activation visibility contracts](ACTIVATION_VISIBILITY_CONTRACTS.md): replacement player/camera pings now reuse the original glass/volume object filter, with atomic refresh, checked inspection and authored Gideon intro acceptance. This is not retail PVS; M2 remains incomplete.
+
+
 M2 remains incomplete. Read [player](PLAYER_CONTRACTS.md), [movement](MOVEMENT_CONTRACTS.md),
 [weapon](WEAPON_CONTRACTS.md) and [trigger](TRIGGER_CONTRACTS.md) contracts together
 with these [source selections](M2_CAMERA_SOURCES.json) and

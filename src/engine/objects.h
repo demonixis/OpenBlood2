@@ -90,6 +90,24 @@ namespace OpenBlood2
         DRotation rotation;
         bool resolved = false;
     };
+    enum class ActivationVisibility
+    {
+        Unqueried,
+        Visible,
+        Blocked,
+        Invalid,
+        Unavailable
+    };
+    struct ActivationProbe
+    {
+        std::uint64_t checks = 0;
+        double time = 0, fraction = 1;
+        ObjectId observer, hit_object;
+        DVector from{}, to{};
+        std::uint32_t polygon = UINT32_MAX;
+        ActivationVisibility visibility = ActivationVisibility::Unqueried;
+        bool refreshed = false; // Visibility alone is not a committed batch refresh.
+    };
     struct ObjectRecord
     {
         ObjectId id;
@@ -136,6 +154,7 @@ namespace OpenBlood2
         bool auto_deactivate = false;
         double deactivation_period = 0, deactivate_at = 0;
         std::uint64_t activation_pings = 0;
+        ActivationProbe activation_probe;
         double due = 0;
         bool scheduled = false;
         std::uint64_t updates = 0;

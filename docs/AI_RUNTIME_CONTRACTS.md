@@ -1,5 +1,8 @@
 # Original Cultist/Civilian initialization and AI_Update
 
+> Extended by [activation visibility contracts](ACTIVATION_VISIBILITY_CONTRACTS.md): replacement player/camera pings now reuse the original glass/volume object filter, with atomic refresh, checked inspection and authored Gideon intro acceptance. This is not retail PVS; M2 remains incomplete.
+
+
 > Extended by [Gideon lifecycle contracts](GIDEON_RUNTIME_CONTRACTS.md): production initialization, AI_Update, health delivery and fifth-table isolation are now integrated. Earlier blanket boss-registration omissions are historical. M2 remains incomplete.
 
 > Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now

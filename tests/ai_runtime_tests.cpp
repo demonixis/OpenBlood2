@@ -2,6 +2,8 @@
 #include "game/original/CameraObj.h"
 #include "game/original/CivilianAI.h"
 #include "game/original/CultistAI.h"
+#include "game/original/DestructableBrush.h"
+#include "game/original/SurfaceTypes.h"
 #include "game/server_adapter.h"
 #include "model_fixture.h"
 #include <cmath>
@@ -155,6 +157,109 @@ namespace
         g.server.collision_ready = false;
         CHECK(!g.server.PingObjects(observer) && g.objects.get(h)->activation_pings == pings);
         CHECK(g.objects.remove(observer) && !g.server.PingObjects(observer) && g.objects.finish_frame());
+        return true;
+    }
+    HOBJECT activation_brush(GameSession& g, const char* type, Properties props = {})
+    {
+        const auto name = "activation-brush" + std::to_string(g.world.models.size());
+        g.world.models.push_back(test_brush::box(name, {-20, 0, 22}, {20, 40, 28}));
+        props["Name"] = name;
+        props.try_emplace("Flags", std::int32_t(FLAG_SOLID));
+        if (std::string_view(type) == "CDestructableBrush")
+            props.try_emplace("HitPoints", 10.f);
+        return g.objects.create(g.objects.find_class(type), {}, Creation::World, props);
+    }
+    bool visibility_filter(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto observer = object(g, {0, 10, 50}, "observer");
+        auto target = object(g, {0, 10, 0}, "activation target");
+        CHECK(observer && target && g.server.SetDeactivationTime(target, 3));
+        auto* r = g.objects.get(target);
+        auto h = activation_brush(g, "CDestructableBrush",
+                                  {{"SurfaceType", std::int32_t(SURFTYPE_GLASS)}, {"CanDamage", false}});
+        auto* glass = h ? dynamic_cast<CDestructableBrush*>(g.objects.get(h)->game.get()) : nullptr;
+        CHECK(glass);
+        auto check = [&](bool visible)
+        {
+            g.server.SetObjectState(target, OBJSTATE_AUTODEACTIVATE_NOW);
+            const auto before = r->activation_pings;
+            if (!g.server.PingObjects(observer))
+                return false;
+            return r->activation_probe.observer == g.objects.get(observer)->id &&
+                   r->activation_probe.visibility ==
+                       (visible ? ActivationVisibility::Visible : ActivationVisibility::Blocked) &&
+                   r->activation_probe.refreshed == visible && r->activation_pings == before + unsigned(visible) &&
+                   r->activity == (visible ? OBJSTATE_ACTIVE : OBJSTATE_AUTODEACTIVATE_NOW);
+        };
+        CHECK(check(true)); // Source CanDamage does not define glass visibility.
+        SegmentHit hit;
+        CHECK(g.server.IntersectSegment({0, 10, 50}, {0, 10, 0}, observer, hit) == SegmentResult::Hit &&
+              hit.object == h);
+        glass->destructable = false;
+        CHECK(check(false) && r->activation_probe.hit_object == g.objects.get(h)->id);
+        glass->destructable = true;
+        glass->surface = SURFTYPE_WOOD;
+        glass->fire_through = true;
+        CHECK(check(false)); // FireThrough is a separate weapon rule.
+        glass->surface = SURFTYPE_GLASS;
+        CHECK(check(true));
+        const auto checks = r->activation_probe.checks;
+        g.server.SetObjectState(target, OBJSTATE_INACTIVE);
+        CHECK(g.server.PingObjects(observer) && r->activity == OBJSTATE_INACTIVE &&
+              r->activation_probe.checks == checks);
+        CHECK(g.objects.remove(h) && g.objects.finish_frame());
+        for (const auto* type : {"Water", "Ladder"})
+        {
+            h = activation_brush(g, type);
+            CHECK(h);
+            g.server.SetObjectFlags(h, g.server.GetObjectFlags(h) | FLAG_SOLID);
+            CHECK(check(true)); // Excludes every VolumeBrush subclass, even a solid diagnostic volume.
+            CHECK(g.objects.remove(h) && g.objects.finish_frame());
+        }
+        h = activation_brush(g, "Door", {{"FireThrough", true}});
+        CHECK(h && check(false) && r->activation_probe.hit_object == g.objects.get(h)->id);
+        CHECK(g.objects.remove(h) && g.objects.finish_frame());
+        auto wall = test_brush::box("world", {-20, 0, 22}, {20, 40, 28});
+        for (auto& surface : wall.surfaces)
+        {
+            surface.flags = 1;
+            surface.texture_flags = SURFTYPE_GLASS;
+        }
+        std::string error;
+        CHECK(g.collision.build(wall, error) && check(false));
+        CHECK(!r->activation_probe.hit_object && r->activation_probe.polygon != UINT32_MAX);
+        return true; // Object filtering never invents transparent baked world geometry.
+    }
+    bool visibility_atomic(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto observer = object(g, {0, 10, 50});
+        auto target = object(g, {0, 10, 0});
+        auto invalid = object(g, {0, 10, 50}); // Invalid zero-length ray after a valid candidate.
+        CHECK(observer && target && invalid);
+        g.server.SetObjectFlags(invalid, 0); // Do not obstruct the first candidate's ray.
+        CHECK(g.server.SetDeactivationTime(target, 3) && g.server.SetDeactivationTime(invalid, 3));
+        g.server.SetObjectState(target, OBJSTATE_AUTODEACTIVATE_NOW);
+        g.server.SetObjectState(invalid, OBJSTATE_AUTODEACTIVATE_NOW);
+        auto* r = g.objects.get(target);
+        CHECK(!g.server.PingObjects(observer));
+        CHECK(r->activation_probe.visibility == ActivationVisibility::Visible && !r->activation_probe.refreshed &&
+              r->activation_pings == 0 && r->activity == OBJSTATE_AUTODEACTIVATE_NOW);
+        CHECK(g.objects.get(invalid)->activation_probe.visibility == ActivationVisibility::Invalid &&
+              g.objects.get(invalid)->activation_pings == 0);
+        CHECK(g.objects.remove(invalid) && g.server.PingObjects(observer));
+        CHECK(r->activation_pings == 1 && r->activation_probe.refreshed && r->activity == OBJSTATE_ACTIVE);
+        const auto checks = r->activation_probe.checks;
+        g.server.collision_ready = false;
+        CHECK(!g.server.PingObjects(observer) && r->activation_probe.checks == checks);
+        const auto old_observer = r->activation_probe.observer;
+        CHECK(g.objects.remove(observer) && g.objects.finish_frame() && !g.objects.get(old_observer));
+        CHECK(!g.server.PingObjects(observer) && r->activation_probe.observer == old_observer);
+        const auto target_id = r->id;
+        CHECK(g.unload_world() && !g.objects.get(target_id));
         return true;
     }
     bool lifetime(const char*)
@@ -555,6 +660,8 @@ int main(int argc, char** argv)
                                                                         {"missing", missing},
                                                                         {"activation", activation},
                                                                         {"visibility", visibility},
+                                                                        {"visibility_filter", visibility_filter},
+                                                                        {"visibility_atomic", visibility_atomic},
                                                                         {"lifetime", lifetime},
                                                                         {"targets", targets},
                                                                         {"tracking", tracking},

@@ -1,5 +1,8 @@
 # Original Gideon initialization and boss-health delivery
 
+> Extended by [activation visibility contracts](ACTIVATION_VISIBILITY_CONTRACTS.md): replacement player/camera pings now reuse the original glass/volume object filter, with atomic refresh, checked inspection and authored Gideon intro acceptance. This is not retail PVS; M2 remains incomplete.
+
+
 Gideon is now a registered original NPC with the existing AI_Update scheduler,
 combat actions and four supported weapons. This extends the
 [attack contracts](GIDEON_ATTACK_CONTRACTS.md), [NPC runtime](AI_RUNTIME_CONTRACTS.md)

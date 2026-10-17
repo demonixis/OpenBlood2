@@ -5,6 +5,7 @@ namespace OpenBlood2
     bool prepare_corpse_smoke(GameSession&, ObjectId&);
     bool check_corpse_smoke(GameSession&, ObjectId, bool log = false);
     bool check_ai_runtime_smoke(GameSession&, ObjectId&);
+    bool check_gideon_intro_smoke(GameSession&, const char* phase);
     bool prepare_ai_escape_smoke(GameSession&, ObjectId&);
     bool check_ai_escape_smoke(GameSession&, ObjectId);
     bool prepare_ai_follow_smoke(GameSession&, ObjectId&);
