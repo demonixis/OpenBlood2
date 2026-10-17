@@ -354,6 +354,11 @@ namespace OpenBlood2
         // A stable heap record survives vector growth during nested callbacks.
         ObjectRecord* object = record.get();
         slots_[index].object = std::move(record);
+        // Publish before constructors/precreate: nested callbacks must see the
+        // same occupied slots as a direct registry scan, in ascending slot order.
+        records_.insert(std::lower_bound(records_.begin(), records_.end(), index,
+                                         [](ObjectId id, std::uint32_t slot) { return id.slot < slot; }),
+                        object->id);
         ++callback_depth_;
         object->game = type->construct();
         --callback_depth_;
@@ -579,12 +584,9 @@ namespace OpenBlood2
     }
     std::vector<ObjectId> Objects::snapshot() const
     {
-        std::vector<ObjectId> ids;
-        ids.reserve(slots_.size()); // One bounded allocation for hot-path snapshots, preserving slot order.
-        for (const auto& slot : slots_)
-            if (slot.object)
-                ids.push_back(slot.object->id);
-        return ids;
+        // Each caller still owns a fresh snapshot across callbacks. Copy compact
+        // identities without walking heap records or vacant high-water slots.
+        return records_;
     }
     std::vector<ObjectId> Objects::container_snapshot() const
     {
@@ -723,6 +725,7 @@ namespace OpenBlood2
             // Keep this binding visible until it returns; do not retain an iterator.
             if (record->container_)
                 std::erase(containers_, id);
+            std::erase(records_, id); // The destructor has returned; nested mutations are finished.
             identities_.erase(h);
             slots_[id.slot].object.reset();
             ++slots_[id.slot].generation;

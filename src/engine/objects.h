@@ -206,6 +206,10 @@ namespace OpenBlood2
         const ObjectRecord* get(ObjectId id) const;
         HOBJECT handle_of(const BaseClass* instance) const;
         std::vector<ObjectId> snapshot() const;
+        std::size_t record_count() const
+        {
+            return records_.size();
+        }
         std::vector<ObjectId> container_snapshot() const;
         std::size_t bound_container_count() const
         {
@@ -253,6 +257,7 @@ namespace OpenBlood2
         HATTACHMENT next_attachment_ = 1;
         std::map<std::string, HCLASS, CaseLess> classes_;
         std::vector<Slot> slots_;
+        std::vector<ObjectId> records_;    // Occupied slots, including construction and deferred destruction.
         std::vector<ObjectId> containers_; // Bound shapes, in slot order, including deferred destruction.
         std::vector<std::unique_ptr<DObject>> handles_;
         std::unordered_map<HOBJECT, ObjectId> identities_;

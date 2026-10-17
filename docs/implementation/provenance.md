@@ -1131,3 +1131,11 @@ not an upstream commit or an original-game adaptation. See the
 ## Original KeyFramer audio
 
 [m2_keyframe_audio_sources.json](sources/m2_keyframe_audio_sources.json) records original ProcessKey sound-before-message ordering, one retained handle across all controlled targets, and destructor cleanup. Existing attached loop/retained-one-shot services replace PlaySoundInfo while preserving authored radii and loop intent. See [contracts](../contracts/keyframe_audio_contracts.md).
+
+## Occupied-object snapshot index
+
+This is new engine-owned registry bookkeeping, with no original-source import.
+The compact slot-ordered identity index replaces repeated occupied-slot scans
+while preserving construction, callback and deferred-reclamation membership.
+Fresh snapshots still own their storage. See [contracts](../contracts/object_snapshot_contracts.md)
+and [measurements](../../../Documentation/Implementation/m2_object_snapshots.md).

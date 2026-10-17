@@ -13,6 +13,14 @@ foreach(case IN ITEMS builtin_model original_objects nested_creation reasons_pro
     set_tests_properties(objects.${case} PROPERTIES LABELS "headless;objects" TIMEOUT 10)
 endforeach()
 
+add_executable(object_snapshot_tests object_snapshot_tests.cpp)
+target_link_libraries(object_snapshot_tests PRIVATE blood2_game)
+blood2_project_options(object_snapshot_tests)
+foreach(case IN ITEMS membership callbacks churn)
+    add_test(NAME object_snapshots.${case} COMMAND object_snapshot_tests "${case}")
+    set_tests_properties(object_snapshots.${case} PROPERTIES LABELS "headless;objects" TIMEOUT 30)
+endforeach()
+
 add_executable(config_tests config_tests.cpp)
 target_link_libraries(config_tests PRIVATE engine)
 blood2_project_options(config_tests)

@@ -632,8 +632,10 @@ namespace OpenBlood2
                 if (ImGui::BeginTabItem("Objects"))
                 {
                     const auto ids = game.objects.snapshot();
-                    ImGui::Text("%zu live records  |  Time %.3f s  |  Strings %zu  |  Messages %zu", ids.size(),
-                                game.objects.time(), game.server.string_count(), game.server.message_count());
+                    ImGui::Text("%zu indexed records  |  Time %.3f s  |  Strings %zu  |  Messages %zu",
+                                game.objects.record_count(), game.objects.time(), game.server.string_count(),
+                                game.server.message_count());
+                    ImGui::TextUnformatted("Snapshot owns slot-ordered identities; records include pending removal.");
                     const auto& messages = game.server.message_stats;
                     ImGui::Text(
                         "Messages, adapter lifetime: %llu created / %llu released / %llu refused; peak %zu / %zu live",

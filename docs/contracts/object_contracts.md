@@ -1,5 +1,7 @@
 # M1 Object Boundary
 
+The [occupied-object index](object_snapshot_contracts.md) now supplies fresh owned, slot-ordered snapshots without scanning heap records; constructor, pending-removal and destructor membership remains unchanged.
+
 The [bound-container index](container_index_contracts.md) now avoids full object-slot scans while preserving fresh owned snapshots, slot order and deferred lifetime.
 
 The [CityHub entry continuation](cityhub_entry_contracts.md) supersedes earlier

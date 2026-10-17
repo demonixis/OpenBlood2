@@ -15,6 +15,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Transient object-message lifetime](message_lifetime_contracts.md)
 - [M2 Model and Collision Services](model_and_collision_contracts.md)
 - [M1 Object Boundary](object_contracts.md)
+- [Owned object snapshots and callback membership](object_snapshot_contracts.md)
 - [Bounded service coverage](service_coverage_contracts.md)
 - [Resource, World and Session Contracts](world_contracts.md)
 
