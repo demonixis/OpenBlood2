@@ -7,9 +7,10 @@ namespace OpenBlood2
 {
     void Inspector::draw_pickups(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextWrapped("Original single-player Beretta, ammunition, health and armor. Other inventory items, timed "
-                           "bonuses, pickup audio "
-                           "and pickup FX remain pending. Medkit: H uses the collected charges (release Shift first).");
+        ImGui::TextWrapped(
+            "Original single-player pickups and spatial collection sounds. Recent results include keys "
+            "and remain visible after collection. Medkit: H uses collected charges (release Shift first). "
+            "Timed bonuses and pickup FX remain incomplete.");
         if (!ImGui::BeginTable("Pickup inspection", 2, ImGuiTableFlags_Resizable))
             return;
         ImGui::TableSetupColumn("Objects", ImGuiTableColumnFlags_WidthFixed, 250);
@@ -100,7 +101,7 @@ namespace OpenBlood2
             ImGui::Text("Attempts %llu / consumed %s", static_cast<unsigned long long>(p->attempts),
                         p->picked_up ? "yes" : "no");
             ImGui::TextWrapped("Trigger: %s -> %s", p->pickup_target.c_str(), p->pickup_command.c_str());
-            ImGui::TextWrapped("Pickup sound request: %s (not played)", p->pickup_sound.c_str());
+            ImGui::TextWrapped("Sound on accepted collection: %s", p->pickup_sound.c_str());
             if (!p->error.empty())
                 ImGui::TextWrapped("Pickup diagnostic: %s", p->error.c_str());
             if (!r->model_error.empty())
@@ -110,8 +111,26 @@ namespace OpenBlood2
             ImGui::TextUnformatted("No live pickup selected.");
         ImGui::SeparatorText("Recent pickups / latest 32");
         for (const auto& v : game.server.pickup_reports)
-            ImGui::TextWrapped("%s / %s: %.0f (type %u)", v.name.c_str(), v.class_name.c_str(), v.value.amount,
-                               v.value.type);
+        {
+            if (v.value)
+                ImGui::TextWrapped("%s / %s: %.0f (type %u)", v.name.c_str(), v.class_name.c_str(), v.value->amount,
+                                   v.value->type);
+            else
+                ImGui::TextWrapped("%s / %s: key %s", v.name.c_str(), v.class_name.c_str(), v.key.c_str());
+            ImGui::TextWrapped("Sound: %s | voice %llu | %s", v.sound.c_str(), (unsigned long long)v.voice,
+                               v.sound.empty()          ? "not requested"
+                               : !v.sound_error.empty() ? "failed"
+                                                        : "started");
+            ImGui::Text("Fixed position %.1f %.1f %.1f | radii 30 / 300 | priority 2 / reverb requested (dry)",
+                        v.position.x, v.position.y, v.position.z);
+            if (const auto* voice = game.server.audio.get(v.voice))
+                ImGui::Text("Decoded frames %llu / %llu | gains %.3f %.3f", (unsigned long long)voice->cursor,
+                            (unsigned long long)voice->clip->frames(), voice->left, voice->right);
+            else if (v.voice)
+                ImGui::TextUnformatted("Voice retired; start record retained.");
+            if (!v.sound_error.empty())
+                ImGui::TextWrapped("Audio failure: %s", v.sound_error.c_str());
+        }
         ImGui::SeparatorText("Destruction spawns / latest 32");
         for (const auto& v : game.server.spawn_reports)
         {

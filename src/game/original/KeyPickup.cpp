@@ -1,4 +1,5 @@
 #include "KeyPickup.h"
+#include "PickupObject.h"
 #include "trigger_helpers.h"
 #include <algorithm>
 using namespace OpenBlood2;
@@ -86,7 +87,10 @@ DDWORD KeyPickup::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD r
         picked_up = true;
         g_pServerDE->SetObjectFlags(m_hObject,
                                     g_pServerDE->GetObjectFlags(m_hObject) & ~FLAG_VISIBLE & ~FLAG_TOUCH_NOTIFY);
-        ++sound_requests; // Original powerup4.wav, not connected audio.
+        ++sound_requests;
+        auto report = PlayPickupSound(m_hObject, "sounds\\powerups\\inventory1.wav");
+        report.key = item.name;
+        g_pServerDE->RecordPickup(m_hObject, report);
         if (!pickup_target.empty() && !pickup_command.empty())
         {
             auto target = g_pServerDE->CreateString(pickup_target.c_str());

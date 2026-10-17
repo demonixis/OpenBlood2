@@ -42,7 +42,7 @@ namespace OpenBlood2
         if (auto* r = objects_.get(report.child); r && !r->model_error.empty())
             spawn_reports.back().outcome += ": " + r->model_error;
     }
-    void ServerAdapter::RecordPickup(HOBJECT h, const PickupMessage& value, std::string_view sound)
+    void ServerAdapter::RecordPickup(HOBJECT h, const PickupReport& report)
     {
         trace_service("RecordPickup");
         auto* r = objects_.get(h);
@@ -50,7 +50,9 @@ namespace OpenBlood2
             return;
         if (pickup_reports.size() == 32)
             pickup_reports.erase(pickup_reports.begin());
-        pickup_reports.push_back({r->state.m_Name, r->type->name, std::string(sound), value});
+        pickup_reports.push_back(report);
+        pickup_reports.back().name = r->state.m_Name;
+        pickup_reports.back().class_name = r->type->name;
     }
     DRESULT ServerAdapter::WritePickupMessage(HMESSAGEWRITE h, const PickupMessage& value)
     {

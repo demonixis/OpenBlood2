@@ -1,5 +1,9 @@
 # Original triggers, door SelfTrigger and keys
 
+Continuation: [original collection audio](PICKUP_AUDIO_CONTRACTS.md) supersedes the
+collection-sound omission for supported pickups and keys. Trigger activation
+sounds, character quips and other missing services remain separate.
+
 > Extended by [conversation contracts](CONVERSATION_CONTRACTS.md): original dialogue sequencing and typed client communication are connected; authored missing mappings remain failures.
 
 > Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and

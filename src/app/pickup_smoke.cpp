@@ -68,8 +68,23 @@ namespace OpenBlood2
         g.client_shell.medkit_down = false;
         if (!g.client_shell.UpdateUse(g.server_shell))
             return false;
-        return player->m_damage.m_fHitPoints == 100 && player->m_InventoryMgr.medkit->count == 25 &&
-               g.client_shell.item_sounds == 1 && g.server.audio.get(g.client_shell.item_voice) &&
-               g.server.pickup_reports.size() == 3;
+        for (const auto& report : g.server.pickup_reports)
+        {
+            const auto* voice = g.server.audio.get(report.voice);
+            if (!report.voice || !report.sound_error.empty() || !voice || !voice->world_owned || !voice->auto_remove ||
+                voice->request.speaker || voice->request.inner_radius != 30 || voice->request.outer_radius != 300 ||
+                g.server.IsObjectAlive(voice->owner))
+                return false;
+        }
+        // Run the normal sample clock after source removal, while the inspector is hidden.
+        if (!g.server.advance_audio(.02, pos, {}))
+            return false;
+        for (const auto& report : g.server.pickup_reports)
+            if (const auto* voice = g.server.audio.get(report.voice); !voice || !voice->cursor)
+                return false;
+        return g.server.audio.has_output() && g.server.audio.submitted_frames > 0 &&
+               g.server.audio.output_error.empty() && player->m_damage.m_fHitPoints == 100 &&
+               player->m_InventoryMgr.medkit->count == 25 && g.client_shell.item_sounds == 1 &&
+               g.server.audio.get(g.client_shell.item_voice) && g.server.pickup_reports.size() == 3;
     }
 } // namespace OpenBlood2

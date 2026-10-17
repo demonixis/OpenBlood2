@@ -75,7 +75,7 @@ class ServerDE : public CSBase
     virtual PathMgr* GetPathManager() = 0;
     virtual bool ValidateSpawnObject(std::string_view) = 0;
     virtual void RecordSpawn(const OpenBlood2::SpawnReport&) = 0;
-    virtual void RecordPickup(HOBJECT, const OpenBlood2::PickupMessage&, std::string_view sound) = 0;
+    virtual void RecordPickup(HOBJECT, const OpenBlood2::PickupReport&) = 0;
     virtual DRESULT WritePickupMessage(HMESSAGEWRITE, const OpenBlood2::PickupMessage&) = 0;
     virtual bool ReadPickupMessage(HMESSAGEREAD, OpenBlood2::PickupMessage&) = 0;
     virtual bool ConfigureWorldBody(HOBJECT, const OpenBlood2::WorldBodyProperties&) = 0;

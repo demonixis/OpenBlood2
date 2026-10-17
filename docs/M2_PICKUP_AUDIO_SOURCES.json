@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "cc329c6a5a9c8eded9894b43f3c6f59ab0e2b558",
+  "status": "M2 incomplete; original successful-collection sound requests using existing detached audio",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/PickupObject.cpp",
+      "source_sha256": "25e0388f983ec0c9e01b6deb8432f411271159a224d582e12300c10863b979da",
+      "purpose": "PickedUp successful collection, sound-before-trigger behavior and base default."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "source_sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "purpose": "PlaySoundFromPos flags, fixed position, inner/outer radii and volume."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectUtilities.h",
+      "source_sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
+      "purpose": "One-shot, non-retained/nonstreaming helper defaults."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AmmoPickups.h",
+      "source_sha256": "c34daeb1228cad71438218097c36706c91529daed487bf2629a4253df8bd41d6",
+      "purpose": "Original ammunition collection WAV."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PowerupPickups.cpp",
+      "source_sha256": "0e0d2190ea3785e7287309c0ccfe109c688a9c14b9b12779c4c5c50642f0d80c",
+      "purpose": "Original health and armor collection WAVs."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/WeaponPickups.h",
+      "source_sha256": "b32860805172dd270043dc8a4e8c6c13e05806825436403461ba94d44a953416",
+      "purpose": "Original weapon collection WAV."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ItemPickups.h",
+      "source_sha256": "ce1dacd1cf4829c39cfdfbeb27ae4873e1f2b6a4895b532b820d587ab7eaa17e",
+      "purpose": "Inventory/bomb-item WAVs and KeyPickup inventory1.wav override."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
+      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
+      "purpose": "Original key touch protocol."
+    },
+    {
+      "source": "sources/blood2/Shared/SoundTypes.h",
+      "source_sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "purpose": "MISC_HIGH priority equals two."
+    }
+  ]
+}

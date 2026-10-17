@@ -2615,8 +2615,8 @@ namespace OpenBlood2
                 ImGui::TextWrapped("Pickup target: %s / %s | icons %s / %s", k->pickup_target.c_str(),
                                    k->pickup_command.c_str(), k->item.icon.c_str(), k->item.highlighted_icon.c_str());
             }
-        ImGui::TextWrapped("Audio, localized key names, generic pickups, save/restore and the complete playable "
-                           "session remain pending.");
+        ImGui::TextWrapped("Collection sounds and removed key records are in Pickups. Trigger activation audio, "
+                           "localized key names and complete gameplay remain pending.");
     }
 } // namespace OpenBlood2
 

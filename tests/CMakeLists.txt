@@ -295,6 +295,18 @@ foreach(case IN ITEMS properties gravity friction impulses pushing player riders
     set_tests_properties(pushables.${case} PROPERTIES LABELS "headless;pushables" TIMEOUT 30)
 endforeach()
 
+add_executable(pickup_audio_tests pickup_audio_tests.cpp)
+target_link_libraries(pickup_audio_tests PRIVATE blood2_game)
+blood2_project_options(pickup_audio_tests)
+foreach(case IN ITEMS rules failures callbacks)
+    add_test(NAME pickup_audio.${case} COMMAND pickup_audio_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/pickup-audio-fixtures/${case}")
+    set_tests_properties(pickup_audio.${case} PROPERTIES LABELS "headless;pickups;audio" TIMEOUT 30)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME pickup_audio.private COMMAND pickup_audio_tests private "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(pickup_audio.private PROPERTIES LABELS "headless;private;pickups;audio" TIMEOUT 90)
+endif()
+
 add_executable(pickup_tests pickup_tests.cpp)
 target_link_libraries(pickup_tests PRIVATE blood2_game)
 blood2_project_options(pickup_tests)

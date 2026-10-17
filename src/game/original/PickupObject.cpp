@@ -2,6 +2,25 @@
 #include "trigger_helpers.h"
 #include <algorithm>
 using namespace OpenBlood2;
+PickupReport OpenBlood2::PlayPickupSound(HOBJECT source, std::string_view sound)
+{
+    PickupReport report;
+    report.sound = sound;
+    if (sound.empty())
+        return report;
+    if (g_pServerDE->GetObjectPos(source, &report.position) != DE_OK)
+    {
+        report.sound_error = "Pickup sound position unavailable";
+        return report;
+    }
+    SoundRequest request;
+    request.resource = sound;
+    request.inner_radius = 30;
+    request.outer_radius = 300;
+    request.priority = 2; // SOUNDPRIORITY_MISC_HIGH; original helper requests reverb.
+    report.voice = g_pServerDE->PlayDetachedSound(source, request, report.position, report.sound_error);
+    return report;
+}
 DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
     if (message == MID_PRECREATE)
@@ -77,7 +96,9 @@ DDWORD PickupObject::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREA
         g_pServerDE->SetObjectFlags(m_hObject,
                                     g_pServerDE->GetObjectFlags(m_hObject) & ~FLAG_VISIBLE & ~FLAG_TOUCH_NOTIFY);
         ++sound_requests;
-        g_pServerDE->RecordPickup(m_hObject, value, pickup_sound);
+        auto report = PlayPickupSound(m_hObject, pickup_sound);
+        report.value = value;
+        g_pServerDE->RecordPickup(m_hObject, report);
         if (!pickup_target.empty() && !pickup_command.empty())
         {
             auto target = g_pServerDE->CreateString(pickup_target.c_str());

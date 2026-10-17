@@ -91,12 +91,13 @@ namespace
         }
         if ((options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
              options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke ||
-             (!options.gpu_smoke && !options.world_smoke)) &&
+             options.pickups_smoke || (!options.gpu_smoke && !options.world_smoke)) &&
             !game->server.audio.open_output(error))
         {
             spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
             if (options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
-                options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke)
+                options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke ||
+                options.pickups_smoke)
                 return 4;
         }
         HOBJECT key = nullptr;
@@ -1743,7 +1744,8 @@ namespace
                              "entries include one explicit missing-world-model omission; destination entry, "
                              "cleanup, presentation and reload checked");
             if (options.pickups_smoke)
-                spdlog::info("PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked");
+                spdlog::info("PICKUPS smoke: ammo/weapon/medkit accepted with hidden UI; three original collection "
+                             "WAVs decoded and submitted to SDL after source removal; unload/reload checked");
             if (options.weapons_smoke)
                 spdlog::info("Weapon smoke passed: animation-key shots, bullets consumed, knife strikes, firing while "
                              "hidden, decoded fire voices submitted to SDL, unload/re-entry");

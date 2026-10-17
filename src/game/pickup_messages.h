@@ -1,5 +1,7 @@
 #pragma once
+#include "engine/audio.h"
 #include "game/legacy/basedefs_de.h"
+#include <optional>
 #include <string>
 #include <string_view>
 namespace OpenBlood2
@@ -28,8 +30,10 @@ namespace OpenBlood2
     };
     struct PickupReport
     {
-        std::string name, class_name, sound;
-        PickupMessage value;
+        std::string name, class_name, sound, sound_error, key;
+        std::optional<PickupMessage> value;
+        DVector position{};
+        SoundId voice = 0;
     };
     bool split_spawn(std::string_view, std::string& class_name, std::string& properties);
 } // namespace OpenBlood2

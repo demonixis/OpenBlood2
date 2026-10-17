@@ -1,5 +1,9 @@
 # Original pickups and destruction spawns
 
+Continuation: [original collection audio](PICKUP_AUDIO_CONTRACTS.md) supersedes the
+collection-sound omission for supported pickups and keys. Trigger activation
+sounds, character quips and other missing services remain separate.
+
 > Extended by [NPC weapon-drop contracts](WEAPON_DROP_CONTRACTS.md): the selected
 > Cabal drop, independent falling hand and Beretta collection now work. Corpse/gib
 > and remaining death services still fail explicitly; M2 is incomplete.
