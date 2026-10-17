@@ -600,6 +600,10 @@ namespace OpenBlood2
                         if (state.m_ObjectType == OT_MODEL)
                             ImGui::Text("Model additive RGB (lighting pending) %.3f %.3f %.3f | alpha %.3f",
                                         object->color.x, object->color.y, object->color.z, object->alpha);
+                        if (const auto* shape =
+                                object->world_model ? object->world_model.get() : object->container.get())
+                            ImGui::Text("Geometry: %zu closed components | %zu shared edges | %zu triangles",
+                                        shape->closed_components, shape->shared_edges, shape->triangles.size());
                         if (const auto* sound = dynamic_cast<const SoundFX*>(object->game.get()))
                         {
                             ImGui::SeparatorText("Original SoundFX");
@@ -2123,6 +2127,7 @@ namespace OpenBlood2
                 ImGui::TextWrapped("FreeFall: zero liquid gravity, no air depletion; source damage remains active.");
             ImGui::Text("%zu triangles | %s closed shell", shape.triangles.size(),
                         shape.convex ? "convex" : "nonconvex");
+            ImGui::Text("%zu closed components | %zu shared edges", shape.closed_components, shape.shared_edges);
             ImGui::Text("Fog %s | near %.0f / far %.0f", brush->fog ? "requested" : "off", brush->fog_near,
                         brush->fog_far);
             ImGui::Text("Surface %s | height %.1f | alpha %.2f", brush->show_surface ? "requested" : "off",
@@ -2235,6 +2240,8 @@ namespace OpenBlood2
             }
             ImGui::Text("Collision: %s | %zu shell triangles", d->box_physics ? "authored box" : "polygon",
                         r->world_model->triangles.size());
+            ImGui::Text("%zu closed components | %zu shared edges", r->world_model->closed_components,
+                        r->world_model->shared_edges);
             if (const auto* rotating = dynamic_cast<const RotatingDoor*>(d))
             {
                 ImGui::Text("Euler radians %.3f %.3f %.3f | substeps %u", rotating->angles.x, rotating->angles.y,

@@ -1,5 +1,7 @@
 # Sliding doors and translating world models
 
+> [Compound-shell validation](COMPOUND_SHELL_CONTRACTS.md) now accepts independently closed components sharing edges; ambiguous/non-manifold components still fail. Geometry and authored BoxPhysics are unchanged.
+
 > The later [train path contracts](WORLDPATH_CONTRACTS.md) supersede blanket
 > world-path/without-GOTHRUWORLD omissions below for static BoxPhysics translation.
 > Angular paths and moving containers remain unavailable; M2 stays open.

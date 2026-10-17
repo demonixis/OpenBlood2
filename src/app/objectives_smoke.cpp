@@ -81,8 +81,8 @@ namespace OpenBlood2
         const auto trial_before = g.destination_trial.attempts;
         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
-            !g.destination_trial.player_entered || g.destination_trial.created != 419 ||
-            g.destination_trial.unknown != 31 || g.destination_trial.failed != 4 ||
+            !g.destination_trial.player_entered || g.destination_trial.created != 421 ||
+            g.destination_trial.unknown != 31 || g.destination_trial.failed != 2 ||
             g.destination_trial.selected_start != "01_egressa")
             return false;
         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&

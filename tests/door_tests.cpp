@@ -301,7 +301,7 @@ namespace
         CHECK(g.initialize());
         std::string error;
         CHECK(g.resources.mount_game(Config{root, "private"}, error));
-        unsigned created = 0, rejected = 0, skipped = 0, self_triggers = 0, polygon = 0;
+        unsigned created = 0, rejected = 0, skipped = 0, self_triggers = 0, polygon = 0, compound = 0;
         std::map<std::string, unsigned> failures;
         for (const auto& [path, resource] : g.resources.index())
         {
@@ -339,7 +339,11 @@ namespace
                     else if (diagnostic.ends_with(": Missing named world model"))
                         ++failures["missing"];
                     else if (diagnostic.find("Open or non-manifold container shell") != std::string::npos)
+                    {
                         ++failures["shell"];
+                        CHECK(path == "worlds/multi/bb_condemned.dat" &&
+                              property_text(props.at("Name")) == "Buildings");
+                    }
                     else
                         CHECK(false); // A new failure must be investigated, not silently counted.
                     std::cout << path << " " << property_text(props.at("Name")) << " rejected: "
@@ -353,6 +357,13 @@ namespace
                     ++created;
                     self_triggers += d->self_trigger;
                     polygon += !d->box_physics;
+                    if (r->world_model->shared_edges)
+                    {
+                        ++compound;
+                        CHECK(r->world_model->closed_components > 1);
+                        std::cout << path << " " << r->state.m_Name << ": " << r->world_model->closed_components
+                                  << " closed components / " << r->world_model->shared_edges << " shared edges\n";
+                    }
                     CHECK(g.objects.remove(h));
                 }
                 CHECK(g.objects.finish_frame());
@@ -360,9 +371,10 @@ namespace
         }
         std::cout << "Door catalog: created=" << created << ", rejected=" << rejected << ", unreadable=" << skipped
                   << ", SelfTrigger=" << self_triggers << ", polygon=" << polygon << "\n";
-        CHECK(created == 605 && rejected == 93 && skipped == 1 && self_triggers == 146 && polygon == 113);
+        CHECK(created == 619 && rejected == 79 && skipped == 1 && self_triggers == 149 && polygon == 114 &&
+              compound == 14);
         CHECK(failures["schema"] == 47 && failures["ambiguous"] == 19 && failures["missing"] == 12 &&
-              failures["shell"] == 15);
+              failures["shell"] == 1);
         return true;
     }
     bool private_data(const std::filesystem::path& root)

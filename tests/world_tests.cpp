@@ -1168,7 +1168,7 @@ namespace
                 {
                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
                     if (std::string_view(name) == "02_cityhub")
-                        CHECK(d.created == 419 && d.unknown == 31 && d.failed == 4);
+                        CHECK(d.created == 421 && d.unknown == 31 && d.failed == 2);
                     else
                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
                 }

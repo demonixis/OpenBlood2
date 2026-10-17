@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "f6df7536b451e8e2b50b26d0452a9bda766fccb5",
+  "status": "M2 incomplete; replacement engine validation and ground-query correction",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
+      "source_sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
+      "purpose": "Authored polygon/BoxPhysics choice and named world-model binding; unchanged."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Door.cpp",
+      "source_sha256": "d96ba29e12f1892008725e02ad02c9a9c314d86db85d7bb7cdc2a7823b3961e0",
+      "purpose": "Authored BoxPhysics flag and named world-model binding; unchanged."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "source_sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "purpose": "MoveObjectToGround downward query, dimensions and final movement; existing selected rules unchanged."
+    }
+  ],
+  "implementation": [
+    "src/engine/container.cpp",
+    "src/engine/container.h",
+    "src/game/server_clients.cpp",
+    "src/app/inspector.cpp"
+  ],
+  "adaptations": [
+    "No new original source import; existing selected game callbacks and properties unchanged",
+    "Conservative independently closed face components, preserving base-ring/welding/closure work bounds",
+    "Ground placement reuses checked current polygon/box geometry instead of pivot-centered boxes for all objects",
+    "Immutable shape inspection counters; no new dependency or mutable game global"
+  ],
+  "unsupported": [
+    "Self-intersection repair, coincident-face union and retail physics parity",
+    "Missing named models and unsupported weapon classes still fail",
+    "Required remaining services and safe NEW_LEVEL; M2 incomplete"
+  ]
+}

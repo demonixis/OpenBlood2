@@ -1,5 +1,7 @@
 # Original destructible models
 
+> [Compound-shell validation and ground queries](COMPOUND_SHELL_CONTRACTS.md) preserve polygon gaps and offset authored-box bounds during initial ground placement. Original model rules remain unchanged.
+
 `CDestructableModel` is a selective direct port of original
 `ObjectDLL/DestructableModel.cpp`, registered under B2BaseClass. It reuses
 CDestructable, CDebris, ABC/DTX resources and the existing model renderer.

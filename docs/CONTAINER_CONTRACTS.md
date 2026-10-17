@@ -1,5 +1,7 @@
 # Container, liquid and ladder boundary
 
+> [Compound-shell validation](COMPOUND_SHELL_CONTRACTS.md) now accepts independently closed components sharing edges; ambiguous/non-manifold components still fail. Geometry and authored BoxPhysics are unchanged.
+
 > Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
 > voice helpers, player sound keys and material/liquid footsteps now execute.
 > Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.

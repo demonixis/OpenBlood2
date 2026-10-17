@@ -1,3 +1,4 @@
+#include "engine/world_model.h"
 #include "game/server_adapter.h"
 #include <cmath>
 
@@ -221,8 +222,10 @@ namespace OpenBlood2
                 !(other->state.m_Flags & FLAG_SOLID))
                 continue;
             CollisionHit hit;
-            if (sweep_box(from, to, {}, other->state.m_Pos, other->dimensions, hit) == CollisionQuery::Hit &&
-                (!found || hit.fraction < nearest.fraction))
+            const auto query = sweep_object(*other, from, to, {}, hit);
+            if (query == CollisionQuery::Invalid)
+                return DE_ERROR;
+            if (query == CollisionQuery::Hit && (!found || hit.fraction < nearest.fraction))
             {
                 nearest = hit;
                 found = true;

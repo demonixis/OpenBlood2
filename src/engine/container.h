@@ -3,7 +3,8 @@
 
 namespace OpenBlood2
 {
-    // Closed, consistently oriented DAT polygon shell. AABBs only reject broad-phase misses.
+    // Closed, consistently oriented DAT polygon components, possibly touching at edges.
+    // AABBs only reject broad-phase misses.
     class ContainerShape
     {
       public:
@@ -14,6 +15,7 @@ namespace OpenBlood2
         CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit&) const;
         DVector min{}, max{}, origin{};
         bool convex = false;
+        std::size_t closed_components = 0, shared_edges = 0;
         std::vector<std::array<DVector, 3>> triangles;
 
       private:

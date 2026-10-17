@@ -98,11 +98,17 @@ namespace OpenBlood2
                     break;
                 }
         }
-        std::map<std::pair<unsigned, unsigned>, std::pair<unsigned, int>> edges;
+        struct EdgeUse
+        {
+            unsigned face;
+            int direction;
+        };
+        std::map<std::pair<unsigned, unsigned>, std::vector<EdgeUse>> edges;
         std::size_t work = 0;
         convex = true;
-        for (auto& polygon : mesh.polygons)
+        for (unsigned face = 0; face < mesh.polygons.size(); ++face)
         {
+            auto& polygon = mesh.polygons[face];
             // Keep both serialized arrays in World; use the base ring for volume topology.
             // In retail v56, extra vertices repeat the ring with possible edge subdivisions.
             if (polygon.base_points != UINT16_MAX)
@@ -179,23 +185,62 @@ namespace OpenBlood2
                 {
                     const auto u = split[k - 1].second, v = split[k].second;
                     auto& edge = edges[{std::min(u, v), std::max(u, v)}];
-                    ++edge.first;
-                    edge.second += u < v ? 1 : -1;
+                    edge.push_back({face, u < v ? 1 : -1});
                 }
             }
         }
-        for (const auto& [key, value] : edges)
+        // Multiple closed brushes can touch along the same DAT edge. First join
+        // faces only through unambiguous two-face edges, then require each resulting
+        // component to close independently. Balance alone would accept ambiguous
+        // non-manifold sheets or duplicated geometry.
+        std::vector<unsigned> parent(mesh.polygons.size()), size(mesh.polygons.size(), 1);
+        for (unsigned i = 0; i < parent.size(); ++i)
+            parent[i] = i;
+        auto root = [&](unsigned face)
         {
-            (void)key;
-            if (value.first != 2 || value.second != 0)
+            while (parent[face] != face)
             {
-                const auto a = mesh.points[key.first], b = mesh.points[key.second];
-                const auto detail = std::string("Open or non-manifold container shell: ") +
-                                    std::to_string(value.first) + " edges / balance " + std::to_string(value.second) +
-                                    " at " + property_text(a) + " -> " + property_text(b);
-                return fail(detail.c_str());
+                parent[face] = parent[parent[face]];
+                face = parent[face];
             }
+            return face;
+        };
+        for (const auto& [key, uses] : edges)
+            if (uses.size() == 2 && uses[0].direction + uses[1].direction == 0)
+            {
+                auto a = root(uses[0].face), b = root(uses[1].face);
+                if (a == b)
+                    continue;
+                if (size[a] < size[b])
+                    std::swap(a, b);
+                parent[b] = a;
+                size[a] += size[b];
+            }
+        for (auto& [key, uses] : edges)
+        {
+            std::sort(uses.begin(), uses.end(),
+                      [&](const auto& a, const auto& b) { return root(a.face) < root(b.face); });
+            for (std::size_t first = 0; first < uses.size();)
+            {
+                auto end = first;
+                int balance = 0;
+                while (end < uses.size() && root(uses[end].face) == root(uses[first].face))
+                    balance += uses[end++].direction;
+                if (end - first != 2 || balance != 0 || uses[first].face == uses[first + 1].face)
+                {
+                    const auto a = mesh.points[key.first], b = mesh.points[key.second];
+                    const auto detail = std::string("Open or non-manifold container shell: ") +
+                                        std::to_string(end - first) + " edges / balance " + std::to_string(balance) +
+                                        " in component " + std::to_string(root(uses[first].face)) + " at " +
+                                        property_text(a) + " -> " + property_text(b);
+                    return fail(detail.c_str());
+                }
+                first = end;
+            }
+            shared_edges += uses.size() > 2;
         }
+        for (unsigned i = 0; i < parent.size(); ++i)
+            closed_components += root(i) == i;
         for (auto& surface : mesh.surfaces)
             surface.flags |= 1;
         if (!boundary_.build(mesh, error))
