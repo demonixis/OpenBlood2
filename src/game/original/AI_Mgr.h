@@ -211,6 +211,13 @@ class AI_Mgr : public CBaseCharacter
     bool AI_STATE_RunToPos();
     bool AI_STATE_SearchVisualTarget();
     bool AI_STATE_SearchSmellTarget();
+    bool AI_STATE_FindAmmo();
+    void ReceiveAmmo(HOBJECT, HMESSAGEREAD);
+    std::uint64_t ammo_searches = 0, ammo_collections = 0, ammo_refusals = 0, ammo_target_losses = 0;
+    DBYTE searched_ammo = 0;
+    std::string searched_ammo_class;
+    HOBJECT searched_ammo_target = nullptr; // Last selected identity; may outlive the FindAmmo state.
+    HOBJECT last_ammo_source = nullptr;     // Checked historical identity, never ownership.
     bool SetSmellCursor(HOBJECT);
     HOBJECT smell_cursor = nullptr;
     DVector smell_position{};
@@ -522,6 +529,7 @@ class AI_Mgr : public CBaseCharacter
     bool EscapeHideStep();
     bool GuardStep();
     bool SmellStep();
+    bool AmmoStep();
     bool NavigationDecision(int stimulus = -1);
     bool NavigationFailure(std::string_view);
     bool script_busy = false;

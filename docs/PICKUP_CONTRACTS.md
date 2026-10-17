@@ -47,8 +47,9 @@ flags do not implement saves or visual effects. Missing ABCs remain
 inspectable with touch/gravity disabled and an explicit diagnostic.
 
 Touches send MID_ADDAMMO (1009) or MID_ADDPOWERUP (3504). The source accepts
-contacts from any object; only the connected CPlayerObj branch changes player
-stats. Alive players accept ammo below their attribute-derived cap, truncating
+contacts from any object. The connected CPlayerObj branch changes player stats;
+[original NPC ammo recovery](AI_AMMO_CONTRACTS.md) additionally accepts ammo
+through a checked active offer and matching acknowledgement. Alive players accept ammo below their attribute-derived cap, truncating
 partial pickups to that cap. Health/MegaHealth and Ward/NecroWard use their
 separate original normal/bonus caps. A full reserve keeps the pickup available;
 zero amounts retain the source acceptance behavior when below the cap. Dead

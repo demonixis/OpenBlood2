@@ -1,8 +1,10 @@
 #include "pickup_smoke.h"
+#include "game/original/AI_Mgr.h"
 #include "game/original/PickupObject.h"
 #include "game/original/WeaponPickups.h"
 #include "game/original/spawn_object.h"
 #include "movement_controls.h"
+#include <spdlog/spdlog.h>
 namespace OpenBlood2
 {
     bool prepare_pickup_smoke(GameSession& g, ObjectId& id)
@@ -68,6 +70,25 @@ namespace OpenBlood2
         g.client_shell.medkit_down = false;
         if (!g.client_shell.UpdateUse(g.server_shell))
             return false;
+        // Actual original NPC/pickup, deliberately isolated contact placement.
+        auto npc = g.objects.create(g.objects.find_class("CultistAI"), {}, Creation::String,
+                                    {{"Name", std::string("NPC ammunition smoke")},
+                                     {"Pos", DVector{1000, 10000, 0}},
+                                     {"AIState", std::string("IDLE")}});
+        auto* ai = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(npc));
+        auto ammo = SpawnObject("BulletAmmoPU Name npc_smoke_ammo", {1000, 10000, 0}, {}, {});
+        if (!ai || !ai->RuntimeReady() || !ammo)
+            return false;
+        ai->m_InventoryMgr.SetAmmoCount(1, 0);
+        pos = g.objects.get(ammo)->state.m_Pos;
+        if (g.server.MoveObject(npc, &pos) != DE_OK || ai->ammo_collections != 1 ||
+            ai->m_InventoryMgr.GetAmmoCount(1) != 100 || g.server.IsObjectAlive(ammo))
+            return false;
+        spdlog::info("NPC ammunition smoke: original collection={}, bullets={}", ai->ammo_collections,
+                     ai->m_InventoryMgr.GetAmmoCount(1));
+        // Source-independent sound must survive removal of both participants.
+        if (!g.objects.remove(npc))
+            return false;
         for (const auto& report : g.server.pickup_reports)
         {
             const auto* voice = g.server.audio.get(report.voice);
@@ -85,6 +106,6 @@ namespace OpenBlood2
         return g.server.audio.has_output() && g.server.audio.submitted_frames > 0 &&
                g.server.audio.output_error.empty() && player->m_damage.m_fHitPoints == 100 &&
                player->m_InventoryMgr.medkit->count == 25 && g.client_shell.item_sounds == 1 &&
-               g.server.audio.get(g.client_shell.item_voice) && g.server.pickup_reports.size() == 3;
+               g.server.audio.get(g.client_shell.item_voice) && g.server.pickup_reports.size() == 4;
     }
 } // namespace OpenBlood2

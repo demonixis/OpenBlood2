@@ -1,4 +1,5 @@
 #include "PickupObject.h"
+#include "AI_Mgr.h"
 #include "trigger_helpers.h"
 #include <algorithm>
 using namespace OpenBlood2;
@@ -90,7 +91,8 @@ DDWORD PickupObject::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREA
     PickupMessage reply;
     if (message == picked_up_message && sender && sender == touching_ && !picked_up &&
         g_pServerDE->ReadPickupMessage(read, reply) && reply == value &&
-        g_pServerDE->IsKindOf(g_pServerDE->GetObjectClass(sender), g_pServerDE->GetClass("CPlayerObj")))
+        (g_pServerDE->IsKindOf(g_pServerDE->GetObjectClass(sender), g_pServerDE->GetClass("CPlayerObj")) ||
+         (value.kind == PickupKind::Ammo && dynamic_cast<AI_Mgr*>(g_pServerDE->HandleToObject(sender)))))
     {
         picked_up = true;
         g_pServerDE->SetObjectFlags(m_hObject,

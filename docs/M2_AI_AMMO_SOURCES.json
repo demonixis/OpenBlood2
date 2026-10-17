@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "e54401b654171f76419d2a5dbd8c8783cd828a04",
+  "status": "M2 incomplete; original NPC ammunition search and collection",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "purpose": "MID_ADDAMMO:784-798; FindObjectInRadius:2918-3066; AI_STATE_FindAmmo:6081-6172; original dispatch and CanSee."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "source_sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "purpose": "NOAMMOCOLLECT=0x200 and original state IDs."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AmmoPickups.cpp",
+      "source_sha256": "3ea2f1ba0b90298563b5a97c451e4e1d60e0b10fdd666320944edb23afa50696",
+      "purpose": "AmmoPickup::ObjectTouch:76-86 sends MID_ADDAMMO to touched objects; original ammo classes."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PickupObject.cpp",
+      "source_sha256": "25e0388f983ec0c9e01b6deb8432f411271159a224d582e12300c10863b979da",
+      "purpose": "MID_PICKEDUP acknowledgement, independent sound and deferred single-player removal."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/CultistAI.cpp",
+      "source_sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
+      "purpose": "FindAmmo decision after completion returns to the previous state when no stimulus exists."
+    }
+  ],
+  "adaptations": [
+    "Typed checked pickup offer/acknowledgement, bounded messages and deferred lifetime.",
+    "Specific+AvoidTarget skips unused uninitialized-forward arithmetic: original object-dot is zero.",
+    "Blocked paths discard partial points; invalid/unavailable/budget failures remain explicit.",
+    "FindAmmo tolerates disappearance of its non-owning pickup tracker without dereferencing it; owned route remains.",
+    "No pickup collision/visibility changes, ammo class aliases or health collection."
+  ]
+}

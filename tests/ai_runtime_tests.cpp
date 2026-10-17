@@ -1,4 +1,5 @@
 #include "brush_fixture.h"
+#include "game/original/AmmoPickups.h"
 #include "game/original/CameraObj.h"
 #include "game/original/CivilianAI.h"
 #include "game/original/CultistAI.h"
@@ -28,7 +29,7 @@ namespace
     }
     bool setup(GameSession& g, const char* root = "")
     {
-        CHECK(g.initialize());
+        CHECK(g.objects.find_class("BaseClass") || g.initialize());
         auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
         for (auto& s : floor.surfaces)
             s.flags = 1;
@@ -108,6 +109,98 @@ namespace
         a->m_nState = AI_Mgr::StateInactive;
         g.server.SetNextUpdate(h, .001f);
         return a;
+    }
+    HOBJECT ammo_fixture(GameSession& g, DVector pos = {0, 10, 80}, const char* type = "BulletAmmoPU")
+    {
+        ObjectCreateStruct state;
+        state.m_Pos = pos;
+        auto h = g.objects.create(g.objects.find_class(type), state);
+        if (auto* r = g.objects.get(h))
+        {
+            // Labelled synthetic pickup bounds; private case uses actual retail ABCs.
+            r->state.m_Flags = FLAG_TOUCH_NOTIFY | FLAG_VISIBLE;
+            r->dimensions = {2, 2, 2};
+        }
+        return h;
+    }
+    bool ammo_receive(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto* a = actor(g);
+        auto h = ammo_fixture(g);
+        CHECK(a && h);
+        auto* pickup = dynamic_cast<AmmoPickup*>(g.objects.get(h)->game.get());
+        CHECK(pickup);
+        // Forged/replayed offers outside the pickup's active contact cannot grant ammo.
+        auto packet = g.server.StartMessageToObject(pickup, a->m_hObject, add_ammo_message);
+        CHECK(packet && g.server.WritePickupMessage(packet, pickup->value) == DE_OK);
+        g.server.EndMessage(packet);
+        CHECK(a->ammo_refusals == 1 && a->m_InventoryMgr.GetAmmoCount(1) == 0);
+        a->m_dwFlags |= 0x200;
+        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, a->m_hObject));
+        CHECK(a->ammo_refusals == 2 && !pickup->picked_up);
+        a->m_dwFlags &= ~0x200u;
+        a->m_damage.m_bDead = true;
+        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, a->m_hObject));
+        CHECK(a->ammo_refusals == 3 && !pickup->picked_up);
+        a->m_damage.m_bDead = false;
+        a->m_InventoryMgr.SetAmmoCount(1, a->m_InventoryMgr.MaxAmmo(1));
+        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, a->m_hObject));
+        CHECK(a->ammo_refusals == 4 && !pickup->picked_up);
+        a->m_InventoryMgr.SetAmmoCount(1, a->m_InventoryMgr.MaxAmmo(1) - 7);
+        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, a->m_hObject));
+        CHECK(a->ammo_collections == 1 && pickup->picked_up && a->last_ammo_source == h);
+        CHECK(a->m_InventoryMgr.GetAmmoCount(1) == a->m_InventoryMgr.MaxAmmo(1));
+        CHECK(!g.server.IsObjectAlive(h) && AmmoPickup::m_dwNumPickups == 1);
+        CHECK(g.objects.finish_frame() && !g.objects.get(h) && AmmoPickup::m_dwNumPickups == 0);
+        CHECK(g.server.message_count() == 0 && g.server.string_count() == 0);
+        auto health = ammo_fixture(g, {100, 10, 0}, "HealthPU");
+        CHECK(health && g.objects.engine_message(health, MID_TOUCHNOTIFY, a->m_hObject));
+        CHECK(g.server.IsObjectAlive(health)); // Original AI does not receive powerups.
+        return true;
+    }
+    bool ammo_search(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto* a = actor(g);
+        CHECK(a && a->SetNewState(AI_Mgr::StateFindAmmo) && a->AI_Update());
+        CHECK(a->m_nState == AI_Mgr::StateIdle && a->ammo_searches == 1);
+        CHECK(a->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA, 1) == InventoryResult::Ok);
+        CHECK(a->m_InventoryMgr.ChangeWeaponSlot(1) == InventoryResult::Ok);
+        a->m_fSeeingDist = 500;
+        a->m_vTargetPos = {0, 10, -100};
+        CHECK(a->MC_BestWeapon() && a->m_nState == AI_Mgr::StateFindAmmo);
+        CHECK(a->AI_Update() && !a->runtime_failed && a->m_nState == AI_Mgr::StateEscapeRun);
+        CHECK(a->searched_ammo == 1 && a->searched_ammo_class == "BulletAmmoPU");
+        auto h = ammo_fixture(g);
+        CHECK(h && a->SetNewState(AI_Mgr::StateFindAmmo) && a->AI_Update());
+        // Original CanSee ignores nonsolid pickups. Do not invent pickup vision.
+        CHECK(a->m_nState == AI_Mgr::StateEscapeRun && a->find.valid && !a->find.selected);
+        g.objects.get(h)->state.m_Flags |= FLAG_RAYHIT; // Explicit branch fixture, not retail pickup flags.
+        CHECK(a->SetNewState(AI_Mgr::StateFindAmmo) && a->AI_Update());
+        CHECK(a->m_nState == AI_Mgr::StateFindAmmo && a->Metacmd == 2 && a->GetTrackedObject() == h);
+        CHECK(a->m_MoveObj.path().size() == 1 && a->AI_Update() && a->Metacmd == 3);
+        g.objects.get(a->m_hObject)->state.m_Flags &= ~FLAG_VISIBLE;
+        CHECK(a->AI_Update() && a->velocity_commands > 0 && !a->runtime_failed);
+        // A removed pickup no longer freezes the actor; its value-owned route remains.
+        CHECK(g.objects.remove(h) && a->AI_Update() && !a->runtime_failed && !a->GetTrackedObject());
+        CHECK(a->ammo_target_losses == 1 && a->m_MoveObj.path().size() == 1);
+        // Reacquire through the real state, then interrupt it before another collector removes the pickup.
+        auto next = ammo_fixture(g, {0, 10, 80});
+        CHECK(next && g.objects.finish_frame());
+        g.objects.get(next)->state.m_Flags |= FLAG_RAYHIT;
+        CHECK(a->SetNewState(AI_Mgr::StateFindAmmo) && a->AI_Update() && a->searched_ammo_target == next);
+        CHECK(a->SetNewState(AI_Mgr::StateInactive) && g.objects.remove(next) && g.objects.finish_frame());
+        CHECK(a->AI_Update() && !a->runtime_failed && a->ammo_target_losses == 2 && !a->GetTrackedObject());
+        a->m_nState = AI_Mgr::StateFindAmmo;
+        a->Metacmd = 3; // Continue the retained synthetic route, without reacquiring a dead object.
+        g.objects.get(a->m_hObject)->state.m_Pos = {0, 10, 80}; // Labelled arrival, not navigation proof.
+        CHECK(a->m_MoveObj.Update() && a->AI_Update() && a->Metacmd == 4);
+        CHECK(a->m_MoveObj.path().empty() && a->navigation_arrivals == 1 && a->AI_Update());
+        CHECK(g.objects.finish_frame() && g.unload_world() && AmmoPickup::m_dwNumPickups == 0);
+        return true;
     }
     bool animation_clearance(const char*)
     {
@@ -592,6 +685,54 @@ namespace
         auto h = g.objects.create(g.objects.find_class(type), {}, reason, std::move(p));
         return g.server.IsObjectAlive(h) ? dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h)) : nullptr;
     }
+    bool ammo_private(const char* root)
+    {
+        GameSession g;
+        CHECK(setup(g, root));
+        ObjectId old{};
+        for (int reload = 0; reload < 2; ++reload)
+        {
+            CHECK(!g.objects.get(old));
+            g.world_path = "synthetic NPC ammunition arena (retail resources)";
+            g.state = SessionState::Inspection;
+            CHECK(g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
+                                   {{"Name", std::string("START")}, {"Pos", DVector{0, 100, 200}}}));
+            g.server_shell.PreStartWorld();
+            std::string error;
+            CHECK(g.server_shell.PostStartWorld() && g.enter_player(error));
+            auto* a = npc(g, "CultistAI", {{"AIState", std::string("IDLE")}});
+            CHECK(a && a->RuntimeReady());
+            old = g.objects.get(a->m_hObject)->id;
+            auto& inventory = a->m_InventoryMgr;
+            inventory.SetAmmoCount(AMMO_BULLET, 0);
+            auto target = g.client_shell.player;
+            CHECK(target && a->SetNewTarget(target) && a->RefreshTargetPosition());
+            CHECK(a->MC_BestWeapon() && a->m_nState == AI_Mgr::StateFindAmmo);
+            CHECK(a->AI_Update() && !a->runtime_failed && a->m_nState == AI_Mgr::StateEscapeRun);
+            auto pos = g.objects.get(a->m_hObject)->state.m_Pos;
+            pos.z += 5; // Deliberate overlapping placement for actual contact dispatch.
+            auto ammo = g.objects.create(g.objects.find_class("BulletAmmoPU"), {}, Creation::World,
+                                         {{"Pos", pos}, {"Name", std::string("NPC ammo contact fixture")}});
+            auto* r = g.objects.get(ammo);
+            CHECK(r && r->model && r->model_error.empty());
+            CHECK(a->SetTrackedObject(ammo) && a->SetNewState(AI_Mgr::StateFindAmmo));
+            a->searched_ammo_target = ammo; // Labelled completed-route fixture, not autonomous retail pursuit.
+            a->Metacmd = 4;                 // Preserve completed route semantics after a contact removes its pickup.
+            CHECK(g.server.advance_physics(.02));
+            CHECK(a->ammo_collections == 1 && inventory.GetAmmoCount(1) == 100);
+            CHECK(!g.server.IsObjectAlive(ammo) && a->AI_Update() && !a->runtime_failed);
+            CHECK(a->ammo_target_losses == 1 && !a->GetTrackedObject());
+            CHECK(g.objects.finish_frame() && !g.objects.get(ammo));
+            CHECK(!g.server.pickup_reports.empty() && g.server.pickup_reports.back().voice != 0);
+            std::cout << "Retail NPC/ammo arena reload=" << reload << " searches=" << a->ammo_searches
+                      << " collections=" << a->ammo_collections << " bullets=" << inventory.GetAmmoCount(1)
+                      << " voice=" << g.server.pickup_reports.back().voice << '\n';
+            CHECK(g.unload_world() && g.objects.snapshot().empty() && AmmoPickup::m_dwNumPickups == 0);
+            CHECK(g.server.message_count() == 0 && g.server.string_count() == 0);
+            CHECK(setup(g, root));
+        }
+        return true;
+    }
     bool missing(const char*)
     {
         GameSession g;
@@ -785,6 +926,9 @@ namespace
 int main(int argc, char** argv)
 {
     const std::map<std::string, std::function<bool(const char*)>> tests{{"body", body},
+                                                                        {"ammo_receive", ammo_receive},
+                                                                        {"ammo_search", ammo_search},
+                                                                        {"ammo_private", ammo_private},
                                                                         {"missing", missing},
                                                                         {"activation", activation},
                                                                         {"animation_clearance", animation_clearance},

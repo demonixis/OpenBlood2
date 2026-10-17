@@ -95,8 +95,8 @@ HOBJECT AI_Mgr::FindObjectInRadius(OpenBlood2::AIFindList list, float range, uns
         return nullptr;
     };
     if (!server || !server->IsObjectAlive(m_hObject) || !std::isfinite(range) || (flags & ~15u) ||
-        ((flags & FindSpecific) && (!specific || (flags & FindAvoidTarget))))
-        return fail("Invalid radius request; specific+avoid uses uninitialized forward in original code");
+        ((flags & FindSpecific) && !specific))
+        return fail("Invalid radius request or missing specific class");
     find.valid = true;
     if (range <= 0)
         return nullptr;
@@ -171,7 +171,10 @@ HOBJECT AI_Mgr::FindObjectInRadius(OpenBlood2::AIFindList list, float range, uns
         }
         else if (!dot_direction(find.origin, position, object_dot))
             return fail("Coincident candidate has undefined original normalization");
-        if ((flags & FindAvoidTarget) && m_hTarget)
+        // The specific-class branch leaves fObjectDp at zero in the source:
+        // its avoidance test cannot reject. Skip the unused uninitialized-forward
+        // dot product instead of importing undefined behavior (AI_AMMO_CONTRACTS).
+        if ((flags & FindAvoidTarget) && !(flags & FindSpecific) && m_hTarget)
         {
             double target_dot = 0;
             if (!server->IsObjectAlive(m_hTarget) || !target_position_valid ||

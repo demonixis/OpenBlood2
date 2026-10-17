@@ -396,6 +396,14 @@ bool AI_Mgr::RuntimeUpdateStep()
             }
         }
     }
+    // A sought pickup may be collected by this actor or another player. Retain
+    // the owned route, but never query its removed object on a later update.
+    if (m_hTrackObject && m_hTrackObject == searched_ammo_target && !s->IsObjectAlive(m_hTrackObject))
+    {
+        m_hTrackObject = nullptr;
+        tracked_position_valid = false;
+        ++ammo_target_losses;
+    }
     if (m_hTrackObject && !RefreshTrackedPosition())
         return RuntimeFailure(target_error);
     if (m_damage.m_fHitPoints <= 0 && m_nState != StateDying && !SetNewState(StateDying))

@@ -293,6 +293,13 @@ namespace OpenBlood2
             ImGui::Text("Last driven state %d | current %d | phase %d", a.navigation_state, a.m_nState, a.Metacmd);
             ImGui::Text("Updates %llu | arrivals %llu | failures %llu", (unsigned long long)a.navigation_updates,
                         (unsigned long long)a.navigation_arrivals, (unsigned long long)a.navigation_failures);
+            ImGui::Text("Ammo searches %llu | accepted %llu | refused %llu | removed targets %llu",
+                        (unsigned long long)a.ammo_searches, (unsigned long long)a.ammo_collections,
+                        (unsigned long long)a.ammo_refusals, (unsigned long long)a.ammo_target_losses);
+            ImGui::Text("Sought ammo %u | class %s", unsigned(a.searched_ammo),
+                        a.searched_ammo_class.empty() ? "none" : a.searched_ammo_class.c_str());
+            const auto* ammo_source = game.objects.get(a.last_ammo_source);
+            ImGui::Text("Last collection source %s", ammo_source ? ammo_source->state.m_Name : "removed / none");
             ImGui::Text("ToPos destination (%.2f %.2f %.2f)", a.m_vDestPos.x, a.m_vDestPos.y, a.m_vDestPos.z);
             ImGui::Text("Last distance %.3f / threshold %.3f | jump speed %.2f", a.navigation_distance,
                         a.navigation_threshold, a.m_fJumpSpeed);

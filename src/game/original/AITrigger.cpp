@@ -282,6 +282,8 @@ DDWORD AI_Mgr::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read
             RuntimeFailure(damage_reaction_error.empty() ? state_error : damage_reaction_error);
         return result;
     }
+    if (message == OpenBlood2::add_ammo_message)
+        ReceiveAmmo(sender, read);
     if (message == 1000 /* MID_TRIGGER */)
     {
         auto* server = GetServerDE();

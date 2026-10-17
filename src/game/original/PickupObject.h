@@ -17,6 +17,10 @@ class PickupObject : public B2BaseClass
     std::int32_t resource_id = 0;
     bool picked_up = false, rotate_fx = false;
     std::uint64_t attempts = 0, sound_requests = 0;
+    bool IsOfferingTo(HOBJECT receiver) const
+    {
+        return touching_ == receiver && !picked_up;
+    }
 
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;

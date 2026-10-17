@@ -57,8 +57,10 @@ Specific preserves the original **reversed** IsKindOf(requested, candidateClass)
 comparison, and skips direction computation; FaceObject then observes its source
 zero dot product. AvoidTarget uses normalized observer-minus-cached-target, and
 rejects only when both target and candidate dots are positive. It requires a live,
-sampled target. Specific+AvoidTarget rejects because the source reads an
-uninitialized forward vector there. Nonfinite or coincident directions also reject
+sampled target. [NPC ammo recovery](AI_AMMO_CONTRACTS.md) now permits
+Specific+AvoidTarget by skipping its unused uninitialized-forward computation:
+the source's zero object dot prevents that branch from rejecting a candidate.
+Other nonfinite or coincident directions still reject
 instead of propagating invalid normalization. Nonpositive finite ranges return a
 successful empty query. Unknown flags, invalid poses, corrupt lists and unavailable
 collision are failures, not an absence of enemies. Last reports are read-only;

@@ -190,6 +190,9 @@ namespace
               a->find.valid);
         auto target = object(g, "BaseClass", {0, 10, -30});
         CHECK(a->SetNewTarget(target) && a->RefreshTargetPosition());
+        CHECK(a->FindObjectInRadius(AIFindList::Ammo, 100, FindSpecific | FindAvoidTarget,
+                                    g.objects.find_class("BulletAmmoPU")) == ammo &&
+              a->find.valid);
         CHECK(!a->FindObjectInRadius(AIFindList::Exits, 100, FindAvoidTarget) &&
               a->find.valid); // source uses observer-target, not reverse
         g.objects.get(target)->state.m_Pos = {0, 10, 30};
@@ -296,8 +299,10 @@ namespace
             CHECK(!a->FindObjectInRadius(AIFindList::Enemies, f) && !a->find.valid);
         CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 0) && a->find.valid);
         CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 100, 16) && !a->find.valid);
-        CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 100, FindSpecific | FindAvoidTarget,
-                                     g.objects.find_class("CPlayerObj")) &&
+        a->FindObjectInRadius(AIFindList::Enemies, 100, FindSpecific | FindAvoidTarget,
+                              g.objects.find_class("CPlayerObj"));
+        CHECK(a->find.valid); // Source zero object-dot makes the unused avoidance branch ineffective.
+        CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 100, FindSpecific | FindAvoidTarget, nullptr) &&
               !a->find.valid);
         auto getter = g.server.GetObjectPos;
         g.server.GetObjectPos = [](HOBJECT, DVector*) -> DRESULT { return DE_ERROR; };
