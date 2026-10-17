@@ -1385,6 +1385,10 @@ namespace
                 CHECK(player && player->m_damage.m_fHitPoints == 37 && player->m_damage.m_fArmorPoints == 23);
                 CHECK(player->m_InventoryMgr.GetAmmoCount(1) == 1234 && player->respawns == 0);
                 CHECK(game->step(.016) && g_pServerDE == &game->server);
+                CHECK(game->client_shell.stats.health == 37 && game->client_shell.stats.armor == 23);
+                CHECK(game->client_shell.stats.ammo == 1234 && game->client_shell.stats.weapon == WEAP_BERETTA);
+                CHECK(game->client_shell.stats.weapon_slot == 1 &&
+                      game->client_shell.stats.weapon_slots[0] == WEAP_MELEE);
             }
         }
         CHECK(game->unload_world() && !game->server.string_count() && !game->server.client_count());

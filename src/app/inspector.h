@@ -19,9 +19,6 @@ namespace OpenBlood2
         const SpriteView* sprite_view = nullptr;
         const WorldViewStats* sprite_render = nullptr;
         const WorldViewStats* world_render = nullptr;
-        bool context = false;
-        bool platform = false;
-        bool renderer = false;
         bool select_models = false;
         bool select_skeleton = false;
         ObjectId skeleton_selection{};
@@ -126,10 +123,8 @@ namespace OpenBlood2
         void draw_doors(GameSession&, ObjectSelection&);
 
         explicit Inspector(Runtime& value) : runtime(value) {}
-        ~Inspector();
         Inspector(const Inspector&) = delete;
         Inspector& operator=(const Inspector&) = delete;
-        bool initialize(std::string& error);
         void apply_commands(GameSession& game, ObjectSelection& selection);
         void draw(const Config& config, const DataStatus& data, bool& visible, std::uint64_t frames, GameSession& game,
                   ObjectSelection& selection);

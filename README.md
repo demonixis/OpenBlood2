@@ -127,6 +127,9 @@ is not a shot. The original SubwayA intro blocks movement/fire for about 12 seco
 
 Keyboard controls remain **WASD/ZQSD**, **Shift** run, **Space** jump, **Ctrl** crouch,
 **arrows** look, **E** USE, **F/G** primary/secondary fire, **H** medkit and **L** flashlight toggle after collection (release Shift). **P** selects proximity bombs,
+**1..9 / 0** (or keypad) select owned weapon slots: initially **1 knife**, **2 Beretta**.
+The bottom HUD shows health, armor, equipped weapon and its ammunition; it stays visible
+with the inspector hidden and hides during external-camera cinematics.
 **R** selects remote bombs and **B** detonates registered remote charges. **F2**
 toggles game controls; a new play request enables them again. Inspection can still
 be folded with its title arrow and resized by dragging its borders.
@@ -627,3 +630,5 @@ The [original blood-pool continuation](../Documentation/Implementation/M2_BLOOD_
 The [blood-spurt continuation](../Documentation/Implementation/M2_BLOOD_SPURTS.md) connects original vector-weapon entry/exit jets, fragment launch jets and impact marks, and deferred limb impact requests. Read [contracts](docs/BLOOD_SPURT_CONTRACTS.md). Preserve random-before-damage selection, raw visual damage, emission-before-motion, separate particle/emitter gravity, strict fade, distinct splat thresholds and detached lifetime. Cosmetic child failures never cancel damage/removal. Separate flesh sparks, outside-world classification, shared SFX eviction, full save/restore and the actual M2 gate remain open. Earlier blanket blood-spurt/gib-impact omissions are superseded for this subset.
 
 The [original impact-spark continuation](../Documentation/Implementation/M2_SPARKS.md) connects CSparksFX flesh bursts and metal sparks, with raw-damage recipes, detached particles and inspection. Read [contracts](docs/SPARK_CONTRACTS.md). Preserve source component velocity clipping, strict fade/removal clocks, cosmetic RNG isolation and explicit empty melee recipes. Exhausted invisible systems are reclaimed after duration; shared-list eviction and other required services remain unavailable. M2 stays incomplete.
+
+The [compact HUD continuation](../Documentation/Implementation/M2_HUD.md) displays delivered health, armor and current primary/alternate ammunition independently of the inspector. Physical 1..9/0 and keypad keys select original normal inventory slots; empty slots and original player/camera gates remain enforced. Read [contracts](docs/HUD_CONTRACTS.md). Preserve owned snapshots, distinct M16 pools, input suppression and shared UI lifetime in inspector-free builds. The original PCX status-bar artwork and other required services remain pending; M2 is incomplete.

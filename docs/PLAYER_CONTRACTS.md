@@ -1,5 +1,7 @@
 # Original Player Entry Boundary
 
+> The [compact HUD continuation](HUD_CONTRACTS.md) now displays actual current ammunition and supports numeric owned-slot commands. Earlier blanket HUD omissions remain historical; original artwork and the M2 gate are still incomplete.
+
 > The [smell-trail continuation](AI_SMELL_CONTRACTS.md) now supplies periodic player hints and the original SearchSmellTarget body. Its source guards do not automatically seed a tracking cursor. Earlier blanket smell omissions are historical; M2 remains incomplete.
 
 > Continued by [player restore contracts](PLAYER_RESTORE_CONTRACTS.md): supported

@@ -60,61 +60,6 @@ namespace OpenBlood2
         // Commands were drained before the owner boundary; do not carry an identity
         // selection into the new object's independent slot/generation namespace.
     }
-    bool Inspector::initialize(std::string& error)
-    {
-        IMGUI_CHECKVERSION();
-        if (!ImGui::CreateContext())
-        {
-            error = "Cannot create Dear ImGui context";
-            return false;
-        }
-        context = true;
-        auto& io = ImGui::GetIO();
-        io.IniFilename = nullptr;
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-        ImGui::StyleColorsDark();
-        auto& style = ImGui::GetStyle();
-        style.FontSizeBase = 17.0f;
-        style.WindowRounding = 8.0f;
-        style.FrameRounding = 4.0f;
-        style.WindowPadding = ImVec2(20, 18);
-        style.ItemSpacing = ImVec2(10, 9);
-        style.Colors[ImGuiCol_WindowBg] = ImVec4(0.075f, 0.085f, 0.10f, 0.98f);
-        style.Colors[ImGuiCol_Header] = ImVec4(0.38f, 0.14f, 0.16f, 1.0f);
-        style.Colors[ImGuiCol_TabSelected] = ImVec4(0.42f, 0.16f, 0.18f, 1.0f);
-        const float scale = SDL_GetWindowDisplayScale(runtime.window);
-        if (scale > 0.0f)
-            style.FontScaleDpi = scale;
-        platform = ImGui_ImplSDL3_InitForSDLGPU(runtime.window);
-        if (!platform)
-        {
-            error = "Cannot initialize Dear ImGui SDL3 platform backend";
-            return false;
-        }
-        ImGui_ImplSDLGPU3_InitInfo info{};
-        info.Device = runtime.gpu;
-        info.ColorTargetFormat = SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window);
-        info.MSAASamples = SDL_GPU_SAMPLECOUNT_1;
-        info.SwapchainComposition = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;
-        info.PresentMode = SDL_GPU_PRESENTMODE_VSYNC;
-        renderer = ImGui_ImplSDLGPU3_Init(&info);
-        if (!renderer)
-            error = "Cannot initialize Dear ImGui SDL_GPU renderer backend";
-        return renderer;
-    }
-
-    Inspector::~Inspector()
-    {
-        if (runtime.gpu)
-            SDL_WaitForGPUIdle(runtime.gpu);
-        if (renderer)
-            ImGui_ImplSDLGPU3_Shutdown();
-        if (platform)
-            ImGui_ImplSDL3_Shutdown();
-        if (context)
-            ImGui::DestroyContext();
-    }
-
     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
     {
         if (scene_explosion_request)
@@ -1531,6 +1476,14 @@ namespace OpenBlood2
                     game.client_shell.m_bInWorld ? "yes" : "no",
                     static_cast<unsigned long long>(game.client_shell.messages),
                     static_cast<unsigned long long>(game.client_shell.updates));
+        const auto& hud = game.client_shell.stats;
+        ImGui::Text("HUD snapshot: HP %.1f | armor %.1f | weapon %u / slot %u", hud.health, hud.armor, hud.weapon,
+                    hud.weapon_slot);
+        ImGui::Text("Ammo %.1f (type %u) | alternate %.1f (type %u) | external camera %s", hud.ammo, hud.ammo_type,
+                    hud.alternate_ammo, hud.alternate_ammo_type,
+                    game.client_shell.view.object ? "yes (HUD hidden)" : "no");
+        ImGui::TextUnformatted(
+            "1..9 / 0: original inventory slots. Compact HUD remains visible with inspector hidden.");
         const auto& boss_client = game.client_shell;
         ImGui::Text("Boss health messages %llu | raw ratio %.3f | bar %s",
                     (unsigned long long)boss_client.boss_health_messages, boss_client.boss_health.fraction,

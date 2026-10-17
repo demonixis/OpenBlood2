@@ -336,6 +336,24 @@ namespace OpenBlood2
         }
         return true;
     }
+    bool GameSession::command_weapon(DBYTE slot, std::string& error)
+    {
+        error.clear();
+        auto* owner = server_shell.Player(local_client);
+        // Original OnCommandOn dead/movement guard, then COMMAND_WEAPON_0..9.
+        if (!client_shell.m_bInWorld || !owner || owner->m_bDead || owner->m_damage.IsDead() ||
+            owner->movement_blocked || owner->camera_movement_blocked || slot >= 10)
+        {
+            error = "Weapon command blocked";
+            return false;
+        }
+        const auto* current = owner->m_InventoryMgr.CurrentWeapon();
+        const auto* requested = owner->m_InventoryMgr.GetWeapon(slot);
+        // ChangeWeaponSlot's current-type no-op must not release held fire input.
+        if (current && requested && current->data.m_nType == requested->data.m_nType)
+            return true;
+        return select_weapon(slot, error);
+    }
     bool GameSession::select_weapon(DBYTE slot, std::string& error)
     {
         error.clear();

@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "0d987417805a29bb26ed1604afed6225b67b2803",
+  "status": "M2 incomplete; compact replacement HUD using original stats/slot rules",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "purpose": "UpdateStats, bounded numeric messages and OnCommandOn weapon slot/death/movement guards."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "purpose": "Current primary/alternate ammo and original owned slot selection."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "purpose": "ChangeWeapon alternate-ammo choice and external-camera status-bar suppression."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/NewStatusBar.cpp",
+      "source_sha256": "c4dee3b2502db56a1a85b94a55c64fca9ddab0a1e69421858b27aeac02e324f5",
+      "purpose": "Original graphical status bar reference; PCX renderer/artwork are not imported."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MenuControls.cpp",
+      "source_sha256": "021bae79acaa4624ae9782f152443e9294f2deb9c9aa072fab7beb6f1aa843a2",
+      "purpose": "Original numbered weapon actions."
+    },
+    {
+      "source": "sources/blood2/Shared/Commands.h",
+      "source_sha256": "adcde2cdc068a16f9a4ae57443646e39bee9e6fc7921eb176e512964326d3d14",
+      "purpose": "COMMAND_WEAPON_0 through COMMAND_WEAPON_9."
+    }
+  ]
+}

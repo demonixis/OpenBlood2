@@ -1066,3 +1066,7 @@ The [original blood-pool continuation](../../Documentation/Implementation/M2_BLO
 ## Original weapon impact sparks
 
 Selected Weapon.cpp flags, WeaponFX.cpp flesh/metal recipes and SparksFX.cpp burst/clock behavior are ported from Blood II. [Source hashes](M2_SPARK_SOURCES.json) and [contracts](SPARK_CONTRACTS.md) document typed ownership, bounded storage, isolated cosmetic RNG, later-engine particle interpolation and invisible exhausted-system reclamation. Reference sources, assets, shaders and pinned dependencies are unchanged.
+
+## Compact HUD and weapon commands
+
+[HUD contracts](HUD_CONTRACTS.md) and [source hashes](M2_HUD_SOURCES.json) record the selected original player stats, command-slot mapping and client visibility rules. The compact ImGui presentation and shared UI lifetime are new engine/application code; original PCX artwork is not ported.

@@ -32,23 +32,22 @@ FetchContent_Declare(spdlog
     SYSTEM EXCLUDE_FROM_ALL)
 FetchContent_MakeAvailable(SDL3 spdlog)
 
-if(BLOOD2_INSPECTOR)
-    FetchContent_Declare(imgui_source
-        URL https://codeload.github.com/ocornut/imgui/tar.gz/${BLOOD2_IMGUI_REVISION}
-        URL_HASH SHA256=b3d8f99838bb3ff05e14185562345f85e00c032da4d8fc277608d7898d847114
-        DOWNLOAD_NAME imgui-${BLOOD2_IMGUI_REVISION}.tar.gz
-        DOWNLOAD_DIR "${PROJECT_SOURCE_DIR}/.cache/downloads"
-        DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
-    FetchContent_MakeAvailable(imgui_source)
-    add_library(imgui STATIC
-        "${imgui_source_SOURCE_DIR}/imgui.cpp"
-        "${imgui_source_SOURCE_DIR}/imgui_draw.cpp"
-        "${imgui_source_SOURCE_DIR}/imgui_tables.cpp"
-        "${imgui_source_SOURCE_DIR}/imgui_widgets.cpp"
-        "${imgui_source_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp"
-        "${imgui_source_SOURCE_DIR}/backends/imgui_impl_sdlgpu3.cpp")
-    target_include_directories(imgui SYSTEM PUBLIC
-        "${imgui_source_SOURCE_DIR}" "${imgui_source_SOURCE_DIR}/backends")
-    target_link_libraries(imgui PUBLIC SDL3::SDL3)
-endif()
+# The HUD uses the same pinned ImGui backend in inspector-free builds.
+FetchContent_Declare(imgui_source
+    URL https://codeload.github.com/ocornut/imgui/tar.gz/${BLOOD2_IMGUI_REVISION}
+    URL_HASH SHA256=b3d8f99838bb3ff05e14185562345f85e00c032da4d8fc277608d7898d847114
+    DOWNLOAD_NAME imgui-${BLOOD2_IMGUI_REVISION}.tar.gz
+    DOWNLOAD_DIR "${PROJECT_SOURCE_DIR}/.cache/downloads"
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+FetchContent_MakeAvailable(imgui_source)
+add_library(imgui STATIC
+    "${imgui_source_SOURCE_DIR}/imgui.cpp"
+    "${imgui_source_SOURCE_DIR}/imgui_draw.cpp"
+    "${imgui_source_SOURCE_DIR}/imgui_tables.cpp"
+    "${imgui_source_SOURCE_DIR}/imgui_widgets.cpp"
+    "${imgui_source_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp"
+    "${imgui_source_SOURCE_DIR}/backends/imgui_impl_sdlgpu3.cpp")
+target_include_directories(imgui SYSTEM PUBLIC
+    "${imgui_source_SOURCE_DIR}" "${imgui_source_SOURCE_DIR}/backends")
+target_link_libraries(imgui PUBLIC SDL3::SDL3)
 

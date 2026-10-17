@@ -1,5 +1,6 @@
 #include "engine/world_model.h"
 #include "game/server_adapter.h"
+#include <algorithm>
 #include <cmath>
 
 namespace OpenBlood2
@@ -79,7 +80,14 @@ namespace OpenBlood2
                 else if constexpr (std::is_same_v<T, PlayerPosition>)
                     return physics_vector(value.position);
                 else if constexpr (std::is_same_v<T, PlayerStats>)
-                    return std::isfinite(value.health) && std::isfinite(value.armor) && std::isfinite(value.bullets);
+                    return std::isfinite(value.health) && std::isfinite(value.armor) && std::isfinite(value.bullets) &&
+                           std::isfinite(value.ammo) && value.ammo >= 0 && std::isfinite(value.alternate_ammo) &&
+                           value.alternate_ammo >= 0 && value.weapon_slot < inventory_weapon_slots &&
+                           value.ammo_type < 13 && value.alternate_ammo_type < 13 &&
+                           (!value.weapon || weapon_definition(value.weapon)) &&
+                           std::all_of(
+                               value.weapon_slots.begin(), value.weapon_slots.end(),
+                               [](DBYTE type) { return !type || weapon_definition(type); });
                 else if constexpr (std::is_same_v<T, InventoryAction>)
                     return value.type == 1 || value.type == 2;
                 else if constexpr (std::is_same_v<T, BossHealth>)

@@ -1,8 +1,10 @@
 #include "ai_model_key_smoke.h"
+#include "app/hud.h"
 #include "app/model_scene.h"
 #include "app/movement_controls.h"
 #include "app/session_playback.h"
 #include "app/sprite_scene.h"
+#include "app/ui_runtime.h"
 #include "brush_smoke.h"
 #include "build_info.h"
 #include "camera_smoke.h"
@@ -39,10 +41,10 @@
 #if BLOOD2_INSPECTOR
 #include "app/inspector.h"
 #include "app/inspector_controls_smoke.h"
+#endif
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlgpu3.h>
-#endif
 
 namespace
 {
@@ -365,6 +367,12 @@ namespace
         DVector sky_eye{};
         std::uint64_t mesh_revision = UINT64_MAX;
         bool viewport_hidden = false, viewport_reloaded = false, viewport_unloaded = false;
+        OpenBlood2::UiRuntime ui(runtime);
+        if (!ui.initialize(error))
+        {
+            spdlog::error("{}", error);
+            return 3;
+        }
 #if BLOOD2_INSPECTOR
         OpenBlood2::Inspector inspector(runtime);
         inspector.world_mesh = &world_mesh;
@@ -410,11 +418,6 @@ namespace
         inspector.select_triggers = options.triggers_smoke;
         inspector.trigger_selection = smoke_trigger;
         inspector.door_selection = smoke_door;
-        if (!inspector.initialize(error))
-        {
-            spdlog::error("{}", error);
-            return 3;
-        }
 #else
         (void)config;
         (void)data;
@@ -468,7 +471,12 @@ namespace
                 const bool escape_releases_mouse =
                     event.type == SDL_EVENT_KEY_DOWN && event.key.windowID == SDL_GetWindowID(runtime.window) &&
                     event.key.scancode == SDL_SCANCODE_ESCAPE && (controls.mouse_requested || controls.mouse_captured);
+#if BLOOD2_INSPECTOR
+                controls.event(event, SDL_GetWindowID(runtime.window),
+                               inspector_visible && !inspector.collapsed && ImGui::GetIO().WantTextInput);
+#else
                 controls.event(event, SDL_GetWindowID(runtime.window));
+#endif
                 if (options.movement_smoke &&
                     (event.type == SDL_EVENT_WINDOW_FOCUS_LOST || event.type == SDL_EVENT_WINDOW_FOCUS_GAINED))
                     spdlog::info("Movement smoke focus at frame {}: {}", frames, controls.focused);
@@ -481,6 +489,9 @@ namespace
 #if BLOOD2_INSPECTOR
                 if (!controls.consumes(event,
                                        inspector_visible && !inspector.collapsed && ImGui::GetIO().WantTextInput))
+                    ImGui_ImplSDL3_ProcessEvent(&event);
+#else
+                if (!controls.consumes(event, false))
                     ImGui_ImplSDL3_ProcessEvent(&event);
 #endif
                 if (event.type == SDL_EVENT_QUIT || (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED &&
@@ -624,6 +635,12 @@ namespace
             game->client_shell.proximity_down = controls.sample_proximity(text_editing);
             game->client_shell.remote_down = controls.sample_remote(text_editing);
             game->client_shell.detonate_down = controls.sample_detonate(text_editing);
+            if (const int slot = controls.sample_weapon_slot(text_editing); slot >= 0)
+            {
+                std::string selection_error;
+                if (!game->command_weapon(static_cast<DBYTE>(slot), selection_error))
+                    spdlog::info("Weapon key {}: {}", (slot + 1) % 10, selection_error);
+            }
             auto keyboard = controls.sample(text_editing);
             auto& movement = game->client_shell.movement_input;
             movement.forward |= keyboard.forward;
@@ -856,16 +873,20 @@ namespace
                 world_unloaded = true;
             if (smoke && frames >= unload_frame && !selection.id && !game->objects.get(original_selection))
                 selection_cleared = true;
-#if BLOOD2_INSPECTOR
             ImGui_ImplSDLGPU3_NewFrame();
             ImGui_ImplSDL3_NewFrame();
             if (controls.enabled)
                 ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
             else
                 ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+#if BLOOD2_INSPECTOR
             if (check_inspector_controls)
                 inspector_controls_smoke.before_frame(frames);
+#endif
             ImGui::NewFrame();
+            OpenBlood2::draw_hud(OpenBlood2::hud_state(game->client_shell.stats, game->client_shell.m_bInWorld,
+                                                       game->client_shell.view.object != nullptr));
+#if BLOOD2_INSPECTOR
             const bool inspector_was_visible = inspector_visible;
             inspector.draw(config, data, inspector_visible, frames, *game, selection);
             if (inspector_was_visible && !inspector_visible && game->client_shell.m_bInWorld && !smoke)
@@ -875,8 +896,8 @@ namespace
             }
             if (check_inspector_controls && !inspector_controls_smoke.after_draw(frames, *game, inspector))
                 return 4;
-            ImGui::Render();
 #endif
+            ImGui::Render();
             SDL_GPUCommandBuffer* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
             if (!commands)
             {
@@ -1051,9 +1072,7 @@ namespace
                     viewport_reloaded |=
                         viewport_unloaded && world_renderer.stats.uploads >= 2 && world_renderer.stats.triangles > 0;
                 }
-#if BLOOD2_INSPECTOR
                 ImGui_ImplSDLGPU3_PrepareDrawData(ImGui::GetDrawData(), commands);
-#endif
                 SDL_GPUColorTargetInfo color{};
                 color.texture = capture_frame ? capture.texture : swapchain;
                 color.clear_color = {0.025f, 0.035f, 0.05f, 1.0f};
@@ -1066,10 +1085,10 @@ namespace
                     SDL_SubmitGPUCommandBuffer(commands);
                     return 3;
                 }
-#if BLOOD2_INSPECTOR
                 if (!(options.viewport_smoke && capture_frame))
                     ImGui_ImplSDLGPU3_RenderDrawData(ImGui::GetDrawData(), commands, pass);
-                if (ImGui::GetDrawData()->TotalVtxCount > 0)
+#if BLOOD2_INSPECTOR
+                if (inspector_visible && ImGui::GetDrawData()->TotalVtxCount > 0)
                     ++ui_frames;
 #endif
                 SDL_EndGPURenderPass(pass);
@@ -1784,7 +1803,7 @@ int main(int argc, char** argv)
                      "  --inspect-world     Parse/mount/create original subset headlessly; does not run a game\n"
                      "  --inspect-player    Exercise original shell/player entry headlessly; not playable\n"
                      "  --view-world        Enter diagnostic 3D view with original player/cameras; F1 inspector, F2 "
-                     "controls\n"
+                     "controls; 1..9/0 weapon slots, HUD health/armor/ammo\n"
                      "  --viewport-smoke    GPU 3D depth view, movement and unload/reload checks\n"
                      "  --start-game        Check session startup; fails explicitly on missing M2 services\n"
                      "  --no-inspector      Start with the inspector hidden\n"

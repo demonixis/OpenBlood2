@@ -87,6 +87,10 @@ namespace OpenBlood2
     struct PlayerStats
     {
         float health = 0, armor = 0, bullets = 0;
+        float ammo = 0, alternate_ammo = 0;
+        DBYTE weapon = 0, weapon_slot = 0, ammo_type = 0, alternate_ammo_type = 0;
+        std::array<DBYTE, 10> weapon_slots{};
+        bool operator==(const PlayerStats&) const = default;
     };
     struct BossHealth
     {

@@ -408,9 +408,21 @@ bool CPlayerObj::InitializeClientState()
 }
 bool CPlayerObj::UpdateStats(bool force)
 {
-    const OpenBlood2::PlayerStats value{m_damage.m_fHitPoints, m_damage.m_fArmorPoints, m_InventoryMgr.GetAmmoCount(1)};
-    if (!force && value.health == last_sent_stats_.health && value.armor == last_sent_stats_.armor &&
-        value.bullets == last_sent_stats_.bullets)
+    OpenBlood2::PlayerStats value{m_damage.m_fHitPoints, m_damage.m_fArmorPoints, m_InventoryMgr.GetAmmoCount(1)};
+    // Original UpdateStats current primary/alternate ammo; never substitute the bullet pool.
+    value.weapon_slot = m_InventoryMgr.m_nCurWeaponSlot;
+    if (const auto* w = m_InventoryMgr.CurrentWeapon())
+    {
+        value.weapon = w->data.m_nType;
+        value.ammo_type = w->GetAmmoType(false);
+        value.alternate_ammo_type = w->GetAmmoType(true);
+        value.ammo = m_InventoryMgr.GetAmmoCount(value.ammo_type);
+        value.alternate_ammo = m_InventoryMgr.GetAmmoCount(value.alternate_ammo_type);
+    }
+    for (unsigned i = 0; i < value.weapon_slots.size(); ++i)
+        if (const auto* w = m_InventoryMgr.GetWeapon(i))
+            value.weapon_slots[i] = w->data.m_nType;
+    if (!force && value == last_sent_stats_)
         return true;
     if (GetServerDE()->SendToClient(m_hClient, value) != DE_OK)
         return false;

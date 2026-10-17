@@ -1,5 +1,7 @@
 # Original Inventory and Vector Weapon Boundary
 
+> The [compact HUD continuation](HUD_CONTRACTS.md) now displays actual current ammunition and supports numeric owned-slot commands. Earlier blanket HUD omissions remain historical; original artwork and the M2 gate are still incomplete.
+
 The [M16/grenade continuation](ASSAULT_CONTRACTS.md) adds ID 9 and mode-specific ammo, original grenade callbacks and explicit finite key-bound metadata warnings. Earlier supported-weapon limits are historical; remaining services and M2 stay open.
 
 The [Flare Gun continuation](FLARE_CONTRACTS.md) adds original ID 3, primary sticking/burn ticks, alternate fragments, pickup/drop and sprite tint/alpha. Earlier blanket omissions are historical for this subset; remaining effects, death services and M2 stay open.

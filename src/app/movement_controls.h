@@ -16,6 +16,20 @@ namespace OpenBlood2
     struct MovementControls
     {
         std::array<bool, SDL_SCANCODE_COUNT> keys{};
+        int pending_weapon_slot = -1;
+        static int weapon_slot(SDL_Scancode code)
+        {
+            if (code >= SDL_SCANCODE_1 && code <= SDL_SCANCODE_0)
+                return code - SDL_SCANCODE_1;
+            if (code >= SDL_SCANCODE_KP_1 && code <= SDL_SCANCODE_KP_0)
+                return code - SDL_SCANCODE_KP_1;
+            return -1;
+        }
+        int sample_weapon_slot(bool text_editing)
+        {
+            const auto slot = std::exchange(pending_weapon_slot, -1);
+            return focused && enabled && !text_editing ? slot : -1;
+        }
         bool focused = false, enabled = true, use_suppressed = false;
         bool flashlight_suppressed = false;
         bool medkit_suppressed = false, proximity_suppressed = false, remote_suppressed = false,
@@ -41,6 +55,7 @@ namespace OpenBlood2
         }
         void player_changed(bool play = false)
         {
+            pending_weapon_slot = -1;
             keys = {};
             flashlight_suppressed = false;
             use_suppressed = medkit_suppressed = proximity_suppressed = remote_suppressed = detonate_suppressed = false;
@@ -78,6 +93,8 @@ namespace OpenBlood2
             if (!focused || !enabled || text_editing ||
                 (event.type != SDL_EVENT_KEY_DOWN && event.type != SDL_EVENT_KEY_UP))
                 return false;
+            if (weapon_slot(event.key.scancode) >= 0)
+                return true;
             switch (event.key.scancode)
             {
                 case SDL_SCANCODE_W:
@@ -106,11 +123,12 @@ namespace OpenBlood2
                     return false;
             }
         }
-        void event(const SDL_Event& event, SDL_WindowID window)
+        void event(const SDL_Event& event, SDL_WindowID window, bool text_editing = false)
         {
             if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST && event.window.windowID == window)
             {
                 focused = false;
+                pending_weapon_slot = -1;
                 keys = {};
                 flashlight_suppressed = false;
                 release_mouse();
@@ -148,6 +166,8 @@ namespace OpenBlood2
                     keys[static_cast<unsigned>(code)] = event.type == SDL_EVENT_KEY_DOWN;
                 if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat)
                 {
+                    if (enabled && !text_editing && weapon_slot(event.key.scancode) >= 0)
+                        pending_weapon_slot = weapon_slot(event.key.scancode);
                     if (code == SDL_SCANCODE_F2)
                         enabled = !enabled;
                     if (code == SDL_SCANCODE_F3)
