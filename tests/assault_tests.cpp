@@ -432,12 +432,14 @@ bool private_game(const std::filesystem::path& root)
     {
         CHECK(g.request_world("02_cityhub", error));
         unsigned created = 0, unknown = 0, failed = 0, assault = 0;
+        unsigned omitted = 0;
         for (std::size_t i = 0; i < g.entries.size(); ++i)
         {
             const auto& e = g.entries[i];
             created += e.state == EntryState::Created;
             unknown += e.state == EntryState::Unsupported;
             failed += e.state == EntryState::Failed;
+            omitted += e.state == EntryState::MissingWorldModel;
             if (g.world.objects[i].class_name == "AssaultRiflePU")
             {
                 ++assault;
@@ -446,7 +448,7 @@ bool private_game(const std::filesystem::path& root)
         }
         std::cout << "CityHub M16=" << assault << " created=" << created << " unknown=" << unknown
                   << " failed=" << failed << '\n';
-        CHECK(assault == 1 && created == 453 && unknown == 0 && failed == 1);
+        CHECK(assault == 1 && created == 453 && unknown == 0 && failed == 0 && omitted == 1);
         CHECK(g.unload_world());
         // Labelled arena uses actual private models/audio, with controlled geometry.
         auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});

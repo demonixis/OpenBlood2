@@ -15,7 +15,7 @@ namespace OpenBlood2
             // Run normal original callbacks first. A registered class or a successful
             // player spawn alone is not permission to discard the old world.
             report.entries.clear();
-            report.unknown = report.failed = 0;
+            report.unknown = report.failed = report.omitted = 0;
             for (std::size_t i = 0; i < game.entries.size(); ++i)
             {
                 const auto& source = game.world.objects[i];
@@ -26,6 +26,7 @@ namespace OpenBlood2
                         row.name = *name;
                 report.unknown += row.state == EntryState::Unsupported;
                 report.failed += row.state == EntryState::Failed;
+                report.omitted += row.state == EntryState::MissingWorldModel;
                 report.entries.push_back(std::move(row));
             }
             report.unavailable_services.clear();
@@ -55,7 +56,7 @@ namespace OpenBlood2
                     error = "Destination world texture " + material.path + ": " + material.error;
                     return false;
                 }
-                if (!material.path.empty())
+                if (!material.path.empty() && material.frames.empty())
                     checked.insert(material.path);
             }
             auto image = [&](std::string_view path)

@@ -239,14 +239,16 @@ namespace
             std::cout << "CityHub pieces=" << pieces.size() << '\n';
             CHECK(pieces.size() == 10);
             unsigned created = 0, unknown = 0, failed = 0;
+            unsigned omitted = 0;
             for (auto& e : g.entries)
             {
                 created += e.state == EntryState::Created;
                 unknown += e.state == EntryState::Unsupported;
                 failed += e.state == EntryState::Failed;
+                omitted += e.state == EntryState::MissingWorldModel;
             }
             std::cout << "Created=" << created << " unsupported=" << unknown << " failed=" << failed << '\n';
-            CHECK(created == 453 && unknown == 0 && failed == 1);
+            CHECK(created == 453 && unknown == 0 && failed == 0 && omitted == 1);
             // Exercise original destruction/name activation, not direct fragment creation.
             auto* list = g.server.FindNamedObjects("billboard");
             CHECK(list && list->m_pFirstLink);

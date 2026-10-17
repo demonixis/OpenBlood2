@@ -284,14 +284,16 @@ namespace
             CHECK(g.request_world("02_cityhub", e));
             g.server_shell.start_point_name = "01_egressa";
             unsigned created = 0, unknown = 0, failed = 0;
+            unsigned omitted = 0;
             HOBJECT h = nullptr;
             for (auto& entry : g.entries)
             {
                 created += entry.state == EntryState::Created;
                 unknown += entry.state == EntryState::Unsupported;
                 failed += entry.state == EntryState::Failed;
+                omitted += entry.state == EntryState::MissingWorldModel;
             }
-            CHECK(created == 453 && unknown == 0 && failed == 1);
+            CHECK(created == 453 && unknown == 0 && failed == 0 && omitted == 1);
             for (auto id : g.objects.snapshot())
                 if (dynamic_cast<MedKitPU*>(g.objects.get(id)->game.get()))
                     h = g.objects.get(id)->handle;

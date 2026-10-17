@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     ModelView scene;
     WorldRenderer world(runtime.gpu), models(runtime.gpu);
     std::uint64_t revision = UINT64_MAX;
-    for (unsigned cycle = 0; cycle < 3; ++cycle)
+    for (unsigned cycle = 0; cycle < 4; ++cycle)
     {
         CHECK(game->step(1. / 60));
         CHECK(game->server.audio.has_output() && game->server.audio.submitted_frames > 0);
@@ -46,6 +46,16 @@ int main(int argc, char** argv)
         scene.clear();
         CHECK(mesh.build(game->world, error, &game->resources));
         CHECK(update_model_scene(*game, scene, error));
+        unsigned animated = 0;
+        for (const auto& material : mesh.materials)
+            if (!material.frames.empty())
+            {
+                ++animated;
+                std::cout << "World SPR " << material.path << ": " << material.frames.size() << " frames / "
+                          << material.fps << " fps\n";
+            }
+        if (game->world_path == "worlds/02_cityhub.dat")
+            CHECK(animated > 0);
         std::vector<WorldDraw> draws;
         WorldViewStats stats;
         CHECK(world_draws(mesh, game->objects, draws, stats, error));
@@ -54,7 +64,7 @@ int main(int argc, char** argv)
         CHECK(world.prepare(mesh, revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 420, error));
         CHECK(models.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 420, error, true));
         const auto view = game->client_shell.view;
-        CHECK(view.object);
+        CHECK(game->client_shell.player && game->client_shell.m_bInWorld);
         auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
         CHECK(cmd);
         CHECK(world.draw(cmd, capture.texture, mesh, draws, view.position, view.rotation, true, error, DrawLoad::Clear,
@@ -96,20 +106,31 @@ int main(int argc, char** argv)
         player->m_InventoryMgr.SetAmmoCount(1, 1234);
         const auto before = game.get();
         const auto old_player = player->m_hObject;
-        CHECK(game->server.SendWorldExit({"02_CityHub"}, "01_egressa") == DE_OK && game->pump_player_messages(error));
+        CHECK(game->server.SendWorldExit({"missing-destination"}, "start") == DE_OK &&
+              game->pump_player_messages(error));
         CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
         CHECK(game.get() == before && game->client_shell.player == old_player && game->world_revision == revision);
-        CHECK(game->level_change.unknown == 0 && game->level_change.failed == 1 && game->server.audio.has_output());
-        CHECK(game->server.SendWorldExit({"01_SubwayA"}, "start") == DE_OK && game->pump_player_messages(error));
-        CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Committed);
+        CHECK(!error.empty() && game->level_change.source_retained && game->server.audio.has_output());
+        const bool city = cycle % 2 == 0;
+        CHECK(game->server.SendWorldExit({city ? "02_CityHub" : "01_SubwayA"}, city ? "01_egressa" : "start") ==
+                  DE_OK &&
+              game->pump_player_messages(error));
+        const auto changed = GameSession::process_level_change(game, error);
+        std::cout << "Destination: " << (city ? "CityHub" : "SubwayA") << " / " << error << '\n';
+        CHECK(changed == LevelChangeResult::Committed);
+        CHECK(game->level_change.omitted == (city ? 1u : 0u) && game->level_change.failed == 0);
+        // SubwayA has only the authored noname single-player start: requesting
+        // "start" must preserve the original fallback, unlike City's named entry.
+        CHECK(game->level_change.selected_start == (city ? "01_egressa" : "noname"));
+        CHECK(game->level_change.start_fallback == !city);
         CHECK(game.get() != before && game->client_shell.player != old_player && game->server.audio.has_output());
         CHECK(game->level_change.cleanup_complete && game->level_change.health == 37 &&
               game->level_change.armor == 23 && game->level_change.bullets == 1234);
         CHECK(game->client_shell.world_exit.completed == cycle + 1 &&
               game->client_shell.world_exit.blocked == cycle + 1);
-        std::cout
-            << "Cycle " << cycle << ": " << filled
-            << " textured pixels, no fallback; CityHub retained source, SubwayA committed, audio output transferred\n";
+        std::cout << "Cycle " << cycle << ": " << filled
+                  << " textured pixels, no fallback; malformed destination retained source, next world committed, "
+                     "audio output transferred\n";
     }
     CHECK(game->unload_world() && game->server.string_count() == 0 && game->server.client_count() == 0);
     return 0;

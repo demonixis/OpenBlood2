@@ -247,17 +247,19 @@ namespace
         {
             CHECK(g.request_world("02_cityhub", error));
             unsigned created = 0, unknown = 0, failed = 0;
+            unsigned omitted = 0;
             ConversationTrigger* conversation = nullptr;
             for (const auto& e : g.entries)
             {
                 created += e.state == EntryState::Created;
                 unknown += e.state == EntryState::Unsupported;
                 failed += e.state == EntryState::Failed;
+                omitted += e.state == EntryState::MissingWorldModel;
             }
             for (auto id : g.objects.snapshot())
                 if (auto* c = dynamic_cast<ConversationTrigger*>(g.objects.get(id)->game.get()))
                     conversation = c;
-            CHECK(created == 453 && unknown == 0 && failed == 1 && conversation);
+            CHECK(created == 453 && unknown == 0 && failed == 0 && omitted == 1 && conversation);
             std::cout << "CityHub conversation count=" << conversation->count << " file=" << conversation->waves[0]
                       << " mapped=" << bool(conversation_text(conversation->waves[0])) << '\n';
             g.server_shell.start_point_name = "01_egressa";

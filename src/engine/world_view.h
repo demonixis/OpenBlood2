@@ -16,6 +16,8 @@ namespace OpenBlood2
     {
         std::string path, error;
         Texture image;
+        unsigned fps = 0;
+        std::vector<std::uint32_t> frames{}; // SPR: indices of decoded DTX materials; image holds dimensions only.
     };
     struct WorldSurfaceEffect
     {
@@ -54,6 +56,7 @@ namespace OpenBlood2
         std::size_t invisible = 0, degenerate = 0, transparent = 0, sky = 0, blended = 0;
         bool build(const World&, std::string&, const Resources* = nullptr);
     };
+    bool world_material_frame(const WorldMesh&, std::uint32_t material, double time, std::uint32_t& image);
     struct WorldDraw
     {
         std::uint32_t range = 0;

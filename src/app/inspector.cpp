@@ -625,7 +625,18 @@ namespace OpenBlood2
                             for (std::size_t i = 1; i < world_mesh->materials.size(); ++i)
                             {
                                 const auto& material = world_mesh->materials[i];
-                                if (material.error.empty())
+                                if (!material.frames.empty() && material.error.empty())
+                                {
+                                    std::uint32_t image = 0;
+                                    const bool valid = world_material_frame(*world_mesh, static_cast<std::uint32_t>(i),
+                                                                            game.server.world_time(), image);
+                                    ImGui::Text("%s: %zu frames / %u fps / %ux%u", material.path.c_str(),
+                                                material.frames.size(), material.fps, material.image.width,
+                                                material.image.height);
+                                    ImGui::Text("Current frame image: %s",
+                                                valid ? world_mesh->materials[image].path.c_str() : "unavailable");
+                                }
+                                else if (material.error.empty())
                                     ImGui::Text("%s: %ux%u, %u stored mips, flags 0x%x", material.path.c_str(),
                                                 material.image.width, material.image.height, material.image.mipmaps,
                                                 material.image.flags);

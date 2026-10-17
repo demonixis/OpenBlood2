@@ -1,5 +1,17 @@
 # Source and Dependency Provenance
 
+## Missing named world-model creation
+
+Original Blood II brush filename binding and SDK error 23 are cross-checked with
+the later LithTech lookup, extra-data initialization and world-file loader. The
+typed creation failure remains a failure to runtime callers; world loading records
+an explicit omission before initial update. No reference files are imported or
+modified. The same continuation connects SPR world materials using the existing
+manifest/image readers, supported by later renderblock/tracker code; its common
+simulation-time phase is a replacement policy. Later-engine evidence is not a
+verified 1998 executable trace. See
+[source hashes](M2_CITYHUB_ENTRY_SOURCES.json) and [contracts](CITYHUB_ENTRY_CONTRACTS.md).
+
 ## Original flashlight
 
 Selected original GameInvItems, InvItem, ItemPickups, InventoryMgr, PlayerObj and

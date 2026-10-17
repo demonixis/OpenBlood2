@@ -289,14 +289,16 @@ namespace
         {
             CHECK(g.request_world("02_cityhub", e));
             unsigned made = 0, unknown = 0, failed = 0, pickups = 0;
+            unsigned omitted = 0;
             std::vector<HOBJECT> authored;
             for (const auto& row : g.entries)
             {
                 made += row.state == EntryState::Created;
                 unknown += row.state == EntryState::Unsupported;
                 failed += row.state == EntryState::Failed;
+                omitted += row.state == EntryState::MissingWorldModel;
             }
-            CHECK(made == 453 && unknown == 0 && failed == 1);
+            CHECK(made == 453 && unknown == 0 && failed == 0 && omitted == 1);
             for (auto id : g.objects.snapshot())
                 if (auto* pu = dynamic_cast<RemotesPU*>(g.objects.get(id)->game.get()))
                 {

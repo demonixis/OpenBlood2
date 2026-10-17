@@ -249,12 +249,14 @@ namespace
         }
         CHECK(g.request_world("02_cityhub", error));
         unsigned created = 0, unknown = 0, failed = 0, mac = 0;
+        unsigned omitted = 0;
         for (std::size_t i = 0; i < g.entries.size(); ++i)
         {
             const auto& e = g.entries[i];
             created += e.state == EntryState::Created;
             unknown += e.state == EntryState::Unsupported;
             failed += e.state == EntryState::Failed;
+            omitted += e.state == EntryState::MissingWorldModel;
             if (g.world.objects[i].class_name == "SubMachineGunPU")
             {
                 ++mac;
@@ -263,7 +265,7 @@ namespace
         }
         std::cout << "CityHub created=" << created << " unknown=" << unknown << " failed=" << failed << " Mac10=" << mac
                   << '\n';
-        CHECK(mac == 1 && created == 453 && unknown == 0 && failed == 1);
+        CHECK(mac == 1 && created == 453 && unknown == 0 && failed == 0 && omitted == 1);
         for (auto id : g.objects.snapshot())
             if (auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(g.objects.get(id)->handle));
                 a && a->runtime_failed)

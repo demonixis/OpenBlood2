@@ -503,6 +503,41 @@ namespace
                 static_cast<ObjectCreateStruct*>(data)->m_Pos.x = std::numeric_limits<float>::infinity();
         };
         CHECK(!probe(s) && s.objects.finish_frame());
+        // Missing BSP rejects construction before initial update, for both world
+        // models and containers. Runtime callers still receive null, never a dummy.
+        s.world.models.resize(1);
+        s.world.models[0].name = "existing";
+        for (const auto kind : {OT_WORLDMODEL, OT_CONTAINER})
+        {
+            HOBJECT rejected = nullptr;
+            context.engine = [&](Probe& p, DDWORD id, void* data, float)
+            {
+                if (id == MID_PRECREATE)
+                {
+                    rejected = p.m_hObject;
+                    auto& state = *static_cast<ObjectCreateStruct*>(data);
+                    state.m_ObjectType = kind;
+                    std::snprintf(state.m_Filename, sizeof(state.m_Filename), "%s", "absent");
+                }
+                if (id == MID_INITIALUPDATE)
+                    ++initial;
+            };
+            CHECK(!probe(s) && s.objects.error() == ObjectError::MissingWorldModel && initial == 0);
+            CHECK(s.objects.get(rejected)->life == Life::Pending);
+            CHECK(s.objects.finish_frame() && !s.objects.get(rejected));
+            // A bound but invalid shape, or ambiguous case-insensitive matches,
+            // is not the original missing-name case and cannot become an omission.
+            s.world.models[0].name = "absent";
+            CHECK(!probe(s) && s.objects.error() == ObjectError::Unsupported && initial == 0);
+            CHECK(s.objects.finish_frame());
+            s.world.models.push_back(s.world.models[0]);
+            s.world.models[1].name = "ABSENT";
+            CHECK(!probe(s) && s.objects.error() == ObjectError::Unsupported && initial == 0);
+            CHECK(s.objects.diagnostics().back().find("Ambiguous") != std::string::npos);
+            CHECK(s.objects.finish_frame());
+            s.world.models.resize(1);
+            s.world.models[0].name = "existing";
+        }
         // Bound recursive spawning and restore property context at every unwind.
         int nested = 0;
         context.engine = [&](Probe&, DDWORD id, void*, float)

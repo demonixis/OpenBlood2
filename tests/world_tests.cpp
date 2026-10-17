@@ -146,6 +146,9 @@ namespace
                 w.append(
                     object("SkyPointer", {string_prop("Name", "sky-reference"),
                                           string_prop("SkyObjectName", trial == 7 ? "missing-sky" : "entry-camera")}));
+            else if (trial == 9 || trial == 10)
+                w.append(object("CDestructableBrush",
+                                {string_prop("Name", trial == 9 ? "absent-brush" : "SyntheticTriangle")}));
             else
                 w.append(object("SmellHint", {string_prop("Name", "scent")}));
             w.append(object("ExitHint", {string_prop("Name", "exit")}));
@@ -1061,7 +1064,7 @@ namespace
     {
         CHECK(test_player::setup(game, root, true, true, true));
         test_player::Directory dir;
-        for (unsigned i = 1; i <= 8; ++i)
+        for (unsigned i = 1; i <= 10; ++i)
             dir.children["worlds"].files["trial" + std::to_string(i) + ".dat"] =
                 dat(false, false, false, false, i).data;
         dir.children["worlds"].files["broken.dat"] = {56, 0, 0, 0};
@@ -1257,16 +1260,22 @@ namespace
             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::None);
         }
         CHECK(transition_images(*game, root));
-        for (const auto* name : {"trial7", "trial8"})
+        for (const auto* name : {"trial7", "trial8", "trial10"})
         {
             CHECK(original_world_request(name, 0, LOADTYPE_NEW_LEVEL, 0, message));
             CHECK(game->queue_level_change(message, "arrival", error));
             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
-            CHECK(error == (std::string_view(name) == "trial7" ? "Invalid sky object/index"
-                                                               : "Only bound world models are supported in the sky"));
+            if (std::string_view(name) == "trial10")
+                CHECK(game->level_change.failed == 1 && game->level_change.omitted == 0);
+            else
+                CHECK(error == (std::string_view(name) == "trial7"
+                                    ? "Invalid sky object/index"
+                                    : "Only bound world models are supported in the sky"));
             CHECK(game.get() == owner && game->objects.snapshot() == ids && game->objects.time() == time);
             CHECK(game->level_change.cleanup_complete && globals.unchanged() && g_pServerDE == &game->server);
-            CHECK(game->server.list_count() == 0 && game->level_change.unknown == 0 && game->level_change.failed == 0);
+            CHECK(game->server.list_count() == 0 && game->level_change.unknown == 0 &&
+                  game->level_change.failed == (std::string_view(name) == "trial10" ? 1u : 0u) &&
+                  game->level_change.omitted == 0);
         }
         CHECK(original_world_request("missing", 0, LOADTYPE_NEW_LEVEL, 0, message));
         CHECK(game->queue_level_change(message, "unused", error));
@@ -1282,7 +1291,7 @@ namespace
             std::cout << "Commit " << cycle << ": " << error << '\n';
             CHECK(result == LevelChangeResult::Committed && error.empty() && game.get() != owner);
             CHECK(game->world_revision == before_revision + 1 && game->objects.time() == 0);
-            CHECK(game->level_change.committed == cycle + 1 && game->level_change.rejected == 10);
+            CHECK(game->level_change.committed == cycle + 1 && game->level_change.rejected == 11);
             CHECK(game->level_change.cleanup_complete && !game->level_change.source_retained);
             CHECK(game->level_change.checked_textures >= 5 && game->level_change.selected_start == "arrival");
             CHECK(g_pServerDE == &game->server && game->client_shell.m_bInWorld);
@@ -1301,6 +1310,14 @@ namespace
             CHECK(game->client_shell.view.object && g_hActiveCamera);
             CHECK(game->step(.016));
             CHECK(game->server.message_count() == 0 && game->server.list_count() == 0);
+            CHECK(game->level_change.omitted == (cycle == 1 ? 1u : 0u));
+            if (cycle == 1)
+            {
+                const auto& row = game->level_change.entries[3];
+                CHECK(row.name == "absent-brush" && row.state == EntryState::MissingWorldModel);
+                CHECK(!game->entries[3].object && row.detail.find("before initial update") != std::string::npos);
+            }
+            CHECK(original_world_request(cycle == 0 ? "trial9" : "trial1", 0, LOADTYPE_NEW_LEVEL, 0, message));
             CHECK(game->queue_level_change(message, "arrival", error));
         }
         CHECK(game->unload_world() && !game->pending_level_change && !game->server.string_count());
@@ -1332,28 +1349,43 @@ namespace
             for (const auto& [id, voice] : game->server.audio.voices())
                 voices[id] = voice.cursor;
             WorldMessage message;
-            CHECK(original_world_request("02_CityHub", 0, LOADTYPE_NEW_LEVEL, 0, message));
-            CHECK(game->queue_level_change(message, "01_egressa", error));
+            CHECK(original_world_request("16_bridge", 0, LOADTYPE_NEW_LEVEL, 0, message));
+            CHECK(game->queue_level_change(message, "start", error));
             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
-            std::cout << "CityHub refusal " << cycle << ": " << error << '\n';
+            std::cout << "Malformed destination refusal " << cycle << ": " << error << '\n';
             CHECK(game.get() == owner && game->objects.snapshot() == ids && globals.unchanged());
-            CHECK(game->level_change.unknown == 0 && game->level_change.failed == 1);
             CHECK(game->level_change.cleanup_complete && game->level_change.source_retained);
             CHECK(game->world_revision == revision && game->objects.time() == time);
             CHECK(game->server.audio.voices().size() == voices.size());
             for (const auto& [id, cursor] : voices)
                 CHECK(game->server.audio.get(id) && game->server.audio.get(id)->cursor == cursor);
-            CHECK(original_world_request("01_SubwayA", 0, LOADTYPE_NEW_LEVEL, 0, message));
-            CHECK(game->queue_level_change(message, "start", error));
-            const auto result = GameSession::process_level_change(game, error);
-            std::cout << "SubwayA transfer " << cycle << ": " << error << '\n';
-            CHECK(result == LevelChangeResult::Committed && error.empty() && game.get() != owner);
-            CHECK(game->level_change.cleanup_complete && game->world_revision == revision + 1);
-            CHECK(game->level_change.checked_textures > 50 && game->objects.time() == 0);
-            player = game->server_shell.Player(game->local_client);
-            CHECK(player && player->m_damage.m_fHitPoints == 37 && player->m_damage.m_fArmorPoints == 23);
-            CHECK(player->m_InventoryMgr.GetAmmoCount(1) == 1234);
-            CHECK(game->step(.016) && g_pServerDE == &game->server);
+            for (bool city : {true, false})
+            {
+                owner = game.get();
+                const auto old_client = game->local_client;
+                const auto old_player = game->client_shell.player;
+                CHECK(original_world_request(city ? "02_CityHub" : "01_SubwayA", 0, LOADTYPE_NEW_LEVEL, 0, message));
+                CHECK(game->queue_level_change(message, city ? "01_egressa" : "start", error));
+                const auto result = GameSession::process_level_change(game, error);
+                std::cout << (city ? "CityHub" : "SubwayA") << " transfer " << cycle << ": " << error << '\n';
+                CHECK(result == LevelChangeResult::Committed && error.empty() && game.get() != owner);
+                CHECK(game->level_change.cleanup_complete && game->world_revision == revision + (city ? 1 : 2));
+                CHECK(game->level_change.checked_textures > 50 && game->objects.time() == 0);
+                CHECK(game->level_change.unknown == 0 && game->level_change.failed == 0);
+                CHECK(game->level_change.omitted == (city ? 1u : 0u));
+                CHECK(game->local_client != old_client && game->client_shell.player != old_player);
+                if (city)
+                {
+                    CHECK(game->level_change.selected_start == "01_egressa" && !game->level_change.start_fallback);
+                    const auto& row = game->level_change.entries[413];
+                    CHECK(row.name == "fallengrills" && row.state == EntryState::MissingWorldModel);
+                    CHECK(!game->entries[413].object && !game->entries[413].sound);
+                }
+                player = game->server_shell.Player(game->local_client);
+                CHECK(player && player->m_damage.m_fHitPoints == 37 && player->m_damage.m_fArmorPoints == 23);
+                CHECK(player->m_InventoryMgr.GetAmmoCount(1) == 1234 && player->respawns == 0);
+                CHECK(game->step(.016) && g_pServerDE == &game->server);
+            }
         }
         CHECK(game->unload_world() && !game->server.string_count() && !game->server.client_count());
         return true;
@@ -1438,7 +1470,7 @@ namespace
                 {
                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
                     if (std::string_view(name) == "02_cityhub")
-                        CHECK(d.created == 453 && d.unknown == 0 && d.failed == 1);
+                        CHECK(d.created == 453 && d.unknown == 0 && d.failed == 0 && d.omitted == 1);
                     else
                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
                 }

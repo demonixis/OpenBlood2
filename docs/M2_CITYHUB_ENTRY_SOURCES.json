@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "d9a83f0b7c1b4d79643fc2b70e15b456416cf728",
+  "status": "M2 incomplete; typed original-compatible missing-model omission and CityHub entry",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
+      "source_sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
+      "purpose": "Original Name-to-world-model filename binding and precreate order."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/de_codes.h",
+      "source_sha256": "75c0fda0c3ea746ff91d05354c7d177d97bbdccb95a22b6955c51d6592f9e21e",
+      "purpose": "Original DE_MISSINGWORLDMODEL numeric error 23."
+    },
+    {
+      "source": "sources/lithtech/runtime/world/src/world_shared_bsp.cpp",
+      "source_sha256": "6d1d4b032df974432ef43411dc6cc2e25f943923c7ac82ccbbe32e0c734c07ad",
+      "purpose": "Later engine case-insensitive lookup and no-match failure; not a Blood II runtime trace."
+    },
+    {
+      "source": "sources/lithtech/runtime/server/src/server_extradata.cpp",
+      "source_sha256": "fc31aff280f38aebb61e659d450535a0149534a8668b296fabf4449f56d54ad5",
+      "purpose": "Later engine missing-model rejection before bounds/geometry initialization; shared by containers."
+    },
+    {
+      "source": "sources/lithtech/runtime/server/src/servermgr.cpp",
+      "source_sha256": "021b651f6d93a426ee9b1150bc1c17a2f57987c2f1f9f9c4a69c2abbae413e5f",
+      "purpose": "Later engine extra-data failure cleanup before initial callback."
+    },
+    {
+      "source": "sources/lithtech/runtime/server/src/s_object.cpp",
+      "source_sha256": "32777bcf2a221ae7c6c8cc6890a102f33120b75f2eb3f60ec7578d54f4b65d68",
+      "purpose": "Later engine world loader frees failed original instances and continues the source-object loop."
+    },
+    {
+      "source": "sources/lithtech/sdk/inc/ltcodes.h",
+      "source_sha256": "289c3ba35fabcbb01b512419f52b4124dff6c79f530c226695c650f48df0ed9c",
+      "purpose": "Later engine LT_MISSINGWORLDMODEL numeric error 23."
+    },
+    {
+      "source": "sources/lithtech/tools/PreProcessor/FindWorldModel.cpp",
+      "source_sha256": "36ad9f0ffd600e357537af7ccdc4c942f68f30676bf28d4b5cde79fc276b4dd7",
+      "purpose": "Later preprocessor emits world-model definitions only with gathered brushes; exact CityHub authoring cause remains unknown."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/d3d_renderblock.cpp",
+      "source_sha256": "19c72a58ee9792980b0ac178c2c8c7a4b3f29508634e901080c516c753264428",
+      "purpose": "Later engine recognizes .spr world materials and loads their first tracked frame."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/d3d_rendershader_base.h",
+      "source_sha256": "78b7a878aaa4581cec94e870f24a9e8d887d8875d8a1e4479e7a04c728985698",
+      "purpose": "Later engine selects tracked texture frames while rendering; our shared simulation-time phase is an explicit adaptation."
+    },
+    {
+      "source": "sources/lithtech/runtime/client/src/sprite.cpp",
+      "source_sha256": "3a1d267c831f4c597ba841eb95e5684fb555a75d02aae2e333d027a4b18d29a7",
+      "purpose": "Later SPR tracker integer frame period and modulo loop; existing sprite service follows this bounded policy."
+    }
+  ],
+  "adaptations": [
+    "No reference code files imported or modified; existing typed lifecycle and safe NEW_LEVEL retained.",
+    "Classify only absent named world/container geometry after original precreate as an explicit omitted source row; runtime creation still fails.",
+    "Preserve stricter ambiguous-name and malformed/unsupported-geometry rejection.",
+    "Engine loading rule is supported by a later LithTech generation and the Blood II SDK error, not a 1998 executable observation.",
+    "World SPR manifests reuse the existing parser and DTX decoder; equal-size frames and a bounded shared image cache select already uploaded textures from read-only world time, without shader changes."
+  ]
+}

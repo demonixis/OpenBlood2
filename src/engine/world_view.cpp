@@ -1,5 +1,6 @@
 #include "engine/world_view.h"
 #include "engine/collision.h"
+#include "engine/sprite.h"
 #include <algorithm>
 #include <charconv>
 #include <cmath>
@@ -106,6 +107,28 @@ namespace OpenBlood2
         }
         return true;
     }
+    bool world_material_frame(const WorldMesh& mesh, std::uint32_t material, double time, std::uint32_t& image)
+    {
+        image = material;
+        if (!std::isfinite(time) || time < 0)
+            return false;
+        if (mesh.materials.empty())
+            return material == 0; // Existing texture-free diagnostic geometry.
+        if (material >= mesh.materials.size() || !mesh.materials[material].error.empty())
+            return false;
+        const auto& entry = mesh.materials[material];
+        if (entry.frames.empty())
+            return entry.fps == 0;
+        if (!entry.fps || entry.fps > 1000 || entry.frames.size() > 4096)
+            return false;
+        const auto period = 1000 / entry.fps;
+        const double duration = period * entry.frames.size();
+        const auto frame = std::min(entry.frames.size() - 1,
+                                    static_cast<std::size_t>(std::fmod(time, duration / 1000.) * 1000 / period));
+        image = entry.frames[frame];
+        return image < mesh.materials.size() && mesh.materials[image].error.empty() &&
+               mesh.materials[image].frames.empty() && mesh.materials[image].fps == 0;
+    }
     bool WorldMesh::build(const World& world, std::string& error, const Resources* resources)
     {
         *this = {};
@@ -122,7 +145,27 @@ namespace OpenBlood2
         materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}});
         texture_bytes = 4;
         std::map<std::string, std::uint32_t> material_ids;
-        std::size_t effect_bytes = 0;
+        std::size_t effect_bytes = 0, frame_references = 0;
+        auto add_image = [&](const std::string& key, std::uint32_t& id)
+        {
+            if (auto found = material_ids.find(key); found != material_ids.end())
+            {
+                id = found->second;
+                return true;
+            }
+            if (materials.size() >= 4097)
+                return false;
+            WorldMaterial entry;
+            entry.path = key;
+            read_texture_resource(*resources, key, entry.image, entry.error);
+            if (entry.image.rgba.size() > 128 * 1024 * 1024 - texture_bytes)
+                return false;
+            texture_bytes += entry.image.rgba.size();
+            id = static_cast<std::uint32_t>(materials.size());
+            materials.push_back(std::move(entry));
+            material_ids.emplace(key, id);
+            return true;
+        };
         for (const auto& model : world.models)
         {
             if (model.polygons.size() > 65536 || model.points.size() > 65536 || !physics_vector(model.translation))
@@ -194,17 +237,63 @@ namespace OpenBlood2
                     auto found = material_ids.find(key);
                     if (found == material_ids.end())
                     {
-                        if (materials.size() >= 4097)
-                            return fail("World texture count budget exceeded");
-                        WorldMaterial entry;
-                        entry.path = key;
-                        read_texture_resource(*resources, key, entry.image, entry.error);
-                        if (entry.image.rgba.size() > 128 * 1024 * 1024 - texture_bytes)
-                            return fail("World texture memory budget exceeded");
-                        texture_bytes += entry.image.rgba.size();
-                        const auto id = static_cast<std::uint32_t>(materials.size());
-                        materials.push_back(std::move(entry));
-                        found = material_ids.emplace(key, id).first;
+                        std::uint32_t id = 0;
+                        if (!key.ends_with(".spr"))
+                        {
+                            if (!add_image(key, id))
+                                return fail("World texture count/memory budget exceeded");
+                        }
+                        else
+                        {
+                            WorldMaterial entry;
+                            entry.path = key;
+                            Sprite sprite;
+                            std::vector<std::uint8_t> bytes;
+                            const auto* resource = resources->find(key);
+                            if (!resource || resource->size > 1024 * 1024)
+                                entry.error = "Missing or oversized world SPR: " + key;
+                            else if (resources->read(key, bytes, entry.error) &&
+                                     read_sprite(bytes, sprite, entry.error))
+                            {
+                                if (sprite.frames.size() > 65536 - frame_references)
+                                    return fail("World SPR frame-reference budget exceeded");
+                                frame_references += sprite.frames.size();
+                                for (const auto& path : sprite.frames)
+                                {
+                                    std::string frame_key;
+                                    if (!resource_path(path, frame_key) || !add_image(frame_key, id))
+                                        return fail("World SPR texture budget/path exceeded");
+                                    const auto& frame = materials[id];
+                                    if (!frame.error.empty())
+                                    {
+                                        entry.error = frame.path + ": " + frame.error;
+                                        break;
+                                    }
+                                    if (entry.frames.empty())
+                                    {
+                                        entry.image.width = frame.image.width;
+                                        entry.image.height = frame.image.height;
+                                    }
+                                    if (entry.image.width != frame.image.width ||
+                                        entry.image.height != frame.image.height)
+                                    {
+                                        entry.error = "World SPR frame dimensions differ";
+                                        break;
+                                    }
+                                    entry.frames.push_back(id);
+                                }
+                                if (entry.error.empty())
+                                    entry.fps = sprite.fps;
+                                else
+                                    entry.frames.clear();
+                            }
+                            if (materials.size() >= 4097)
+                                return fail("World texture count budget exceeded");
+                            id = static_cast<std::uint32_t>(materials.size());
+                            materials.push_back(std::move(entry));
+                            material_ids.emplace(key, id);
+                        }
+                        found = material_ids.find(key);
                     }
                     if (!(surface.flags & (1u << 4)))
                     {

@@ -267,11 +267,13 @@ namespace
         {
             CHECK(g.request_world("02_cityhub", error));
             unsigned created = 0, transferred = 0, failed = 0, unknown = 0, fx = 0, fx_voices = 0, streams = 0;
+            unsigned omitted = 0;
             for (const auto& e : g.entries)
             {
                 created += e.state == EntryState::Created;
                 transferred += e.state == EntryState::WorldSound;
                 failed += e.state == EntryState::Failed;
+                omitted += e.state == EntryState::MissingWorldModel;
                 unknown += e.state == EntryState::Unsupported;
             }
             for (auto id : g.objects.snapshot())
@@ -295,7 +297,8 @@ namespace
             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
-            CHECK(created == 453 && transferred == 31 && unknown == 0 && failed == 1 && fx == 5 && fx_voices == 4);
+            CHECK(created == 453 && transferred == 31 && unknown == 0 && failed == 0 && omitted == 1 && fx == 5 &&
+                  fx_voices == 4);
             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
                   !g.server.audio.cached_bytes());
         }

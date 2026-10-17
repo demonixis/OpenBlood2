@@ -3,6 +3,7 @@
 #include "engine/world_view.h"
 #include "player_fixture.h"
 #include <iostream>
+#include <limits>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
     do                                                                                                                 \
@@ -115,6 +116,49 @@ namespace
         test_player::Directory directory;
         directory.files["a.dtx"] = fixture(false);
         directory.files["bad.dtx"] = {1, 2, 3};
+        directory.files["b.dtx"] = fixture(true);
+        auto spr = [](std::initializer_list<const char*> frames)
+        {
+            test_model::Writer w;
+            w.u32(frames.size());
+            w.u32(8);
+            w.u32(0);
+            w.u32(0);
+            w.u32(0);
+            for (auto frame : frames)
+            {
+                std::string_view path(frame);
+                w.u16(path.size());
+                for (auto c : path)
+                    w.u8(c);
+            }
+            return w.b;
+        };
+        directory.files["animated.spr"] = spr({"A.DTX", "b.dtx", "a.dtx"});
+        directory.files["invalid-frame.spr"] = spr({"a.dtx", "bad.dtx"});
+        directory.files["absent-frame.spr"] = spr({"missing.dtx"});
+        directory.files["truncated.spr"] = {1, 2, 3};
+        auto small = fixture(false);
+        small.resize(1069);
+        u16(small, 8, 1);
+        u16(small, 10, 1);
+        u16(small, 12, 1);
+        directory.files["small.dtx"] = small;
+        directory.files["unequal.spr"] = spr({"a.dtx", "small.dtx"});
+        test_model::Writer repeated;
+        repeated.u32(4096);
+        repeated.u32(8);
+        repeated.u32(0);
+        repeated.u32(0);
+        repeated.u32(0);
+        for (unsigned i = 0; i < 4096; ++i)
+        {
+            repeated.u16(5);
+            for (char c : std::string_view("a.dtx"))
+                repeated.u8(c);
+        }
+        for (unsigned i = 0; i < 17; ++i)
+            directory.files["repeat" + std::to_string(i) + ".spr"] = repeated.b;
         directory.children["other"].files["missing.dtx"] = fixture(false);
         test_model::Writer writer;
         writer.b.resize(168);
@@ -148,6 +192,38 @@ namespace
         CHECK(mesh.vertices[0].uv[0] == 2 && mesh.vertices[0].uv[1] == -1);
         CHECK(mesh.vertices[3].uv == mesh.vertices[0].uv && mesh.vertices[3].position.x == -492);
         CHECK(mesh.ranges[0].batches.size() == 1 && mesh.ranges[1].batches[0].material == 1);
+        world.models[0].textures[0] = "ANIMATED.SPR";
+        CHECK(mesh.build(world, error, &resources));
+        const auto animation = mesh.ranges[0].batches[0].material;
+        CHECK(mesh.materials.size() == 4 && mesh.texture_bytes == 68);
+        CHECK(mesh.materials[animation].fps == 8 && mesh.materials[animation].frames.size() == 3);
+        CHECK(mesh.materials[animation].image.width == 4 && mesh.materials[animation].image.height == 2);
+        CHECK(mesh.materials[animation].image.rgba.empty()); // No duplicate pixels on the manifest.
+        CHECK(mesh.vertices[0].uv[0] == 2 && mesh.vertices[0].uv[1] == -1);
+        std::uint32_t frame = 0;
+        const auto a = mesh.ranges[1].batches[0].material;
+        CHECK(world_material_frame(mesh, animation, 0, frame) && frame == a);
+        CHECK(world_material_frame(mesh, animation, .124, frame) && frame == a);
+        CHECK(world_material_frame(mesh, animation, .125, frame) && frame != a);
+        CHECK(world_material_frame(mesh, animation, .25, frame) && frame == a);
+        CHECK(world_material_frame(mesh, animation, .375, frame) && frame == a);
+        CHECK(world_material_frame(mesh, animation, 1000000.125, frame));
+        CHECK(!world_material_frame(mesh, animation, -1, frame));
+        CHECK(!world_material_frame(mesh, animation, std::numeric_limits<double>::infinity(), frame));
+        mesh.materials[animation].frames[0] = animation;
+        CHECK(!world_material_frame(mesh, animation, 0, frame));
+        for (auto name : {"invalid-frame.spr", "absent-frame.spr", "truncated.spr", "unequal.spr"})
+        {
+            world.models[0].textures[0] = name;
+            CHECK(mesh.build(world, error, &resources));
+            CHECK(mesh.ranges[0].batches[0].material == 0);
+            bool rejected = false;
+            for (const auto& entry : mesh.materials)
+                if (entry.path == name)
+                    rejected = !entry.error.empty() && entry.frames.empty();
+            CHECK(rejected);
+        }
+        world.models[0].textures[0] = "a.dtx";
         auto& animated = world.models[0];
         animated.surfaces.push_back(animated.surfaces[0]);
         animated.surfaces.back().has_effect = true;
@@ -196,6 +272,13 @@ namespace
         world.models[0].textures[0] = "a.dtx";
         world.models[0].surfaces[0].texture = 1;
         CHECK(!mesh.build(world, error, &resources) && mesh.ranges.empty());
+        world.models.assign(17, model);
+        for (unsigned i = 0; i < 17; ++i)
+            world.models[i].textures[0] = "repeat" + std::to_string(i) + ".spr";
+        CHECK(!mesh.build(world, error, &resources) && mesh.materials.empty());
+        CHECK(error == "World SPR frame-reference budget exceeded");
+        world.models.pop_back();
+        CHECK(mesh.build(world, error, &resources) && mesh.materials.size() == 18 && mesh.texture_bytes == 36);
         std::error_code ec;
         CHECK(std::filesystem::remove(path, ec) && !ec);
         return true;

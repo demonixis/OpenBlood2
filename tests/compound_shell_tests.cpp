@@ -220,16 +220,18 @@ namespace
         {
             CHECK(g.request_world("02_cityhub", error));
             unsigned created = 0, unknown = 0, failed = 0, transferred = 0;
+            unsigned omitted = 0;
             for (auto& e : g.entries)
             {
                 created += e.state == EntryState::Created;
                 unknown += e.state == EntryState::Unsupported;
                 failed += e.state == EntryState::Failed;
+                omitted += e.state == EntryState::MissingWorldModel;
                 transferred += e.state == EntryState::WorldSound;
             }
             std::cout << "CityHub: " << created << " created / " << transferred << " sounds / " << unknown
                       << " unsupported / " << failed << " failed\n";
-            CHECK(created == 453 && transferred == 31 && unknown == 0 && failed == 1);
+            CHECK(created == 453 && transferred == 31 && unknown == 0 && failed == 0 && omitted == 1);
             WorldMesh mesh;
             CHECK(mesh.build(g.world, error, &g.resources));
             if (gpu)

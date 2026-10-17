@@ -82,7 +82,7 @@ namespace OpenBlood2
         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
             !g.destination_trial.player_entered || g.destination_trial.created != 453 ||
-            g.destination_trial.unknown != 0 || g.destination_trial.failed != 1 ||
+            g.destination_trial.unknown != 0 || g.destination_trial.failed != 0 || g.destination_trial.omitted != 1 ||
             g.destination_trial.selected_start != "01_egressa")
             return false;
         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&

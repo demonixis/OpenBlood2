@@ -290,13 +290,15 @@ namespace
         {
             CHECK(g.request_world("02_cityhub", e));
             unsigned created = 0, unknown = 0, failed = 0;
+            unsigned omitted = 0;
             for (auto& entry : g.entries)
             {
                 created += entry.state == EntryState::Created;
                 unknown += entry.state == EntryState::Unsupported;
                 failed += entry.state == EntryState::Failed;
+                omitted += entry.state == EntryState::MissingWorldModel;
             }
-            CHECK(created == 453 && unknown == 0 && failed == 1);
+            CHECK(created == 453 && unknown == 0 && failed == 0 && omitted == 1);
             auto& streams = g.server.particle_streams;
             CHECK(streams.active.size() == 8 && !streams.failed);
             unsigned initial = 0;

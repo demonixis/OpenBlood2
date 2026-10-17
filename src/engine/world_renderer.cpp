@@ -267,7 +267,9 @@ namespace OpenBlood2
         for (std::size_t i = 0; i < count; ++i)
         {
             if (!mesh.materials.empty())
-                images[i] = mesh.materials[i].error.empty() ? &mesh.materials[i].image : nullptr;
+                images[i] = mesh.materials[i].error.empty() && mesh.materials[i].frames.empty()
+                                ? &mesh.materials[i].image
+                                : nullptr;
             if (const auto* image = images[i])
             {
                 if (!image->width || !image->height || image->width > 1024 || image->height > 1024 ||
@@ -420,8 +422,10 @@ namespace OpenBlood2
             const auto& r = mesh.ranges[d.range];
             for (const auto& b : r.batches)
             {
-                if (b.material >= textures_.size() || !textures_[b.material] || b.first < r.first ||
-                    b.first > std::size_t(r.first) + r.count || b.count > std::size_t(r.first) + r.count - b.first ||
+                std::uint32_t image = 0;
+                if (!world_material_frame(mesh, b.material, surface_time, image) || image >= textures_.size() ||
+                    !textures_[image] || b.first < r.first || b.first > std::size_t(r.first) + r.count ||
+                    b.count > std::size_t(r.first) + r.count - b.first ||
                     !world_texture_offset(b.uv_rate, surface_time, texture_offset))
                 {
                     error = "Invalid diagnostic GPU material batch";
@@ -497,7 +501,9 @@ namespace OpenBlood2
                     world_texture_offset(rate, surface_time, uniform.texture_offset);
                     SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
                     pan_batches += rate[0] != 0 || rate[1] != 0;
-                    SDL_GPUTextureSamplerBinding texture{textures_[material], sampler_};
+                    std::uint32_t image = material;
+                    world_material_frame(mesh, material, surface_time, image); // Validated before beginning the pass.
+                    SDL_GPUTextureSamplerBinding texture{textures_[image], sampler_};
                     SDL_BindGPUFragmentSamplers(pass, 0, &texture, 1);
                     SDL_DrawGPUPrimitives(pass, count, 1, first, 0);
                 };

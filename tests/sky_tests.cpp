@@ -160,13 +160,15 @@ namespace
         {
             CHECK(g.request_world("02_cityhub", e));
             unsigned created = 0, failed = 0, unknown = 0;
+            unsigned omitted = 0;
             for (const auto& entry : g.entries)
             {
                 created += entry.state == EntryState::Created;
                 failed += entry.state == EntryState::Failed;
+                omitted += entry.state == EntryState::MissingWorldModel;
                 unknown += entry.state == EntryState::Unsupported;
             }
-            CHECK(created == 453 && failed == 1 && unknown == 0);
+            CHECK(created == 453 && failed == 0 && omitted == 1 && unknown == 0);
             for (const auto& use : g.resource_uses)
                 CHECK(use.path != "Clouds1Pointer" && use.path != "Moon1Pointer" && use.path != "Star1Pointer" &&
                       use.path != "BuildingsPointer");

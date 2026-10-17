@@ -395,7 +395,11 @@ namespace OpenBlood2
             {
                 contexts_.pop_back();
                 remove(handle);
-                fail(ObjectError::Unsupported,
+                // The original engine rejects this object before initial update. Its
+                // world-file loader continues after a missing named BSP; ambiguity,
+                // invalid shapes and an unattached world remain hard failures here.
+                const bool absent = world && !world->models.empty() && state.m_Filename[0] && !model && error.empty();
+                fail(absent ? ObjectError::MissingWorldModel : ObjectError::Unsupported,
                      std::string(state.m_Name) + ": " +
                          (error.empty() ? (state.m_ObjectType == OT_CONTAINER ? "Missing named container model"
                                                                               : "Missing named world model")

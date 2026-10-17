@@ -70,7 +70,8 @@ namespace OpenBlood2
         InvalidTime,
         Busy,
         Limit,
-        Unsupported
+        Unsupported,
+        MissingWorldModel
     };
     struct ObjectId
     {

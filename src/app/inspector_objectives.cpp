@@ -80,6 +80,7 @@ namespace OpenBlood2
         ImGui::Text("Captured %d / loaded %d / entered %d / cleanup %d / source retained %d", d.player_captured,
                     d.world_loaded, d.player_entered, d.cleanup_complete, d.source_retained);
         ImGui::Text("Unsupported %zu / failed %zu / decoded images %zu", d.unknown, d.failed, d.checked_textures);
+        ImGui::Text("Omitted missing world models: %zu (no runtime instance)", d.omitted);
         if (d.player_entered)
             ImGui::Text("Destination HP %.1f / armor %.1f / bullets %.1f / keys %zu", d.health, d.armor, d.bullets,
                         d.keys);
@@ -118,6 +119,7 @@ namespace OpenBlood2
                     d.player_entered ? "yes" : "no", d.cleanup_complete ? "complete" : "not completed");
         ImGui::Text("%zu created / %zu sounds / %zu editor / %zu filtered / %zu unknown / %zu failed", d.created,
                     d.sounds, d.editor_only, d.filtered, d.unknown, d.failed);
+        ImGui::Text("Omitted missing world models: %zu (no runtime instance)", d.omitted);
         if (d.player_entered)
             ImGui::Text("Restored HP %.1f / armor %.1f / bullets %.1f / keys %zu / active camera %s", d.health, d.armor,
                         d.bullets, d.keys, d.entry_camera_active ? "yes" : "no");

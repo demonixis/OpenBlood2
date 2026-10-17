@@ -287,6 +287,7 @@ namespace
         {
             CHECK(g.request_world("02_CityHub", error));
             unsigned count = 0, pushable = 0, gravity = 0, failed = 0, unknown = 0, created = 0, ground_misses = 0;
+            unsigned omitted = 0;
             std::vector<ObjectId> ids;
             ModelView scene;
             for (std::size_t i = 0; i < g.entries.size(); ++i)
@@ -295,6 +296,7 @@ namespace
                 created += e.state == EntryState::Created;
                 unknown += e.state == EntryState::Unsupported;
                 failed += e.state == EntryState::Failed;
+                omitted += e.state == EntryState::MissingWorldModel;
                 if (g.world.objects[i].class_name != "CDestructableModel")
                     continue;
                 auto* r = g.objects.get(e.object);
@@ -313,7 +315,7 @@ namespace
             std::cout << "CityHub model initialization: " << count << " models / " << pushable << " pushable / "
                       << gravity << " gravity / " << ground_misses << " ground misses\n";
             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
-            CHECK(created == 453 && unknown == 0 && failed == 1);
+            CHECK(created == 453 && unknown == 0 && failed == 0 && omitted == 1);
             CHECK(update_model_scene(g, scene, error));
             unsigned skin_failures = 0, triangles = 0;
             for (auto id : ids)

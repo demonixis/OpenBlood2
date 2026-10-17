@@ -556,7 +556,7 @@ namespace
                     continue;
                 }
                 if (!r && path == "worlds/20_powerstation.dat" && source.class_name == "Damage" &&
-                    game.objects.error() == ObjectError::Unsupported && !game.objects.diagnostics().empty() &&
+                    game.objects.error() == ObjectError::MissingWorldModel && !game.objects.diagnostics().empty() &&
                     game.objects.diagnostics().back() == "kkk: Missing named container model")
                 {
                     std::cout << path << " Damage: missing kkk model\n";

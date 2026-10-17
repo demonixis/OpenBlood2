@@ -47,7 +47,7 @@ namespace OpenBlood2
         bool world_loaded = false, player_entered = false, cleanup_complete = false, entry_camera_active = false;
         float health = 0, armor = 0, bullets = 0;
         std::size_t keys = 0;
-        std::size_t created = 0, sounds = 0, editor_only = 0, filtered = 0, unknown = 0, failed = 0;
+        std::size_t created = 0, sounds = 0, editor_only = 0, filtered = 0, omitted = 0, unknown = 0, failed = 0;
         std::size_t runtime_objects = 0, attachments = 0, voices = 0;
         std::vector<DestinationTrialEntry> entries;
     };
@@ -68,7 +68,7 @@ namespace OpenBlood2
         std::string source_world, destination, requested_start, selected_start, error;
         bool player_captured = false, world_loaded = false, player_entered = false, cleanup_complete = false;
         bool source_retained = true, start_fallback = false;
-        std::size_t unknown = 0, failed = 0, checked_textures = 0;
+        std::size_t unknown = 0, failed = 0, omitted = 0, checked_textures = 0;
         std::vector<DestinationTrialEntry> entries;
         std::vector<std::string> unavailable_services;
         float health = 0, armor = 0, bullets = 0;

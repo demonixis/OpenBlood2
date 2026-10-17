@@ -17,6 +17,7 @@ namespace OpenBlood2
         EditorOnly,
         Unsupported,
         Filtered,
+        MissingWorldModel, // Engine creation rejected; source row retained, no runtime instance.
         Failed
     };
     const char* entry_state_name(EntryState state);

@@ -94,6 +94,9 @@ namespace OpenBlood2
                     case EntryState::Unsupported:
                         ++next.unknown;
                         break;
+                    case EntryState::MissingWorldModel:
+                        ++next.omitted;
+                        break;
                     case EntryState::Failed:
                         ++next.failed;
                         break;

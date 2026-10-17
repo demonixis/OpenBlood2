@@ -1,5 +1,11 @@
 # M1 Object Boundary
 
+The [CityHub entry continuation](CITYHUB_ENTRY_CONTRACTS.md) supersedes earlier
+missing-named-world-model and CityHub refusal statements: absent named BSPs are
+explicitly omitted before initial update, with no runtime instance. All other
+preparation failures retain their checks. Later simulation and the M2 gate remain
+separate from successful NEW_LEVEL initialization.
+
 Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
 this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
 The existing action/service limitations remain unless explicitly superseded.

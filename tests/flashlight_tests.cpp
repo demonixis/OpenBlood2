@@ -307,14 +307,16 @@ namespace
             CHECK(g.request_world("02_cityhub", e));
             g.server_shell.start_point_name = "01_egressa";
             unsigned made = 0, unknown = 0, failed = 0;
+            unsigned omitted = 0;
             HOBJECT h = nullptr;
             for (const auto& entry : g.entries)
             {
                 made += entry.state == EntryState::Created;
                 unknown += entry.state == EntryState::Unsupported;
                 failed += entry.state == EntryState::Failed;
+                omitted += entry.state == EntryState::MissingWorldModel;
             }
-            CHECK(made == 453 && unknown == 0 && failed == 1);
+            CHECK(made == 453 && unknown == 0 && failed == 0 && omitted == 1);
             for (auto id : g.objects.snapshot())
                 if (dynamic_cast<FlashlightPU*>(g.objects.get(id)->game.get()))
                     h = g.objects.get(id)->handle;

@@ -1,5 +1,11 @@
 # Resource, World and Session Contracts
 
+The [CityHub entry continuation](CITYHUB_ENTRY_CONTRACTS.md) supersedes earlier
+missing-named-world-model and CityHub refusal statements: absent named BSPs are
+explicitly omitted before initial update, with no runtime instance. All other
+preparation failures retain their checks. Later simulation and the M2 gate remain
+separate from successful NEW_LEVEL initialization.
+
 > Continued by [named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md): supported
 > captured players can enter an already loaded different world at a named start.
 > Automatic NEW_LEVEL still refuses; staged cleanup is not world rollback.

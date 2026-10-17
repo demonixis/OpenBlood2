@@ -330,7 +330,8 @@ namespace
         };
         const bool path_smoke = options.player_smoke && game->world_path == "worlds/01_subwaya.dat";
         PathList smoke_paths;
-        bool paths_hidden = false;
+        bool paths_hidden = false, objective_paths_reentered = false;
+        const auto path_source_revision = game->world_revision;
         if (path_smoke && !OpenBlood2::prepare_path_manager_smoke(*game, smoke_paths))
             return 4;
         bool interaction_hidden = false;
@@ -570,8 +571,15 @@ namespace
             if (options.cameras_smoke && frames == reload_frame + 1 &&
                 !OpenBlood2::prepare_camera_smoke(*game, smoke_camera))
                 return 4;
-            if (options.objectives_smoke && frames == reload_frame + 1 && !OpenBlood2::objective_smoke(*game))
-                return 4;
+            if (options.objectives_smoke && frames == reload_frame + 1)
+            {
+                // Recheck the reloaded source before its second exit. Handle values
+                // from the discarded session cannot be compared across revisions.
+                objective_paths_reentered = game->world_revision != path_source_revision &&
+                                            OpenBlood2::check_path_manager_smoke(*game, smoke_paths, false);
+                if (!objective_paths_reentered || !OpenBlood2::objective_smoke(*game))
+                    return 4;
+            }
             if (options.pickups_smoke && frames == reload_frame + 1)
                 if (!OpenBlood2::prepare_pickup_smoke(*game, smoke_pickup))
                     return 4;
@@ -1276,13 +1284,15 @@ namespace
                 }
                 if (options.world_smoke && frames == hide_frame)
                     hidden_model_time = game->preview_animation.time;
-                if (options.world_smoke && frames == show_frame)
+                // The objective probe queues a real world replacement. Observe
+                // source progress while hidden, before the next frame commits it.
+                if (options.world_smoke && frames == (options.objectives_smoke ? show_frame - 1 : show_frame))
                     model_advanced_hidden = game->preview_model && game->preview_animation.time > hidden_model_time;
                 if (path_smoke && frames == show_frame - 1)
                     paths_hidden = OpenBlood2::check_path_manager_smoke(*game, smoke_paths, false);
                 if (options.player_smoke && frames == hide_frame)
                     hidden_player_updates = game->server_shell.Player(game->local_client)->updates;
-                if (options.player_smoke && frames == show_frame)
+                if (options.player_smoke && frames == (options.objectives_smoke ? show_frame - 1 : show_frame))
                     player_advanced_hidden =
                         game->server_shell.Player(game->local_client)->updates > hidden_player_updates;
                 if (options.weapons_smoke && frames == hide_frame)
@@ -1334,6 +1344,10 @@ namespace
                         inspector.unload_request = true;
                     else
                     {
+                        // Repeat the authored SubwayA exit after unloading CityHub.
+                        // The interactive Reload button correctly remembers CityHub.
+                        if (options.objectives_smoke)
+                            inspector.reload_world_name = options.world;
                         inspector.reload_request = true;
                         inspector.enter_player_request = options.player_smoke && !options.restore_smoke;
                         inspector.restore_player_request = options.restore_smoke && !options.keepalive_smoke;
@@ -1547,7 +1561,10 @@ namespace
                              character_audio_hidden, character_audio_reentered, player ? player->sound_starts : 0,
                              player ? int(player->m_eLastSurface) : -1, game->server.audio.submitted_frames);
             }
-            const bool paths_reentered = !path_smoke || OpenBlood2::check_path_manager_smoke(*game, smoke_paths, true);
+            const bool paths_reentered =
+                !path_smoke ||
+                (options.objectives_smoke ? objective_paths_reentered
+                                          : OpenBlood2::check_path_manager_smoke(*game, smoke_paths, true));
             if (path_smoke)
                 spdlog::info("AI paths: hidden={}, reentered={}, copied points={}", paths_hidden, paths_reentered,
                              smoke_paths.size());
@@ -1616,8 +1633,13 @@ namespace
                  (!keyframe_hidden ||
                   !OpenBlood2::check_keyframe_smoke(*game, smoke_keyframe, options.worldpaths_smoke))) ||
                 (options.cameras_smoke && (!camera_hidden || !OpenBlood2::check_camera_smoke(*game, smoke_camera))) ||
-                (options.objectives_smoke && !objective_hidden) || (options.pickups_smoke && !pickup_hidden) ||
-                (options.interaction_smoke && !interaction_hidden) || (options.brushes_smoke && !brush_hidden) ||
+                (options.objectives_smoke &&
+                 (!objective_hidden || game->world_path != "worlds/02_cityhub.dat" || !game->level_change.committed ||
+                  !game->level_change.cleanup_complete || game->level_change.source_retained ||
+                  game->level_change.omitted != 1 || game->level_change.failed || game->level_change.unknown ||
+                  !game->client_shell.m_bInWorld)) ||
+                (options.pickups_smoke && !pickup_hidden) || (options.interaction_smoke && !interaction_hidden) ||
+                (options.brushes_smoke && !brush_hidden) ||
                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
                 (options.movement_smoke &&
                  (!movement_hidden || !movement_jumped || !movement_landed || !game->client_shell.move_mgr.ready() ||
@@ -1638,8 +1660,9 @@ namespace
                 (options.world_smoke &&
                  (!world_unloaded || !model_advanced_hidden || !game->preview_model || !game->server.collision_ready ||
                   game->world_path.empty() ||
-                  game->objects.snapshot().size() != initial_objects - (options.scene_explosions_smoke ? 1 : 0) ||
-                  game->server.string_count() != initial_strings)))
+                  (!options.objectives_smoke &&
+                   (game->objects.snapshot().size() != initial_objects - (options.scene_explosions_smoke ? 1 : 0) ||
+                    game->server.string_count() != initial_strings)))))
             {
                 auto delta = smoke_object_counts();
                 for (const auto& [key, count] : initial_smoke_objects)
@@ -1658,8 +1681,11 @@ namespace
             spdlog::info("GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and "
                          "selection invalidation");
             if (options.world_smoke)
-                spdlog::info("World smoke passed: unload/reload, original instance/string counts restored, "
-                             "collision/model resources restored, preview animation advanced while hidden");
+                spdlog::info(options.objectives_smoke
+                                 ? "World smoke passed: unload/reload, source paths/progress checked before exit, "
+                                   "CityHub creation/resource report verified"
+                                 : "World smoke passed: unload/reload, original instance/string counts restored, "
+                                   "collision/model resources restored, preview animation advanced while hidden");
             if (options.lights_smoke)
                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
                              "and after reload; evaluated radius/color checked; world illumination unavailable");
@@ -1694,9 +1720,9 @@ namespace
                              "gate and reload checked");
             if (options.objectives_smoke)
                 spdlog::info("OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
-                             "ExitTrigger NEW_LEVEL refusal preserves player/inventory; read-only CityHub preparation "
-                             "checks 1026 entries; temporary CityHub initialization/kept-player entry, cleanup and "
-                             "source restoration checked");
+                             "authored ExitTrigger NEW_LEVEL commits CityHub with the retained player; 1026 source "
+                             "entries include one explicit missing-world-model omission; destination entry, "
+                             "cleanup, presentation and reload checked");
             if (options.pickups_smoke)
                 spdlog::info("PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked");
             if (options.weapons_smoke)

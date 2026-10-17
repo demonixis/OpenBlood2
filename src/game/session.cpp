@@ -24,6 +24,8 @@ namespace OpenBlood2
                 return "Class not ported";
             case EntryState::Filtered:
                 return "Original filter";
+            case EntryState::MissingWorldModel:
+                return "Omitted: missing world model";
             case EntryState::Failed:
                 return "Creation failed";
         }
@@ -138,6 +140,12 @@ namespace OpenBlood2
                 {
                     entry.state = EntryState::Filtered;
                     entry.detail = "Removed by original initial-update difficulty/game-type rules";
+                }
+                else if (!h && objects.error() == ObjectError::MissingWorldModel)
+                {
+                    entry.state = EntryState::MissingWorldModel;
+                    entry.detail = objects.diagnostics().back() +
+                                   "; engine rejected creation before initial update; world loading continues";
                 }
                 else
                 {

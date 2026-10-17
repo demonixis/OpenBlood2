@@ -395,12 +395,14 @@ namespace
         }
         CHECK(g.request_world("02_cityhub", error));
         unsigned created = 0, unknown = 0, failed = 0, flare = 0;
+        unsigned omitted = 0;
         for (std::size_t i = 0; i < g.entries.size(); ++i)
         {
             auto& e = g.entries[i];
             created += e.state == EntryState::Created;
             unknown += e.state == EntryState::Unsupported;
             failed += e.state == EntryState::Failed;
+            omitted += e.state == EntryState::MissingWorldModel;
             if (auto* a =
                     dynamic_cast<CultistAI*>(g.objects.get(e.object) ? g.objects.get(e.object)->game.get() : nullptr);
                 a && a->m_InventoryMgr.CurrentWeapon() && a->m_InventoryMgr.CurrentWeapon()->data.m_nType == 3)
@@ -413,7 +415,7 @@ namespace
         }
         std::cout << "CityHub created=" << created << " unsupported=" << unknown << " failed=" << failed
                   << " flare NPCs=" << flare << '\n';
-        CHECK(created == 453 && unknown == 0 && failed == 1 && flare == 1);
+        CHECK(created == 453 && unknown == 0 && failed == 0 && omitted == 1 && flare == 1);
         CHECK(g.unload_world());
         return true;
     }

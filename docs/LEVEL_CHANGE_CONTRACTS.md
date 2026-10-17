@@ -1,5 +1,11 @@
 # Safe NEW_LEVEL ownership transfer
 
+The [CityHub entry continuation](CITYHUB_ENTRY_CONTRACTS.md) supersedes earlier
+missing-named-world-model and CityHub refusal statements: absent named BSPs are
+explicitly omitted before initial update, with no runtime instance. All other
+preparation failures retain their checks. Later simulation and the M2 gate remain
+separate from successful NEW_LEVEL initialization.
+
 `GameSession::queue_level_change` and `process_level_change` connect original exit
 messages to the existing player snapshot and KeepAlive Load paths. This is a
 replacement engine transaction, not retail Keep.sav serialization. M2 remains open.

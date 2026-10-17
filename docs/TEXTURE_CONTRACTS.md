@@ -94,3 +94,9 @@ The [sky continuation](SKY_CONTRACTS.md) supersedes blanket sky-rendering omissi
 for registered world-model skies. Valid visible skies render behind the world and
 replace bit-4 portal markers; unavailable skies retain diagnostics. No retail
 lighting, fog or complete M2 acceptance is implied.
+
+The [CityHub entry continuation](CITYHUB_ENTRY_CONTRACTS.md) additionally resolves
+authored SPR world materials, decodes/deduplicates all same-size DTX frames and
+binds frames from the read-only world clock. Manifest/frame errors still block
+NEW_LEVEL. Both world passes share the phase; geometry, alpha rules and shader
+artifacts are unchanged.
