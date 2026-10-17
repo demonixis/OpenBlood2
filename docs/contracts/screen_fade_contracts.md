@@ -29,8 +29,8 @@ Fresh/restored world entry and client exit clear fade state. KeepAlive does not
 transfer a source fade into the destination; this is not whole-world save support.
 
 The inspector shows mode, value, scale, received fades and player command/delivery
-counts, including the last unsupported-command reason. Music, sound/VoiceMgr and
-multiplayer flag commands are **not** implemented by this change. They now increment
+counts, including the last unsupported-command reason. Music and multiplayer flag commands remain **unimplemented**. The later
+[player VoiceMgr continuation](player_voice_contracts.md) connects SOUND. They now increment
 an explicit unsupported-player-command counter and retain their last command; receiving
 them is not successful execution. Unknown tokens take the original no-op branch
 and have a separate ignored counter. They are separate from the server-interface

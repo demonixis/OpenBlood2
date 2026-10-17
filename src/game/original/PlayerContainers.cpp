@@ -30,9 +30,29 @@ void CPlayerObj::ProcessTriggerMsg(HMESSAGEREAD read)
         else
             player_trigger_error = "Screen fade client delivery failed";
     }
-    else if (OpenBlood2::same_name(token, "music") || OpenBlood2::same_name(token, "sound") ||
-             OpenBlood2::same_name(token, "flaggrab") || OpenBlood2::same_name(token, "flaggive") ||
-             OpenBlood2::same_name(token, "flagdrop"))
+    else if (OpenBlood2::same_name(token, "sound"))
+    {
+        // strtok(NULL, "") preserves the suffix after exactly one consumed space.
+        if (server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE ||
+            end == std::string::npos || end + 1 == last_player_trigger.size())
+            return;
+        ++trigger_sound_requests;
+        if (server->SendToClient(m_hClient, OpenBlood2::VoiceStop{}) == DE_OK)
+            ++trigger_voice_stops;
+        else
+            player_trigger_error = "Voice stop client delivery failed";
+        OpenBlood2::SoundRequest request;
+        request.resource = trigger_sound_resource = last_player_trigger.substr(end + 1);
+        request.space = OpenBlood2::SoundSpace::Local;
+        request.priority = 6; // PLAYER_HIGH, buffered local one-shot, no reverb.
+        request.reverb_requested = false;
+        trigger_sound_error.clear();
+        trigger_sound = server->PlayLocalSound(m_hObject, request, trigger_sound_error);
+        if (trigger_sound)
+            ++trigger_sound_starts;
+    }
+    else if (OpenBlood2::same_name(token, "music") || OpenBlood2::same_name(token, "flaggrab") ||
+             OpenBlood2::same_name(token, "flaggive") || OpenBlood2::same_name(token, "flagdrop"))
     {
         ++unsupported_triggers;
         last_unsupported_player_trigger = last_player_trigger;
@@ -102,9 +122,12 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
                 if (result == InventoryResult::Ok)
                 {
                     int chance = 0;
-                    // Original optional voice branch: retain its RNG draw. Playback remains unavailable.
+                    // Original 15% branch, then unique reply and an independent 20% group draw.
                     if (server->RandomInt(0, 99, chance) && chance < 15)
+                    {
                         ++weapon_pickup_voice_requests;
+                        PlayWeaponVoiceSoundOnClient(pickup.type);
+                    }
                 }
                 const auto* definition = weapon_definition(pickup.type);
                 if (result != InventoryResult::Full && pickup.amount > 0 && definition &&

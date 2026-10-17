@@ -293,6 +293,7 @@ namespace OpenBlood2
         }
         // No fallible preparation remains. Replace ownership, never move a session,
         // reconstruct the old DAT, replay destination initialization or fresh-respawn.
+        destination->client_shell.voice_manager.InheritHistory(source.client_shell.voice_manager);
         auto exit = source.client_shell.world_exit;
         ++exit.completed;
         exit.error.clear();

@@ -5,6 +5,7 @@
 #include "PlayerObj.h"
 #include "ScreenFade.h"
 #include "ViewWeapon.h"
+#include "VoiceMgr.h"
 #include "game/session.h"
 
 // Original single-player entry branches adapted to the typed local boundary.
@@ -68,7 +69,10 @@ class CBloodServerShell
 class CBloodClientShell
 {
   public:
-    explicit CBloodClientShell(ServerDE& server) : server_(server) {}
+    explicit CBloodClientShell(ServerDE& server, const OpenBlood2::Resources& resources)
+        : voice_manager(server), resources_(resources), server_(server)
+    {
+    }
     bool StartNewWorld(const char*, OpenBlood2::WorldMessage&);
     bool OnEnterWorld(HCLIENT, bool restored = false);
     bool restored_entry = false;
@@ -87,6 +91,7 @@ class CBloodClientShell
     OpenBlood2::SoundId item_voice = 0; // Checked inspection token, not owned.
     std::string item_audio_error;
     CScreenFade fade;
+    CVoiceMgr voice_manager;
     CMoveMgr move_mgr;
     OpenBlood2::MovementInput movement_input;
     bool SyncWeapons(OpenBlood2::ModelStore&, OpenBlood2::Resources&, CBloodServerShell&, std::string&);
@@ -124,6 +129,7 @@ class CBloodClientShell
 
   private:
     bool InitSinglePlayer(CBloodServerShell&);
+    const OpenBlood2::Resources& resources_;
     HCLIENT client_ = nullptr;
     ServerDE& server_;
 };

@@ -88,6 +88,9 @@ namespace OpenBlood2
                            std::all_of(
                                value.weapon_slots.begin(), value.weapon_slots.end(),
                                [](DBYTE type) { return !type || weapon_definition(type); });
+                else if constexpr (std::is_same_v<T, VoiceEvent>)
+                    return value.character >= 0 && value.character < 4 && value.event >= 0 &&
+                           value.event < (value.group ? 12 : 9);
                 else if constexpr (std::is_same_v<T, InventoryAction>)
                     return value.type == 1 || value.type == 2;
                 else if constexpr (std::is_same_v<T, BossHealth>)

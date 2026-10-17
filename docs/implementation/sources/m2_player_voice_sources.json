@@ -1,0 +1,163 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete; selected original player VoiceMgr and SOUND callers connected",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ClientShellDLL/VoiceMgr.cpp",
+      "source_line_ranges": [
+        [
+          30,
+          216
+        ],
+        [
+          228,
+          316
+        ],
+        [
+          338,
+          409
+        ],
+        [
+          486,
+          861
+        ]
+      ],
+      "selection": "Selected original group enumeration/selection, four base characters, event/unique rules, local retained playback, timing and reset.",
+      "source_sha256": "298aa4746f65fa5ef6b830ffc91dd1794d7f701f1437de090a62d8b3c5c9cc75",
+      "target": "src/game/original/VoiceMgr.cpp",
+      "target_sha256": "d673015b43e0257dd8b626ce2b30309bca39ccd249d820d950feb4b3993d8a1c"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/VoiceMgr.h",
+      "source_line_ranges": [
+        [
+          24,
+          60
+        ],
+        [
+          136,
+          155
+        ]
+      ],
+      "selection": "Original 64-sound/128-byte bounds and initial last index.",
+      "source_sha256": "bd02c85b9c95a121f4f4d1cdd07a2eaa976ce2959005ec80c57786c021e56a72",
+      "target": "src/game/original/VoiceMgr.h",
+      "target_sha256": "165843ecc3f945735155c24363ebbd454f7134b841fe67f153f5a76333a12f07"
+    },
+    {
+      "source": "sources/blood2/Shared/VoiceMgrDefs.h",
+      "source_line_ranges": [
+        [
+          20,
+          70
+        ]
+      ],
+      "selection": "Original base character, event and unique numeric identifiers.",
+      "source_sha256": "f1fb15fa133241b630c302cc35b4dd00e845f6947ac7faf1980123fb4416fa35",
+      "target": "src/game/player_messages.h",
+      "target_sha256": "d5c11b288ee04851e9c9ddb56f20f50b6d7084fe786208388f82f64826028ae7"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          4329,
+          4360
+        ],
+        [
+          4463,
+          4508
+        ]
+      ],
+      "selection": "Original accepted-weapon 15 percent branch, single-player SOUND suffix, voice-stop and local playback order.",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target": "src/game/original/PlayerContainers.cpp",
+      "target_sha256": "03186a2007bb75c59ea589b8a0160bb5b186b0b417227e7eb547b318fca2c9c9"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          6063,
+          6198
+        ]
+      ],
+      "selection": "Original typed-equivalent group/unique delivery, weapon mapping, single-player filters and second 20 percent draw.",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target": "src/game/original/PlayerVoice.cpp",
+      "target_sha256": "082fdc43437d7352f2ca70b288e789d493f14d8226a8a7499438c76faa14cf3f"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_line_ranges": [
+        [
+          2840,
+          2850
+        ],
+        [
+          3948,
+          3962
+        ],
+        [
+          4460,
+          4480
+        ],
+        [
+          5294,
+          5322
+        ]
+      ],
+      "selection": "World-exit stop, new-game reset, conversation preemption and VoiceMgr message dispatch.",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "target": "src/game/original/BloodShells.cpp",
+      "target_sha256": "240f442d068df49538e60d2383e2a29fe60e115d9124c41410c0d048700c758e"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/CommLink.cpp",
+      "source_line_ranges": [
+        [
+          292,
+          321
+        ]
+      ],
+      "selection": "Stop VoiceMgr before delayed cue and defer subsequent speech by duration plus 0.5 seconds.",
+      "source_sha256": "d870df0e5486ea70ee88c6f9829bb8257dbe8566c26905f1c56734ae50300e92",
+      "target": "src/game/original/CommLink.cpp",
+      "target_sha256": "340960656c94a2fe8e458bd4b893ea6dc9eb9831835e6a407ab162328a4fcc0d"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "source_line_ranges": [
+        [
+          138,
+          183
+        ]
+      ],
+      "selection": "Buffered local SOUND defaults and no reverb.",
+      "source_sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "target": "src/game/original/PlayerContainers.cpp",
+      "target_sha256": "03186a2007bb75c59ea589b8a0160bb5b186b0b417227e7eb547b318fca2c9c9"
+    },
+    {
+      "source": "sources/blood2/Shared/SoundTypes.h",
+      "source_line_ranges": [
+        [
+          14,
+          33
+        ]
+      ],
+      "selection": "PLAYER_MEDIUM=5 and PLAYER_HIGH=6 priority intent.",
+      "source_sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "target": "src/game/original/VoiceMgr.cpp",
+      "target_sha256": "d673015b43e0257dd8b626ce2b30309bca39ccd249d820d950feb4b3993d8a1c"
+    }
+  ],
+  "adaptations": [
+    "Owned VoiceEvent/VoiceStop local messages replace original byte/word payloads; existing bounded checked client delivery remains authoritative.",
+    "Canonical sorted resource enumeration replaces legacy GetFileList order; client-only portable mt19937 replaces CRT rand seeded from client time. No retail random-sequence identity is claimed.",
+    "Existing retained local sound, PCM streaming and unretained local services replace engine handles. Missing references remain failures; no invented assets or streaming fallbacks.",
+    "NEW_LEVEL copies values only after all fallible preparation; source sounds/deadlines are discarded on commit, retained on rollback.",
+    "Inspection is read-only; required remaining callers, interactive IMA music, reverb/priority arbitration and whole-world saving remain incomplete."
+  ]
+}

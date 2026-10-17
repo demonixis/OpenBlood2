@@ -119,6 +119,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Original character voices and player animation sounds](character_audio_contracts.md)
 - [Original cinematic cues and bounded audio](cinematic_contracts.md)
 - [Original conversation triggers and client communication](conversation_contracts.md)
+- [Original player VoiceMgr and SOUND commands](player_voice_contracts.md)
 - [Original random sound emitters](random_sound_contracts.md)
 - [Original SoundFX controllers](sound_fx_contracts.md)
 - [Original world-owned Sound loops](world_sound_contracts.md)

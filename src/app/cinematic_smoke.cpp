@@ -41,6 +41,17 @@ namespace OpenBlood2
         std::replace(file.begin(), file.end(), '/', '\\');
         if (!g.client_shell.m_bInWorld)
             return false;
+        // Labelled client diagnostic: a real streamed pickup reply must submit PCM
+        // before the original conversation message interrupts only its retained voice.
+        auto& manager = g.client_shell.voice_manager;
+        const auto prior_starts = manager.starts;
+        if (!g.objects.advance(.01) || !g.client_shell.OnMessage(VoiceEvent{false, 0, 0}, g.server_shell) ||
+            !manager.voice || manager.starts != prior_starts + 1 || !g.server.advance_audio(.01, {}, {}))
+            return false;
+        const auto prior_voice = manager.voice;
+        const auto* prior = g.server.audio.get(prior_voice);
+        if (!prior || !prior->clip->stream || !prior->cursor || !g.server.audio.submitted_frames)
+            return false;
         auto h = g.objects.create(g.objects.find_class("ConversationTrigger"), {}, Creation::World,
                                   {{"Name", std::string("Diagnostic conversation (retail WAV)")}, {"WaveFile", file}});
         if (!h)
@@ -52,8 +63,8 @@ namespace OpenBlood2
         g.server.FreeString(text);
         if (!ok || !g.pump_player_messages(error) || !g.objects.advance(.25))
             return false;
-        g.client_shell.communication.Update(g.server, g.client_shell.player);
-        return g.client_shell.communication.voice != 0;
+        g.client_shell.communication.Update(g.server, g.client_shell.player, g.client_shell.voice_manager);
+        return g.client_shell.communication.voice != 0 && !manager.voice && !g.server.audio.get(prior_voice);
     }
     bool check_cinematic_smoke(GameSession& g, ObjectId selected)
     {
@@ -63,6 +74,8 @@ namespace OpenBlood2
             const auto& comm = g.client_shell.communication;
             const auto* voice = g.server.audio.get(comm.voice);
             return conversation->queued == 1 && conversation->current == 1 && !conversation->unmapped &&
+                   g.client_shell.voice_manager.starts > 0 && g.client_shell.voice_manager.played[0][0] &&
+                   !g.client_shell.voice_manager.voice && !g.client_shell.voice_manager.failures &&
                    comm.received == 1 && comm.started == 1 && !comm.busy && !comm.sound_failures &&
                    comm.message.text == "Bring it on!" && voice && voice->cursor > 0 &&
                    voice->request.space == SoundSpace::Local && !voice->request.streaming &&

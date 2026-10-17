@@ -1,6 +1,7 @@
 #pragma once
 #include "server_de.h"
 // Original ClientShellDLL/CommLink numeric-character path. Clock work is outside drawing.
+class CVoiceMgr;
 class CCommLink
 {
   public:
@@ -15,5 +16,5 @@ class CCommLink
     std::string portrait, error;
     void Reset(ServerDE&);
     bool Start(ServerDE&, const OpenBlood2::Conversation&);
-    void Update(ServerDE&, HOBJECT player);
+    void Update(ServerDE&, HOBJECT player, CVoiceMgr&);
 };

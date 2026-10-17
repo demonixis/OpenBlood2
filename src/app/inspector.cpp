@@ -1542,6 +1542,46 @@ namespace OpenBlood2
             ImGui::TextWrapped("Last unsupported: %s", player->last_unsupported_player_trigger.c_str());
             ImGui::TextWrapped("Last command: %s | %s", player->last_player_trigger.c_str(),
                                player->player_trigger_error.c_str());
+            if (ImGui::TreeNode("Original player voices"))
+            {
+                const auto& vm = client.voice_manager;
+                const auto* sound = game.server.audio.get(vm.voice);
+                ImGui::Text("Requests %llu | starts %llu | refused %llu | failures %llu | stops %llu",
+                            (unsigned long long)vm.requests, (unsigned long long)vm.starts,
+                            (unsigned long long)vm.refused, (unsigned long long)vm.failures,
+                            (unsigned long long)vm.stops);
+                ImGui::Text("Enabled %s | retained voice %llu (%s) | next allowed after %.3f", vm.on ? "yes" : "no",
+                            (unsigned long long)vm.voice,
+                            !sound        ? "none / expired"
+                            : sound->done ? "done"
+                                          : "playing",
+                            vm.next_play_time);
+                ImGui::TextWrapped("Resource: %s | refusal: %s | error: %s", vm.last_resource.c_str(),
+                                   vm.reason.c_str(), vm.error.c_str());
+                ImGui::Text("Weapon pickup branches %llu | queued replies %llu | failed delivery %llu",
+                            (unsigned long long)player->weapon_pickup_voice_requests,
+                            (unsigned long long)player->voice_messages,
+                            (unsigned long long)player->voice_delivery_failures);
+                ImGui::Text("SOUND attempts %llu / started %llu / stops queued %llu | last voice %llu",
+                            (unsigned long long)player->trigger_sound_requests,
+                            (unsigned long long)player->trigger_sound_starts,
+                            (unsigned long long)player->trigger_voice_stops, (unsigned long long)player->trigger_sound);
+                ImGui::TextWrapped("SOUND: %s | %s", player->trigger_sound_resource.c_str(),
+                                   player->trigger_sound_error.c_str());
+                for (std::size_t c = 0; c < vm.groups.size(); ++c)
+                {
+                    for (std::size_t e = 0; e < vm.groups[c].size(); ++e)
+                    {
+                        const auto& group = vm.groups[c][e];
+                        ImGui::Text("Character %zu / event %zu: %zu WAVs | %s | last %d | rejected %u", c, e,
+                                    group.sounds.size(), group.custom ? "custom" : "standard", group.last,
+                                    group.rejected);
+                    }
+                }
+                for (std::size_t e = 0; e < vm.played[0].size(); ++e)
+                    ImGui::Text("Caleb unique %zu: %s", e, vm.played[0][e] ? "played" : "not played");
+                ImGui::TreePop();
+            }
             const auto* use_target = game.objects.get(player->use_hit.object);
             ImGui::Text(
                 "Ray %s | target %s | distance %.2f / 82", ray_results[static_cast<unsigned>(player->use_result)],

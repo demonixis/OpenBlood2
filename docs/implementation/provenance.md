@@ -1139,3 +1139,11 @@ The compact slot-ordered identity index replaces repeated occupied-slot scans
 while preserving construction, callback and deferred-reclamation membership.
 Fresh snapshots still own their storage. See [contracts](../contracts/object_snapshot_contracts.md)
 and [measurements](../../../Documentation/Implementation/m2_object_snapshots.md).
+
+## Original player VoiceMgr
+
+[m2_player_voice_sources.json](sources/m2_player_voice_sources.json) records original
+client voice groups, unique replies, gating, replacement and cooldown; original
+player weapon-pickup/SOUND callers; and conversation interruption. Typed owned
+messages, sorted resource enumeration, separate portable client RNG and value-only
+NEW_LEVEL history replace engine/DLL services. See [contracts](../contracts/player_voice_contracts.md).

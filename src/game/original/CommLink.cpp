@@ -1,4 +1,5 @@
 #include "CommLink.h"
+#include "VoiceMgr.h"
 #include <algorithm>
 void CCommLink::Reset(ServerDE& server)
 {
@@ -9,7 +10,7 @@ void CCommLink::Reset(ServerDE& server)
 bool CCommLink::Start(ServerDE& server, const OpenBlood2::Conversation& value)
 {
     ++received;
-    ++voice_manager_requests; // Original shell StopAll; VoiceMgr is explicitly unavailable.
+    ++voice_manager_requests; // Original shell StopAll executes before Start, including a busy refusal.
     if (level)
     {
         ++busy;
@@ -32,7 +33,7 @@ bool CCommLink::Start(ServerDE& server, const OpenBlood2::Conversation& value)
     ++started;
     return true;
 }
-void CCommLink::Update(ServerDE& server, HOBJECT player)
+void CCommLink::Update(ServerDE& server, HOBJECT player, CVoiceMgr& manager)
 {
     if (!level)
         return;
@@ -50,6 +51,7 @@ void CCommLink::Update(ServerDE& server, HOBJECT player)
                 if (play_voice)
                 {
                     ++voice_manager_requests;
+                    manager.StopAll();
                     if (voice)
                         server.KillSound(voice);
                     OpenBlood2::SoundRequest r;
@@ -66,7 +68,8 @@ void CCommLink::Update(ServerDE& server, HOBJECT player)
                     {
                         float duration = 3;
                         server.GetSoundDuration(voice, duration);
-                        voice_manager_delay = duration + .5f; // Requested only; no invented VoiceMgr arbitration.
+                        voice_manager_delay = duration + .5f;
+                        manager.SetNextPlayTime(voice_manager_delay);
                     }
                 }
             }

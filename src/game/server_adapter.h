@@ -409,7 +409,7 @@ namespace OpenBlood2
         Objects objects;
         ServerAdapter server{objects};
         CBloodServerShell server_shell{server};
-        CBloodClientShell client_shell{server};
+        CBloodClientShell client_shell{server, resources};
         HCLIENT local_client = nullptr;
         World world;
         std::vector<WorldEntry> entries;

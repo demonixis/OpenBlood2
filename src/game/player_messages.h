@@ -92,6 +92,14 @@ namespace OpenBlood2
         std::array<DBYTE, 10> weapon_slots{};
         bool operator==(const PlayerStats&) const = default;
     };
+    struct VoiceEvent
+    {
+        bool group = true;
+        int character = 0, event = 0;
+    };
+    struct VoiceStop
+    {
+    };
     struct ScreenFade
     {
         bool in = false;
@@ -123,5 +131,5 @@ namespace OpenBlood2
     };
     using PlayerEvent =
         std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats, MissionObjectives,
-                     WorldExit, BossHealth, Conversation, InventoryAction, ScreenFade>;
+                     WorldExit, BossHealth, Conversation, InventoryAction, ScreenFade, VoiceEvent, VoiceStop>;
 } // namespace OpenBlood2

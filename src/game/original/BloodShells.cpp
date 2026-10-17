@@ -216,6 +216,11 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
         return false;
     if (!move_mgr.Init(server_, client))
         return false;
+    voice_manager.Init(resources_);
+    if (!restored)
+        voice_manager.Reset();
+    else
+        voice_manager.StopAll();
     client_ = client;
     player = object;
     m_bInWorld = true;
@@ -255,6 +260,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
 }
 void CBloodClientShell::OnExitWorld()
 {
+    voice_manager.StopAll();
     weapons = {};
     weapon_input = {};
     move_mgr.Term();
@@ -313,6 +319,19 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     ++messages;
     if (std::holds_alternative<OpenBlood2::PlayerInitRequest>(event))
         return InitSinglePlayer(server);
+    if (std::holds_alternative<OpenBlood2::VoiceStop>(event))
+    {
+        voice_manager.StopAll();
+        return true;
+    }
+    if (const auto* value = std::get_if<OpenBlood2::VoiceEvent>(&event))
+    {
+        if (value->group)
+            voice_manager.PlayEventSound(player, value->character, value->event, view.object != nullptr);
+        else
+            voice_manager.PlayUniqueSound(player, value->character, value->event, view.object != nullptr);
+        return true; // Delivery is distinct from gated or failed cosmetic playback.
+    }
     if (const auto* value = std::get_if<OpenBlood2::ScreenFade>(&event))
     {
         fade.Begin(value->in);
@@ -383,6 +402,7 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     }
     else if (const auto* value = std::get_if<OpenBlood2::Conversation>(&event))
     {
+        voice_manager.StopAll();
         communication.Start(server_, *value); // Original ignores COMM_BUSY.
     }
     else if (const auto* value = std::get_if<OpenBlood2::MissionObjectives>(&event))
@@ -412,7 +432,7 @@ bool CBloodClientShell::Update()
     if (!m_bInWorld || server_.GetClientUserData(client_) != player)
         return false;
     ++updates;
-    communication.Update(server_, player);
+    communication.Update(server_, player, voice_manager);
     server_.GetObjectPos(player, &position);
     const auto* owner = dynamic_cast<CPlayerObj*>(server_.HandleToObject(player));
     if (!owner)

@@ -56,15 +56,15 @@ communication state. No new mutable game global or shared table owner is added.
 
 Timing moved from the source Draw method into the client simulation update so it
 continues with Dear ImGui hidden or compiled out. This is an explicit adaptation.
-The source's client VoiceMgr StopAll/SetNextPlayTime service is still unavailable:
-inspection counts stop requests and retains the requested delay, without stopping
-unrelated server voices or reporting successful arbitration. Original HUD drawing,
-VoiceMgr arbitration, complete save/restore and safe NEW_LEVEL remain pending.
+The [player VoiceMgr continuation](player_voice_contracts.md) now connects the
+source StopAll/SetNextPlayTime arbitration to actual retained player speech.
+Original portrait/font HUD drawing and full save/restore remain pending. Safe
+NEW_LEVEL is covered by the later [transition contract](level_change_contracts.md).
 
 ## Inspection and external-data evidence
 
 The Cinematics tab shows client text/file/portrait, busy drops, phase ratios,
-text duration, real voice attempts/failures and unavailable VoiceMgr requests.
+text duration, real voice attempts/failures and VoiceMgr stop requests and delay.
 It lists every conversation controller, including hidden/inactive ones, its
 sequence/options, all eight resource/mapping slots and errors. TRIGGER queues
 through the existing frame-boundary command path with the player as sender.

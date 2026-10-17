@@ -75,7 +75,13 @@ class CPlayerObj : public CBaseCharacter
     SurfaceType m_eLastSurface = SURFTYPE_UNKNOWN, footstep_surface = SURFTYPE_UNKNOWN;
     ContainerCode footstep_container = CC_NOTHING;
     bool GetFootstepSound(std::string&);
-    std::uint64_t weapon_pickup_voice_requests = 0; // Requested only; client voice playback is unavailable.
+    bool PlayVoiceGroupEventOnClient(int event, bool single_player_only = false);
+    bool PlayVoiceUniqueEventOnClient(int event);
+    void PlayWeaponVoiceSoundOnClient(int weapon);
+    std::uint64_t weapon_pickup_voice_requests = 0, voice_messages = 0, voice_delivery_failures = 0;
+    std::uint64_t trigger_sound_requests = 0, trigger_sound_starts = 0, trigger_voice_stops = 0;
+    OpenBlood2::SoundId trigger_sound = 0; // Historical unretained local one-shot.
+    std::string trigger_sound_resource, trigger_sound_error;
     std::uint64_t sound_keys = 0, sound_attempts = 0, sound_starts = 0, sound_failures = 0;
     std::uint64_t suppressed_footsteps = 0, unresolved_footsteps = 0, unavailable_sound_alerts = 0;
     OpenBlood2::SoundAlertReport sound_alert;

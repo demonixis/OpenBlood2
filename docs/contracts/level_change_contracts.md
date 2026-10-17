@@ -107,3 +107,7 @@ charges have left that list. Restore/KeepAlive preserve weapon/ammo, never old b
 handles. The shared model-projectile solver now admits CGrenade, CProximityBomb
 and CRemoteBomb. Earlier remote omissions are historical; time bombs and the
 complete M2 gate remain open.
+
+The [player VoiceMgr continuation](player_voice_contracts.md) preserves unique
+reply flags and client/group random history only after successful preparation.
+Old voice handles/deadlines are never transferred; rollback leaves them intact.

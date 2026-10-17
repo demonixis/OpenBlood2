@@ -36,7 +36,7 @@ namespace OpenBlood2
                     (unsigned long long)comm.sound_failures, comm.length);
         ImGui::Text("Scroll tab/text %.3f / %.3f | VoiceMgr requests %llu / requested delay %.3f", comm.ratio,
                     comm.text_ratio, (unsigned long long)comm.voice_manager_requests, comm.voice_manager_delay);
-        ImGui::TextWrapped("Original portrait/font HUD and client VoiceMgr stop/delay arbitration are unavailable. "
+        ImGui::TextWrapped("Original portrait/font HUD is unavailable; VoiceMgr stop/delay arbitration is connected. "
                            "These are inspected requests, not successful services.");
         if (!comm.error.empty())
             ImGui::TextWrapped("Conversation audio: %s", comm.error.c_str());
