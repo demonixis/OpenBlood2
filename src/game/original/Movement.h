@@ -64,6 +64,8 @@ class CMovement : public Aggregate
     std::uint64_t samples = 0, sample_failures = 0, calculations = 0, failures = 0;
     unsigned rays = 0, iterations = 0, added_points = 0;
     DVector requested_destination{};
+    std::uint64_t alignment_fallbacks = 0;
+    DVector alignment_direction{}, alignment_up{}, alignment_right{}; // Last successful fallback, read-only history.
     // Original FindTurn stops recursion after ten accumulated points; the typed
     // service additionally bounds loops/rays, including tiny authored dimensions.
     static constexpr unsigned max_iterations = 4096, max_rays = 8192, max_points = 64;
@@ -78,6 +80,7 @@ class CMovement : public Aggregate
     std::vector<DVector> points;
     bool fail(Outcome, const char*);
     bool ready();
+    bool frame_axes(DVector direction, DVector& forward_axis, DVector& right_axis);
     bool clear_to_point(DVector, DVector, DVector, OpenBlood2::SegmentHit&);
     bool add(DVector);
     bool cast(DVector, DVector, OpenBlood2::SegmentHit&);

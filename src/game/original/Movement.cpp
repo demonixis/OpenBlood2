@@ -18,11 +18,38 @@ namespace
     {
         return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
     }
-    // Same forward/up construction used by source AlignRotation/GetRotationVectors;
-    // no need to create a quaternion for these local query axes.
-    bool axes(DVector direction, DVector up, DVector& forward, DVector& right)
+    // Blood II's AlignRotation contract supplies another up vector for parallel
+    // axes. The later gr_GetPerpendicularVector corroborates this perturbation
+    // order/threshold. Keep this engine's existing +X right convention.
+    bool axes(DVector direction, DVector up, DVector& forward, DVector& right, bool& fallback)
     {
-        return normalize(direction, forward) && normalize(cross(up, forward), right);
+        fallback = false;
+        if (!normalize(direction, forward) || !normalize(up, up))
+            return false;
+        auto parallel = [&]() { return std::abs(vector_dot(forward, up)) > .99f; };
+        if (parallel())
+        {
+            fallback = true;
+            up.z += 5;
+            if (!normalize(up, up))
+                return false;
+            if (parallel())
+            {
+                up.x += 5;
+                up.y += 5;
+                if (!normalize(up, up))
+                    return false;
+                if (parallel())
+                {
+                    up.x += 5;
+                    up.y -= 2;
+                    up.z -= 5;
+                    if (!normalize(up, up))
+                        return false;
+                }
+            }
+        }
+        return normalize(cross(up, forward), right);
     }
     float distance(DVector a, DVector b)
     {
@@ -30,6 +57,20 @@ namespace
         return std::hypot(d.x, d.y, d.z);
     }
 } // namespace
+bool CMovement::frame_axes(DVector direction, DVector& forward_axis, DVector& right_axis)
+{
+    bool fallback = false;
+    if (!axes(direction, up, forward_axis, right_axis, fallback))
+        return false;
+    if (fallback)
+    {
+        ++alignment_fallbacks;
+        alignment_direction = forward_axis;
+        alignment_up = up;
+        alignment_right = right_axis;
+    }
+    return true;
+}
 bool CMovement::fail(Outcome status, const char* why)
 {
     outcome = status;
@@ -163,7 +204,7 @@ bool CMovement::clear_to_point(DVector start, DVector destination, DVector dimen
         dimensions.x < 0 || dimensions.y < 0 || dimensions.z < 0)
         return fail(Outcome::Invalid, "Invalid movement clearance request");
     DVector f, r;
-    if (!axes(vector_subtract(destination, start), up, f, r))
+    if (!frame_axes(vector_subtract(destination, start), f, r))
         return fail(Outcome::Invalid, "Movement clearance direction/up is degenerate");
     const float width = std::hypot(dimensions.x, dimensions.z) + .1f;
     // Source deliberately checks only two side rays, right before left. It is
@@ -180,7 +221,7 @@ bool CMovement::clear_to_point(DVector start, DVector destination, DVector dimen
 bool CMovement::shortest_turn(DVector start, DVector& facing, float step, DVector& out)
 {
     DVector f, r;
-    if (!axes(facing, up, f, r))
+    if (!frame_axes(facing, f, r))
         return fail(Outcome::Invalid, "Obstacle normal/up is degenerate");
     const auto left = vector_scale(r, -1);
     SegmentHit hit;

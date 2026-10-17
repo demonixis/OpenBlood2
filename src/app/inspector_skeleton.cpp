@@ -381,6 +381,15 @@ namespace OpenBlood2
             ImGui::Text("Remaining points %zu | source accumulated %u", m.path().size(), m.added_points);
             ImGui::Text("Requested destination %.2f %.2f %.2f", m.requested_destination.x, m.requested_destination.y,
                         m.requested_destination.z);
+            ImGui::Text("AlignRotation parallel-axis fallbacks: %llu", (unsigned long long)m.alignment_fallbacks);
+            if (m.alignment_fallbacks)
+            {
+                ImGui::Text("Last direction %.3f %.3f %.3f / reference up %.3f %.3f %.3f", m.alignment_direction.x,
+                            m.alignment_direction.y, m.alignment_direction.z, m.alignment_up.x, m.alignment_up.y,
+                            m.alignment_up.z);
+                ImGui::Text("Resolved right %.3f %.3f %.3f", m.alignment_right.x, m.alignment_right.y,
+                            m.alignment_right.z);
+            }
             for (std::size_t i = 0; i < m.path().size(); ++i)
                 ImGui::Text("%zu: %.2f %.2f %.2f", i, m.path()[i].x, m.path()[i].y, m.path()[i].z);
             if (!m.error.empty())

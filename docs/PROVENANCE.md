@@ -1,5 +1,14 @@
 # Source and Dependency Provenance
 
+## Original movement alignment
+
+The Blood II SDK requires a fallback up vector for parallel AlignRotation inputs.
+CMovement now follows that contract using the available later LithTech frame
+builder's bounded reference perturbations, retaining the existing right-axis
+convention. No reference files or dependencies are imported. See
+[source hashes](M2_AI_ALIGNMENT_SOURCES.json) and [contracts](AI_ALIGNMENT_CONTRACTS.md).
+The later implementation is corroboration, not verified retail1998 parity.
+
 ## Missing named world-model creation
 
 Original Blood II brush filename binding and SDK error 23 are cross-checked with

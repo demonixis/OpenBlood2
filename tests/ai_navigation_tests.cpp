@@ -162,8 +162,44 @@ namespace
         g.server.collision_ready = true;
         CHECK(m.ClearToPoint(start, end, dims, hit) && m.error.empty() && m.rays == 2);
         CHECK(!m.ClearToPoint(start, start, dims, hit) && m.outcome == CMovement::Outcome::Invalid);
-        CHECK(!m.ClearToPoint(start, {0, 100, 0}, dims, hit)); // Direction parallel to up has no defined side axis.
+        CHECK(m.ClearToPoint(start, {0, 100, 0}, dims, hit)); // SDK AlignRotation supplies a perpendicular up.
+        CHECK(m.alignment_fallbacks == 1 && same(m.alignment_right, {-1, 0, 0}));
         CHECK(!m.ClearToPoint(start, end, {-1, 2, 1}, hit));
+        return true;
+    }
+    bool parallel_axes(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto* a = actor(g);
+        CHECK(a && a->m_MoveObj.Init(a->m_hObject));
+        auto& m = a->m_MoveObj;
+        const auto position = m.GetPos();
+        SegmentHit hit;
+        const DVector dims{1, 2, 1};
+        CHECK(m.ClearToPoint(position, {0, 20, 0}, dims, hit));
+        CHECK(same(m.alignment_direction, {0, 1, 0}) && same(m.alignment_up, {0, 1, 0}));
+        CHECK(same(m.alignment_right, {-1, 0, 0}) && m.rays == 2);
+        CHECK(m.ClearToPoint(position, {0, 5, 0}, dims, hit));
+        CHECK(same(m.alignment_right, {1, 0, 0}));
+        CHECK(m.ClearToPoint(position, {0, 20, .01f}, dims, hit) && m.alignment_fallbacks == 3);
+        CHECK(near(vector_dot(m.alignment_direction, m.alignment_right), 0));
+        CHECK(near(vector_dot(m.alignment_right, m.alignment_right), 1));
+        CHECK(m.ClearToPoint(position, {0, 10, 100}, dims, hit) && m.alignment_fallbacks == 3);
+        CHECK(!m.ClearToPoint(position, position, dims, hit) && m.outcome == CMovement::Outcome::Invalid);
+        CHECK(!m.ClearToPoint(position, {NAN, 10, 0}, dims, hit) && m.outcome == CMovement::Outcome::Invalid);
+        CHECK(m.alignment_fallbacks == 3);
+        // Local up can also point along Z. This exercises the second reference
+        // perturbation, not a world-Y-only or hardcoded horizontal axis fallback.
+        g.objects.get(a->m_hObject)->state.m_Rotation = rotation_from_euler({1.57079632679f, 0, 0});
+        CHECK(m.Update() && m.ClearToPoint(position, {0, 10, 100}, dims, hit));
+        CHECK(m.alignment_fallbacks == 4 && same(m.alignment_up, {0, 0, 1}));
+        CHECK(near(m.alignment_right.x, .70710678f) && near(m.alignment_right.y, -.70710678f));
+        CHECK(same(g.objects.get(a->m_hObject)->state.m_Pos, position)); // Queries never move the owner.
+        g.server.collision_ready = false;
+        CHECK(!m.CalculatePath({0, 10, 100}) && m.outcome == CMovement::Outcome::Unavailable);
+        CHECK(g.objects.remove(a->m_hObject) && !m.Update() && !m.CalculatePath({0, 10, 100}));
+        CHECK(g.objects.finish_frame());
         return true;
     }
     bool rays(const char*)
@@ -329,14 +365,67 @@ namespace
         }
         return true;
     }
+    bool cityhub_parallel(const char* root)
+    {
+        GameSession g;
+        CHECK(g.initialize());
+        Config c;
+        c.data_dir = root;
+        std::string error;
+        CHECK(g.resources.mount_game(c, error));
+        HOBJECT previous = nullptr;
+        // Recorded production Cultist requests from a labelled relocation
+        // diagnostic. Recreate planner inputs against the real DAT; this is not
+        // authored NPC placement or a campaign playthrough.
+        const DVector positions[]{{1312, 613.818f, -2544}, {884.889f, 676.914f, -2394.71f}};
+        const DVector destinations[]{{1760, 446.118f, -2656}, {1760, 500.718f, -2656}};
+        const DVector dimensions[]{{24.0261f, 37.8169f, 24.0261f}, {24.6436f, 36.9135f, 24.6436f}};
+        for (unsigned cycle = 0; cycle < 2; ++cycle)
+        {
+            CHECK(g.request_world("02_CityHub", error) && g.enter_player(error) && !g.objects.get(previous));
+            for (unsigned i = 0; i < 2; ++i)
+            {
+                auto* a = actor(g, positions[i]);
+                CHECK(a);
+                previous = a->m_hObject;
+                g.objects.get(previous)->dimensions = dimensions[i];
+                auto& m = a->m_MoveObj;
+                CHECK(m.Init(previous));
+                const bool planned = m.CalculatePath(destinations[i]);
+                std::cout << "CityHub parallel contact " << i << " cycle " << cycle << ": planned=" << planned
+                          << " outcome=" << int(m.outcome) << " fallback=" << m.alignment_fallbacks
+                          << " rays=" << m.rays << " reason=" << m.error << '\n';
+                // The original lateral search cannot find a route here. That is
+                // an ordinary blocked plan, not a failed engine service or a
+                // successful route through the horizontal surface.
+                CHECK(!planned && m.outcome == CMovement::Outcome::Blocked && m.alignment_fallbacks == 1);
+                CHECK(m.rays <= m.max_rays && m.iterations <= m.max_iterations);
+                for (const auto& point : m.path())
+                    CHECK(physics_vector(point));
+                CHECK(same(g.objects.get(previous)->state.m_Pos, positions[i]));
+                CHECK(g.objects.remove(previous) && g.objects.finish_frame());
+            }
+            CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.server.string_count() &&
+                  !g.server.message_count() && !g.server.client_count());
+        }
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
     if (argc < 2)
         return 2;
-    const std::map<std::string, std::function<bool(const char*)>> tests{
-        {"sample", sample},   {"clearance", clearance}, {"rays", rays},         {"direct", direct}, {"detour", detour},
-        {"blocked", blocked}, {"limits", limits},       {"lifetime", lifetime}, {"subway", subway}};
+    const std::map<std::string, std::function<bool(const char*)>> tests{{"sample", sample},
+                                                                        {"clearance", clearance},
+                                                                        {"rays", rays},
+                                                                        {"direct", direct},
+                                                                        {"detour", detour},
+                                                                        {"blocked", blocked},
+                                                                        {"limits", limits},
+                                                                        {"lifetime", lifetime},
+                                                                        {"subway", subway},
+                                                                        {"parallel_axes", parallel_axes},
+                                                                        {"cityhub_parallel", cityhub_parallel}};
     auto i = tests.find(argv[1]);
     return i != tests.end() && i->second(argc > 2 ? argv[2] : "") ? 0 : 1;
 }

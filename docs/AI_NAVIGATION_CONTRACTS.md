@@ -83,8 +83,9 @@ objects with the existing closest-hit implementation. CastWorldRay stays primary
 both share endpoint construction. Invalid input, missing collision, hit and miss
 remain distinct. No arbitrary navigation range or invented hit is supplied.
 
-Degenerate direction/up axes, nonfinite/out-of-domain points or direction vectors and negative dimensions
-fail. Searches allow at most 4,096 iterations and 8,192 submitted ray queries per
+Zero/invalid direction or up, nonfinite/out-of-domain points or direction vectors and negative dimensions
+fail. Valid parallel axes use the [original AlignRotation fallback](AI_ALIGNMENT_CONTRACTS.md),
+superseding the earlier port's blanket degenerate-axis rejection. Searches allow at most 4,096 iterations and 8,192 submitted ray queries per
 operation; diagnostics include the rejected extra attempt when a budget is exceeded.
 Precision-stalled increments fail. Service failure aborts the algorithm rather than
 being interpreted as a clear ray. Public clearance/consolidation start fresh query
