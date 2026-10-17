@@ -866,3 +866,7 @@ Selected ComputeState, MC_Fire_Stand, Fire, MC_Extra and MagicPowerup are direct
 ## Gideon fade and teleport
 
 Selected MC_FadeOut, AI_STATE_Teleport and Special1 are directly adapted from the original subclass. See [source ledger](M2_GIDEON_TELEPORT_SOURCES.json) and [contracts](GIDEON_TELEPORT_CONTRACTS.md). Color storage/rendering, snapshot preservation, checked callbacks and replacement ray/movement policies are explicit engine adaptations. No production boss or new global is introduced.
+
+## Gideon attack and dodge sequences
+
+Selected original close/far states, dodge commands, inline Recoil and shared Bold taunt are adapted directly from original sources. See [source ledger](M2_GIDEON_ATTACK_SOURCES.json) and [contracts](GIDEON_ATTACK_CONTRACTS.md). Typed failures, inspection and shared Beg/Bold implementation are explicit adaptations; no production boss or new global is introduced.

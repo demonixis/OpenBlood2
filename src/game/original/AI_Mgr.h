@@ -185,6 +185,7 @@ class AI_Mgr : public CBaseCharacter
     bool StopVelocity();
     bool SetAnimation(DDWORD);
     bool MC_Taunt_Beg();
+    bool MC_Taunt_Bold();
     virtual bool AI_STATE_Escape_RunAway();
     virtual bool AI_STATE_Escape_Hide();
     bool AI_STATE_GuardLocation();
@@ -250,7 +251,7 @@ class AI_Mgr : public CBaseCharacter
     std::uint64_t death_starts = 0, corpses_created = 0, kill_voice_requests = 0;
     HOBJECT last_corpse = nullptr; // Non-owning; the corpse survives its original actor.
     std::string death_error;
-    bool AI_STATE_Recoil();
+    virtual bool AI_STATE_Recoil();
     std::uint64_t damage_reactions = 0, recoil_starts = 0;
     int recoil_node = -1, recoil_slot = -1;
     std::string damage_reaction_error;
@@ -467,6 +468,7 @@ class AI_Mgr : public CBaseCharacter
     bool runtime_busy = false;
     bool locomotion_busy = false;
     bool LocomotionReady();
+    bool TauntMovement(unsigned slot, int command);
     bool LocomotionFailure(std::string_view);
     bool Locomotion(bool run, bool fire, bool crawl = false);
     bool navigation_busy = false;

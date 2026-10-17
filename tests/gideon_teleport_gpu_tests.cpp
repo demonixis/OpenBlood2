@@ -81,6 +81,11 @@ int main(int argc, char** argv)
     WorldRenderer renderer(runtime.gpu);
     GameSession g;
     CHECK(g.initialize());
+    auto floor = test_brush::box("distant floor", {-10000, -2000, -10000}, {10000, -1990, 10000});
+    for (auto& surface : floor.surfaces)
+        surface.flags = 1;
+    CHECK(g.collision.build(floor, error));
+    g.server.collision_ready = true;
     std::filesystem::create_directories(argv[1]);
     if (argc == 3)
     {
@@ -148,6 +153,20 @@ int main(int argc, char** argv)
     a->Metacmd = 4;
     CHECK(a->AI_STATE_Teleport() && update_model_scene(g, view, error) && view.mesh.blended == 0);
     CHECK(render(runtime, renderer, view, eye, camera, capture, again, error) && again == full);
+    // Original dodge uses server time and cached lateral velocity, independently
+    // of both the inspector and rendering. Exercise the actual posed model too.
+    a->m_fRollSpeed = 3.5f;
+    const auto start = record->state.m_Pos;
+    CHECK(a->MC_Dodge_Right() && g.step(.5) && a->MC_Dodge_Right());
+    CHECK(std::abs(record->state.m_Pos.x - start.x - 1.75f) < .003f && a->m_bAnimating);
+    CHECK(update_model_scene(g, view, error) && render(runtime, renderer, view, eye, camera, capture, again, error));
+    CHECK(again != full && capture.save((std::filesystem::path(argv[1]) / "gideon-dodge.png").c_str()));
+    clock = record->animation.time;
+    const auto calls = a->dodge_calls;
+    CHECK(update_model_scene(g, view, error) && render(runtime, renderer, view, eye, camera, capture, half, error));
+    CHECK(again == half && record->animation.time == clock && a->dodge_calls == calls);
+    CHECK(g.step(.5) && a->MC_Dodge_Right() && !a->m_bAnimating && a->dodge_finishes == 1);
+    CHECK(std::abs(record->state.m_Pos.x - start.x - 3.5f) < .003f && record->velocity.x == 3.5f);
     CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame() && update_model_scene(g, view, error));
     CHECK(view.entries.empty() && render(runtime, renderer, view, eye, camera, capture, again, error) && again == zero);
     CHECK(g.unload_world());
@@ -155,6 +174,6 @@ int main(int argc, char** argv)
     renderer.clear_geometry();
     std::cout << (argc == 3 ? "External Gideon" : "Synthetic triangle") << ": " << ink
               << " visible pixels; original 16-step fade reaches empty frame; reappearance exact; repeated reads do "
-                 "not advance clocks.\n";
+                 "not advance clocks. Dodge motion integrates once and finishes at one second.\n";
     return 0;
 }

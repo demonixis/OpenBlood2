@@ -1,0 +1,33 @@
+{
+  "baseline_commit": "8eedff348da3f3b2b490e276c56eb84f27a61cc4",
+  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
+      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
+      "use": "MC_Dodge_Left/Right 249-315 and AI_STATE_AttackClose/Far 481-580"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Gideon.h",
+      "sha256": "5a1c49b5d7e8cfd89b851955a0bc64d5f07c2718b2b911ab40a45f0b745e57c9",
+      "use": "Inline AI_STATE_Recoil at line56"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "MC_Taunt_Beg/Bold 5355-5411"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
+      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
+      "use": "IsRandomChance percent rule at193-196"
+    }
+  ],
+  "adaptations": [
+    "Selected original methods, no production constructor/factory or new shared table.",
+    "Typed failures for unavailable model/cache/target/velocity, invalid clocks/speeds and counter overflow.",
+    "Existing cached-transform timing, portable RNG, atomic foot-anchored resize and single replacement physics integration.",
+    "Shared Beg/Bold helper preserves source entry-only lateral velocity; virtual Recoil permits original subclass dispatch.",
+    "Inspection counters and explicit diagnostic fixtures do not substitute for production AI_Update."
+  ]
+}

@@ -112,3 +112,5 @@ Shade recovery, smell following, assist/pickup/recoil/death states, full product
 NPC initialization/update/activation, required client FX and ExitTrigger/session
 services remain open. SubwayA still has 17 unsupported source entries. Other
 platforms, XR and retail gameplay/physics parity remain unverified.
+
+The [Gideon attack continuation](GIDEON_ATTACK_CONTRACTS.md) supersedes the selected attack/dodge/recoil sequencing omissions and adds original Bold taunt. Production boss lifecycle and the M2 gate remain incomplete.

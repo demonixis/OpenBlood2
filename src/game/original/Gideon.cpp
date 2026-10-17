@@ -352,3 +352,145 @@ bool Gideon::TeleportStep(bool special)
             return true; // Original switch has no default action.
     }
 }
+
+// Original Gideon.cpp:249-315,481-580 and Gideon.h:56.
+bool Gideon::MC_Dodge_Left()
+{
+    return Dodge(false);
+}
+bool Gideon::MC_Dodge_Right()
+{
+    return Dodge(true);
+}
+bool Gideon::Dodge(bool right)
+{
+    state_error.clear();
+    auto* s = GetServerDE();
+    const auto* table = AnimSound();
+    if (teleport_busy || !s || !s->IsObjectAlive(m_hObject) || !table || !m_MoveObj.initialized || !m_MoveObj.sampled ||
+        !std::isfinite(s->GetTime()) || !std::isfinite(m_fRollSpeed) || m_fRollSpeed < 0 || m_fRollSpeed > 1e7f)
+        return StateFailure("Gideon dodge owner/table/cache/clock/speed unavailable");
+    const int command = right ? 22 : 21;
+    const bool start = !m_bAnimating || m_nCurMetacmd != command;
+    const float elapsed = start ? 0 : s->GetTime() - m_fTimeStart;
+    if (!std::isfinite(elapsed) || elapsed < 0 || (elapsed >= 1 && Metacmd == std::numeric_limits<int>::max()))
+        return StateFailure("Gideon dodge elapsed time or completion counter invalid");
+    ++dodge_calls;
+    dodge_elapsed = elapsed;
+    if (start)
+    {
+        m_fTimeStart = s->GetTime();
+        if (!SetAnimation(right ? table->m_nAnim_DODGE_RIGHT : table->m_nAnim_DODGE_LEFT))
+            return false;
+        s->SetModelLooping(m_hObject, DFALSE);
+    }
+    // Cached basis and unnormalized velocity; Move never integrates position.
+    if (!Move(vector_scale(m_MoveObj.GetRightVector(), right ? 1.f : -1.f), m_fRollSpeed))
+        return StateFailure("Gideon dodge velocity service failed");
+    if (start)
+    {
+        m_bAnimating = true;
+        m_nCurMetacmd = command;
+    }
+    else if (elapsed >= 1)
+    {
+        m_bAnimating = false;
+        ++Metacmd;
+        ++dodge_finishes;
+        // Source leaves lateral velocity intact and ignores MS_PLAYDONE.
+    }
+    return true;
+}
+bool Gideon::AttackReady(bool distance)
+{
+    auto* s = GetServerDE();
+    if (teleport_busy || !s || !s->IsObjectAlive(m_hObject) || (GetTarget() && !s->IsObjectAlive(GetTarget())))
+        return StateFailure("Gideon attack owner/target unavailable or teleport callback active");
+    if (distance)
+    {
+        if (!m_MoveObj.initialized || !m_MoveObj.sampled || !target_position_valid || !physics_vector(m_vTargetPos) ||
+            !physics_vector(m_MoveObj.GetPos()) || !std::isfinite(m_fSeeingDist) || m_fSeeingDist < 0)
+            return StateFailure("Gideon attack distance/cache invalid");
+        const auto delta = vector_subtract(m_MoveObj.GetPos(), m_vTargetPos);
+        attack_distance = std::hypot(delta.x, delta.y, delta.z);
+        if (!std::isfinite(attack_distance))
+            return StateFailure("Gideon attack distance overflow");
+        m_fStimuli[0] = attack_distance; // Source temporarily stores raw distance in SIGHT.
+    }
+    return true;
+}
+bool Gideon::AI_STATE_AttackClose()
+{
+    state_error.clear();
+    ++attack_updates;
+    if (!AttackReady(false))
+        return false;
+    if (!GetTarget())
+        return SetNewState(StateSearchVisual);
+    switch (Metacmd)
+    {
+        case 1:
+            return MC_FaceTarget();
+        case 2:
+            if (!AttackReady(true))
+                return false;
+            if (m_fStimuli[0] <= m_fSeeingDist * .90f || m_nCurMetacmd == 7)
+                return MC_Fire_Stand();
+            if (!MC_FaceTarget())
+                return false;
+            --Metacmd;
+            if (m_fStimuli[0] > m_fSeeingDist * .40) // Original double literal.
+                return SetNewState(StateSpecial1);
+            return MC_Walk();
+        case 3:
+            if (m_nCurMetacmd == 22)
+                return MC_Dodge_Right();
+            if (m_nCurMetacmd == 21)
+                return MC_Dodge_Left();
+            if (!GetServerDE()->RandomInt(0, 99, dodge_roll))
+                return StateFailure("Gideon dodge chance draw unavailable");
+            return dodge_roll < 50 ? MC_Dodge_Right() : MC_Dodge_Left();
+        case 4:
+            return ComputeState();
+        default:
+            return true; // Original switch has no default action.
+    }
+}
+bool Gideon::AI_STATE_AttackFar()
+{
+    state_error.clear();
+    ++attack_updates;
+    if (!AttackReady(false))
+        return false;
+    if (!GetTarget())
+        return SetNewState(StateSearchVisual);
+    if (!AttackReady(true))
+        return false;
+    switch (Metacmd)
+    {
+        case 1:
+            if (!MC_FaceTarget())
+                return false;
+            --Metacmd;
+            // MC_FaceTarget does not replace the current action command.
+            return m_fStimuli[0] <= m_fSeeingDist * .30f || m_nCurMetacmd == 7 ? MC_Fire_Stand()
+                                                                               : SetNewState(StateSpecial1);
+        case 2:
+            return MC_Taunt_Bold();
+        case 3:
+            if (!MC_FaceTarget())
+                return false;
+            --Metacmd;
+            return m_fStimuli[0] <= m_fSeeingDist * .40f ? SetNewState(StateSpecial1) : MC_Walk();
+        case 4:
+            return ComputeState();
+        default:
+            return true;
+    }
+}
+bool Gideon::AI_STATE_Recoil()
+{
+    if (!AttackReady(false))
+        return false;
+    return SetNewState(StateSpecial1);
+}

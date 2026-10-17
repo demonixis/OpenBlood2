@@ -102,3 +102,5 @@ The [AI recovery/navigation continuation](AI_RECOVERY_CONTRACTS.md) now executes
 jump/crouch/crawl and seven destination/recovery/visual-search states. Earlier
 blanket omissions for those bodies are superseded. Failed partial routes remain
 unusable; shade recovery, other states and full production AI_Update remain open.
+
+The [Gideon attack continuation](GIDEON_ATTACK_CONTRACTS.md) supersedes the selected attack/dodge/recoil sequencing omissions and adds original Bold taunt. Production boss lifecycle and the M2 gate remain incomplete.

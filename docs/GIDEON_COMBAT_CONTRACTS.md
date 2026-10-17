@@ -105,3 +105,5 @@ and the unchanged M2 acceptance gate remain open. No retail playthrough, other
 platform or XR validation is claimed.
 
 The [Gideon fade/teleport continuation](GIDEON_TELEPORT_CONTRACTS.md) adds the original selected states, live model color/alpha, real transparent model presentation and supported player color preservation. Earlier blanket omissions are historical; production boss lifecycle and M2 remain incomplete.
+
+The [Gideon attack continuation](GIDEON_ATTACK_CONTRACTS.md) supersedes the selected attack/dodge/recoil sequencing omissions and adds original Bold taunt. Production boss lifecycle and the M2 gate remain incomplete.

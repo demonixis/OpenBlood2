@@ -13,6 +13,14 @@ class Gideon : public AI_Mgr
     bool MC_Extra(std::string_view) override;
     bool MagicPowerup();
     bool MC_FadeOut();
+    bool MC_Dodge_Left();
+    bool MC_Dodge_Right();
+    bool AI_STATE_AttackClose() override;
+    bool AI_STATE_AttackFar() override;
+    bool AI_STATE_Recoil() override;
+    std::uint64_t attack_updates = 0, dodge_calls = 0, dodge_finishes = 0;
+    int dodge_roll = -1;
+    float attack_distance = 0, dodge_elapsed = 0;
     bool AI_STATE_Teleport() override;
     bool AI_STATE_Special(int) override;
     std::uint64_t fade_calls = 0, teleport_moves = 0;
@@ -31,6 +39,8 @@ class Gideon : public AI_Mgr
     InventoryResult completion_selection = InventoryResult::NotAvailable;
 
   private:
+    bool Dodge(bool right);
+    bool AttackReady(bool distance);
     bool TeleportStep(bool special);
     bool teleport_busy = false;
 };

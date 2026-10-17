@@ -434,6 +434,13 @@ namespace OpenBlood2
                         int(boss->completion_selection));
             ImGui::TextWrapped("No timed firing or generic clearance query. Actual weapon shots retain their own "
                                "collision and lifetime checks.");
+            ImGui::Text("Attack updates %llu | last distance %.2f | dodge roll %d",
+                        (unsigned long long)boss->attack_updates, boss->attack_distance, boss->dodge_roll);
+            ImGui::Text("Dodge calls %llu | finishes %llu | elapsed %.3f / 1 s | lateral speed %.2f",
+                        (unsigned long long)boss->dodge_calls, (unsigned long long)boss->dodge_finishes,
+                        boss->dodge_elapsed, boss->m_fRollSpeed);
+            ImGui::TextWrapped("Dodge completion uses the server clock, not playback; dodge/taunt retain lateral "
+                               "velocity. Attack distance uses the cached movement position.");
             ImGui::Text("Fade calls %llu | completed moves %llu | ray result %d", (unsigned long long)boss->fade_calls,
                         (unsigned long long)boss->teleport_moves, int(boss->teleport_ray));
             ImGui::Text("Teleport requested %.2f %.2f %.2f", boss->teleport_requested.x, boss->teleport_requested.y,

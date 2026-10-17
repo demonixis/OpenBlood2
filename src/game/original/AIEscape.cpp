@@ -8,22 +8,32 @@ using namespace OpenBlood2;
 
 bool AI_Mgr::MC_Taunt_Beg()
 {
+    return TauntMovement(6, 17);
+}
+bool AI_Mgr::MC_Taunt_Bold()
+{
+    return TauntMovement(4, 18);
+}
+// Original AI_Mgr.cpp:5355-5411: both taunts start with a rightward velocity
+// write, then wait for playback without refreshing or stopping that velocity.
+bool AI_Mgr::TauntMovement(unsigned slot, int command)
+{
     ++locomotion_calls;
     if (locomotion_busy)
-        return LocomotionFailure("Reentrant beg command rejected");
+        return LocomotionFailure("Reentrant taunt command rejected");
     locomotion_busy = true;
     locomotion_error.clear();
-    locomotion_command = 17;
+    locomotion_command = command;
     // No callbacks occur in these typed clip/velocity operations. Keep original
     // SetAnimation -> nonloop -> rightward Move -> command state ordering.
     bool ok = LocomotionReady();
     if (ok && (!std::isfinite(m_fRollSpeed) || m_fRollSpeed < 0 || m_fRollSpeed > 1e7f ||
                Metacmd == std::numeric_limits<int>::max()))
-        ok = LocomotionFailure("Invalid beg roll speed/Metacmd");
-    if (ok && (!m_bAnimating || m_nCurMetacmd != 17))
+        ok = LocomotionFailure("Invalid taunt roll speed/Metacmd");
+    if (ok && (!m_bAnimating || m_nCurMetacmd != command))
     {
-        if (!m_pAnim_Sound || !SetAnimation(m_pAnim_Sound->m_nAnim_TAUNT[6]))
-            ok = LocomotionFailure("Beg animation table/clip/resize unavailable");
+        if (!m_pAnim_Sound || !SetAnimation(m_pAnim_Sound->m_nAnim_TAUNT[slot]))
+            ok = LocomotionFailure("Taunt animation table/clip/resize unavailable");
         else
         {
             GetServerDE()->SetModelLooping(m_hObject, DFALSE);
@@ -31,7 +41,7 @@ bool AI_Mgr::MC_Taunt_Beg()
             if (ok)
             {
                 m_bAnimating = true;
-                m_nCurMetacmd = 17;
+                m_nCurMetacmd = command;
             }
             else
                 LocomotionFailure(script_motion_error);
@@ -41,7 +51,7 @@ bool AI_Mgr::MC_Taunt_Beg()
     {
         std::string name;
         if (!GetServerDE()->GetModelAnimationName(m_hObject, GetServerDE()->GetModelAnimation(m_hObject), name))
-            ok = LocomotionFailure("Beg playback unavailable");
+            ok = LocomotionFailure("Taunt playback unavailable");
         else if (GetServerDE()->GetModelPlaybackState(m_hObject) & MS_PLAYDONE)
         {
             m_bAnimating = false;

@@ -95,3 +95,5 @@ SubwayA remains 203 created / 4 transferred sounds / 372 editor-only /
 1 unsupported Gideon / 0 creation failures. Required boss services/FX and safe
 NEW_LEVEL keep the actual M2 gate open. Linux validation is not a retail boss
 playthrough, other-platform claim or XR verification.
+
+The [Gideon attack continuation](GIDEON_ATTACK_CONTRACTS.md) supersedes the selected attack/dodge/recoil sequencing omissions and adds original Bold taunt. Production boss lifecycle and the M2 gate remain incomplete.
