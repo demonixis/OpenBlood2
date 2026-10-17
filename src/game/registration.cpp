@@ -29,6 +29,7 @@
 #include "game/original/RotatingDoor.h"
 #include "game/original/SmellHint.h"
 #include "game/original/Sound.h"
+#include "game/original/SoundFX.h"
 #include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
 #include "game/original/WeaponPickups.h"
@@ -128,6 +129,19 @@ namespace OpenBlood2
                                {"Volume", std::int32_t(100)},
                                {"Ambient", true},
                                {"FileStream", false}}};
+        const ClassInfo sound_fx{"SoundFX",
+                                 &b2base,
+                                 construct<SoundFX>,
+                                 {{"StartOn", true},
+                                  {"RampUpSound", std::string{}},
+                                  {"RampDownSound", std::string{}},
+                                  {"Sound", std::string{}},
+                                  {"Priority", std::int32_t(0)},
+                                  {"OuterRadius", 500.0f},
+                                  {"InnerRadius", 100.0f},
+                                  {"Volume", std::int32_t(100)},
+                                  {"Ambient", true},
+                                  {"FileStream", false}}};
         const ClassInfo random_sound{"RandomSoundFX", &b2base, construct<RandomSoundFX>, []
                                      {
                                          std::vector<PropertySpec> p{
@@ -711,9 +725,9 @@ namespace OpenBlood2
                objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
                objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
                objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
-               objects.register_class(detail_sprite) && objects.register_class(sound) &&
-               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
-               objects.register_class(game_start) && objects.register_class(path) &&
+               objects.register_class(sound_fx) && objects.register_class(detail_sprite) &&
+               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
+               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(exit_hint) && objects.register_class(character) &&
                objects.register_class(ai_manager) && objects.register_class(cultist) &&

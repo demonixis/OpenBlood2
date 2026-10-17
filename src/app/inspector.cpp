@@ -11,6 +11,7 @@
 #include "game/original/Projectile.h"
 #include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
+#include "game/original/SoundFX.h"
 #include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
 
@@ -596,6 +597,33 @@ namespace OpenBlood2
                         if (state.m_ObjectType == OT_MODEL)
                             ImGui::Text("Model additive RGB (lighting pending) %.3f %.3f %.3f | alpha %.3f",
                                         object->color.x, object->color.y, object->color.z, object->alpha);
+                        if (const auto* sound = dynamic_cast<const SoundFX*>(object->game.get()))
+                        {
+                            ImGui::SeparatorText("Original SoundFX");
+                            ImGui::Text("State %s | startup %s | %s | streaming requested %s", sound->state_name(),
+                                        sound->start_on ? "on" : "off", sound->ambient ? "ambient" : "spatial",
+                                        sound->file_stream ? "yes (unsupported)" : "no");
+                            ImGui::TextWrapped("Ramp up: %s | Main: %s | Ramp down: %s", sound->ramp_up.c_str(),
+                                               sound->sound_path.c_str(), sound->ramp_down.c_str());
+                            ImGui::Text("Radii %.1f / %.1f | volume byte %u | priority %u", sound->inner_radius,
+                                        sound->outer_radius, unsigned(sound->volume), unsigned(sound->priority));
+                            ImGui::Text("Commands %llu | starts %llu | failures %llu",
+                                        (unsigned long long)sound->commands, (unsigned long long)sound->attempts,
+                                        (unsigned long long)sound->failures);
+                            if (const auto* voice = game.server.audio.get(sound->sound))
+                                ImGui::Text("Voice %llu | %s | loop %s | %.3f / %.3f s | fixed %.1f %.1f %.1f",
+                                            (unsigned long long)voice->id, voice->done ? "finished" : "playing",
+                                            voice->request.loop ? "yes" : "no", voice->cursor / voice->clip->rate,
+                                            voice->clip->duration(), voice->position.x, voice->position.y,
+                                            voice->position.z);
+                            else
+                                ImGui::TextUnformatted("No live voice.");
+                            if (!sound->error.empty())
+                                ImGui::TextWrapped("Playback failure: %s", sound->error.c_str());
+                            ImGui::TextWrapped(
+                                "Only ambient ON loops. Reverb/streaming/save are unavailable. "
+                                "Hidden/inactive objects remain listed; failed source schemas are in World.");
+                        }
                         if (const auto* model = dynamic_cast<const CDestructableModel*>(object->game.get()))
                         {
                             ImGui::SeparatorText("Original destructible model");

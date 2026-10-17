@@ -157,9 +157,10 @@ namespace OpenBlood2
                 use(path, "BSP texture");
         for (const auto& source : world.objects)
             for (auto key :
-                 {"Filename", "Skin", "SoundName", "SpriteSurfaceName", "OpenBusySound", "OpenStopSound",
-                  "CloseBusySound", "CloseStopSound", "LockedSound", "UnlockedSound", "InitFilename", "InitSkin",
-                  "DamageFilename", "DamageSkin", "DestroyFilename", "DestroySkin", "SlidingSound"})
+                 {"Filename",      "Skin",           "SoundName",      "SpriteSurfaceName", "OpenBusySound",
+                  "OpenStopSound", "CloseBusySound", "CloseStopSound", "LockedSound",       "UnlockedSound",
+                  "InitFilename",  "InitSkin",       "DamageFilename", "DamageSkin",        "DestroyFilename",
+                  "DestroySkin",   "SlidingSound",   "RampUpSound",    "RampDownSound",     "Sound"})
                 if (const auto* p = source.find(key))
                     if (const auto* path = std::get_if<std::string>(p))
                         use(*path, key);

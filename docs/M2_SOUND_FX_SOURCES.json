@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "87b6c35b8af8c2322091615644401c3d3e88afab",
+  "status": "M2 incomplete; original nonstreaming SoundFX controllers",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/SoundFX.cpp",
+      "source_sha256": "0e9115b1a3d8fc3ff85298dd99c9d3c09c12d1a5fa8ed8aa9d231cfe766bf5ce",
+      "purpose": "Original constructor, properties, callback order, trigger/state/duration rules and playback flags; save/load/precache omitted."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/SoundFX.h",
+      "source_sha256": "203ce748e77c8f81f5e42d63f1aef0b319fd06a77cf5997216595adb380b474d",
+      "purpose": "Original four-state model and fields; owned strings and checked voice identities replace legacy handles."
+    },
+    {
+      "source": "sources/blood2/Shared/SoundTypes.h",
+      "source_sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "purpose": "MISC_LOW constructor priority zero."
+    },
+    {
+      "source": "sources/blood2/Shared/ClientServerShared.h",
+      "source_sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
+      "purpose": "Original saveable user flag bit three."
+    }
+  ],
+  "ports": [
+    "src/game/original/SoundFX.cpp",
+    "src/game/original/SoundFX.h"
+  ],
+  "adaptations": [
+    "Owned path strings remove duplicate destructor release; checked null trigger text",
+    "Reuse typed fixed-position retained audio; explicit streaming rejection",
+    "Registration and read-only in-game inspection; strict historical schema failures retained"
+  ],
+  "unsupported": [
+    "FileStream/TIMESYNC; historical VoiceType schemas",
+    "Save/restore, precache, reverb, priority arbitration",
+    "Safe automatic NEW_LEVEL and complete M2"
+  ]
+}

@@ -889,3 +889,12 @@ bodies reuse the existing atomic box solver; source contact forces remain absent
 AI CheckClearShot now includes the original model-only destructible exclusion.
 See [ledger](M2_DESTRUCTABLE_MODEL_SOURCES.json) and [contracts](DESTRUCTABLE_MODEL_CONTRACTS.md).
 No new dependency or mutable global is introduced.
+
+## Original SoundFX controllers
+
+The original ObjectDLL SoundFX property/callback/command/state rules now use the
+existing typed audio mixer, including real ramp durations and ambient loops.
+See [ledger](M2_SOUND_FX_SOURCES.json) and [contracts](SOUND_FX_CONTRACTS.md).
+Owned strings fix the original duplicate destructor release; null commands are
+checked. FileStream/TIMESYNC, historical VoiceType, reverb and save remain explicit
+limits. No reference source, mutable game global or new dependency is introduced.

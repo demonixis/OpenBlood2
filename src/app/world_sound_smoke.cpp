@@ -1,4 +1,5 @@
 #include "world_sound_smoke.h"
+#include "game/original/SoundFX.h"
 namespace OpenBlood2
 {
     bool check_world_sound_smoke(GameSession& g)
@@ -14,7 +15,42 @@ namespace OpenBlood2
                     return false;
                 ++count;
             }
-        return count == 4 && g.server.audio.has_output() && g.server.audio.submitted_frames > 0 &&
-               g.server.audio.output_error.empty();
+        if (count != 4 || !g.server.audio.has_output() || !g.server.audio.submitted_frames ||
+            !g.server.audio.output_error.empty())
+            return false;
+        // Labelled SoundFX probe with an actual decoded SubwayA asset; runs while UI is hidden and after reload.
+        std::string resource;
+        for (const auto& entry : g.entries)
+            if (entry.state == EntryState::WorldSound)
+            {
+                resource = g.server.audio.get(entry.sound)->request.resource;
+                break;
+            }
+        auto h =
+            g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::World,
+                             {{"Name", std::string("diagnostic_soundfx")}, {"StartOn", false}, {"Sound", resource}});
+        auto* sound = dynamic_cast<SoundFX*>(g.server.HandleToObject(h));
+        if (!sound)
+            return false;
+        auto command = [&](const char* text)
+        {
+            auto str = g.server.CreateString(text);
+            auto message = g.server.StartMessageToObject(nullptr, h, 1000);
+            const bool ok = message && g.server.WriteToMessageHString(message, str) == DE_OK &&
+                            g.server.EndMessage(message) == DE_OK;
+            g.server.FreeString(str);
+            return ok;
+        };
+        if (!command("ON") || !sound->sound || sound->state != SoundFX::On)
+            return false;
+        const auto voice = sound->sound;
+        const auto submitted = g.server.audio.submitted_frames;
+        if (!g.server.advance_audio(.02, {}, {}) || g.server.audio.submitted_frames <= submitted ||
+            !g.server.audio.get(voice) || g.server.audio.get(voice)->cursor <= 0 ||
+            !g.server.audio.get(voice)->request.loop || !command("OFF") || sound->state != SoundFX::Off ||
+            g.server.audio.get(voice) || !g.objects.remove(h))
+            return false;
+        g.objects.finish_frame();
+        return !g.objects.get(h) && g.server.audio.output_error.empty();
     }
 } // namespace OpenBlood2
