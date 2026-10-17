@@ -210,6 +210,9 @@ namespace OpenBlood2
                         ImGui::Text("Saved medkit: %u charges (retained by keep-alive)", *inventory.medkit_charge);
                     else
                         ImGui::TextUnformatted("Saved medkit: absent");
+                    if (inventory.flashlight)
+                        ImGui::Text("Saved flashlight: %u / %.3f seconds; restores inactive",
+                                    inventory.flashlight->count, inventory.flashlight->remaining);
                     for (const auto& key : inventory.keys)
                         ImGui::Text("Key %s: %u uses", key.name.c_str(), key.uses);
                     ImGui::TreePop();

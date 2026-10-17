@@ -40,6 +40,21 @@ namespace OpenBlood2
             for (unsigned i = 1; i <= 8; ++i)
                 ImGui::Text("%u: %.0f / %.0f", i, player->m_InventoryMgr.GetAmmoCount(i),
                             player->m_InventoryMgr.MaxAmmo(i));
+            if (const auto& item = player->m_InventoryMgr.flashlight)
+            {
+                const auto& fx = game.client_shell.flashlight;
+                ImGui::Text("Flashlight (L): %u / 100, %.3f seconds, active %d, child alive %d", item->count,
+                            item->remaining, item->active, game.server.IsObjectAlive(item->light));
+                ImGui::Text("Ray %d / visible %d / distance %.2f / radius %.2f / intensity %.3f", int(fx.result),
+                            fx.visible, fx.distance, fx.light.radius, fx.light.color.x);
+                ImGui::Text("Light at %.2f %.2f %.2f / updates %llu", fx.light.position.x, fx.light.position.y,
+                            fx.light.position.z, (unsigned long long)fx.updates);
+                ImGui::TextWrapped("Point shade unavailable: original fallback. Radial brightening, no shadows. "
+                                   "Resource 301 / flashlight.pcx HUD unavailable.");
+                ImGui::TextWrapped("Item: %s / effect: %s", item->error.c_str(), fx.error.c_str());
+            }
+            else
+                ImGui::TextUnformatted("Flashlight: not collected (L after collection)");
             if (const auto& item = player->m_InventoryMgr.medkit)
             {
                 ImGui::Text("Medkit: %u / 100 charges", item->count);

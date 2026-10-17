@@ -296,7 +296,7 @@ namespace
                 unknown += row.state == EntryState::Unsupported;
                 failed += row.state == EntryState::Failed;
             }
-            CHECK(made == 452 && unknown == 1 && failed == 1);
+            CHECK(made == 453 && unknown == 0 && failed == 1);
             for (auto id : g.objects.snapshot())
                 if (auto* pu = dynamic_cast<RemotesPU*>(g.objects.get(id)->game.get()))
                 {

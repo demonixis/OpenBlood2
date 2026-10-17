@@ -171,7 +171,7 @@ namespace OpenBlood2
         bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
                                 BodyPlacement&) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
-        SegmentResult CastRay(DVector, DVector, SegmentHit&) override;
+        SegmentResult CastRay(DVector, DVector, SegmentHit&, HOBJECT ignore = nullptr) override;
         SegmentResult CastWorldRay(DVector, DVector, SegmentHit&) override;
         SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false,
                                        SegmentObjects objects = SegmentObjects::SolidOnly,

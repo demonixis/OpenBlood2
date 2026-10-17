@@ -52,6 +52,14 @@ CInventoryMgr::~CInventoryMgr()
 }
 DDWORD CInventoryMgr::EngineMessageFn(LPBASECLASS object, DDWORD message, void* data, DFLOAT fData)
 {
+    if (message == MID_UPDATE && flashlight)
+    {
+        const auto count = flashlight->count;
+        const auto active = flashlight->active;
+        flashlight->Update(); // Checked by the session; error remains on the item.
+        if (count != flashlight->count || active != flashlight->active)
+            ++revision;
+    }
     if (message == MID_UPDATE)
         for (unsigned i = 0; i < m_Weapons.size(); ++i)
         {
@@ -373,8 +381,17 @@ InventoryResult CInventoryMgr::DropCurrentWeapon()
 // Selected original AddItem/SetActiveItem branches; other items remain unsupported.
 InventoryResult CInventoryMgr::AddItem(DBYTE type, DBYTE value)
 {
-    if (type != 1 || !BaseClass::GetServerDE()->IsObjectAlive(m_hOwner))
+    if ((type != 1 && type != 2) || !BaseClass::GetServerDE()->IsObjectAlive(m_hOwner))
         return InventoryResult::Invalid;
+    if (type == 2)
+    {
+        if (!flashlight)
+            flashlight = std::make_unique<CInvFlashlight>(m_hOwner);
+        else if (!flashlight->AddItem(value))
+            return InventoryResult::AlreadyHave;
+        ++revision;
+        return InventoryResult::Ok;
+    }
     if (!medkit)
         medkit.emplace().Init(m_hOwner);
     else if (!medkit->AddItem(value))
@@ -386,6 +403,13 @@ InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
 {
     if (type == 7 || type == 8)
         return SelectInventoryWeapon(WEAP_PROXIMITYBOMB + type - 7);
+    if (type == 2)
+    {
+        if (!flashlight || !flashlight->ActivateItem())
+            return InventoryResult::NotAvailable;
+        ++revision;
+        return InventoryResult::Ok;
+    }
     if (type != 1 || !medkit)
         return InventoryResult::NotAvailable;
     const auto before = medkit->count;

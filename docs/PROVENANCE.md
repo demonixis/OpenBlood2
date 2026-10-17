@@ -1,5 +1,14 @@
 # Source and Dependency Provenance
 
+## Original flashlight
+
+Selected original GameInvItems, InvItem, ItemPickups, InventoryMgr, PlayerObj and
+client FlashlightFX/BloodClientShell branches supply charge, ownership, commands,
+hit-light placement and audio. Typed ownership/snapshots and one bounded radial
+point shader replace engine services; point-shade failure uses the original
+fallback. See [source hashes](M2_FLASHLIGHT_SOURCES.json) and
+[contracts](FLASHLIGHT_CONTRACTS.md). Reference files and dependency pins are unchanged.
+
 ## Metal shader packaging
 
 Project-owned GLSL is compiled to SPIR-V and translated offline using pinned

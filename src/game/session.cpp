@@ -474,6 +474,12 @@ namespace OpenBlood2
         ok = objects.finish_frame() && ok;
         ok = objects.refresh_attachments() && ok;
         ok = server.advance_lights() && ok;
+        auto* flash_owner = server_shell.Player(local_client);
+        const auto* flash_item = flash_owner ? flash_owner->m_InventoryMgr.flashlight.get() : nullptr;
+        ok = (!flash_item || flash_item->update_ok) && ok;
+        ok = client_shell.flashlight.Update(server, flash_item ? flash_item->light : nullptr,
+                                            flash_owner ? flash_owner->m_hObject : nullptr) &&
+             ok;
         ok = server.explosion_sprites.advance(objects.time()) && ok;
         ok = server.weapon_sprites.advance(objects.time()) && ok;
         ok = server.explosion_models.advance(objects.time()) && ok;

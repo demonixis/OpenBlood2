@@ -113,3 +113,10 @@ charges have left that list. Restore/KeepAlive preserve weapon/ammo, never old b
 handles. The shared model-projectile solver now admits CGrenade, CProximityBomb
 and CRemoteBomb. Earlier remote omissions are historical; time bombs and the
 complete M2 gate remain open.
+
+
+The [flashlight continuation](FLASHLIGHT_CONTRACTS.md) adds original item2, L toggle,
+active-only charge, local audio, checked child lifetime and forced-inactive
+Restore/KeepAlive. One radial point light is rendered over the unlit world/models;
+GetPointShade, shadows and general dynamic illumination remain unavailable.
+Earlier blanket flashlight omissions are superseded only by this bounded subset.

@@ -988,8 +988,8 @@ namespace
                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
                 else
                 {
-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 484 && d.editor_only == 541 &&
-                          d.unknown == 1 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                    CHECK(d.entries.size() == 1026 && d.schema_checked == 485 && d.editor_only == 541 &&
+                          d.unknown == 0 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
                     for (const auto& e : d.entries)
                         if (e.state == DestinationEntryState::InvalidProperties)
                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
@@ -1222,6 +1222,12 @@ namespace
         player->m_nAttribSpeed = 6;
         CHECK(player->m_InventoryMgr.AddItem(1, 1) == InventoryResult::Ok);
         player->m_InventoryMgr.medkit->count = 43;
+        CHECK(player->m_InventoryMgr.AddItem(2, 1) == InventoryResult::Ok);
+        auto& flashlight = *player->m_InventoryMgr.flashlight;
+        CHECK(flashlight.ActivateItem());
+        flashlight.remaining = 32;
+        flashlight.count = 27;
+        auto flashlight_child = flashlight.light;
         player->m_damage.SetHitPoints(37);
         player->m_damage.SetArmorPoints(23);
         player->m_InventoryMgr.SetAmmoCount(1, 1234);
@@ -1247,6 +1253,7 @@ namespace
             CHECK(game->world_revision == revision && game->objects.time() == time);
             CHECK(player->m_damage.m_fHitPoints == 37 && player->m_InventoryMgr.GetAmmoCount(1) == 1234);
             CHECK(player->m_InventoryMgr.keys.size() == 1);
+            CHECK(flashlight.active && flashlight.light == flashlight_child && flashlight.remaining == 32);
             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::None);
         }
         CHECK(transition_images(*game, root));
@@ -1285,6 +1292,11 @@ namespace
             CHECK(player->m_damage.m_fMaxHitPoints == 311 && player->m_damage.m_fResistance == .42f);
             CHECK(player->m_nAttribSpeed == 6 && player->respawns == 0);
             CHECK(player->m_InventoryMgr.medkit && player->m_InventoryMgr.medkit->count == 43);
+            const auto& restored_light = player->m_InventoryMgr.flashlight;
+            CHECK(restored_light && !restored_light->active && restored_light->count == 27 &&
+                  restored_light->remaining == 32);
+            CHECK(restored_light->light && game->server.IsObjectAlive(restored_light->light) &&
+                  !game->server.GetObjectUserFlags(restored_light->light));
             CHECK(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_DIFFICULTY")) == 3);
             CHECK(game->client_shell.view.object && g_hActiveCamera);
             CHECK(game->step(.016));
@@ -1325,7 +1337,7 @@ namespace
             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
             std::cout << "CityHub refusal " << cycle << ": " << error << '\n';
             CHECK(game.get() == owner && game->objects.snapshot() == ids && globals.unchanged());
-            CHECK(game->level_change.unknown == 1 && game->level_change.failed == 1);
+            CHECK(game->level_change.unknown == 0 && game->level_change.failed == 1);
             CHECK(game->level_change.cleanup_complete && game->level_change.source_retained);
             CHECK(game->world_revision == revision && game->objects.time() == time);
             CHECK(game->server.audio.voices().size() == voices.size());
@@ -1426,7 +1438,7 @@ namespace
                 {
                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
                     if (std::string_view(name) == "02_cityhub")
-                        CHECK(d.created == 452 && d.unknown == 1 && d.failed == 1);
+                        CHECK(d.created == 453 && d.unknown == 0 && d.failed == 1);
                     else
                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
                 }

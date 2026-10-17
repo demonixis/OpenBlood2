@@ -23,6 +23,7 @@ struct main0_out
 {
     float3 faceColor [[user(locn0)]];
     float2 texCoord [[user(locn1)]];
+    float3 worldPosition [[user(locn2)]];
     float4 gl_Position [[position]];
 };
 
@@ -41,6 +42,7 @@ vertex main0_out main0(main0_in in [[stage_in]], constant View& u [[buffer(0)]])
     float3 relative = world - u.eye.xyz;
     float z = dot(relative, u.forward.xyz);
     out.gl_Position = float4(dot(relative, u.right.xyz) * u.projection.x, dot(relative, u.up.xyz) * u.projection.y, (z * u.projection.z) + u.projection.w, z);
+    out.worldPosition = world;
     out.faceColor = in.color;
     out.texCoord = in.uv + u._textureOffset.xy;
     return out;

@@ -81,7 +81,7 @@ namespace OpenBlood2
                 else if constexpr (std::is_same_v<T, PlayerStats>)
                     return std::isfinite(value.health) && std::isfinite(value.armor) && std::isfinite(value.bullets);
                 else if constexpr (std::is_same_v<T, InventoryAction>)
-                    return value.type == 1;
+                    return value.type == 1 || value.type == 2;
                 else if constexpr (std::is_same_v<T, BossHealth>)
                     return std::isfinite(value.fraction);
                 else if constexpr (std::is_same_v<T, WorldExit>)

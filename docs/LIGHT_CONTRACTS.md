@@ -106,3 +106,10 @@ directional light are separate: the owner's clarification identifies DirLight as
 spots. World illumination, shadows/fog, general client FX/audio, cinematic/world
 model motion, AI, transitions and other required M2 services remain pending. No
 retail executable, additional platform, mobile or XR validation is claimed.
+
+
+The [flashlight continuation](FLASHLIGHT_CONTRACTS.md) adds original item2, L toggle,
+active-only charge, local audio, checked child lifetime and forced-inactive
+Restore/KeepAlive. One radial point light is rendered over the unlit world/models;
+GetPointShade, shadows and general dynamic illumination remain unavailable.
+Earlier blanket flashlight omissions are superseded only by this bounded subset.

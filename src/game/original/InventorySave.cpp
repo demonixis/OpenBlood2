@@ -11,7 +11,9 @@ namespace
             state.current_slot >= state.right.size() ||
             (state.current_slot >= 10 && !state.right[state.current_slot]) || !std::isfinite(state.damage_multiplier) ||
             state.damage_multiplier < 0 || state.damage_multiplier > 1000 || state.keys.size() > 256 ||
-            (state.medkit_charge && *state.medkit_charge > 100))
+            (state.medkit_charge && *state.medkit_charge > 100) ||
+            (state.flashlight && (state.flashlight->count > 100 || !std::isfinite(state.flashlight->remaining) ||
+                                  state.flashlight->remaining < -60 || state.flashlight->remaining > 120)))
         {
             error = "Invalid inventory attributes, selection, multiplier or item count";
             return false;
@@ -87,6 +89,8 @@ bool CInventoryMgr::Save(OpenBlood2::InventoryState& output, std::string& error)
     state.keys = keys;
     if (medkit)
         state.medkit_charge = medkit->count;
+    if (flashlight)
+        state.flashlight = OpenBlood2::FlashlightState{flashlight->count, flashlight->remaining};
     state.current_slot = m_nCurWeaponSlot;
     state.damage_multiplier = damage_multiplier;
     if (!valid(state, error))
@@ -149,6 +153,18 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
         staged.medkit->count = *state.medkit_charge;
     }
 
+    if (state.flashlight)
+    {
+        staged.flashlight = std::make_unique<CInvFlashlight>(m_hOwner);
+        staged.flashlight->count = state.flashlight->count;
+        staged.flashlight->remaining = state.flashlight->remaining;
+        if (!staged.flashlight->CreateLight())
+        {
+            error = staged.flashlight->error;
+            return false;
+        }
+        // Original InvItem::Load clears active for both load modes; new child stays hidden.
+    }
     // Commit only after every fallible service. Old child removal is deferred;
     // transferred weapons must point at this aggregate, never the local stage.
     m_Weapons.swap(staged.m_Weapons);
@@ -156,6 +172,7 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
     std::swap(m_hMuzzleFlash, staged.m_hMuzzleFlash);
     keys.swap(staged.keys);
     medkit.swap(staged.medkit);
+    flashlight.swap(staged.flashlight);
     m_fAmmo = staged.m_fAmmo;
     m_nAttribStrength = staged.m_nAttribStrength;
     m_nAttribMagic = staged.m_nAttribMagic;

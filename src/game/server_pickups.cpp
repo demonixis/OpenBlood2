@@ -73,8 +73,9 @@ namespace OpenBlood2
             !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit ||
             (value.kind == PickupKind::Weapon && !WeaponPickupClass(value.type)) || !std::isfinite(value.amount) ||
             value.amount < 0 || value.amount > 1e6f ||
-            (value.kind == PickupKind::Item && ((value.type != 1 && value.type != 7 && value.type != 8) ||
-                                                value.amount > 255 || std::floor(value.amount) != value.amount)))
+            (value.kind == PickupKind::Item &&
+             ((value.type != 1 && value.type != 2 && value.type != 7 && value.type != 8) || value.amount > 255 ||
+              std::floor(value.amount) != value.amount)))
         {
             m->bad = true;
             return DE_INVALIDPARAMS;

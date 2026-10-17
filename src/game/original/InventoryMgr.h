@@ -1,5 +1,6 @@
 #pragma once
 #include "B2BaseClass.h"
+#include "Flashlight.h"
 #include "GameInvItems.h"
 #include "Weapon.h"
 #include "game/inventory_state.h"
@@ -32,6 +33,7 @@ class CInventoryMgr : public Aggregate
     InventoryResult SelectNextWeapon();
     InventoryResult SetActiveItem(DBYTE);
     std::optional<CInvMedkit> medkit;
+    std::unique_ptr<CInvFlashlight> flashlight;
     InventoryResult AddKey(const OpenBlood2::KeyItem&);
     InventoryResult QueryKey(std::string_view);
     std::vector<OpenBlood2::KeyItem> keys;

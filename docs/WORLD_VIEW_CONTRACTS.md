@@ -101,3 +101,10 @@ The [sky continuation](SKY_CONTRACTS.md) supersedes blanket sky-rendering omissi
 for registered world-model skies. Valid visible skies render behind the world and
 replace bit-4 portal markers; unavailable skies retain diagnostics. No retail
 lighting, fog or complete M2 acceptance is implied.
+
+
+The [flashlight continuation](FLASHLIGHT_CONTRACTS.md) adds original item2, L toggle,
+active-only charge, local audio, checked child lifetime and forced-inactive
+Restore/KeepAlive. One radial point light is rendered over the unlit world/models;
+GetPointShade, shadows and general dynamic illumination remain unavailable.
+Earlier blanket flashlight omissions are superseded only by this bounded subset.

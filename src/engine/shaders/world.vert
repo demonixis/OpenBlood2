@@ -4,6 +4,7 @@ layout(location=1) in vec3 color;
 layout(location=2) in vec2 uv;
 layout(location=0) out vec3 faceColor;
 layout(location=1) out vec2 texCoord;
+layout(location=2) out vec3 worldPosition;
 layout(set=1,binding=0,std140) uniform View {
     vec4 eye, right, up, forward, projection, translation, quaternion, textureOffset;
 } u;
@@ -15,6 +16,7 @@ void main() {
     gl_Position=vec4(dot(relative,u.right.xyz)*u.projection.x,
                      dot(relative,u.up.xyz)*u.projection.y,
                      z*u.projection.z+u.projection.w,z);
+    worldPosition=world;
     faceColor=color;
     texCoord=uv+u.textureOffset.xy;
 }

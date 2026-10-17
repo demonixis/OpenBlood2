@@ -76,3 +76,10 @@ Verification: 730/730 headless tests in Debug and inspector-free Release;
 The private authored medkit fixture repeats CityHub loading and validates real
 45,312-frame activation audio. No Windows/macOS/mobile/XR or retail executable
 parity is claimed. Detailed logs are linked from the implementation evidence.
+
+
+The [flashlight continuation](FLASHLIGHT_CONTRACTS.md) adds original item2, L toggle,
+active-only charge, local audio, checked child lifetime and forced-inactive
+Restore/KeepAlive. One radial point light is rendered over the unlit world/models;
+GetPointShade, shadows and general dynamic illumination remain unavailable.
+Earlier blanket flashlight omissions are superseded only by this bounded subset.

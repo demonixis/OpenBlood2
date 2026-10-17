@@ -33,3 +33,11 @@ RemotesPU::RemotesPU()
     display_name = "Remote Bomb";
     resource_id = 307;
 }
+
+FlashlightPU::FlashlightPU()
+{
+    value = {OpenBlood2::PickupKind::Item, 2, 1};
+    file = "Flashlight_pu";
+    display_name = "Flashlight";
+    resource_id = 301;
+}

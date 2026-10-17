@@ -39,7 +39,7 @@ namespace
         auto& inv = p.m_InventoryMgr;
         auto& d = p.m_damage;
         CHECK(inv.AddItem(1, 0) == InventoryResult::Ok && inv.medkit->count == 100);
-        CHECK(inv.AddItem(1, 255) == InventoryResult::AlreadyHave && inv.AddItem(2, 1) == InventoryResult::Invalid);
+        CHECK(inv.AddItem(1, 255) == InventoryResult::AlreadyHave && inv.AddItem(3, 1) == InventoryResult::Invalid);
         d.SetHitPoints(35);
         d.m_fMaxHitPoints = 100;
         CHECK(inv.SetActiveItem(1) == InventoryResult::Ok && d.m_fHitPoints == 100 && inv.medkit->count == 35);
@@ -147,7 +147,7 @@ namespace
         auto h = create(g);
         CHECK(h);
         auto* item = g.objects.get(h)->game.get();
-        for (auto value : {PickupMessage{PickupKind::Item, 2, 1}, PickupMessage{PickupKind::Item, 1, .5},
+        for (auto value : {PickupMessage{PickupKind::Item, 3, 1}, PickupMessage{PickupKind::Item, 1, .5},
                            PickupMessage{PickupKind::Item, 1, 256}, PickupMessage{PickupKind::Item, 1, -1}})
         {
             auto m = g.server.StartMessageToObject(item, p.m_hObject, add_item_message);
@@ -157,7 +157,7 @@ namespace
         auto m = g.server.StartMessageToObject(item, p.m_hObject, add_powerup_message);
         CHECK(m && g.server.WritePickupMessage(m, {PickupKind::Item, 1, 1}) != DE_OK);
         g.server.EndHMessageWrite(m);
-        CHECK(g.server.SendToClient(g.local_client, InventoryAction{2}) == DE_INVALIDPARAMS);
+        CHECK(g.server.SendToClient(g.local_client, InventoryAction{3}) == DE_INVALIDPARAMS);
         std::string sound_error;
         SoundRequest request;
         request.resource = "sounds/powerups/medikit.wav";
@@ -291,7 +291,7 @@ namespace
                 unknown += entry.state == EntryState::Unsupported;
                 failed += entry.state == EntryState::Failed;
             }
-            CHECK(created == 452 && unknown == 1 && failed == 1);
+            CHECK(created == 453 && unknown == 0 && failed == 1);
             for (auto id : g.objects.snapshot())
                 if (dynamic_cast<MedKitPU*>(g.objects.get(id)->game.get()))
                     h = g.objects.get(id)->handle;

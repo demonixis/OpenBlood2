@@ -26,7 +26,7 @@ int main()
             CHECK(info.code && info.code_size > 128 && info.props == 0);
             CHECK(info.num_storage_buffers == 0 && info.num_storage_textures == 0);
             CHECK(info.num_samplers == (shader == WorldShader::Vertex ? 0u : 1u));
-            CHECK(info.num_uniform_buffers == (shader == WorldShader::OpaqueFragment ? 0u : 1u));
+            CHECK(info.num_uniform_buffers == 1u);
             CHECK(info.stage ==
                   (shader == WorldShader::Vertex ? SDL_GPU_SHADERSTAGE_VERTEX : SDL_GPU_SHADERSTAGE_FRAGMENT));
             if (formats & SDL_GPU_SHADERFORMAT_SPIRV)
@@ -39,7 +39,7 @@ int main()
             {
                 CHECK(info.format == SDL_GPU_SHADERFORMAT_MSL && std::strcmp(info.entrypoint, "main0") == 0);
                 const std::string_view source(reinterpret_cast<const char*>(info.code), info.code_size);
-                CHECK(source.starts_with("#include <metal_stdlib>"));
+                CHECK(source.find("#include <metal_stdlib>") != source.npos);
                 CHECK(info.code[info.code_size] == 0); // Runtime Metal compilation also gets terminated source.
                 CHECK(source.find(shader == WorldShader::Vertex ? "vertex main0_out main0("
                                                                 : "fragment main0_out main0(") != source.npos);
@@ -49,6 +49,10 @@ int main()
                     CHECK(source.find("[[texture(0)]]") != source.npos && source.find("[[sampler(0)]]") != source.npos);
                 if (shader == WorldShader::Vertex)
                     CHECK(source.find("u._textureOffset.xy") != source.npos);
+                else
+                    CHECK(source.find("float4 positionRadius;") != source.npos &&
+                          source.find("float4 lightColor;") != source.npos &&
+                          source.find("float3 worldPosition") != source.npos);
             }
             const auto* owned = info.code;
             SDL_GPUShaderCreateInfo repeated{};

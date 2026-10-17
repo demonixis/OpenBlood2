@@ -246,7 +246,7 @@ namespace
                 failed += e.state == EntryState::Failed;
             }
             std::cout << "Created=" << created << " unsupported=" << unknown << " failed=" << failed << '\n';
-            CHECK(created == 452 && unknown == 1 && failed == 1);
+            CHECK(created == 453 && unknown == 0 && failed == 1);
             // Exercise original destruction/name activation, not direct fragment creation.
             auto* list = g.server.FindNamedObjects("billboard");
             CHECK(list && list->m_pFirstLink);

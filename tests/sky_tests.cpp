@@ -166,7 +166,7 @@ namespace
                 failed += entry.state == EntryState::Failed;
                 unknown += entry.state == EntryState::Unsupported;
             }
-            CHECK(created == 452 && failed == 1 && unknown == 1);
+            CHECK(created == 453 && failed == 1 && unknown == 0);
             for (const auto& use : g.resource_uses)
                 CHECK(use.path != "Clouds1Pointer" && use.path != "Moon1Pointer" && use.path != "Star1Pointer" &&
                       use.path != "BuildingsPointer");

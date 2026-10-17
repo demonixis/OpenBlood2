@@ -14,6 +14,11 @@ class ItemPickup : public PickupObject
 class ItemPickupCharged : public ItemPickup
 {
 };
+class FlashlightPU : public ItemPickupCharged
+{
+  public:
+    FlashlightPU();
+};
 class MedKitPU : public ItemPickupCharged
 {
   public:

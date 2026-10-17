@@ -84,8 +84,8 @@ namespace test_player
             }
         if (pickup_assets)
             for (auto name : {"bulletammo_pu", "shellammo_pu", "bmgammo_pu", "flareammo_pu", "diebugdieammo_pu",
-                              "howitzerammo_pu", "medkit_pu", "fuelammo_pu", "batteryammo_pu", "health_pu",
-                              "megahealth_pu", "ward_pu", "necroward_pu"})
+                              "howitzerammo_pu", "medkit_pu", "flashlight_pu", "fuelammo_pu", "batteryammo_pu",
+                              "health_pu", "megahealth_pu", "ward_pu", "necroward_pu"})
             {
                 dir.children["models"].children["powerups"].files[std::string(name) + ".abc"] =
                     test_model::abc(false, true).b;

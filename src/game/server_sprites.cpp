@@ -29,7 +29,7 @@ namespace OpenBlood2
             return SegmentResult::Hit; // A valid bounded segment, not an intersection result.
         }
     } // namespace
-    SegmentResult ServerAdapter::CastRay(DVector from, DVector direction, SegmentHit& out)
+    SegmentResult ServerAdapter::CastRay(DVector from, DVector direction, SegmentHit& out, HOBJECT ignore)
     {
         trace_service("CastRay (solid world and objects)");
         out = {};
@@ -41,7 +41,7 @@ namespace OpenBlood2
             return SegmentResult::Unavailable;
         if (bound != SegmentResult::Hit)
             return bound;
-        return IntersectSegment(from, to, nullptr, out);
+        return IntersectSegment(from, to, ignore, out);
     }
     SegmentResult ServerAdapter::CastWorldRay(DVector from, DVector direction, SegmentHit& out)
     {

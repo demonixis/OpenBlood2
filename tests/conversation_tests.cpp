@@ -257,7 +257,7 @@ namespace
             for (auto id : g.objects.snapshot())
                 if (auto* c = dynamic_cast<ConversationTrigger*>(g.objects.get(id)->game.get()))
                     conversation = c;
-            CHECK(created == 452 && unknown == 1 && failed == 1 && conversation);
+            CHECK(created == 453 && unknown == 0 && failed == 1 && conversation);
             std::cout << "CityHub conversation count=" << conversation->count << " file=" << conversation->waves[0]
                       << " mapped=" << bool(conversation_text(conversation->waves[0])) << '\n';
             g.server_shell.start_point_name = "01_egressa";

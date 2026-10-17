@@ -78,6 +78,8 @@ class CBloodClientShell
     bool UpdateUse(CBloodServerShell&);
     bool use_down = false, use_was_down = false;
     bool medkit_down = false, medkit_was_down = false;
+    bool flashlight_down = false, flashlight_was_down = false;
+    CFlashlightFX flashlight;
     bool proximity_down = false, proximity_was_down = false;
     bool remote_down = false, remote_was_down = false, detonate_down = false, detonate_was_down = false;
     std::uint64_t item_actions = 0, item_sounds = 0;

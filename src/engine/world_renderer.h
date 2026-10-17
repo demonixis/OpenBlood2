@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/point_light.h"
 #include "engine/world_view.h"
 #include <SDL3/SDL_gpu.h>
 
@@ -36,7 +37,8 @@ namespace OpenBlood2
                      std::string& error, bool dynamic = false);
         bool draw(SDL_GPUCommandBuffer*, SDL_GPUTexture*, const WorldMesh&, std::span<const WorldDraw>, DVector eye,
                   DRotation view, bool letterbox, std::string& error, DrawLoad = DrawLoad::Clear,
-                  SDL_GPUTexture* shared_depth = nullptr, WorldPass = WorldPass::Opaque, double surface_time = 0);
+                  SDL_GPUTexture* shared_depth = nullptr, WorldPass = WorldPass::Opaque, double surface_time = 0,
+                  const PointLight& light = {});
         SDL_GPUTexture* depth_target() const
         {
             return depth_;

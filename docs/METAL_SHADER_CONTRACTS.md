@@ -22,8 +22,10 @@ There is no runtime shader-file lookup or translation dependency.
 
 The vertex uniform is eight float4 fields (128 bytes), including the per-batch
 texture offset. Its uniform buffer is slot 0 and vertex attributes are 0/1/2.
-Both fragments sample texture/sampler 0; the alpha fragment additionally uses
-uniform buffer 0. Storage buffers/textures are unused. Keep reflection and all
+Both fragments sample texture/sampler 0 and use uniform buffer 0. The flashlight
+continuation expands that fragment buffer to three float4 fields (48 bytes):
+modulation, world position/radius and RGB light color. Both stages pass the
+current posed world position for the bounded radial illumination. Storage buffers/textures are unused. Keep reflection and all
 packaged artifacts synchronized when GLSL changes. Source texture coordinates,
 SDL GPU depth/orientation conventions, current transforms, alpha policy and
 world-clock panning are identical inputs on both paths; add no backend-only

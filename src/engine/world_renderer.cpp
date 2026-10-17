@@ -1,4 +1,5 @@
 #include "engine/world_renderer.h"
+#include "engine/collision.h"
 #include "engine/world_shaders.h"
 #include <cmath>
 #include <cstring>
@@ -360,8 +361,15 @@ namespace OpenBlood2
     bool WorldRenderer::draw(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target, const WorldMesh& mesh,
                              std::span<const WorldDraw> draws, DVector eye, DRotation view, bool letterbox,
                              std::string& error, DrawLoad load, SDL_GPUTexture* shared_depth, WorldPass world_pass,
-                             double surface_time)
+                             double surface_time, const PointLight& light)
     {
+        if (!physics_vector(light.position) || !physics_vector(light.color) || !std::isfinite(light.radius) ||
+            light.radius < 0 || light.radius > 1e7 || light.color.x < 0 || light.color.y < 0 || light.color.z < 0 ||
+            light.color.x > 1 || light.color.y > 1 || light.color.z > 1)
+        {
+            error = "Invalid point light";
+            return false;
+        }
         if (!pipeline_ || !depth_ || (!vertices_ && !mesh.vertices.empty()))
         {
             error = "Diagnostic renderer not prepared";
@@ -469,11 +477,20 @@ namespace OpenBlood2
                     uniform.projection[2] = far / (far - near);
                     uniform.projection[3] = -near * far / (far - near);
                 }
-                if (sky || translucent || style_ == DrawStyle::SpriteAlpha)
-                {
-                    const std::array<float, 4> modulation{d.alpha, 0, 0, 0};
-                    SDL_PushGPUFragmentUniformData(commands, 0, modulation.data(), sizeof(modulation));
-                }
+                const bool illuminate = !sky && style_ == DrawStyle::Opaque && load != DrawLoad::ClearDepth;
+                const std::array<float, 12> fragment{d.alpha,
+                                                     0,
+                                                     0,
+                                                     0,
+                                                     light.position.x,
+                                                     light.position.y,
+                                                     light.position.z,
+                                                     illuminate ? light.radius : 0,
+                                                     light.color.x,
+                                                     light.color.y,
+                                                     light.color.z,
+                                                     0};
+                SDL_PushGPUFragmentUniformData(commands, 0, fragment.data(), sizeof(fragment));
                 auto batch =
                     [&](std::uint32_t first, std::uint32_t count, std::uint32_t material, std::array<double, 2> rate)
                 {

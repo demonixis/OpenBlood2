@@ -611,6 +611,7 @@ namespace
             if (!controls.focused && !smoke)
                 game->client_shell.weapon_input = {};
             game->client_shell.use_down = controls.sample_use(text_editing);
+            game->client_shell.flashlight_down = controls.sample_flashlight(text_editing);
             game->client_shell.medkit_down = controls.sample_medkit(text_editing);
             game->client_shell.proximity_down = controls.sample_proximity(text_editing);
             game->client_shell.remote_down = controls.sample_remote(text_editing);
@@ -913,6 +914,7 @@ namespace
                 if (render_world)
                 {
                     const auto& view = game->client_shell.view;
+                    const auto flashlight = game->client_shell.flashlight.Current(game->server);
                     if (!world_renderer.prepare(world_mesh, mesh_revision,
                                                 SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
                                                 height, error) ||
@@ -926,7 +928,7 @@ namespace
                             view.position, view.rotation, view.object && view.settings.type == 1, error,
                             sky_draws.empty() ? OpenBlood2::DrawLoad::Clear : OpenBlood2::DrawLoad::Load, nullptr,
                             sky_draws.empty() ? OpenBlood2::WorldPass::Opaque : OpenBlood2::WorldPass::OpaqueWithSky,
-                            game->server.world_time()))
+                            game->server.world_time(), flashlight))
                     {
                         spdlog::error("World viewport: {}", error);
                         SDL_SubmitGPUCommandBuffer(commands);
@@ -938,7 +940,8 @@ namespace
                         !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
                                              model_scene.world_draws, view.position, view.rotation,
                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
-                                             world_renderer.depth_target()))
+                                             world_renderer.depth_target(), OpenBlood2::WorldPass::Opaque, 0,
+                                             flashlight))
                     {
                         spdlog::error("Model viewport: {}", error);
                         SDL_SubmitGPUCommandBuffer(commands);
@@ -948,7 +951,8 @@ namespace
                         !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
                                              world_draws, view.position, view.rotation,
                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
-                                             nullptr, OpenBlood2::WorldPass::Translucent, game->server.world_time()))
+                                             nullptr, OpenBlood2::WorldPass::Translucent, game->server.world_time(),
+                                             flashlight))
                     {
                         spdlog::error("Transparent world viewport: {}", error);
                         SDL_SubmitGPUCommandBuffer(commands);
@@ -958,7 +962,8 @@ namespace
                         !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
                                              model_scene.world_draws, view.position, view.rotation,
                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
-                                             world_renderer.depth_target(), OpenBlood2::WorldPass::Translucent))
+                                             world_renderer.depth_target(), OpenBlood2::WorldPass::Translucent, 0,
+                                             flashlight))
                     {
                         spdlog::error("Transparent model viewport: {}", error);
                         SDL_SubmitGPUCommandBuffer(commands);

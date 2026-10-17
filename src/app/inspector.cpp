@@ -485,7 +485,7 @@ namespace OpenBlood2
             ImGui::PopTextWrapPos();
             ImGui::Checkbox("Game controls (F2)", &keyboard_movement);
             ImGui::TextWrapped("WASD / ZQSD: walk | Shift: run | Space: jump | Ctrl: crouch | Arrows: look | E: use | "
-                               "H: medkit (release Shift)");
+                               "H: medkit; L: flashlight (release Shift)");
             ImGui::TextWrapped(
                 "F3: capture mouse and hide inspector | Mouse: look | Left/F: fire | Right/G: alternate fire");
             ImGui::Text("Mouse: %s", mouse_captured ? "captured" : "released for UI");

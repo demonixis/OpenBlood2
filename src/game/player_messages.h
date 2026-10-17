@@ -32,6 +32,7 @@ namespace OpenBlood2
     struct InventoryAction
     {
         DBYTE type = 1;
+        bool active = false;
     };
     struct PlayerUse
     {

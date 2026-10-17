@@ -1,5 +1,7 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The [flashlight continuation](../Documentation/Implementation/M2_FLASHLIGHT.md) connects original FlashlightPU/CInvFlashlight/CFlashlightFX, L toggle, battery, local audio, inactive restoration and visible radial point illumination with inspection. CityHub now has 453 created / 31 transferred sounds / 541 editor-only / zero unsupported / one failed entry. Missing `fallengrills` geometry still rejects CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical.
+
 The [remote-bomb continuation](../Documentation/Implementation/M2_REMOTE_BOMBS.md) connects original RemotesPU, reserved slot11, charged throws, separate detonation and player-owned charge cleanup, with inspection. CityHub now has 452 created / 31 transferred sounds / 541 editor-only / one unsupported / one failed entry. FlashlightPU and missing `fallengrills` geometry still reject CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical.
 
 The [proximity-bomb continuation](../Documentation/Implementation/M2_PROXIMITY.md) connects original ProximitiesPU, reserved inventory slot10, charged throws, sticking/detection/detonation, independent lifetime and inspection. CityHub now has 450 created / 31 transferred sounds / 541 editor-only / three unsupported / one failed entry. Remote bombs, flashlight and missing `fallengrills` geometry still block CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical.
@@ -114,7 +116,7 @@ play. **F3** also toggles capture. The first click that focuses/captures the win
 is not a shot. The original SubwayA intro blocks movement/fire for about 12 seconds.
 
 Keyboard controls remain **WASD/ZQSD**, **Shift** run, **Space** jump, **Ctrl** crouch,
-**arrows** look, **E** USE, **F/G** primary/secondary fire and **H** medkit. **P** selects proximity bombs,
+**arrows** look, **E** USE, **F/G** primary/secondary fire, **H** medkit and **L** flashlight toggle after collection (release Shift). **P** selects proximity bombs,
 **R** selects remote bombs and **B** detonates registered remote charges. **F2**
 toggles game controls; a new play request enables them again. Inspection can still
 be folded with its title arrow and resized by dragging its borders.

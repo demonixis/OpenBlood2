@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "370888772d481a1ea66db7f030e0c4bb0abac1bc",
+  "status": "M2 incomplete; original flashlight with bounded replacement point illumination",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/GameInvItems.cpp",
+      "source_sha256": "b2a72cdf5bd9e23ec496c6f6af3ed5bd4449e3b84d8cc088c33c1e1bbe081ee8",
+      "purpose": "CInvFlashlight construction, charge, child, activation, pose update and Save/Load."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameInvItems.h",
+      "source_sha256": "592488eb133230295961290bc2bfd621429c6ccc11df1de010ba7ccaa0bd7aac",
+      "purpose": "Flashlight constants and destructor ownership."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InvItem.cpp",
+      "source_sha256": "89074a1645a0977cb8961731764d7b54b2b3da1720adc9cfe8ce0b539fff5aaa",
+      "purpose": "Original action active-bit serialization and item state preservation."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InvItem.h",
+      "source_sha256": "7b0ffbe822337d7f430466fd469c435e604d2c264c34a9af64e79f938e1329cc",
+      "purpose": "ActivateItem toggle result and forced inactive Load in both modes."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
+      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
+      "purpose": "FlashlightPU assets/type/name and charged pickup ancestry."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "purpose": "Original item acquisition, direct activation and per-item update order."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "purpose": "Direct-item command gates and internal player rotation."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/FlashlightFX.cpp",
+      "source_sha256": "f623447fbe64461b421b404a88fb259cdc998e600f14121f350a32dc325192db",
+      "purpose": "Original forward hit point, distance/radius/intensity and shade-failure fallback."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "purpose": "Flashlight activation/deactivation local audio."
+    },
+    {
+      "source": "sources/blood2/Shared/ClientServerShared.h",
+      "source_sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
+      "purpose": "USRFLG_VISIBLE bit."
+    }
+  ],
+  "adaptations": [
+    "Owned typed inventory/child and client PointLight value replace item list and client OT_LIGHT.",
+    "Original shade-failure fallback remains explicit; no GetPointShade implementation is claimed.",
+    "Supported solid ray excludes the authoritative local player; no complete retail client intersection parity.",
+    "One radial point brightening over unlit materials, without shadows/lightmaps/normal response.",
+    "Application L binding, checked service failures, staged snapshot validation and inactive restore.",
+    "Existing pinned ShaderCross regenerates bundled SPIR-V/MSL; no runtime compiler."
+  ]
+}

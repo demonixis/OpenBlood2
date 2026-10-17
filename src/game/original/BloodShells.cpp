@@ -237,6 +237,8 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     boss_health_visible = false;
     communication.Reset(server_);
     medkit_down = medkit_was_down = false;
+    flashlight_down = flashlight_was_down = false;
+    flashlight = {};
     proximity_down = proximity_was_down = false;
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     item_actions = item_sounds = item_voice = 0;
@@ -278,6 +280,8 @@ void CBloodClientShell::OnExitWorld()
     boss_health_visible = false;
     communication.Reset(server_);
     medkit_down = medkit_was_down = false;
+    flashlight_down = flashlight_was_down = false;
+    flashlight = {};
     proximity_down = proximity_was_down = false;
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     item_actions = item_sounds = item_voice = 0;
@@ -309,11 +313,11 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         return InitSinglePlayer(server);
     if (const auto* value = std::get_if<OpenBlood2::InventoryAction>(&event))
     {
-        if (value->type != 1)
+        if (value->type != 1 && value->type != 2)
             return false;
         ++item_actions;
         OpenBlood2::SoundRequest request;
-        request.resource = "sounds/powerups/medikit.wav";
+        request.resource = value->type == 1 ? "sounds/powerups/medikit.wav" : "sounds/powerups/flashlight.wav";
         request.space = OpenBlood2::SoundSpace::Local;
         request.priority = 4; // SOUNDPRIORITY_PLAYER_LOW.
         request.reverb_requested = false;
@@ -486,6 +490,10 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerDetona
 }
 bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
 {
+    const bool flashlight_pressed = flashlight_down && !flashlight_was_down;
+    flashlight_was_down = flashlight_down;
+    if (flashlight_pressed)
+        server.OnMessage(client_, OpenBlood2::PlayerItemCommand{2});
     const bool remote_pressed = remote_down && !remote_was_down;
     remote_was_down = remote_down;
     if (remote_pressed)

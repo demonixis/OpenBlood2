@@ -415,6 +415,12 @@ namespace
                         CHECK(bomb && bomb->value.kind == PickupKind::Item && bomb->value.type == 8 &&
                               bomb->value.amount == 1 && bomb->resource_id == 307);
                     }
+                    if (source.class_name == "FlashlightPU")
+                    {
+                        auto* item = dynamic_cast<PickupObject*>(g.objects.get(h)->game.get());
+                        CHECK(item && item->value.kind == PickupKind::Item && item->value.type == 2 &&
+                              item->value.amount == 1 && item->resource_id == 301);
+                    }
                     missing += !g.objects.get(h)->model;
                 }
                 CHECK(g.objects.clear() && AmmoPickup::m_dwNumPickups == 0);
@@ -447,10 +453,10 @@ namespace
         }
         CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2 &&
               counts["AssaultRiflePU"] == 5 && counts["MedKitPU"] == 22 && counts["ProximitiesPU"] == 161 &&
-              counts["RemotesPU"] == 107);
+              counts["RemotesPU"] == 107 && counts["FlashlightPU"] == 10);
         CHECK(failures["ProximitiesPU: invalid property TypeAction"] == 28);
         CHECK(failures["RemotesPU: invalid property TypeAction"] == 14);
-        CHECK(worlds == 57 && created == 1516 && missing == 0 && rejected == 220 && spawns == 60);
+        CHECK(worlds == 57 && created == 1526 && missing == 0 && rejected == 220 && spawns == 60);
         return true;
     }
 } // namespace
