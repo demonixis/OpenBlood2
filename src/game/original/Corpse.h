@@ -19,7 +19,8 @@ class CCorpse : public B2BaseClass
     OpenBlood2::SoundId burn_sound = 0;
     float burn_start = 0, smoke_start = 0;
     std::uint64_t fire_effect = 0, smoke_effect = 0, gib_events = 0, limbs_created = 0;
-    int hit_limb = -1;
+    int hit_limb = -1, big_gib_voice_roll = -1;
+    std::uint64_t big_gib_voice_requests = 0, combat_voice_deliveries = 0;
     std::string burn_error, gib_error;
     bool OnStringKey(ArgList*);
     bool initialized = false, configured = false, animation_done = false;

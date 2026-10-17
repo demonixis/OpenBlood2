@@ -129,6 +129,8 @@ namespace OpenBlood2
             ImGui::Text("Health %.1f | limb loss %d | hit node %d | limbs %llu / gib events %llu",
                         c.m_damage.m_fHitPoints, c.limb_loss, c.hit_limb, (unsigned long long)c.limbs_created,
                         (unsigned long long)c.gib_events);
+            ImGui::Text("Gib voice draw %d | eligible %llu / queued %llu (playback in Session)", c.big_gib_voice_roll,
+                        (unsigned long long)c.big_gib_voice_requests, (unsigned long long)c.combat_voice_deliveries);
             ImGui::Text("Burn %.3f / smoke %.3f | attached %llu | fire FX %llu / smoke FX %llu | loop %llu",
                         c.burn_start, c.smoke_start, (unsigned long long)c.burn_attachment,
                         (unsigned long long)c.fire_effect, (unsigned long long)c.smoke_effect,
@@ -172,8 +174,11 @@ namespace OpenBlood2
             const auto& a = *target_ai;
             ImGui::Text("Starts %llu | corpses %llu | slot %d / clip %u", (unsigned long long)a.death_starts,
                         (unsigned long long)a.corpses_created, a.death_slot, a.m_nCorpseType);
-            ImGui::Text("Frame damage fraction %.3f | optional kill-voice requests %llu (unavailable)",
-                        a.m_damage.m_fLastDamagePercent, (unsigned long long)a.kill_voice_requests);
+            ImGui::Text("Frame damage fraction %.3f | kill / gib voice draws %d / %d", a.m_damage.m_fLastDamagePercent,
+                        a.kill_voice_roll, a.big_gib_voice_roll);
+            ImGui::Text("Eligible kill / gib replies %llu / %llu | queued %llu (playback in Session)",
+                        (unsigned long long)a.kill_voice_requests, (unsigned long long)a.big_gib_voice_requests,
+                        (unsigned long long)a.combat_voice_deliveries);
             ImGui::Text("Gib events %llu | detached limbs %llu | burning source %s", (unsigned long long)a.gib_events,
                         (unsigned long long)a.limbs_created, a.fire_source ? "owned" : "none/transferred");
             ImGui::TextWrapped("%s %s", a.death_error.c_str(), a.gib_error.c_str());

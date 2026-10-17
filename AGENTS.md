@@ -637,3 +637,6 @@ The [object snapshot optimization](../Documentation/Implementation/m2_object_sna
 
 
 The [original player VoiceMgr continuation](../Documentation/Implementation/m2_player_voices.md) connects weapon-pickup replies, SOUND and conversation arbitration. Read [contracts](docs/contracts/player_voice_contracts.md); preserve custom-group precedence, strict cooldown, unique-after-success flags, both server chance draws, stop-before-failure, independent local tails and value-only NEW_LEVEL history. Two installed unique references are absent; missing playback is not success. Other original callers, IMA music and the M2 gate remain open.
+
+
+The [combat voice continuation](../Documentation/Implementation/m2_combat_voices.md) connects original player pain/burning and NPC/corpse kill/gib replies. Read [contracts](docs/contracts/combat_voice_contracts.md); preserve integer net-health loss, chance-draw order, distinct killer filters, checked local-client lookup and cosmetic failure independence. Queued replies are not successful playback; inspect the actual VoiceMgr status. Remaining original callers, interactive music and the M2 gate stay open.

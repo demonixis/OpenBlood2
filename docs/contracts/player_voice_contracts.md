@@ -61,7 +61,7 @@ sets the voice deadline to the cue duration plus 0.5 seconds (three-second durat
 fallback). This connects the former request-only inspection fields without
 stopping footsteps, ambient sounds or other unrelated voices. Updates run outside
 inspection and drawing. Other original VoiceMgr callers (including spontaneous
-idle/pain/death/jump events) are not wired by this increment merely because their
+idle/death/jump events) are not wired by this increment merely because their
 groups are discoverable and the typed event supports them.
 
 ## Lifetime and inspection
@@ -82,3 +82,5 @@ the original communication-HUD limitation. Reading the UI never advances audio.
 The engine retains its existing dry mixer and explicit unsupported priority
 arbitration/reverb behavior. Group support does not certify all required voices,
 all original callers, addon characters, interactive IMA music or the M2 exit gate.
+
+The [combat voice continuation](combat_voice_contracts.md) connects original pain/burning and NPC/corpse kill/gib callers. The remaining caller omissions above still apply.

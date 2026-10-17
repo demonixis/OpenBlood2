@@ -2,6 +2,7 @@
 #include "Corpse.h"
 #include "ClientSplatFX.h"
 #include "Gib.h"
+#include "PlayerObj.h"
 #include "Sparam.h"
 #include "engine/collision.h"
 #include "game/game_settings.h"
@@ -410,8 +411,14 @@ bool CCorpse::HandleDamage(const Damage& hit)
         }
         ClearBurn();
         s->SetNextUpdate(m_hObject, .1f);
-        int roll;
-        s->RandomInt(0, 99, roll); // Original optional VME_BIGGIB voice draw.
+        big_gib_voice_roll = -1;
+        if (s->RandomInt(0, 99, big_gib_voice_roll) && big_gib_voice_roll < 7)
+        {
+            ++big_gib_voice_requests;
+            // Original postmortem caller has no killer filter.
+            if (auto* player = CPlayerObj::LocalVoicePlayer())
+                combat_voice_deliveries += player->PlayVoiceGroupEventOnClient(1, true);
+        }
     }
     else if (hit_limb >= 0 && hit_limb < int(NUM_ALL_NODES) && limb_loss)
     {

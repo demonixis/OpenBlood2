@@ -1562,6 +1562,11 @@ namespace OpenBlood2
                             (unsigned long long)player->weapon_pickup_voice_requests,
                             (unsigned long long)player->voice_messages,
                             (unsigned long long)player->voice_delivery_failures);
+                ImGui::Text("Damage voice: integer HP %u | last loss %u | draw %d | event %d", player->m_nLastHitPoints,
+                            player->m_nLastDamage, player->damage_voice_roll, player->damage_voice_event);
+                ImGui::Text("Damage checks %llu / eligible requests %llu | %s",
+                            (unsigned long long)player->damage_voice_checks,
+                            (unsigned long long)player->damage_voice_requests, player->damage_voice_error.c_str());
                 ImGui::Text("SOUND attempts %llu / started %llu / stops queued %llu | last voice %llu",
                             (unsigned long long)player->trigger_sound_requests,
                             (unsigned long long)player->trigger_sound_starts,

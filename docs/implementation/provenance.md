@@ -1147,3 +1147,11 @@ client voice groups, unique replies, gating, replacement and cooldown; original
 player weapon-pickup/SOUND callers; and conversation interruption. Typed owned
 messages, sorted resource enumeration, separate portable client RNG and value-only
 NEW_LEVEL history replace engine/DLL services. See [contracts](../contracts/player_voice_contracts.md).
+
+## Original combat voice callers
+
+[m2_combat_voice_sources.json](sources/m2_combat_voice_sources.json) records original
+PlayerObj integer-health damage feedback and cache resets, AI_Mgr kill/gib replies
+and CCorpse postmortem replies. Existing typed VoiceMgr messages replace legacy
+packets; checked local-client lookup replaces the raw singleton pointer. NPC/corpse
+draw order and all client gates are preserved. See [contracts](../contracts/combat_voice_contracts.md).

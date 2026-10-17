@@ -78,6 +78,12 @@ class CPlayerObj : public CBaseCharacter
     bool PlayVoiceGroupEventOnClient(int event, bool single_player_only = false);
     bool PlayVoiceUniqueEventOnClient(int event);
     void PlayWeaponVoiceSoundOnClient(int weapon);
+    static CPlayerObj* LocalVoicePlayer(); // Checked replacement for the source single-player global.
+    void UpdateDamageVoice();
+    std::uint32_t m_nLastHitPoints = 0, m_nLastDamage = 0;
+    int damage_voice_roll = -1, damage_voice_event = -1;
+    std::uint64_t damage_voice_checks = 0, damage_voice_requests = 0;
+    std::string damage_voice_error;
     std::uint64_t weapon_pickup_voice_requests = 0, voice_messages = 0, voice_delivery_failures = 0;
     std::uint64_t trigger_sound_requests = 0, trigger_sound_starts = 0, trigger_voice_stops = 0;
     OpenBlood2::SoundId trigger_sound = 0; // Historical unretained local one-shot.

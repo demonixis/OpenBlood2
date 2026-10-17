@@ -133,6 +133,8 @@ bool AI_Mgr::HandleDamage()
         }
         if (support.ground_object && !(s->GetObjectFlags(support.ground_object) & FLAG_SOLID))
             m_dwFlags |= 0x40u; // FLAG_ALWAYSGIB; primary world has a real polygon, not a fabricated HOBJECT.
+        // The last accepted lethal packet supplies original WhoKilledMeLast.
+        // Retaliation memory is different: instant Death bypasses its assignment.
         const auto type = m_damage.reaction_damage_type;
         if (type == OpenBlood2::DamageType::Fire && !(m_dwFlags & 0x40u))
         {
@@ -146,19 +148,26 @@ bool AI_Mgr::HandleDamage()
             m_bRemoveMe = true;
             if (!s->RandomInt(0, 99, big_gib_voice_roll))
                 return false;
-            const auto attacker = m_damage.GetLastDamager();
-            if (big_gib_voice_roll < 7 && attacker &&
-                s->IsKindOf(s->GetObjectClass(attacker), s->GetClass("CPlayerObj")))
-                ++big_gib_voice_requests;
+            if (big_gib_voice_roll < 7)
+                if (auto* player = CPlayerObj::LocalVoicePlayer();
+                    player && m_damage.last_damage.attacker == player->m_hObject)
+                {
+                    ++big_gib_voice_requests;
+                    combat_voice_deliveries += player->PlayVoiceGroupEventOnClient(1, true);
+                }
         }
         if (!s->RandomInt(0, 99, kill_voice_roll))
         {
             damage_reaction_error = "NPC kill voice draw unavailable";
             return false;
         }
-        const auto attacker = m_damage.GetLastDamager();
-        if (kill_voice_roll < 6 && attacker && s->IsKindOf(s->GetObjectClass(attacker), s->GetClass("CPlayerObj")))
-            ++kill_voice_requests; // Optional VME_KILL request; voice-event playback remains unavailable.
+        if (kill_voice_roll < 6)
+            if (auto* player = CPlayerObj::LocalVoicePlayer();
+                player && m_damage.last_damage.attacker == player->m_hObject)
+            {
+                ++kill_voice_requests;
+                combat_voice_deliveries += player->PlayVoiceGroupEventOnClient(3, true);
+            }
     }
     if (m_nState == StateScript && !(m_dwScriptFlags & (1u << 1)))
         return true;

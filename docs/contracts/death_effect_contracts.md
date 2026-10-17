@@ -15,7 +15,8 @@ lethal hits gib for EXPLODE, ALWAYSGIB or accumulated frame damage fraction >= .
 unless NEVERGIB. Preserve the unused initial limb random draw, then strict >80,
 >70, >50, >70, >50 thresholds for neck/right arm/left arm/right leg/left leg.
 The source's optional seven-percent big-gib and six-percent kill voice draws remain
-ordered; the VoiceMgr events are inspection requests, not played voice groups.
+ordered; the [combat voice continuation](combat_voice_contracts.md) now delivers
+the selected original requests to actual client VoiceMgr playback and arbitration.
 The commented-out living-NPC limb-loss branch stays disabled.
 
 AI gib launch uses the last direction with Y+2, normalization and speed

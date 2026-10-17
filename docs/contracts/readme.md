@@ -158,3 +158,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [DTX textures and opaque world materials](texture_contracts.md)
 - [Transparent world surfaces](world_alpha_contracts.md)
 - [Diagnostic 3D world view](world_view_contracts.md)
+
+- [Original combat voice callers](combat_voice_contracts.md)

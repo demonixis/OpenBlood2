@@ -1,0 +1,99 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete; selected original combat voice callers connected",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "implementation_parent": "cf5a39a13767d3ff7b1b1f0c74a422be61ab945d",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          671,
+          672
+        ],
+        [
+          1903,
+          1936
+        ],
+        [
+          6713,
+          6714
+        ]
+      ],
+      "selection": "Original integer-health decrease, damage chance and Pain/Burning voice selection; initial and Load cache reset.",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target": "src/game/original/PlayerVoice.cpp",
+      "target_sha256": "aaf424b5aeed94b35e10a13c142fa55fa2480314badf90368ad160d1d1edcae3"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "source_line_ranges": [
+        [
+          1846,
+          1883
+        ]
+      ],
+      "selection": "Original big-gib then kill chance and single-player killer attribution.",
+      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "target": "src/game/original/AIHitReaction.cpp",
+      "target_sha256": "603c676e21ad1c9bc000077bac268b09c4a87c759e59b9d3840fb95b37c71411"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/corpse.cpp",
+      "source_line_ranges": [
+        [
+          402,
+          428
+        ]
+      ],
+      "selection": "Original postmortem big-gib reply without killer attribution.",
+      "source_sha256": "f92ec5bd0e4175f61461aae1f5fe498b0a1d21b5f0ee7d889573d02480543fdd",
+      "target": "src/game/original/Corpse.cpp",
+      "target_sha256": "6aff6e7c591ccf34b04554a23fe9aa4d150102a3f52d582e06bc0da66fc27036"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectUtilities.h",
+      "source_line_ranges": [
+        [
+          193,
+          196
+        ]
+      ],
+      "selection": "Original random modulo-100 chance threshold; portable checked engine generator retained.",
+      "source_sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
+      "target": "src/game/original/PlayerVoice.cpp",
+      "target_sha256": "aaf424b5aeed94b35e10a13c142fa55fa2480314badf90368ad160d1d1edcae3"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "source_line_ranges": [
+        [
+          475,
+          483
+        ],
+        [
+          635,
+          641
+        ]
+      ],
+      "selection": "WhoKilledMeLast is lethal packet attribution, distinct from AI retaliation memory; typed last accepted packet supplies that identity in the supported death path.",
+      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "target": "src/game/original/AIHitReaction.cpp",
+      "target_sha256": "603c676e21ad1c9bc000077bac268b09c4a87c759e59b9d3840fb95b37c71411"
+    }
+  ],
+  "adaptations": [
+    "Existing typed owned VoiceEvent delivery and streamed local VoiceMgr playback; no new dependencies.",
+    "Checked associated-player lookup through existing faction list replaces the raw global pointer.",
+    "Unsigned health conversion validates finite/range input; widened threshold arithmetic avoids overflow.",
+    "Separate integer original feedback cache preserves exact fractional compact HUD stats.",
+    "Existing portable server RNG retained; sequences are not claimed retail-bit-identical."
+  ],
+  "related_target_hashes": {
+    "src/game/original/PlayerObj.h": "f9af94de0e59d641ed27564b767f4eaa24391cc80c327dcefda2035e894121b7",
+    "src/game/original/PlayerObj.cpp": "74a0ea04246187f7b373415ade0d42cf196a16065d3593c4170530848931be07",
+    "src/game/original/PlayerSave.cpp": "a82eeff1bad45ee1105de3f8c1f78001d3b12dccc34e41ffd3b5d5f9d07ee4f2",
+    "src/game/original/AI_Mgr.h": "effad1199f0225be52042ea98d414042826152974c1530ee31936c2ed00487bb",
+    "src/game/original/Corpse.h": "b067f536bcf9c2ce3a49c0e91a78ecd436a6f21825c21171e6d22966902396e8"
+  }
+}

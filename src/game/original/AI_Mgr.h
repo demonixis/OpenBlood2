@@ -274,6 +274,7 @@ class AI_Mgr : public CBaseCharacter
     HOBJECT fire_source = nullptr;
     std::uint64_t gib_events = 0, limbs_created = 0, big_gib_voice_requests = 0;
     int big_gib_voice_roll = -1;
+    std::uint64_t combat_voice_deliveries = 0;
     std::string gib_error;
     DDWORD m_nCorpseType = 0;
     OpenBlood2::SoundId m_hCurSound = 0; // Original per-actor retained sound, distinct from shared table voice.

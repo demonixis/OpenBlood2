@@ -408,6 +408,7 @@ bool CPlayerObj::InitializeClientState()
 }
 bool CPlayerObj::UpdateStats(bool force)
 {
+    UpdateDamageVoice();
     OpenBlood2::PlayerStats value{m_damage.m_fHitPoints, m_damage.m_fArmorPoints, m_InventoryMgr.GetAmmoCount(1)};
     // Original UpdateStats current primary/alternate ammo; never substitute the bullet pool.
     value.weapon_slot = m_InventoryMgr.m_nCurWeaponSlot;

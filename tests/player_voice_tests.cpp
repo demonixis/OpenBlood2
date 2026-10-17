@@ -1,6 +1,8 @@
 #include "audio_fixture.h"
 #include "camera_fixture.h"
 #include "game/game_settings.h"
+#include "game/original/AI_Mgr.h"
+#include "game/original/Corpse.h"
 #include "game/original/WeaponPickups.h"
 #include <algorithm>
 #include <cmath>
@@ -22,6 +24,8 @@ namespace
         auto& caleb = d.children["sounds"].children["chosen"].children["caleb"];
         caleb.children["weapon"].files["a.WAV"] = test_audio::wave();
         caleb.children["weapon"].files["b.wav"] = test_audio::wave();
+        caleb.children["pain"].files["a.wav"] = test_audio::wave();
+        caleb.children["burning"].files["a.wav"] = test_audio::wave();
         caleb.children["jump"].files["a.wav"] = test_audio::wave();
         caleb.children["jump"].files["ignored.txt"] = {1};
         caleb.children["jump"].children["nested"].files["ignored.wav"] = test_audio::wave();
@@ -218,6 +222,179 @@ namespace
         CHECK(branches && replies && replies < branches);
         return true;
     }
+    bool damage(GameSession& g, HOBJECT owner, float amount, DamageType type, HOBJECT attacker)
+    {
+        DVector position;
+        CHECK(g.server.GetObjectPos(owner, &position) == DE_OK);
+        auto m = g.server.StartMessageToObject(g.server.HandleToObject(attacker), owner, damage_message);
+        CHECK(m && g.server.WriteDamage(m, {{0, 0, 1}, position, amount, type, attacker, true}) == DE_OK &&
+              g.server.EndMessage(m) == DE_OK);
+        return true;
+    }
+    bool damage_voices(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(setup(g, root) && g.objects.advance(.01));
+        auto* p = g.server_shell.Player(g.local_client);
+        const auto h = p->m_hObject;
+        auto& vm = g.client_shell.voice_manager;
+        std::string error;
+        CHECK(CPlayerObj::LocalVoicePlayer() == p && p->m_nLastHitPoints == 100 && !p->damage_voice_checks);
+        p->m_damage.m_fResistance = 1;
+        CHECK(damage(g, h, 15, DamageType::Normal, h) && damage(g, h, 16, DamageType::Normal, h));
+        CHECK(p->UpdateStats() && g.pump_player_messages(error));
+        CHECK(p->m_nLastHitPoints == 69 && p->m_nLastDamage == 31 && p->damage_voice_checks == 1 &&
+              p->damage_voice_requests == 1 && p->damage_voice_event == 2 && vm.starts == 1);
+        CHECK(vm.last_resource == "sounds/chosen/caleb/pain/a.wav");
+        CHECK(g.server.advance_audio(.01, {}, {}) && g.server.audio.get(vm.voice)->cursor > 0);
+        CHECK(p->UpdateStats(true) && g.pump_player_messages(error) && p->damage_voice_checks == 1);
+        // Same-frame healing back to the previous integer health cancels the net-loss branch.
+        CHECK(damage(g, h, 1, DamageType::Normal, h));
+        CHECK(p->m_damage.Heal(1) && p->UpdateStats() && p->damage_voice_checks == 1);
+        p->m_damage.SetHitPoints(69.9f);
+        CHECK(p->UpdateStats());
+        CHECK(damage(g, h, .4f, DamageType::Fire, h) && p->UpdateStats() && p->damage_voice_checks == 1);
+        CHECK(damage(g, h, 31, DamageType::Fire, h) && p->UpdateStats() && g.pump_player_messages(error));
+        CHECK(p->m_nLastDamage == 31 && p->damage_voice_event == 5 && vm.starts == 1 && vm.reason == "busy");
+        vm.StopAll();
+        p->m_damage.Heal(100);
+        CHECK(p->UpdateStats());
+        CHECK(damage(g, h, 31, DamageType::Fire, h) && p->UpdateStats() && g.pump_player_messages(error));
+        CHECK(vm.starts == 2 && vm.last_resource == "sounds/chosen/caleb/burning/a.wav");
+        vm.StopAll();
+        g.server.set_game_settings(1, 1);
+        const auto messages = p->voice_messages, checks = p->damage_voice_checks;
+        CHECK(damage(g, h, 31, DamageType::Normal, h) && p->UpdateStats() && g.pump_player_messages(error));
+        CHECK(p->damage_voice_checks == checks + 1 && p->voice_messages == messages && !vm.voice);
+        g.server.set_game_settings(0, 1);
+        PlayerState saved;
+        CHECK(p->SaveFields(saved, error));
+        CHECK(g.server.SetClientUserData(g.local_client, nullptr) == DE_OK);
+        p->SetClient(nullptr);
+        CHECK(!CPlayerObj::LocalVoicePlayer() && p->LoadFields(saved, error));
+        p->SetClient(g.local_client);
+        CHECK(g.server.SetClientUserData(g.local_client, h) == DE_OK);
+        CHECK(!p->m_nLastHitPoints && !p->m_nLastDamage && p->UpdateStats());
+        CHECK(p->damage_voice_checks == checks + 1); // Restore never invents damage feedback.
+        CHECK(g.objects.remove(h) && !CPlayerObj::LocalVoicePlayer() && g.objects.finish_frame());
+        CHECK(g.unload_world() && g.server.audio.voices().empty());
+        return true;
+    }
+    bool combat_private(const std::filesystem::path& root)
+    {
+        GameSession g;
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(g.initialize() && g.resources.mount_game(config, error));
+        WorldModel floor;
+        floor.points = {{-4000, 0, -4000}, {4000, 0, -4000}, {4000, 0, 4000}, {-4000, 0, 4000}};
+        floor.surfaces.resize(1);
+        floor.surfaces[0].flags = 1;
+        floor.polygons = {{0, {0, 1, 2, 3}}};
+        CHECK(g.collision.build(floor, error));
+        g.server.collision_ready = true;
+        g.world_path = "diagnostic-combat-voices.dat";
+        g.state = SessionState::Inspection;
+        g.server_shell.PreStartWorld();
+        CHECK(g.server_shell.PostStartWorld());
+        CHECK(g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
+                               {{"Name", std::string("START")}, {"Pos", DVector{-500, 100, 0}}}));
+        CHECK(g.enter_player(error) && g.objects.advance(.01));
+        auto* player = g.server_shell.Player(g.local_client);
+        CHECK(CPlayerObj::LocalVoicePlayer() == player);
+        auto other = g.objects.create(g.objects.find_class("BaseClass"), {});
+        const auto keep = g.objects.snapshot();
+        auto& vm = g.client_shell.voice_manager;
+        unsigned kills = 0, gibs = 0, corpses = 0, both = 0, scripted = 0, no_hit_node = 0;
+        for (int mode = 0; mode < 4; ++mode)
+            for (int trial = 0; trial < (mode == 3 ? 128 : 64); ++trial)
+            {
+                vm.StopAll();
+                const auto starts = vm.starts, requests = vm.requests;
+                auto h = g.objects.create(g.objects.find_class("CultistAI"), {}, Creation::World,
+                                          {{"Pos", DVector{0, 100, 0}},
+                                           {"AIState", std::string("IDLE")},
+                                           {"AIWeapon1", std::string("BERETTA")}});
+                auto* a = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h));
+                CHECK(a && a->RuntimeReady() && a->m_MoveObj.Update());
+                if (mode != 1)
+                    a->m_dwFlags |= 0x800u; // Isolate ordinary death from the source gib branch.
+                a->m_damage.SetArmorPoints(0);
+                const bool by_player = mode != 2 && (mode == 3 ? trial < 64 : trial % 2 == 0);
+                if (mode == 3)
+                {
+                    // Isolate instant-death attribution from random head localization.
+                    a->m_damage.ai_hit_localization = false;
+                    a->m_damage.node_hit = 2;
+                    CHECK(damage(g, h, 1, DamageType::Normal, by_player ? other : player->m_hObject));
+                    CHECK(!a->m_damage.IsDead());
+                    a->m_damage.ai_hit_localization = true; // Restore ordinary accepted-damage dispatch.
+                }
+                CHECK(damage(g, h, 500,
+                             mode == 1   ? DamageType::Explode
+                             : mode == 3 ? DamageType::Death
+                                         : DamageType::Normal,
+                             by_player ? player->m_hObject : other));
+                CHECK(a->m_damage.IsDead() && !a->runtime_failed);
+                if (a->kill_voice_roll < 0)
+                {
+                    CHECK(a->m_damage.node_hit == -1 && mode != 3); // Original HandleDamage early return.
+                    ++no_hit_node;
+                }
+                CHECK(a->kill_voice_requests ==
+                      unsigned(by_player && a->kill_voice_roll >= 0 && a->kill_voice_roll < 6));
+                CHECK(a->big_gib_voice_requests == unsigned(mode == 1 && by_player && a->big_gib_voice_roll < 7));
+                auto expected = a->kill_voice_requests + a->big_gib_voice_requests;
+                CHECK(a->combat_voice_deliveries == expected);
+                kills += a->kill_voice_requests;
+                if (mode == 3)
+                {
+                    scripted += a->kill_voice_requests;
+                    CHECK(a->m_damage.GetLastDamager() == (by_player ? other : player->m_hObject));
+                    CHECK(a->m_damage.last_damage.attacker == (by_player ? player->m_hObject : other));
+                }
+                gibs += a->big_gib_voice_requests;
+                both += expected == 2;
+                if (mode == 2)
+                {
+                    CHECK(a->AI_Update() && a->AI_Update() && a->last_corpse);
+                    auto* c = dynamic_cast<CCorpse*>(g.server.HandleToObject(a->last_corpse));
+                    CHECK(c);
+                    CHECK(damage(g, c->m_hObject, 500, DamageType::Explode, other));
+                    CHECK(c->dead && c->big_gib_voice_roll >= 0);
+                    expected = unsigned(c->big_gib_voice_roll < 7);
+                    CHECK(c->big_gib_voice_requests == expected && c->combat_voice_deliveries == expected);
+                    corpses += expected; // No player-killer requirement for the original corpse reply.
+                }
+                const bool gib_reply = mode == 2 || a->big_gib_voice_requests;
+                CHECK(g.objects.remove(h) &&
+                      g.objects.finish_frame()); // Message owns its values after actor destruction.
+                CHECK(g.pump_player_messages(error) && vm.requests == requests + expected);
+                CHECK(vm.starts ==
+                      starts + unsigned(expected != 0)); // Big-gib precedes kill; busy suppresses the latter.
+                if (expected)
+                {
+                    CHECK(g.server.advance_audio(.01, {}, {}));
+                    const auto* voice = g.server.audio.get(vm.voice);
+                    CHECK(voice && voice->cursor > 0 && voice->request.streaming && voice->clip->stream);
+                    CHECK(vm.last_resource.find(gib_reply ? "/biggib/" : "/kill/") != std::string::npos);
+                }
+                for (const auto handle : g.objects.snapshot())
+                    if (std::find(keep.begin(), keep.end(), handle) == keep.end())
+                        CHECK(g.objects.remove(g.objects.get(handle)->handle));
+                CHECK(g.objects.finish_frame());
+                g.server.flesh_gibs.clear();
+                g.server.blood_spurts.clear();
+                g.server.blood_splats.clear();
+            }
+        CHECK(kills && gibs && corpses && scripted);
+        std::cout << "Isolated original deaths: kill replies=" << kills << " gib replies=" << gibs
+                  << " corpse replies=" << corpses << " scripted kills=" << scripted << " simultaneous=" << both
+                  << " missing-node early returns=" << no_hit_node << '\n';
+        CHECK(g.unload_world() && !CPlayerObj::LocalVoicePlayer() && g.server.audio.voices().empty());
+        return true;
+    }
     bool private_data(const std::filesystem::path& root)
     {
         auto game = std::make_unique<GameSession>();
@@ -287,10 +464,12 @@ int main(int argc, char** argv)
         return 2;
     const std::string mode = argv[1];
     const std::filesystem::path root = argv[2];
-    const bool ok = mode == "groups"     ? groups(root)
-                    : mode == "timing"   ? timing(root)
-                    : mode == "messages" ? messages(root)
-                    : mode == "pickup"   ? pickup(root)
-                                         : mode == "private" && private_data(root);
+    const bool ok = mode == "groups"           ? groups(root)
+                    : mode == "timing"         ? timing(root)
+                    : mode == "messages"       ? messages(root)
+                    : mode == "pickup"         ? pickup(root)
+                    : mode == "damage"         ? damage_voices(root)
+                    : mode == "combat_private" ? combat_private(root)
+                                               : mode == "private" && private_data(root);
     return ok ? 0 : 1;
 }
