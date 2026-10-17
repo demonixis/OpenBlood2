@@ -11,7 +11,8 @@ namespace OpenBlood2
             ImGui::TextWrapped("Directory: %s | %zu original requests / %zu unique assets | %zu bytes read",
                                music.plan.directory.c_str(), music.plan.requests.size(), music.assets.size(),
                                music.bytes_read);
-            ImGui::TextWrapped("RIFF structure and section-to-style filenames only. Pattern events, personality "
+            ImGui::TextWrapped("RIFF structure, section-to-style filenames and decoded DLS sample/region data. Pattern "
+                               "events, personality "
                                "records, DLS synthesis and playlist playback are not implemented. MUSIC commands "
                                "still report unsupported; no audio is produced by this inspection.");
             if (!music.error.empty())
@@ -39,11 +40,104 @@ namespace OpenBlood2
                     ImGui::TableNextColumn();
                     ImGui::Text("%zu chunks\n%zu patterns\n%zu note chunks", asset.chunks, asset.patterns,
                                 asset.note_chunks);
+                    if (asset.bank)
+                        ImGui::Text("%zu instruments\n%zu waves", asset.bank->instruments.size(),
+                                    asset.bank->waves.size());
                     ImGui::TableNextColumn();
                     ImGui::TextWrapped("%s", asset.error.empty() ? asset.style_reference.c_str() : asset.error.c_str());
+                    if (!asset.bank_error.empty())
+                        ImGui::TextWrapped("DLS decoding failed: %s", asset.bank_error.c_str());
                 }
                 ImGui::EndTable();
             }
+        }
+        if (ImGui::TreeNode("DLS instruments and samples (no synthesis)"))
+        {
+            auto settings = [](const DlsSampleSettings& sample)
+            {
+                ImGui::Text("Unity note %u | fine tune %d | raw attenuation %d | options 0x%x",
+                            unsigned(sample.unity_note), int(sample.fine_tune), sample.attenuation, sample.options);
+                if (sample.loop)
+                    ImGui::Text("Forward loop: start %u / length %u frames | %s", sample.loop->start,
+                                sample.loop->length,
+                                sample.loop_in_bounds ? "in bounds" : "INVALID default (region override required)");
+                else
+                    ImGui::TextUnformatted("One shot (no sample loop)");
+            };
+            auto articulation = [](const DlsArticulation& art)
+            {
+                ImGui::Text("Articulation graph: %s / %zu raw connections (not evaluated)",
+                            art.present ? "present" : "absent", art.connections.size());
+                for (const auto& c : art.connections)
+                    ImGui::Text("  src 0x%x / control 0x%x -> dest 0x%x / transform 0x%x / scale %d",
+                                unsigned(c.source), unsigned(c.control), unsigned(c.destination), unsigned(c.transform),
+                                c.scale);
+            };
+            for (const auto& asset : music.assets)
+            {
+                if (asset.kind != MusicAssetKind::Instruments)
+                    continue;
+                if (!ImGui::TreeNode(asset.filename.c_str()))
+                    continue;
+                if (!asset.bank)
+                    ImGui::TextWrapped("No decoded bank: %s",
+                                       asset.bank_error.empty() ? asset.error.c_str() : asset.bank_error.c_str());
+                else
+                {
+                    const auto& bank = *asset.bank;
+                    ImGui::Text("%zu instruments / %zu waves / %zu cues / %.2f MiB PCM / %zu opaque chunks",
+                                bank.instruments.size(), bank.waves.size(), bank.cues.size(),
+                                bank.decoded_bytes / 1048576.0, bank.opaque_chunks);
+                    for (const auto& instrument : bank.instruments)
+                    {
+                        const auto label = "Bank " + std::to_string(instrument.bank) + " / program " +
+                                           std::to_string(instrument.program);
+                        if (!ImGui::TreeNode(label.c_str()))
+                            continue;
+                        articulation(instrument.articulation);
+                        for (std::size_t i = 0; i < instrument.regions.size(); ++i)
+                        {
+                            const auto& r = instrument.regions[i];
+                            if (!ImGui::TreeNode(reinterpret_cast<void*>(i + 1),
+                                                 "Region %zu: keys %u..%u / velocity %u..%u", i, unsigned(r.key_low),
+                                                 unsigned(r.key_high), unsigned(r.velocity_low),
+                                                 unsigned(r.velocity_high)))
+                                continue;
+                            const auto& w = bank.waves[r.wave];
+                            ImGui::Text("Cue %u -> wave %u | %zu frames / %u Hz | pool offset %u", r.cue, r.wave,
+                                        w.samples.size(), w.rate, w.pool_offset);
+                            ImGui::Text("Region flags 0x%x / group %u | wave flags 0x%x / phase %u / channel %u",
+                                        unsigned(r.options), unsigned(r.key_group), unsigned(r.wave_options),
+                                        unsigned(r.phase_group), r.channel);
+                            ImGui::Text("Settings: %s",
+                                        r.settings_override ? "region override" : "inherited from wave");
+                            settings(r.settings);
+                            articulation(r.articulation);
+                            ImGui::TreePop();
+                        }
+                        ImGui::TreePop();
+                    }
+                    if (ImGui::TreeNode("All waves (including unreferenced)"))
+                    {
+                        for (std::size_t i = 0; i < bank.waves.size(); ++i)
+                        {
+                            const auto& w = bank.waves[i];
+                            if (!ImGui::TreeNode(reinterpret_cast<void*>(i + 1), "Wave %zu: %zu frames / %u Hz", i,
+                                                 w.samples.size(), w.rate))
+                                continue;
+                            ImGui::Text("Pool offset %u", w.pool_offset);
+                            if (w.settings)
+                                settings(*w.settings);
+                            else
+                                ImGui::TextUnformatted("No wave settings; a region must supply them");
+                            ImGui::TreePop();
+                        }
+                        ImGui::TreePop();
+                    }
+                }
+                ImGui::TreePop();
+            }
+            ImGui::TreePop();
         }
         const auto& audio = game.server.audio;
         ImGui::TextWrapped("Original Sound starts an unattached loop and removes its source object. "

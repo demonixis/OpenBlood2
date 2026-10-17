@@ -88,3 +88,7 @@ transitions before accepting the engine music calls. Do not substitute recorded
 soundtrack files or a silent success. CD audio, motifs and breaks require their
 own source review (the supplied client motif/break helpers are no-ops). M2 remains
 incomplete.
+
+The [DLS continuation](music_dls_contracts.md) now decodes a bounded instrument-data
+subset alongside the structural survey. Earlier blanket DLS opacity statements
+are superseded only for that subset; synthesis and music playback remain absent.

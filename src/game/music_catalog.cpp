@@ -81,7 +81,7 @@ namespace OpenBlood2
         // Own all names. Never retain directory iterators, resource spans or game objects.
         auto requests = plan.requests;
         std::set<std::string> seen;
-        std::size_t reserved_bytes = 0;
+        std::size_t reserved_bytes = 0, decoded_bytes = 0;
         for (std::size_t i = 0; i < requests.size(); ++i)
         {
             const auto request = requests[i];
@@ -117,6 +117,15 @@ namespace OpenBlood2
                     {
                         MusicAssetInfo info;
                         record.container_valid = read_music_asset(bytes, request.kind, info, record.error);
+                        if (record.container_valid && request.kind == MusicAssetKind::Instruments)
+                        {
+                            auto bank = std::make_shared<DlsBank>();
+                            if (read_dls_bank(bytes, *bank, record.bank_error, 64 * 1024 * 1024 - decoded_bytes))
+                            {
+                                decoded_bytes += bank->decoded_bytes;
+                                record.bank = std::move(bank);
+                            }
+                        }
                         record.chunks = info.chunks.size();
                         record.style_reference = info.style_reference;
                         for (const auto& chunk : info.chunks)

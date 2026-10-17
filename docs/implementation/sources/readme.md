@@ -17,3 +17,5 @@ Runtime test logs and measurements belong in the
 [dedicated evidence directory](../../../../Documentation/Implementation/evidence).
 
 - [Original music asset preparation](m2_music_asset_sources.json)
+
+- [DLS decoding references and private format quirks](m2_music_dls_sources.json)

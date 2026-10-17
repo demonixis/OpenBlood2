@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete; DLS data prerequisite only, music playback unavailable",
+  "implementation_parent": "2a57e2c110b97fa67cf553e6747c65acad57ff3f",
+  "imports": [],
+  "references": [
+    {
+      "url": "https://raw.githubusercontent.com/microsoft/win32metadata/b07213e28bcc48221c155024f9c5e0e1a92c6497/generation/WinSDK/RecompiledIdlHeaders/shared/dls1.h",
+      "commit": "b07213e28bcc48221c155024f9c5e0e1a92c6497",
+      "sha256": "a2929e5ab586fe7d6deb285e7bddf90b9f5021588218a413c5516b6739df4db2",
+      "bytes": 9462,
+      "use": "Public-use format field layouts only; no header or implementation copied"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/ns-mmeapi-waveformatex",
+      "use": "PCM layout and ignored PCM cbSize; no code copied"
+    },
+    {
+      "source": "sources/blood2/AppHeaders/client_de.h",
+      "sha256": "d4bd76f15d1689a0314f832bcba0877d2bbabcdf830a8a44da9d662b4aa534e1",
+      "use": "Original InitInstruments(DLS,style) requirement; original playlist caller remains as previously imported"
+    }
+  ],
+  "replacement_code": [
+    "src/engine/dls_bank.cpp: bounded independent PCM/region/cue/sample-settings/articulation data decoder",
+    "src/game/music_catalog.cpp: immutable per-world decoded bank ownership and separate decode diagnostics",
+    "src/app/inspector_world_sounds.cpp: read-only decoded bank inspection"
+  ],
+  "private_data_quirks": [
+    "All 156 waves use mono PCM16 22050 Hz, 18-byte fmt with ignored cbSize=18",
+    "Cabal wave8 has invalid default loop start7000 length13277 for13277 frames, overridden by valid effective region settings",
+    "Crudux program2 region1 wave12 effective loop length664633 exceeds64633 frames: bank refused",
+    "Track1 program4 region0 wave2 effective loop length32025 exceeds23025 frames: bank refused"
+  ],
+  "limitations": [
+    "Articulation connections and opaque chunks are data, not evaluated synthesis",
+    "No AASE/AASY event decoding, personalities, playlist playback or successful MUSIC service",
+    "No automatic loop repair or claims about retail handling of malformed banks",
+    "Commercial files and reference repositories remain external and unchanged"
+  ]
+}

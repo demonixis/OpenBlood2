@@ -1182,3 +1182,12 @@ RIFF containers and section style references, without synthesizing music or retu
 success for missing music services. See [contracts](../contracts/music_asset_contracts.md),
 [source selections](sources/m2_music_asset_sources.json) and
 [evidence](../../../Documentation/Implementation/m2_music_assets.md).
+
+## DLS instrument data (M2)
+
+The independent engine reader decodes PCM samples, cue/region mappings and raw
+articulation from the original client's external instrument bank. SDK format facts
+are references, not copied implementation. Unused invalid wave defaults stay
+visible; invalid effective region loops refuse decoding. See
+[contracts](../contracts/music_dls_contracts.md) and
+[source ledger](sources/m2_music_dls_sources.json). Music playback remains unavailable.
