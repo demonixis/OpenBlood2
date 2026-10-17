@@ -1,3 +1,11 @@
+# OpenBlood2
+
+A preservation project rebuilding **Blood II: The Chosen** with its original game
+code and a new, small, portable C++20 engine. The stack uses CMake, pinned SDL3
+`main`, SDL_GPU, spdlog and Dear ImGui for in-game inspection.
+
+## Status
+
 | Milestone | Estimated task completion |
 | --- | ---: |
 | M0 | 100% |
@@ -9,14 +17,6 @@
 | M6 | ~15% |
 | M7 | 0% |
 | M8 | 0% |
-
-# OpenBlood2
-
-A preservation project rebuilding **Blood II: The Chosen** with its original game
-code and a new, small, portable C++20 engine. The stack uses CMake, pinned SDL3
-`main`, SDL_GPU, spdlog and Dear ImGui for in-game inspection.
-
-## Status
 
 The percentages above are rough task estimates, not milestone acceptance.
 M0/M1 are complete for their documented Linux scope; **M2 remains in progress**.
