@@ -1123,3 +1123,7 @@ not an upstream commit or an original-game adaptation. See the
 ## M2 Door Audio Continuation
 
 [m2_door_audio_sources.json](sources/m2_door_audio_sources.json) records original Door::StartSound and destructor loop cleanup, including fixed radii and MISC_MEDIUM priority. Existing attached-loop/one-shot services replace PlaySoundInfo without importing an audio backend or changing door rules. See [contracts](../contracts/door_audio_contracts.md).
+
+## M2 Trigger Audio Continuation
+
+[m2_trigger_audio_sources.json](sources/m2_trigger_audio_sources.json) records original Trigger activation, lock/explicit-unlock decisions and ObjectUtilities attached one-shot defaults. Speaker/radius/priority differ by branch; successful key replies deliberately remain silent. Existing checked audio services replace legacy PlaySoundInfo. See [contracts](../contracts/trigger_audio_contracts.md).

@@ -2730,7 +2730,24 @@ namespace OpenBlood2
                 }
                 ImGui::EndTable();
             }
-            ImGui::TextWrapped("Last sound request: %s (not played)", t->last_sound.c_str());
+            ImGui::TextWrapped("Activation / locked / unlocked: %s / %s / %s", t->activation_sound.c_str(),
+                               t->locked_sound.c_str(), t->unlocked_sound.c_str());
+            ImGui::TextWrapped("Last sound: %s", t->last_sound.c_str());
+            ImGui::Text("Sound attempts %llu | started %llu | failed %llu", (unsigned long long)t->sound_requests,
+                        (unsigned long long)t->sound_starts, (unsigned long long)t->sound_failures);
+            const auto* sound_owner = game.objects.get(t->last_sound_owner);
+            ImGui::Text("Attachment: %s | radius %.1f | priority %u | voice %llu",
+                        sound_owner && sound_owner->life == Life::Alive ? sound_owner->state.m_Name : "absent",
+                        t->last_sound_radius, unsigned(t->last_sound_priority), (unsigned long long)t->last_voice);
+            if (const auto* voice = game.server.audio.get(t->last_voice))
+                ImGui::Text("Decoded frames %zu | cursor %.1f | sampled position %.1f %.1f %.1f",
+                            static_cast<std::size_t>(voice->clip->frames()), voice->cursor, voice->position.x,
+                            voice->position.y, voice->position.z);
+            else
+                ImGui::TextUnformatted("Last voice is absent, completed or removed.");
+            ImGui::TextWrapped("%s", t->sound_error.c_str());
+            ImGui::TextWrapped("Attached one-shots may overlap. Playback is dry; reverb/priority arbitration and "
+                               "Action-mode console feedback remain unavailable.");
         }
         else
             ImGui::TextUnformatted("No live Trigger selected.");

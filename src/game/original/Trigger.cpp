@@ -1,5 +1,6 @@
 #include "Trigger.h"
 #include "engine/collision.h"
+#include "game/game_settings.h"
 #include "trigger_helpers.h"
 #include <algorithm>
 #include <cmath>
@@ -57,11 +58,39 @@ bool Trigger::ReadProp()
     }
     return true;
 }
-void Trigger::Sound(const std::string& name)
+void Trigger::Sound(const std::string& name, HOBJECT owner, float radius, DBYTE priority)
 {
     last_sound = name;
-    if (!name.empty())
-        ++sound_requests; // Audio/Action-mode console localization is not connected.
+    last_sound_owner = owner;
+    last_sound_radius = radius;
+    last_sound_priority = priority;
+    last_voice = 0;
+    sound_error.clear();
+    if (name.empty())
+        return;
+    ++sound_requests;
+    // Original Action mode uses localized console feedback for lock sounds.
+    // That mode has no supported local player session; do not substitute audio.
+    if (priority == 2 && GetGameType() == GAMETYPE_ACTION)
+        sound_error = "Action-mode localized lock feedback is unavailable";
+    else
+    {
+        SoundRequest request;
+        request.resource = name;
+        request.speaker = owner;
+        request.space = SoundSpace::Spatial;
+        request.inner_radius = radius * .1f;
+        request.outer_radius = radius;
+        request.volume = 1;
+        request.priority = priority;
+        request.reverb_requested = true;
+        // Original PlaySoundFromObject defaults: attached, no loop or retained handle.
+        last_voice = g_pServerDE->PlayCharacterSound(owner, request, false, sound_error);
+    }
+    if (last_voice)
+        ++sound_starts;
+    else
+        ++sound_failures; // Missing feedback never cancels original trigger/lock progression.
 }
 bool Trigger::ValidateSender(HOBJECT sender)
 {
@@ -91,7 +120,7 @@ bool Trigger::ValidateSender(HOBJECT sender)
             }
             accepted = !locked;
             if (locked)
-                Sound(locked_sound);
+                Sound(locked_sound, sender, 200, 2); // MISC_HIGH, attached to the denied player.
         }
     }
     else if (g_pServerDE->IsKindOf(type, g_pServerDE->GetClass("CBaseCharacter")))
@@ -128,7 +157,7 @@ void Trigger::Activate(HOBJECT sender, bool touch)
     }
     current_activation = 0;
     ++activations;
-    Sound(activation_sound);
+    Sound(activation_sound, m_hObject, sound_radius, 1); // MISC_MEDIUM, attached to this sensor.
     last_sender = sender;
     if (max_delay != 0)
     {
@@ -240,7 +269,7 @@ DDWORD Trigger::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD rea
         else if (same_name(command, "UNLOCK"))
         {
             if (locked)
-                Sound(unlocked_sound);
+                Sound(unlocked_sound, sender, 200, 2); // The command sender, not necessarily a player.
             locked = false;
             g_pServerDE->SetNextUpdate(m_hObject, 0);
         }

@@ -628,3 +628,5 @@ updates belong in docs and workspace Documentation. Preserve historical evidence
 snapshots and original/third-party notices when updating references.
 
 The [door-audio continuation](../Documentation/Implementation/m2_door_audio.md) connects original attached busy loops and stop sounds. Read [contracts](docs/contracts/door_audio_contracts.md); preserve stop-before-empty/failure, unretained one-shot overlap, fixed 500/1500 radii, priority 1 and checked owner lifetime. Inspect actual voices and failures; reverb/arbitration, lock sounds and music remain separate. The exact exit population now includes the original periodic smell hint. M2 remains incomplete.
+
+The [trigger-audio continuation](../Documentation/Implementation/m2_trigger_audio.md) connects original activation and lock/explicit-unlock one-shots. Read [contracts](docs/contracts/trigger_audio_contracts.md). Preserve trigger-versus-sender attachment, R*0.1 inner radius, silent key replies, overlapping voices and unchanged lock/activation progression after playback failure. Action-mode console feedback, reverb/priority arbitration and the actual M2 gate remain open.

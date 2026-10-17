@@ -41,8 +41,8 @@ The inspector resolves it each frame and shows decoded frame count, cursor,
 loop count and position, plus attempts/starts/failures and the latest error.
 An empty command clears the latest request/error without erasing failure totals.
 Reverb and priority remain requested metadata: playback is dry, without priority
-arbitration, occlusion or retail acoustic parity. Lock/unlock Trigger audio,
-portals, music and full save support remain separate limitations; M2 stays open.
+arbitration, occlusion or retail acoustic parity. [Trigger activation/lock audio](trigger_audio_contracts.md) is now connected.
+Portals, music and full save support remain separate limitations; M2 stays open.
 
 ## Checks
 

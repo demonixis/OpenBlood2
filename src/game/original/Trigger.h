@@ -20,9 +20,14 @@ class Trigger : public B2BaseClass
     bool active = true, touch_activate = true, player_activate = true, ai_activate = true;
     bool object_activate = false, relay_activate = true, named_activate = false, locked = false;
     std::string activation_name, activation_sound, locked_sound, unlocked_sound, key_name = "Key";
-    std::string locked_message, unlocked_message, last_sound, last_command;
+    std::string locked_message, unlocked_message, last_sound, last_command, sound_error;
     std::uint32_t activation_count = 1, current_activation = 0;
     std::uint64_t activations = 0, rejected = 0, key_queries = 0, sound_requests = 0;
+    std::uint64_t sound_starts = 0, sound_failures = 0;
+    OpenBlood2::SoundId last_voice = 0; // Non-owning history; attached one-shots release automatically.
+    HOBJECT last_sound_owner = nullptr;
+    float last_sound_radius = 0;
+    DBYTE last_sound_priority = 0;
     HOBJECT last_sender = nullptr, owner_door = nullptr;
     void SetActive(bool value)
     {
@@ -40,7 +45,7 @@ class Trigger : public B2BaseClass
     bool ValidateSender(HOBJECT);
     void Activate(HOBJECT, bool touch);
     void Update();
-    void Sound(const std::string&);
+    void Sound(const std::string&, HOBJECT owner, float radius, DBYTE priority);
     bool activating_ = false;
     HOBJECT querying_ = nullptr;
 };

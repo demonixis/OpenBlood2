@@ -92,13 +92,14 @@ namespace
         }
         if ((options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
              options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke ||
-             options.pickups_smoke || options.doors_smoke || (!options.gpu_smoke && !options.world_smoke)) &&
+             options.pickups_smoke || options.doors_smoke || options.triggers_smoke ||
+             (!options.gpu_smoke && !options.world_smoke)) &&
             !game->server.audio.open_output(error))
         {
             spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
             if (options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
                 options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke ||
-                options.doors_smoke || options.pickups_smoke)
+                options.doors_smoke || options.pickups_smoke || options.triggers_smoke)
                 return 4;
         }
         HOBJECT key = nullptr;
@@ -172,6 +173,7 @@ namespace
         }
         OpenBlood2::ObjectId smoke_door{}, smoke_trigger{};
         bool key_unlocked_hidden = false;
+        OpenBlood2::SoundId trigger_denial_voice = 0;
         DVector hidden_door_position{};
         bool door_moved_hidden = false, door_sound_hidden = false;
         if (options.doors_smoke)
@@ -1257,13 +1259,17 @@ namespace
                 {
                     hidden_door_position = game->objects.get(smoke_door)->state.m_Pos;
                     if (options.triggers_smoke)
-                        key_unlocked_hidden = OpenBlood2::activate_trigger_smoke(*game, smoke_trigger);
+                        key_unlocked_hidden =
+                            OpenBlood2::activate_trigger_smoke(*game, smoke_trigger, trigger_denial_voice);
                 }
                 if ((options.doors_smoke || options.triggers_smoke) && frames == show_frame)
                 {
                     const auto delta =
                         OpenBlood2::vector_subtract(game->objects.get(smoke_door)->state.m_Pos, hidden_door_position);
                     door_moved_hidden = OpenBlood2::vector_dot(delta, delta) > .01f;
+                    if (options.triggers_smoke)
+                        key_unlocked_hidden =
+                            OpenBlood2::check_trigger_audio_smoke(*game, trigger_denial_voice) && key_unlocked_hidden;
                     if (options.doors_smoke)
                     {
                         const auto* record = game->objects.get(smoke_door);

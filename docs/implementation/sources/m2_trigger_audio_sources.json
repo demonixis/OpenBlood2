@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete; original single-player trigger audio connected",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/Trigger.cpp",
+      "source_line_ranges": [
+        [
+          684,
+          714
+        ],
+        [
+          728,
+          820
+        ],
+        [
+          870,
+          880
+        ],
+        [
+          890,
+          949
+        ]
+      ],
+      "selection": "Activation threshold/order, silent key responses, distinct locked/explicit-unlock speaker selection.",
+      "source_sha256": "373658121f86b4d792eeb986a0e093291af3e1205b831385f142cf2ea445198c",
+      "target": "src/game/original/Trigger.cpp",
+      "target_sha256": "43ddc81b923483aa30c2accbfa0d30f7e7f60779ae472786ca704fa85936e42d"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "source_line_ranges": [
+        [
+          38,
+          82
+        ]
+      ],
+      "selection": "Attached one-shot defaults, inner radius R*0.1, volume and reverb request.",
+      "source_sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "target": "src/game/original/Trigger.cpp",
+      "target_sha256": "43ddc81b923483aa30c2accbfa0d30f7e7f60779ae472786ca704fa85936e42d"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ObjectUtilities.h",
+      "source_line_ranges": [
+        [
+          25,
+          27
+        ]
+      ],
+      "selection": "Original default arguments: no loop, handle, time, stream or instant mode.",
+      "source_sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
+      "target": "src/game/original/Trigger.cpp",
+      "target_sha256": "43ddc81b923483aa30c2accbfa0d30f7e7f60779ae472786ca704fa85936e42d"
+    },
+    {
+      "source": "sources/blood2/Shared/SoundTypes.h",
+      "source_line_ranges": [
+        [
+          14,
+          24
+        ]
+      ],
+      "selection": "Original MISC_MEDIUM=1 and MISC_HIGH=2 priorities.",
+      "source_sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "target": "src/game/original/Trigger.cpp",
+      "target_sha256": "43ddc81b923483aa30c2accbfa0d30f7e7f60779ae472786ca704fa85936e42d"
+    }
+  ],
+  "adaptations": [
+    "Existing checked PlayCharacterSound service replaces PlaySoundInfo for attached non-retained one-shots; no new engine service.",
+    "Monotonic non-owning voice history, owned strings and explicit start/failure inspection.",
+    "Action-mode console lock feedback remains explicitly unavailable; local player entry supports single-player only.",
+    "Playback failure does not change activation, key consumption or unlock rules; dry mixer preserves requested priority/reverb metadata."
+  ]
+}

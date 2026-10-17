@@ -111,6 +111,8 @@ For everyday setup and contribution guidance, return to the [developer index](..
 
 ## Audio and conversation
 
+- [Original trigger audio](trigger_audio_contracts.md)
+
 - [Disk-backed PCM audio and historical audio metadata](audio_stream_contracts.md)
 - [Original character voices and player animation sounds](character_audio_contracts.md)
 - [Original cinematic cues and bounded audio](cinematic_contracts.md)
