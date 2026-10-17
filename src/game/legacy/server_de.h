@@ -33,6 +33,7 @@ class CSBase
 
 namespace OpenBlood2
 {
+    struct BloodSplatSettings;
     struct WeaponSpriteSettings;
     struct ParticleStreamSettings;
     struct SkyDefinition;
@@ -83,6 +84,7 @@ class ServerDE : public CSBase
                                         unsigned failed = 0) = 0;
     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
     virtual std::uint64_t PublishParticleStream(HOBJECT, const OpenBlood2::ParticleStreamSettings&, std::string&) = 0;
+    virtual std::uint64_t PublishBloodSplat(HOBJECT, const OpenBlood2::BloodSplatSettings&, std::string&) = 0;
     virtual std::uint64_t PublishFleshGibs(HOBJECT, DVector, DVector, DVector, float, unsigned, std::string&) = 0;
     virtual std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) = 0;
     virtual std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&) = 0;

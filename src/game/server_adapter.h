@@ -4,6 +4,7 @@
 #include "engine/objects.h"
 #include "engine/sky.h"
 #include "engine/string_resources.h"
+#include "game/blood_splats.h"
 #include "game/explosion_flames.h"
 #include "game/explosion_fragments.h"
 #include "game/explosion_lights.h"
@@ -94,6 +95,8 @@ namespace OpenBlood2
         void RecordDebrisEffect(const DebrisEffect&) override;
         std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         ExplosionSprites explosion_sprites;
+        BloodSplats blood_splats;
+        std::uint64_t PublishBloodSplat(HOBJECT, const BloodSplatSettings&, std::string&) override;
         WeaponSprites weapon_sprites;
         std::uint64_t PublishWeaponSprites(HOBJECT, const WeaponSpriteSettings&, std::string&) override;
         ExplosionModels explosion_models;
@@ -151,6 +154,7 @@ namespace OpenBlood2
             scene_explosions.clear();
             projectile_reports.clear();
             explosion_sprites.clear();
+            blood_splats.clear();
             weapon_sprites.clear();
             explosion_models.clear();
             laser_beams.clear();

@@ -489,6 +489,7 @@ namespace OpenBlood2
                                             flash_owner ? flash_owner->m_hObject : nullptr) &&
              ok;
         ok = server.explosion_sprites.advance(objects.time()) && ok;
+        ok = server.blood_splats.advance(objects.time()) && ok;
         ok = server.weapon_sprites.advance(objects.time()) && ok;
         ok = server.explosion_models.advance(objects.time()) && ok;
         ok = server.laser_beams.advance(objects.time()) && ok;

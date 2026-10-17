@@ -1059,3 +1059,6 @@ ported from original Blood II, retaining existing SmellHint timeout/list ownersh
 [Source hashes](M2_AI_SMELL_SOURCES.json) and [contracts](AI_SMELL_CONTRACTS.md)
 record original guards, cadence, phase quirks and the checked cursor/link repair.
 No reference source, dependency, shader or commercial asset is modified.
+
+
+The [original blood-pool continuation](../../Documentation/Implementation/M2_BLOOD_SPLATS.md) connects CClientSplatFX/CBloodSplatFX with corpse ground-hit publication, persistent oriented sprites and inspection. Read [source hashes](M2_BLOOD_SPLAT_SOURCES.json) and [contracts](BLOOD_SPLAT_CONTRACTS.md). Preserve eleven-existing-neighbor reuse, nearest-prefix/tie order, state-preserving relocation, delta-squared growth, uncapped Term clocks and detached lifetime. Blood spurts/gib impact callers, shared-list eviction and the actual M2 gate remain incomplete.

@@ -34,6 +34,7 @@ class CCorpse : public B2BaseClass
     OpenBlood2::SegmentResult pool_result = OpenBlood2::SegmentResult::Invalid;
     OpenBlood2::SegmentHit pool_hit;
     bool pool_requested = false;
+    std::uint64_t pool_event = 0;
     std::string pool_error;
 
   protected:

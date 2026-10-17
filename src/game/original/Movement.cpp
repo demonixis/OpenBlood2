@@ -6,51 +6,6 @@
 using namespace OpenBlood2;
 namespace
 {
-    bool normalize(DVector v, DVector& out)
-    {
-        const auto length = std::hypot(v.x, v.y, v.z);
-        if (!physics_vector(v) || !std::isfinite(length) || length < 1e-6f)
-            return false;
-        out = vector_scale(v, 1 / length);
-        return true;
-    }
-    DVector cross(DVector a, DVector b)
-    {
-        return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
-    }
-    // Blood II's AlignRotation contract supplies another up vector for parallel
-    // axes. The later gr_GetPerpendicularVector corroborates this perturbation
-    // order/threshold. Keep this engine's existing +X right convention.
-    bool axes(DVector direction, DVector up, DVector& forward, DVector& right, bool& fallback)
-    {
-        fallback = false;
-        if (!normalize(direction, forward) || !normalize(up, up))
-            return false;
-        auto parallel = [&]() { return std::abs(vector_dot(forward, up)) > .99f; };
-        if (parallel())
-        {
-            fallback = true;
-            up.z += 5;
-            if (!normalize(up, up))
-                return false;
-            if (parallel())
-            {
-                up.x += 5;
-                up.y += 5;
-                if (!normalize(up, up))
-                    return false;
-                if (parallel())
-                {
-                    up.x += 5;
-                    up.y -= 2;
-                    up.z -= 5;
-                    if (!normalize(up, up))
-                        return false;
-                }
-            }
-        }
-        return normalize(cross(up, forward), right);
-    }
     float distance(DVector a, DVector b)
     {
         auto d = vector_subtract(a, b);
@@ -60,7 +15,7 @@ namespace
 bool CMovement::frame_axes(DVector direction, DVector& forward_axis, DVector& right_axis)
 {
     bool fallback = false;
-    if (!axes(direction, up, forward_axis, right_axis, fallback))
+    if (!alignment_axes(direction, up, forward_axis, right_axis, fallback))
         return false;
     if (fallback)
     {

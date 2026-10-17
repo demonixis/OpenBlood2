@@ -1,5 +1,7 @@
 # Ordinary original NPC death and CCorpse
 
+> Current extension: [original blood pools](BLOOD_SPLAT_CONTRACTS.md) now render primary-world corpse hits. Earlier pool omissions below are historical; blood spurts/gib impact callers and M2 remain incomplete.
+
 > Extended by [initial placement contracts](CORPSE_PLACEMENT_CONTRACTS.md): the original raw body now receives bounded source-side clearance before transfer. Impossible placements fail visibly and roll back deferred, retaining the source; general/retail depenetration remains unavailable.
 
 Selected original `AI_Mgr::HandleDamage`, `MC_Dead`, `AI_STATE_Dying`,

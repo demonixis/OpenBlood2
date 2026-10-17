@@ -119,7 +119,8 @@ namespace OpenBlood2
             ImGui::Text("Sound keys %llu / starts %llu | last voice %llu", (unsigned long long)c.sound_attempts,
                         (unsigned long long)c.sound_starts, (unsigned long long)c.last_sound);
             ImGui::TextWrapped("%s | %s", c.sound_resource.c_str(), c.sound_error.c_str());
-            ImGui::Text("Blood-pool ray %d | request %s", int(c.pool_result), c.pool_requested ? "yes" : "no");
+            ImGui::Text("Blood-pool ray %d | request %s | event %llu", int(c.pool_result),
+                        c.pool_requested ? "yes" : "no", (unsigned long long)c.pool_event);
             ImGui::TextWrapped("%s", c.pool_error.c_str());
             ImGui::Text("Health %.1f | limb loss %d | hit node %d | limbs %llu / gib events %llu",
                         c.m_damage.m_fHitPoints, c.limb_loss, c.hit_limb, (unsigned long long)c.limbs_created,

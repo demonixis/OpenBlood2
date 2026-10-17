@@ -1,5 +1,6 @@
 // Original ObjectDLL/corpse.cpp: selected corpse lifetime, burning and damage.
 #include "Corpse.h"
+#include "ClientSplatFX.h"
 #include "Gib.h"
 #include "Sparam.h"
 #include "engine/collision.h"
@@ -143,7 +144,19 @@ bool CCorpse::Update()
             {
                 pool_hit.point.y += .1f;
                 pool_requested = true;
-                pool_error = "Original CClientSplatFX is unavailable; blood pool is not rendered";
+                ObjectCreateStruct create;
+                create.m_Pos = pool_hit.point;
+                const auto publisher = s->CreateObject(s->GetClass("CClientSplatFX"), &create);
+                auto* splat = dynamic_cast<CClientSplatFX*>(publisher);
+                pool_event = 0;
+                if (!splat)
+                    pool_error = "Cannot create original CClientSplatFX";
+                else
+                {
+                    splat->Setup(pool_hit.point, pool_hit.normal, .1f, .02f);
+                    pool_event = splat->event;
+                    pool_error = splat->error;
+                }
             }
             else if (pool_result != SegmentResult::Miss && pool_result != SegmentResult::Hit)
                 pool_error = "Corpse blood-pool ray unavailable";

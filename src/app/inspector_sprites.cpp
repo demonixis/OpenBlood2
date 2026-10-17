@@ -9,6 +9,7 @@ namespace OpenBlood2
         ImGui::TextWrapped("Original DetailSprite placement and SPR clock; decoded DTX alpha on world-depth quads. "
                            "Rotatable sprites use their object pose; others face the camera. Unlit replacement "
                            "presentation: glow, view bias, no-Z and sky modes remain unavailable.");
+        draw_blood_splats(game);
         draw_weapon_sprites(game);
         if (sprite_view && sprite_render)
             ImGui::Text("Prepared %zu quads / %zu entries | GPU passes %llu / texture uploads %llu | %zu RGBA bytes",
@@ -192,5 +193,41 @@ namespace OpenBlood2
             if (!r.error.empty())
                 ImGui::TextWrapped("%s", r.error.c_str());
         }
+    }
+} // namespace OpenBlood2
+
+namespace OpenBlood2
+{
+    void Inspector::draw_blood_splats(const GameSession& game)
+    {
+        if (!ImGui::CollapsingHeader("Original blood splats / corpse pools"))
+            return;
+        const auto& effects = game.server.blood_splats;
+        ImGui::Text("Active %zu | created %llu / reused %llu / expired %llu / failed %llu", effects.active.size(),
+                    (unsigned long long)effects.started, (unsigned long long)effects.reused,
+                    (unsigned long long)effects.expired, (unsigned long long)effects.failed);
+        ImGui::TextWrapped("Detached rotatable sprites. Blood spurts, gib impact callers and general SFX-list eviction "
+                           "remain unavailable.");
+        if (!effects.update_error.empty())
+            ImGui::TextWrapped("%s", effects.update_error.c_str());
+        for (const auto& fx : effects.active)
+        {
+            ImGui::Text("Splat %llu / event %llu | grow clock %.3f | %s | alpha %.3f | callbacks %llu",
+                        (unsigned long long)fx.id, (unsigned long long)fx.event, fx.grow_time,
+                        fx.shrinking ? "shrinking" : "persistent", fx.alpha, (unsigned long long)fx.updates);
+            ImGui::Text("Position %.3f %.3f %.3f | scale %.3f %.3f %.3f", fx.position.x, fx.position.y, fx.position.z,
+                        fx.scale.x, fx.scale.y, fx.scale.z);
+            ImGui::TextWrapped("%s", fx.resource.c_str());
+            if (sprite_view)
+                for (const auto& entry : sprite_view->entries)
+                    if (entry.blood_splat == fx.id)
+                        ImGui::TextWrapped("Frame %s | %u x %u | %s | %s", entry.frame_path.c_str(), entry.width,
+                                           entry.height, entry.range == UINT32_MAX ? "not prepared" : "quad prepared",
+                                           entry.error.c_str());
+        }
+        for (const auto& report : effects.reports)
+            ImGui::TextWrapped("Event %llu / %s -> splat %llu (%s): %s", (unsigned long long)report.id,
+                               report.source.c_str(), (unsigned long long)report.effect,
+                               report.reused ? "moved existing" : "creation", report.error.c_str());
     }
 } // namespace OpenBlood2

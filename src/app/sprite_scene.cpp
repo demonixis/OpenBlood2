@@ -23,6 +23,13 @@ namespace OpenBlood2
                 return false;
             scene.entries.back().client_effect = fx.id;
         }
+        for (const auto& fx : game.server.blood_splats.active)
+        {
+            if (!scene.add(fx.sprite.get(), fx.track, {fx.position, fx.rotation}, fx.scale,
+                           FLAG_VISIBLE | FLAG_ROTATEABLESPRITE, {}, game.resources, error, fx.alpha, {.1f, .1f, .1f}))
+                return false;
+            scene.entries.back().blood_splat = fx.id;
+        }
         for (const auto& fx : game.server.weapon_sprites.flashes)
         {
             if (!scene.add(fx.sprite.get(), fx.track, {fx.settings.position, fx.rotation}, fx.scale, fx.flags, {},

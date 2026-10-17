@@ -2,6 +2,18 @@
 #include <cmath>
 namespace OpenBlood2
 {
+    std::uint64_t ServerAdapter::PublishBloodSplat(HOBJECT source, const BloodSplatSettings& settings,
+                                                   std::string& error)
+    {
+        trace_service("PublishBloodSplat (original detached pool sprite)");
+        error.clear();
+        if (!IsObjectAlive(source) || !objects_.sprites)
+        {
+            error = "Blood splat source/store unavailable";
+            return 0;
+        }
+        return blood_splats.publish(settings, GetObjectName(source), *objects_.sprites, objects_.time(), error);
+    }
     std::uint64_t ServerAdapter::PublishFleshGibs(HOBJECT owner, DVector pos, DVector dir, DVector dims, float scale,
                                                   unsigned count, std::string& error)
     {

@@ -134,3 +134,6 @@ service and does not close M2. The renderer and Skeleton inspector expose fragme
 counts, resources, poses, velocity, liquid/rest state, impacts and errors. Corpse
 and limb panels expose actual health, masks, clocks, attachment/effect/voice IDs and
 cleanup. Inspection never advances simulation.
+
+
+Continuation: [original corpse blood pools](BLOOD_SPLAT_CONTRACTS.md) supersedes the pool omission for corpse ground hits. Blood-spurt particles, gib impact callers, shared SFX eviction and other required services remain incomplete. The M2 exit gate is unchanged.

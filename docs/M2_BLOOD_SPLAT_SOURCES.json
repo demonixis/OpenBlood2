@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "d7b744394b6a9fde0969362b3b6374bd52981f8e",
+  "status": "M2 incomplete; original corpse pools and detached client splats",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/ClientSplatFX.cpp",
+      "source_sha256": "f3fdd4b2792668d189613b250cbeb15535c070f0171b399670ded7cee00384f3",
+      "purpose": "Original instant publication and deferred publisher lifetime."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ClientSplatFX.h",
+      "source_sha256": "4a8ef4ab88d5f435b0fb8c1531fc4ae428fdfee5edacd9ae1d5699b4e5beef8e",
+      "purpose": "Original CClientSFX subclass."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodSplatFX.cpp",
+      "source_sha256": "5d381f9d6af3203ad53d964e6dff497e291bd75c9605978915a499b5566cab3a",
+      "purpose": "Original region scan, resource selection, growth, Term and Update."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodSplatFX.h",
+      "source_sha256": "ac0aadb1062dec0769d88932448e1b6a517899d6c3d18acd2c7600c51b7d71f7",
+      "purpose": "Static list insertion/removal and defaults."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/corpse.cpp",
+      "source_sha256": "f92ec5bd0e4175f61461aae1f5fe498b0a1d21b5f0ee7d889573d02480543fdd",
+      "purpose": "CreateBloodPool and animation-completion caller."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
+      "source_sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
+      "purpose": "Instant decode and terminating-list policy; shared eviction not integrated."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ClientSFX.cpp",
+      "source_sha256": "6e3731e0371a886cb02a22ba7aa5145f67b47080ed74805150d09206d41b6d54",
+      "purpose": "Inherited force-client-update base chain."
+    }
+  ],
+  "adaptations": [
+    "Typed copied descriptors and per-session values replace packets/client handles/static raw list.",
+    "Checked runtime-only publisher retains original deferred removal; sprites outlive source and release on unload.",
+    "Finite time/descriptor and active/report budgets fail explicitly; no automatic shared-list eviction.",
+    "Existing parallel-axis fallback shared with CMovement for original normal/normal alignment.",
+    "Portable RNG and existing sprite rasterization are not claimed retail-bit-identical."
+  ]
+}
