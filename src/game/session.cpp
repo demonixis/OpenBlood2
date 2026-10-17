@@ -170,6 +170,11 @@ namespace OpenBlood2
         }
         server.trace_enabled = false;
         state = SessionState::Inspection;
+        std::map<std::string, std::string> music_properties;
+        for (const char* key : {"MusicDirectory", "InstrumentFiles", "AmbientList", "CruisingList", "HarddrivingList"})
+            if (const auto found = server.variables().find(key); found != server.variables().end())
+                music_properties.emplace(key, found->second.text);
+        music_catalog.inspect(resources.content_root(), music_properties);
         std::map<std::string, std::string> requested;
         auto use = [&](const std::string& path, const char* purpose)
         {
@@ -448,6 +453,7 @@ namespace OpenBlood2
         preview_playing = true;
         entries.clear();
         resource_uses.clear();
+        music_catalog = {};
         world = {};
         ++world_revision;
         world_path.clear();

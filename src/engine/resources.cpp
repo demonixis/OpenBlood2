@@ -235,6 +235,7 @@ namespace OpenBlood2
             else if (!next.mount(found->second, error))
                 return false;
         }
+        next.content_root_ = config.data_dir;
         *this = std::move(next);
         return true;
     }

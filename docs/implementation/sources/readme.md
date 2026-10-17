@@ -15,3 +15,5 @@ byte. Add a new record for a new source selection; do not refresh historical
 hashes merely because an implementation file or its documentation links changed.
 Runtime test logs and measurements belong in the
 [dedicated evidence directory](../../../../Documentation/Implementation/evidence).
+
+- [Original music asset preparation](m2_music_asset_sources.json)

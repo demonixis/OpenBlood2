@@ -5,6 +5,46 @@ namespace OpenBlood2
 {
     void Inspector::draw_world_sounds(GameSession& game)
     {
+        const auto& music = game.music_catalog;
+        if (ImGui::CollapsingHeader("Original music assets (playback unavailable)", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::TextWrapped("Directory: %s | %zu original requests / %zu unique assets | %zu bytes read",
+                               music.plan.directory.c_str(), music.plan.requests.size(), music.assets.size(),
+                               music.bytes_read);
+            ImGui::TextWrapped("RIFF structure and section-to-style filenames only. Pattern events, personality "
+                               "records, DLS synthesis and playlist playback are not implemented. MUSIC commands "
+                               "still report unsupported; no audio is produced by this inspection.");
+            if (!music.error.empty())
+                ImGui::TextWrapped("Music inspection: %s", music.error.c_str());
+            if (ImGui::TreeNode("Original request order"))
+            {
+                for (const auto& request : music.plan.requests)
+                    ImGui::BulletText("%s: %s", request.role.c_str(), request.filename.c_str());
+                ImGui::TreePop();
+            }
+            if (ImGui::BeginTable("Music resources", 4,
+                                  ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+                                  ImVec2(0, 200)))
+            {
+                for (const char* title : {"External file", "Container", "Records", "Style reference / error"})
+                    ImGui::TableSetupColumn(title);
+                ImGui::TableHeadersRow();
+                for (const auto& asset : music.assets)
+                {
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::TextUnformatted(asset.filename.c_str());
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s\n%zu bytes", asset.container_valid ? "RIFF valid only" : "Failed", asset.bytes);
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%zu chunks\n%zu patterns\n%zu note chunks", asset.chunks, asset.patterns,
+                                asset.note_chunks);
+                    ImGui::TableNextColumn();
+                    ImGui::TextWrapped("%s", asset.error.empty() ? asset.style_reference.c_str() : asset.error.c_str());
+                }
+                ImGui::EndTable();
+            }
+        }
         const auto& audio = game.server.audio;
         ImGui::TextWrapped("Original Sound starts an unattached loop and removes its source object. "
                            "Playback belongs to this world until unload. No activation commands are added.");

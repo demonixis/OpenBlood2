@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete; music playback unavailable",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "implementation_parent": "3d15e6ea4b892108ce3da6c8ce90dde157a36c2d",
+  "imports": [
+    {
+      "source": "sources/blood2/ClientShellDLL/Music.cpp",
+      "source_line_ranges": [
+        [
+          24,
+          37
+        ],
+        [
+          111,
+          199
+        ]
+      ],
+      "source_sha256": "1024e355e8da92ba670b96fc7cec5a57f301ea45e18f0a43f910a914f6e24ee0",
+      "target": "src/game/original/Music.cpp",
+      "target_sha256": "28dcdeef2ffffe37a2e9bc373013bb5a3e6bf98ec863b8b9b170cfb944d8c5c9",
+      "selection": "Transition arrays and InitPlayLists/InitTrans/InitList request order, adapted to an owned inspection plan. No engine music call or playback result implemented."
+    }
+  ],
+  "references": [
+    {
+      "source": "sources/blood2/AppHeaders/client_de.h",
+      "source_line_ranges": [
+        [
+          234,
+          275
+        ]
+      ],
+      "sha256": "d4bd76f15d1689a0314f832bcba0877d2bbabcdf830a8a44da9d662b4aa534e1",
+      "use": "Original InitInstruments(DLS, style) and playlist API comments"
+    },
+    {
+      "source": "sources/blood2/AppHeaders/basetypes_de.h",
+      "source_line_ranges": [
+        [
+          48,
+          49
+        ]
+      ],
+      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
+      "use": "Original parser token count/size limits"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/WorldProperties.cpp",
+      "source_line_ranges": [
+        [
+          184,
+          216
+        ]
+      ],
+      "sha256": "d93bc435da9829a8c0b6495298ee284c325d267bfd4bb32a8e35b96e1664c550",
+      "use": "Original exported music properties"
+    }
+  ],
+  "replacement_code": [
+    "src/engine/music_asset.cpp: bounded RIFF metadata reader; only direct section sref interpreted as an ASCII UTF-16LE basename",
+    "src/game/music_catalog.cpp: exact-relative case-folded loose-file resolution below configured root, bounded reads and per-file structural diagnostics",
+    "src/game/session.cpp: one snapshot per world, independent of ImGui, cleared on unload"
+  ],
+  "observed_private_formats": {
+    "sections": "156 RIFF/AASE files",
+    "styles": "39 RIFF/AASY files",
+    "banks": "5 RIFF/DLS files",
+    "personalities": "5 .PER files, not parsed or certified",
+    "redistributed_commercial_payloads": false
+  },
+  "limitations": [
+    "Unknown musical records remain opaque; valid structure is not synthesis or semantic compatibility.",
+    "Read-only planning does not reproduce original loader short-circuiting: inspection continues past missing files.",
+    "Observed section style basename + .sty resolution is not a full historical IMA loader.",
+    "MUSIC LEVEL 3 remains explicitly unsupported. No DLLs are executed and no recorded soundtrack is substituted.",
+    "No native Windows/macOS/Android/iOS validation in this increment."
+  ]
+}

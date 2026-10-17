@@ -14,6 +14,7 @@
 #include "game/explosion_sprites.h"
 #include "game/flesh_gibs.h"
 #include "game/laser_beams.h"
+#include "game/music_catalog.h"
 #include "game/object_particles.h"
 #include "game/original/BloodShells.h"
 #include "game/original/LightFX.h"
@@ -412,6 +413,7 @@ namespace OpenBlood2
         CBloodClientShell client_shell{server, resources};
         HCLIENT local_client = nullptr;
         World world;
+        MusicCatalog music_catalog; // Read-only asset evidence; no music playback success is implied.
         std::vector<WorldEntry> entries;
         std::vector<ResourceUse> resource_uses;
         std::vector<std::string> trace;

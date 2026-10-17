@@ -36,9 +36,14 @@ namespace OpenBlood2
         {
             return mounts_;
         }
+        const auto& content_root() const
+        {
+            return content_root_;
+        }
 
       private:
         std::map<std::string, Resource> index_;
         std::vector<Mount> mounts_;
+        std::filesystem::path content_root_; // Set only by a successful mount_game; loose music remains external.
     };
 } // namespace OpenBlood2

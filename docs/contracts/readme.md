@@ -10,6 +10,8 @@ For everyday setup and contribution guidance, return to the [developer index](..
 
 ## Core services and resources
 
+- [Original music asset inspection](music_asset_contracts.md)
+
 - [Collision traversal and post-transition work](collision_traversal_contracts.md)
 - [Compound DAT shell validation](compound_shell_contracts.md)
 - [Transient object-message lifetime](message_lifetime_contracts.md)
