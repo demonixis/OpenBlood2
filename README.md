@@ -1,5 +1,7 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The [burning death and dismemberment continuation](../Documentation/Implementation/M2_DEATH_EFFECTS.md) connects original lethal fire/gib decisions, burning corpses, postmortem limb loss and visible client flesh fragments, with checked cleanup and in-game inspection. These paths no longer fail solely because fire/gib services were missing. Blood-spurt/splat effects, generic gib/save services and the actual M2 gate remain open. Earlier blanket fire/gib omissions are historical.
+
 The [scripted opportunity-fire continuation](../Documentation/Implementation/M2_AI_SCRIPT_FIRE.md) connects original standing/walking/running fire to FOLLOWPATH and MOVETOOBJECT, with inspection and checked lifetime. Real Cultist model diagnostics verify shots, damage and movement through reloads; these are not authored encounter or traversal proofs. M2 remains incomplete.
 
 The [AI alignment correction](../Documentation/Implementation/M2_AI_ALIGNMENT.md) restores the original parallel-axis fallback used by CMovement. Two reproduced CityHub Cultist update failures now become ordinary blocked-path decisions; inspection exposes the resolved axes. A 120-second relocation diagnostic reports no suspended NPCs after the correction, but is not a playthrough. M2 remains incomplete.

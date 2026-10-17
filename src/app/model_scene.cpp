@@ -22,6 +22,12 @@ namespace OpenBlood2
                 return false;
             scene.entries.back().fragment_effect = fx.id;
         }
+        for (const auto& fx : game.server.flesh_gibs.active)
+        {
+            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, true,
+                           false, {}, fx.model_path, game.resources, error))
+                return false;
+        }
         for (const auto& fx : game.server.laser_beams.active)
         {
             if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale,

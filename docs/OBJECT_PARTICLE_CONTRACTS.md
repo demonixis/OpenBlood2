@@ -109,3 +109,8 @@ now implements the selected Tesla component. Earlier blanket flame omissions are
 historical for that recipe; surface illumination and the actual M2 gate remain open.
 
 The [shield/powerup continuation](SHIELD_WEAPON_CONTRACTS.md) now implements original CGideonShield and owner-bound ObjectFX19/36. Earlier blanket shield/ramp/object-particle omissions are superseded only for these selected recipes. Boss actions, required remaining services and M2 stay open.
+
+The [burning death/dismemberment continuation](DEATH_EFFECT_CONTRACTS.md) supersedes
+blanket fire/gib/corpse-damage omissions for its selected original paths. Real
+flame/smoke particles, burned corpses, runtime limbs and flesh models now run with
+inspection. Blood-spurt/splat FX, generic gib/save services and full M2 remain open.

@@ -254,6 +254,13 @@ class AI_Mgr : public CBaseCharacter
     bool MC_Dead();
     bool AI_STATE_Dying();
     bool CreateCorpse();
+    bool StartBurnDeath();
+    bool CreateDeathGibs();
+    float m_fAIMass = 250; // Original AI_DEFAULT_MASS, distinct from aggregate overrides.
+    HOBJECT fire_source = nullptr;
+    std::uint64_t gib_events = 0, limbs_created = 0, big_gib_voice_requests = 0;
+    int big_gib_voice_roll = -1;
+    std::string gib_error;
     DDWORD m_nCorpseType = 0;
     OpenBlood2::SoundId m_hCurSound = 0; // Original per-actor retained sound, distinct from shared table voice.
     int death_slot = -1, kill_voice_roll = -1;

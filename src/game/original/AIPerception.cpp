@@ -23,6 +23,8 @@ AI_Mgr::AI_Mgr()
 }
 AI_Mgr::~AI_Mgr()
 {
+    if (fire_source && GetServerDE())
+        GetServerDE()->RemoveObject(fire_source);
     if (m_hCurSound && GetServerDE())
         GetServerDE()->KillSound(m_hCurSound);
     if (m_Link.m_pData)

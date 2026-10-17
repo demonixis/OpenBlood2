@@ -111,3 +111,8 @@ inspectable with zero HP and an error, not a fabricated corpse or completed kill
 sequence. This boundary, Gideon, ExitTrigger, required client FX and other missing
 session/state services keep M2 open. The earlier no-player self-target boundary
 also remains. Only the documented Linux configurations have been verified.
+
+The [burning death/dismemberment continuation](DEATH_EFFECT_CONTRACTS.md) supersedes
+blanket fire/gib/corpse-damage omissions for its selected original paths. Real
+flame/smoke particles, burned corpses, runtime limbs and flesh models now run with
+inspection. Blood-spurt/splat FX, generic gib/save services and full M2 remain open.

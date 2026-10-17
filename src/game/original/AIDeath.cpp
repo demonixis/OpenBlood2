@@ -1,7 +1,9 @@
 // Original AI_Mgr MC_Dead/AI_STATE_Dying/CreateCorpse, ordinary death only.
 #include "AI_Mgr.h"
 #include "Corpse.h"
+#include "Gib.h"
 #include "engine/collision.h"
+#include <cmath>
 #include <cstring>
 
 bool AI_Mgr::MC_Dead()
@@ -73,12 +75,19 @@ bool AI_Mgr::CreateCorpse()
         return StateFailure(why);
     };
     if (!s || !s->IsObjectAlive(m_hObject) || !m_pAnim_Sound || !m_MoveObj.initialized || !m_MoveObj.sampled ||
-        !physics_vector(m_vDims) || m_damage.reaction_damage_type == DamageType::Fire)
-        return fail("Corpse owner/cache/table unavailable or fire death unsupported");
+        !physics_vector(m_vDims))
+        return fail("Corpse owner/cache/table unavailable");
     std::string model, skin, clip_name;
     auto type = s->GetClass("CCorpse");
     if (!type || !s->GetModelFilenames(m_hObject, model, skin))
         return fail("Corpse class/model filenames unavailable");
+    if (m_damage.reaction_damage_type == DamageType::Fire)
+    {
+        skin = "skins\\enemies\\burned.dtx";
+        if (!s->RandomInt(0, 11, death_slot))
+            return fail("Burned corpse RNG unavailable");
+        m_nCorpseType = m_pAnim_Sound->m_nAnim_DEATH[death_slot];
+    }
     if (m_nCorpseType < m_pAnim_Sound->m_nAnim_DEATH[0])
     {
         int slot;
@@ -107,8 +116,10 @@ bool AI_Mgr::CreateCorpse()
     report.child = h;
     auto position = state.m_Pos;
     position.y -= (m_vDims.y - dims.y) - .001f;
-    const bool configured =
-        s->IsObjectAlive(m_hObject) && s->IsObjectAlive(h) && corpse->Setup(m_pAnim_Sound->GetSoundRoot(), m_bCabal);
+    const bool configured = s->IsObjectAlive(m_hObject) && s->IsObjectAlive(h) &&
+                            corpse->Setup(m_pAnim_Sound->GetSoundRoot(), m_bCabal, fire_source);
+    if (configured)
+        fire_source = nullptr; // Ownership transfers once, including failure rollback.
     if (configured)
     {
         s->SetModelAnimation(h, m_nCorpseType);
@@ -127,11 +138,81 @@ bool AI_Mgr::CreateCorpse()
         return fail("Corpse setup failed; incomplete child removed");
     }
     corpse->placement = corpse_placement;
-    // All supported NPC nodes are visible; per-limb hiding remains unavailable.
+    for (int node : {1, 4, 7, 10, 14})
+    {
+        DBOOL hidden = false;
+        if (s->GetModelNodeHideStatus(m_hObject, szNodes[node], &hidden) == DE_OK && hidden)
+            HideLimb(h, node, death_error);
+    }
     last_corpse = h;
     ++corpses_created;
     report.position = corpse_placement.candidate;
     report.outcome = "Original ordinary corpse initialized; independent animation/lifetime";
     s->RecordSpawn(report);
     return true;
+}
+
+bool AI_Mgr::StartBurnDeath()
+{
+    auto* s = GetServerDE();
+    if (fire_source && s->IsObjectAlive(fire_source))
+        return true;
+    ObjectCreateStruct state;
+    state.m_ObjectType = OT_NORMAL;
+    state.m_Flags = FLAG_FORCECLIENTUPDATE;
+    if (s->QueryModelNodeTransform(m_hObject, "torso", &state.m_Pos, &state.m_Rotation) != ServerDE::NodeQuery::Found)
+    {
+        damage_reaction_error = "Burning death torso unavailable";
+        return false;
+    }
+    std::strcpy(state.m_Name, "Corpse fire source");
+    auto* object = s->CreateObject(s->GetClass("BaseClass"), &state);
+    if (!object)
+    {
+        damage_reaction_error = "Burning death source creation failed";
+        return false;
+    }
+    fire_source = object->m_hObject;
+    return true;
+}
+bool AI_Mgr::CreateDeathGibs()
+{
+    using namespace OpenBlood2;
+    auto* s = GetServerDE();
+    gib_error.clear();
+    auto direction = m_damage.last_damage.direction;
+    direction.y += 2;
+    const float length = std::sqrt(vector_dot(direction, direction));
+    // CreateGibs negates, then SetupClientGibFX negates its IN/OUT argument again.
+    direction = length > 0 ? vector_scale(direction, (50 + 2 * m_damage.m_fLastDamageAmount) / length) : DVector{};
+    const float scale = m_fAIMass > 0 && m_fAIMass < 250 ? m_fAIMass / 250 : 1;
+    if (!std::isfinite(m_damage.m_fMass) || m_damage.m_fMass < 0 || m_damage.m_fMass > 2048)
+    {
+        gib_error = "AI gib mass exceeds bounded fragment request";
+        return false;
+    }
+    const unsigned count = static_cast<unsigned>(m_damage.m_fMass) / 32;
+    const auto event = s->PublishFleshGibs(m_hObject, m_MoveObj.GetPos(), direction, m_vDims, scale, count, gib_error);
+    gib_events += event != 0;
+    if (m_bCabal)
+    {
+        int roll;
+        if (!s->RandomInt(0, 100, roll))
+            return false; // Source's unused initial draw.
+        constexpr int nodes[]{1, 4, 7, 14, 10}, thresholds[]{80, 70, 50, 70, 50};
+        for (int i = 0; i < 5; ++i)
+        {
+            if (!s->RandomInt(0, 100, roll))
+                return false;
+            if (roll > thresholds[i])
+            {
+                std::string error;
+                if (CreateLimb(m_hObject, nodes[i], direction, error))
+                    ++limbs_created;
+                else if (gib_error.empty())
+                    gib_error = error;
+            }
+        }
+    }
+    return event != 0;
 }

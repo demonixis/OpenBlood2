@@ -136,14 +136,20 @@ bool AI_Mgr::HandleDamage()
         const auto type = m_damage.reaction_damage_type;
         if (type == OpenBlood2::DamageType::Fire && !(m_dwFlags & 0x40u))
         {
-            damage_reaction_error = "NPC fire death requires original burning services";
-            return false;
+            if (!StartBurnDeath())
+                return false;
         }
-        if (!(m_dwFlags & 0x800u) &&
-            (type == OpenBlood2::DamageType::Explode || (m_dwFlags & 0x40u) || m_damage.m_fLastDamagePercent >= .9f))
+        else if (!(m_dwFlags & 0x800u) && (type == OpenBlood2::DamageType::Explode || (m_dwFlags & 0x40u) ||
+                                           m_damage.m_fLastDamagePercent >= .9f))
         {
-            damage_reaction_error = "NPC gib death requires original gib services";
-            return false;
+            CreateDeathGibs(); // Original removal is independent of client FX/limb success.
+            m_bRemoveMe = true;
+            if (!s->RandomInt(0, 99, big_gib_voice_roll))
+                return false;
+            const auto attacker = m_damage.GetLastDamager();
+            if (big_gib_voice_roll < 7 && attacker &&
+                s->IsKindOf(s->GetObjectClass(attacker), s->GetClass("CPlayerObj")))
+                ++big_gib_voice_requests;
         }
         if (!s->RandomInt(0, 99, kill_voice_roll))
         {

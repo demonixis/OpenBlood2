@@ -10,6 +10,7 @@
 #include "game/explosion_models.h"
 #include "game/explosion_rings.h"
 #include "game/explosion_sprites.h"
+#include "game/flesh_gibs.h"
 #include "game/laser_beams.h"
 #include "game/object_particles.h"
 #include "game/original/BloodShells.h"
@@ -50,6 +51,7 @@ namespace OpenBlood2
         SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
         SoundId PlayLocalSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) override;
         SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) override;
+        SoundId PlayClientSound(const SoundRequest&, DVector, std::string&) override;
         SoundId PlaySoundAt(HOBJECT, const SoundRequest&, DVector, std::string&) override;
         SoundId PlayWorldSound(HOBJECT, const SoundRequest&, bool file_stream, std::string&) override;
         bool RandomInt(int, int, int&) override;
@@ -109,6 +111,8 @@ namespace OpenBlood2
         ExplosionRings explosion_rings;
         ExplosionFlames explosion_flames;
         std::uint64_t PublishExplosionFlames(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+        FleshGibs flesh_gibs;
+        std::uint64_t PublishFleshGibs(HOBJECT, DVector, DVector, DVector, float, unsigned, std::string&) override;
         ExplosionFragments explosion_fragments;
         std::uint64_t PublishExplosionFragments(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         std::uint64_t PublishExplosionRings(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
@@ -157,6 +161,7 @@ namespace OpenBlood2
             explosion_rings.clear();
             explosion_flames.clear();
             explosion_fragments.clear();
+            flesh_gibs.clear();
             spawn_reports.clear();
             pickup_reports.clear();
             camera_effects.clear();

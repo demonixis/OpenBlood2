@@ -169,7 +169,7 @@ namespace
         std::string model = "unchanged", skin = "unchanged";
         CHECK(!g.server.GetModelFilenames(nullptr, model, skin) && model == "unchanged" && skin == "unchanged");
         a->m_damage.reaction_damage_type = DamageType::Fire;
-        CHECK(!a->CreateCorpse() && a->corpses_created == 1);
+        CHECK(!a->StartBurnDeath() && !a->damage_reaction_error.empty()); // Synthetic model has no torso.
         CHECK(!g.objects.create(g.objects.find_class("CCorpse"), {}, Creation::World));
         return true;
     }
@@ -240,28 +240,29 @@ namespace
         auto* a = actor(g);
         CHECK(a);
         a->m_bCabal = false;
-        for (auto type : {DamageType::Fire, DamageType::Explode})
-        {
-            a->m_damage.reaction_damage_type = type;
-            CHECK(!a->HandleDamage() && !a->damage_reaction_error.empty());
-        }
+        a->m_damage.reaction_damage_type = DamageType::Fire;
+        CHECK(!a->HandleDamage() && !a->damage_reaction_error.empty()); // No synthetic torso.
+        a->m_damage.reaction_damage_type = DamageType::Explode;
+        CHECK(a->HandleDamage() && a->m_bRemoveMe); // Missing cosmetic resource must not freeze the actor.
+        a->m_bRemoveMe = false;
         a->m_damage.reaction_damage_type = DamageType::Normal;
         a->m_damage.m_fLastDamagePercent = .9f;
-        CHECK(!a->HandleDamage());
+        CHECK(a->HandleDamage() && a->m_bRemoveMe);
+        a->m_bRemoveMe = false;
         a->m_damage.m_fLastDamagePercent = .899f;
-        CHECK(a->HandleDamage() && a->kill_voice_roll >= 0 && a->m_nState == AI_Mgr::StateRecoil);
+        CHECK(a->HandleDamage() && !a->m_bRemoveMe && a->kill_voice_roll >= 0);
         a->m_damage.m_fLastDamagePercent = 100;
         a->m_dwFlags = 0x800;
-        CHECK(a->HandleDamage());
+        CHECK(a->HandleDamage() && !a->m_bRemoveMe);
         auto* c = corpse(g);
         CHECK(c);
         auto m = g.server.StartMessageToObject(a, c->m_hObject, damage_message);
         CHECK(g.server.WriteDamage(m, {{0, 0, 1}, {0, 30, 0}, 100, DamageType::Death, a->m_hObject}) == DE_OK &&
               g.server.EndMessage(m) == DE_OK);
         CHECK(c->placement.result == BodyPlacementResult::Unqueried); // Direct diagnostic construction, no transfer.
-        CHECK(c->m_damage.m_fHitPoints == 50 && c->damage_refusals == 1 && !c->damage_error.empty() &&
-              c->error.empty());
-        CHECK(g.server.advance_models(.2) && g.objects.advance(.2) && c->animation_done);
+        CHECK(c->m_damage.IsDead() && c->dead && c->error.empty());
+        const auto child = c->m_hObject;
+        CHECK(g.objects.advance(.2) && !g.server.IsObjectAlive(child));
         return true;
     }
     bool accumulation(const std::filesystem::path& path)

@@ -2,6 +2,17 @@
 #include <cmath>
 namespace OpenBlood2
 {
+    std::uint64_t ServerAdapter::PublishFleshGibs(HOBJECT owner, DVector pos, DVector dir, DVector dims, float scale,
+                                                  unsigned count, std::string& error)
+    {
+        if (!client_resources || !objects_.models)
+        {
+            error = "Flesh-gib resources unavailable";
+            return 0;
+        }
+        return flesh_gibs.publish(owner, pos, dir, dims, scale, count, *this, *objects_.models, *client_resources,
+                                  objects_.time(), error);
+    }
     std::uint64_t ServerAdapter::PublishParticleStream(HOBJECT owner, const ParticleStreamSettings& settings,
                                                        std::string& error)
     {

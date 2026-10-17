@@ -1042,3 +1042,12 @@ preserved. [Source hashes](M2_REMOTE_SOURCES.json) cover fourteen consulted file
 checked identities, the existing replacement box solver and the pending-owner
 link notification adaptation. The shared explosion publisher preserves proximity
 behavior. No source repository, commercial resource or dependency pin changes.
+
+## Original burning deaths and dismemberment
+
+Selected AI_Mgr/CCorpse lethal decisions, AI_Shared limb masks/spawning, runtime
+CGib limbs, client flesh CGibFX/client_physics and ObjectFX21/24 are ported from
+Blood II source. [Hashes](M2_DEATH_EFFECTS_SOURCES.json) and
+[contracts](DEATH_EFFECT_CONTRACTS.md) separate source rules, typed ownership,
+replacement physics, bounded client storage and remaining blood/generic-gib FX.
+No source repository, commercial asset, dependency pin or shader artifact changes.

@@ -46,6 +46,22 @@ namespace OpenBlood2
             GetObjectPos(request.speaker, &position);
         return audio.play(*client_resources, owner, request, position, error);
     }
+    SoundId ServerAdapter::PlayClientSound(const SoundRequest& request, DVector position, std::string& error)
+    {
+        if (!client_resources || request.speaker || request.loop || request.streaming ||
+            request.space != SoundSpace::Spatial)
+        {
+            error = "Client sound requires a buffered spatial one-shot";
+            return 0;
+        }
+        const auto id = audio.play(*client_resources, nullptr, request, position, error);
+        if (auto* voice = audio.get(id))
+        {
+            voice->world_owned = true;
+            voice->auto_remove = true;
+        }
+        return id;
+    }
     SoundId ServerAdapter::PlaySoundAt(HOBJECT owner, const SoundRequest& request, DVector position, std::string& error)
     {
         trace_service("PlaySoundAt");

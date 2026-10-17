@@ -45,13 +45,34 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
         return Init(type, owner, failure);
     failure.clear();
     *this = {};
-    if ((type != 19 && type != 36) || !owner)
+    if ((type != 19 && type != 36 && type != 21 && type != 24) || !owner)
     {
         failure = "Unsupported object particle recipe or absent parent";
         return false;
     }
     recipe = type;
     parent = owner;
+    if (type == 21 || type == 24)
+    {
+        // CCorpse requests scale=3, SCALENUMPARTICLES only. Other fields stay unscaled.
+        radius = 2500;
+        position_radius = 12.5f;
+        ramp_down = .25f;
+        duration = type == 21 ? 2.f : 0.f;
+        add_delay = type == 21 ? .1f : .05f;
+        gravity = type == 21 ? 125.f : 275.f;
+        density = type == 21 ? 10.f : 7.5f;
+        authored_count = type == 21 ? 9 : 15;
+        requested_alpha = type == 21 ? .25f : .75f;
+        min_life = type == 21 ? .5f : .25f;
+        max_life = type == 21 ? 1.5f : .75f;
+        min_color = type == 21 ? DVector{192, 192, 192} : DVector{192, 0, 0};
+        max_color = {255, 255, 255};
+        flags = type == 21 ? 0x0cu : 0x04u;
+        texture = type == 21 ? "SpriteTextures\\smoke64_2.dtx" : "SpriteTextures\\Firepart64.dtx";
+        initialized_ = true;
+        return true;
+    }
     const bool shield = type == 19;
     radius = shield ? 500.f : 1750.f;
     gravity = shield ? 0.f : 150.f;
@@ -138,31 +159,47 @@ bool CObjectParticleFX::AddParticles(std::minstd_rand& random, std::size_t budge
 }
 bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t budget)
 {
-    if (particles.size() > budget || authored_count > budget - particles.size() ||
-        particles.size() + authored_count > 2048)
+    const auto delta = vector_subtract(last_position, position);
+    const float distance = std::sqrt(vector_dot(delta, delta));
+    const float samples = recipe == 21 ? distance / (density * radius / 1000.f) : 1.f;
+    if (!std::isfinite(samples) || samples > 2048)
+    {
+        error = "Object particle stream capacity exceeded";
+        return false;
+    }
+    const unsigned copies = static_cast<unsigned>(samples), count = copies * authored_count;
+    if (particles.size() > budget || count > budget - particles.size() || particles.size() + count > 2048)
     {
         error = "Object particle burst capacity exceeded";
         return false;
     }
     auto basis = source_rotation;
-    particles.reserve(particles.size() + authored_count);
-    for (unsigned i = 0; i < authored_count; ++i)
+    if (!count)
+        return true; // Source's unused zero-count division is skipped.
+    const auto step = vector_scale(delta, 1.f / copies);
+    particles.reserve(particles.size() + count);
+    for (unsigned i = 0; i < count; ++i)
     {
         // Cache axes BEFORE rotating. The source uses the preceding right axis
         // for this particle, and carries the rotated basis into the next one.
         auto right = rotate_vector(basis, {1, 0, 0});
         const auto forward = rotate_vector(basis, {0, 0, 1});
         around(basis, forward, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
-        if (recipe == 19)
+        if (recipe == 19 || recipe == 21 || recipe == 24)
             around(basis, right, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
         right = vector_scale(right, 1 / std::sqrt(vector_dot(right, right)));
-        const float speed = draw(random, 0, 0); // Original zero-speed draw still consumes RNG.
+        const float speed =
+            draw(random, 0, recipe == 21 || recipe == 24 ? 25.f : 0.f); // Original zero-speed draw still consumes RNG.
+        auto start =
+            vector_scale(right, recipe == 21 || recipe == 24 ? draw(random, 0, position_radius) : position_radius);
+        if (recipe == 21 || recipe == 24)
+            start = vector_add(
+                start, vector_add(vector_subtract(position, origin), vector_scale(step, float(i / authored_count))));
         const auto color = vector_scale(
             vector_add(min_color, vector_scale(vector_subtract(max_color, min_color), draw(random, 0, 1))), 1 / 255.f);
-        particles.push_back({vector_scale(right, position_radius), vector_scale(right, speed),
-                             draw(random, min_life, max_life), color});
+        particles.push_back({start, vector_scale(right, speed), draw(random, min_life, max_life), color});
     }
-    emitted += authored_count;
+    emitted += count;
     return true;
 }
 bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_rand& random, std::size_t budget)
@@ -199,7 +236,7 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         if (duration < elapsed)
             return false;
     }
-    else
+    else if (recipe == 1)
     {
         const auto difference = vector_subtract(owner->position, last_object_position);
         if (difference.x == 0 && difference.y == 0 && difference.z == 0)
@@ -215,6 +252,12 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
             position = owner->position;
         // ALIGNROTATION affects emission, not the fixed smoke system transform.
         source_rotation = owner->rotation;
+    }
+    else if (recipe == 21 || recipe == 24)
+    {
+        position = owner->position;
+        // Both recipes use MOVINGSOURCE; smoke also streams backward between samples.
+        // Neither recipe enables alpha ramp flags: authored alpha remains unused.
     }
     else
     {

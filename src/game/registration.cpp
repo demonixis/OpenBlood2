@@ -18,6 +18,7 @@
 #include "game/original/ExitTrigger.h"
 #include "game/original/FlareProjectile.h"
 #include "game/original/GameStartPoint.h"
+#include "game/original/Gib.h"
 #include "game/original/Gideon.h"
 #include "game/original/Grenade.h"
 #include "game/original/HandWeaponModel.h"
@@ -124,6 +125,7 @@ namespace OpenBlood2
                 {"TypeCoop", true},
                 {"DifficultyInsane", true, false} // Read by original code, absent from its class registration.
             }};
+        const ClassInfo gib{"CGib", &b2base, construct<CGib>, {}};
         const ClassInfo corpse{"CCorpse", &b2base, construct<CCorpse>, {}};
         const ClassInfo camera_object{"CameraObj",
                                       &b2base,
@@ -852,10 +854,11 @@ namespace OpenBlood2
                objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
                objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
                objects.register_class(world_debris) && objects.register_class(hand_model) &&
-               objects.register_class(corpse) && objects.register_class(proximity) && objects.register_class(remote) &&
-               objects.register_class(grenade) && objects.register_class(flare_projectile) &&
-               objects.register_class(flare_alt) && objects.register_class(flare_burst) &&
-               objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
+               objects.register_class(gib) && objects.register_class(corpse) && objects.register_class(proximity) &&
+               objects.register_class(remote) && objects.register_class(grenade) &&
+               objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
+               objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
+               objects.register_class(shockwave_projectile);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "79a2cef1891b0f10b9ab83b076cd19867352e305",
+  "status": "M2 incomplete; selected original burning and dismemberment paths",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "purpose": "Lethal decisions, burning source, corpse transfer, gib launch and random limb selection."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/corpse.cpp",
+      "source_sha256": "f92ec5bd0e4175f61461aae1f5fe498b0a1d21b5f0ee7d889573d02480543fdd",
+      "purpose": "Burn setup/update, damage, hit limbs, limb/gib requests and timing."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/corpse.h",
+      "source_sha256": "a3b9b0feda537fe7cccb6dfcb65d13437bdab288c93ef7beeb62e8d04c1fe6dc",
+      "purpose": "Initial state and original erroneous destructor cleanup."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Shared.CPP",
+      "source_sha256": "a9ebccf2ae68c1b6256e699991658e6a9aab54714fda3ad7748f9de7c4aa955f",
+      "purpose": "CreateLimb, HideLimb and named subnode rules."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Gib.cpp",
+      "source_sha256": "56af4e2090149c4f1deb9da33a6f64bc8f741f85b383723a766510bc13b85c0c",
+      "purpose": "Selected runtime limb initialization, update, kick and bounce."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PhysicalAttributes.h",
+      "source_sha256": "bb58c0afd5e3175a9007063a64fbe31089a1a595851c61e3bfee7a19f72dda55",
+      "purpose": "Original AI_DEFAULT_MASS 250."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ClientGibFX.cpp",
+      "source_sha256": "df9438b10d31a49c787dde9a1f3795e11fc436dd37c34799ffa30de519f305ba",
+      "purpose": "In/out direction negation and request fields."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/gibfx.cpp",
+      "source_sha256": "4e448e2303e82eed903ae31a557a83963ea424f0c0a69406947ef5e6793858c5",
+      "purpose": "Selected flesh model creation, velocity, bounce and sound."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/client_physics.cpp",
+      "source_sha256": "a2d7fcae81f82df02406aa3b586897aff9c409e803e315f233fbe33e3d65de16",
+      "purpose": "InitMovingObject resets flags; integration/reflection and contents."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "purpose": "Normal/liquid client gravity and damping."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
+      "source_sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
+      "purpose": "High-detail flesh count adjustment."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ObjectFX.cpp",
+      "source_sha256": "1af815cdb07c8e0fcd56bebb723e78b539cd3398221a78e3b3fcf977bf109c48",
+      "purpose": "High-detail flame/smoke recipes, filled sphere, streaming and scale flags."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ObjectFX.h",
+      "source_sha256": "f10854489408e05859507a3b73cfbbd1ba3514988aa7caf93ec48d992bbfaffe",
+      "purpose": "Exact original particle flags."
+    }
+  ],
+  "adaptations": [
+    "Typed objects, checked IDs and explicit ownership replace raw SDK handles and pointer-sized userdata.",
+    "Original decisions and quirks remain; numeric/asset/capacity failures are visible.",
+    "Finite zero-direction normalization and skipped zero-emission divisions avoid undefined arithmetic.",
+    "Existing replacement nonsolid-body and world-ray collision, independent client RNG and bounded effect storage.",
+    "Actual burned skin, limb/flesh models, alpha particles and WAV playback; blood-spurt/splat child FX remain unavailable.",
+    "Cleanup repairs wrong-handle original destructor behavior; no source, assets, dependency or shader changes.",
+    "Bounded nonsolid limb placement uses the parent as its anchor to avoid initial floor/wall penetration; this is replacement physics, not claimed retail parity."
+  ]
+}

@@ -93,3 +93,8 @@ Corpses are dynamic instances, not extra authored coverage. Required FX,
 corpse/fire/gib services, safe NEW_LEVEL and complete original session acceptance
 keep M2 open. Linux-only tests and synthetic diagnostics do not establish
 original-executable or platform parity.
+
+The [burning death/dismemberment continuation](DEATH_EFFECT_CONTRACTS.md) supersedes
+blanket fire/gib/corpse-damage omissions for its selected original paths. Real
+flame/smoke particles, burned corpses, runtime limbs and flesh models now run with
+inspection. Blood-spurt/splat FX, generic gib/save services and full M2 remain open.

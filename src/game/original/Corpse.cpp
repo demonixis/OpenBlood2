@@ -1,5 +1,6 @@
-// Original ObjectDLL/corpse.cpp: selected ordinary corpse branch.
+// Original ObjectDLL/corpse.cpp: selected corpse lifetime, burning and damage.
 #include "Corpse.h"
+#include "Gib.h"
 #include "Sparam.h"
 #include "engine/collision.h"
 #include "game/game_settings.h"
@@ -11,13 +12,56 @@ CCorpse::CCorpse() : B2BaseClass(OT_MODEL)
 {
     AddAggregate(&m_damage);
 }
-bool CCorpse::Setup(std::string_view root, bool limbs)
+bool CCorpse::Setup(std::string_view root, bool limbs, HOBJECT fire)
 {
     if (!initialized || configured || !measurements.SetSoundRoot(root))
         return false;
     sound_root = root; // Replaces the source's pointer truncated into m_UserData.
     limb_loss = limbs;
     configured = true;
+    if (fire)
+    {
+        auto* s = GetServerDE();
+        fire_source = fire;
+        burn_start = s->GetTime();
+        DVector offset{};
+        DRotation rotation;
+        if (s->CreateAttachment(m_hObject, fire, "torso", &offset, &rotation, &burn_attachment) != DE_OK)
+        {
+            error = "Corpse flame attachment failed";
+            return false;
+        }
+        fire_effect = s->PublishObjectParticles(fire, 24, burn_error);
+        SoundRequest request;
+        request.resource = "sounds/weapons/fireloop.wav";
+        request.speaker = m_hObject;
+        request.outer_radius = 1000;
+        request.inner_radius = 200;
+        request.volume = .6f;
+        request.loop = true;
+        request.reverb_requested = true;
+        request.priority = 3;
+        std::string failure;
+        burn_sound = s->PlayObjectLoopSound(m_hObject, request, failure);
+        if (!failure.empty())
+            burn_error += failure;
+        ObjectCreateStruct state;
+        state.m_ObjectType = OT_NORMAL;
+        state.m_Flags = FLAG_FORCECLIENTUPDATE;
+        if (s->QueryModelNodeTransform(m_hObject, "torso", &state.m_Pos, &state.m_Rotation) !=
+            ServerDE::NodeQuery::Found)
+        {
+            error = "Corpse smoke torso unavailable";
+            return false;
+        }
+        auto* smoke = s->CreateObject(s->GetClass("BaseClass"), &state);
+        if (!smoke)
+        {
+            error = "Corpse smoke source unavailable";
+            return false;
+        }
+        smoke_source = smoke->m_hObject;
+    }
     return true;
 }
 DDWORD CCorpse::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
@@ -75,6 +119,13 @@ bool CCorpse::Update()
         return true; // Failed service remains visible; never claims animation completion.
     }
     const auto now = s->GetTime();
+    if (dead)
+        return false;
+    if (!UpdateBurn())
+    {
+        s->SetNextUpdate(m_hObject, 0);
+        return true;
+    }
     if (remove_time && remove_time <= now)
         return false;
     if (s->GetModelPlaybackState(m_hObject) & MS_PLAYDONE)
@@ -100,7 +151,7 @@ bool CCorpse::Update()
         const bool multiplayer = GetGameType() != GAMETYPE_SINGLE;
         if (multiplayer)
             remove_time = now + 30.f - .1f;
-        s->SetNextUpdate(m_hObject, multiplayer ? 30.f : 0.f);
+        s->SetNextUpdate(m_hObject, burn_attachment ? .1f : multiplayer ? 30.f : 0.f);
     }
     else
         s->SetNextUpdate(m_hObject, .1f);
@@ -108,13 +159,13 @@ bool CCorpse::Update()
 }
 DDWORD CCorpse::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
 {
-    if (message == damage_message || message == 1000)
+    if (message == damage_message)
     {
-        // Do not mutate health through the aggregate while its required corpse
-        // hit/limb/gib response is unavailable, including a generic KILL trigger.
-        ++damage_refusals;
-        damage_error = "Corpse damage/limb/gib services unavailable";
-        return 0;
+        Damage damage;
+        if (!GetServerDE()->ReadDamage(read, damage))
+            return 0;
+        B2BaseClass::ObjectMessageFn(sender, message, read);
+        return GetServerDE()->IsObjectAlive(m_hObject) && !dead && HandleDamage(damage);
     }
     return B2BaseClass::ObjectMessageFn(sender, message, read);
 }
@@ -187,4 +238,176 @@ bool CCorpse::OnStringKey(ArgList* args)
     last_sound = GetServerDE()->PlayCharacterSound(m_hObject, request, false, sound_error);
     sound_starts += last_sound != 0;
     return last_sound != 0; // No GETHANDLE: auto release; repeated keys may overlap.
+}
+
+CCorpse::~CCorpse()
+{
+    ClearBurn();
+}
+void CCorpse::ClearBurn()
+{
+    auto* s = GetServerDE();
+    if (!s)
+        return;
+    if (burn_attachment)
+        s->RemoveAttachment(burn_attachment);
+    if (fire_source)
+        s->RemoveObject(fire_source);
+    if (smoke_source)
+        s->RemoveObject(smoke_source);
+    if (burn_sound)
+        s->KillSound(burn_sound);
+    burn_attachment = 0;
+    fire_source = smoke_source = nullptr;
+    burn_sound = 0;
+}
+bool CCorpse::UpdateBurn()
+{
+    auto* s = GetServerDE();
+    const float now = s->GetTime();
+    if (!smoke_start && fire_source && now - burn_start > 5)
+    {
+        s->RemoveAttachment(burn_attachment);
+        burn_attachment = 0;
+        s->RemoveObject(fire_source);
+        fire_source = nullptr;
+        if (burn_sound)
+            s->KillSound(burn_sound);
+        burn_sound = 0;
+        smoke_effect = s->PublishObjectParticles(smoke_source, 21, burn_error);
+        DVector offset{};
+        DRotation rotation;
+        if (s->CreateAttachment(m_hObject, smoke_source, "torso", &offset, &rotation, &burn_attachment) != DE_OK)
+        {
+            error = "Corpse smoke attachment failed";
+            return false;
+        }
+        smoke_start = now;
+    }
+    else if (!fire_source && smoke_source && now - smoke_start > 5)
+    {
+        s->RemoveAttachment(burn_attachment);
+        burn_attachment = 0;
+        s->RemoveObject(smoke_source);
+        smoke_source = nullptr;
+    }
+    return true;
+}
+int CCorpse::CalculateHitLimb(DVector direction, DVector position)
+{
+    auto* s = GetServerDE();
+    DVector dims;
+    if (!measurements.hit_spheres_valid ||
+        s->GetModelAnimUserDims(m_hObject, &dims, s->GetModelAnimation(m_hObject)) != DE_OK)
+        return -1;
+    const DVector absolute{std::abs(direction.x), std::abs(direction.y), std::abs(direction.z)};
+    float length = 0;
+    if (absolute.x > absolute.y && absolute.x > absolute.z)
+        length = dims.x / absolute.x;
+    else if (absolute.y > absolute.x && absolute.y > absolute.z)
+        length = dims.y / absolute.y;
+    else if (absolute.z > absolute.x && absolute.z > absolute.y)
+        length = dims.z / absolute.z;
+    const auto segment = vector_scale(direction, length);
+    const float squared = vector_dot(segment, segment);
+    if (squared == 0)
+        return -1; // Original tied/zero direction yields no candidate.
+    int node = -1;
+    float nearest = 999;
+    DBOOL hidden = false;
+    DVector pose{};
+    DRotation rotation;
+    bool have = false;
+    for (unsigned i = 0; i < NUM_STD_NODES; ++i)
+    {
+        const auto status = s->GetModelNodeHideStatus(m_hObject, szNodes[i], &hidden);
+        if (status != DE_OK && status != DE_NOTFOUND)
+            return -1;
+        if (hidden)
+            continue;
+        const auto found = s->QueryModelNodeTransform(m_hObject, szNodes[i], &pose, &rotation);
+        if (found == ServerDE::NodeQuery::Unavailable || (!have && found != ServerDE::NodeQuery::Found))
+            return -1;
+        have = true;
+        const float t = vector_dot(segment, pose) / squared - vector_dot(segment, position) / squared;
+        if (t < 0 || t > 1)
+            continue;
+        const auto delta = vector_subtract(pose, vector_add(position, vector_scale(segment, t)));
+        const float distance = std::sqrt(vector_dot(delta, delta));
+        if (distance < nearest && distance <= measurements.m_fHitSpheres[i])
+        {
+            nearest = distance;
+            node = int(i);
+        }
+    }
+    return CDestructable::SetProperNode(node);
+}
+bool CCorpse::HandleDamage(const Damage& hit)
+{
+    auto* s = GetServerDE();
+    damage_error.clear();
+    auto direction = vector_scale(hit.direction, -1);
+    hit_limb = -1;
+    if (limb_loss)
+    {
+        hit_limb = CalculateHitLimb(direction, hit.position);
+        // Preserve source bitwise test, not equality: Fire (1) passes EXPLODE (5).
+        if (hit_limb == -1 && !(unsigned(hit.type) & unsigned(DamageType::Explode)))
+            return false;
+    }
+    if (m_damage.IsDead())
+    {
+        dead = true;
+        direction.y -= 1;
+        const float length = std::sqrt(vector_dot(direction, direction));
+        // SetupClientGibFX reverses the same vector subsequently passed to limbs.
+        direction = length > 0 ? vector_scale(direction, -(50 + hit.amount) / length) : DVector{};
+        DVector pos, dims;
+        s->GetObjectPos(m_hObject, &pos);
+        s->GetObjectDims(m_hObject, &dims);
+        if (!std::isfinite(m_damage.m_fMass) || m_damage.m_fMass < 0 || m_damage.m_fMass > 2048)
+            gib_error = "Corpse gib mass exceeds bounded fragment request";
+        else
+            gib_events += s->PublishFleshGibs(m_hObject, pos, direction, dims, 1, unsigned(m_damage.m_fMass) / 32,
+                                              gib_error) != 0;
+        if (limb_loss)
+        {
+            constexpr int nodes[]{1, 4, 7, 14, 10}, chance[]{100, 80, 80, 60, 60};
+            for (int i = 0; i < 5; ++i)
+            {
+                DBOOL hidden = true;
+                if (s->GetModelNodeHideStatus(m_hObject, szNodes[nodes[i]], &hidden) != DE_OK || hidden)
+                    continue;
+                int roll = 0;
+                if (i && !s->RandomInt(0, 99, roll))
+                    continue;
+                if (roll < chance[i])
+                {
+                    std::string failure;
+                    const auto h = CreateLimb(m_hObject, nodes[i], direction, failure);
+                    if (h)
+                    {
+                        last_limb = h;
+                        ++limbs_created;
+                    }
+                    else if (gib_error.empty())
+                        gib_error = failure;
+                }
+            }
+        }
+        ClearBurn();
+        s->SetNextUpdate(m_hObject, .1f);
+        int roll;
+        s->RandomInt(0, 99, roll); // Original optional VME_BIGGIB voice draw.
+    }
+    else if (hit_limb >= 0 && hit_limb < int(NUM_ALL_NODES) && limb_loss)
+    {
+        int roll;
+        if (s->RandomInt(0, 99, roll) && roll < 50 && HideLimb(m_hObject, hit_limb, damage_error))
+        {
+            last_limb = CreateLimb(m_hObject, hit_limb, direction, damage_error);
+            limbs_created += last_limb != nullptr;
+        }
+    }
+    return true;
 }

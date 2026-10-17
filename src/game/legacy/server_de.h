@@ -49,6 +49,7 @@ class ServerDE : public CSBase
     virtual OpenBlood2::SoundId PlayCinematicSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
     virtual OpenBlood2::SoundId PlayLocalSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
     virtual OpenBlood2::SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
+    virtual OpenBlood2::SoundId PlayClientSound(const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
     virtual OpenBlood2::SoundId PlaySoundAt(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
     virtual OpenBlood2::SoundId PlayWorldSound(HOBJECT, const OpenBlood2::SoundRequest&, bool file_stream,
                                                std::string&) = 0;
@@ -82,6 +83,7 @@ class ServerDE : public CSBase
                                         unsigned failed = 0) = 0;
     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
     virtual std::uint64_t PublishParticleStream(HOBJECT, const OpenBlood2::ParticleStreamSettings&, std::string&) = 0;
+    virtual std::uint64_t PublishFleshGibs(HOBJECT, DVector, DVector, DVector, float, unsigned, std::string&) = 0;
     virtual std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) = 0;
     virtual std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&) = 0;
     virtual std::uint64_t PublishExplosionFragments(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;

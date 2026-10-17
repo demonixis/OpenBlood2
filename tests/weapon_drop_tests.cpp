@@ -319,8 +319,8 @@ namespace
             auto m = g.server.StartMessageToObject(a, h, damage_message);
             CHECK(g.server.WriteDamage(m, {{0, 0, 1}, {0, 150, 0}, 10000, DamageType::Death, h}) == DE_OK &&
                   g.server.EndMessage(m) == DE_OK);
-            CHECK(a->m_damage.IsDead() && a->runtime_failed && a->m_InventoryMgr.drops == 1 &&
-                  !a->m_InventoryMgr.CurrentWeapon());
+            CHECK(a->m_damage.IsDead() && !a->runtime_failed && a->m_bRemoveMe && a->gib_events == 1 &&
+                  a->m_InventoryMgr.drops == 1 && !a->m_InventoryMgr.CurrentWeapon());
             CHECK(g.objects.remove(h) && g.objects.finish_frame() && g.server.IsObjectAlive(hand));
             for (int i = 0; i < 130 && g.server.IsObjectAlive(hand); ++i)
                 CHECK(g.server.advance_physics(.01) && g.objects.advance(.01));
@@ -334,7 +334,7 @@ namespace
             MovementState landed;
             CHECK(g.server.GetMovementState(ph, landed) && landed.standing);
             std::cout << "Retail Cultist lethal drop cycle " << load
-                      << ": detached Beretta -> original pickup (death remains unavailable)\n";
+                      << ": detached Beretta -> original pickup (original gib death accepted)\n";
             CHECK(g.objects.clear() && !g.objects.get(hand) && g.objects.attachments().empty() &&
                   !g.server.message_count());
             g.server.spawn_reports.clear();

@@ -103,3 +103,8 @@ SubwayA source-entry accounting stays 202 created, four transferred sounds,
 372 editor-only, two unsupported, zero failed. Dynamic pickups/hands are runtime
 objects, not additional supported authored entries. Linux tests do not establish
 other-platform, XR, retail timing or original-executable parity.
+
+The [burning death/dismemberment continuation](DEATH_EFFECT_CONTRACTS.md) supersedes
+blanket fire/gib/corpse-damage omissions for its selected original paths. Real
+flame/smoke particles, burned corpses, runtime limbs and flesh models now run with
+inspection. Blood-spurt/splat FX, generic gib/save services and full M2 remain open.

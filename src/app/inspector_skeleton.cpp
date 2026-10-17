@@ -1,6 +1,7 @@
 #include "game/original/AI_Mgr.h"
 #include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
+#include "game/original/Gib.h"
 #include "game/original/Gideon.h"
 #include "inspector.h"
 #include <algorithm>
@@ -30,7 +31,22 @@ namespace OpenBlood2
     {
         ImGui::TextWrapped(
             "Original hit spheres at current ABC node poses. Initialized NPCs use them for hit "
-            "localization. Ordinary corpse animation is integrated; fire/gibs and blood-pool FX remain unavailable.");
+            "localization. Burning corpses and dismemberment are integrated; blood-spurt/splat FX remain unavailable.");
+        if (ImGui::CollapsingHeader("Original flesh fragments"))
+        {
+            const auto& fx = game.server.flesh_gibs;
+            ImGui::Text("Client models %zu / 256; independent from dead actors", fx.active.size());
+            for (const auto& report : fx.reports)
+                ImGui::TextWrapped("Event %llu %s: %u / %u created; scale %.2f; %s | %s", (unsigned long long)report.id,
+                                   report.source.c_str(), report.created, report.requested, report.scale,
+                                   report.error.c_str(), report.unavailable.c_str());
+            for (const auto& g : fx.active)
+                ImGui::TextWrapped("#%llu %s | resting %d / liquid %d / impacts %llu | pos %.1f %.1f %.1f | speed %.1f "
+                                   "%.1f %.1f | %s %s",
+                                   (unsigned long long)g.id, g.model_path.c_str(), g.resting, g.liquid,
+                                   (unsigned long long)g.impacts, g.position.x, g.position.y, g.position.z,
+                                   g.velocity.x, g.velocity.y, g.velocity.z, g.error.c_str(), g.sound_error.c_str());
+        }
         if (ImGui::CollapsingHeader("Live attachments"))
         {
             ImGui::TextWrapped("Held models follow current parent nodes. Physical/nested attachments and dropped "
@@ -104,10 +120,23 @@ namespace OpenBlood2
             ImGui::TextWrapped("%s | %s", c.sound_resource.c_str(), c.sound_error.c_str());
             ImGui::Text("Blood-pool ray %d | request %s", int(c.pool_result), c.pool_requested ? "yes" : "no");
             ImGui::TextWrapped("%s", c.pool_error.c_str());
-            ImGui::Text("Damage refused %llu | limb-loss requested %s", (unsigned long long)c.damage_refusals,
-                        c.limb_loss ? "yes" : "no");
-            ImGui::TextWrapped("Corpse damage, limb hiding, gibs, fire and splat FX remain unavailable. %s %s",
-                               c.error.c_str(), c.damage_error.c_str());
+            ImGui::Text("Health %.1f | limb loss %d | hit node %d | limbs %llu / gib events %llu",
+                        c.m_damage.m_fHitPoints, c.limb_loss, c.hit_limb, (unsigned long long)c.limbs_created,
+                        (unsigned long long)c.gib_events);
+            ImGui::Text("Burn %.3f / smoke %.3f | attached %llu | fire FX %llu / smoke FX %llu | loop %llu",
+                        c.burn_start, c.smoke_start, (unsigned long long)c.burn_attachment,
+                        (unsigned long long)c.fire_effect, (unsigned long long)c.smoke_effect,
+                        (unsigned long long)c.burn_sound);
+            ImGui::TextWrapped("%s %s %s %s", c.error.c_str(), c.damage_error.c_str(), c.burn_error.c_str(),
+                               c.gib_error.c_str());
+        }
+        if (const auto* gib = r ? dynamic_cast<const CGib*>(r->game.get()) : nullptr)
+        {
+            ImGui::Text("Original limb node %d | HP %.1f | kickable %d | kicks %llu / impacts %llu", gib->limb,
+                        gib->damage.m_fHitPoints, gib->kickable, (unsigned long long)gib->kicks,
+                        (unsigned long long)gib->impacts);
+            draw_placement(gib->placement);
+            ImGui::TextWrapped("%s %s", gib->error.c_str(), gib->sound_error.c_str());
         }
         if (const auto* player = character ? dynamic_cast<const CPlayerObj*>(character) : nullptr)
         {
@@ -129,7 +158,9 @@ namespace OpenBlood2
                         (unsigned long long)a.corpses_created, a.death_slot, a.m_nCorpseType);
             ImGui::Text("Frame damage fraction %.3f | optional kill-voice requests %llu (unavailable)",
                         a.m_damage.m_fLastDamagePercent, (unsigned long long)a.kill_voice_requests);
-            ImGui::TextWrapped("%s", a.death_error.c_str());
+            ImGui::Text("Gib events %llu | detached limbs %llu | burning source %s", (unsigned long long)a.gib_events,
+                        (unsigned long long)a.limbs_created, a.fire_source ? "owned" : "none/transferred");
+            ImGui::TextWrapped("%s %s", a.death_error.c_str(), a.gib_error.c_str());
             draw_placement(a.corpse_placement);
         }
         if (target_ai && target_ai->npc_type != AI_Mgr::NPCType::Diagnostic &&
@@ -212,7 +243,7 @@ namespace OpenBlood2
             if (!a.damage_reaction_error.empty())
                 ImGui::TextWrapped("Reaction failure: %s", a.damage_reaction_error.c_str());
             ImGui::TextWrapped(
-                "Visible-node hit spheres; no limb hiding. Death/corpses/gibs and NPC impulses remain unavailable.");
+                "Visible-node hit spheres; living limb-loss branch remains disabled as in the original source.");
         }
         if (target_ai && ImGui::CollapsingHeader("Original escape and guard", ImGuiTreeNodeFlags_DefaultOpen))
         {
