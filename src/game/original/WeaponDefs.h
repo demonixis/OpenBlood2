@@ -1,11 +1,12 @@
 #pragma once
 #include "basedefs_de.h"
 // Selected original definitions; complete source fields, base-game weapon numbering.
-inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38, WEAP_ZEALOT_ENERGYBLAST = 27,
-                       WEAP_SOUL_HOOK = 23, WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42;
+inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38,
+                       WEAP_ZEALOT_ENERGYBLAST = 27, WEAP_SOUL_HOOK = 23, WEAP_GIDEON_SHIELD = 41,
+                       WEAP_GIDEON_WIND = 42;
 inline constexpr DBYTE TYPE_RIFLE = 0, TYPE_PISTOL = 2, TYPE_MELEE = 4, TYPE_MAGIC = 8, AMMO_NONE = 0, AMMO_BULLET = 1,
                        AMMO_SHELL = 2, AMMO_BMG = 3;
-inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_KNIFE = 366;
+inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_MAC10 = 354, IDS_WEAPON_KNIFE = 366;
 // Weapon spread structure
 typedef struct Spread_t
 {

@@ -47,6 +47,15 @@ bool CViewWeapon::Create(DBYTE weapon, bool left_hand, ModelStore& models, Resou
     start_ = {index("start_fire"), index("start_alt_fire")};
     fire_ = {index("fire"), index("alt_fire")};
     stop_ = {index("end_fire"), index("end_alt_fire")};
+    // Original SetupViewModel: absent alternate clips reuse the complete primary sequence.
+    if (idle_ == no_animation)
+        idle_ = rest_;
+    if (fire_[1] == no_animation)
+    {
+        start_[1] = start_[0];
+        fire_[1] = fire_[0];
+        stop_[1] = stop_[0];
+    }
     animation.animation = no_animation;
     animation.looping = false;
     state = WS_DRAW;

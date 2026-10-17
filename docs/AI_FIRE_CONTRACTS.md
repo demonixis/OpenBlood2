@@ -1,5 +1,7 @@
 # Original AI weapon choice and standing fire
 
+The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.
+
 > [Destructible model contracts](DESTRUCTABLE_MODEL_CONTRACTS.md) now implement
 > the CDestructableModel-only IGNORE_DESTRUCTABLE branch in CheckClearShot.
 > Earlier absence statements below are historical; CanSee keeps its own filter.

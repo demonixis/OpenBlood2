@@ -122,9 +122,10 @@ bool AI_Mgr::Fire(bool alternate)
     auto* weapon = m_InventoryMgr.CurrentWeapon();
     if (!weapon)
         return fail(FireResult::Unavailable, "AI has no current weapon");
-    if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_MELEE &&
-        weapon->data.m_nType != WEAP_NAGA_EYEBEAM && weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST &&
-        weapon->data.m_nType != WEAP_GIDEON_WIND && weapon->data.m_nType != WEAP_GIDEON_SHIELD)
+    if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_SUBMACHINEGUN &&
+        weapon->data.m_nType != WEAP_MELEE && weapon->data.m_nType != WEAP_NAGA_EYEBEAM &&
+        weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST && weapon->data.m_nType != WEAP_GIDEON_WIND &&
+        weapon->data.m_nType != WEAP_GIDEON_SHIELD)
         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
     DRotation rotation;
     const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM;

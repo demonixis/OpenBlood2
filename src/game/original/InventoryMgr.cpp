@@ -170,6 +170,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
     std::unique_ptr<CWeapon> weapon;
     if (type == WEAP_BERETTA)
         weapon = std::make_unique<CBeretta>();
+    else if (type == WEAP_SUBMACHINEGUN)
+        weapon = std::make_unique<CSubMachineGun>();
     else if (type == WEAP_MELEE)
         weapon = std::make_unique<CMelee>();
     else if (type == WEAP_NAGA_EYEBEAM)

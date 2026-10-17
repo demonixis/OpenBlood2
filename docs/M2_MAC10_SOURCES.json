@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "669d1064e1098e3c56da5dbd2ad49b77bf3b7f8d",
+  "status": "M2 incomplete; original Mac-10 weapon, pickup, NPC use/drop and view-animation fallback",
+  "references": [
+    {
+      "source": "sources/blood2/Shared/WeaponDefs.cpp",
+      "source_sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
+      "purpose": "Complete original Mac-10 WeaponData fields, primary/alternate loop flags, spreads and resources."
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "purpose": "Original weapon identifier 2."
+    },
+    {
+      "source": "sources/blood2/Shared/ClientRes.h",
+      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
+      "purpose": "Original resource identifier 354."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameWeapons.h",
+      "source_sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19",
+      "purpose": "CSubMachineGun uses generic CWeapon firing; chrome and multiplayer boost remain outside supported scope."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "purpose": "ObtainWeapon type selection, dual inventory and original acquisition/drop rules."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/WeaponPickups.cpp",
+      "source_sha256": "116eac417209ee2cc523044e02ff615406b597164df9df5d5f2e0be80cfbc1d4",
+      "purpose": "SubMachineGunPU constructor and SpawnWeaponPickup case."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/HandWeaponModel.cpp",
+      "source_sha256": "480adb2a0ad140120bb9ddb160cf8f8112508abdf70e218067213e0f04c8ed96",
+      "purpose": "Original detached hand support-to-pickup transfer."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "purpose": "SUBMA prefix parsing and generic standing fire/aiming paths."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
+      "source_sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
+      "purpose": "SetupViewModel absent-idle and absent-alternate fallback; original animation/FIRE_KEY loop."
+    }
+  ],
+  "implementation": [
+    "src/game/original/WeaponDefs.cpp",
+    "src/game/original/Weapon.h",
+    "src/game/original/InventoryMgr.cpp",
+    "src/game/original/WeaponPickups.cpp",
+    "src/game/original/HandWeaponModel.cpp",
+    "src/game/original/AIRuntime.cpp",
+    "src/game/original/AIFire.cpp",
+    "src/game/original/ViewWeapon.cpp"
+  ],
+  "adaptations": [
+    "Typed original weapon/pickup services; explicit class registration",
+    "Existing checked callback/attachment ownership and deferred removals",
+    "No new mutable game global, dependency or commercial/reference asset modification"
+  ],
+  "unsupported": [
+    "Chrome/environment mapping, muzzle-flash presentation, recoil and casing ejection",
+    "View-model SOUND_KEY stock-folding audio remains indexed, not played",
+    "Multiplayer damage boost and player-initiated dropping",
+    "Other weapons, required services and safe NEW_LEVEL; M2 remains incomplete"
+  ]
+}

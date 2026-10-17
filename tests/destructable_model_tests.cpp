@@ -311,7 +311,7 @@ namespace
                 ids.push_back(r->id);
             }
             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
-            CHECK(created == 418 && unknown == 32 && failed == 4);
+            CHECK(created == 419 && unknown == 31 && failed == 4);
             CHECK(update_model_scene(g, scene, error));
             unsigned skin_failures = 0, triangles = 0;
             for (auto id : ids)

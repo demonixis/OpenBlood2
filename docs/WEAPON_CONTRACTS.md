@@ -1,5 +1,7 @@
 # Original Inventory and Vector Weapon Boundary
 
+The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.
+
 > Extended by [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md): original multi-hit
 > material rules, selected impact audio and automatic impact hearing now execute.
 > Earlier impact-audio omissions are historical; visuals and the M2 gate remain open.

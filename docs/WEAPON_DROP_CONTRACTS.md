@@ -1,5 +1,7 @@
 # Original NPC weapon drops and Beretta pickups
 
+The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.
+
 > Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
 > transfer ordinary deaths. Earlier blanket corpse omissions are historical;
 > fire/gibs, corpse damage, required FX and complete M2 remain unavailable.

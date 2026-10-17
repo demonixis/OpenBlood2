@@ -373,6 +373,8 @@ namespace OpenBlood2
         {
             if (add_beretta_request)
                 player->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA);
+            if (add_mac10_request)
+                player->m_InventoryMgr.ObtainWeapon(WEAP_SUBMACHINEGUN);
             if (add_ammo_request)
                 player->m_InventoryMgr.AddAmmo(AMMO_BULLET, 50);
             if (weapon_input_request)
@@ -382,7 +384,7 @@ namespace OpenBlood2
             if (movement_input_request)
                 game.client_shell.movement_input = *movement_input_request;
         }
-        add_beretta_request = add_ammo_request = false;
+        add_beretta_request = add_mac10_request = add_ammo_request = false;
         weapon_input_request.reset();
         weapon_aim_request.reset();
         movement_input_request.reset();
@@ -1360,9 +1362,10 @@ namespace OpenBlood2
                         player->m_damage.IsDead(), player->m_damage.m_bNighInvulnerable);
             ImGui::TextWrapped("Model: %s | Skin: %s (decode status in 3D view)", record->state.m_Filename,
                                record->state.m_SkinName);
-            ImGui::TextWrapped("Requested slot 1: %u. Current slot: %u. Original inventory owns the Beretta/knife; "
-                               "inspect their use in Weapons. Muzzle light exists but is not rendered.",
-                               player->m_InventoryMgr.requested_weapons[0], player->m_InventoryMgr.m_nCurWeaponSlot);
+            ImGui::TextWrapped(
+                "Requested slot 1: %u. Current slot: %u. Original inventory owns supported original weapons; "
+                "inspect their use in Weapons. Muzzle light exists but is not rendered.",
+                player->m_InventoryMgr.requested_weapons[0], player->m_InventoryMgr.m_nCurWeaponSlot);
             if (!player->pending_model_commands.empty())
             {
                 ImGui::TextUnformatted("Unhandled character model commands:");
@@ -1787,7 +1790,7 @@ namespace OpenBlood2
     }
     void Inspector::draw_weapons(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextUnformatted("Original inventory / Beretta 92F / Chosen Knife");
+        ImGui::TextUnformatted("Original inventory / Beretta 92F / Ingram Mac-10 / Chosen Knife");
         auto* player = game.server_shell.Player(game.local_client);
         if (!player)
         {
@@ -1855,7 +1858,10 @@ namespace OpenBlood2
             ImGui::SameLine();
             if (ImGui::Button("Obtain second Beretta (inspection)"))
                 add_beretta_request = true;
-            ImGui::TextWrapped("These call the inventory directly; world pickup classes are not yet connected.");
+            if (ImGui::Button("Obtain Mac-10 (inspection)"))
+                add_mac10_request = true;
+            ImGui::TextWrapped("These diagnostic grants call inventory directly. Beretta/Mac-10 world pickups also use "
+                               "original collection rules; chrome and muzzle flashes remain unavailable.");
         }
         auto aim = game.client_shell.rotation;
         if (ImGui::SliderAngle("Inspection yaw", &aim.yaw, -180, 180) |
@@ -1887,6 +1893,11 @@ namespace OpenBlood2
         ImGui::TextWrapped("State %u | FIRE_KEY events %llu | Client shots %llu", static_cast<unsigned>(view.state),
                            static_cast<unsigned long long>(view.fire_keys),
                            static_cast<unsigned long long>(view.shots));
+        ImGui::Text("Reload %.2f / %.2f s | Loop primary %s / alternate %s", definition.m_fReloadTime,
+                    definition.m_fAltReloadTime, definition.m_bLoopAnim ? "yes" : "no",
+                    definition.m_bAltLoopAnim ? "yes" : "no");
+        if (view.model && animation_index(*view.model, "alt_fire") == no_animation)
+            ImGui::TextUnformatted("Original alternate animation fallback: primary start/fire/end clips.");
         draw_weapon_sound(*weapon, game);
         if (view.model && view.animation.animation < view.model->animations.size())
         {

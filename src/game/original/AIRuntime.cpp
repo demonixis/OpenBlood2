@@ -24,6 +24,8 @@ namespace
             id = WEAP_GIDEON_WIND;
         else if (name.starts_with("NAGA_BLAST"))
             id = WEAP_NAGA_EYEBEAM;
+        else if (name.starts_with("SUBMA"))
+            id = WEAP_SUBMACHINEGUN;
         else if (name.starts_with("MELEE"))
             id = WEAP_MELEE;
         else

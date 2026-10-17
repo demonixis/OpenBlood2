@@ -907,3 +907,12 @@ retail implementation. Sound/SoundFX preserve observed VoiceType=0 as documented
 unused metadata; no voice-category behavior is invented. Nonzero values and
 TypeAction still reject. See [ledger](M2_AUDIO_STREAM_SOURCES.json) and
 [contracts](AUDIO_STREAM_CONTRACTS.md). No new dependency or mutable global is added.
+
+## Original Ingram Mac-10
+
+The original WeaponData, CSubMachineGun selection, SubMachineGunPU, SUBMA parser
+and generic NPC/vector fire paths now use existing typed services. Original
+SetupViewModel fallback restores missing alternate/idle animation handling, including
+the actual left Mac-10. See [ledger](M2_MAC10_SOURCES.json) and
+[contracts](MAC10_CONTRACTS.md). Chrome, multiplayer boost and view-key audio remain
+explicitly unavailable. No source asset, dependency or mutable game global is added.

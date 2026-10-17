@@ -1,5 +1,7 @@
 # Original inventory Save/Load subset
 
+The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.
+
 > Continued by [named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md): supported
 > captured players can enter an already loaded different world at a named start.
 > Automatic NEW_LEVEL still refuses; staged cleanup is not world rollback.

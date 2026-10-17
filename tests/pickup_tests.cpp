@@ -382,6 +382,13 @@ namespace
                               gun->value.amount == 12);
                         std::cout << "Authored BerettaPU: " << path << '\n';
                     }
+                    if (source.class_name == "SubMachineGunPU")
+                    {
+                        auto* gun = dynamic_cast<PickupObject*>(g.objects.get(h)->game.get());
+                        CHECK(gun && gun->value.kind == PickupKind::Weapon && gun->value.type == WEAP_SUBMACHINEGUN &&
+                              gun->value.amount == 20 && gun->resource_id == IDS_WEAPON_MAC10);
+                        std::cout << "Authored SubMachineGunPU: " << path << '\n';
+                    }
                     missing += !g.objects.get(h)->model;
                 }
                 CHECK(g.objects.clear() && AmmoPickup::m_dwNumPickups == 0);
@@ -412,8 +419,8 @@ namespace
             CHECK(reason.ends_with("invalid property TypeAction"));
             rejected += n;
         }
-        CHECK(counts["BerettaPU"] == 1);
-        CHECK(worlds == 57 && created == 1259 && missing == 0 && rejected == 176 && spawns == 60);
+        CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4);
+        CHECK(worlds == 57 && created == 1263 && missing == 0 && rejected == 176 && spawns == 60);
         return true;
     }
 } // namespace

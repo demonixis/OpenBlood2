@@ -17,4 +17,9 @@ class BerettaPU : public WeaponPickup
   public:
     BerettaPU();
 };
+class SubMachineGunPU : public WeaponPickup
+{
+  public:
+    SubMachineGunPU();
+};
 HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector, DRotation, bool include_ammo);

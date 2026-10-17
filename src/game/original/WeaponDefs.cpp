@@ -2,6 +2,66 @@
 namespace
 {
     constexpr WeaponData definitions[] = {
+        // Ingram Mac-10 Sub-machine Gun
+        {
+            "Models\\Weapons\\Mac10_pv.abc",              // Model
+            "Models\\Weapons\\lh_Mac10_pv.abc",           // Model
+            "Skins\\Weapons\\C_Mac10_pv_t.dtx",           // Skin
+            "Models\\Powerups\\Mac10_pu.abc",             // 3rd person model
+            "Skins\\Powerups\\Mac10_pu.dtx",              // 3rd person skin
+            WEAP_SUBMACHINEGUN,                           // Type
+            TYPE_PISTOL,                                  // Fire type
+            AMMO_BULLET,                                  // Ammo type
+            1,                                            // Ammo Use
+            1,                                            // Alt Ammo Use
+            8.0f,                                         // Min Damage
+            12.0f,                                        // Max Damage
+            8.0f,                                         // Min Alt damage
+            12.0f,                                        // Max Alt damage
+            0.1f,                                         // Reload time
+            0.5f,                                         // Alt reload time
+            {200.0f, 100.0f},                             // Spread
+            {75.0f, 25.0f},                               // Alt Spread
+            0.0f,                                         // Projectile Velocity
+            0.0f,                                         // Alt Projectile Velocity
+            3500.0f,                                      // Range
+            3500.0f,                                      // Alt Range
+            1,                                            // Shots per fire
+            1,                                            // Alt Shots per fire
+            2,                                            // Strength or Magic required
+            3,                                            // Two-handed Strength or Magic required
+            0,                                            // Damage Radius (projectiles)
+            0,                                            // Alt Damage Radius (projectiles)
+            DFALSE,                                       // Alt fire zoom
+            DFALSE,                                       // Semi-auto
+            "Sounds\\weapons\\mac10\\fire.wav",           // Fire sound
+            "Sounds\\weapons\\mac10\\alt.wav",            // Alt Fire sound
+            "",                                           // Empty weapon sound
+            "",                                           // Alt Empty weapon sound
+            NULL,                                         // Projectile class
+            NULL,                                         // Alt Projectile class
+            100,                                          // Muzzle Flash radius
+            {1.0f, 0.68f, 0.35f},                         // Muzzle Flash color
+            "Ingram Mac-10",                              // Name
+            IDS_WEAPON_MAC10,                             // Name ID (resource)
+            "Sprites\\mac10flare.spr",                    // flash sprite name
+            "Sprites\\mac10flare.spr",                    // alt flash Sprite name
+            0.01f,                                        // Flash duration
+            0.11f,                                        // Flash scale
+            {0.0f, 0.0f, 0.0f},                           // 3rd person gun offset
+            {0.8f, -0.7f, 2.0f},                          // Gun Offset
+            {1.0f, 0.0f, 1.0f},                           // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                        // Recoil
+            {8.0f, -5.75f, 28.0f},                        // Flash position
+            0.625f,                                       // Eject interval
+            0.0f,                                         // View kick
+            DFALSE,                                       // View kick is Cumulative
+            DTRUE,                                        // Animation looping
+            DTRUE,                                        // Alt anim looping
+            "interface\\statusbar\\weapons\\mac10.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\mac10_h.pcx", // Highlighted icon for status bar
+        },
+
         // Beretta (Pistol)
         {
             "Models\\Weapons\\Beretta_pv.abc",    // View Model
