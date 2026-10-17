@@ -1815,9 +1815,18 @@ namespace OpenBlood2
         ImGui::Text("Primary-world collision: %s / %zu triangles / %zu BVH nodes",
                     game.server.collision_ready ? "indexed" : "not loaded", game.collision.triangles(),
                     game.collision.nodes());
+        const auto& work = game.collision.work();
+        ImGui::Text("Since collision build: %llu node tests / %llu rejected",
+                    static_cast<unsigned long long>(work.node_tests),
+                    static_cast<unsigned long long>(work.node_rejections));
+        ImGui::Text("Triangle bounds: %llu tests / %llu rejected / %llu full SAT tests",
+                    static_cast<unsigned long long>(work.triangle_bounds_tests),
+                    static_cast<unsigned long long>(work.triangle_rejections),
+                    static_cast<unsigned long long>(work.triangle_tests));
         ImGui::TextWrapped(
-            "Continuous axis-aligned boxes, sliding and object touch callbacks. Moving/rotating BSP "
-            "models and crush response are not implemented. Grounded FLAG_STAIRSTEP and player locomotion are active.");
+            "Continuous axis-aligned boxes, sliding and object touch callbacks. Selected translating/rotating "
+            "world models and player locomotion are active. These counters cover primary-world queries, "
+            "including placement; they exclude object boxes and separate world-model indices.");
         ImGui::Text("Gravity: %.2f %.2f %.2f", game.server.gravity.x, game.server.gravity.y, game.server.gravity.z);
         if (ImGui::BeginTable("World console variables", 2,
                               ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,

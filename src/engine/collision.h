@@ -21,6 +21,11 @@ namespace OpenBlood2
         Miss,
         Hit
     };
+    struct CollisionWork
+    {
+        std::uint64_t node_tests = 0, node_rejections = 0;
+        std::uint64_t triangle_bounds_tests = 0, triangle_rejections = 0, triangle_tests = 0;
+    };
     // Continuous axis-aligned box/triangle queries against the primary DAT model.
     // Dynamic world-model transforms, stair stepping and BSP contents are not
     // inferred here. The caller can inspect precisely which geometry is indexed.
@@ -33,6 +38,7 @@ namespace OpenBlood2
         {
             triangles_.clear();
             nodes_.clear();
+            work_ = {};
         }
         CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit& hit) const;
         BodyPlacement place_body(DVector anchor, DVector anchor_half, DVector requested, DVector half) const;
@@ -43,6 +49,12 @@ namespace OpenBlood2
         std::size_t nodes() const
         {
             return nodes_.size();
+        }
+        // Diagnostic work since build/clear, including body-placement queries.
+        // Like the collision index's transforms, access is simulation-thread only.
+        const CollisionWork& work() const
+        {
+            return work_;
         }
 
       private:
@@ -60,6 +72,7 @@ namespace OpenBlood2
         };
         std::vector<Triangle> triangles_;
         std::vector<Node> nodes_;
+        mutable CollisionWork work_;
         std::uint32_t partition(std::uint32_t begin, std::uint32_t end);
         void query(std::uint32_t node, DVector from, DVector to, DVector half, CollisionHit& hit, bool& found,
                    const PlacementAnchor* anchor = nullptr, const Triangle** selected = nullptr) const;

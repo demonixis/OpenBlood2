@@ -225,6 +225,28 @@ namespace OpenBlood2
             auto lo = vector_subtract(minv(from, to), half), hi = vector_add(maxv(from, to), half);
             return lo.x <= max.x && hi.x >= min.x && lo.y <= max.y && hi.y >= min.y && lo.z <= max.z && hi.z >= min.z;
         }
+        bool segment_bounds(DVector from, DVector delta, DVector half, DVector min, DVector max, double nearest)
+        {
+            // Conservative subset of the narrowphase's XYZ interval tests.
+            // Keep its float displacement, stationary threshold and tolerances;
+            // touching, penetration and normals remain the SAT's responsibility.
+            double enter = 0, leave = nearest;
+            auto axis = [&](double origin, double speed, double low, double high, double radius)
+            {
+                low -= radius + 1e-6;
+                high += radius + 1e-6;
+                if (std::abs(speed) < 1e-10)
+                    return origin >= low && origin <= high;
+                auto first = (low - origin) / speed, last = (high - origin) / speed;
+                if (first > last)
+                    std::swap(first, last);
+                enter = std::max(enter, first);
+                leave = std::min(leave, last);
+                return enter <= leave + 1e-9;
+            };
+            return axis(from.x, delta.x, min.x, max.x, half.x) && axis(from.y, delta.y, min.y, max.y, half.y) &&
+                   axis(from.z, delta.z, min.z, max.z, half.z);
+        }
     } // namespace
     CollisionQuery sweep_box(DVector from, DVector to, DVector half, DVector center, DVector other_half,
                              CollisionHit& hit)
@@ -319,8 +341,16 @@ namespace OpenBlood2
                                bool& found, const PlacementAnchor* anchor, const Triangle** selected) const
     {
         const auto& n = nodes_[index];
-        if (!broadphase(from, to, half, n.min, n.max))
+        ++work_.node_tests;
+        const auto delta = vector_subtract(to, from);
+        // Retain the existing coarse rejection policy as well as traversal order.
+        // Inclusive nearest bounds keep equal-time polygon tie-breaking intact.
+        if (!broadphase(from, to, half, n.min, n.max) ||
+            !segment_bounds(from, delta, half, n.min, n.max, found ? hit.fraction : 1))
+        {
+            ++work_.node_rejections;
             return;
+        }
         if (n.left)
         {
             query(n.left, from, to, half, hit, found, anchor, selected);
@@ -329,6 +359,13 @@ namespace OpenBlood2
         }
         for (auto i = n.begin; i < n.end; ++i)
         {
+            ++work_.triangle_bounds_tests;
+            if (!segment_bounds(from, delta, half, triangles_[i].min, triangles_[i].max, found ? hit.fraction : 1))
+            {
+                ++work_.triangle_rejections;
+                continue;
+            }
+            ++work_.triangle_tests;
             CollisionHit candidate;
             if (triangle_hit(triangles_[i].points, from, to, half, candidate, anchor) &&
                 (!found || candidate.fraction < hit.fraction ||

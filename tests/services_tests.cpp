@@ -237,6 +237,51 @@ namespace
         CHECK(!world.build(w, error) && world.triangles() == 0);
         return true;
     }
+    bool collision_traversal()
+    {
+        WorldModel model;
+        model.surfaces.resize(1);
+        model.surfaces[0].flags = 1;
+        for (unsigned x = 0; x < 32; ++x)
+            for (unsigned z = 0; z < 32; ++z)
+            {
+                auto first = static_cast<std::uint32_t>(model.points.size());
+                const float px = x * 10, pz = z * 10;
+                model.points.insert(
+                    model.points.end(),
+                    {{px - 2, 0, pz - 2}, {px + 2, 0, pz - 2}, {px + 2, 0, pz + 2}, {px - 2, 0, pz + 2}});
+                model.polygons.push_back(
+                    {0,
+                     {static_cast<std::uint16_t>(first), static_cast<std::uint16_t>(first + 1),
+                      static_cast<std::uint16_t>(first + 2), static_cast<std::uint16_t>(first + 3)}});
+            }
+        CollisionWorld world;
+        std::string error;
+        CHECK(world.build(model, error));
+        CollisionHit hit;
+        // The segment's enclosing box overlaps the entire grid. Only its actual
+        // path near y=0 requires expensive triangle tests, even without a hit.
+        CHECK(world.sweep({0, 50, 0}, {310, -50, 310}, {}, hit) == CollisionQuery::Miss);
+        CHECK(world.work().triangle_tests < 128 && world.work().node_rejections > 0);
+        CHECK(world.sweep({0, 50, 0}, {300, -50, 300}, {}, hit) == CollisionQuery::Hit);
+        CHECK(hit.fraction == .5 && hit.polygon == 15 * 32 + 15 && hit.normal.y == 1);
+        // Nearest-hit pruning must still examine equal-time and penetrating
+        // contacts. Source polygon zero wins independently of BVH order.
+        CHECK(world.sweep({155, 0, 155}, {155, 0, 155}, {500, 1, 500}, hit) == CollisionQuery::Hit);
+        CHECK(hit.start_solid && hit.fraction == 0 && hit.polygon == 0);
+        CHECK(world.transform({}, {}, {0, 20, 0}));
+        CHECK(world.sweep({150, 50, 150}, {150, -50, 150}, {}, hit) == CollisionQuery::Hit);
+        CHECK(hit.fraction == .3 && std::abs(hit.point.y - 20) < 1e-5);
+        CHECK(world.work().triangle_bounds_tests == world.work().triangle_tests + world.work().triangle_rejections);
+        world.clear();
+        CHECK(world.work().node_tests == 0 && world.work().triangle_tests == 0);
+        CHECK(world.sweep({}, {}, {}, hit) == CollisionQuery::Miss && world.work().node_tests == 0);
+        CHECK(world.build(model, error) && world.work().triangle_bounds_tests == 0);
+        CHECK(world.sweep({}, {}, {-1, 0, 0}, hit) == CollisionQuery::Invalid && world.work().node_tests == 0);
+        model.polygons[0].points[0] = UINT16_MAX;
+        CHECK(!world.build(model, error) && world.nodes() == 0 && world.work().node_tests == 0);
+        return true;
+    }
     bool movement_contacts()
     {
         GameSession game;
@@ -554,6 +599,8 @@ int main(int argc, char** argv)
         ok = model_callbacks();
     else if (name == "collision_queries")
         ok = collision_queries();
+    else if (name == "collision_traversal")
+        ok = collision_traversal();
     else if (name == "movement_contacts")
         ok = movement_contacts();
     else if (name == "placement_queries")

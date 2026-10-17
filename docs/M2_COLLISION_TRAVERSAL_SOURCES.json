@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "bbfc2f46c5c4e8c0590379e2f1e9c9ccd63dc1aa",
+  "status": "M2 incomplete; replacement engine broadphase optimization, no original rule change",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "purpose": "Original PINGPERIOD scheduling and player/camera observer selection, unchanged."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "purpose": "Original activation state and PingObjects service contract."
+    }
+  ]
+}
