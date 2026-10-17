@@ -116,3 +116,5 @@ objects, voices and histories. No mutable process-global state was added; isolat
 destination rehearsal preserves the source projectile and aggregate lists.
 
 The [wind/shockwave continuation](WIND_WEAPON_CONTRACTS.md) extends the runtime-only projectile subset with OT_NORMAL scale metadata and the original type20 model/light recipe. Earlier type/resource restrictions are superseded only for this bounded subset; production Gideon and M2 remain incomplete.
+
+The [proximity continuation](PROXIMITY_CONTRACTS.md) adds original weapon49 in reserved slot10, item7 collection, P selection, charged/secondary throws and independent CProximityBomb lifecycle. Owned snapshots now contain thirteen slots, with only the first reserved slot implemented. The shared grenade/bomb service is named AdvanceModelProjectile. Earlier omissions/counts remain historical; M2 stays incomplete.

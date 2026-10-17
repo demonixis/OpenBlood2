@@ -446,7 +446,7 @@ bool private_game(const std::filesystem::path& root)
         }
         std::cout << "CityHub M16=" << assault << " created=" << created << " unknown=" << unknown
                   << " failed=" << failed << '\n';
-        CHECK(assault == 1 && created == 448 && unknown == 5 && failed == 1);
+        CHECK(assault == 1 && created == 450 && unknown == 3 && failed == 1);
         CHECK(g.unload_world());
         // Labelled arena uses actual private models/audio, with controlled geometry.
         auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});

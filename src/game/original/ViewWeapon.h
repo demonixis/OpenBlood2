@@ -30,6 +30,7 @@ class CViewWeapon
     std::string last_key, pending_sound;
     bool sound_indexed = false; // Request only; audio output is not ported.
     std::uint64_t fire_keys = 0, shots = 0;
+    float bomb_start = 0, bomb_held = 0, bomb_speed = 1000;
     FireResult last_result = FireResult::Invalid;
 
   private:

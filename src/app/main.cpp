@@ -612,6 +612,7 @@ namespace
                 game->client_shell.weapon_input = {};
             game->client_shell.use_down = controls.sample_use(text_editing);
             game->client_shell.medkit_down = controls.sample_medkit(text_editing);
+            game->client_shell.proximity_down = controls.sample_proximity(text_editing);
             auto keyboard = controls.sample(text_editing);
             auto& movement = game->client_shell.movement_input;
             movement.forward |= keyboard.forward;

@@ -72,7 +72,7 @@ bool CPlayerObj::OnCommandItem(DBYTE type)
 {
     // Original OnCommandOn COMMAND_INVITEM_1, including its run-key exclusion.
     if (!g_pServerDE->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() || movement_blocked ||
-        camera_movement_blocked || command_run)
+        camera_movement_blocked || (type != 7 && command_run))
         return false;
     return m_InventoryMgr.SetActiveItem(type) == InventoryResult::Ok;
 }

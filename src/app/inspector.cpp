@@ -12,6 +12,7 @@
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
 #include "game/original/Projectile.h"
+#include "game/original/ProximityBomb.h"
 #include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
 #include "game/original/SoundFX.h"
@@ -841,6 +842,20 @@ namespace OpenBlood2
                                         game.server.IsObjectAlive(projectile->m_hFiredFrom) ? "yes" : "no",
                                         game.server.IsObjectAlive(projectile->m_hHitObject) ? "yes" : "no",
                                         projectile->contact.polygon);
+                            if (const auto* bomb = dynamic_cast<const CProximityBomb*>(projectile))
+                            {
+                                ImGui::Text("Proximity: armed %d / direct contact %d / scans %llu / contacts %llu",
+                                            bomb->armed, bomb->hit_character, (unsigned long long)bomb->scans,
+                                            (unsigned long long)bomb->contacts);
+                                ImGui::Text("Detect %.1f / getaway %.2f / delay %.2f / sounds %u", bomb->detect_radius,
+                                            bomb->get_away, bomb->explode_delay, bomb->sounds);
+                                ImGui::Text("Detected identity alive: %d / inherited fuse unused",
+                                            game.server.IsObjectAlive(bomb->detected));
+                                ImGui::Text("Pitch %.3f / yaw %.3f / spin %.3f %.3f", bomb->pitch, bomb->yaw,
+                                            bomb->pitch_velocity, bomb->yaw_velocity);
+                                if (!bomb->sound_error.empty())
+                                    ImGui::TextWrapped("Audio: %s", bomb->sound_error.c_str());
+                            }
                             if (const auto* grenade = dynamic_cast<const CGrenade*>(projectile))
                             {
                                 ImGui::Text("Grenade: bounces left %d / contacts %llu / pitch %.3f / yaw %.3f",
@@ -972,6 +987,11 @@ namespace OpenBlood2
                             ImGui::Text("%.3f %s: %s at %.2f %.2f %.2f / delivered %u", report.time,
                                         report.source.c_str(), report.outcome.c_str(), report.position.x,
                                         report.position.y, report.position.z, report.delivered);
+                            if (report.proximity)
+                                ImGui::Text(
+                                    "Proximity: armed %d / character impact %d / scans %llu / contacts %llu / audio %s",
+                                    report.armed, report.hit_character, (unsigned long long)report.scans,
+                                    (unsigned long long)report.contacts, report.audio_error.c_str());
                             if (report.grenade)
                                 ImGui::Text("Grenade: contacts %llu / bounces left %d / explosion passes %u",
                                             (unsigned long long)report.contacts, report.bounces_left,
@@ -1960,7 +1980,7 @@ namespace OpenBlood2
     }
     void Inspector::draw_weapons(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextUnformatted("Original inventory / Beretta 92F / Ingram Mac-10 / Flare Gun / M16 / Chosen Knife");
+        ImGui::TextUnformatted("Original inventory / Beretta / Mac-10 / Flare / M16 / Knife / Proximity Bomb");
         auto* player = game.server_shell.Player(game.local_client);
         if (!player)
         {
@@ -1969,6 +1989,11 @@ namespace OpenBlood2
             return;
         }
         auto& inventory = player->m_InventoryMgr;
+        ImGui::TextWrapped("P selects collected proximity bombs. Hold primary to charge, then release; holding over "
+                           "1.25 seconds explodes in hand. Secondary drops a bomb.");
+        if (game.client_shell.weapons[0].type == WEAP_PROXIMITYBOMB)
+            ImGui::Text("Bomb charge %.3f s / speed %.1f / ammo %.0f", game.client_shell.weapons[0].bomb_held,
+                        game.client_shell.weapons[0].bomb_speed, inventory.GetAmmoCount(10));
         ImGui::TextWrapped("Hold a fire button to drive original animation, shots, decoded fire sounds and AI hearing. "
                            "The model preview is diagnostic; remaining impact FX and audio reverb are unavailable.");
         if (!world_error.empty())
@@ -1984,7 +2009,7 @@ namespace OpenBlood2
             ImGui::TableSetupColumn("Left hand");
             ImGui::TableSetupColumn("Select");
             ImGui::TableHeadersRow();
-            for (unsigned slot = 0; slot < 10; ++slot)
+            for (unsigned slot = 0; slot < inventory_weapon_slots; ++slot)
             {
                 const auto* right = inventory.GetWeapon(slot);
                 const auto* left = inventory.GetWeapon(slot, true);

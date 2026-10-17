@@ -50,7 +50,7 @@ namespace
             error = "Active player powers require unported saved expiration timers";
             return false;
         }
-        for (unsigned slot = 0; slot < 10; ++slot)
+        for (unsigned slot = 0; slot < inventory_weapon_slots; ++slot)
             for (bool left : {false, true})
                 if (const auto* weapon = player.m_InventoryMgr.GetWeapon(slot, left); weapon && weapon->firing)
                 {

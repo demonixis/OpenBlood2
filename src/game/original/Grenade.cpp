@@ -32,7 +32,7 @@ bool CGrenade::AdvanceFlight(double seconds)
 {
     if (!configured || m_bExplode || failed || seconds == 0)
         return !failed;
-    if (!g_pServerDE->AdvanceGrenade(m_hObject, seconds))
+    if (!g_pServerDE->AdvanceModelProjectile(m_hObject, seconds))
         return failed ? false : Fail("Grenade box flight unavailable/invalid (including embedded starts)");
     return !failed;
 }

@@ -68,3 +68,5 @@ The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisitio
 CInvMedkit recharge/healing, H direct-item input, local activation audio and owned
 charge preservation through Restore/KeepAlive. Other items, original inventory HUD,
 pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.
+
+The [proximity continuation](PROXIMITY_CONTRACTS.md) adds original weapon49 in reserved slot10, item7 collection, P selection, charged/secondary throws and independent CProximityBomb lifecycle. Owned snapshots now contain thirteen slots, with only the first reserved slot implemented. The shared grenade/bomb service is named AdvanceModelProjectile. Earlier omissions/counts remain historical; M2 stays incomplete.

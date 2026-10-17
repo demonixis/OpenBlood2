@@ -29,6 +29,7 @@
 #include "game/original/PathPoint.h"
 #include "game/original/PowerupPickups.h"
 #include "game/original/Projectile.h"
+#include "game/original/ProximityBomb.h"
 #include "game/original/RandomSoundFX.h"
 #include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
@@ -97,6 +98,7 @@ namespace OpenBlood2
             {{"Filename", std::string{}}, {"Skin", std::string{}}, {"Flags", std::int32_t(FLAG_VISIBLE)}}};
         const ClassInfo shockwave_projectile{
             "CBehemothShockwaveProjectile", &base, construct<CBehemothShockwaveProjectile>, {}};
+        const ClassInfo proximity{"CProximityBomb", &base, construct<CProximityBomb>, {}};
         const ClassInfo grenade{"CGrenade", &base, construct<CGrenade>, {}};
         const ClassInfo flare_projectile{"CFlareProjectile", &base, construct<CFlareProjectile>, {}};
         const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {}};
@@ -502,6 +504,8 @@ namespace OpenBlood2
                                {{"PickupTriggerTarget", std::string{}}, {"PickupTriggerMessage", std::string{}}}};
         const ClassInfo item_pickup{"ItemPickup", &pickup, construct<ItemPickup>, {}};
         const ClassInfo charged_pickup{"ItemPickupCharged", &item_pickup, construct<ItemPickupCharged>, {}};
+        const ClassInfo item_weapon{"ItemPickupWeapon", &item_pickup, construct<ItemPickupWeapon>, {}};
+        const ClassInfo proximity_pickup{"ProximitiesPU", &item_weapon, construct<ProximitiesPU>, {}};
         const ClassInfo medkit_pickup{"MedKitPU", &charged_pickup, construct<MedKitPU>, {}};
         const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}};
         const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
@@ -824,7 +828,8 @@ namespace OpenBlood2
                objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
                objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
                objects.register_class(key_pickup) && objects.register_class(pickup) &&
-               objects.register_class(item_pickup) && objects.register_class(charged_pickup) &&
+               objects.register_class(item_pickup) && objects.register_class(item_weapon) &&
+               objects.register_class(proximity_pickup) && objects.register_class(charged_pickup) &&
                objects.register_class(medkit_pickup) && objects.register_class(weapon_pickup) &&
                objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
                objects.register_class(flare_pickup) && objects.register_class(mac10_pickup) &&
@@ -842,7 +847,7 @@ namespace OpenBlood2
                objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
                objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
                objects.register_class(world_debris) && objects.register_class(hand_model) &&
-               objects.register_class(corpse) && objects.register_class(grenade) &&
+               objects.register_class(corpse) && objects.register_class(proximity) && objects.register_class(grenade) &&
                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
                objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
                objects.register_class(shockwave_projectile);

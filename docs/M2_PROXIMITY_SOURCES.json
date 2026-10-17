@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "6fdab8820ecdd761e09738a8fd608ee01221c673",
+  "status": "M2 incomplete; original proximity pickup/weapon/projectile subset",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/GameProjectiles.cpp",
+      "source_sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f",
+      "purpose": "CProximityBomb constructor, Update, HandleTouch and AddExplosion."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Projectile.cpp",
+      "source_sha256": "52b805c67775579b5703e0ad1099a8ea44d76b245349c8f6d1fac0a1b3b74ef2",
+      "purpose": "Base model flags, Setup/InitialUpdate, typed base damage/impact and callback order."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameWeapons.cpp",
+      "source_sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd",
+      "purpose": "CWeapProximityBomb FireProjectile charged, overheld and secondary branches."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameWeapons.h",
+      "source_sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19",
+      "purpose": "Proximity special-float assignment."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "purpose": "Reserved slots, AddInventoryWeapon, SelectInventoryWeapon, SelectNextWeapon and Save/Load."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
+      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
+      "purpose": "ProximitiesPU and ItemPickupWeapon single-player initial callback."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ItemPickups.h",
+      "source_sha256": "ce1dacd1cf4829c39cfdfbeb27ae4873e1f2b6a4895b532b820d587ab7eaa17e",
+      "purpose": "Ancestry, ammo2.wav and quantity one."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "purpose": "MID_INVENTORYITEMTOUCH branch and COMMAND_PROXIMITIES."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameInvItems.cpp",
+      "source_sha256": "b2a72cdf5bd9e23ec496c6f6af3ed5bd4449e3b84d8cc088c33c1e1bbe081ee8",
+      "purpose": "CInvProxBomb activation; menu-node ownership compressed into weapon/pool."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/GameWeapons.cpp",
+      "source_sha256": "292753e7a91be363aa955731d552f967845c6a783dd6aeec954db59e2d2128d7",
+      "purpose": "Client before/after base update and charged throw float."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/GameWeapons.h",
+      "source_sha256": "c5f9176a2f6ad7c28dedb5ec24c710a16f1c2f4957d1efb793cf77e42e8378e0",
+      "purpose": "Hold/distance times and velocity constants."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
+      "source_sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
+      "purpose": "Base animation/state and FIRE_KEY-driven fire."
+    },
+    {
+      "source": "sources/blood2/Shared/WeaponDefs.cpp",
+      "source_sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
+      "purpose": "Complete original proximity WeaponData entry."
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "purpose": "Base-game weapon49, item7, ammo10 and original reserved slot10."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PickupObject.cpp",
+      "source_sha256": "25e0388f983ec0c9e01b6deb8432f411271159a224d582e12300c10863b979da",
+      "purpose": "Preserve existing user bits when applying pickup initial-update flags."
+    }
+  ]
+}

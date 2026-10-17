@@ -988,3 +988,7 @@ interactive-frame bound, paused resource/capture work and visible discarded time
 This is new frontend scheduling policy, not an imported original gameplay rule;
 see [session playback](SESSION_PLAYBACK_CONTRACTS.md). Diagnostic/core timing and
 physics rejection bounds remain unchanged.
+
+## Original proximity bombs
+
+Selected original pickup, inventory, weapon and client charge/projectile rules are integrated with typed transport and checked ownership. [Contracts](PROXIMITY_CONTRACTS.md) and [source hashes](M2_PROXIMITY_SOURCES.json) distinguish source behavior from the shared replacement box solver, menu-node compression and bounded validation. No donor codebase, dependency or commercial asset is imported.

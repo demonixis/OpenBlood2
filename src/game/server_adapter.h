@@ -269,7 +269,7 @@ namespace OpenBlood2
         DRESULT SetAcceleration(HOBJECT, DVector*) override;
         bool advance_physics(double seconds);
         bool advance_projectiles(double seconds);
-        bool AdvanceGrenade(HOBJECT, double seconds) override;
+        bool AdvanceModelProjectile(HOBJECT, double seconds) override;
         void RecordProjectile(const ProjectileReport&) override;
         std::vector<ProjectileReport> projectile_reports;
         CollisionWorld* collision = nullptr;

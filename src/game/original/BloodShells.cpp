@@ -237,6 +237,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     boss_health_visible = false;
     communication.Reset(server_);
     medkit_down = medkit_was_down = false;
+    proximity_down = proximity_was_down = false;
     item_actions = item_sounds = item_voice = 0;
     item_audio_error.clear();
     objectives = {};
@@ -276,6 +277,7 @@ void CBloodClientShell::OnExitWorld()
     boss_health_visible = false;
     communication.Reset(server_);
     medkit_down = medkit_was_down = false;
+    proximity_down = proximity_was_down = false;
     item_actions = item_sounds = item_voice = 0;
     item_audio_error.clear();
     objectives = {};
@@ -477,6 +479,10 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerItemCo
 }
 bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
 {
+    const bool proximity_pressed = proximity_down && !proximity_was_down;
+    proximity_was_down = proximity_down;
+    if (proximity_pressed)
+        server.OnMessage(client_, OpenBlood2::PlayerItemCommand{7});
     const bool item_pressed = medkit_down && !medkit_was_down;
     medkit_was_down = medkit_down;
     if (item_pressed)

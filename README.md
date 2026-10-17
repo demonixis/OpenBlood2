@@ -1,5 +1,7 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The [proximity-bomb continuation](../Documentation/Implementation/M2_PROXIMITY.md) connects original ProximitiesPU, reserved inventory slot10, charged throws, sticking/detection/detonation, independent lifetime and inspection. CityHub now has 450 created / 31 transferred sounds / 541 editor-only / three unsupported / one failed entry. Remote bombs, flashlight and missing `fallengrills` geometry still block CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical.
+
 The [original sky continuation](../Documentation/Implementation/M2_SKY.md) connects DemoSkyWorldModel and deferred SkyPointer lookup to checked sky slots, parallax and SDL_GPU world-model background rendering. CityHub now has 448 created / 31 transferred sounds / 541 editor-only / five unsupported / one failed entry; four pointers remove themselves on their first update. Earlier counts below are historical. Missing pickups and `fallengrills` geometry still reject CityHub NEW_LEVEL; M2 remains incomplete.
 
 The [authored particle-stream continuation](../Documentation/Implementation/M2_PARTICLE_STREAMS.md) connects original server toggles and client ramps, current-owner emission and SDL_GPU particle rendering, with inspection. All eight CityHub streams create; the level now has 443 created / 31 transferred sounds / 541 editor-only / 10 unsupported / one failed entry. Original unread sound fields remain metadata. CityHub NEW_LEVEL still refuses; M2 remains incomplete.

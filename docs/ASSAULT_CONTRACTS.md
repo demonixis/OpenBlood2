@@ -112,3 +112,5 @@ composite FX, supported autonomous rifle-bearing NPCs, retail physics/presentati
 parity and safe NEW_LEVEL remain open. CityHub is 433 created / 31 transferred
 sounds / 541 editor-only / 20 unsupported / one failed. Missing fallengrills geometry
 remains a failure. These counts do not close M2.
+
+The [proximity continuation](PROXIMITY_CONTRACTS.md) adds original weapon49 in reserved slot10, item7 collection, P selection, charged/secondary throws and independent CProximityBomb lifecycle. Owned snapshots now contain thirteen slots, with only the first reserved slot implemented. The shared grenade/bomb service is named AdvanceModelProjectile. Earlier omissions/counts remain historical; M2 stays incomplete.

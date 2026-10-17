@@ -2,6 +2,7 @@
 #include "Projectile.h"
 #include "FlareProjectile.h"
 #include "Grenade.h"
+#include "ProximityBomb.h"
 #include "SurfaceTypes.h"
 #include "engine/collision.h"
 #include "engine/objects.h"
@@ -23,8 +24,13 @@ void CProjectile::Finish(const char* outcome)
 {
     DVector position;
     g_pServerDE->GetObjectPos(m_hObject, &position);
-    ProjectileReport report{
-        g_pServerDE->GetObjectName(m_hObject), outcome, error, position, g_pServerDE->GetTime(), targets.delivered};
+    ProjectileReport report;
+    report.source = g_pServerDE->GetObjectName(m_hObject);
+    report.outcome = outcome;
+    report.error = error;
+    report.position = position;
+    report.time = g_pServerDE->GetTime();
+    report.delivered = targets.delivered;
     report.cancelled = targets.cancelled;
     report.candidates = targets.candidates;
     report.in_radius = targets.in_radius;
@@ -36,6 +42,15 @@ void CProjectile::Finish(const char* outcome)
         report.query = wave->ground_result;
         report.blast_position = wave->blast_position;
         report.blast_normal = wave->blast_normal;
+    }
+    if (const auto* bomb = dynamic_cast<const CProximityBomb*>(this))
+    {
+        report.proximity = true;
+        report.armed = bomb->armed;
+        report.hit_character = bomb->hit_character;
+        report.contacts = bomb->contacts;
+        report.scans = bomb->scans;
+        report.audio_error = bomb->sound_error;
     }
     if (const auto* grenade = dynamic_cast<const CGrenade*>(this))
     {
@@ -263,7 +278,8 @@ bool CProjectile::AddImpact(DVector position)
     m_vDir = vector_scale(m_vDir, 20);
     SegmentHit impact;
     auto normal = vector_scale(m_vDir, -1), point = position;
-    if (m_hHitObject || (!dynamic_cast<CGrenade*>(this) && !contact.object && contact.polygon != UINT32_MAX))
+    if (m_hHitObject || (!dynamic_cast<CGrenade*>(this) && !dynamic_cast<CProximityBomb*>(this) && !contact.object &&
+                         contact.polygon != UINT32_MAX))
     {
         const auto query = g_pServerDE->IntersectSegment(from, vector_add(position, m_vDir), nullptr, impact);
         if (query != SegmentResult::Hit && query != SegmentResult::Miss)

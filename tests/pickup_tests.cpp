@@ -403,6 +403,12 @@ namespace
                               gun->value.amount == 50 && gun->resource_id == IDS_WEAPON_M16);
                         std::cout << "Authored AssaultRiflePU: " << path << '\n';
                     }
+                    if (source.class_name == "ProximitiesPU")
+                    {
+                        auto* bomb = dynamic_cast<PickupObject*>(g.objects.get(h)->game.get());
+                        CHECK(bomb && bomb->value.kind == PickupKind::Item && bomb->value.type == 7 &&
+                              bomb->value.amount == 1 && bomb->resource_id == 306);
+                    }
                     missing += !g.objects.get(h)->model;
                 }
                 CHECK(g.objects.clear() && AmmoPickup::m_dwNumPickups == 0);
@@ -434,8 +440,9 @@ namespace
             rejected += n;
         }
         CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2 &&
-              counts["AssaultRiflePU"] == 5 && counts["MedKitPU"] == 22);
-        CHECK(worlds == 57 && created == 1290 && missing == 0 && rejected == 178 && spawns == 60);
+              counts["AssaultRiflePU"] == 5 && counts["MedKitPU"] == 22 && counts["ProximitiesPU"] == 161);
+        CHECK(failures["ProximitiesPU: invalid property TypeAction"] == 28);
+        CHECK(worlds == 57 && created == 1423 && missing == 0 && rejected == 206 && spawns == 60);
         return true;
     }
 } // namespace

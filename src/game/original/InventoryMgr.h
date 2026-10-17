@@ -27,6 +27,9 @@ class CInventoryMgr : public Aggregate
     // separate player-transfer responsibility, never silently bypassed here.
     bool Load(const OpenBlood2::InventoryState&, OpenBlood2::InventoryLoadType, std::string&);
     InventoryResult AddItem(DBYTE, DBYTE);
+    InventoryResult AddInventoryWeapon(DBYTE, DBYTE);
+    InventoryResult SelectInventoryWeapon(DBYTE);
+    InventoryResult SelectNextWeapon();
     InventoryResult SetActiveItem(DBYTE);
     std::optional<CInvMedkit> medkit;
     InventoryResult AddKey(const OpenBlood2::KeyItem&);
@@ -58,7 +61,7 @@ class CInventoryMgr : public Aggregate
     bool FindBestWeapon(float target_distance, CWeapon*& alternative) const;
     CWeapon* GetWeapon(unsigned slot, bool left = false) const
     {
-        return slot < 10 ? (left ? m_LWeapons[slot].get() : m_Weapons[slot].get()) : nullptr;
+        return slot < inventory_weapon_slots ? (left ? m_LWeapons[slot].get() : m_Weapons[slot].get()) : nullptr;
     }
     CWeapon* CurrentWeapon(bool left = false) const
     {
@@ -75,6 +78,6 @@ class CInventoryMgr : public Aggregate
     std::uint64_t revision = 0;
 
   private:
-    std::array<std::unique_ptr<CWeapon>, 10> m_Weapons{}, m_LWeapons{};
+    std::array<std::unique_ptr<CWeapon>, inventory_weapon_slots> m_Weapons{}, m_LWeapons{};
     DDWORD EngineMessageFn(LPBASECLASS, DDWORD, void*, DFLOAT) override;
 };

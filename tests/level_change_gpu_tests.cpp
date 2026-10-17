@@ -99,7 +99,7 @@ int main(int argc, char** argv)
         CHECK(game->server.SendWorldExit({"02_CityHub"}, "01_egressa") == DE_OK && game->pump_player_messages(error));
         CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
         CHECK(game.get() == before && game->client_shell.player == old_player && game->world_revision == revision);
-        CHECK(game->level_change.unknown == 5 && game->level_change.failed == 1 && game->server.audio.has_output());
+        CHECK(game->level_change.unknown == 3 && game->level_change.failed == 1 && game->server.audio.has_output());
         CHECK(game->server.SendWorldExit({"01_SubwayA"}, "start") == DE_OK && game->pump_player_messages(error));
         CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Committed);
         CHECK(game.get() != before && game->client_shell.player != old_player && game->server.audio.has_output());

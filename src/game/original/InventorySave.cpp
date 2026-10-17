@@ -8,7 +8,8 @@ namespace
     bool valid(const OpenBlood2::InventoryState& state, std::string& error)
     {
         if (state.strength < 1 || state.strength > 6 || state.magic < 1 || state.magic > 6 ||
-            state.current_slot >= state.right.size() || !std::isfinite(state.damage_multiplier) ||
+            state.current_slot >= state.right.size() ||
+            (state.current_slot >= 10 && !state.right[state.current_slot]) || !std::isfinite(state.damage_multiplier) ||
             state.damage_multiplier < 0 || state.damage_multiplier > 1000 || state.keys.size() > 256 ||
             (state.medkit_charge && *state.medkit_charge > 100))
         {
@@ -24,7 +25,9 @@ namespace
         for (unsigned i = 0; i < state.right.size(); ++i)
         {
             const auto* right = weapon_definition(state.right[i]);
-            if ((state.right[i] && !right) ||
+            if ((i >= 10 && ((i != 10 && state.right[i]) || (state.right[i] && state.right[i] != WEAP_PROXIMITYBOMB) ||
+                             state.left[i])) ||
+                (i < 10 && state.right[i] == WEAP_PROXIMITYBOMB) || (state.right[i] && !right) ||
                 (state.left[i] && (!right || state.left[i] != state.right[i] || !right->m_dwTwoHandStrengthReq)))
             {
                 error = "Unsupported weapon or invalid dual-hand inventory slot";

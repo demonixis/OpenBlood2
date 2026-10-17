@@ -77,6 +77,7 @@ class CBloodClientShell
     bool UpdateUse(CBloodServerShell&);
     bool use_down = false, use_was_down = false;
     bool medkit_down = false, medkit_was_down = false;
+    bool proximity_down = false, proximity_was_down = false;
     std::uint64_t item_actions = 0, item_sounds = 0;
     OpenBlood2::SoundId item_voice = 0; // Checked inspection token, not owned.
     std::string item_audio_error;

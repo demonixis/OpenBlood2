@@ -40,7 +40,8 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
             if (reason == INITIALUPDATE_WORLDFILE && g_pServerDE->MoveObjectToGround(m_hObject) != DE_OK)
                 error = "Initial pickup ground placement failed";
         }
-        g_pServerDE->SetObjectUserFlags(m_hObject, (1u << 3) | (1u << 10) | (rotate_fx ? (1u << 4) : 0));
+        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3) | (1u << 10) |
+                                                       (rotate_fx ? (1u << 4) : 0));
         g_pServerDE->SetNextUpdate(m_hObject, 0);
         // String creation follows SpawnItem: no bounce for these source constructors,
         // no ground snap, and the helper applies SpawnObjectVel after initial update.

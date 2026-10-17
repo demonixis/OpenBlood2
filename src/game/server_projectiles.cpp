@@ -1,15 +1,20 @@
 #include "game/original/Grenade.h"
 #include "game/original/Projectile.h"
+#include "game/original/ProximityBomb.h"
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
 namespace OpenBlood2
 {
-    bool ServerAdapter::AdvanceGrenade(HOBJECT h, double seconds)
+    bool ServerAdapter::AdvanceModelProjectile(HOBJECT h, double seconds)
     {
-        trace_service("AdvanceGrenade");
+        trace_service("AdvanceModelProjectile");
         auto* record = objects_.get(h);
-        auto* grenade = record && record->life == Life::Alive ? dynamic_cast<CGrenade*>(record->game.get()) : nullptr;
+        auto* grenade =
+            record && record->life == Life::Alive ? dynamic_cast<CProjectile*>(record->game.get()) : nullptr;
+        auto* bomb = dynamic_cast<CProximityBomb*>(grenade);
+        if (!dynamic_cast<CGrenade*>(grenade) && !bomb)
+            return false;
         if (!grenade || !grenade->configured || moving_ || objects_.busy() || !collision || !collision_ready ||
             !std::isfinite(seconds) || seconds <= 0 || seconds > .5 || record->attachment ||
             record->state.m_ObjectType != OT_MODEL || !record->model || !physics_vector(record->velocity) ||
@@ -28,7 +33,8 @@ namespace OpenBlood2
         const auto ids = objects_.snapshot();
         const auto steps = static_cast<unsigned>(std::max(1.0, std::ceil(seconds * 120)));
         const float dt = static_cast<float>(seconds / steps);
-        for (unsigned step = 0; step < steps && record->life == Life::Alive && !grenade->m_bExplode; ++step)
+        for (unsigned step = 0;
+             step < steps && record->life == Life::Alive && !grenade->m_bExplode && (!bomb || !bomb->armed); ++step)
         {
             ContainerPhysics physics{
                 h,    record->velocity, record->acceleration, dt, (record->state.m_Flags & FLAG_GRAVITY) != 0, false,
@@ -98,7 +104,10 @@ namespace OpenBlood2
                 SegmentHit contact{hit.point, hit.normal, hit.object, hit.polygon, hit.fraction, hit.texture_flags};
                 grenade->contact = contact;
                 grenade->contacted = true;
-                ++grenade->contacts;
+                if (auto* g = dynamic_cast<CGrenade*>(grenade))
+                    ++g->contacts;
+                if (bomb)
+                    ++bomb->contacts;
                 grenade->HandleContact(contact);
                 auto* target = objects_.get(hit.object);
                 if (record->life == Life::Alive && target && target->life == Life::Alive &&
@@ -138,9 +147,9 @@ namespace OpenBlood2
                 const bool was_contact = projectile->contacted;
                 ok = projectile->AdvanceFlight(seconds) && ok;
                 const auto* target = objects_.get(projectile->m_hHitObject);
-                if (!dynamic_cast<CGrenade*>(projectile) && !was_contact && projectile->contacted &&
-                    record->life == Life::Alive && target && target->life == Life::Alive &&
-                    (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
+                if (!dynamic_cast<CGrenade*>(projectile) && !dynamic_cast<CProximityBomb*>(projectile) &&
+                    !was_contact && projectile->contacted && record->life == Life::Alive && target &&
+                    target->life == Life::Alive && (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
                     objects_.engine_message(target->handle, MID_TOUCHNOTIFY, record->handle);
             }
         }

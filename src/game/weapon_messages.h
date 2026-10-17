@@ -9,6 +9,7 @@ namespace OpenBlood2
         DVector position{}, direction{0, 0, 1};
         DBYTE seed = 2, weapon = 1;
         bool alternate = false, left = false;
+        float projectile_speed = 1000; // Original FIREMSG_SPECIAL_FLOAT for inventory bombs only.
     };
     enum class DamageType : DBYTE
     {

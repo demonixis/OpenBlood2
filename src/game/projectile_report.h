@@ -13,7 +13,9 @@ namespace OpenBlood2
         DVector query_from{}, query_to{}, blast_position{}, blast_normal{};
         SegmentResult query = SegmentResult::Unavailable;
         unsigned candidates = 0, in_radius = 0;
-        bool grenade = false;
+        bool grenade = false, proximity = false, armed = false, hit_character = false;
+        std::uint64_t scans = 0;
+        std::string audio_error;
         int bounces_left = 0;
         unsigned explosions = 0;
         std::uint64_t contacts = 0;

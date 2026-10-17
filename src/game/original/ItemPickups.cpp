@@ -17,3 +17,11 @@ MedKitPU::MedKitPU()
     display_name = "Medkit";
     resource_id = 302;
 }
+
+ProximitiesPU::ProximitiesPU()
+{
+    value = {OpenBlood2::PickupKind::Item, 7, 1};
+    file = "Proximities_pu";
+    display_name = "Proximity Bomb";
+    resource_id = 306;
+}

@@ -95,11 +95,15 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
     {
         if (!server.Player(client))
             return true;
-        if (state != WS_FIRING && state != WS_ALT_FIRING)
+        if (state != WS_FIRING && state != WS_ALT_FIRING &&
+            !(type == WEAP_PROXIMITYBOMB && (state == WS_STOP_FIRING || state == WS_STOP_ALT_FIRING)))
             return true;
-        const bool alternate = state == WS_ALT_FIRING;
+        const bool alternate = state == WS_ALT_FIRING || state == WS_STOP_ALT_FIRING;
+        if (player->m_InventoryMgr.CurrentWeapon(left) != weapon)
+            return true;
         next_seed_ = static_cast<DBYTE>(2 + random_() % 254);
-        auto result = server.OnMessage(client, WeaponFire{position, direction, next_seed_, type, alternate, left});
+        auto result =
+            server.OnMessage(client, WeaponFire{position, direction, next_seed_, type, alternate, left, bomb_speed});
         last_result = result;
         if (result == FireResult::Fired)
         {
@@ -117,6 +121,15 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
     };
     const float time = engine.GetTime();
     const bool primary = input.primary && input.left == left, alternate = input.alternate && input.left == left;
+    if (type == WEAP_PROXIMITYBOMB && state == WS_STOP_FIRING)
+    {
+        if (!PlayAnimation(stop_[0]))
+        {
+            PlayAnimation(draw_);
+            state = WS_DRAW;
+        }
+        idle_start_ = time;
+    }
     // Client CMelee::UpdateFiringState chooses fire/fire2 while resting.
     if (type == WEAP_MELEE && state == WS_REST)
         fire_[0] = animation_index(*model, random_() % 2 ? "fire" : "fire2");
@@ -228,6 +241,25 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
             break;
         default:
             break;
+    }
+    if (type == WEAP_PROXIMITYBOMB)
+    {
+        if (state == WS_START_FIRING)
+            bomb_start = time;
+        if (state == WS_FIRING)
+        {
+            bomb_held = time - bomb_start;
+            bomb_speed = 250 + 1500 * std::min(bomb_held / .75f, 1.f);
+            if (bomb_held > 1.25f)
+            {
+                bomb_speed = 0;
+                bomb_held = 0;
+                state = WS_STOP_FIRING;
+                animation.looping = false;
+            }
+        }
+        else
+            animation.looping = false;
     }
     last_firing_ = primary || alternate;
     if (animation.animation == no_animation)

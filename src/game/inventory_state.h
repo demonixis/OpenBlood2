@@ -10,7 +10,7 @@ namespace OpenBlood2
     // No engine handles, weapon pointers, client views or resource references.
     struct InventoryState
     {
-        std::array<DBYTE, 10> right{}, left{};
+        std::array<DBYTE, 13> right{}, left{};
         std::array<float, 13> ammo{};
         std::vector<KeyItem> keys;
         std::optional<DBYTE> medkit_charge;

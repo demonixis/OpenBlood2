@@ -988,8 +988,8 @@ namespace
                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
                 else
                 {
-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 480 && d.editor_only == 541 &&
-                          d.unknown == 5 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                    CHECK(d.entries.size() == 1026 && d.schema_checked == 482 && d.editor_only == 541 &&
+                          d.unknown == 3 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
                     for (const auto& e : d.entries)
                         if (e.state == DestinationEntryState::InvalidProperties)
                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
@@ -1325,7 +1325,7 @@ namespace
             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
             std::cout << "CityHub refusal " << cycle << ": " << error << '\n';
             CHECK(game.get() == owner && game->objects.snapshot() == ids && globals.unchanged());
-            CHECK(game->level_change.unknown == 5 && game->level_change.failed == 1);
+            CHECK(game->level_change.unknown == 3 && game->level_change.failed == 1);
             CHECK(game->level_change.cleanup_complete && game->level_change.source_retained);
             CHECK(game->world_revision == revision && game->objects.time() == time);
             CHECK(game->server.audio.voices().size() == voices.size());
@@ -1426,7 +1426,7 @@ namespace
                 {
                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
                     if (std::string_view(name) == "02_cityhub")
-                        CHECK(d.created == 448 && d.unknown == 5 && d.failed == 1);
+                        CHECK(d.created == 450 && d.unknown == 3 && d.failed == 1);
                     else
                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
                 }

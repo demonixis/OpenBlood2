@@ -27,7 +27,10 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     } reset{firing};
     auto* server = BaseClass::GetServerDE();
     if (!server || !m_pInventoryMgr || !server->IsObjectAlive(m_hOwner) || request.weapon != data.m_nType ||
-        request.left != m_bLeftHand || !physics_vector(request.position) || !physics_vector(request.direction) ||
+        request.left != m_bLeftHand ||
+        (data.m_nType == WEAP_PROXIMITYBOMB && (!std::isfinite(request.projectile_speed) ||
+                                                request.projectile_speed < 0 || request.projectile_speed > 1750)) ||
+        !physics_vector(request.position) || !physics_vector(request.direction) ||
         !std::isfinite(m_pInventoryMgr->damage_multiplier) || m_pInventoryMgr->damage_multiplier < 0 ||
         m_pInventoryMgr->damage_multiplier > 1000)
         return FireResult::Invalid;
@@ -70,6 +73,12 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     const auto trace = [&]()
     {
         auto aim_direction = direction;
+        if (data.m_nType == WEAP_PROXIMITYBOMB && request.alternate)
+        {
+            last_shot.direction = {0, -1, 0};
+            last_shot.collision = SegmentResult::Miss;
+            return server->GetObjectPos(m_hOwner, &last_shot.request.position) == DE_OK;
+        }
         // Source FireSpread aligns the eye only for a player. NPCs fire the
         // spread direction from their actual gun node (or body fallback).
         if (const auto* player = dynamic_cast<CPlayerObj*>(server->HandleToObject(m_hOwner)))
@@ -78,7 +87,8 @@ FireResult CWeapon::Fire(const WeaponFire& request)
             server->GetObjectPos(m_hOwner, &eye);
             eye.y += player->eye_level;
             last_shot.request.position = request.position;
-            if (data.m_nType == WEAP_FLAREGUN || (data.m_nType == WEAP_ASSAULTRIFLE && request.alternate))
+            if (data.m_nType == WEAP_PROXIMITYBOMB || data.m_nType == WEAP_FLAREGUN ||
+                (data.m_nType == WEAP_ASSAULTRIFLE && request.alternate))
             {
                 SegmentHit close_hit;
                 const auto close = server->IntersectSegment(eye, vector_add(eye, vector_scale(forward, 60)), m_hOwner,
