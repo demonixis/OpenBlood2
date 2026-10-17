@@ -1,5 +1,5 @@
 // Original AI_Mgr.cpp:5959-6078, PlayerObj.cpp:1692-1736 and SmellHint list order.
-// See AI_SMELL_CONTRACTS.md for checked identities and source reachability limits.
+// See ai_smell_contracts.md for checked identities and source reachability limits.
 #include "AI_Mgr.h"
 #include "PlayerObj.h"
 #include "SmellHint.h"

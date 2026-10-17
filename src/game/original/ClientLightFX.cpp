@@ -1,4 +1,4 @@
-// Selected original ObjectDLL/ClientLightFX.cpp. See LIGHT_CONTRACTS.md.
+// Selected original ObjectDLL/ClientLightFX.cpp. See light_contracts.md.
 #include "ClientLightFX.h"
 #include "engine/collision.h"
 #include <algorithm>

@@ -2,7 +2,7 @@
 #include "Anim_Sound.h"
 #include "Destructable.h"
 
-// Original corpse lifetime, damage, limb loss and burning; see DEATH_EFFECT_CONTRACTS.md.
+// Original corpse lifetime, damage, limb loss and burning; see death_effect_contracts.md.
 class CCorpse : public B2BaseClass
 {
   public:

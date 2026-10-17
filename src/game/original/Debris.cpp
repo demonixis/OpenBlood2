@@ -1,4 +1,4 @@
-// Selected original CDebris and SetupClientGibFX; see M2_EXPLOSION_SOURCES.json.
+// Selected original CDebris and SetupClientGibFX; see m2_explosion_sources.json.
 #include "Debris.h"
 #include "engine/collision.h"
 #include "radius_damage.h"

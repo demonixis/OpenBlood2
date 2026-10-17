@@ -1,4 +1,4 @@
-// Original AI_Mgr.cpp:784-798,6081-6172. See AI_AMMO_CONTRACTS.md.
+// Original AI_Mgr.cpp:784-798,6081-6172. See ai_ammo_contracts.md.
 #include "AI_Mgr.h"
 #include "AmmoPickups.h"
 #include "engine/collision.h"

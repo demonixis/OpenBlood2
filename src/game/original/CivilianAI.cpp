@@ -1,4 +1,4 @@
-// Original CivilianAI.cpp:339-366,493-639; see AI_STATE_CONTRACTS.md.
+// Original CivilianAI.cpp:339-366,493-639; see ai_state_contracts.md.
 #include "CivilianAI.h"
 #include <cmath>
 

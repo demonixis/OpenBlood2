@@ -1,4 +1,4 @@
-// Selected ObjectDLL/Rotating.cpp rules. See M2_BRUSH_SOURCES.json for adaptations.
+// Selected ObjectDLL/Rotating.cpp rules. See m2_brush_sources.json for adaptations.
 #include "Rotating.h"
 #include "engine/collision.h"
 #include "engine/objects.h"

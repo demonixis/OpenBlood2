@@ -2,7 +2,7 @@
 #include "B2BaseClass.h"
 #include "KeyData.h"
 #include <vector>
-// Selected source rules; bounded storage and diagnostics: KEYFRAMER_CONTRACTS.md.
+// Selected source rules; bounded storage and diagnostics: keyframer_contracts.md.
 class KeyFramer : public B2BaseClass
 {
   public:

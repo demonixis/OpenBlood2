@@ -1,5 +1,5 @@
 // Original CultistAI.cpp:460-550, CivilianAI.cpp:374-489 and AI_Mgr.cpp:5355-5379,6275-6350.
-// Checked adaptations and diagnostic scope: AI_ESCAPE_CONTRACTS.md.
+// Checked adaptations and diagnostic scope: ai_escape_contracts.md.
 #include "AI_Mgr.h"
 #include "engine/collision.h"
 #include <cmath>

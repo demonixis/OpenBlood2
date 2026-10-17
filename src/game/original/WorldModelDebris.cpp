@@ -1,4 +1,4 @@
-// Original WorldModelDebris rules; see docs/WORLD_DEBRIS_CONTRACTS.md.
+// Original WorldModelDebris rules; see docs/world_debris_contracts.md.
 #include "WorldModelDebris.h"
 #include "engine/collision.h"
 #include <cmath>

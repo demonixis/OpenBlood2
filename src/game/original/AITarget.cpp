@@ -1,5 +1,5 @@
 // Original AI_Mgr.cpp:716-722,1269-1314,2200,5556-5608.
-// See AI_TARGET_CONTRACTS.md for checked failures and current-transform adaptation.
+// See ai_target_contracts.md for checked failures and current-transform adaptation.
 #include "AI_Mgr.h"
 #include "engine/collision.h"
 #include <cmath>

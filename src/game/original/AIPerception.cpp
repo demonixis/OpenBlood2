@@ -1,5 +1,5 @@
 // Selected AI_Mgr list registration, FindObjectInRadius, ComputeStimuli and
-// ChooseOpportunityTarget (Monolith 1997/1998). See AI_PERCEPTION_CONTRACTS.md.
+// ChooseOpportunityTarget (Monolith 1997/1998). See ai_perception_contracts.md.
 #include "AI_Mgr.h"
 #include "AmmoPickups.h"
 #include "ExitHint.h"

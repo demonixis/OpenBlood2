@@ -3,7 +3,7 @@
 #include <array>
 #include <string>
 
-// Selective original Trigger/BigTrigger/ToggleTrigger port. See TRIGGER_CONTRACTS.md.
+// Selective original Trigger/BigTrigger/ToggleTrigger port. See trigger_contracts.md.
 class Trigger : public B2BaseClass
 {
   public:

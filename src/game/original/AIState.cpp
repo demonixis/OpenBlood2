@@ -1,4 +1,4 @@
-// Original AI_Mgr state/animation selections. See AI_STATE_CONTRACTS.md.
+// Original AI_Mgr state/animation selections. See ai_state_contracts.md.
 #include "AI_Mgr.h"
 #include <cmath>
 #include <limits>

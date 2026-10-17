@@ -1,5 +1,5 @@
 // Original ObjectDLL/Gideon.cpp:15-240,323-473,583-600,770-808 (Monolith, 1998).
-// Typed failure/lifetime adaptations are documented in GIDEON_RUNTIME_CONTRACTS.md.
+// Typed failure/lifetime adaptations are documented in gideon_runtime_contracts.md.
 #include "Gideon.h"
 #include "engine/collision.h"
 #include <cmath>

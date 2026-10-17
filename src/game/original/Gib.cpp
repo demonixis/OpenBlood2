@@ -1,4 +1,4 @@
-// Selected original AI_Shared.CPP / Gib.cpp. See DEATH_EFFECT_CONTRACTS.md.
+// Selected original AI_Shared.CPP / Gib.cpp. See death_effect_contracts.md.
 #include "Gib.h"
 #include "AI_Mgr.h"
 #include "ParticleExplosionFX.h"

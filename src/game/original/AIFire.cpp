@@ -1,5 +1,5 @@
 // Selected original AI_Mgr.cpp:3204-3539,4469-4528,5612-5670.
-// See AI_FIRE_CONTRACTS.md and the Naga/energy/wind continuations for supported aiming branches.
+// See ai_fire_contracts.md and the Naga/energy/wind continuations for supported aiming branches.
 #include "AI_Mgr.h"
 #include "engine/collision.h"
 #include <cmath>

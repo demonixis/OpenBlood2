@@ -1,4 +1,4 @@
-// Original AI_Mgr.cpp:276-281,880-975 (Monolith, 1997). See AI_MODEL_KEY_CONTRACTS.md.
+// Original AI_Mgr.cpp:276-281,880-975 (Monolith, 1997). See ai_model_key_contracts.md.
 #include "AI_Mgr.h"
 #include "CameraObj.h"
 #include "Sparam.h"

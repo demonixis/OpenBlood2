@@ -1,4 +1,4 @@
-// Selected original GameProjectiles.cpp:5055-5165. See WIND_WEAPON_CONTRACTS.md.
+// Selected original GameProjectiles.cpp:5055-5165. See WIND_weapon_contracts.md.
 #include "Projectile.h"
 #include "engine/collision.h"
 #include <cmath>

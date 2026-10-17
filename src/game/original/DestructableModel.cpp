@@ -1,4 +1,4 @@
-// Selective original-source port. See DESTRUCTABLE_MODEL_CONTRACTS.md for boundaries.
+// Selective original-source port. See destructable_model_contracts.md for boundaries.
 #include "DestructableModel.h"
 #include "PlayerObj.h"
 #include "engine/collision.h"

@@ -1,7 +1,7 @@
 #pragma once
 #include "AI_Mgr.h"
 // Original selected Civilian rules, registered lifecycle and update loop.
-// Remaining damage/death actions are explicit limitations in AI_RUNTIME_CONTRACTS.md.
+// Remaining damage/death actions are explicit limitations in ai_runtime_contracts.md.
 class CivilianAI : public AI_Mgr
 {
   public:

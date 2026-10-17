@@ -1,4 +1,4 @@
-// Original AI_Mgr.cpp:5874-5951,6445-6755. See AI_RECOVERY_CONTRACTS.md.
+// Original AI_Mgr.cpp:5874-5951,6445-6755. See ai_recovery_contracts.md.
 #include "AI_Mgr.h"
 #include "engine/collision.h"
 #include <cmath>

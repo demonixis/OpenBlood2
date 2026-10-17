@@ -14,8 +14,8 @@
 #include <vector>
 
 // Selective source port of the entry/lifetime portions of PlayerObj,
-// BaseCharacter, Destructable and InventoryMgr. See PLAYER_CONTRACTS.md and
-// M2_PLAYER_SOURCES.json. Inventory/vector weapons are selected separately;
+// BaseCharacter, Destructable and InventoryMgr. See player_contracts.md and
+// m2_player_sources.json. Inventory/vector weapons are selected separately;
 // locomotion and containers are selected separately; complete combat remains outside this port.
 class CBaseCharacter : public B2BaseClass
 {

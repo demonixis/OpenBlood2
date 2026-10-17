@@ -1,4 +1,4 @@
-// Selected ObjectDLL/ClientExplosionSFX.cpp; see SCENE_EXPLOSION_CONTRACTS.md.
+// Selected ObjectDLL/ClientExplosionSFX.cpp; see SCENE_explosion_contracts.md.
 #include "ClientExplosionSFX.h"
 #include "engine/collision.h"
 #include "radius_damage.h"

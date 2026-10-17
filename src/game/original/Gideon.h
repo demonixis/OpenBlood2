@@ -2,8 +2,8 @@
 #include "AI_Mgr.h"
 
 // Original Gideon lifecycle and selected combat methods.
-// See GIDEON_RUNTIME_CONTRACTS.md for message ordering and remaining services.
-// See GIDEON_COMBAT_CONTRACTS.md before extending this subclass.
+// See gideon_runtime_contracts.md for message ordering and remaining services.
+// See gideon_combat_contracts.md before extending this subclass.
 class Gideon : public AI_Mgr
 {
   public:

@@ -1,5 +1,5 @@
 // Original BaseCharacter.cpp:108-219; bounded numeric parsing and explicit
-// service outcomes replace unsafe fixed buffers/atof. See CHARACTER_MOTION_CONTRACTS.md.
+// service outcomes replace unsafe fixed buffers/atof. See character_motion_contracts.md.
 #include "PlayerObj.h"
 #include "Sparam.h"
 #include "engine/collision.h"

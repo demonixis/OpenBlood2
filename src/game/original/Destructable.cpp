@@ -1,4 +1,4 @@
-// Selected shared damage/lifetime and brush trigger branches; see M2_BRUSH_SOURCES.json.
+// Selected shared damage/lifetime and brush trigger branches; see m2_brush_sources.json.
 #include "Destructable.h"
 #include "AI_Mgr.h"
 #include "engine/collision.h"

@@ -1,4 +1,4 @@
-// Original AI_Mgr.cpp:987-1263, selected command/hearing branches. See AI_TRIGGER_CONTRACTS.md.
+// Original AI_Mgr.cpp:987-1263, selected command/hearing branches. See ai_trigger_contracts.md.
 #include "AI_Mgr.h"
 #include "engine/collision.h"
 #include "engine/model_commands.h"

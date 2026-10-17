@@ -1,5 +1,5 @@
 // Original PathMgr.cpp and PathListData.cpp (Monolith, 1998).
-// See docs/PATH_MANAGER_CONTRACTS.md for preserved ordering and ownership adaptations.
+// See docs/path_manager_contracts.md for preserved ordering and ownership adaptations.
 #include "PathMgr.h"
 #include "PathPoint.h"
 #include <algorithm>

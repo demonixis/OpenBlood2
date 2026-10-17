@@ -1,5 +1,5 @@
 // Original AI_Mgr obstruction/ledge queries and MC_Walk/Run/Fire_Walk/Fire_Run.
-// Checked typed boundaries and missing shade recovery: AI_LOCOMOTION_CONTRACTS.md.
+// Checked typed boundaries and missing shade recovery: ai_locomotion_contracts.md.
 #include "AI_Mgr.h"
 #include "engine/collision.h"
 #include <cmath>

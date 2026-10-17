@@ -6,7 +6,7 @@
 #include <vector>
 
 // Original animation/node and voice subsets, also used by production NPC hit localization.
-// See CHARACTER_ANIMATION_CONTRACTS.md and AI_HIT_CONTRACTS.md.
+// See character_animation_contracts.md and ai_hit_contracts.md.
 inline constexpr unsigned NUM_ALL_NODES = 21, NUM_STD_NODES = 18;
 extern const std::array<const char*, NUM_ALL_NODES> szNodes;
 void CheckAnims(std::span<DDWORD>);

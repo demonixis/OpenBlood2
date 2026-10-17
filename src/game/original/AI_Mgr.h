@@ -90,9 +90,9 @@ namespace OpenBlood2
 } // namespace OpenBlood2
 
 // Selected original AI services and production Cultist/Civilian lifecycle.
-// See AI_RUNTIME_CONTRACTS.md for remaining state/action failures.
+// See ai_runtime_contracts.md for remaining state/action failures.
 // Selected CanSee and explicit target/facing commands are documented in
-// AI_SIGHT_CONTRACTS.md and AI_TARGET_CONTRACTS.md.
+// ai_sight_contracts.md and ai_target_contracts.md.
 class AI_Mgr : public CBaseCharacter
 {
   public:

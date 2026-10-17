@@ -5,7 +5,7 @@
 #include "game/weapon_messages.h"
 #include <string>
 
-// Selective VolumeBrush.cpp / VolumeBrushTypes.cpp source port; see CONTAINER_CONTRACTS.md.
+// Selective VolumeBrush.cpp / VolumeBrushTypes.cpp source port; see container_contracts.md.
 class VolumeBrush : public B2BaseClass
 {
   public:

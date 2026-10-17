@@ -1,5 +1,5 @@
 // Selected CPlayerObj::UpdateAnim/Do*Anim/SetAnimation and CAnim_Sound mappings.
-// See docs/LOCOMOTION_CONTRACTS.md for source evidence and engine adaptations.
+// See docs/locomotion_contracts.md for source evidence and engine adaptations.
 #include "PlayerObj.h"
 #include <cmath>
 

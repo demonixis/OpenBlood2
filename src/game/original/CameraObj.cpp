@@ -1,4 +1,4 @@
-// Selected original CameraObj callbacks and rules; see CAMERA_CONTRACTS.md.
+// Selected original CameraObj callbacks and rules; see camera_contracts.md.
 #include "CameraObj.h"
 #include "trigger_helpers.h"
 #include <algorithm>

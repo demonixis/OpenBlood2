@@ -5,7 +5,7 @@
 class CBloodServerShell;
 // Selected locomotion/container branches of original ClientShellDLL/MoveMgr.
 // One checked local player body replaces the legacy client/server duplicate.
-// See MOVEMENT_CONTRACTS.md and LOCOMOTION_CONTRACTS.md for the source selections and physics adaptations.
+// See movement_contracts.md and locomotion_contracts.md for the source selections and physics adaptations.
 class CMoveMgr
 {
   public:

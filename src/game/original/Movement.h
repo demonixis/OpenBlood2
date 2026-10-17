@@ -6,7 +6,7 @@
 #include <vector>
 
 // Original CMovement aggregate and obstacle path algorithm. Not the client MoveMgr.
-// Selected source rules, bounded searches and adaptations: AI_NAVIGATION_CONTRACTS.md.
+// Selected source rules, bounded searches and adaptations: ai_navigation_contracts.md.
 class CMovement : public Aggregate
 {
   public:

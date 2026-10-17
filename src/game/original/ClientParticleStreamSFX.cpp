@@ -1,4 +1,4 @@
-// Selected original ObjectDLL/ClientParticleStreamSFX.cpp. See PARTICLE_STREAM_CONTRACTS.md.
+// Selected original ObjectDLL/ClientParticleStreamSFX.cpp. See particle_stream_contracts.md.
 #include "ClientParticleStreamSFX.h"
 using namespace OpenBlood2;
 bool CClientParticleStreamSFX::ReadProp()

@@ -1,4 +1,4 @@
-// Original CultistAI.cpp:269-332; see AI_STATE_CONTRACTS.md.
+// Original CultistAI.cpp:269-332; see ai_state_contracts.md.
 #include "CultistAI.h"
 #include <cmath>
 

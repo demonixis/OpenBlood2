@@ -1,5 +1,5 @@
 // Selected original Anim_Sound voice helpers and PlayerObj model-key sound path.
-// See docs/CHARACTER_AUDIO_CONTRACTS.md for preserved rules and unavailable callers.
+// See docs/character_audio_contracts.md for preserved rules and unavailable callers.
 #include "PlayerObj.h"
 #include <algorithm>
 #include <cmath>

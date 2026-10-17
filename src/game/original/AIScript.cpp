@@ -1,5 +1,5 @@
 // Selected AI_Mgr.cpp / AIScriptList.h commands and state dispatch.
-// See AI_SCRIPT_CONTRACTS.md: preparation does not emulate the missing AI_Update.
+// See ai_script_contracts.md: preparation does not emulate the missing AI_Update.
 #include "AI_Mgr.h"
 #include "engine/model_commands.h"
 #include <charconv>

@@ -1,7 +1,7 @@
 #pragma once
 #include "AI_Mgr.h"
 // Original decisions/attacks and production lifecycle; remaining action failures
-// are documented in AI_RUNTIME_CONTRACTS.md.
+// are documented in ai_runtime_contracts.md.
 class CultistAI : public AI_Mgr
 {
   public:

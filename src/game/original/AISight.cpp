@@ -1,5 +1,5 @@
 // Original AI_Mgr::CanSee and its GlobalFilterFn flags (Monolith, 1997/1998).
-// See AI_SIGHT_CONTRACTS.md for source scope, typed failures and geometry limits.
+// See ai_sight_contracts.md for source scope, typed failures and geometry limits.
 #include "AI_Mgr.h"
 namespace OpenBlood2
 {

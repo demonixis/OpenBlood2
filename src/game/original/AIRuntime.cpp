@@ -1,5 +1,5 @@
 // Selected original AI_Mgr construction/ReadProp/InitialUpdate/AI_Update and
-// CultistAI/CivilianAI construction/model/table initialization. See AI_RUNTIME_CONTRACTS.md.
+// CultistAI/CivilianAI construction/model/table initialization. See ai_runtime_contracts.md.
 #include "AI_Mgr.h"
 #include "CameraObj.h"
 #include "CivilianAI.h"

@@ -1,5 +1,5 @@
 // Selected original Destructable hit localization and AI_Mgr damage/recoil.
-// See AI_HIT_CONTRACTS.md for explicit service failures and safety adaptations.
+// See ai_hit_contracts.md for explicit service failures and safety adaptations.
 #include "AI_Mgr.h"
 #include "engine/collision.h"
 #include <cmath>
