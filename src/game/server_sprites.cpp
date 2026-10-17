@@ -31,7 +31,7 @@ namespace OpenBlood2
     } // namespace
     SegmentResult ServerAdapter::CastRay(DVector from, DVector direction, SegmentHit& out, HOBJECT ignore)
     {
-        trace_service("CastRay (solid world and objects)");
+        trace_service("CastRay");
         out = {};
         DVector to;
         const auto bound = ray_end(from, direction, to);

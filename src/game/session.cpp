@@ -62,6 +62,7 @@ namespace OpenBlood2
         collision = std::move(next.collision);
         server.collision_ready = true;
         server.service_calls.clear();
+        server.unavailable_history.clear();
         server.trace_enabled = true;
         world = std::move(next.world);
         world_path = request.filename;
@@ -204,6 +205,7 @@ namespace OpenBlood2
     }
     bool GameSession::pump_player_messages(std::string& error)
     {
+        ServiceTraceScope trace_scope(server.trace_enabled);
         if (objects.busy())
         {
             error = "Player message pump during object callback rejected";
@@ -323,6 +325,7 @@ namespace OpenBlood2
     }
     bool GameSession::leave_player()
     {
+        ServiceTraceScope trace_scope(server.trace_enabled);
         if (objects.busy())
             return false;
         pending_level_change.reset();
@@ -338,6 +341,7 @@ namespace OpenBlood2
     }
     bool GameSession::command_weapon(DBYTE slot, std::string& error)
     {
+        ServiceTraceScope trace_scope(server.trace_enabled);
         error.clear();
         auto* owner = server_shell.Player(local_client);
         // Original OnCommandOn dead/movement guard, then COMMAND_WEAPON_0..9.
@@ -356,6 +360,7 @@ namespace OpenBlood2
     }
     bool GameSession::select_weapon(DBYTE slot, std::string& error)
     {
+        ServiceTraceScope trace_scope(server.trace_enabled);
         error.clear();
         if (objects.busy())
         {
@@ -404,10 +409,9 @@ namespace OpenBlood2
         const auto missing =
             std::count_if(entries.begin(), entries.end(), [](const auto& e)
                           { return e.state == EntryState::Unsupported || e.state == EntryState::Failed; });
-        error = "RunWorld blocked: " + std::to_string(missing) +
-                " uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat "
-                "reactions, "
-                "audio, autosave and remaining mover classes remain unported";
+        error = "RunWorld acceptance gate not passed: " + std::to_string(missing) +
+                " uninstantiated required objects. Inspect Services for bounded implementation/trace coverage; "
+                "remaining required paths must pass M2 acceptance.";
         if (!entry_error.empty())
             error += "; player entry: " + entry_error;
         if (trace.empty() || trace.back() != error)

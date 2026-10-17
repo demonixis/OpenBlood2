@@ -21,6 +21,7 @@
 #include "game/player_restore.h"
 #include "game/polygrids.h"
 #include "game/projectile_report.h"
+#include "game/service_coverage.h"
 #include "game/session.h"
 #include "game/sparks.h"
 #include "game/weapon_sprites.h"
@@ -80,6 +81,7 @@ namespace OpenBlood2
         bool ScaleObject(HOBJECT, DVector) override;
         PathMgr* GetPathManager() override
         {
+            trace_service("GetPathManager");
             return ai_paths;
         }
         PathMgr* ai_paths = nullptr;
@@ -248,6 +250,13 @@ namespace OpenBlood2
         void set_game_settings(unsigned difficulty, unsigned game_type);
         std::map<std::string, std::uint64_t> service_calls;
         std::map<std::string, std::uint64_t> unavailable_services;
+        // Retained through teardown; cleared alongside service_calls on the next world load.
+        std::map<std::string, std::uint64_t> unavailable_history;
+        void record_unavailable(const std::string& reason)
+        {
+            ++unavailable_services[reason];
+            ++unavailable_history[reason];
+        }
         bool trace_enabled = false;
         void trace_service(const char* name)
         {

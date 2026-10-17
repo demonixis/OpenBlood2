@@ -1083,3 +1083,13 @@ Selected Weapon.cpp flags, WeaponFX.cpp flesh/metal recipes and SparksFX.cpp bur
 [NPC animation clearance](M2_AI_ANIMATION_CLEARANCE_SOURCES.json): correct the selective original SetAnimation adaptation; see [contracts](AI_ANIMATION_CLEARANCE_CONTRACTS.md).
 
 [Original NPC ammunition recovery](M2_AI_AMMO_SOURCES.json): FindAmmo phases and MID_ADDAMMO collection, with defined query/lifetime adaptations in [contracts](AI_AMMO_CONTRACTS.md).
+
+## Service coverage and lifecycle trace
+
+`service_coverage.{h,cpp}` and `service_catalog.inc` are new engine inspection code,
+not imported gameplay. The catalogue describes the existing bounded
+`legacy/server_de.h` surface, including its three explicit unsupported methods.
+Canonical instrumentation adds no original rules. Player restoration and exit
+now retain their real adapter calls through scoped tracing; unavailable history
+survives teardown. See [contracts](SERVICE_COVERAGE_CONTRACTS.md) and
+[execution evidence](../../Documentation/Implementation/M2_SERVICE_COVERAGE.md).

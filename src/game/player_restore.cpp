@@ -98,6 +98,7 @@ namespace OpenBlood2
     bool GameSession::restore_player(const PlayerRestoreState& s, std::string& error, PlayerRestoreMode mode,
                                      std::string_view start_name)
     {
+        ServiceTraceScope trace_scope(server.trace_enabled);
         error.clear();
         ++restoration.attempts;
         auto failed = [&]()

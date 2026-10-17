@@ -132,6 +132,7 @@ namespace OpenBlood2
     }
     void ServerAdapter::RecordProjectile(const ProjectileReport& report)
     {
+        trace_service("RecordProjectile");
         if (projectile_reports.size() == 64)
             projectile_reports.erase(projectile_reports.begin());
         projectile_reports.push_back(report);

@@ -48,6 +48,7 @@ namespace OpenBlood2
     }
     SoundId ServerAdapter::PlayClientSound(const SoundRequest& request, DVector position, std::string& error)
     {
+        trace_service("PlayClientSound");
         if (!client_resources || request.speaker || request.loop || request.streaming ||
             request.space != SoundSpace::Spatial)
         {

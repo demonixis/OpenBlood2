@@ -3,7 +3,7 @@ namespace OpenBlood2
 {
     bool ServerAdapter::SetSkyDefinition(const SkyDefinition& d)
     {
-        trace_service("SetSkyDef");
+        trace_service("SetSkyDefinition");
         if (sky.set(d))
             return true;
         ReportSkyFailure(sky.error);
@@ -11,7 +11,7 @@ namespace OpenBlood2
     }
     bool ServerAdapter::AddSkyObject(HOBJECT h, unsigned index)
     {
-        trace_service("AddObjectToSky");
+        trace_service("AddSkyObject");
         if (sky.add(objects_, h, index))
             return true;
         ReportSkyFailure(sky.error);
@@ -19,8 +19,9 @@ namespace OpenBlood2
     }
     void ServerAdapter::ReportSkyFailure(std::string_view message)
     {
+        trace_service("ReportSkyFailure");
         sky.error = message;
         objects_.fail(ObjectError::Unsupported, sky.error);
-        ++unavailable_services["Sky: " + sky.error];
+        record_unavailable("Sky: " + sky.error);
     }
 } // namespace OpenBlood2

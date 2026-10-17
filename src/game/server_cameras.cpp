@@ -38,7 +38,7 @@ namespace OpenBlood2
     }
     DRESULT ServerAdapter::AlignRotation(DRotation& rotation, DVector forward)
     {
-        trace_service("AlignRotation (world Y up)");
+        trace_service("AlignRotation");
         // Shared original +Y-up convention, with deterministic vertical fallback.
         return align_rotation(forward, rotation) ? DE_OK : DE_INVALIDPARAMS;
     }

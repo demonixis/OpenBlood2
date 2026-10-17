@@ -389,6 +389,7 @@ namespace
         inspector.world_render = &world_renderer.stats;
         if (options.keepalive_smoke)
             SAFE_STRCPY(inspector.keep_start_name, "01_egressa");
+        inspector.select_services = options.gpu_smoke;
         inspector.select_models =
             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
@@ -901,7 +902,14 @@ namespace
                                                        game->client_shell.view.object != nullptr));
 #if BLOOD2_INSPECTOR
             const bool inspector_was_visible = inspector_visible;
+            const auto coverage_before =
+                options.gpu_smoke ? game->server.service_calls : std::map<std::string, std::uint64_t>{};
             inspector.draw(config, data, inspector_visible, frames, *game, selection);
+            if (options.gpu_smoke && coverage_before != game->server.service_calls)
+            {
+                spdlog::error("Inspector mutated service coverage");
+                return 4;
+            }
             if (inspector_was_visible && !inspector_visible && game->client_shell.m_bInWorld && !smoke)
             {
                 controls.request_play(); // The window close button resumes just like F1.

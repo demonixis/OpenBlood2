@@ -248,8 +248,8 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     objective_messages = 0;
     objectives_resolved = false;
     messages = updates = 0;
-    blocker = "Locomotion/weapon inspection: remaining container/FX and mover classes, full combat, audio and "
-              "autosave remain unported";
+    blocker = "M2 acceptance remains open: see Services for bounded implementation/trace coverage. "
+              "Whole-world saves and unexercised gameplay paths are not validated.";
     return true;
 }
 void CBloodClientShell::OnExitWorld()

@@ -23,6 +23,7 @@ namespace OpenBlood2
         const WorldViewStats* sprite_render = nullptr;
         const WorldViewStats* world_render = nullptr;
         bool select_models = false;
+        bool select_services = false;
         bool select_skeleton = false;
         ObjectId skeleton_selection{};
         void draw_skeleton(GameSession&, ObjectSelection&);

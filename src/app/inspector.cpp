@@ -422,8 +422,8 @@ namespace OpenBlood2
         {
             ImGui::TextColored(ImVec4(0.95f, 0.48f, 0.43f, 1),
                                game.world_path.empty() ? "ORIGINAL OBJECT DIAGNOSTICS" : "M2  /  WORLD INSPECTION");
-            ImGui::TextWrapped("Original objects, ABC animation and primary-world collision. Full original player "
-                               "session remains blocked.");
+            ImGui::TextWrapped("Bounded original-code session, models and world collision. M2 acceptance remains "
+                               "incomplete; inspect observed service coverage in Services.");
             ImGui::PushTextWrapPos(0);
             ImGui::TextDisabled("Title arrow: fold/unfold | Drag borders: resize | F1: inspector | F3: mouse capture | "
                                 "Esc: release/quit");
@@ -995,9 +995,7 @@ namespace OpenBlood2
                         }
                         ImGui::TreePop();
                     }
-                    ImGui::SeparatorText("Reached engine services (original object callbacks / teardown)");
-                    for (const auto& [name, count] : game.server.service_calls)
-                        ImGui::Text("%s: %llu", name.c_str(), static_cast<unsigned long long>(count));
+                    ImGui::TextWrapped("Service coverage, including unexercised entries, is in the Services tab.");
                     for (const auto& diagnostic : game.objects.diagnostics())
                         ImGui::TextWrapped("%s", diagnostic.c_str());
                     ImGui::EndTabItem();
@@ -1013,8 +1011,9 @@ namespace OpenBlood2
                     draw_models(game);
                     ImGui::EndTabItem();
                 }
-                if (ImGui::BeginTabItem("Services"))
+                if (ImGui::BeginTabItem("Services", nullptr, select_services ? ImGuiTabItemFlags_SetSelected : 0))
                 {
+                    select_services = false;
                     draw_services(game);
                     ImGui::EndTabItem();
                 }
@@ -1818,6 +1817,42 @@ namespace OpenBlood2
     }
     void Inspector::draw_services(const GameSession& game)
     {
+        if (ImGui::CollapsingHeader("Service coverage", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::TextWrapped("Current world trace: loading, player entry/restore, updates and teardown. "
+                               "Counts are attempts, not successful results. Unexercised does not mean unsupported. "
+                               "This is the bounded port interface, not the full original SDK or client API.");
+            if (ImGui::BeginTable("Service coverage table", 4,
+                                  ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+                                  ImVec2(0, 260)))
+            {
+                ImGui::TableSetupColumn("Service");
+                ImGui::TableSetupColumn("Boundary");
+                ImGui::TableSetupColumn("Implementation");
+                ImGui::TableSetupColumn("Observed calls");
+                ImGui::TableHeadersRow();
+                for (const auto& row : service_coverage(game.server.service_calls))
+                {
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::TextUnformatted(row.name.c_str());
+                    ImGui::TableNextColumn();
+                    ImGui::TextUnformatted(service_boundary_name(row.boundary));
+                    ImGui::TableNextColumn();
+                    ImGui::TextUnformatted(service_support_name(row.support));
+                    ImGui::TableNextColumn();
+                    if (row.calls)
+                        ImGui::Text("%llu", static_cast<unsigned long long>(row.calls));
+                    else
+                        ImGui::TextUnformatted("Unexercised");
+                }
+                ImGui::EndTable();
+            }
+            for (const auto& [reason, count] : game.server.unavailable_history)
+                ImGui::TextWrapped("Unavailable request (%llu): %s", static_cast<unsigned long long>(count),
+                                   reason.c_str());
+        }
+
         ImGui::Text("Primary-world collision: %s / %zu triangles / %zu BVH nodes",
                     game.server.collision_ready ? "indexed" : "not loaded", game.collision.triangles(),
                     game.collision.nodes());
