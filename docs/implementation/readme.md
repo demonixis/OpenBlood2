@@ -30,3 +30,4 @@ the original log or patch.
 - [Legacy DLS pan compatibility](../../../Documentation/Implementation/m2_music_legacy_pan.md): all 38 Cabal region auditions, isolated original-dispatch evidence and explicit remaining music gaps.
 
 - [IMA pattern-note decoding](../../../Documentation/Implementation/m2_music_notes.md): original loader equivalence, 7,030 inspected note records and explicit remaining sequencing gaps.
+- [IMA band decoding and channel setup](../../../Documentation/Implementation/m2_music_bands.md): original executable equivalence and separate style/section inspection.

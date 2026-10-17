@@ -188,6 +188,14 @@ namespace
         CHECK(!catalog.assets.front().bank && !catalog.assets.front().bank_error.empty());
         CHECK(!catalog.assets[1].style && !catalog.assets[1].style_error.empty()); // Structural-only fake style.
 
+        CHECK(catalog.assets[1].bands && catalog.assets[1].bands->bands.empty() &&
+              catalog.assets[1].bands_error.empty());
+        const auto init_file = root / "Music/Test" / catalog.assets[1].filename;
+        CHECK(write(init_file, container("AASY", container("AABN", {}))));
+        catalog.inspect(root, props);
+        CHECK(catalog.assets[1].container_valid && !catalog.assets[1].bands && !catalog.assets[1].bands_error.empty());
+        CHECK(write(init_file, container("AASY", {})));
+        catalog.inspect(root, props);
         const auto initial = catalog.bytes_read;
         catalog.inspect(root, props);
         CHECK(catalog.bytes_read == initial);
@@ -283,11 +291,18 @@ namespace
             CHECK(bank.waves.size() == 35 && bank.instruments.size() == 14);
             const std::weak_ptr<const DlsBank> bank_lifetime = catalog.assets.front().bank;
             std::weak_ptr<const ImaStyle> style_lifetime;
+            const std::weak_ptr<const ImaBands> bands_lifetime = catalog.assets[1].bands;
             const ImaNote* first_note = nullptr;
             std::size_t style_index = 0, style_notes = 0;
             for (std::size_t i = 0; i < catalog.assets.size(); ++i)
             {
                 const auto& asset = catalog.assets[i];
+                if (asset.kind != MusicAssetKind::Instruments)
+                {
+                    CHECK(asset.bands && asset.bands_error.empty() && asset.bands->bands.size() == 1);
+                    std::array<ImaMidiSetup, 80> setup;
+                    CHECK(ima_band_setup(asset.bands->bands.front(), setup, error));
+                }
                 if (asset.kind != MusicAssetKind::Style)
                     continue;
                 CHECK(asset.style && asset.style_error.empty());
@@ -310,8 +325,9 @@ namespace
                   game.music_catalog.assets.front().bank->waves.front().samples.data() ==
                       samples); // No per-frame/UI-dependent file work.
             CHECK(catalog.assets[style_index].style.get() == style_lifetime.lock().get());
+            CHECK(!bands_lifetime.expired() && catalog.assets[1].bands.get() == bands_lifetime.lock().get());
             CHECK(game.unload_world() && game.music_catalog.assets.empty() && game.music_catalog.plan.requests.empty());
-            CHECK(bank_lifetime.expired() && style_lifetime.expired());
+            CHECK(bank_lifetime.expired() && style_lifetime.expired() && bands_lifetime.expired());
             CHECK(game.objects.snapshot().empty() && !game.server.message_count() && !game.server.string_count());
         }
         return true;

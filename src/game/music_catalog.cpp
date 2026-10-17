@@ -81,7 +81,7 @@ namespace OpenBlood2
         // Own all names. Never retain directory iterators, resource spans or game objects.
         auto requests = plan.requests;
         std::set<std::string> seen;
-        std::size_t reserved_bytes = 0, decoded_bytes = 0, decoded_notes = 0;
+        std::size_t reserved_bytes = 0, decoded_bytes = 0, decoded_notes = 0, decoded_bands = 0;
         for (std::size_t i = 0; i < requests.size(); ++i)
         {
             const auto request = requests[i];
@@ -133,6 +133,15 @@ namespace OpenBlood2
                             {
                                 decoded_notes += style->notes;
                                 record.style = std::move(style);
+                            }
+                        }
+                        if (record.container_valid && request.kind != MusicAssetKind::Instruments)
+                        {
+                            auto bands = std::make_shared<ImaBands>();
+                            if (read_ima_bands(bytes, request.kind, *bands, record.bands_error, 4096 - decoded_bands))
+                            {
+                                decoded_bands += bands->bands.size();
+                                record.bands = std::move(bands);
                             }
                         }
                         record.chunks = info.chunks.size();

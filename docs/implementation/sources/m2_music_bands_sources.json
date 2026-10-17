@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "43246c39bc5e9b592ff142316050c250f8e2ee07",
+  "status": "M2 incomplete; original IMA band data and setup plan, no music playback",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/IMUSIC25.DLL",
+      "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "band_loader_rva": "0x15fe",
+      "emulated_load_arithmetic_rvas": [
+        "0x16c2",
+        "0x17d3"
+      ],
+      "apply_rva": "0x1e9d",
+      "transpose_getter_rva": "0x1c10",
+      "volume_setter_rva": "0x186d",
+      "pan_setter_rva": "0x1902",
+      "use": "Read-only static examination and isolated bounded x86 load/apply probe. No native DLL loading, imported OS calls or binary bytes imported."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/Music.cpp",
+      "sha256": "1024e355e8da92ba670b96fc7cec5a57f301ea45e18f0a43f910a914f6e24ee0",
+      "use": "Original DLS/style request plan remains unchanged; collection labels do not drive file access."
+    }
+  ],
+  "observations": {
+    "synthetic_cases": 8,
+    "bands": 195,
+    "bands_by_kind": {
+      ".sec": 156,
+      ".sty": 39
+    },
+    "setup_events": 15600,
+    "event_sha256": "82ae83ed9de76b60b4c5546385d71041b71e58dc6e8952bc472e856b45ceb9da",
+    "event_fnv64": 7277285548350807734
+  },
+  "replacement_code": [
+    "Independent typed little-endian reader with owned data and exact installed header profile",
+    "Original patch flags/legacy fallback and ordered channel setup plan, with checked MIDI ranges",
+    "Immutable once-per-world band catalogue and read-only inspection"
+  ],
+  "deliberate_limits": [
+    "Only direct AABN children of AASE/AASY; nested bands remain opaque",
+    "ASCII terminated fixed labels; no collection loading or filename inference",
+    "Reader retains all numeric bits; setup refuses invalid MIDI controller/selected program values",
+    "No effective band selection, sequencer, MIDI send, DLS instrument resolution or new music playback",
+    "Names and collection resolution not emulated; optional Unicorn is not a project dependency"
+  ],
+  "target_sha256": {
+    "CMakeLists.txt": "157cf5057605ac0213976a53ef66f96a97be7538d82cee0e3030c5a3ceb95378",
+    "src/engine/ima_band.h": "c6c466c5570b1001b354a73ba154139972b7597f6f59256906600b7700160fed",
+    "src/engine/ima_band.cpp": "83b75c6e5b7a47f55a7b4e9f4ea2b1fe3b8f2aa8cbfaafe655788cca914ddf3b",
+    "src/game/music_catalog.h": "0a2af4ee6582d4bad556bdc7e5c8499f392027aec23692f2e77e495d1b26a8d0",
+    "src/game/music_catalog.cpp": "f647ac6aa6d491470038a7809f3b461ef8c42e8d95ef650407f56eb5b6a1f4d3",
+    "src/app/inspector_world_sounds.cpp": "7941069328bdc9d577c53abf0abd963d06994f73ae3d4e1a15e4099da7b1a47c",
+    "src/app/world_sound_smoke.cpp": "0e544468a55ba54751fef438b4193f4fe832ecf464b2ca91bb6b76f8999859d9",
+    "tests/ima_band_tests.cpp": "164fd3950ffa4ee47740c7a87a783905d42fe984d7856f3af81ae1409fa92835",
+    "tests/music_asset_tests.cpp": "9b05650ae84c0b35f8eaa6a581439faf3c6ed148cceb076ecc88225e9ff3eeac",
+    "tests/CMakeLists.txt": "a362ed637cb11b7fc45274eb34b2f36b682071cdf730a0f52720bf56165a9954"
+  }
+}

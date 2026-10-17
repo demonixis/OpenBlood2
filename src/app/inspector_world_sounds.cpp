@@ -140,7 +140,7 @@ namespace OpenBlood2
                                music.plan.directory.c_str(), music.plan.requests.size(), music.assets.size(),
                                music.bytes_read);
             ImGui::TextWrapped(
-                "Decoded IMA pattern note records and DLS sample/region data. Pattern "
+                "Decoded IMA bands/pattern notes and DLS sample/region data. Pattern "
                 "selection, curves, personality "
                 "records and playlist playback are not implemented. MUSIC commands "
                 "still report unsupported. Explicit DLS diagnostic notes above use the existing audio output.");
@@ -176,16 +176,77 @@ namespace OpenBlood2
                     ImGui::TextWrapped("%s", asset.error.empty() ? asset.style_reference.c_str() : asset.error.c_str());
                     if (!asset.style_error.empty())
                         ImGui::TextWrapped("IMA note decoding failed: %s", asset.style_error.c_str());
+                    if (!asset.bands_error.empty())
+                        ImGui::TextWrapped("IMA band decoding failed: %s", asset.bands_error.c_str());
                     if (!asset.bank_error.empty())
                         ImGui::TextWrapped("DLS decoding failed: %s", asset.bank_error.c_str());
                 }
                 ImGui::EndTable();
             }
         }
+        if (ImGui::TreeNode("IMA bands (data and setup only)"))
+        {
+            ImGui::TextWrapped("Style and section bands stay separate, in file order. Collection names are labels; "
+                               "no bank is loaded from them. Setup messages are planned, not played. "
+                               "Effective band selection and original MUSIC playback remain unavailable.");
+            for (const auto& asset : music.assets)
+            {
+                if (!asset.bands || !ImGui::TreeNode(asset.filename.c_str()))
+                    continue;
+                ImGui::Text("%zu direct bands", asset.bands->bands.size());
+                for (const auto& band : asset.bands->bands)
+                {
+                    ImGui::PushID(static_cast<int>(band.offset));
+                    if (ImGui::TreeNode("band", "%s (offset %u)", band.name.c_str(), band.offset))
+                    {
+                        ImGui::Text("Collection: %s | raw byte104 %d / byte105 %u", band.collection.c_str(),
+                                    band.byte104, band.byte105);
+                        std::array<ImaMidiSetup, 80> setup;
+                        std::string error;
+                        const bool valid = ima_band_setup(band, setup, error);
+                        if (!valid)
+                            ImGui::TextWrapped("Setup unavailable: %s", error.c_str());
+                        if (ImGui::BeginTable("channels", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+                        {
+                            for (const auto* label : {"Source -> MIDI", "Packed patch / raw bank", "Program / legacy",
+                                                      "Volume / pan / transpose", "Raw byte154"})
+                                ImGui::TableSetupColumn(label);
+                            ImGui::TableHeadersRow();
+                            for (unsigned i = 0; i < 16; ++i)
+                            {
+                                const auto& c = band.channels[i];
+                                ImGui::TableNextRow();
+                                ImGui::TableNextColumn();
+                                ImGui::Text("%u -> %u%s", i, (i + 4) & 15, i == 5 ? " percussion" : "");
+                                ImGui::TableNextColumn();
+                                ImGui::Text("%08x / %04x", ima_band_patch(c, !band.collection.empty(), i == 5), c.bank);
+                                ImGui::TableNextColumn();
+                                ImGui::Text("%u / %u", c.program, c.legacy_program);
+                                ImGui::TableNextColumn();
+                                ImGui::Text("%u / %u / %+d", c.volume, c.pan, c.transpose);
+                                ImGui::TableNextColumn();
+                                ImGui::Text("%u", c.byte154);
+                            }
+                            ImGui::EndTable();
+                        }
+                        if (valid && ImGui::TreeNode("Ordered setup messages (not sent)"))
+                        {
+                            for (const auto& event : setup)
+                                ImGui::Text("%02x %02x %02x", event.status, event.data1, event.data2);
+                            ImGui::TreePop();
+                        }
+                        ImGui::TreePop();
+                    }
+                    ImGui::PopID();
+                }
+                ImGui::TreePop();
+            }
+            ImGui::TreePop();
+        }
         if (ImGui::TreeNode("IMA pattern notes (data only)"))
         {
             ImGui::TextWrapped("File order and raw timing/variation/pitch fields; these are not final MIDI notes. "
-                               "Curves, header tails, bands and personality rules remain undecoded. No playback.");
+                               "Curves, header tails and personality rules remain undecoded. No playback.");
             for (const auto& asset : music.assets)
             {
                 if (!asset.style || !ImGui::TreeNode(asset.filename.c_str()))

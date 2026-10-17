@@ -660,3 +660,5 @@ The [legacy DLS pan continuation](../Documentation/Implementation/m2_music_legac
 
 
 The [IMA pattern-note continuation](../Documentation/Implementation/m2_music_notes.md) decodes the installed AASY pattern/grid/note profile with original-reader equivalence and read-only inspection. Read [contracts](docs/contracts/music_note_contracts.md); preserve record order, signed fields, opaque curves/header tails, bounded atomic failure and immutable world ownership. Decoded notes are not final MIDI events or successful MUSIC playback; sequencing, required services and the actual M2 gate remain open.
+
+The [IMA band continuation](../Documentation/Implementation/m2_music_bands.md) decodes original style/section channel records and prepares verified original-order controller/program messages. Read [contracts](docs/contracts/music_band_contracts.md); preserve packed flags, legacy fallback, signed transpose, direct scope, raw unknown fields and immutable ownership. Setup messages are not sent; effective band selection, sequencing and the actual M2 gate remain open.

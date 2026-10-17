@@ -23,3 +23,4 @@ Runtime test logs and measurements belong in the
 - [Legacy DLS pan source ledger](m2_music_legacy_pan_sources.json): installed binary observations, independent implementation and validation limits.
 
 - [IMA pattern notes](m2_music_notes_sources.json): independent reader, original binary identity and bounded loader probe.
+- [IMA bands](m2_music_bands_sources.json): independent reader/setup planner and original executable probe.

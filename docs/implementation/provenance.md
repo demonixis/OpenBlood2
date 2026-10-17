@@ -1224,3 +1224,15 @@ inputs to an unavailable sequencer, not final MIDI messages.
 See the [source ledger](sources/m2_music_notes_sources.json),
 [contracts](../contracts/music_note_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_notes.md).
+
+## IMA bands and channel setup
+
+Independent `src/engine/ima_band.*` decodes installed AABN records and prepares
+the original controller/program order. Read-only examination and isolated
+emulation of the external IMUSIC25.DLL loader/apply arithmetic establish packed
+patches, fallback and channel routing. No commercial binary/source is imported.
+The portable implementation adds explicit MIDI range checks, bounded owned data
+and immutable catalogue inspection. It does not load collections or play music.
+See [source ledger](sources/m2_music_bands_sources.json),
+[contracts](../contracts/music_band_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_bands.md).

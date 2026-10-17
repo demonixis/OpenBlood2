@@ -10,15 +10,27 @@ namespace OpenBlood2
         if (!music.error.empty() || music.assets.empty() || !music.assets.front().bank ||
             !music.assets.front().bank_error.empty())
             return false;
-        std::size_t pattern_notes = 0;
+        std::size_t pattern_notes = 0, band_count = 0;
         for (const auto& asset : music.assets)
+        {
+            if (asset.kind != MusicAssetKind::Instruments)
+            {
+                if (!asset.bands || !asset.bands_error.empty() || asset.bands->bands.size() != 1)
+                    return false;
+                std::array<ImaMidiSetup, 80> setup;
+                std::string error;
+                if (!ima_band_setup(asset.bands->bands.front(), setup, error) || setup[25].status != 0xb9)
+                    return false;
+                ++band_count;
+            }
             if (asset.kind == MusicAssetKind::Style)
             {
                 if (!asset.style || !asset.style_error.empty())
                     return false;
                 pattern_notes += asset.style->notes;
             }
-        if (pattern_notes != 3049)
+        }
+        if (pattern_notes != 3049 || band_count != 44)
             return false;
         const auto& bank = *music.assets.front().bank;
         if (bank.instruments.size() != 14 || bank.waves.size() != 35 || bank.decoded_bytes != 913403 * sizeof(float) ||
