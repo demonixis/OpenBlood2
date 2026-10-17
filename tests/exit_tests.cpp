@@ -47,7 +47,7 @@ namespace
         CHECK(send(g, t->m_hObject, relay) && t->attempts == 1 && t->deliveries == 1 && !t->active);
         std::string error;
         CHECK(g.pump_player_messages(error) && g.client_shell.world_exit.received == 1);
-        CHECK(!g.client_shell.world_exit.error.empty() && g.client_shell.world_exit.blocked == 0);
+        CHECK(!g.client_shell.world_exit.error.empty() && g.client_shell.world_exit.queued == 0);
         CHECK(g.client_shell.m_bInWorld && g.server_shell.start_point_name == "start");
         CHECK(send(g, t->m_hObject, relay) && t->attempts == 1); // Source zero reset stays inactive.
         CHECK(create(g, {{"EndEpisode", true}})->exit.type == WorldExitType::World);
@@ -71,10 +71,10 @@ namespace
         // Each virtual dispatch emits the whole exit, without named dispatch.
         CHECK(t->attempts == 1 && t->deliveries == 1 && t->slots[0].pending && t->slots[2].pending);
         std::string error;
-        CHECK(g.pump_player_messages(error) && g.client_shell.world_exit.blocked == 1);
+        CHECK(g.pump_player_messages(error) && g.client_shell.world_exit.queued == 1);
         CHECK(g.step(.1) && t->attempts == 1 && g.step(.11) && t->attempts == 2);
-        CHECK(g.client_shell.world_exit.blocked == 2 && !t->active && !t->slots[0].pending && t->slots[2].pending);
-        CHECK(g.step(.21) && t->attempts == 3 && g.client_shell.world_exit.blocked == 3 && !t->slots[2].pending);
+        CHECK(g.client_shell.world_exit.queued == 2 && !t->active && !t->slots[0].pending && t->slots[2].pending);
+        CHECK(g.step(.21) && t->attempts == 3 && g.client_shell.world_exit.queued == 3 && !t->slots[2].pending);
         CHECK(g.step(.1) && t->attempts == 3 && !t->active);
         return true;
     }
@@ -114,15 +114,15 @@ namespace
         CHECK(g.server.SendWorldExit({"next", WorldExitType::Subworld}, "arrival") == DE_OK);
         CHECK(g.client_shell.world_exit.received == 0 && g.pump_player_messages(error));
         const auto& exit = g.client_shell.world_exit;
-        CHECK(exit.received == 1 && exit.blocked == 1 && !exit.pending && exit.request.type == WorldExitType::Subworld);
+        CHECK(exit.received == 1 && exit.queued == 1 && !exit.pending && exit.request.type == WorldExitType::Subworld);
         CHECK(exit.load.bytes == load.bytes && exit.load.id == CMSG_LOADWORLD);
-        CHECK(exit.error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos);
+        CHECK(!exit.error.empty());
         CHECK(g.objects.snapshot() == ids && g.world_revision == before_revision && g.world_path == before_path);
         CHECK(g.local_client == before_client && g.client_shell.player == player->m_hObject);
         CHECK(player->m_damage.m_fHitPoints == 73 && player->m_InventoryMgr.GetAmmoCount(1) == bullets);
         CHECK(!g.client_shell.m_bFirstWorld && g.client_shell.m_bInWorld &&
               g.server_shell.start_point_name == "arrival");
-        CHECK(g.step(.016) && g.client_shell.world_exit.blocked == 1);
+        CHECK(g.step(.016) && g.client_shell.world_exit.queued == 1);
         return true;
     }
     bool dead(const std::filesystem::path& root)
@@ -137,7 +137,7 @@ namespace
         CHECK(g.pump_player_messages(error));
         CHECK(g.client_shell.world_exit.received == 1 && g.client_shell.world_exit.ignored_dead == 1);
         CHECK(g.client_shell.world_exit.request.next_world.empty() && g.client_shell.world_exit.load.bytes.empty());
-        CHECK(g.client_shell.world_exit.blocked == 0 && g.client_shell.world_exit.error.empty());
+        CHECK(g.client_shell.world_exit.queued == 0 && g.client_shell.world_exit.error.empty());
         CHECK(g.server_shell.start_point_name == "dead-arrival" && g.client_shell.player == player->m_hObject);
         return true;
     }
@@ -156,10 +156,10 @@ namespace
         CHECK(g.server_shell.start_point_name == "copied-before-failed-send");
         std::string error;
         CHECK(g.pump_player_messages(error));
-        CHECK(g.client_shell.world_exit.received == 256 && g.client_shell.world_exit.blocked == 256);
+        CHECK(g.client_shell.world_exit.received == 256 && g.client_shell.world_exit.queued == 256);
         CHECK(g.server.SendToClient(g.local_client, WorldExit{"next", static_cast<WorldExitType>(255)}) ==
               DE_INVALIDPARAMS);
-        CHECK(g.client_shell.m_bInWorld && g.client_shell.world_exit.error.find("KeepAliveSave") != std::string::npos);
+        CHECK(g.client_shell.m_bInWorld && g.pending_level_change.has_value());
         return true;
     }
     bool lifetime(const std::filesystem::path& root)
@@ -229,7 +229,7 @@ namespace
             }
             CHECK(exits == 1);
             CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11);
-            CHECK(g.client_shell.world_exit.received == 1 && g.client_shell.world_exit.blocked == 1);
+            CHECK(g.client_shell.world_exit.received == 1 && g.client_shell.world_exit.queued == 1);
             CHECK(g.world_path == "worlds/01_subwaya.dat" && g.client_shell.m_bInWorld);
             CHECK(!g.run_world(error) && error.find("0 uninstantiated") != std::string::npos);
             CHECK(g.unload_world() && g.server.string_count() == 0 && g.objects.snapshot().empty());

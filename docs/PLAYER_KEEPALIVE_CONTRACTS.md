@@ -1,5 +1,10 @@
 # Named keep-alive player entry
 
+> Current continuation: [safe NEW_LEVEL](LEVEL_CHANGE_CONTRACTS.md) promotes a fully prepared
+> destination with the supported player, or retains the source on failure. Earlier
+> blanket transfer omissions below are historical; each standalone diagnostic API
+> retains its documented scope. CityHub and full M2 acceptance remain incomplete.
+
 This extends [player restoration](PLAYER_RESTORE_CONTRACTS.md) with the original
 new-level entry branch **into an already loaded destination**. It is not an
 accepted ExitTrigger/NEW_LEVEL transaction, a retail Keep.sav implementation or a

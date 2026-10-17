@@ -104,3 +104,8 @@ It isolates the current original globals, destroys the temporary session and res
 Ordinary second-session binding remains forbidden; no automatic transfer or completed M2 acceptance is claimed.
 
 The [Gideon fade/teleport continuation](GIDEON_TELEPORT_CONTRACTS.md) adds checked live-model RGBA storage with the SDK black/opaque default and actual alpha presentation. Additive RGB shading remains unavailable. Supported player engine snapshots preserve these fields; non-model color mutation rejects.
+
+The [NEW_LEVEL transaction](LEVEL_CHANGE_CONTRACTS.md) extends synchronous isolation
+to ownership promotion. Source and destination destructors run under their own
+adapter and original globals. Ordinary concurrent sessions remain forbidden;
+clear old ObjectIds/input at promotion and never move a GameSession.

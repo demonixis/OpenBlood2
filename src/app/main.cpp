@@ -80,8 +80,9 @@ namespace
                      OpenBlood2::build::sdl_revision, SDL_GetCurrentVideoDriver(), SDL_GetGPUDeviceDriver(runtime.gpu));
         spdlog::info("GPU device: {}", SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu),
                                                              SDL_PROP_GPU_DEVICE_NAME_STRING, "unreported"));
-        OpenBlood2::GameSession game;
-        if (!game.initialize())
+        auto game_owner = std::make_unique<OpenBlood2::GameSession>();
+        auto* game = game_owner.get();
+        if (!game->initialize())
         {
             spdlog::error("Original game boundary initialization failed");
             return 4;
@@ -89,7 +90,7 @@ namespace
         if ((options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
              options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke ||
              (!options.gpu_smoke && !options.world_smoke)) &&
-            !game.server.audio.open_output(error))
+            !game->server.audio.open_output(error))
         {
             spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
             if (options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
@@ -100,48 +101,48 @@ namespace
         OpenBlood2::ObjectSelection selection;
         if (options.gpu_smoke)
         {
-            game.create_example("CameraSpot");
-            key = game.create_example("Key");
+            game->create_example("CameraSpot");
+            key = game->create_example("Key");
             if (!key)
                 return 4;
-            selection.id = game.objects.get(key)->id;
+            selection.id = game->objects.get(key)->id;
         }
         else
         {
-            if (!game.resources.mount_game(config, error) || !game.request_world(options.world, error))
+            if (!game->resources.mount_game(config, error) || !game->request_world(options.world, error))
             {
                 spdlog::error("World inspection load failed: {}", error);
                 return 5;
             }
-            for (const auto& entry : game.entries)
+            for (const auto& entry : game->entries)
                 if (entry.object)
                 {
                     selection.id = entry.object;
                     break;
                 }
-            spdlog::info("DAT v{}: {} source objects, {} original instances, {} BSP models", game.world.version,
-                         game.world.objects.size(), game.objects.snapshot().size(), game.world.models.size());
+            spdlog::info("DAT v{}: {} source objects, {} original instances, {} BSP models", game->world.version,
+                         game->world.objects.size(), game->objects.snapshot().size(), game->world.models.size());
             if (options.player_smoke || options.view_world)
             {
-                if (!game.enter_player(error))
+                if (!game->enter_player(error))
                 {
                     spdlog::error("Player entry: {}", error);
                     return 6;
                 }
                 if ((options.weapons_smoke || options.movement_smoke || options.interaction_smoke ||
                      options.pickups_smoke) &&
-                    !OpenBlood2::finish_camera_intro_for_smoke(game))
+                    !OpenBlood2::finish_camera_intro_for_smoke(*game))
                 {
                     spdlog::error("Authored intro camera did not release player control");
                     return 4;
                 }
-                if (options.viewport_smoke && !OpenBlood2::check_gideon_intro_smoke(game, "initial"))
+                if (options.viewport_smoke && !OpenBlood2::check_gideon_intro_smoke(*game, "initial"))
                     return 4;
                 if (options.restore_smoke)
                 {
                     if (options.keepalive_smoke)
                     {
-                        auto* p = game.server_shell.Player(game.local_client);
+                        auto* p = game->server_shell.Player(game->local_client);
                         p->m_damage.SetHitPoints(73);
                         p->m_InventoryMgr.SetAmmoCount(1, 17);
                         if (p->m_InventoryMgr.AddKey({"keep-probe", "Diagnostic key", "icon", "selected", 1}) !=
@@ -149,20 +150,20 @@ namespace
                             return 6;
                     }
                     OpenBlood2::PlayerRestoreState saved;
-                    if (!game.capture_player(saved, error) || !game.leave_player() ||
-                        !game.request_world(options.keepalive_smoke ? "02_cityhub" : options.world, error) ||
-                        !game.restore_player(saved, error,
-                                             options.keepalive_smoke ? OpenBlood2::PlayerRestoreMode::KeepAlive
-                                                                     : OpenBlood2::PlayerRestoreMode::SavedPosition,
-                                             options.keepalive_smoke ? "01_egressa" : ""))
+                    if (!game->capture_player(saved, error) || !game->leave_player() ||
+                        !game->request_world(options.keepalive_smoke ? "02_cityhub" : options.world, error) ||
+                        !game->restore_player(saved, error,
+                                              options.keepalive_smoke ? OpenBlood2::PlayerRestoreMode::KeepAlive
+                                                                      : OpenBlood2::PlayerRestoreMode::SavedPosition,
+                                              options.keepalive_smoke ? "01_egressa" : ""))
                     {
                         spdlog::error("Restored player entry: {}", error);
                         return 6;
                     }
-                    game.restoration.saved = std::move(saved);
-                    ++game.restoration.captures;
+                    game->restoration.saved = std::move(saved);
+                    ++game->restoration.captures;
                 }
-                selection.id = game.objects.get(game.client_shell.player)->id;
+                selection.id = game->objects.get(game->client_shell.player)->id;
             }
         }
         OpenBlood2::ObjectId smoke_door{}, smoke_trigger{};
@@ -171,19 +172,19 @@ namespace
         bool door_moved_hidden = false;
         if (options.doors_smoke)
         {
-            for (auto id : game.objects.snapshot())
+            for (auto id : game->objects.snapshot())
             {
-                auto* r = game.objects.get(id);
+                auto* r = game->objects.get(id);
                 const auto* door = dynamic_cast<const Door*>(r->game.get());
                 if (door && door->speed > 0 && door->move_dist > 0 && door->open_delay < .05f)
                 {
                     smoke_door = selection.id = id;
-                    auto text = game.server.CreateString("TRIGGER");
-                    auto message = game.server.StartMessageToObject(nullptr, r->handle, 1000);
-                    if (!message || game.server.WriteToMessageHString(message, text) != DE_OK ||
-                        game.server.EndMessage(message) != DE_OK)
+                    auto text = game->server.CreateString("TRIGGER");
+                    auto message = game->server.StartMessageToObject(nullptr, r->handle, 1000);
+                    if (!message || game->server.WriteToMessageHString(message, text) != DE_OK ||
+                        game->server.EndMessage(message) != DE_OK)
                         return 4;
-                    game.server.FreeString(text);
+                    game->server.FreeString(text);
                     break;
                 }
             }
@@ -192,7 +193,7 @@ namespace
         }
         if (options.triggers_smoke)
         {
-            if (!OpenBlood2::prepare_trigger_smoke(game, smoke_door, smoke_trigger))
+            if (!OpenBlood2::prepare_trigger_smoke(*game, smoke_door, smoke_trigger))
             {
                 spdlog::error("Trigger smoke preparation failed");
                 return 4;
@@ -201,7 +202,7 @@ namespace
         }
         if (options.interaction_smoke)
         {
-            if (!OpenBlood2::prepare_interaction_smoke(game, smoke_door))
+            if (!OpenBlood2::prepare_interaction_smoke(*game, smoke_door))
                 return 4;
             selection.id = smoke_door;
         }
@@ -209,7 +210,7 @@ namespace
         bool brush_hidden = false;
         if (options.brushes_smoke)
         {
-            if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
+            if (!OpenBlood2::prepare_brush_smoke(*game, smoke_brush, smoke_explosion, smoke_body))
                 return 4;
             selection.id = smoke_brush;
         }
@@ -217,7 +218,7 @@ namespace
         bool pickup_hidden = false, objective_hidden = false;
         if (options.pickups_smoke)
         {
-            if (!OpenBlood2::prepare_pickup_smoke(game, smoke_pickup))
+            if (!OpenBlood2::prepare_pickup_smoke(*game, smoke_pickup))
                 return 4;
             selection.id = smoke_pickup;
         }
@@ -225,19 +226,19 @@ namespace
         bool camera_hidden = false;
         if (options.cameras_smoke)
         {
-            if (!OpenBlood2::prepare_camera_smoke(game, smoke_camera))
+            if (!OpenBlood2::prepare_camera_smoke(*game, smoke_camera))
                 return 4;
             selection.id = smoke_camera;
         }
         OpenBlood2::ObjectId smoke_scene_explosion{};
         bool scene_explosion_hidden = false;
-        if (options.scene_explosions_smoke && !OpenBlood2::prepare_scene_explosion_smoke(game, smoke_scene_explosion))
+        if (options.scene_explosions_smoke && !OpenBlood2::prepare_scene_explosion_smoke(*game, smoke_scene_explosion))
             return 4;
         OpenBlood2::ObjectId smoke_random_sound{};
         bool random_sound_hidden = false, world_sound_hidden = false, sprite_hidden = false;
         if (options.random_sounds_smoke)
         {
-            if (!OpenBlood2::prepare_random_sound_smoke(game, smoke_random_sound))
+            if (!OpenBlood2::prepare_random_sound_smoke(*game, smoke_random_sound))
                 return 4;
             selection.id = smoke_random_sound;
         }
@@ -245,7 +246,7 @@ namespace
         bool cinematic_hidden = false;
         if (options.cinematics_smoke)
         {
-            if (!OpenBlood2::prepare_cinematic_smoke(game, smoke_cinematic))
+            if (!OpenBlood2::prepare_cinematic_smoke(*game, smoke_cinematic))
                 return 4;
             selection.id = smoke_cinematic;
         }
@@ -253,7 +254,7 @@ namespace
         bool light_hidden = false;
         if (options.lights_smoke)
         {
-            if (!OpenBlood2::prepare_light_smoke(game, smoke_light))
+            if (!OpenBlood2::prepare_light_smoke(*game, smoke_light))
                 return 4;
             selection.id = smoke_light;
         }
@@ -261,52 +262,52 @@ namespace
         bool keyframe_hidden = false;
         if (options.keyframes_smoke)
         {
-            if (!OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe, options.worldpaths_smoke))
+            if (!OpenBlood2::prepare_keyframe_smoke(*game, smoke_keyframe, options.worldpaths_smoke))
                 return 4;
             selection.id = smoke_keyframe;
         }
         // Compare reload lifetime at the same phase: original controllers copy
         // and consume their Key objects on the first normal simulation update.
-        if (options.world_smoke && !game.step(1.0 / 60))
+        if (options.world_smoke && !game->step(1.0 / 60))
             return 4;
         OpenBlood2::ObjectId smoke_motion{};
         bool character_motion_hidden = false;
-        if (options.skeleton_smoke && !OpenBlood2::prepare_character_motion_smoke(game, smoke_motion))
+        if (options.skeleton_smoke && !OpenBlood2::prepare_character_motion_smoke(*game, smoke_motion))
             return 4;
         const auto original_motion = smoke_motion;
         OpenBlood2::ObjectId smoke_ai_key{};
         bool ai_key_hidden = false;
-        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
+        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_model_key_smoke(*game, smoke_ai_key))
             return 4;
         const auto original_ai_key = smoke_ai_key;
         OpenBlood2::ObjectId smoke_ai_state{};
         bool ai_state_hidden = false;
-        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_state_smoke(game, smoke_ai_state))
+        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_state_smoke(*game, smoke_ai_state))
             return 4;
         const auto original_ai_state = smoke_ai_state;
         OpenBlood2::ObjectId smoke_ai_fire{};
         bool ai_fire_hidden = false;
-        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_fire_smoke(game, smoke_ai_fire))
+        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_fire_smoke(*game, smoke_ai_fire))
             return 4;
         const auto original_ai_fire = smoke_ai_fire;
         OpenBlood2::ObjectId smoke_ai_follow{};
         bool ai_follow_hidden = false;
-        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
+        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_follow_smoke(*game, smoke_ai_follow))
             return 4;
         const auto original_ai_follow = smoke_ai_follow;
         OpenBlood2::ObjectId smoke_ai_escape{};
         bool ai_escape_hidden = false;
-        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_escape_smoke(game, smoke_ai_escape))
+        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_escape_smoke(*game, smoke_ai_escape))
             return 4;
         const auto original_ai_escape = smoke_ai_escape;
         OpenBlood2::ObjectId smoke_corpse{};
         bool corpse_hidden = false, corpse_drawn = false;
-        if (options.skeleton_smoke && !OpenBlood2::prepare_corpse_smoke(game, smoke_corpse))
+        if (options.skeleton_smoke && !OpenBlood2::prepare_corpse_smoke(*game, smoke_corpse))
             return 4;
         const auto original_corpse = smoke_corpse;
         OpenBlood2::ObjectId smoke_ai_runtime{};
         if (options.skeleton_smoke)
-            OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
+            OpenBlood2::check_ai_runtime_smoke(*game, smoke_ai_runtime);
         const auto original_ai_runtime = smoke_ai_runtime;
         bool ai_runtime_hidden = false;
         bool ai_sight_hidden = false;
@@ -315,33 +316,33 @@ namespace
         HATTACHMENT old_hand = 0;
         auto check_hand = [&]()
         {
-            const auto* player = game.server_shell.Player(game.local_client);
+            const auto* player = game->server_shell.Player(game->local_client);
             const auto* w = player ? player->m_InventoryMgr.CurrentWeapon() : nullptr;
-            const auto* child = w ? game.objects.get(w->m_hHandModel) : nullptr;
+            const auto* child = w ? game->objects.get(w->m_hHandModel) : nullptr;
             if (!w || !child || child->life != OpenBlood2::Life::Alive || !child->model)
                 return false;
             DVector node;
             DRotation rotation;
-            return game.server.GetModelNodeTransform(player->m_hObject, "r_gun", &node, &rotation) &&
+            return game->server.GetModelNodeTransform(player->m_hObject, "r_gun", &node, &rotation) &&
                    std::abs(node.x - child->state.m_Pos.x) < .001f && std::abs(node.y - child->state.m_Pos.y) < .001f &&
                    std::abs(node.z - child->state.m_Pos.z) < .001f && child->attachment == w->m_hHandAttachment &&
                    child->attachment != 0;
         };
-        const bool path_smoke = options.player_smoke && game.world_path == "worlds/01_subwaya.dat";
+        const bool path_smoke = options.player_smoke && game->world_path == "worlds/01_subwaya.dat";
         PathList smoke_paths;
         bool paths_hidden = false;
-        if (path_smoke && !OpenBlood2::prepare_path_manager_smoke(game, smoke_paths))
+        if (path_smoke && !OpenBlood2::prepare_path_manager_smoke(*game, smoke_paths))
             return 4;
         bool interaction_hidden = false;
         const auto original_selection = selection.id;
-        const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
+        const bool conveyor_smoke = options.containers_smoke && game->world_path == "worlds/01_subwaya.dat";
         bool selection_cleared = false, world_unloaded = false;
-        const auto initial_objects = game.objects.snapshot().size(), initial_strings = game.server.string_count();
+        const auto initial_objects = game->objects.snapshot().size(), initial_strings = game->server.string_count();
         auto smoke_object_counts = [&]()
         {
             std::map<std::string, int> counts;
-            for (auto id : game.objects.snapshot())
-                if (const auto* r = game.objects.get(id))
+            for (auto id : game->objects.snapshot())
+                if (const auto* r = game->objects.get(id))
                     ++counts[std::string(r->type->name) + ":" + r->state.m_Name];
             return counts;
         };
@@ -439,7 +440,7 @@ namespace
         controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
         controls.mouse_requested = options.view_world && !smoke;
         std::string mouse_error;
-        auto* initial_controlled = game.objects.get(game.client_shell.player);
+        auto* initial_controlled = game->objects.get(game->client_shell.player);
         auto controlled_player = initial_controlled ? initial_controlled->id : OpenBlood2::ObjectId{};
         DVector hidden_position{};
         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
@@ -494,7 +495,7 @@ namespace
                     if (event.key.key == SDLK_F1)
                     {
                         inspector_visible = !inspector_visible;
-                        if (!inspector_visible && game.client_shell.m_bInWorld && !smoke)
+                        if (!inspector_visible && game->client_shell.m_bInWorld && !smoke)
                         {
                             controls.request_play();
                             inspector.keyboard_movement = controls.enabled;
@@ -521,70 +522,70 @@ namespace
             const auto tick = SDL_GetTicksNS();
             const double delta = smoke ? 1.0 / 60.0 : static_cast<double>(tick - previous_tick) / 1e9;
             previous_tick = tick;
-            game.client_shell.movement_input = {};
-            game.client_shell.weapon_input = {};
+            game->client_shell.movement_input = {};
+            game->client_shell.weapon_input = {};
             bool text_editing = false;
 #if BLOOD2_INSPECTOR
-            inspector.apply_commands(game, selection);
+            inspector.apply_commands(*game, selection);
             controls.enabled = inspector.keyboard_movement;
             text_editing = inspector_visible && !inspector.collapsed && ImGui::GetIO().WantTextInput;
 #endif
             if (frames == reload_frame + 1 &&
                 (options.weapons_smoke || options.movement_smoke || options.interaction_smoke ||
                  options.pickups_smoke) &&
-                !OpenBlood2::finish_camera_intro_for_smoke(game))
+                !OpenBlood2::finish_camera_intro_for_smoke(*game))
                 return 4;
             if (frames == reload_frame + 1 && options.viewport_smoke &&
-                !OpenBlood2::check_gideon_intro_smoke(game, "reload"))
+                !OpenBlood2::check_gideon_intro_smoke(*game, "reload"))
                 return 4;
             if (options.interaction_smoke && frames == reload_frame + 1)
-                if (!OpenBlood2::prepare_interaction_smoke(game, smoke_door))
+                if (!OpenBlood2::prepare_interaction_smoke(*game, smoke_door))
                     return 4;
             if (options.brushes_smoke && frames == reload_frame + 1)
-                if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
+                if (!OpenBlood2::prepare_brush_smoke(*game, smoke_brush, smoke_explosion, smoke_body))
                     return 4;
             if (options.scene_explosions_smoke && frames == reload_frame + 1)
             {
-                if (!OpenBlood2::prepare_scene_explosion_smoke(game, smoke_scene_explosion) ||
-                    !OpenBlood2::activate_scene_explosion_smoke(game, smoke_scene_explosion) || !game.step(.11))
+                if (!OpenBlood2::prepare_scene_explosion_smoke(*game, smoke_scene_explosion) ||
+                    !OpenBlood2::activate_scene_explosion_smoke(*game, smoke_scene_explosion) || !game->step(.11))
                     return 4;
             }
             if (options.random_sounds_smoke && frames == reload_frame + 1 &&
-                !OpenBlood2::prepare_random_sound_smoke(game, smoke_random_sound))
+                !OpenBlood2::prepare_random_sound_smoke(*game, smoke_random_sound))
                 return 4;
             if (options.cinematics_smoke && frames == reload_frame + 1 &&
-                !OpenBlood2::prepare_cinematic_smoke(game, smoke_cinematic))
+                !OpenBlood2::prepare_cinematic_smoke(*game, smoke_cinematic))
                 return 4;
             if (options.lights_smoke && frames == reload_frame + 1 &&
-                !OpenBlood2::prepare_light_smoke(game, smoke_light))
+                !OpenBlood2::prepare_light_smoke(*game, smoke_light))
                 return 4;
             if (options.keyframes_smoke && frames == reload_frame + 1 &&
-                !OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe, options.worldpaths_smoke))
+                !OpenBlood2::prepare_keyframe_smoke(*game, smoke_keyframe, options.worldpaths_smoke))
                 return 4;
             if (options.cameras_smoke && frames == reload_frame + 1 &&
-                !OpenBlood2::prepare_camera_smoke(game, smoke_camera))
+                !OpenBlood2::prepare_camera_smoke(*game, smoke_camera))
                 return 4;
-            if (options.objectives_smoke && frames == reload_frame + 1 && !OpenBlood2::objective_smoke(game))
+            if (options.objectives_smoke && frames == reload_frame + 1 && !OpenBlood2::objective_smoke(*game))
                 return 4;
             if (options.pickups_smoke && frames == reload_frame + 1)
-                if (!OpenBlood2::prepare_pickup_smoke(game, smoke_pickup))
+                if (!OpenBlood2::prepare_pickup_smoke(*game, smoke_pickup))
                     return 4;
-            const auto* controlled = game.objects.get(game.client_shell.player);
+            const auto* controlled = game->objects.get(game->client_shell.player);
             const auto current_player = controlled ? controlled->id : OpenBlood2::ObjectId{};
             if (current_player != controlled_player)
             {
                 controls.player_changed(current_player && !smoke);
                 controlled_player = current_player;
-                game.client_shell.weapon_input = {};
+                game->client_shell.weapon_input = {};
             }
 #if BLOOD2_INSPECTOR
-            if (std::exchange(inspector.play_request, false) && game.client_shell.m_bInWorld)
+            if (std::exchange(inspector.play_request, false) && game->client_shell.m_bInWorld)
                 controls.request_play();
             // Explicit play actions also restore controls disabled through F2/UI.
             inspector.keyboard_movement = controls.enabled;
 #endif
             const bool was_captured = controls.mouse_captured;
-            if (!controls.sync_mouse(runtime.window, game.client_shell.m_bInWorld, text_editing, mouse_error))
+            if (!controls.sync_mouse(runtime.window, game->client_shell.m_bInWorld, text_editing, mouse_error))
                 spdlog::error("Mouse capture: {}", mouse_error);
             if (was_captured != controls.mouse_captured)
                 spdlog::info("Player mouse: {} ({})",
@@ -600,14 +601,14 @@ namespace
             (void)was_captured;
 #endif
             const auto fire_buttons = controls.sample_fire(text_editing);
-            game.client_shell.weapon_input.primary |= fire_buttons.primary;
-            game.client_shell.weapon_input.alternate |= fire_buttons.alternate;
+            game->client_shell.weapon_input.primary |= fire_buttons.primary;
+            game->client_shell.weapon_input.alternate |= fire_buttons.alternate;
             if (!controls.focused && !smoke)
-                game.client_shell.weapon_input = {};
-            game.client_shell.use_down = controls.sample_use(text_editing);
-            game.client_shell.medkit_down = controls.sample_medkit(text_editing);
+                game->client_shell.weapon_input = {};
+            game->client_shell.use_down = controls.sample_use(text_editing);
+            game->client_shell.medkit_down = controls.sample_medkit(text_editing);
             auto keyboard = controls.sample(text_editing);
-            auto& movement = game.client_shell.movement_input;
+            auto& movement = game->client_shell.movement_input;
             movement.forward |= keyboard.forward;
             movement.backward |= keyboard.backward;
             movement.left |= keyboard.left;
@@ -617,7 +618,7 @@ namespace
             movement.crouch |= keyboard.crouch;
             if (!controls.focused && !smoke)
                 movement = {};
-            controls.look(game.client_shell.rotation, delta, text_editing);
+            controls.look(game->client_shell.rotation, delta, text_editing);
             if (options.movement_smoke)
             {
                 if (frames == 45 || frames == 100 || frames == 170 || frames == 185)
@@ -629,9 +630,9 @@ namespace
                 crouch_frames += movement.crouch;
                 run_frames += movement.run;
             }
-            if (options.weapons_smoke && game.local_client)
+            if (options.weapons_smoke && game->local_client)
             {
-                if (frames == 60 && !game.select_weapon(0, error))
+                if (frames == 60 && !game->select_weapon(0, error))
                 {
                     spdlog::error("{}", error);
                     return 6;
@@ -640,15 +641,15 @@ namespace
             }
             if (options.containers_smoke && frames == 2)
             {
-                auto* player = game.server_shell.Player(game.local_client);
+                auto* player = game->server_shell.Player(game->local_client);
                 DVector position = conveyor_smoke ? DVector{-32, 80.001f, 0} : DVector{0, 80, 0};
                 DVector dimensions;
                 OpenBlood2::CollisionHit hit;
                 const auto code = conveyor_smoke ? CC_CONVEYOR : CC_WATER;
-                if (!player || game.server.TeleportObject(player->m_hObject, &position) != DE_OK ||
-                    game.server.GetObjectDims(player->m_hObject, &dimensions) != DE_OK ||
-                    game.collision.sweep(position, position, dimensions, hit) != OpenBlood2::CollisionQuery::Miss ||
-                    !player->TeleportClientToServerPos() || !game.pump_player_messages(error) ||
+                if (!player || game->server.TeleportObject(player->m_hObject, &position) != DE_OK ||
+                    game->server.GetObjectDims(player->m_hObject, &dimensions) != DE_OK ||
+                    game->collision.sweep(position, position, dimensions, hit) != OpenBlood2::CollisionQuery::Miss ||
+                    !player->TeleportClientToServerPos() || !game->pump_player_messages(error) ||
                     !player->UpdateContainerState() || player->containers.count == 0 ||
                     player->containers.body[0].code != code ||
                     (!conveyor_smoke && player->containers.head.code != code))
@@ -658,61 +659,77 @@ namespace
                 }
                 initial_air = player->m_fAirLevel;
 #if BLOOD2_INSPECTOR
-                inspector.container_selection = game.objects.get(player->containers.body[0].object)->id;
+                inspector.container_selection = game->objects.get(player->containers.body[0].object)->id;
 #endif
             }
-            const bool waiting = OpenBlood2::waiting_for_player(game, smoke);
+            const bool waiting = OpenBlood2::waiting_for_player(*game, smoke);
             waiting_frames += waiting;
 #if BLOOD2_INSPECTOR
             inspector.waiting_for_player = waiting;
 #endif
-            if (!OpenBlood2::step_app_session(game, delta, smoke))
+            if (!OpenBlood2::step_app_session(*game, delta, smoke))
             {
                 spdlog::error("Object simulation step failed");
                 return 4;
             }
+            const auto change = OpenBlood2::GameSession::process_level_change(game_owner, error);
+            game = game_owner.get();
+            if (change == OpenBlood2::LevelChangeResult::Committed)
+            {
+                selection.id = {};
+                controlled_player = {};
+                controls.player_changed(!smoke && !inspector_visible);
+#if BLOOD2_INSPECTOR
+                inspector.forget_world();
+#endif
+                spdlog::info("NEW_LEVEL committed: {} -> {} / start {}", game->level_change.source_world,
+                             game->world_path, game->level_change.selected_start);
+            }
+            else if (change == OpenBlood2::LevelChangeResult::Rejected)
+                spdlog::warn("NEW_LEVEL retained current world: {}", error);
             if (options.skeleton_smoke && !inspector_visible && check_hand())
             {
                 hand_hidden = true;
                 if (!old_hand)
-                    old_hand =
-                        game.server_shell.Player(game.local_client)->m_InventoryMgr.CurrentWeapon()->m_hHandAttachment;
+                    old_hand = game->server_shell.Player(game->local_client)
+                                   ->m_InventoryMgr.CurrentWeapon()
+                                   ->m_hHandAttachment;
             }
             if (options.skeleton_smoke && !inspector_visible)
-                ai_fire_hidden |= OpenBlood2::check_ai_fire_smoke(game, smoke_ai_fire);
+                ai_fire_hidden |= OpenBlood2::check_ai_fire_smoke(*game, smoke_ai_fire);
             if (options.skeleton_smoke && !inspector_visible)
-                ai_follow_hidden |= OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
+                ai_follow_hidden |= OpenBlood2::check_ai_follow_smoke(*game, smoke_ai_follow);
             if (options.skeleton_smoke && !inspector_visible)
-                corpse_hidden |= OpenBlood2::check_corpse_smoke(game, smoke_corpse, frames == 110);
+                corpse_hidden |= OpenBlood2::check_corpse_smoke(*game, smoke_corpse, frames == 110);
             if (options.skeleton_smoke && !inspector_visible)
-                ai_escape_hidden |= OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
+                ai_escape_hidden |= OpenBlood2::check_ai_escape_smoke(*game, smoke_ai_escape);
             if (options.skeleton_smoke && !inspector_visible)
-                ai_runtime_hidden |= OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
+                ai_runtime_hidden |= OpenBlood2::check_ai_runtime_smoke(*game, smoke_ai_runtime);
             if (options.skeleton_smoke && !inspector_visible)
-                ai_state_hidden |= OpenBlood2::check_ai_state_smoke(game, smoke_ai_state);
+                ai_state_hidden |= OpenBlood2::check_ai_state_smoke(*game, smoke_ai_state);
             if (options.skeleton_smoke && !inspector_visible)
-                ai_target_hidden |= OpenBlood2::check_ai_target_smoke(game, smoke_ai_key);
+                ai_target_hidden |= OpenBlood2::check_ai_target_smoke(*game, smoke_ai_key);
             if (options.skeleton_smoke && !inspector_visible)
-                ai_sight_hidden |= OpenBlood2::check_ai_sight_smoke(game, smoke_ai_key);
+                ai_sight_hidden |= OpenBlood2::check_ai_sight_smoke(*game, smoke_ai_key);
             if (options.skeleton_smoke && !inspector_visible)
-                ai_key_hidden |= OpenBlood2::check_ai_model_key_smoke(game, smoke_ai_key, 2);
+                ai_key_hidden |= OpenBlood2::check_ai_model_key_smoke(*game, smoke_ai_key, 2);
             if (options.skeleton_smoke && !inspector_visible)
-                if (const auto* r = game.objects.get(smoke_motion))
+                if (const auto* r = game->objects.get(smoke_motion))
                     if (const auto* c = dynamic_cast<const CBaseCharacter*>(r->game.get()))
                         character_motion_hidden |=
-                            c->motion_keys >= 2 && OpenBlood2::check_character_motion_smoke(game, smoke_motion);
-            if (options.movement_smoke && game.local_client)
+                            c->motion_keys >= 2 && OpenBlood2::check_character_motion_smoke(*game, smoke_motion);
+            if (options.movement_smoke && game->local_client)
             {
-                const auto* player = game.server_shell.Player(game.local_client);
-                const auto* record = player ? game.objects.get(player->m_hObject) : nullptr;
+                const auto* player = game->server_shell.Player(game->local_client);
+                const auto* record = player ? game->objects.get(player->m_hObject) : nullptr;
                 if (player && record)
                 {
                     if (options.skeleton_smoke && !inspector_visible)
-                        if (const auto* voice = game.server.audio.get(player->m_hCurSound))
+                        if (const auto* voice = game->server.audio.get(player->m_hCurSound))
                             character_audio_hidden |=
                                 voice->cursor > 0 && voice->request.speaker == player->m_hObject &&
                                 voice->request.resource.starts_with("sounds/player/footsteps/") &&
-                                game.server.audio.submitted_frames > 0 && game.server.audio.output_error.empty();
+                                game->server.audio.submitted_frames > 0 && game->server.audio.output_error.empty();
                     saw_walk |= player->move_state == CPlayerObj::MoveState::Walk;
                     saw_run |= player->move_state == CPlayerObj::MoveState::Run;
                     saw_jump |= player->move_state == CPlayerObj::MoveState::Jump;
@@ -728,7 +745,7 @@ namespace
                         auto i = std::find_if(record->model->nodes.begin(), record->model->nodes.end(),
                                               [](const auto& node) { return node.name == "head"; });
                         if (i != record->model->nodes.end() && player->m_Anim_Sound.hit_spheres_valid &&
-                            game.server.GetModelNodeTransform(record->handle, "head", &head, &rotation) &&
+                            game->server.GetModelNodeTransform(record->handle, "head", &head, &rotation) &&
                             sample_node_pose(*record->model, record->animation.animation, record->animation.time,
                                              static_cast<std::size_t>(i - record->model->nodes.begin()), pose))
                         {
@@ -747,8 +764,8 @@ namespace
                     }
                 }
             }
-            selection.refresh(game.objects);
-            if (mesh_revision != game.world_revision)
+            selection.refresh(game->objects);
+            if (mesh_revision != game->world_revision)
             {
                 world_renderer.clear_geometry();
                 model_renderer.clear_geometry();
@@ -759,34 +776,34 @@ namespace
                 sprite_renderer.clear_geometry();
                 world_mesh = {};
                 world_draws.clear();
-                if (!game.world_path.empty() && !world_mesh.build(game.world, error, &game.resources))
+                if (!game->world_path.empty() && !world_mesh.build(game->world, error, &game->resources))
                 {
                     spdlog::error("World mesh: {}", error);
                     return 5;
                 }
-                mesh_revision = game.world_revision;
-                if (game.world_path.empty())
+                mesh_revision = game->world_revision;
+                if (game->world_path.empty())
                     viewport_unloaded = true;
             }
-            const bool render_world = game.client_shell.m_bInWorld && !world_mesh.ranges.empty();
-            if (!OpenBlood2::world_draws(world_mesh, game.objects, world_draws, world_renderer.stats, error))
+            const bool render_world = game->client_shell.m_bInWorld && !world_mesh.ranges.empty();
+            if (!OpenBlood2::world_draws(world_mesh, game->objects, world_draws, world_renderer.stats, error))
             {
                 spdlog::error("World draw bindings: {}", error);
                 return 5;
             }
 
-            if (!OpenBlood2::update_model_scene(game, model_scene, error))
+            if (!OpenBlood2::update_model_scene(*game, model_scene, error))
             {
                 spdlog::error("Model presentation: {}", error);
                 return 5;
             }
 
-            if (!OpenBlood2::update_explosion_model_scene(game, explosion_model_scene, error))
+            if (!OpenBlood2::update_explosion_model_scene(*game, explosion_model_scene, error))
             {
                 spdlog::error("Explosion model presentation: {}", error);
                 return 5;
             }
-            if (!OpenBlood2::update_sprite_scene(game, sprite_scene, error))
+            if (!OpenBlood2::update_sprite_scene(*game, sprite_scene, error))
             {
                 spdlog::error("Sprite presentation: {}", error);
                 return 5;
@@ -797,10 +814,10 @@ namespace
                     if (entry.object == smoke_corpse && entry.visible && entry.error.empty() && entry.triangles > 0)
                         corpse_drawn = true;
 
-            if (options.world_smoke && frames >= unload_frame && game.world_path.empty() &&
-                game.server.string_count() == 0)
+            if (options.world_smoke && frames >= unload_frame && game->world_path.empty() &&
+                game->server.string_count() == 0)
                 world_unloaded = true;
-            if (smoke && frames >= unload_frame && !selection.id && !game.objects.get(original_selection))
+            if (smoke && frames >= unload_frame && !selection.id && !game->objects.get(original_selection))
                 selection_cleared = true;
 #if BLOOD2_INSPECTOR
             ImGui_ImplSDLGPU3_NewFrame();
@@ -813,13 +830,13 @@ namespace
                 inspector_controls_smoke.before_frame(frames);
             ImGui::NewFrame();
             const bool inspector_was_visible = inspector_visible;
-            inspector.draw(config, data, inspector_visible, frames, game, selection);
-            if (inspector_was_visible && !inspector_visible && game.client_shell.m_bInWorld && !smoke)
+            inspector.draw(config, data, inspector_visible, frames, *game, selection);
+            if (inspector_was_visible && !inspector_visible && game->client_shell.m_bInWorld && !smoke)
             {
                 controls.request_play(); // The window close button resumes just like F1.
                 inspector.keyboard_movement = controls.enabled;
             }
-            if (check_inspector_controls && !inspector_controls_smoke.after_draw(frames, game, inspector))
+            if (check_inspector_controls && !inspector_controls_smoke.after_draw(frames, *game, inspector))
                 return 4;
             ImGui::Render();
 #endif
@@ -850,7 +867,7 @@ namespace
                                : 2u) &&
                 !captured && !options.capture_file.empty();
             if (capture_frame && options.viewport_smoke)
-                for (const auto& weapon : game.client_shell.weapons)
+                for (const auto& weapon : game->client_shell.weapons)
                     if (weapon.model && weapon.animation.animation < weapon.model->animations.size())
                         spdlog::info("Captured view weapon: clip={}, time={}ms, state={}",
                                      weapon.model->animations[weapon.animation.animation].name, weapon.animation.time,
@@ -867,14 +884,14 @@ namespace
             {
                 if (render_world)
                 {
-                    const auto& view = game.client_shell.view;
+                    const auto& view = game->client_shell.view;
                     if (!world_renderer.prepare(world_mesh, mesh_revision,
                                                 SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
                                                 height, error) ||
                         !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
                                              world_draws, view.position, view.rotation,
                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Clear,
-                                             nullptr, OpenBlood2::WorldPass::Opaque, game.server.world_time()))
+                                             nullptr, OpenBlood2::WorldPass::Opaque, game->server.world_time()))
                     {
                         spdlog::error("World viewport: {}", error);
                         SDL_SubmitGPUCommandBuffer(commands);
@@ -896,7 +913,7 @@ namespace
                         !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
                                              world_draws, view.position, view.rotation,
                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
-                                             nullptr, OpenBlood2::WorldPass::Translucent, game.server.world_time()))
+                                             nullptr, OpenBlood2::WorldPass::Translucent, game->server.world_time()))
                     {
                         spdlog::error("Transparent world viewport: {}", error);
                         SDL_SubmitGPUCommandBuffer(commands);
@@ -1112,31 +1129,31 @@ namespace
                     if (frames == 170)
                         event_ok = key_event(SDL_SCANCODE_LCTRL, true);
                     if (frames == hide_frame)
-                        hidden_position = game.client_shell.position;
+                        hidden_position = game->client_shell.position;
                     if (frames == show_frame)
                     {
-                        const auto p = game.client_shell.position;
+                        const auto p = game->client_shell.position;
                         movement_hidden = std::hypot(p.x - hidden_position.x, p.z - hidden_position.z) > 1;
-                        movement_jumped = game.client_shell.move_mgr.jumps > 0;
+                        movement_jumped = game->client_shell.move_mgr.jumps > 0;
                         movement_landed =
-                            game.client_shell.move_mgr.landings > 0 && game.client_shell.move_mgr.m_bOnGround;
+                            game->client_shell.move_mgr.landings > 0 && game->client_shell.move_mgr.m_bOnGround;
                         spdlog::info("Movement: hidden distance={}, jumps={}, landings={}, ground={}, forward "
                                      "frames={}, jump frames={}",
                                      std::hypot(p.x - hidden_position.x, p.z - hidden_position.z),
-                                     game.client_shell.move_mgr.jumps, game.client_shell.move_mgr.landings,
-                                     game.client_shell.move_mgr.m_bOnGround, forward_frames, jump_frames);
+                                     game->client_shell.move_mgr.jumps, game->client_shell.move_mgr.landings,
+                                     game->client_shell.move_mgr.m_bOnGround, forward_frames, jump_frames);
                     }
                 }
                 if ((options.doors_smoke || options.triggers_smoke) && frames == hide_frame)
                 {
-                    hidden_door_position = game.objects.get(smoke_door)->state.m_Pos;
+                    hidden_door_position = game->objects.get(smoke_door)->state.m_Pos;
                     if (options.triggers_smoke)
-                        key_unlocked_hidden = OpenBlood2::activate_trigger_smoke(game, smoke_trigger);
+                        key_unlocked_hidden = OpenBlood2::activate_trigger_smoke(*game, smoke_trigger);
                 }
                 if ((options.doors_smoke || options.triggers_smoke) && frames == show_frame)
                 {
                     const auto delta =
-                        OpenBlood2::vector_subtract(game.objects.get(smoke_door)->state.m_Pos, hidden_door_position);
+                        OpenBlood2::vector_subtract(game->objects.get(smoke_door)->state.m_Pos, hidden_door_position);
                     door_moved_hidden = OpenBlood2::vector_dot(delta, delta) > .01f;
                 }
                 if (options.interaction_smoke && (frames == hide_frame || frames == show_frame - 1))
@@ -1159,81 +1176,81 @@ namespace
                 }
                 if (options.skeleton_smoke && frames == hide_frame)
                 {
-                    const auto* r = game.objects.get(smoke_motion);
-                    const auto* ai = game.objects.get(smoke_ai_key);
-                    if (!r || !ai || game.server.ResetModelAnimation(r->handle) != DE_OK ||
-                        game.server.ResetModelAnimation(ai->handle) != DE_OK)
+                    const auto* r = game->objects.get(smoke_motion);
+                    const auto* ai = game->objects.get(smoke_ai_key);
+                    if (!r || !ai || game->server.ResetModelAnimation(r->handle) != DE_OK ||
+                        game->server.ResetModelAnimation(ai->handle) != DE_OK)
                         return 4;
                 }
                 if (options.scene_explosions_smoke && frames == hide_frame &&
-                    !OpenBlood2::activate_scene_explosion_smoke(game, smoke_scene_explosion))
+                    !OpenBlood2::activate_scene_explosion_smoke(*game, smoke_scene_explosion))
                     return 4;
                 if (options.scene_explosions_smoke && frames == show_frame - 1)
-                    scene_explosion_hidden = OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion);
+                    scene_explosion_hidden = OpenBlood2::check_scene_explosion_smoke(*game, smoke_scene_explosion);
                 if (options.sprites_smoke && frames == show_frame - 1)
-                    sprite_hidden = OpenBlood2::check_sprite_smoke(game);
+                    sprite_hidden = OpenBlood2::check_sprite_smoke(*game);
                 if (options.world_sounds_smoke && frames == show_frame - 1)
-                    world_sound_hidden = OpenBlood2::check_world_sound_smoke(game);
+                    world_sound_hidden = OpenBlood2::check_world_sound_smoke(*game);
                 if (options.random_sounds_smoke && frames == show_frame - 1)
-                    random_sound_hidden = OpenBlood2::check_random_sound_smoke(game, smoke_random_sound);
+                    random_sound_hidden = OpenBlood2::check_random_sound_smoke(*game, smoke_random_sound);
                 if (options.cinematics_smoke && frames == show_frame - 1)
-                    cinematic_hidden = OpenBlood2::check_cinematic_smoke(game, smoke_cinematic);
+                    cinematic_hidden = OpenBlood2::check_cinematic_smoke(*game, smoke_cinematic);
                 if (options.lights_smoke && frames == show_frame - 1)
-                    light_hidden = OpenBlood2::check_light_smoke(game, smoke_light);
+                    light_hidden = OpenBlood2::check_light_smoke(*game, smoke_light);
                 if (options.keyframes_smoke && frames == show_frame - 1)
-                    keyframe_hidden = OpenBlood2::check_keyframe_smoke(game, smoke_keyframe, options.worldpaths_smoke);
+                    keyframe_hidden = OpenBlood2::check_keyframe_smoke(*game, smoke_keyframe, options.worldpaths_smoke);
                 if (options.cameras_smoke && frames == show_frame - 1)
-                    camera_hidden = OpenBlood2::check_camera_smoke(game, smoke_camera);
+                    camera_hidden = OpenBlood2::check_camera_smoke(*game, smoke_camera);
                 if (options.objectives_smoke && frames == show_frame - 1)
-                    objective_hidden = OpenBlood2::objective_smoke(game);
+                    objective_hidden = OpenBlood2::objective_smoke(*game);
                 if (options.pickups_smoke && frames == show_frame - 1)
-                    pickup_hidden = OpenBlood2::collect_pickup_smoke(game, smoke_pickup);
+                    pickup_hidden = OpenBlood2::collect_pickup_smoke(*game, smoke_pickup);
                 if (options.brushes_smoke)
                 {
-                    if (frames == hide_frame && !OpenBlood2::command_brush_smoke(game, smoke_explosion, "KILL"))
+                    if (frames == hide_frame && !OpenBlood2::command_brush_smoke(*game, smoke_explosion, "KILL"))
                         return 4;
                     if (frames == hide_frame || frames == 11)
-                        if (!OpenBlood2::command_brush_smoke(game, smoke_brush, "ON"))
+                        if (!OpenBlood2::command_brush_smoke(*game, smoke_brush, "ON"))
                             return 4;
                     if (frames == show_frame)
                     {
-                        brush_hidden = OpenBlood2::check_brush_smoke(game, smoke_brush, smoke_body);
-                        if (!OpenBlood2::command_brush_smoke(game, smoke_brush, "OFF"))
+                        brush_hidden = OpenBlood2::check_brush_smoke(*game, smoke_brush, smoke_body);
+                        if (!OpenBlood2::command_brush_smoke(*game, smoke_brush, "OFF"))
                             return 4;
                     }
                 }
                 if (options.interaction_smoke && frames == show_frame)
-                    interaction_hidden = OpenBlood2::check_interaction_smoke(game, smoke_door);
+                    interaction_hidden = OpenBlood2::check_interaction_smoke(*game, smoke_door);
                 if (conveyor_smoke && frames == hide_frame)
-                    hidden_position = game.client_shell.position;
+                    hidden_position = game->client_shell.position;
                 if (options.containers_smoke && frames == show_frame)
                 {
-                    const auto* player = game.server_shell.Player(game.local_client);
-                    container_hidden = conveyor_smoke ? player && game.client_shell.move_mgr.m_bBodyOnConveyor &&
-                                                            game.client_shell.move_mgr.m_bUseGravity &&
-                                                            game.client_shell.position.z < hidden_position.z - .05f
+                    const auto* player = game->server_shell.Player(game->local_client);
+                    container_hidden = conveyor_smoke ? player && game->client_shell.move_mgr.m_bBodyOnConveyor &&
+                                                            game->client_shell.move_mgr.m_bUseGravity &&
+                                                            game->client_shell.position.z < hidden_position.z - .05f
                                                       : player && player->m_fAirLevel < initial_air &&
                                                             player->containers.head.code == CC_WATER &&
-                                                            game.client_shell.move_mgr.m_bBodyInLiquid &&
-                                                            !game.client_shell.move_mgr.m_bUseGravity;
+                                                            game->client_shell.move_mgr.m_bBodyInLiquid &&
+                                                            !game->client_shell.move_mgr.m_bUseGravity;
                 }
                 if (options.world_smoke && frames == hide_frame)
-                    hidden_model_time = game.preview_animation.time;
+                    hidden_model_time = game->preview_animation.time;
                 if (options.world_smoke && frames == show_frame)
-                    model_advanced_hidden = game.preview_model && game.preview_animation.time > hidden_model_time;
+                    model_advanced_hidden = game->preview_model && game->preview_animation.time > hidden_model_time;
                 if (path_smoke && frames == show_frame - 1)
-                    paths_hidden = OpenBlood2::check_path_manager_smoke(game, smoke_paths, false);
+                    paths_hidden = OpenBlood2::check_path_manager_smoke(*game, smoke_paths, false);
                 if (options.player_smoke && frames == hide_frame)
-                    hidden_player_updates = game.server_shell.Player(game.local_client)->updates;
+                    hidden_player_updates = game->server_shell.Player(game->local_client)->updates;
                 if (options.player_smoke && frames == show_frame)
                     player_advanced_hidden =
-                        game.server_shell.Player(game.local_client)->updates > hidden_player_updates;
+                        game->server_shell.Player(game->local_client)->updates > hidden_player_updates;
                 if (options.weapons_smoke && frames == hide_frame)
                     hidden_weapon_shots =
-                        game.server_shell.Player(game.local_client)->m_InventoryMgr.GetWeapon(1)->shots;
+                        game->server_shell.Player(game->local_client)->m_InventoryMgr.GetWeapon(1)->shots;
                 if (options.weapons_smoke && frames == show_frame)
                 {
-                    const auto& inv = game.server_shell.Player(game.local_client)->m_InventoryMgr;
+                    const auto& inv = game->server_shell.Player(game->local_client)->m_InventoryMgr;
                     weapon_advanced_hidden =
                         inv.GetWeapon(1)->shots > hidden_weapon_shots && inv.GetWeapon(0)->shots > 0 &&
                         inv.GetWeapon(1)->sounds_played == inv.GetWeapon(1)->shots &&
@@ -1243,14 +1260,14 @@ namespace
                 }
                 if (options.weapons_smoke && frames == unload_frame)
                 {
-                    const auto& inv = game.server_shell.Player(game.local_client)->m_InventoryMgr;
+                    const auto& inv = game->server_shell.Player(game->local_client)->m_InventoryMgr;
                     weapons_fired = inv.GetWeapon(1)->shots > 0 && inv.GetWeapon(0)->shots > 0 &&
                                     inv.GetAmmoCount(1) < 50 &&
                                     inv.GetWeapon(1)->sounds_played == inv.GetWeapon(1)->shots &&
                                     inv.GetWeapon(0)->sounds_played == inv.GetWeapon(0)->shots &&
                                     !inv.GetWeapon(1)->sound_failures && !inv.GetWeapon(0)->sound_failures &&
                                     inv.GetWeapon(1)->impact_sounds > 0 && !inv.GetWeapon(1)->impact_sound_failures &&
-                                    game.server.audio.has_output() && game.server.audio.submitted_frames > 0;
+                                    game->server.audio.has_output() && game->server.audio.submitted_frames > 0;
                     spdlog::info("Weapon impacts: contacts={}, sounds={}, failures={}, hidden={}",
                                  inv.GetWeapon(1)->impact_contacts, inv.GetWeapon(1)->impact_sounds,
                                  inv.GetWeapon(1)->impact_sound_failures, weapon_advanced_hidden);
@@ -1267,7 +1284,7 @@ namespace
 #if BLOOD2_INSPECTOR
                     inspector.remove_request = selection.id; // Same queued command as the UI button.
 #else
-                    game.objects.remove(key);
+                    game->objects.remove(key);
 #endif
                 }
                 if (options.world_smoke && (frames == unload_frame || frames == reload_frame))
@@ -1286,20 +1303,20 @@ namespace
                     }
 #else
                     if (frames == unload_frame)
-                        game.unload_world();
-                    else if (!game.request_world(options.keepalive_smoke ? "02_cityhub" : options.world, error))
+                        game->unload_world();
+                    else if (!game->request_world(options.keepalive_smoke ? "02_cityhub" : options.world, error))
                     {
                         spdlog::error("{}", error);
                         return 5;
                     }
                     else if (options.player_smoke &&
                              !(options.restore_smoke
-                                   ? game.restore_player(*game.restoration.saved, error,
-                                                         options.keepalive_smoke
-                                                             ? OpenBlood2::PlayerRestoreMode::KeepAlive
-                                                             : OpenBlood2::PlayerRestoreMode::SavedPosition,
-                                                         options.keepalive_smoke ? "01_egressa" : "")
-                                   : game.enter_player(error)))
+                                   ? game->restore_player(*game->restoration.saved, error,
+                                                          options.keepalive_smoke
+                                                              ? OpenBlood2::PlayerRestoreMode::KeepAlive
+                                                              : OpenBlood2::PlayerRestoreMode::SavedPosition,
+                                                          options.keepalive_smoke ? "01_egressa" : "")
+                                   : game->enter_player(error)))
                     {
                         spdlog::error("{}", error);
                         return 6;
@@ -1318,6 +1335,10 @@ namespace
                     return 4;
                 }
             }
+            // Preparation and first presentation upload are paused loading time,
+            // not a physics/audio delta for the retained or newly entered world.
+            if (change != OpenBlood2::LevelChangeResult::None)
+                previous_tick = SDL_GetTicksNS();
             if (options.frame_limit != 0 && frames >= options.frame_limit)
                 done = true;
         }
@@ -1325,8 +1346,8 @@ namespace
                      ui_frames, hidden_frames, toggles, resized, quit_received);
         unsigned npc_ready = 0, npc_failed = 0;
         std::uint64_t npc_updates = 0;
-        for (auto id : game.objects.snapshot())
-            if (const auto* a = dynamic_cast<const AI_Mgr*>(game.objects.get(id)->game.get());
+        for (auto id : game->objects.snapshot())
+            if (const auto* a = dynamic_cast<const AI_Mgr*>(game->objects.get(id)->game.get());
                 a && a->npc_type != AI_Mgr::NPCType::Diagnostic)
             {
                 npc_ready += a->RuntimeReady();
@@ -1334,87 +1355,90 @@ namespace
                 npc_updates += a->runtime_updates;
             }
         spdlog::info("Session playback: waiting={} time={} npc-ready={} npc-failed={} npc-updates={}", waiting_frames,
-                     game.objects.time(), npc_ready, npc_failed, npc_updates);
+                     game->objects.time(), npc_ready, npc_failed, npc_updates);
         if (smoke)
         {
             int width = 0, height = 0;
             SDL_GetWindowSize(runtime.window, &width, &height);
             bool skeleton_reentered = false;
             if (options.movement_smoke)
-                if (auto* player = game.server_shell.Player(game.local_client))
+                if (auto* player = game->server_shell.Player(game->local_client))
                 {
                     DVector head;
                     DRotation rotation;
-                    skeleton_reentered = player->m_Anim_Sound.hit_spheres_valid &&
-                                         game.server.GetModelNodeTransform(player->m_hObject, "head", &head, &rotation);
+                    skeleton_reentered =
+                        player->m_Anim_Sound.hit_spheres_valid &&
+                        game->server.GetModelNodeTransform(player->m_hObject, "head", &head, &rotation);
                 }
             bool character_motion_reentered = !options.skeleton_smoke;
             if (options.skeleton_smoke)
             {
-                if (game.objects.get(original_motion) ||
-                    !OpenBlood2::prepare_character_motion_smoke(game, smoke_motion) || !game.server.advance_models(0))
+                if (game->objects.get(original_motion) ||
+                    !OpenBlood2::prepare_character_motion_smoke(*game, smoke_motion) || !game->server.advance_models(0))
                     return 4;
-                character_motion_reentered = OpenBlood2::check_character_motion_smoke(game, smoke_motion);
+                character_motion_reentered = OpenBlood2::check_character_motion_smoke(*game, smoke_motion);
                 spdlog::info("Character motion probe: hidden={}, reentered={}, old handle invalidated={}",
-                             character_motion_hidden, character_motion_reentered, !game.objects.get(original_motion));
+                             character_motion_hidden, character_motion_reentered, !game->objects.get(original_motion));
             }
             bool ai_key_reentered = !options.skeleton_smoke;
             bool ai_sight_reentered = !options.skeleton_smoke;
             bool ai_target_reentered = !options.skeleton_smoke;
             if (options.skeleton_smoke)
             {
-                if (game.objects.get(original_ai_escape) || !OpenBlood2::prepare_ai_escape_smoke(game, smoke_ai_escape))
+                if (game->objects.get(original_ai_escape) ||
+                    !OpenBlood2::prepare_ai_escape_smoke(*game, smoke_ai_escape))
                     return 4;
                 // Start the independent route before the existing key/state/fire clocks.
                 // Its longer script + navigation sequence must not inherit the shot-only deadline.
-                if (game.objects.get(original_ai_follow) || !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
+                if (game->objects.get(original_ai_follow) ||
+                    !OpenBlood2::prepare_ai_follow_smoke(*game, smoke_ai_follow))
                     return 4;
-                if (game.objects.get(original_corpse) || !OpenBlood2::prepare_corpse_smoke(game, smoke_corpse))
+                if (game->objects.get(original_corpse) || !OpenBlood2::prepare_corpse_smoke(*game, smoke_corpse))
                     return 4;
-                if (game.objects.get(original_ai_key) || !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
+                if (game->objects.get(original_ai_key) || !OpenBlood2::prepare_ai_model_key_smoke(*game, smoke_ai_key))
                     return 4;
                 for (int i = 0; i < 90 && !ai_key_reentered; ++i)
                 {
-                    if (!game.step(1.0 / 60))
+                    if (!game->step(1.0 / 60))
                         return 4;
-                    ai_key_reentered = OpenBlood2::check_ai_model_key_smoke(game, smoke_ai_key, 1);
+                    ai_key_reentered = OpenBlood2::check_ai_model_key_smoke(*game, smoke_ai_key, 1);
                 }
                 spdlog::info("AI model-key probe: hidden={}, reentered={}, old handle invalidated={}", ai_key_hidden,
-                             ai_key_reentered, !game.objects.get(original_ai_key));
-                ai_target_reentered = OpenBlood2::check_ai_target_smoke(game, smoke_ai_key);
+                             ai_key_reentered, !game->objects.get(original_ai_key));
+                ai_target_reentered = OpenBlood2::check_ai_target_smoke(*game, smoke_ai_key);
                 spdlog::info("AI target probe: hidden={}, reentered={}, old handle invalidated={}", ai_target_hidden,
-                             ai_target_reentered, !game.objects.get(original_ai_key));
-                ai_sight_reentered = OpenBlood2::check_ai_sight_smoke(game, smoke_ai_key);
+                             ai_target_reentered, !game->objects.get(original_ai_key));
+                ai_sight_reentered = OpenBlood2::check_ai_sight_smoke(*game, smoke_ai_key);
                 spdlog::info("AI sight probe: hidden={}, reentered={}, old handle invalidated={}", ai_sight_hidden,
-                             ai_sight_reentered, !game.objects.get(original_ai_key));
+                             ai_sight_reentered, !game->objects.get(original_ai_key));
             }
             bool ai_state_reentered = !options.skeleton_smoke;
             if (options.skeleton_smoke)
             {
-                if (game.objects.get(original_ai_state) || !OpenBlood2::prepare_ai_state_smoke(game, smoke_ai_state))
+                if (game->objects.get(original_ai_state) || !OpenBlood2::prepare_ai_state_smoke(*game, smoke_ai_state))
                     return 4;
                 for (int i = 0; i < 360 && !ai_state_reentered; ++i)
                 {
-                    if (!game.step(1.0 / 60))
+                    if (!game->step(1.0 / 60))
                         return 4;
-                    ai_state_reentered = OpenBlood2::check_ai_state_smoke(game, smoke_ai_state);
+                    ai_state_reentered = OpenBlood2::check_ai_state_smoke(*game, smoke_ai_state);
                 }
                 spdlog::info("AI state probe: hidden={}, reentered={}, old handle invalidated={}", ai_state_hidden,
-                             ai_state_reentered, !game.objects.get(original_ai_state));
+                             ai_state_reentered, !game->objects.get(original_ai_state));
             }
             if (options.skeleton_smoke)
             {
-                if (game.objects.get(original_ai_fire) || !OpenBlood2::prepare_ai_fire_smoke(game, smoke_ai_fire))
+                if (game->objects.get(original_ai_fire) || !OpenBlood2::prepare_ai_fire_smoke(*game, smoke_ai_fire))
                     return 4;
                 bool reentered = false;
                 for (int i = 0; i < 360 && !reentered; ++i)
                 {
-                    if (!game.step(1.0 / 60))
+                    if (!game->step(1.0 / 60))
                         return 4;
-                    reentered = OpenBlood2::check_ai_fire_smoke(game, smoke_ai_fire);
+                    reentered = OpenBlood2::check_ai_fire_smoke(*game, smoke_ai_fire);
                 }
                 spdlog::info("AI weapon probe: hidden={}, reentered={}, old identity invalidated={}", ai_fire_hidden,
-                             reentered, !game.objects.get(original_ai_fire));
+                             reentered, !game->objects.get(original_ai_fire));
                 if (!ai_fire_hidden || !reentered)
                     return 4;
             }
@@ -1422,10 +1446,10 @@ namespace
             {
                 // Runs alongside the existing key/state/fire probes: do not extend the authored
                 // scene clock past the cinematic's existing lifetime assertion.
-                const bool reentered = OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
+                const bool reentered = OpenBlood2::check_ai_follow_smoke(*game, smoke_ai_follow);
                 spdlog::info("AI script interpreter: hidden={}, reentered={}, old identity invalidated={}",
-                             ai_follow_hidden, reentered, !game.objects.get(original_ai_follow));
-                if (const auto* r = game.objects.get(smoke_ai_follow))
+                             ai_follow_hidden, reentered, !game->objects.get(original_ai_follow));
+                if (const auto* r = game->objects.get(smoke_ai_follow))
                     if (const auto* a = dynamic_cast<const AI_Mgr*>(r->game.get()))
                         spdlog::info("AI navigation: state={}, phase={}, z={}, updates={}, arrivals={}, failures={}, "
                                      "points={}, error={}",
@@ -1434,51 +1458,51 @@ namespace
                                      a->navigation_error);
                 if (!ai_follow_hidden || !reentered)
                     return 4;
-                const bool runtime_reentered = OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
+                const bool runtime_reentered = OpenBlood2::check_ai_runtime_smoke(*game, smoke_ai_runtime);
                 spdlog::info(
                     "Original NPC AI_Update + hit localization: hidden={}, reentered={}, old identity invalidated={}",
-                    ai_runtime_hidden, runtime_reentered, !game.objects.get(original_ai_runtime));
-                if (!ai_runtime_hidden || !runtime_reentered || game.objects.get(original_ai_runtime))
+                    ai_runtime_hidden, runtime_reentered, !game->objects.get(original_ai_runtime));
+                if (!ai_runtime_hidden || !runtime_reentered || game->objects.get(original_ai_runtime))
                     return 4;
-                const bool corpse_reentered = OpenBlood2::check_corpse_smoke(game, smoke_corpse, true);
+                const bool corpse_reentered = OpenBlood2::check_corpse_smoke(*game, smoke_corpse, true);
                 spdlog::info("Original corpse: hidden={}, rendered={}, reentered={}, old identity invalidated={}",
-                             corpse_hidden, corpse_drawn, corpse_reentered, !game.objects.get(original_corpse));
-                if (!corpse_hidden || !corpse_drawn || !corpse_reentered || game.objects.get(original_corpse))
+                             corpse_hidden, corpse_drawn, corpse_reentered, !game->objects.get(original_corpse));
+                if (!corpse_hidden || !corpse_drawn || !corpse_reentered || game->objects.get(original_corpse))
                     return 4;
-                const bool escape_reentered = OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
+                const bool escape_reentered = OpenBlood2::check_ai_escape_smoke(*game, smoke_ai_escape);
                 spdlog::info("AI escape/beg: hidden={}, reentered={}, old identity invalidated={}", ai_escape_hidden,
-                             escape_reentered, !game.objects.get(original_ai_escape));
+                             escape_reentered, !game->objects.get(original_ai_escape));
                 if (!ai_escape_hidden || !escape_reentered)
                     return 4;
             }
             bool hand_reentered = !options.skeleton_smoke;
             if (options.skeleton_smoke)
             {
-                hand_reentered = check_hand() && old_hand && !game.objects.attachments().contains(old_hand);
+                hand_reentered = check_hand() && old_hand && !game->objects.attachments().contains(old_hand);
                 spdlog::info("Held attachments: hidden={}, reentered={}, old identity invalidated={}", hand_hidden,
-                             hand_reentered, !game.objects.attachments().contains(old_hand));
+                             hand_reentered, !game->objects.attachments().contains(old_hand));
             }
             bool character_audio_reentered = !options.skeleton_smoke;
             if (options.skeleton_smoke)
             {
-                auto* player = game.server_shell.Player(game.local_client);
-                game.client_shell.movement_input.forward = true;
+                auto* player = game->server_shell.Player(game->local_client);
+                game->client_shell.movement_input.forward = true;
                 for (int i = 0; player && i < 90 && !character_audio_reentered; ++i)
                 {
-                    if (!game.step(1.0 / 60))
+                    if (!game->step(1.0 / 60))
                         return 4;
-                    if (const auto* voice = game.server.audio.get(player->m_hCurSound))
+                    if (const auto* voice = game->server.audio.get(player->m_hCurSound))
                         character_audio_reentered = voice->cursor > 0 && player->sound_starts > 0 &&
-                                                    game.server.audio.submitted_frames > 0 &&
-                                                    game.server.audio.output_error.empty();
+                                                    game->server.audio.submitted_frames > 0 &&
+                                                    game->server.audio.output_error.empty();
                 }
-                game.client_shell.movement_input = {};
-                game.client_shell.weapon_input = {};
+                game->client_shell.movement_input = {};
+                game->client_shell.weapon_input = {};
                 spdlog::info("Character audio: hidden={}, reentered={}, starts={}, surface={}, submitted={}",
                              character_audio_hidden, character_audio_reentered, player ? player->sound_starts : 0,
-                             player ? int(player->m_eLastSurface) : -1, game.server.audio.submitted_frames);
+                             player ? int(player->m_eLastSurface) : -1, game->server.audio.submitted_frames);
             }
-            const bool paths_reentered = !path_smoke || OpenBlood2::check_path_manager_smoke(game, smoke_paths, true);
+            const bool paths_reentered = !path_smoke || OpenBlood2::check_path_manager_smoke(*game, smoke_paths, true);
             if (path_smoke)
                 spdlog::info("AI paths: hidden={}, reentered={}, copied points={}", paths_hidden, paths_reentered,
                              smoke_paths.size());
@@ -1507,7 +1531,7 @@ namespace
                              world_mesh.effects.size(), world_renderer.stats.pan_batches,
                              world_renderer.stats.alpha_pan_batches, world_renderer.stats.surface_time);
                 if (world_mesh.effects.size() != 60 || !world_renderer.stats.pan_batches ||
-                    world_renderer.stats.surface_time != game.server.world_time())
+                    world_renderer.stats.surface_time != game->server.world_time())
                     return 3;
                 if (world_mesh.blended != 31 || world_renderer.stats.alpha_batches != 31 ||
                     world_renderer.stats.alpha_frames != world_renderer.stats.frames)
@@ -1526,51 +1550,51 @@ namespace
                   !character_motion_reentered || !ai_key_hidden || !ai_key_reentered || !ai_sight_hidden ||
                   !ai_sight_reentered || !ai_state_hidden || !ai_state_reentered || !ai_target_hidden ||
                   !ai_target_reentered || !hand_hidden || !hand_reentered)) ||
-                (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                (options.gpu_smoke && (game->server.string_count() != 0 || game->objects.snapshot().size() != 1)) ||
                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
                 (options.scene_explosions_smoke &&
                  (!scene_explosion_hidden || !explosion_sprites_drawn_hidden || !explosion_model_drawn_hidden ||
                   !explosion_rings_drawn_hidden || !explosion_fragments_drawn_hidden ||
                   !explosion_trails_drawn_hidden ||
-                  !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
+                  !OpenBlood2::check_scene_explosion_smoke(*game, smoke_scene_explosion))) ||
                 (options.sprites_smoke &&
                  (!sprite_hidden || !sprites_drawn_hidden || sprite_scene.draws.size() != 12 ||
-                  sprite_renderer.stats.uploads < 2 || !OpenBlood2::check_sprite_smoke(game))) ||
-                (options.world_sounds_smoke && (!world_sound_hidden || !OpenBlood2::check_world_sound_smoke(game))) ||
+                  sprite_renderer.stats.uploads < 2 || !OpenBlood2::check_sprite_smoke(*game))) ||
+                (options.world_sounds_smoke && (!world_sound_hidden || !OpenBlood2::check_world_sound_smoke(*game))) ||
                 (options.random_sounds_smoke &&
-                 (!random_sound_hidden || !OpenBlood2::check_random_sound_smoke(game, smoke_random_sound))) ||
+                 (!random_sound_hidden || !OpenBlood2::check_random_sound_smoke(*game, smoke_random_sound))) ||
                 (options.cinematics_smoke &&
-                 (!cinematic_hidden || !OpenBlood2::check_cinematic_smoke(game, smoke_cinematic))) ||
-                (options.lights_smoke && (!light_hidden || !OpenBlood2::check_light_smoke(game, smoke_light))) ||
+                 (!cinematic_hidden || !OpenBlood2::check_cinematic_smoke(*game, smoke_cinematic))) ||
+                (options.lights_smoke && (!light_hidden || !OpenBlood2::check_light_smoke(*game, smoke_light))) ||
                 (options.keyframes_smoke &&
                  (!keyframe_hidden ||
-                  !OpenBlood2::check_keyframe_smoke(game, smoke_keyframe, options.worldpaths_smoke))) ||
-                (options.cameras_smoke && (!camera_hidden || !OpenBlood2::check_camera_smoke(game, smoke_camera))) ||
+                  !OpenBlood2::check_keyframe_smoke(*game, smoke_keyframe, options.worldpaths_smoke))) ||
+                (options.cameras_smoke && (!camera_hidden || !OpenBlood2::check_camera_smoke(*game, smoke_camera))) ||
                 (options.objectives_smoke && !objective_hidden) || (options.pickups_smoke && !pickup_hidden) ||
                 (options.interaction_smoke && !interaction_hidden) || (options.brushes_smoke && !brush_hidden) ||
                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
                 (options.movement_smoke &&
-                 (!movement_hidden || !movement_jumped || !movement_landed || !game.client_shell.move_mgr.ready() ||
+                 (!movement_hidden || !movement_jumped || !movement_landed || !game->client_shell.move_mgr.ready() ||
                   forward_frames != 55 || jump_frames != 10 || crouch_frames != 45 || run_frames != 20 ||
                   !skeleton_reentered || !skeleton_hidden || !crouched_hidden || !stood_after_crouch ||
                   !locomotion_pose || !saw_walk || !saw_run || !saw_jump)) ||
                 (options.keepalive_smoke &&
-                 (game.restoration.last_mode != OpenBlood2::PlayerRestoreMode::KeepAlive ||
-                  game.restoration.selected_start != "01_egressa" || game.restoration.start_fallback ||
-                  game.client_shell.stats.health != 73 || game.client_shell.stats.bullets != 17 ||
-                  !game.server_shell.Player(game.local_client) ||
-                  !game.server_shell.Player(game.local_client)->m_InventoryMgr.keys.empty())) ||
-                (options.restore_smoke && (game.restoration.restored != 2 || !game.client_shell.restored_entry ||
-                                           !game.server_shell.Player(game.local_client) ||
-                                           game.server_shell.Player(game.local_client)->respawns != 0)) ||
-                (options.player_smoke && (!player_advanced_hidden || !game.client_shell.m_bInWorld ||
-                                          !game.server_shell.Player(game.local_client))) ||
+                 (game->restoration.last_mode != OpenBlood2::PlayerRestoreMode::KeepAlive ||
+                  game->restoration.selected_start != "01_egressa" || game->restoration.start_fallback ||
+                  game->client_shell.stats.health != 73 || game->client_shell.stats.bullets != 17 ||
+                  !game->server_shell.Player(game->local_client) ||
+                  !game->server_shell.Player(game->local_client)->m_InventoryMgr.keys.empty())) ||
+                (options.restore_smoke && (game->restoration.restored != 2 || !game->client_shell.restored_entry ||
+                                           !game->server_shell.Player(game->local_client) ||
+                                           game->server_shell.Player(game->local_client)->respawns != 0)) ||
+                (options.player_smoke && (!player_advanced_hidden || !game->client_shell.m_bInWorld ||
+                                          !game->server_shell.Player(game->local_client))) ||
                 (options.world_smoke &&
-                 (!world_unloaded || !model_advanced_hidden || !game.preview_model || !game.server.collision_ready ||
-                  game.world_path.empty() ||
-                  game.objects.snapshot().size() != initial_objects - (options.scene_explosions_smoke ? 1 : 0) ||
-                  game.server.string_count() != initial_strings)))
+                 (!world_unloaded || !model_advanced_hidden || !game->preview_model || !game->server.collision_ready ||
+                  game->world_path.empty() ||
+                  game->objects.snapshot().size() != initial_objects - (options.scene_explosions_smoke ? 1 : 0) ||
+                  game->server.string_count() != initial_strings)))
             {
                 auto delta = smoke_object_counts();
                 for (const auto& [key, count] : initial_smoke_objects)
@@ -1582,8 +1606,8 @@ namespace
                     "GPU smoke failed: selection={}, crouch/run frames={}/{}, skeleton reentry/hidden={}/{}, "
                     "crouched/stood={}/{}, locomotion/walk/run/jump={}/{}/{}/{}, objects={}/{}, strings={}/{}",
                     selection_cleared, crouch_frames, run_frames, skeleton_reentered, skeleton_hidden, crouched_hidden,
-                    stood_after_crouch, locomotion_pose, saw_walk, saw_run, saw_jump, game.objects.snapshot().size(),
-                    initial_objects, game.server.string_count(), initial_strings);
+                    stood_after_crouch, locomotion_pose, saw_walk, saw_run, saw_jump, game->objects.snapshot().size(),
+                    initial_objects, game->server.string_count(), initial_strings);
                 return 4;
             }
             spdlog::info("GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and "

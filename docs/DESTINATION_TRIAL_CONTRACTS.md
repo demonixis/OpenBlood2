@@ -1,5 +1,10 @@
 # Isolated destination initialization rehearsal
 
+> Current continuation: [safe NEW_LEVEL](LEVEL_CHANGE_CONTRACTS.md) promotes a fully prepared
+> destination with the supported player, or retains the source on failure. Earlier
+> blanket transfer omissions below are historical; each standalone diagnostic API
+> retains its documented scope. CityHub and full M2 acceptance remain incomplete.
+
 > Extended by [weapon fire-audio contracts](WEAPON_AUDIO_CONTRACTS.md): Beretta/knife
 > retained playback and automatic gunfire hearing now execute; source weapon voices
 > survive disposable destination rehearsal. Earlier fire-audio omissions are historical.

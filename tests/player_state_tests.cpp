@@ -293,7 +293,7 @@ namespace
         auto& c = g.server_shell.player_capture;
         CHECK(c.valid && c.captures == 1 && c.attempts == 2 && c.state.air == 35 && c.state.smell_time_offset == -3);
         CHECK(c.state.name && c.state.name->empty() && c.state.trigger == "TRIGGER" &&
-              g.client_shell.world_exit.blocked == 1);
+              g.client_shell.world_exit.queued == 1);
         p->m_fAirLevel = 25;
         CHECK(c.state.air == 35);
         p->m_bPowerupActivated[PU_SILENT] = true;

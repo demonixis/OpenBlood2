@@ -72,3 +72,10 @@ are synthetic SDL events, not physical-device automation or a human walkthrough.
 
 This proves the selected encounter, not the whole level/campaign. Other missing
 AI actions, fire/gib deaths, required world services and safe NEW_LEVEL remain open.
+
+## Subsequent user report — 17 October
+
+The user confirms mouse control works after capture, but reports intermittent frozen
+dead Cultists still blocking the train, including later enemies. This is an open
+regression despite the deterministic cases above. Broader positions/impact regions
+and death placement must be reproduced; no new fix is claimed by this note.

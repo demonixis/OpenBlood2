@@ -131,6 +131,7 @@ namespace OpenBlood2
         void reset_world_time()
         {
             audio.clear();
+            unavailable_services.clear();
             world_time_origin_ = objects_.time();
             brush_destructions.clear();
             debris_effects.clear();
@@ -213,6 +214,7 @@ namespace OpenBlood2
         void unbind();
         void set_game_settings(unsigned difficulty, unsigned game_type);
         std::map<std::string, std::uint64_t> service_calls;
+        std::map<std::string, std::uint64_t> unavailable_services;
         bool trace_enabled = false;
         void trace_service(const char* name)
         {
@@ -335,7 +337,7 @@ namespace OpenBlood2
         std::unordered_map<HMESSAGEWRITE, Message> messages_;
         std::vector<std::unique_ptr<ObjectList>> list_tokens_;
         std::unordered_set<ObjectList*> lists_;
-        // Only the synchronous destination rehearsal may temporarily suspend this binding.
+        // Only synchronous destination preparation/commit may temporarily suspend this binding.
         friend class GameSession;
         static ServerAdapter* active_;
         static ServerAdapter& active();
@@ -384,6 +386,11 @@ namespace OpenBlood2
         }
         DestinationInspection destination_inspection;
         DestinationTrial destination_trial;
+        LevelChangeReport level_change;
+        std::optional<LevelChangeRequest> pending_level_change;
+        bool queue_level_change(const WorldMessage&, std::string_view start, std::string&);
+        // Called only at an owning frame boundary, after all callbacks/step references have returned.
+        static LevelChangeResult process_level_change(std::unique_ptr<GameSession>&, std::string&);
         bool rehearse_destination(const WorldMessage&, std::string_view start, std::string& error);
         bool inspect_destination(const WorldMessage&, std::string_view start, std::string& error);
         bool load_world(const WorldMessage& message, std::string& error);

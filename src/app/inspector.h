@@ -93,9 +93,12 @@ namespace OpenBlood2
         bool capture_player_request = false, restore_player_request = false, keep_player_request = false;
         char keep_start_name[101]{};
         char keep_world_name[256]{"02_cityhub"};
-        bool keep_world_request = false, inspect_destination_request = false, trial_destination_request = false;
+        bool keep_world_request = false, inspect_destination_request = false, trial_destination_request = false,
+             level_change_request = false;
         void draw_destination(const GameSession&);
         void draw_destination_trial(const GameSession&);
+        void draw_level_change(const GameSession&);
+        void forget_world();
         ObjectId remove_request{};
         std::string spawn_request;
         std::string world_error, reload_world_name = "01_SubwayA";

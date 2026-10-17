@@ -51,4 +51,27 @@ namespace OpenBlood2
         std::size_t runtime_objects = 0, attachments = 0, voices = 0;
         std::vector<DestinationTrialEntry> entries;
     };
+    enum class LevelChangeResult
+    {
+        None,
+        Rejected,
+        Committed
+    };
+    struct LevelChangeRequest
+    {
+        WorldMessage message;
+        std::string start;
+    };
+    struct LevelChangeReport
+    {
+        std::uint64_t attempts = 0, committed = 0, rejected = 0, source_revision = 0, destination_revision = 0;
+        std::string source_world, destination, requested_start, selected_start, error;
+        bool player_captured = false, world_loaded = false, player_entered = false, cleanup_complete = false;
+        bool source_retained = true, start_fallback = false;
+        std::size_t unknown = 0, failed = 0, checked_textures = 0;
+        std::vector<DestinationTrialEntry> entries;
+        std::vector<std::string> unavailable_services;
+        float health = 0, armor = 0, bullets = 0;
+        std::size_t keys = 0;
+    };
 } // namespace OpenBlood2

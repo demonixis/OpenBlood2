@@ -318,7 +318,7 @@ namespace
         auto& capture = g.server_shell.damage_capture;
         CHECK(capture.valid && capture.captures == 1 && capture.attempts == 2 && capture.state.health == 73 &&
               capture.state.armor == 29);
-        CHECK(g.client_shell.world_exit.blocked == 1 && p->m_damage.m_fHitPoints == 73);
+        CHECK(g.client_shell.world_exit.queued == 1 && p->m_damage.m_fHitPoints == 73);
         p->m_damage.m_fHitPoints = 67;
         CHECK(capture.state.health == 73);
         g.server.SetObjectState(p->m_hObject, OBJSTATE_INACTIVE);

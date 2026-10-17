@@ -63,6 +63,48 @@ namespace OpenBlood2
         }
         ImGui::TreePop();
     }
+    void Inspector::draw_level_change(const GameSession& game)
+    {
+        if (game.pending_level_change)
+            ImGui::TextWrapped("NEW_LEVEL queued for the owning frame boundary; current session retained.");
+        const auto& d = game.level_change;
+        if (!d.attempts || !ImGui::TreeNodeEx("Safe NEW_LEVEL transaction", ImGuiTreeNodeFlags_DefaultOpen))
+            return;
+        ImGui::Text("Attempts %llu / committed %llu / rejected %llu", (unsigned long long)d.attempts,
+                    (unsigned long long)d.committed, (unsigned long long)d.rejected);
+        ImGui::TextWrapped("%s -> %s | requested start %s / selected %s%s", d.source_world.c_str(),
+                           d.destination.c_str(), d.requested_start.c_str(), d.selected_start.c_str(),
+                           d.start_fallback ? " (original fallback)" : "");
+        ImGui::Text("Source %llu / destination %llu / current revision %llu", (unsigned long long)d.source_revision,
+                    (unsigned long long)d.destination_revision, (unsigned long long)game.world_revision);
+        ImGui::Text("Captured %d / loaded %d / entered %d / cleanup %d / source retained %d", d.player_captured,
+                    d.world_loaded, d.player_entered, d.cleanup_complete, d.source_retained);
+        ImGui::Text("Unsupported %zu / failed %zu / decoded images %zu", d.unknown, d.failed, d.checked_textures);
+        if (d.player_entered)
+            ImGui::Text("Destination HP %.1f / armor %.1f / bullets %.1f / keys %zu", d.health, d.armor, d.bullets,
+                        d.keys);
+        if (!d.error.empty())
+            ImGui::TextWrapped("%s", d.error.c_str());
+        for (const auto& name : d.unavailable_services)
+            ImGui::TextWrapped("Unavailable service: %s", name.c_str());
+        if (ImGui::TreeNode("Destination creation results"))
+        {
+            ImGuiListClipper clip;
+            clip.Begin(static_cast<int>(d.entries.size()));
+            while (clip.Step())
+                for (int i = clip.DisplayStart; i < clip.DisplayEnd; ++i)
+                {
+                    const auto& row = d.entries[i];
+                    ImGui::Text("%s / %s / %s", row.class_name.c_str(), row.name.c_str(), entry_state_name(row.state));
+                    if (ImGui::IsItemHovered() && !row.detail.empty())
+                        ImGui::SetTooltip("%s", row.detail.c_str());
+                }
+            ImGui::TreePop();
+        }
+        ImGui::TextWrapped(
+            "Owned historical report. Initialization checks do not certify later gameplay or complete M2.");
+        ImGui::TreePop();
+    }
     void Inspector::draw_destination_trial(const GameSession& game)
     {
         const auto& d = game.destination_trial;
@@ -111,11 +153,15 @@ namespace OpenBlood2
             const auto& exit = game.client_shell.world_exit;
             ImGui::Text("Received %llu / dead ignored %llu / transfer blocked %llu", (unsigned long long)exit.received,
                         (unsigned long long)exit.ignored_dead, (unsigned long long)exit.blocked);
+            ImGui::Text("Queued %llu / completed %llu", (unsigned long long)exit.queued,
+                        (unsigned long long)exit.completed);
             ImGui::TextWrapped("Requested world: %s / type %u / server start: %s", exit.request.next_world.c_str(),
                                static_cast<unsigned>(exit.request.type), game.server_shell.start_point_name.c_str());
-            ImGui::TextWrapped("%s", exit.error.empty() ? "No transfer attempted; safe NEW_LEVEL transfer unavailable."
-                                                        : exit.error.c_str());
+            ImGui::TextWrapped("%s", exit.error.empty()
+                                         ? "No exit error; queued transitions execute at the frame boundary."
+                                         : exit.error.c_str());
             draw_destination_trial(game);
+            draw_level_change(game);
             draw_destination(game);
             const auto& fields = game.server_shell.player_capture;
             ImGui::Text("Player fields: %llu / %llu captures; %s", (unsigned long long)fields.captures,
@@ -136,8 +182,9 @@ namespace OpenBlood2
                     ImGui::Text("Move state %u | last crouch %d / forced crouch %d", p.move_state, p.last_crouch,
                                 p.forced_crouch);
                     ImGui::TextWrapped("Trigger string: %s", p.trigger ? p.trigger->c_str() : "<null>");
-                    ImGui::TextWrapped("Selected original value block only. Power timers, engine/model state, "
-                                       "client restoration and destination transfer remain unavailable.");
+                    ImGui::TextWrapped(
+                        "Selected original value block. The NEW_LEVEL transaction combines this with "
+                        "engine/model state and restored client association. Power timers remain unavailable.");
                     ImGui::TreePop();
                 }
             }

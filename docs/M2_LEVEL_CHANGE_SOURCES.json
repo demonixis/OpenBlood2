@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "01eb4e84e824cae3d4a9a4bd755078d9d4188922",
+  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "selected_lines": [
+        [
+          827,
+          997
+        ],
+        [
+          1140,
+          1212
+        ]
+      ],
+      "use": "Original NEW_LEVEL KeepAliveSave/Load sequence and retained difficulty; existing typed player paths reused"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "selected_lines": [
+        [
+          1700,
+          1735
+        ],
+        [
+          6216,
+          6284
+        ]
+      ],
+      "use": "Original dead-player guard, owned next-world intent and client world-exit cleanup"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selected_lines": [
+        [
+          2156,
+          2300
+        ]
+      ],
+      "use": "Existing original named start selection, trigger-before-teleport and grounding"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "selected_lines": [],
+      "use": "Existing original type-1 Load, key removal and retained inventory"
+    }
+  ],
+  "adaptations": [
+    "New owning frame-boundary transaction using existing original player Save/Load and named entry; no new original gameplay functions imported",
+    "Seven list/count pairs, active camera, five AI table owners and adapter binding isolate staged destination callbacks and source destruction",
+    "Retained current difficulty, original key removal, explicit resource/entry failure rollback without reconstructing source world",
+    "Move SDL output ownership after preparation; monotonic presentation revision and cleared old input/selections"
+  ],
+  "remaining": [
+    "CityHub 18 unsupported classes and one failed entry still reject authored campaign exit",
+    "Retail Keep.sav/autosave, complete player/client/world state and future runtime service completeness",
+    "Intermittent frozen dead NPC user report remains under investigation; M2 incomplete"
+  ]
+}

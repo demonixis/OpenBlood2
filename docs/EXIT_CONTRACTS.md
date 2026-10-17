@@ -1,5 +1,10 @@
 # Original level-exit contracts
 
+> Current continuation: [safe NEW_LEVEL](LEVEL_CHANGE_CONTRACTS.md) promotes a fully prepared
+> destination with the supported player, or retains the source on failure. Earlier
+> blanket transfer omissions below are historical; each standalone diagnostic API
+> retains its documented scope. CityHub and full M2 acceptance remain incomplete.
+
 > Continued by [named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md): supported
 > captured players can enter an already loaded different world at a named start.
 > Automatic NEW_LEVEL still refuses; staged cleanup is not world rollback.

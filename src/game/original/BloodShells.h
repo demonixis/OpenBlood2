@@ -103,7 +103,7 @@ class CBloodClientShell
         OpenBlood2::WorldExit request;
         OpenBlood2::WorldMessage load;
         std::string error;
-        std::uint64_t received = 0, ignored_dead = 0, blocked = 0;
+        std::uint64_t received = 0, ignored_dead = 0, blocked = 0, queued = 0, completed = 0;
         bool pending = false;
     } world_exit;
     OpenBlood2::BossHealth boss_health;

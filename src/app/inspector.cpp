@@ -29,6 +29,34 @@
 namespace OpenBlood2
 {
 
+    void Inspector::forget_world()
+    {
+        skeleton_selection = trigger_selection = trigger_request = scene_explosion_selection =
+            scene_explosion_request = {};
+        sprite_selection = random_sound_selection = random_sound_request = cinematic_selection = cinematic_request = {};
+        light_selection = light_request = keyframe_selection = keyframe_request = camera_selection =
+            camera_request = {};
+        objective_selection = pickup_selection = brush_selection = brush_request = door_selection =
+            door_trigger_request = {};
+        container_selection = container_toggle_request = remove_request = {};
+        world_sound_selection = 0;
+        source_selection = model_selection = 0;
+        player_position_request.reset();
+        movement_input_request.reset();
+        weapon_input_request.reset();
+        weapon_aim_request.reset();
+        trigger_command.clear();
+        random_sound_command.clear();
+        light_command.clear();
+        keyframe_command.clear();
+        camera_command.clear();
+        brush_command.clear();
+        spawn_request.clear();
+        world_error.clear();
+        weapon_slot_request = -1;
+        // Commands were drained before the owner boundary; do not carry an identity
+        // selection into the new object's independent slot/generation namespace.
+    }
     bool Inspector::initialize(std::string& error)
     {
         IMGUI_CHECKVERSION();
@@ -342,6 +370,15 @@ namespace OpenBlood2
             else
                 world_error = "Invalid destination request";
             trial_destination_request = false;
+        }
+        if (level_change_request)
+        {
+            WorldMessage message;
+            if (original_world_request(keep_world_name, 0, LOADTYPE_NEW_LEVEL, 0, message))
+                game.queue_level_change(message, keep_start_name, world_error);
+            else
+                world_error = "Invalid destination request";
+            level_change_request = false;
         }
         if (keep_world_request)
         {
@@ -1348,6 +1385,10 @@ namespace OpenBlood2
         ImGui::EndDisabled();
         ImGui::InputText("Destination world", keep_world_name, sizeof(keep_world_name));
         ImGui::InputText("Destination start (empty = start)", keep_start_name, sizeof(keep_start_name));
+        ImGui::BeginDisabled(!game.local_client);
+        if (ImGui::Button("Change level safely with current player"))
+            level_change_request = true;
+        ImGui::EndDisabled();
         if (ImGui::Button("Inspect destination without leaving"))
             inspect_destination_request = true;
         ImGui::BeginDisabled(!player);
@@ -1355,6 +1396,7 @@ namespace OpenBlood2
             trial_destination_request = true;
         ImGui::EndDisabled();
         draw_destination_trial(game);
+        draw_level_change(game);
         draw_destination(game);
         ImGui::BeginDisabled(player);
         if (ImGui::Button("Load destination for inspection"))

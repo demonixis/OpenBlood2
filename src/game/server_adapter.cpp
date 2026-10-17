@@ -477,6 +477,7 @@ namespace OpenBlood2
     }
     DRESULT ServerAdapter::unsupported(const char* service)
     {
+        ++unavailable_services[service];
         objects_.fail(ObjectError::Unsupported, std::string(service) + ": not implemented");
         return DE_ERROR;
     }

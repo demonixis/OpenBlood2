@@ -198,13 +198,11 @@ namespace OpenBlood2
                 if (inspect_exit)
                 {
                     // At most one bounded destination scan per pump: inspect the final
-                    // owned request, while preserving each source exit/capture/refusal.
+                    // owned request, while preserving each source exit/capture/queue observation.
                     auto& exit = client_shell.world_exit;
                     std::string diagnostic;
                     if (!inspect_destination(exit.load, server_shell.start_point_name, diagnostic))
                         exit.error += "; destination scan: " + diagnostic;
-                    else
-                        exit.error += "; destination scan completed without running original creation/start callbacks";
                 }
                 return true;
             }
@@ -222,16 +220,11 @@ namespace OpenBlood2
                     server_shell.CapturePlayerInventory(local_client);
                     server_shell.CapturePlayerDamage(local_client);
                     server_shell.CapturePlayerFields(local_client);
-                    // NEW_LEVEL is rejected by the decoder before any teardown:
-                    // selected fields/aggregates are not complete KeepAliveSave/Load.
-                    WorldRequest request;
-                    if (!decode_world_request(exit.load, request, exit.error))
-                    {
+                    if (!queue_level_change(exit.load, server_shell.start_point_name, exit.error))
                         ++exit.blocked;
-                        inspect_exit = true;
-                    }
                     else
-                        return objects.fail(ObjectError::Unsupported, "World exit transfer is unavailable");
+                        ++exit.queued;
+                    inspect_exit = true;
                 }
             }
         }
@@ -307,6 +300,7 @@ namespace OpenBlood2
     {
         if (objects.busy())
             return false;
+        pending_level_change.reset();
         client_shell.OnExitWorld();
         if (local_client)
         {
@@ -364,7 +358,7 @@ namespace OpenBlood2
         error = "RunWorld blocked: " + std::to_string(missing) +
                 " uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat "
                 "reactions, "
-                "audio, autosave, keep-alive level transfer and remaining mover classes remain unported";
+                "audio, autosave and remaining mover classes remain unported";
         if (!entry_error.empty())
             error += "; player entry: " + entry_error;
         if (trace.empty() || trace.back() != error)

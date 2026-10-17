@@ -42,7 +42,7 @@ namespace OpenBlood2
         const auto old_revision = g.world_revision;
         const auto old_bullets = player->m_InventoryMgr.GetAmmoCount(1);
         const auto received = g.client_shell.world_exit.received;
-        const auto blocked = g.client_shell.world_exit.blocked;
+        const auto blocked = g.client_shell.world_exit.queued;
         const auto scans = g.destination_inspection.attempts;
         const auto captures = g.server_shell.inventory_capture.captures;
         const auto field_captures = g.server_shell.player_capture.captures;
@@ -86,7 +86,7 @@ namespace OpenBlood2
             g.destination_trial.selected_start != "01_egressa")
             return false;
         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
-               g.client_shell.world_exit.blocked == blocked + 1 && g.server_shell.inventory_capture.valid &&
+               g.client_shell.world_exit.queued == blocked + 1 && g.server_shell.inventory_capture.valid &&
                g.server_shell.inventory_capture.captures == captures + 1 &&
                g.server_shell.inventory_capture.state.ammo[1] == old_bullets && g.server_shell.damage_capture.valid &&
                g.server_shell.damage_capture.captures == damage_captures + 1 &&
@@ -95,8 +95,8 @@ namespace OpenBlood2
                g.server_shell.player_capture.valid && g.server_shell.player_capture.captures == field_captures + 1 &&
                g.server_shell.player_capture.state.air == player->m_fAirLevel &&
                g.server_shell.player_capture.state.name == std::optional<std::string>("") &&
-               g.client_shell.world_exit.error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos &&
-               g.destination_inspection.scan_complete && g.destination_inspection.attempts == scans + 1 &&
+               g.pending_level_change.has_value() && g.destination_inspection.scan_complete &&
+               g.destination_inspection.attempts == scans + 1 &&
                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
                g.destination_inspection.source_revision == old_revision &&

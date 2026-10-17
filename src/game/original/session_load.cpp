@@ -80,8 +80,8 @@ namespace OpenBlood2
             return false;
         if (next.load_type == LOADTYPE_NEW_LEVEL)
         {
-            error = "LOADTYPE_NEW_LEVEL requires original KeepAliveSave/KeepAliveLoad; safe player/world transfer is "
-                    "unavailable";
+            error = "LOADTYPE_NEW_LEVEL requires the owned KeepAliveSave/KeepAliveLoad transaction; "
+                    "queue it for the frame boundary";
             return false;
         }
         request = std::move(next);

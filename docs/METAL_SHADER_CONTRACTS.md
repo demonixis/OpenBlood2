@@ -90,3 +90,7 @@ panning, resize and unload/re-entry. With private/GPU tests enabled, run the sam
 focused suite documented in the evidence under `SDL_GPU_DRIVER=metal`. Record the
 actual Apple hardware, macOS/SDK and results before claiming native validation.
 iOS, D3D12, full lighting and complete M2 acceptance remain outside this change.
+
+On 17 October 2026 the user confirmed the updated build works on macOS. Record this
+as user-reported execution; hardware/OS/SDK and a native automated GPU test run
+remain unrecorded. Local evidence remains Linux/NVIDIA Vulkan.

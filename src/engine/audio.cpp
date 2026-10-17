@@ -446,6 +446,27 @@ namespace OpenBlood2
         output_error.clear();
         return true;
     }
+    bool AudioMixer::transfer_output_to(AudioMixer& destination, std::string& error)
+    {
+        if (&destination == this || destination.output_ || destination.audio_initialized_)
+        {
+            error = "Audio output transfer requires a separate offline destination";
+            return false;
+        }
+        // Last fallible operation before committing a level: old queued PCM must
+        // not play in the destination. Voices and caches remain with their world.
+        if (output_ && !SDL_ClearAudioStream(output_))
+        {
+            error = SDL_GetError();
+            return false;
+        }
+        destination.output_ = output_;
+        destination.audio_initialized_ = audio_initialized_;
+        destination.inspect_pcm = inspect_pcm;
+        output_ = nullptr;
+        audio_initialized_ = false;
+        return true;
+    }
     void AudioMixer::clear()
     {
         voices_.clear();

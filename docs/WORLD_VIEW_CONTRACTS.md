@@ -64,7 +64,7 @@ same world path. Presentation without an entered player remains inspection-only.
 The packaged world shaders now support Vulkan/SPIR-V and Metal/MSL. See
 [Metal shader contracts](METAL_SHADER_CONTRACTS.md) for backend selection, generated
 bindings and optional SDL_shadercross regeneration. Both artifacts are checked in;
-ordinary builds need no shader toolchain. Native Metal execution remains pending,
+ordinary builds need no shader toolchain. macOS execution is user-confirmed; native automated tests remain pending,
 while Linux Vulkan has actual GPU evidence. D3D12 artifacts remain unavailable.
 
 ## Use and evidence

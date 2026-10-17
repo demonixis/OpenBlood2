@@ -65,6 +65,7 @@ namespace OpenBlood2
         AudioMixer& operator=(const AudioMixer&) = delete;
         ~AudioMixer();
         bool open_output(std::string& error);
+        bool transfer_output_to(AudioMixer& destination, std::string& error);
         bool has_output() const
         {
             return output_ != nullptr;

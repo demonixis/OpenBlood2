@@ -133,10 +133,14 @@ namespace
             Writer arrival;
             arrival.vec(trial == 3 ? 10000 : 0, 100, 0);
             if (trial != 2)
-                w.append(object("GameStartPoint",
-                                {string_prop("Name", "arrival"), prop("Pos", 1, arrival),
-                                 string_prop("TriggerTarget", "entry-camera"), string_prop("TriggerMessage", "ON")}));
-            w.append(object("CameraObj", {string_prop("Name", "entry-camera")}));
+                w.append(object("GameStartPoint", {string_prop("Name", "arrival"), prop("Pos", 1, arrival),
+                                                   string_prop("TriggerTarget", "entry-camera"),
+                                                   string_prop("TriggerMessage", trial == 6 ? "TRIGGER" : "ON")}));
+            if (trial == 6)
+                w.append(object("ExitTrigger", {string_prop("Name", "entry-camera"), string_prop("NextWorld", "trial1"),
+                                                prop("ObjectActivate", 5, yes)}));
+            else
+                w.append(object(trial == 5 ? "NotPorted" : "CameraObj", {string_prop("Name", "entry-camera")}));
             w.append(object("PathPoint", {string_prop("Name", "WALK0"), prop("Pos", 1, arrival)}));
             w.append(object("SmellHint", {string_prop("Name", "scent")}));
             w.append(object("ExitHint", {string_prop("Name", "exit")}));
@@ -770,6 +774,8 @@ namespace
     unsigned destination_constructed = 0;
     GameSession* destination_session = nullptr;
     bool rejected_reentrant = false;
+    std::unique_ptr<GameSession>* transition_owner = nullptr;
+    bool transition_reentrant_rejected = false;
     struct DestinationProbe : BaseClass
     {
         DestinationProbe()
@@ -778,6 +784,16 @@ namespace
         }
         DDWORD EngineMessageFn(DDWORD id, void*, float) override
         {
+            if (id == MID_UPDATE && transition_owner)
+            {
+                std::string error;
+                auto* before = transition_owner->get();
+                transition_reentrant_rejected =
+                    GameSession::process_level_change(*transition_owner, error) == LevelChangeResult::Rejected &&
+                    transition_owner->get() == before && before->pending_level_change &&
+                    before->level_change.attempts == 0 && error.find("callbacks") != error.npos;
+                return 1;
+            }
             if (id == MID_UPDATE && destination_session)
             {
                 WorldMessage message;
@@ -909,7 +925,7 @@ namespace
         for (unsigned i = 0; i < 256; ++i)
             CHECK(game.server.SendWorldExit({i == 255 ? "destination" : "broken"}, "arrival") == DE_OK);
         CHECK(game.pump_player_messages(error));
-        CHECK(game.client_shell.world_exit.blocked == 256 && game.client_shell.world_exit.received == 256);
+        CHECK(game.client_shell.world_exit.queued == 256 && game.client_shell.world_exit.received == 256);
         CHECK(d.attempts == attempts + 1 && d.scan_complete && d.destination == "worlds/destination.dat");
         CHECK(game.pump_player_messages(error) && d.attempts == attempts + 1);
         CHECK(game.objects.snapshot() == ids && game.client_shell.player == player->m_hObject);
@@ -1040,7 +1056,7 @@ namespace
     {
         CHECK(test_player::setup(game, root, true, true, true));
         test_player::Directory dir;
-        for (unsigned i = 1; i <= 4; ++i)
+        for (unsigned i = 1; i <= 6; ++i)
             dir.children["worlds"].files["trial" + std::to_string(i) + ".dat"] =
                 dat(false, false, false, false, i).data;
         dir.children["worlds"].files["broken.dat"] = {56, 0, 0, 0};
@@ -1130,6 +1146,188 @@ namespace
         CHECK(resumed);
         CHECK(game.unload_world() && game.server.string_count() == 0 && game.objects.snapshot().empty());
         CHECK(game.destination_trial.player_entered && game.destination_trial.source_revision != game.world_revision);
+        return true;
+    }
+    bool transition_images(GameSession& game, const std::filesystem::path& root)
+    {
+        // Transition preparation decodes images. Override the older indexed-only
+        // fixture skins with real synthetic -2 DTX data, never retail assets.
+        test_model::Writer image;
+        image.u32(0);
+        image.u32(0xfffffffeu);
+        image.u16(2);
+        image.u16(2);
+        image.u16(1);
+        image.u16(0);
+        image.u32(0);
+        image.u32(0);
+        image.b.resize(1068);
+        image.b[44] = image.b[45] = image.b[46] = image.b[47] = 255;
+        image.b.insert(image.b.end(), {0, 0, 0, 0});
+        test_player::Directory dir;
+        for (const auto& [path, resource] : game.resources.index())
+            if (path.ends_with(".dtx"))
+            {
+                auto* parent = &dir;
+                std::size_t begin = 0, slash;
+                while ((slash = path.find('/', begin)) != path.npos)
+                {
+                    parent = &parent->children[path.substr(begin, slash - begin)];
+                    begin = slash + 1;
+                }
+                parent->files[path.substr(begin)] = image.b;
+            }
+        dir.files["t.dtx"] = image.b;
+        dir.children["models"].files["path1.abc"] = test_model::abc(false, true).b;
+        dir.children["skins"].files["path1.dtx"] = image.b;
+        test_model::Writer archive;
+        archive.b.resize(168);
+        archive.b[0] = archive.b[62] = archive.b[124] = 13;
+        archive.b[1] = archive.b[63] = archive.b[125] = 10;
+        archive.b[126] = 26;
+        archive.patch(127, 1);
+        const auto [offset, size] = test_player::write_dir(archive, dir);
+        archive.patch(131, offset);
+        archive.patch(135, size);
+        CHECK(save(root / "images.rez", archive.b));
+        std::string error;
+        CHECK(game.resources.mount(root / "images.rez", error));
+        return true;
+    }
+    bool level_change(const std::filesystem::path& root)
+    {
+        auto game = std::make_unique<GameSession>();
+        CHECK(trial_fixture(*game, root));
+        WorldMessage queued;
+        std::string guard_error;
+        CHECK(original_world_request("trial1", 0, LOADTYPE_NEW_LEVEL, 0, queued));
+        CHECK(game->queue_level_change(queued, "arrival", guard_error));
+        CHECK(game->objects.register_class(destination_type));
+        auto probe = game->objects.create(game->objects.find_class("DestinationProbe"), {}, Creation::World);
+        CHECK(probe);
+        transition_owner = &game;
+        CHECK(game->objects.engine_message(probe, MID_UPDATE, nullptr));
+        transition_owner = nullptr;
+        CHECK(transition_reentrant_rejected);
+        CHECK(game->objects.remove(probe) && game->objects.finish_frame());
+        game->server.SetGameConVar("GAME_DIFFICULTY", "3");
+        auto* player = game->server_shell.Player(game->local_client);
+        player->m_damage.m_fMaxHitPoints = 311;
+        player->m_damage.m_fResistance = .42f;
+        player->m_nAttribSpeed = 6;
+        CHECK(player->m_InventoryMgr.AddItem(1, 1) == InventoryResult::Ok);
+        player->m_InventoryMgr.medkit->count = 43;
+        player->m_damage.SetHitPoints(37);
+        player->m_damage.SetArmorPoints(23);
+        player->m_InventoryMgr.SetAmmoCount(1, 1234);
+        CHECK(player->m_InventoryMgr.AddKey({"old-key", "Old key", "icon", "selected", 2}) == InventoryResult::Ok);
+        std::string error;
+        WorldMessage message;
+        const auto* owner = game.get();
+        const auto ids = game->objects.snapshot();
+        const auto client = game->local_client;
+        const auto revision = game->world_revision;
+        const auto time = game->objects.time();
+        GlobalSnapshot globals;
+        CHECK(globals.capture());
+        for (const auto* name : {"trial1", "trial2", "trial3", "trial4", "trial5", "trial6", "broken", "missing"})
+        {
+            CHECK(original_world_request(name, 0, LOADTYPE_NEW_LEVEL, 0, message));
+            CHECK(game->queue_level_change(message, "arrival", error));
+            CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+            std::cout << name << ": " << error << '\n';
+            CHECK(!error.empty() && game.get() == owner && game->level_change.source_retained);
+            CHECK(game->level_change.cleanup_complete && globals.unchanged() && g_pServerDE == &game->server);
+            CHECK(game->objects.snapshot() == ids && game->local_client == client);
+            CHECK(game->world_revision == revision && game->objects.time() == time);
+            CHECK(player->m_damage.m_fHitPoints == 37 && player->m_InventoryMgr.GetAmmoCount(1) == 1234);
+            CHECK(player->m_InventoryMgr.keys.size() == 1);
+            CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::None);
+        }
+        CHECK(transition_images(*game, root));
+        CHECK(original_world_request("missing", 0, LOADTYPE_NEW_LEVEL, 0, message));
+        CHECK(game->queue_level_change(message, "unused", error));
+        CHECK(original_world_request("trial1", 0, LOADTYPE_NEW_LEVEL, 0, message));
+        CHECK(!game->queue_level_change(message, std::string("a\0b", 3), error));
+        CHECK(game->queue_level_change(message, "ARRIVAL", error));
+        CHECK(game->pending_level_change->start == "ARRIVAL");
+        for (unsigned cycle = 0; cycle < 3; ++cycle)
+        {
+            owner = game.get();
+            const auto before_revision = game->world_revision;
+            const auto result = GameSession::process_level_change(game, error);
+            std::cout << "Commit " << cycle << ": " << error << '\n';
+            CHECK(result == LevelChangeResult::Committed && error.empty() && game.get() != owner);
+            CHECK(game->world_revision == before_revision + 1 && game->objects.time() == 0);
+            CHECK(game->level_change.committed == cycle + 1 && game->level_change.rejected == 8);
+            CHECK(game->level_change.cleanup_complete && !game->level_change.source_retained);
+            CHECK(game->level_change.checked_textures >= 5 && game->level_change.selected_start == "arrival");
+            CHECK(g_pServerDE == &game->server && game->client_shell.m_bInWorld);
+            player = game->server_shell.Player(game->local_client);
+            CHECK(player && player->m_damage.m_fHitPoints == 37 && player->m_damage.m_fArmorPoints == 23);
+            CHECK(player->m_InventoryMgr.GetAmmoCount(1) == 1234 && player->m_InventoryMgr.keys.empty());
+            CHECK(player->m_damage.m_fMaxHitPoints == 311 && player->m_damage.m_fResistance == .42f);
+            CHECK(player->m_nAttribSpeed == 6 && player->respawns == 0);
+            CHECK(player->m_InventoryMgr.medkit && player->m_InventoryMgr.medkit->count == 43);
+            CHECK(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_DIFFICULTY")) == 3);
+            CHECK(game->client_shell.view.object && g_hActiveCamera);
+            CHECK(game->step(.016));
+            CHECK(game->server.message_count() == 0 && game->server.list_count() == 0);
+            CHECK(game->queue_level_change(message, "arrival", error));
+        }
+        CHECK(game->unload_world() && !game->pending_level_change && !game->server.string_count());
+        return true;
+    }
+    bool level_change_private(const std::filesystem::path& root)
+    {
+        auto game = std::make_unique<GameSession>();
+        CHECK(game->initialize());
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(game->resources.mount_game(config, error));
+        CHECK(game->request_world("01_SubwayA", error) && game->enter_player(error));
+        CHECK(game->step(.016));
+        for (unsigned cycle = 0; cycle < 3; ++cycle)
+        {
+            auto* player = game->server_shell.Player(game->local_client);
+            player->m_damage.SetHitPoints(37);
+            player->m_damage.SetArmorPoints(23);
+            player->m_InventoryMgr.SetAmmoCount(1, 1234);
+            GlobalSnapshot globals;
+            CHECK(globals.capture());
+            auto* owner = game.get();
+            const auto ids = game->objects.snapshot();
+            const auto revision = game->world_revision;
+            const auto time = game->objects.time();
+            std::map<SoundId, double> voices;
+            for (const auto& [id, voice] : game->server.audio.voices())
+                voices[id] = voice.cursor;
+            WorldMessage message;
+            CHECK(original_world_request("02_CityHub", 0, LOADTYPE_NEW_LEVEL, 0, message));
+            CHECK(game->queue_level_change(message, "01_egressa", error));
+            CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+            std::cout << "CityHub refusal " << cycle << ": " << error << '\n';
+            CHECK(game.get() == owner && game->objects.snapshot() == ids && globals.unchanged());
+            CHECK(game->level_change.unknown == 18 && game->level_change.failed == 1);
+            CHECK(game->level_change.cleanup_complete && game->level_change.source_retained);
+            CHECK(game->world_revision == revision && game->objects.time() == time);
+            CHECK(game->server.audio.voices().size() == voices.size());
+            for (const auto& [id, cursor] : voices)
+                CHECK(game->server.audio.get(id) && game->server.audio.get(id)->cursor == cursor);
+            CHECK(original_world_request("01_SubwayA", 0, LOADTYPE_NEW_LEVEL, 0, message));
+            CHECK(game->queue_level_change(message, "start", error));
+            const auto result = GameSession::process_level_change(game, error);
+            std::cout << "SubwayA transfer " << cycle << ": " << error << '\n';
+            CHECK(result == LevelChangeResult::Committed && error.empty() && game.get() != owner);
+            CHECK(game->level_change.cleanup_complete && game->world_revision == revision + 1);
+            CHECK(game->level_change.checked_textures > 50 && game->objects.time() == 0);
+            player = game->server_shell.Player(game->local_client);
+            CHECK(player && player->m_damage.m_fHitPoints == 37 && player->m_damage.m_fArmorPoints == 23);
+            CHECK(player->m_InventoryMgr.GetAmmoCount(1) == 1234);
+            CHECK(game->step(.016) && g_pServerDE == &game->server);
+        }
+        CHECK(game->unload_world() && !game->server.string_count() && !game->server.client_count());
         return true;
     }
     bool destination_trial_private(const std::filesystem::path& root)
@@ -1302,6 +1500,8 @@ int main(int argc, char** argv)
     std::filesystem::path root = argc > 2 ? path_from_utf8(argv[2]) : std::filesystem::path{};
     if (name == "private")
         ok = private_world(root);
+    else if (name == "level_change_private")
+        ok = level_change_private(root);
     else if (name == "destination_trial_private")
         ok = destination_trial_private(root);
     else if (name == "destination_private")
@@ -1315,6 +1515,8 @@ int main(int argc, char** argv)
             return 2;
         if (name == "surface_effects")
             ok = surface_effects();
+        else if (name == "level_change")
+            ok = level_change(root);
         else if (name == "destination_trials")
             ok = destination_trials(root);
         else if (name == "destination_messages")

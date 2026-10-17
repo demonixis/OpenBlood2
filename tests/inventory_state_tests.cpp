@@ -192,7 +192,7 @@ namespace
               g.pump_player_messages(error));
         auto& capture = g.server_shell.inventory_capture;
         CHECK(capture.valid && capture.captures == 1 && capture.attempts == 2 && capture.state.keys.size() == 1);
-        CHECK(g.client_shell.world_exit.blocked == 1 && inv.keys.size() == 1);
+        CHECK(g.client_shell.world_exit.queued == 1 && inv.keys.size() == 1);
         auto saved = capture.state;
         inv.SetAmmoCount(1, 17);
         CHECK(capture.state.ammo[1] == 50 && !inv.Load(saved, InventoryLoadType::KeepAlive, error));
