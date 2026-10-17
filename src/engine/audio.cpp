@@ -382,6 +382,8 @@ namespace OpenBlood2
                 v.done = v.cursor >= clip.frames();
             }
         }
+        if (!instruments.advance(frames, mixed))
+            return false;
         if (stream_failed)
         {
             mixed.clear();
@@ -470,6 +472,7 @@ namespace OpenBlood2
     void AudioMixer::clear()
     {
         voices_.clear();
+        instruments.clear();
         clips_.clear();
         streams_.clear();
         cached_bytes_ = 0;

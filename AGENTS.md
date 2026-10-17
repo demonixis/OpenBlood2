@@ -653,3 +653,5 @@ The [original music asset prerequisite](../Documentation/Implementation/m2_music
 
 
 The [DLS data continuation](../Documentation/Implementation/m2_music_dls.md) decodes original external instrument-bank PCM, cue/region mappings and raw articulation. Read [contracts](docs/contracts/music_dls_contracts.md); preserve cue indirection, signed values, region overrides, strict effective loop bounds and immutable world ownership. Cabal's unused invalid wave default remains visible; Crudux/Track1 invalid effective loops refuse decoding without invented repair. No synthesis or successful MUSIC service is claimed; M2 remains incomplete.
+
+The [DLS voice continuation](../Documentation/Implementation/m2_music_sampler.md) adds explicit instrument auditions through the existing audio clock/output. Read [contracts](docs/contracts/music_sampler_contracts.md); preserve region graph precedence, effective loops, signed gain/envelope units, immutable bank lifetime and explicit unsupported connections. Cabal has 33 synthesized / five refused region probes. Diagnostic notes are not original MUSIC playback; M2 stays incomplete.

@@ -24,3 +24,5 @@ Reports are chronological evidence, not blanket support claims. M2 remains
 incomplete. Preserve failed attempts, platform limitations and historical hashes;
 later verified records may supersede an earlier limitation without rewriting
 the original log or patch.
+
+- [DLS diagnostic voice synthesis](../../../Documentation/Implementation/m2_music_sampler.md): sample/envelope auditions, shared audio clock and Cabal refusals; M2 remains incomplete.

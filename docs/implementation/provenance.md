@@ -1191,3 +1191,12 @@ are references, not copied implementation. Unused invalid wave defaults stay
 visible; invalid effective region loops refuse decoding. See
 [contracts](../contracts/music_dls_contracts.md) and
 [source ledger](sources/m2_music_dls_sources.json). Music playback remains unavailable.
+
+## DLS diagnostic voices (M2)
+
+Independent sample/envelope/LFO evaluation uses the public DLS specification and
+its errata, with later DirectMusic region/global graph selection explicitly noted.
+No original music command is marked successful. See
+[contracts](../contracts/music_sampler_contracts.md),
+[source ledger](sources/m2_music_sampler_sources.json) and
+[evidence](../../../Documentation/Implementation/m2_music_sampler.md).

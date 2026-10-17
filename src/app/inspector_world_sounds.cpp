@@ -1,58 +1,38 @@
 #include "engine/audio_stream.h"
 #include "inspector.h"
+#include <algorithm>
 #include <imgui.h>
 namespace OpenBlood2
 {
     void Inspector::draw_world_sounds(GameSession& game)
     {
         const auto& music = game.music_catalog;
-        if (ImGui::CollapsingHeader("Original music assets (playback unavailable)", ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::TreeNodeEx("DLS instruments, samples and diagnostic notes", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            ImGui::TextWrapped("Directory: %s | %zu original requests / %zu unique assets | %zu bytes read",
-                               music.plan.directory.c_str(), music.plan.requests.size(), music.assets.size(),
-                               music.bytes_read);
-            ImGui::TextWrapped("RIFF structure, section-to-style filenames and decoded DLS sample/region data. Pattern "
-                               "events, personality "
-                               "records, DLS synthesis and playlist playback are not implemented. MUSIC commands "
-                               "still report unsupported; no audio is produced by this inspection.");
-            if (!music.error.empty())
-                ImGui::TextWrapped("Music inspection: %s", music.error.c_str());
-            if (ImGui::TreeNode("Original request order"))
+            auto& sampler = game.server.audio.instruments;
+            ImGui::TextWrapped(
+                "Audition creates a one-second note at the region midpoint, velocity 100, gain 20%%. "
+                "This is a sample/envelope diagnostic, not original music playback. Unsupported "
+                "connections refuse the note; no MIDI controller, exclusivity or sequence service is claimed.");
+            ImGui::Text("Voices %zu/%u | started %llu | completed %llu | refused %llu", sampler.voices().size(),
+                        DlsSampler::max_voices, (unsigned long long)sampler.started,
+                        (unsigned long long)sampler.completed, (unsigned long long)sampler.rejected);
+            if (!sampler.last_error.empty())
+                ImGui::TextWrapped("Last note failure: %s", sampler.last_error.c_str());
+            for (const auto& v : sampler.voices())
             {
-                for (const auto& request : music.plan.requests)
-                    ImGui::BulletText("%s: %s", request.role.c_str(), request.filename.c_str());
-                ImGui::TreePop();
+                ImGui::PushID(int(v.id));
+                ImGui::Text(
+                    "Note %llu | instrument %zu / region %zu | key %u velocity %u | %.3f s / cursor %.2f / loops %llu",
+                    (unsigned long long)v.id, v.instrument, v.region, v.key, v.velocity,
+                    double(v.frames) / DlsSampler::rate, v.cursor, (unsigned long long)v.loops);
+                ImGui::Text("Amplitude A/D/S/R %.3f / %.3f / %.3f / %.3f | pitch EG %.1f cents | LFO %.2f Hz",
+                            v.amplitude.attack, v.amplitude.decay, v.amplitude.sustain, v.amplitude.release,
+                            v.envelope_pitch, v.lfo_hz);
+                if (ImGui::SmallButton("Release note"))
+                    sampler.release(v.id);
+                ImGui::PopID();
             }
-            if (ImGui::BeginTable("Music resources", 4,
-                                  ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
-                                  ImVec2(0, 200)))
-            {
-                for (const char* title : {"External file", "Container", "Records", "Style reference / error"})
-                    ImGui::TableSetupColumn(title);
-                ImGui::TableHeadersRow();
-                for (const auto& asset : music.assets)
-                {
-                    ImGui::TableNextRow();
-                    ImGui::TableNextColumn();
-                    ImGui::TextUnformatted(asset.filename.c_str());
-                    ImGui::TableNextColumn();
-                    ImGui::Text("%s\n%zu bytes", asset.container_valid ? "RIFF valid only" : "Failed", asset.bytes);
-                    ImGui::TableNextColumn();
-                    ImGui::Text("%zu chunks\n%zu patterns\n%zu note chunks", asset.chunks, asset.patterns,
-                                asset.note_chunks);
-                    if (asset.bank)
-                        ImGui::Text("%zu instruments\n%zu waves", asset.bank->instruments.size(),
-                                    asset.bank->waves.size());
-                    ImGui::TableNextColumn();
-                    ImGui::TextWrapped("%s", asset.error.empty() ? asset.style_reference.c_str() : asset.error.c_str());
-                    if (!asset.bank_error.empty())
-                        ImGui::TextWrapped("DLS decoding failed: %s", asset.bank_error.c_str());
-                }
-                ImGui::EndTable();
-            }
-        }
-        if (ImGui::TreeNode("DLS instruments and samples (no synthesis)"))
-        {
             auto settings = [](const DlsSampleSettings& sample)
             {
                 ImGui::Text("Unity note %u | fine tune %d | raw attenuation %d | options 0x%x",
@@ -66,8 +46,8 @@ namespace OpenBlood2
             };
             auto articulation = [](const DlsArticulation& art)
             {
-                ImGui::Text("Articulation graph: %s / %zu raw connections (not evaluated)",
-                            art.present ? "present" : "absent", art.connections.size());
+                ImGui::Text("Articulation graph: %s / %zu raw connections", art.present ? "present" : "absent",
+                            art.connections.size());
                 for (const auto& c : art.connections)
                     ImGui::Text("  src 0x%x / control 0x%x -> dest 0x%x / transform 0x%x / scale %d",
                                 unsigned(c.source), unsigned(c.control), unsigned(c.destination), unsigned(c.transform),
@@ -113,6 +93,14 @@ namespace OpenBlood2
                                         r.settings_override ? "region override" : "inherited from wave");
                             settings(r.settings);
                             articulation(r.articulation);
+                            if (ImGui::Button("Audition region (1 second)"))
+                            {
+                                std::string error;
+                                sampler.play(asset.bank, std::size_t(&instrument - bank.instruments.data()),
+                                             (r.key_low + r.key_high) / 2,
+                                             std::clamp(100U, unsigned(r.velocity_low), unsigned(r.velocity_high)), 1,
+                                             .2, error);
+                            }
                             ImGui::TreePop();
                         }
                         ImGui::TreePop();
@@ -138,6 +126,53 @@ namespace OpenBlood2
                 ImGui::TreePop();
             }
             ImGui::TreePop();
+        }
+        if (ImGui::CollapsingHeader("Original music assets (sequence playback unavailable)",
+                                    ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::TextWrapped("Directory: %s | %zu original requests / %zu unique assets | %zu bytes read",
+                               music.plan.directory.c_str(), music.plan.requests.size(), music.assets.size(),
+                               music.bytes_read);
+            ImGui::TextWrapped(
+                "RIFF structure, section-to-style filenames and decoded DLS sample/region data. Pattern "
+                "events, personality "
+                "records and playlist playback are not implemented. MUSIC commands "
+                "still report unsupported. Explicit DLS diagnostic notes below use the existing audio output.");
+            if (!music.error.empty())
+                ImGui::TextWrapped("Music inspection: %s", music.error.c_str());
+            if (ImGui::TreeNode("Original request order"))
+            {
+                for (const auto& request : music.plan.requests)
+                    ImGui::BulletText("%s: %s", request.role.c_str(), request.filename.c_str());
+                ImGui::TreePop();
+            }
+            if (ImGui::BeginTable("Music resources", 4,
+                                  ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+                                  ImVec2(0, 200)))
+            {
+                for (const char* title : {"External file", "Container", "Records", "Style reference / error"})
+                    ImGui::TableSetupColumn(title);
+                ImGui::TableHeadersRow();
+                for (const auto& asset : music.assets)
+                {
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::TextUnformatted(asset.filename.c_str());
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s\n%zu bytes", asset.container_valid ? "RIFF valid only" : "Failed", asset.bytes);
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%zu chunks\n%zu patterns\n%zu note chunks", asset.chunks, asset.patterns,
+                                asset.note_chunks);
+                    if (asset.bank)
+                        ImGui::Text("%zu instruments\n%zu waves", asset.bank->instruments.size(),
+                                    asset.bank->waves.size());
+                    ImGui::TableNextColumn();
+                    ImGui::TextWrapped("%s", asset.error.empty() ? asset.style_reference.c_str() : asset.error.c_str());
+                    if (!asset.bank_error.empty())
+                        ImGui::TextWrapped("DLS decoding failed: %s", asset.bank_error.c_str());
+                }
+                ImGui::EndTable();
+            }
         }
         const auto& audio = game.server.audio;
         ImGui::TextWrapped("Original Sound starts an unattached loop and removes its source object. "

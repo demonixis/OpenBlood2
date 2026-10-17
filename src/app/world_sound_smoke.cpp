@@ -14,6 +14,20 @@ namespace OpenBlood2
         if (bank.instruments.size() != 14 || bank.waves.size() != 35 || bank.decoded_bytes != 913403 * sizeof(float) ||
             !bank.waves[8].settings || bank.waves[8].settings->loop_in_bounds)
             return false;
+        // An explicit diagnostic note, not a MUSIC/playlist success. It shares the real SDL stream.
+        auto& sampler = g.server.audio.instruments;
+        std::string note_error;
+        const auto& region = bank.instruments[2].regions[0];
+        const auto note =
+            sampler.play(music.assets.front().bank, 2, (region.key_low + region.key_high) / 2, 100, 1, .2, note_error);
+        if (!note || !note_error.empty())
+            return false;
+        const auto before_note = g.server.audio.submitted_frames;
+        if (!g.server.advance_audio(.02, {}, {}) || sampler.voices().size() != 1 || sampler.voices()[0].frames != 960 ||
+            g.server.audio.submitted_frames <= before_note || !sampler.release(note))
+            return false;
+        if (!g.server.advance_audio(4, {}, {}) || !sampler.voices().empty() || sampler.completed == 0)
+            return false;
         unsigned count = 0;
         for (const auto& e : g.entries)
             if (e.state == EntryState::WorldSound)

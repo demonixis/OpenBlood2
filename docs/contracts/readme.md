@@ -170,3 +170,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Original jump voices and landing sounds](movement_audio_contracts.md).
 
 - [DLS instrument data](music_dls_contracts.md)
+
+- [DLS diagnostic voices](music_sampler_contracts.md): bounded synthesis, graph selection, shared output, lifetime and explicit unsupported music.

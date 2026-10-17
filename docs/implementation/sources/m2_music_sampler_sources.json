@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "2b6b6a8fa842d28f920c5135e1dfbc1a32bc8d30",
+  "status": "M2 incomplete; diagnostic DLS voices, original sequence playback unavailable",
+  "imports": [],
+  "references": [
+    {
+      "url": "https://midi.org/dls-level-1",
+      "document": "DLS Level 1, including version 1.1 errata",
+      "public_pdf": "https://drive.google.com/file/d/1BXsjtoAqkLZlVet5KfafbUYZ-MF6FDUZ/view",
+      "sha256": "d58664f5f25ea3313e504d2b310464b32453dc9a2fb5e16ad0df105675b663b0",
+      "use": "Synthesis units, connection graph/defaults, envelope, pan, looping and corrected signed gain; no implementation or document copied"
+    },
+    {
+      "url": "https://learn.microsoft.com/nl-nl/previous-versions/ms808241(v=msdn.10)",
+      "use": "Later DirectMusic region articulation with global fallback; applying it to these old melodic region graphs is an explicit compatibility adaptation, not retail proof"
+    },
+    {
+      "source": "sources/blood2/AppHeaders/client_de.h",
+      "sha256": "d4bd76f15d1689a0314f832bcba0877d2bbabcdf830a8a44da9d662b4aa534e1",
+      "use": "Original InitInstruments(DLS,style) boundary remains unmet by diagnostic audition alone"
+    }
+  ],
+  "replacement_code": [
+    "src/engine/dls_sampler.cpp: bounded independent sample voice evaluation",
+    "src/engine/audio.cpp: additive shared-clock/output integration and world cleanup",
+    "src/app/inspector_world_sounds.cpp: explicit note audition and truthful state/refusals"
+  ],
+  "limits": [
+    "32 voices, 48 kHz, 10-second gates, 20-second maximum release, no voice stealing",
+    "Fixed MIDI power-on controller values, no MIDI event/channel/exclusivity implementation",
+    "Unsupported graph edges and duplicate connections refuse notes without default substitution",
+    "Cabal: 33/38 midpoint-key velocity-100 notes synthesize; five reject unknown destination 2",
+    "Linear resampling, no reverb or retail listening comparison",
+    "MUSIC remains unsupported; no original sequence/style/personality playback"
+  ]
+}
