@@ -898,6 +898,7 @@ namespace
                 inspector_controls_smoke.before_frame(frames);
 #endif
             ImGui::NewFrame();
+            OpenBlood2::draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
             OpenBlood2::draw_hud(OpenBlood2::hud_state(game->client_shell.stats, game->client_shell.m_bInWorld,
                                                        game->client_shell.view.object != nullptr));
 #if BLOOD2_INSPECTOR

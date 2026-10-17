@@ -3,6 +3,7 @@
 #include "MoveMgr.h"
 #include "PathMgr.h"
 #include "PlayerObj.h"
+#include "ScreenFade.h"
 #include "ViewWeapon.h"
 #include "game/session.h"
 
@@ -85,6 +86,7 @@ class CBloodClientShell
     std::uint64_t item_actions = 0, item_sounds = 0;
     OpenBlood2::SoundId item_voice = 0; // Checked inspection token, not owned.
     std::string item_audio_error;
+    CScreenFade fade;
     CMoveMgr move_mgr;
     OpenBlood2::MovementInput movement_input;
     bool SyncWeapons(OpenBlood2::ModelStore&, OpenBlood2::Resources&, CBloodServerShell&, std::string&);

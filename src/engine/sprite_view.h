@@ -21,7 +21,7 @@ namespace OpenBlood2
     class SpriteView
     {
       public:
-        static constexpr unsigned max_entries = 16384;
+        static constexpr unsigned max_entries = 32768;
         SpriteView()
         {
             clear();

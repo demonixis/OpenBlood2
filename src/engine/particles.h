@@ -11,5 +11,7 @@ namespace OpenBlood2
         DVector color{1, 1, 1};
     };
     // Local coordinates; no collision, implicit world gravity or callbacks.
-    bool advance_particles(std::vector<Particle>&, float gravity, double seconds, std::string&);
+    inline constexpr std::size_t max_particle_capacity = 16384;
+    bool advance_particles(std::vector<Particle>&, float gravity, double seconds, std::string&,
+                           std::size_t capacity = 2048);
 } // namespace OpenBlood2

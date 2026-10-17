@@ -4,11 +4,12 @@
 #include <cmath>
 namespace OpenBlood2
 {
-    bool advance_particles(std::vector<Particle>& particles, float gravity, double seconds, std::string& error)
+    bool advance_particles(std::vector<Particle>& particles, float gravity, double seconds, std::string& error,
+                           std::size_t capacity)
     {
         error.clear();
         if (!std::isfinite(seconds) || seconds < 0 || seconds > 60 || !std::isfinite(gravity) ||
-            std::abs(gravity) > 10000 || particles.size() > 2048)
+            std::abs(gravity) > 10000 || capacity > max_particle_capacity || particles.size() > capacity)
         {
             error = "Invalid particle step/budget";
             return false;

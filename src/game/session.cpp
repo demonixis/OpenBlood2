@@ -482,7 +482,8 @@ namespace OpenBlood2
                 std::string error;
                 const bool updated = pump_player_messages(error) &&
                                      client_shell.UpdateMovement(server_shell, seconds, error) &&
-                                     client_shell.Update() && client_shell.UpdateUse(server_shell) &&
+                                     client_shell.Update() && client_shell.fade.Update(seconds) &&
+                                     client_shell.UpdateUse(server_shell) &&
                                      client_shell.SyncWeapons(models, resources, server_shell, error) &&
                                      client_shell.UpdateWeapons(server_shell, seconds, error) &&
                                      (!server_shell.Player(local_client) ||

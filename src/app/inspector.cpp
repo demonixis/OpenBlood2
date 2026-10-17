@@ -1519,6 +1519,19 @@ namespace OpenBlood2
                         static_cast<unsigned long long>(player->use_commands),
                         static_cast<unsigned long long>(player->use_messages), player->use_door_refused ? "yes" : "no");
             constexpr const char* ray_results[] = {"invalid", "miss", "hit", "unavailable"};
+            const auto& fade = game.client_shell.fade;
+            ImGui::Text("Screen fade: %s | value %.2f / 255 | scale %.3f | messages %llu",
+                        fade.fade_in    ? "in"
+                        : fade.fade_out ? "out (holds black)"
+                                        : "inactive",
+                        fade.value, fade.Scale(), (unsigned long long)fade.messages);
+            ImGui::Text("Player triggers %llu | delivered fades %llu | unsupported %llu",
+                        (unsigned long long)player->trigger_messages, (unsigned long long)player->fade_messages,
+                        (unsigned long long)player->unsupported_triggers);
+            ImGui::Text("Unknown commands ignored by source: %llu", (unsigned long long)player->ignored_triggers);
+            ImGui::TextWrapped("Last unsupported: %s", player->last_unsupported_player_trigger.c_str());
+            ImGui::TextWrapped("Last command: %s | %s", player->last_player_trigger.c_str(),
+                               player->player_trigger_error.c_str());
             const auto* use_target = game.objects.get(player->use_hit.object);
             ImGui::Text(
                 "Ray %s | target %s | distance %.2f / 82", ray_results[static_cast<unsigned>(player->use_result)],

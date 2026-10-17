@@ -15,4 +15,5 @@ namespace OpenBlood2
     };
     HudState hud_state(const PlayerStats&, bool in_world, bool external_camera);
     bool draw_hud(const HudState&);
+    bool draw_screen_fade(float scale, bool in_world);
 } // namespace OpenBlood2

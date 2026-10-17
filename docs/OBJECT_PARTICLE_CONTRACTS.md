@@ -1,3 +1,10 @@
+# Current budget continuation
+
+The [authored exit-fade validation](SCREEN_FADE_CONTRACTS.md) supersedes the old
+smoke-only 2,048/8,192 budgets below: a measured 10,240-particle trail now fits
+explicit 16,384 per-system/aggregate limits, with a 32,768-quad sprite snapshot.
+Other recipes retain their limits; emission, RNG, lifetime and failures are unchanged.
+
 # Original fragment smoke-trail contracts
 
 Selected CObjectParticleFX Init/CreateObject/Update/AddParticles/GetRandomColor and

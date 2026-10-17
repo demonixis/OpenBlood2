@@ -1,0 +1,44 @@
+{
+  "baseline": "original Blood II sources, read-only",
+  "files": [
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "selections": [
+        "ProcessTriggerMsg 4464-4526",
+        "SendFadeMsg 3177-3187",
+        "MID_TRIGGER 4258-4264"
+      ]
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "selections": [
+        "constructor 412-414",
+        "world entry 1512",
+        "light scale update 2623-2685",
+        "SMSG_SCREENFADE 5048-5064"
+      ]
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
+      "selections": [
+        "CExplosionFragFX::Update 1056-1189: unchanged per-update falling motion"
+      ]
+    }
+  ],
+  "adaptations": [
+    "Typed owned ScreenFade event instead of legacy packet byte; checked existing client queue.",
+    "Simulation-owned clock independent of rendering and inspector; existing 60-second diagnostic session bound (100 ms interactive frontend cap).",
+    "Black compositing layer instead of full original global-light-scale material pipeline; HUD/editor excluded.",
+    "Other player trigger commands counted as unsupported; no inferred Music/VoiceMgr/CTF behavior.",
+    "Measured authored exit requires 10,240 particles; bounded smoke pool 16,384, default other pools 2,048, sprite snapshot 32,768 quads. No emission/lifetime changes or silent truncation."
+  ],
+  "not_claimed": [
+    "Full retail lighting and blindness/item precedence",
+    "Native Metal execution in this run",
+    "Whole-world save state",
+    "Full level traversal or M2 completion"
+  ]
+}

@@ -92,6 +92,10 @@ namespace OpenBlood2
         std::array<DBYTE, 10> weapon_slots{};
         bool operator==(const PlayerStats&) const = default;
     };
+    struct ScreenFade
+    {
+        bool in = false;
+    };
     struct BossHealth
     {
         float fraction = 0;
@@ -117,6 +121,7 @@ namespace OpenBlood2
         std::string next_world; // Empty represents the source null HSTRING.
         WorldExitType type = WorldExitType::World;
     };
-    using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
-                                     MissionObjectives, WorldExit, BossHealth, Conversation, InventoryAction>;
+    using PlayerEvent =
+        std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats, MissionObjectives,
+                     WorldExit, BossHealth, Conversation, InventoryAction, ScreenFade>;
 } // namespace OpenBlood2

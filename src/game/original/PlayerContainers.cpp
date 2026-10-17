@@ -1,12 +1,52 @@
 #include "game/game_settings.h"
 // Selected PlayerObj::UpdateClientPhysics and UpdateAirLevel source rules.
 #include "PlayerObj.h"
+#include "game/key_messages.h"
 #include <algorithm>
 #include <cmath>
+
+// Original ProcessTriggerMsg uses only a space-delimited first token. Fade
+// suffixes are ignored, and dispatch has no dead-player guard. Other command
+// families remain explicitly inspectable rather than pretending they ran.
+void CPlayerObj::ProcessTriggerMsg(HMESSAGEREAD read)
+{
+    auto* server = GetServerDE();
+    auto text = server->ReadFromMessageHString(read);
+    const auto* raw = server->GetStringData(text);
+    last_player_trigger = raw ? raw : "";
+    server->FreeString(text);
+    ++trigger_messages;
+    player_trigger_error.clear();
+    const auto begin = last_player_trigger.find_first_not_of(' ');
+    if (begin == std::string::npos)
+        return;
+    const auto end = last_player_trigger.find(' ', begin);
+    const auto token = last_player_trigger.substr(begin, end - begin);
+    const bool in = OpenBlood2::same_name(token, "fadein");
+    if (in || OpenBlood2::same_name(token, "fadeout"))
+    {
+        if (server->SendToClient(m_hClient, OpenBlood2::ScreenFade{in}) == DE_OK)
+            ++fade_messages;
+        else
+            player_trigger_error = "Screen fade client delivery failed";
+    }
+    else if (OpenBlood2::same_name(token, "music") || OpenBlood2::same_name(token, "sound") ||
+             OpenBlood2::same_name(token, "flaggrab") || OpenBlood2::same_name(token, "flaggive") ||
+             OpenBlood2::same_name(token, "flagdrop"))
+    {
+        ++unsupported_triggers;
+        last_unsupported_player_trigger = last_player_trigger;
+        player_trigger_error = "Player trigger command is not integrated";
+    }
+    else
+        ++ignored_triggers; // Original ProcessTriggerMsg has no branch for this token.
+}
 
 DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
 {
     auto* server = GetServerDE();
+    if (message == 1000 /* MID_TRIGGER */)
+        ProcessTriggerMsg(read);
     // Original PlayerObj.cpp 4266-4280: ignore volume damage during the first
     // two level seconds. The explicit level clock survives delayed player entry
     // without restarting the grace period, and resets on world replacement.

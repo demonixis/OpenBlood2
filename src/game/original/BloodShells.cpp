@@ -243,6 +243,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     item_actions = item_sounds = item_voice = 0;
     item_audio_error.clear();
+    fade = {};
     objectives = {};
     objectives_error.clear();
     objective_messages = 0;
@@ -286,6 +287,7 @@ void CBloodClientShell::OnExitWorld()
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     item_actions = item_sounds = item_voice = 0;
     item_audio_error.clear();
+    fade = {};
     objectives = {};
     objectives_error.clear();
     objective_messages = 0;
@@ -311,6 +313,11 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     ++messages;
     if (std::holds_alternative<OpenBlood2::PlayerInitRequest>(event))
         return InitSinglePlayer(server);
+    if (const auto* value = std::get_if<OpenBlood2::ScreenFade>(&event))
+    {
+        fade.Begin(value->in);
+        return true;
+    }
     if (const auto* value = std::get_if<OpenBlood2::InventoryAction>(&event))
     {
         if (value->type != 1 && value->type != 2)

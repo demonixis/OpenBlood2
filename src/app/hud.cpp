@@ -30,6 +30,17 @@ namespace OpenBlood2
         h.weapon = w->m_szWeaponName;
         return h;
     }
+    bool draw_screen_fade(float scale, bool in_world)
+    {
+        if (!in_world || !std::isfinite(scale) || scale < 0 || scale >= 1)
+            return false;
+        const auto* viewport = ImGui::GetMainViewport();
+        const auto alpha = static_cast<int>(std::lround((1.f - scale) * 255.f));
+        ImGui::GetBackgroundDrawList()->AddRectFilled(
+            viewport->Pos, {viewport->Pos.x + viewport->Size.x, viewport->Pos.y + viewport->Size.y},
+            IM_COL32(0, 0, 0, alpha));
+        return true;
+    }
     bool draw_hud(const HudState& h)
     {
         if (!h.visible)

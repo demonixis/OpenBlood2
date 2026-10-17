@@ -212,7 +212,7 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
     }
     if (!owner)
         return false; // Checked equivalent of WantRemove clearing m_hServerObject.
-    if (!advance_particles(particles, gravity, now - last_time, error))
+    if (!advance_particles(particles, gravity, now - last_time, error, recipe == 1 ? max_particle_capacity : 2048))
         return false;
     last_time = now;
     if (now < next_update)

@@ -122,8 +122,12 @@ namespace OpenBlood2
                           NodePose pose;
                           if (parent != active.end())
                               pose = {parent->position, parent->rotation};
+                          // The authored staggered train exit exceeds the old 2048-particle
+                          // per-trail cap. Keep a bounded pool without dropping source emissions.
                           const std::size_t budget =
-                              total - previous <= 8192 ? std::min<std::size_t>(2048, 8192 - (total - previous)) : 0;
+                              total - previous <= 16384
+                                  ? std::min<std::size_t>(max_particle_capacity, 16384 - (total - previous))
+                                  : 0;
                           if (trail.Update(now, parent == active.end() ? nullptr : &pose, trail_random_, budget))
                           {
                               total = total - previous + trail.particles.size();

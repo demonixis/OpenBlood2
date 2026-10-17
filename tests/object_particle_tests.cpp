@@ -83,6 +83,17 @@ namespace
     }
     bool failures(const std::filesystem::path& root)
     {
+        // Existing callers retain 2048; explicitly bounded smoke pools can be larger.
+        std::string capacity_error;
+        std::vector<Particle> pool(2049);
+        for (auto& particle : pool)
+            particle.lifetime = 1;
+        CHECK(!advance_particles(pool, 0, .1, capacity_error) && pool.front().lifetime == 1);
+        CHECK(advance_particles(pool, 0, .1, capacity_error, max_particle_capacity));
+        CHECK(near(pool.front().lifetime, .9f));
+        CHECK(!advance_particles(pool, 0, .1, capacity_error, max_particle_capacity + 1));
+        pool.resize(max_particle_capacity + 1);
+        CHECK(!advance_particles(pool, 0, .1, capacity_error, max_particle_capacity));
         Resources r;
         CHECK(setup(r, root));
         std::string e;

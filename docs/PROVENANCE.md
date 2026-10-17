@@ -1093,3 +1093,7 @@ Canonical instrumentation adds no original rules. Player restoration and exit
 now retain their real adapter calls through scoped tracing; unavailable history
 survives teardown. See [contracts](SERVICE_COVERAGE_CONTRACTS.md) and
 [execution evidence](../../Documentation/Implementation/M2_SERVICE_COVERAGE.md).
+
+## Original player exit fades and measured smoke budgets
+
+Selected PlayerObj ProcessTriggerMsg/SendFadeMsg and BloodClientShell screen-fade message/update rules now use owned local events and simulation-owned state. The full authored train exit exposed a 2,048-particle smoke cap; bounded capacity now covers its measured 10,240-particle peak without changing original emission. See [contracts](SCREEN_FADE_CONTRACTS.md), [source selections](M2_SCREEN_FADE_SOURCES.json) and [evidence](../../Documentation/Implementation/M2_SCREEN_FADE.md). Composed darkening is a replacement presentation; Music/VoiceMgr/flag commands and full lighting remain separate.

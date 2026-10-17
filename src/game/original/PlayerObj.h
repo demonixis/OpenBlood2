@@ -51,6 +51,9 @@ class CPlayerObj : public CBaseCharacter
 {
   public:
     ~CPlayerObj() override;
+    void ProcessTriggerMsg(HMESSAGEREAD);
+    std::uint64_t trigger_messages = 0, fade_messages = 0, unsupported_triggers = 0, ignored_triggers = 0;
+    std::string last_player_trigger, last_unsupported_player_trigger, player_trigger_error;
     bool AddRemoteBomb(HOBJECT);
     void RemoveRemoteBomb(HOBJECT);
     void ClearRemoteBombs();
