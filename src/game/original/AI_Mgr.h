@@ -42,7 +42,8 @@ namespace OpenBlood2
         Invalid,
         PlaybackFailed,
         FireAttempt,
-        FireBlocked
+        FireBlocked,
+        ExtraAction
     };
     const char* ai_key_outcome_name(AIKeyOutcome);
     enum class AISightOutcome
@@ -255,9 +256,10 @@ class AI_Mgr : public CBaseCharacter
     std::string damage_reaction_error;
     bool MC_Idle();
     bool MC_BestWeapon();
-    bool MC_Fire_Stand();
+    virtual bool MC_Fire_Stand();
     bool CheckClearShot(DVector origin, DVector& direction, bool alternate = false);
-    bool Fire(bool alternate = false); // Source acceptance includes dry attempts; inspect fire_result.
+    virtual bool Fire(bool alternate = false); // Source acceptance includes dry attempts; inspect fire_result.
+    virtual bool MC_Extra(std::string_view);
     OpenBlood2::AIClearShot clear_shot;
     FireResult fire_result = FireResult::Invalid;
     DVector fire_origin{}, fire_direction{};

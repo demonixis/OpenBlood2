@@ -1,6 +1,7 @@
 #include "game/original/AI_Mgr.h"
 #include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
+#include "game/original/Gideon.h"
 #include "inspector.h"
 #include <algorithm>
 #include <imgui.h>
@@ -393,8 +394,12 @@ namespace OpenBlood2
             }
             ImGui::Text("Last attempt: %s", ai.fire_calls ? result : "none");
             ImGui::Text("Origin %s: %.2f %.2f %.2f | cadence %.3f / last %.3f",
-                        ai.fire_gun_node ? (weapon && weapon->data.m_nType == WEAP_NAGA_EYEBEAM ? "head_gun" : "r_gun")
-                                         : "body fallback",
+                        ai.fire_gun_node
+                            ? (dynamic_cast<const Gideon*>(&ai) ? static_cast<const Gideon&>(ai).m_szFireNode.c_str()
+                               : weapon && weapon->data.m_nType == WEAP_NAGA_EYEBEAM       ? "head_gun"
+                               : weapon && weapon->data.m_nType == WEAP_ZEALOT_ENERGYBLAST ? "r_hand_extra2"
+                                                                                           : "r_gun")
+                            : "body fallback",
                         ai.fire_origin.x, ai.fire_origin.y, ai.fire_origin.z, ai.m_fAttackLoadTime,
                         ai.m_fLoadTimeStart);
             ImGui::Text("Clearance: %s | rays %u | head retry %s", ai_clear_outcome_name(ai.clear_shot.outcome),
@@ -411,6 +416,26 @@ namespace OpenBlood2
             }
             if (!ai.fire_error.empty())
                 ImGui::TextWrapped("Failed: %s", ai.fire_error.c_str());
+        }
+        if (const auto* boss = dynamic_cast<const Gideon*>(target_ai);
+            boss && ImGui::CollapsingHeader("Original Gideon combat actions", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::TextWrapped("Selected original combat methods; diagnostic actor. Boss initialization, fade/teleport "
+                               "and full AI_Update remain unavailable.");
+            ImGui::Text("Node %s | selected weapon %u | chance draw %d", boss->m_szFireNode.c_str(),
+                        boss->selected_weapon, boss->attack_roll);
+            ImGui::Text("Armor %.2f | grants %llu | last shield %.3f / interval %.3f | last panic %.3f",
+                        boss->m_damage.m_fArmorPoints, (unsigned long long)boss->shield_grants, boss->m_fLastShield,
+                        boss->m_fShieldDuration, boss->m_fLastPanic);
+            ImGui::Text("Extra keys %llu | powerup attempts %llu | historical effect %llu",
+                        (unsigned long long)boss->extra_calls, (unsigned long long)boss->powerup_calls,
+                        (unsigned long long)boss->powerup_effect);
+            ImGui::Text("Completion Soul Hook request result %d (source ignores absent weapon)",
+                        int(boss->completion_selection));
+            ImGui::TextWrapped("No timed firing or generic clearance query. Actual weapon shots retain their own "
+                               "collision and lifetime checks.");
+            if (!boss->powerup_error.empty())
+                ImGui::TextWrapped("Powerup failed: %s", boss->powerup_error.c_str());
         }
         if (target_ai && ImGui::CollapsingHeader("Original AI state actions", ImGuiTreeNodeFlags_DefaultOpen))
         {

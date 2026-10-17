@@ -133,3 +133,5 @@ The [interactive entry correction](SESSION_PLAYBACK_CONTRACTS.md) now holds appl
 The [Naga weapon continuation](NAGA_WEAPON_CONTRACTS.md) extends the supported NPC weapon subset with original eye-beam damage, head_gun aiming and red-small beam presentation. Gideon and the eye impact composite remain unavailable; earlier blanket weapon omissions are superseded only for this subset.
 
 The [wind/shockwave continuation](WIND_WEAPON_CONTRACTS.md) extends the runtime-only projectile subset with OT_NORMAL scale metadata and the original type20 model/light recipe. Earlier type/resource restrictions are superseded only for this bounded subset; production Gideon and M2 remain incomplete.
+
+The [Gideon combat continuation](GIDEON_COMBAT_CONTRACTS.md) supersedes the selected-method omissions for boss decisions, shield armor, node firing and extra-key powerup. Production boss lifecycle remains unavailable. Sparse supported NPC weapon IDs now use value-based duplicate suppression.

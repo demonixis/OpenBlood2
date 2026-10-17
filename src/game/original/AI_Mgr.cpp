@@ -12,6 +12,8 @@ namespace OpenBlood2
     {
         switch (value)
         {
+            case AIKeyOutcome::ExtraAction:
+                return "Extra action accepted (inspect effect/shot)";
             case AIKeyOutcome::FireAttempt:
                 return "Weapon attempt (inspect shot result)";
             case AIKeyOutcome::FireBlocked:
@@ -67,6 +69,11 @@ bool AI_Mgr::InitStatics(std::shared_ptr<CAnim_Sound> sound)
         return false;
     m_pAnim_Sound = std::move(sound);
     return true;
+}
+bool AI_Mgr::MC_Extra(std::string_view)
+{
+    ai_key_error = "Original AI MC_Extra is not integrated for this class";
+    return false;
 }
 bool AI_Mgr::OnStringKey(ArgList* args)
 {
@@ -126,12 +133,22 @@ bool AI_Mgr::OnStringKey(ArgList* args)
             fail(AIKeyOutcome::Unavailable, fire_error.c_str());
         }
     }
-    else if (branch == 1 || branch == 2)
+    else if (branch == 2)
+    {
+        if (MC_Extra(value))
+            key_outcome = AIKeyOutcome::ExtraAction;
+        else
+        {
+            ++unavailable_keys;
+            // Copy before fail assigns ai_key_error (its buffer may alias the input).
+            const auto reason = ai_key_error;
+            fail(AIKeyOutcome::Unavailable, reason.c_str());
+        }
+    }
+    else if (branch == 1)
     {
         ++unavailable_keys;
-        fail(AIKeyOutcome::Unavailable, branch == 1
-                                            ? "AI ShowHandModel unavailable; source reads an uninitialized buffer"
-                                            : "Original AI MC_Extra is not integrated");
+        fail(AIKeyOutcome::Unavailable, "AI ShowHandModel unavailable; source reads an uninitialized buffer");
     }
     else if (branch == 3)
     {

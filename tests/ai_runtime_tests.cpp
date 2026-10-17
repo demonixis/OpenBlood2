@@ -424,6 +424,28 @@ namespace
         CHECK(g.unload_world() && AI_Mgr::m_dwNumCabal == 0 && AI_Mgr::m_dwNumMonster == 0);
         return true;
     }
+    bool sparse_weapons(const char* root)
+    {
+        GameSession g;
+        CHECK(setup(g, root));
+        Properties p{{"AIWeapon1", std::string("GIDEON_SHIELD")}, {"AIWeapon2", std::string("ENERGY_BLAST")},
+                     {"AIWeapon3", std::string("NAGA_BLAST")},    {"AIWeapon4", std::string("GIDEON_WIND")},
+                     {"AIWeapon5", std::string("GIDEON_SHIELD")}, {"AIState", std::string("INACTIVE")}};
+        for (int cycle = 0; cycle < 3; ++cycle)
+        {
+            auto* a = npc(g, "CultistAI", p);
+            CHECK(a && a->RuntimeReady());
+            const DBYTE expected[]{41, 27, 38, 42};
+            for (unsigned i = 0; i < 4; ++i)
+                CHECK(a->m_InventoryMgr.GetWeapon(i) && a->m_InventoryMgr.GetWeapon(i)->data.m_nType == expected[i]);
+            CHECK(!a->m_InventoryMgr.GetWeapon(4) && a->m_InventoryMgr.CurrentWeapon()->data.m_nType == 41);
+            CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame());
+        }
+        CHECK(g.unload_world());
+        std::cout << "Sparse IDs 41/27/38/42 and duplicate fifth slot initialized three times through original NPC "
+                     "lifecycle.\n";
+        return true;
+    }
     bool failures(const char* root)
     {
         GameSession g;
@@ -528,11 +550,21 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
-    const std::map<std::string, std::function<bool(const char*)>> tests{
-        {"body", body},         {"missing", missing},   {"activation", activation}, {"visibility", visibility},
-        {"lifetime", lifetime}, {"targets", targets},   {"tracking", tracking},     {"camera", camera},
-        {"spatial", spatial},   {"triggers", triggers}, {"arena", arena},           {"catalog", catalog},
-        {"failures", failures}, {"subway", subway}};
+    const std::map<std::string, std::function<bool(const char*)>> tests{{"body", body},
+                                                                        {"missing", missing},
+                                                                        {"activation", activation},
+                                                                        {"visibility", visibility},
+                                                                        {"lifetime", lifetime},
+                                                                        {"targets", targets},
+                                                                        {"tracking", tracking},
+                                                                        {"camera", camera},
+                                                                        {"spatial", spatial},
+                                                                        {"triggers", triggers},
+                                                                        {"arena", arena},
+                                                                        {"catalog", catalog},
+                                                                        {"failures", failures},
+                                                                        {"subway", subway},
+                                                                        {"sparse_weapons", sparse_weapons}};
     if (argc < 2)
         return 2;
     auto t = tests.find(argv[1]);

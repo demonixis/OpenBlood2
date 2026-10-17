@@ -548,3 +548,5 @@ The [energy projectile continuation](../Documentation/Implementation/M2_ENERGY_P
 The [wind weapon continuation](../Documentation/Implementation/M2_WIND_WEAPON.md) connects the original one-shot shockwave, full-radius damage and actual model/WAV presentation. The repaired ground query and checked callback lifetime are explicit. Gideon state/shield integration, required services and safe NEW_LEVEL keep M2 incomplete.
 
 The [shield/powerup dependency](../Documentation/Implementation/M2_SHIELD_WEAPON.md) adds the original visual-only shield weapon, actual WAV and owner-bound sphere/ring particles with inspection. Armor remains the responsibility of the pending boss action. Gideon, required services and safe NEW_LEVEL still keep M2 incomplete.
+
+The [Gideon combat continuation](../Documentation/Implementation/M2_GIDEON_COMBAT.md) connects original decision thresholds, shield armor, animation-driven fire and extra-key/node aiming. It also fixes sparse NPC weapon-ID initialization. Production boss lifecycle/fade/teleport, required services and safe NEW_LEVEL remain open; M2 is incomplete.

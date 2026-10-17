@@ -1,0 +1,39 @@
+{
+  "baseline_commit": "37928d12fc4720accacff4eec5f2424087ea87d7",
+  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
+      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
+      "use": "Selected constructor fire-node/shield/panic defaults 61-74; ComputeState 323-407; MC_Fire_Stand 415-473; MagicPowerup 583-600; MC_Extra/Fire 770-808"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Gideon.h",
+      "sha256": "5a1c49b5d7e8cfd89b851955a0bc64d5f07c2718b2b911ab40a45f0b745e57c9",
+      "use": "Subclass virtual combat methods, fire-node buffer and shield/panic fields"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "OnStringKey 880-975; extra-key dispatch and source 32-byte unsafe scalar buffer"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "use": "ChangeWeapon 772-837; absent Soul Hook is ignored by original caller"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "use": "TYPE_MAGIC=8, base-game WEAP_SOUL_HOOK=23 and existing boss weapon IDs"
+    }
+  ],
+  "adaptations": [
+    "Selected methods only; no production Gideon class registration or original initialization claimed.",
+    "Checked typed object/model/inventory/particle services and existing owned WeaponFire transport; failed services reject.",
+    "Nonempty NUL-free 63-byte extra-key/node limit replaces unsafe buffers; failed animation retains prior original armor/selection mutations.",
+    "Existing inventory reports Invalid for unsupported Soul Hook; original ignored completion request is retained and inspected.",
+    "No new mutable original globals; fixture tables are independently owned.",
+    "Sparse supported NPC weapon IDs are deduplicated by value across the five requested names, replacing unsafe 18-entry raw-ID indexing."
+  ]
+}

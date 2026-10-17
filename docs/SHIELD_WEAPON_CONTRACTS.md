@@ -116,3 +116,5 @@ caller is still pending. No authored boss fight is claimed.
 SubwayA remains 203 created / 4 transferred sounds / 372 editor-only / 1 unsupported
 Gideon / 0 failures. Boss initialization/actions, required missing FX, safe NEW_LEVEL
 and the actual M2 exit criteria remain open.
+
+The [Gideon combat continuation](GIDEON_COMBAT_CONTRACTS.md) supersedes the selected-method omissions for boss decisions, shield armor, node firing and extra-key powerup. Production boss lifecycle remains unavailable. Sparse supported NPC weapon IDs now use value-based duplicate suppression.

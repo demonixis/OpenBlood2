@@ -160,3 +160,5 @@ unusable; shade recovery, other states and full production AI_Update remain open
 The [escape/guard continuation](AI_ESCAPE_CONTRACTS.md) supplies selected original
 escape/hide/guard and beg bodies, plus checked non-owning tracking. Earlier blanket
 omissions for those bodies are superseded; full NPC initialization/update remains open.
+
+The [Gideon combat continuation](GIDEON_COMBAT_CONTRACTS.md) supersedes the selected-method omissions for boss decisions, shield armor, node firing and extra-key powerup. Production boss lifecycle remains unavailable. Sparse supported NPC weapon IDs now use value-based duplicate suppression.

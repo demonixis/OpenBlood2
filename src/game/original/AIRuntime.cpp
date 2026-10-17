@@ -4,6 +4,7 @@
 #include "CameraObj.h"
 #include "CivilianAI.h"
 #include "engine/collision.h"
+#include <algorithm>
 #include <cmath>
 using namespace OpenBlood2;
 namespace
@@ -220,17 +221,19 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (!InitStatics(table) || !m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
         return RuntimeFailure("NPC aggregates unavailable");
     m_InventoryMgr.SetStrength(5);
-    std::array<bool, 18> obtained{};
+    // Original weapon IDs are sparse (Gideon's loadout reaches 42). Track the
+    // at-most-five requested IDs, not an array sized for player-only weapons.
+    std::array<DBYTE, 5> obtained{};
     for (const auto& name : npc_weapons)
     {
         DBYTE id;
         if (!weapon(name, id))
             return RuntimeFailure("NPC weapon unavailable");
-        if (id && !obtained[id])
+        if (id && std::find(obtained.begin(), obtained.end(), id) == obtained.end())
         {
             if (m_InventoryMgr.ObtainWeapon(id) != InventoryResult::Ok)
                 return RuntimeFailure("NPC weapon acquisition failed");
-            obtained[id] = true;
+            *std::find(obtained.begin(), obtained.end(), DBYTE{0}) = id;
         }
     }
     DBYTE first;

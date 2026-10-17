@@ -858,3 +858,7 @@ Selected original Gideon Wind definition, projectile Update and high-detail mode
 ## Original Gideon shield / spell particles
 
 Selected original CGideonShield, complete WeaponData41, AI name/generic firing branch, and ObjectFX19/36 recipe/lifecycle/ring/sphere emission extend the existing CObjectParticleFX. [Source hashes and adaptations](M2_SHIELD_WEAPON_SOURCES.json), [contracts](SHIELD_WEAPON_CONTRACTS.md) and [verification](../../Documentation/Implementation/M2_SHIELD_WEAPON.md) distinguish source gameplay from the typed lifetime, bounded arrays and later-engine rotation/particle policies. No new dependency or commercial resource is imported. Gideon itself remains pending.
+
+## Original Gideon combat methods
+
+Selected ComputeState, MC_Fire_Stand, Fire, MC_Extra and MagicPowerup are directly adapted from the original subclass, with typed failures and existing lifetime rules. See [source ledger](M2_GIDEON_COMBAT_SOURCES.json) and [contracts](GIDEON_COMBAT_CONTRACTS.md). No production boss constructor/registration or mutable shared table is introduced. The NPC initialization ID-bound repair is engine integration, not a gameplay rule change.

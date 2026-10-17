@@ -2,7 +2,7 @@
 #include "engine/capture.h"
 #include "engine/runtime.h"
 #include "engine/world_renderer.h"
-#include "shield_fixture.h"
+#include "gideon_fixture.h"
 #include <cmath>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
@@ -76,12 +76,12 @@ int main(int argc, char** argv)
     }
     else
         CHECK(test_shield::mount(g.resources, argv[1], error));
-    ObjectCreateStruct state;
-    state.m_Pos = {0, 0, 100};
-    auto h = g.objects.create(g.objects.find_class("BaseClass"), state);
-    CHECK(h);
-    CHECK(g.server.PublishObjectParticles(h, 19, error));
-    CHECK(g.server.PublishObjectParticles(h, 36, error));
+    auto* boss = test_gideon::actor(g, false, {0, 0, 100});
+    CHECK(boss);
+    auto h = boss->m_hObject;
+    CHECK(boss->Fire());
+    CHECK(test_gideon::key(g, *boss, "[extra_key:powerup]"));
+    CHECK(boss->fire_shots == 1 && boss->powerup_effect && boss->key_outcome == AIKeyOutcome::ExtraAction);
     auto& manager = g.server.object_particles;
     CHECK(manager.advance(0, g.server) && manager.advance(.11, g.server));
     SpriteView scene;
