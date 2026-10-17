@@ -100,6 +100,9 @@ namespace OpenBlood2
     struct VoiceStop
     {
     };
+    struct PlayerDead
+    {
+    };
     struct ScreenFade
     {
         bool in = false;
@@ -129,7 +132,7 @@ namespace OpenBlood2
         std::string next_world; // Empty represents the source null HSTRING.
         WorldExitType type = WorldExitType::World;
     };
-    using PlayerEvent =
-        std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats, MissionObjectives,
-                     WorldExit, BossHealth, Conversation, InventoryAction, ScreenFade, VoiceEvent, VoiceStop>;
+    using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
+                                     MissionObjectives, WorldExit, BossHealth, Conversation, InventoryAction,
+                                     ScreenFade, VoiceEvent, VoiceStop, PlayerDead>;
 } // namespace OpenBlood2

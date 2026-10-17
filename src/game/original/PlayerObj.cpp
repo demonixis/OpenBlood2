@@ -390,7 +390,19 @@ DBOOL CPlayerObj::Update(DVector*)
         if (!server->PingObjects(observer))
             ++activation_ping_failures;
     }
-    return UpdateStats() && UpdateSmellTrail();
+    if (!UpdateStats() || !UpdateSmellTrail())
+        return DFALSE;
+    // Original Update handles the first death after stats and smell, before
+    // aggregate update clears accumulated frame damage.
+    if (m_damage.IsDead() && !m_bDead)
+        HandleDeath();
+    if (m_bDead)
+    {
+        m_InventoryMgr.UpdateHandModels();
+        if (m_InventoryMgr.ChangeWeaponSlot(1) == InventoryResult::NotAvailable)
+            m_InventoryMgr.ChangeWeaponSlot(0);
+    }
+    return DTRUE;
 }
 bool CPlayerObj::InitializeClientState()
 {

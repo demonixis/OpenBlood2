@@ -188,3 +188,5 @@ The headless command returns 0 for the entry inspection contract. `--start-game`
 still returns 6, with missing gameplay services reported. The GPU test checks
 hidden-UI updates, selection invalidation, world unload/re-entry and restored
 object/string counts, also in the inspector-free Release build.
+
+The [single-player death continuation](player_death_contracts.md) supersedes the missing selected Caleb death/corpse/gib and client death-camera paths above. Active powers, multiplayer death and whole-world/dead-player restoration remain unavailable. M2 is still incomplete.

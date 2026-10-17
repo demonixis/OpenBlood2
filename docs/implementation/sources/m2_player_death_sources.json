@@ -1,0 +1,164 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete; selected original single-player death and camera connected",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "implementation_parent": "c9e4ec39f6c2f6e8901ed994d453dcf56709f600",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          393,
+          394
+        ],
+        [
+          1668,
+          1779
+        ],
+        [
+          5613,
+          5778
+        ],
+        [
+          5998,
+          6050
+        ],
+        [
+          7386,
+          7527
+        ]
+      ],
+      "selection": "Original single-player first-death order, retained player, corpse/gib decisions, source null-killer guard and per-frame dead weapon fallback.",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target": "src/game/original/PlayerDeath.cpp",
+      "target_sha256": "4ea645efa34f065bbadbfae17f6540db0aac2177f7fec652c92c7272fa460834"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "source_line_ranges": [
+        [
+          1943,
+          2010
+        ]
+      ],
+      "selection": "RemoveItem: active item deactivation, first matching item removal; do not conflate inventory selectors with weapon storage.",
+      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "target": "src/game/original/InventoryMgr.cpp",
+      "target_sha256": "b489f887eb47e970fcb58d0c180d6d32006ce8bff0a705c595017c3bcc43c58c"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/PlayerCamera.cpp",
+      "source_line_ranges": [
+        [
+          18,
+          32
+        ],
+        [
+          77,
+          109
+        ],
+        [
+          170,
+          179
+        ],
+        [
+          260,
+          273
+        ],
+        [
+          480,
+          558
+        ],
+        [
+          570,
+          654
+        ],
+        [
+          782,
+          859
+        ]
+      ],
+      "selection": "Original death orbit, double-basis offsets, ray placement, one-second transition and look direction.",
+      "source_sha256": "0315517beaaf85540d9810899fb312be4ae5ba78aae30cc9c1f38f4a2ca105f0",
+      "target": "src/game/original/PlayerDeathCamera.cpp",
+      "target_sha256": "a63a428b717f5e097c808ab1c6b927baab1315625b721ec07e5972b08987329a"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/PlayerCamera.h",
+      "source_line_ranges": [
+        [
+          94,
+          105
+        ]
+      ],
+      "selection": "Original once-only GoDeathMode/StartCircle timing.",
+      "source_sha256": "58b3706d757416003bdc4b992064398654b0ce8d178513a631b45aa0849569d4",
+      "target": "src/game/original/PlayerDeathCamera.h",
+      "target_sha256": "6199b8757211898bed966fb23abf085f28056c63fc82407b40d7a69220d1684e"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_line_ranges": [
+        [
+          1304,
+          1313
+        ],
+        [
+          5261,
+          5276
+        ]
+      ],
+      "selection": "Death target offset and SMSG_DEAD client mode entry; no invented multiplayer/wonky service.",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "target": "src/game/original/BloodShells.cpp",
+      "target_sha256": "c85000e089dcdf4a2030521e305b0ba3a92cac69c51314df577f00c56eab0cf3"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.h",
+      "source_line_ranges": [
+        [
+          23,
+          39
+        ]
+      ],
+      "selection": "PMOVE_DEAD is 16; humiliation15 remains unavailable.",
+      "source_sha256": "fb92d0a74b30d2a13b0589a2e4f90658a366cc2163e1fe37d446b2b50ed1da4a",
+      "target": "src/game/original/PlayerObj.h",
+      "target_sha256": "f03ae89b8bc47856cf1d4c902d81cb3e49442f105510987c3984e6d2d74ec032"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/corpse.h",
+      "source_line_ranges": [
+        [
+          22,
+          46
+        ]
+      ],
+      "selection": "Player corpse keeps constructor defaults: empty sound directory, limb loss enabled, no burn source.",
+      "source_sha256": "a3b9b0feda537fe7cccb6dfcb65d13437bdab288c93ef7beeb62e8d04c1fe6dc",
+      "target": "src/game/original/PlayerDeath.cpp",
+      "target_sha256": "4ea645efa34f065bbadbfae17f6540db0aac2177f7fec652c92c7272fa460834"
+    },
+    {
+      "source": "sources/blood2/Shared/VoiceMgrDefs.h",
+      "source_line_ranges": [
+        [
+          41,
+          50
+        ]
+      ],
+      "selection": "Death4 and Suicide8 event IDs.",
+      "source_sha256": "f1fb15fa133241b630c302cc35b4dd00e845f6947ac7faf1980123fb4416fa35",
+      "target": "src/game/original/PlayerDeath.cpp",
+      "target_sha256": "4ea645efa34f065bbadbfae17f6540db0aac2177f7fec652c92c7272fa460834"
+    }
+  ],
+  "adaptations": [
+    "Typed owned PlayerDead; checked identities instead of raw client/killer pointers; source tree unchanged.",
+    "Explicit refusal of active powers, multiplayer and non-Caleb death; no fabricated ResetPowerups or unattach behavior.",
+    "Existing bounded nonsolid placement, typed fragments and checked camera rays replace engine services; no retail physics parity claim.",
+    "Zero-length camera aim retains target rotation; zero gib normalization stays finite; invalid data fails explicitly.",
+    "Player corpse Setup records original constructor defaults; unit scale is the selected Caleb source profile.",
+    "Frame-local dead-command gates replace absent inventory selector objects after death while retaining original weapon/ammo ownership."
+  ]
+}

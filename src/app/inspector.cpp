@@ -1528,6 +1528,34 @@ namespace OpenBlood2
             ImGui::Text("USE (E with F2 controls): %llu commands / %llu messages | door refused %s",
                         static_cast<unsigned long long>(player->use_commands),
                         static_cast<unsigned long long>(player->use_messages), player->use_door_refused ? "yes" : "no");
+            if (ImGui::TreeNode("Original player death"))
+            {
+                const auto& death = client.death_camera;
+                ImGui::Text("Committed %d / deaths %llu / client messages %llu / received %llu", player->m_bDead,
+                            static_cast<unsigned long long>(player->deaths),
+                            static_cast<unsigned long long>(player->death_messages),
+                            static_cast<unsigned long long>(client.death_notifications));
+                ImGui::Text("Voice group %d / corpse slot %d / corpses %llu / gib requests %llu / limbs %llu",
+                            player->death_voice_event, player->death_slot,
+                            static_cast<unsigned long long>(player->death_corpses),
+                            static_cast<unsigned long long>(player->death_gibs),
+                            static_cast<unsigned long long>(player->death_limbs));
+                ImGui::Text("Corpse currently alive %d / placement result %d",
+                            game.server.IsObjectAlive(player->last_death_corpse),
+                            static_cast<int>(player->death_placement.result));
+                ImGui::Text("Death camera active %d / orbit %.3f rad / transition %.3f / obstruction %d", death.active,
+                            death.angle, death.fraction, static_cast<int>(death.result));
+                ImGui::Text("Death camera position %.2f %.2f %.2f", death.position.x, death.position.y,
+                            death.position.z);
+                for (const auto* issue :
+                     std::array<const std::string*, 3>{&player->death_error, &player->death_effect_error, &death.error})
+                    if (!issue->empty())
+                        ImGui::TextWrapped("%s", issue->c_str());
+                ImGui::TextWrapped("Single-player death keeps the player/client. Movement, fire and item commands "
+                                   "are blocked; USE retains its original ray. Loading a live checkpoint is separate "
+                                   "from full world-save support.");
+                ImGui::TreePop();
+            }
             constexpr const char* ray_results[] = {"invalid", "miss", "hit", "unavailable"};
             const auto& fade = game.client_shell.fade;
             ImGui::Text("Screen fade: %s | value %.2f / 255 | scale %.3f | messages %llu",

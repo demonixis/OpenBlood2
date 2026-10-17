@@ -21,6 +21,8 @@ For everyday setup and contribution guidance, return to the [developer index](..
 
 ## Player and session
 
+- [Original single-player death and camera](player_death_contracts.md)
+
 - [NPC activation visibility and the authored Gideon intro](activation_visibility_contracts.md)
 - [Original CDestructable state preservation](damage_state_contracts.md)
 - [Read-only destination preparation](destination_contracts.md)

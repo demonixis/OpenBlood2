@@ -16,7 +16,7 @@ namespace OpenBlood2
         bool last_crouch = false, forced_crouch = false;
         std::uint8_t character = 0, skin = 0;
         std::uint8_t strength = 1, speed = 1, resistance = 1, magic = 1;
-        std::uint8_t move_state = 0; // Original PMOVE_NONE..PMOVE_FIRE_CRAWL (0..14).
+        std::uint8_t move_state = 0; // Original 0..14 or PMOVE_DEAD (16); humiliation (15) is unavailable.
         bool operator==(const PlayerState&) const = default;
     };
 } // namespace OpenBlood2

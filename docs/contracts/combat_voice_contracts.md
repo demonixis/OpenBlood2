@@ -69,3 +69,5 @@ early return, postmortem replies without player attribution, streamed PCM advanc
 destruction before message delivery and world cleanup. These isolated encounters
 are not an authored playthrough or a retail probability/random-sequence comparison.
 The continuous train and transition regressions remain separate acceptance evidence.
+
+The [single-player death continuation](player_death_contracts.md) supersedes the missing selected Caleb death/corpse/gib and client death-camera paths above. Active powers, multiplayer death and whole-world/dead-player restoration remain unavailable. M2 is still incomplete.

@@ -17,7 +17,7 @@ namespace
             error = "Invalid saved player clock, angle or air level";
             return false;
         }
-        if (state.character != 0 || state.skin != 0 || state.move_state > 14)
+        if (state.character != 0 || state.skin != 0 || (state.move_state > 14 && state.move_state != 16))
         {
             error = "Unsupported saved player character, skin or movement state";
             return false;
@@ -99,7 +99,7 @@ bool CPlayerObj::SaveFields(OpenBlood2::PlayerState& output, std::string& error)
     state.speed = m_nAttribSpeed;
     state.resistance = m_nAttribResistance;
     state.magic = m_nAttribMagic;
-    if (static_cast<unsigned>(move_state) > 14)
+    if (static_cast<unsigned>(move_state) > 14 && move_state != MoveState::Dead)
     {
         error = "Unsupported current player movement state";
         return false;

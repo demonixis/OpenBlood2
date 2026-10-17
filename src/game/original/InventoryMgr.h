@@ -32,6 +32,7 @@ class CInventoryMgr : public Aggregate
     InventoryResult SelectInventoryWeapon(DBYTE);
     InventoryResult SelectNextWeapon();
     InventoryResult SetActiveItem(DBYTE);
+    void RemoveDeathItems();
     std::optional<CInvMedkit> medkit;
     std::unique_ptr<CInvFlashlight> flashlight;
     InventoryResult AddKey(const OpenBlood2::KeyItem&);

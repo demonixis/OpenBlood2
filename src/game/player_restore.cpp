@@ -39,7 +39,7 @@ namespace OpenBlood2
             if (!channel(s.color.x) || !channel(s.color.y) || !channel(s.color.z) || !channel(s.alpha))
                 return fail("Invalid saved player color/alpha");
             if (s.player.dead || s.damage.dead || s.damage.death_delay != 0)
-                return fail("Dead/dying player restoration requires unported player death state");
+                return fail("Restoring a dead/dying player and its independent corpse is unavailable");
             std::shared_ptr<const Model> model;
             if (!game.models.load(s.model, model, error))
                 return false;

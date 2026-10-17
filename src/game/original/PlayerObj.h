@@ -98,6 +98,14 @@ class CPlayerObj : public CBaseCharacter
     DBOOL InitialUpdate(int);
     DBOOL Update(DVector*);
     bool Respawn();
+    void HandleDeath();
+    bool CreateDeathCorpse();
+    bool CreateDeathGibs();
+    HOBJECT last_death_corpse = nullptr; // Non-owning, independent world lifetime.
+    OpenBlood2::BodyPlacement death_placement;
+    int death_voice_event = -1, death_slot = -1;
+    std::uint64_t deaths = 0, death_messages = 0, death_corpses = 0, death_gibs = 0, death_limbs = 0;
+    std::string death_error, death_effect_error;
     bool SaveFields(OpenBlood2::PlayerState&, std::string&) const;
     bool LoadFields(const OpenBlood2::PlayerState&, std::string&);
     bool RestoreModelState(std::string&);
@@ -132,7 +140,8 @@ class CPlayerObj : public CBaseCharacter
         FireRun,
         FireJump,
         FireCrouch,
-        FireCrawl
+        FireCrawl,
+        Dead = 16 // Source 15 is the unported multiplayer humiliation state.
     };
     MoveState move_state = MoveState::None;
     bool crouch_requested = false, crouched = false, forced_crouch = false;

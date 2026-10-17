@@ -1155,3 +1155,7 @@ PlayerObj integer-health damage feedback and cache resets, AI_Mgr kill/gib repli
 and CCorpse postmortem replies. Existing typed VoiceMgr messages replace legacy
 packets; checked local-client lookup replaces the raw singleton pointer. NPC/corpse
 draw order and all client gates are preserved. See [contracts](../contracts/combat_voice_contracts.md).
+
+## Original single-player death and camera
+
+[m2_player_death_sources.json](sources/m2_player_death_sources.json) records selected CPlayerObj death/corpse/gib paths, inventory item removal and CPlayerCamera death orbit. Typed notifications, checked identities and existing bounded body/ray/fragment services replace historical engine calls. Constructor-default corpse audio and source decision quirks remain explicit. See [contracts](../contracts/player_death_contracts.md).

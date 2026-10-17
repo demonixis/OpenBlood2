@@ -420,6 +420,21 @@ InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
     return activated ? InventoryResult::Ok : InventoryResult::NotAvailable;
 }
 
+// Original DoDeath calls RemoveItem once for each type 1..9, including KEY.
+// Inventory bomb selector items are separate from weapons in the source: keep
+// reserved weapons/ammunition and already-thrown charges. Dead-player command
+// gates disable our slot-backed selectors; restoring a live checkpoint rebuilds them.
+void CInventoryMgr::RemoveDeathItems()
+{
+    medkit.reset();
+    if (flashlight && flashlight->active)
+        flashlight->SetActive(false); // Original active-item removal sends its off action.
+    flashlight.reset();
+    if (!keys.empty())
+        keys.erase(keys.begin()); // One item of this type, not the entire key inventory.
+    ++revision;
+}
+
 // Original AddInventoryWeapon/SelectInventoryWeapon and exhaustion fallback.
 InventoryResult CInventoryMgr::AddInventoryWeapon(DBYTE type, DBYTE count)
 {

@@ -123,3 +123,5 @@ general audio/rendering and complete M2 acceptance still remain unavailable.
 The [diagnostic 3D view](world_view_contracts.md) supersedes the absence of any world
 rasterization: existing player/scripted cameras now drive depth-tested geometry and
 letterbox presentation. Materials, lighting, models/FX and complete M2 remain open.
+
+The [single-player death continuation](player_death_contracts.md) supersedes the missing selected Caleb death/corpse/gib and client death-camera paths above. Active powers, multiplayer death and whole-world/dead-player restoration remain unavailable. M2 is still incomplete.

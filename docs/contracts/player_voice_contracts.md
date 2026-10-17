@@ -84,3 +84,5 @@ arbitration/reverb behavior. Group support does not certify all required voices,
 all original callers, addon characters, interactive IMA music or the M2 exit gate.
 
 The [combat voice continuation](combat_voice_contracts.md) connects original pain/burning and NPC/corpse kill/gib callers. The remaining caller omissions above still apply.
+
+The [single-player death continuation](player_death_contracts.md) supersedes the missing selected Caleb death/corpse/gib and client death-camera paths above. Active powers, multiplayer death and whole-world/dead-player restoration remain unavailable. M2 is still incomplete.

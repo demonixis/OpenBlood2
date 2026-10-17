@@ -181,5 +181,51 @@ int main(int argc, char** argv)
         CHECK(game.resources.mount_game(config, error) && game.collision.build(floor, error));
         game.server.collision_ready = true;
     }
+    // Original player death notification -> original orbit -> actual corpse rendering.
+    // Uses the same diagnostic floor and retail Caleb assets, with no inspector clocks.
+    game.world_path = "diagnostic-player-death-gpu.dat";
+    game.state = SessionState::Inspection;
+    game.server_shell.PreStartWorld();
+    CHECK(game.server_shell.PostStartWorld());
+    CHECK(game.objects.create(game.objects.find_class("GameStartPoint"), {}, Creation::World,
+                              {{"Name", std::string("START")}, {"Pos", DVector{0, 100, 0}}}));
+    CHECK(game.enter_player(error));
+    auto* player = game.server_shell.Player(game.local_client);
+    CHECK(player);
+    auto damage = game.server.StartMessageToObject(player, player->m_hObject, damage_message);
+    CHECK(damage &&
+          game.server.WriteDamage(damage, {{0, 0, 1}, {}, 1000, DamageType::Normal, player->m_hObject}) == DE_OK);
+    CHECK(game.server.EndMessage(damage) == DE_OK);
+    for (int i = 0; i < 60; ++i)
+        CHECK(game.step(1. / 60));
+    CHECK(player->m_bDead && player->death_corpses == 1 && player->death_error.empty() &&
+          player->death_effect_error.empty());
+    CHECK(game.client_shell.death_camera.active && !game.client_shell.weapons_visible);
+    ModelView player_models;
+    CHECK(update_model_scene(game, player_models, error));
+    const auto corpse_handle = player->last_death_corpse;
+    const auto* body = game.objects.get(corpse_handle);
+    CHECK(body && body->model);
+    // Isolate the created corpse's real mesh for a stable raster assertion.
+    player_models.begin_frame();
+    CHECK(player_models.add(body->model.get(), body->animation, body->state.m_SkinName,
+                            {body->state.m_Pos, body->state.m_Rotation}, body->state.m_Scale, true, false, body->id,
+                            body->state.m_Filename, game.resources, error, body->hidden_nodes));
+    CHECK(player_models.entries.front().error.empty() && player_models.entries.front().triangles > 0);
+    const auto death_view = game.client_shell.view;
+    CHECK(render(runtime, renderer, player_models.mesh, player_models.revision, player_models.world_draws,
+                 death_view.position, death_view.rotation, capture, pixels, error));
+    CHECK(ink() > 25);
+    const auto corpse_pixels = ink();
+    CHECK(render(runtime, renderer, player_models.mesh, player_models.revision, player_models.world_draws,
+                 death_view.position, death_view.rotation, capture, again, error) &&
+          again == pixels);
+    CHECK(capture.save((std::filesystem::path(argv[1]) / "player-death.png").c_str()));
+    CHECK(game.leave_player() && game.server.IsObjectAlive(corpse_handle));
+    CHECK(game.unload_world() && !game.client_shell.death_camera.active);
+    player_models.clear();
+    renderer.clear_geometry();
+    std::cout << "Original player death camera: corpse pixels=" << corpse_pixels
+              << "; repeated readback unchanged; independent corpse lifetime; client reset\n";
     return 0;
 }

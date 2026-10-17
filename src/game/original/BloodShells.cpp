@@ -233,6 +233,8 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     listener_position = {};
     player_visible = false;
     weapons_visible = true;
+    death_camera = {};
+    death_notifications = 0;
     rotation = {};
     physics = {};
     stats = {};
@@ -278,6 +280,8 @@ void CBloodClientShell::OnExitWorld()
     listener_position = {};
     player_visible = false;
     weapons_visible = true;
+    death_camera = {};
+    death_notifications = 0;
     rotation = {};
     physics = {};
     stats = {};
@@ -322,6 +326,13 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     if (std::holds_alternative<OpenBlood2::VoiceStop>(event))
     {
         voice_manager.StopAll();
+        return true;
+    }
+    if (std::holds_alternative<OpenBlood2::PlayerDead>(event))
+    {
+        death_camera.Begin(server_.GetTime());
+        ++death_notifications;
+        weapons_visible = false;
         return true;
     }
     if (const auto* value = std::get_if<OpenBlood2::VoiceEvent>(&event))
@@ -563,8 +574,8 @@ bool CBloodClientShell::UpdateCameraSelection()
         return false;
     view = server_.GetCameraView();
     owner->camera_movement_blocked = view.object && !view.settings.player_movement;
-    player_visible = view.object && !view.settings.hide_player;
-    weapons_visible = !view.object;
+    player_visible = view.object && !view.settings.hide_player && !death_camera.active;
+    weapons_visible = !view.object && !death_camera.active;
     if (!view.object)
     {
         view.position = camera_position;
@@ -573,6 +584,13 @@ bool CBloodClientShell::UpdateCameraSelection()
         const DVector forward{std::sin(rotation.yaw) * cp, -std::sin(rotation.pitch), std::cos(rotation.yaw) * cp};
         if (server_.AlignRotation(view.rotation, forward) != DE_OK)
             return false;
+        if (death_camera.active)
+        {
+            if (!death_camera.Update(server_, player, camera_position))
+                return false;
+            view.position = death_camera.position;
+            view.rotation = death_camera.rotation;
+        }
     }
     listener_position = view.object && view.settings.listener ? view.position : position;
     return true;

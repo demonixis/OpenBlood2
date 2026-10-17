@@ -2,6 +2,7 @@
 #include "CommLink.h"
 #include "MoveMgr.h"
 #include "PathMgr.h"
+#include "PlayerDeathCamera.h"
 #include "PlayerObj.h"
 #include "ScreenFade.h"
 #include "ViewWeapon.h"
@@ -104,6 +105,8 @@ class CBloodClientShell
     OpenBlood2::CameraView view;
     DVector listener_position{};
     bool player_visible = false, weapons_visible = true;
+    CPlayerDeathCamera death_camera;
+    std::uint64_t death_notifications = 0;
     bool UpdateCameraSelection();
     OpenBlood2::PlayerRotation rotation;
     OpenBlood2::PlayerPhysics physics;
