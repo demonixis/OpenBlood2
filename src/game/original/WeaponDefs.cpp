@@ -2,6 +2,66 @@
 namespace
 {
     constexpr WeaponData definitions[] = {
+        // RemoteBomb
+        {
+            "Models\\Weapons\\C4remote_pv.abc",    // Model
+            "Models\\Weapons\\C4remote_pv.abc",    // Model
+            "Skins\\Weapons\\C_C4remote_pv_t.dtx", // Skin
+            "Models\\Powerups\\remotes_pu.abc",    // 3rd person model
+            "Skins\\Powerups\\remotes_pu.dtx",     // 3rd person skin
+            WEAP_REMOTEBOMB,                       // Type
+            TYPE_MELEE,                            // Fire type
+            AMMO_REMOTEBOMB,                       // Ammo type
+            1,                                     // Ammo Use
+            1,                                     // Alt Ammo Use
+            80.0f,                                 // Min Damage
+            120.0f,                                // Max Damage
+            80.0f,                                 // Min Alt damage
+            120.0f,                                // Max Alt damage
+            1.0f,                                  // Reload time
+            1.0f,                                  // Alt reload time
+            {0.0f, 0.0f},                          // Spread
+            {0.0f, 0.0f},                          // Alt Spread
+            1000.0f,                               // Projectile Velocity
+            0.0f,                                  // Alt Projectile Velocity
+            2000.0f,                               // Range
+            0.0f,                                  // Alt Range
+            1,                                     // Shots per fire
+            1,                                     // Alt Shots per fire
+            1,                                     // Strength or Magic required
+            0,                                     // Two-handed Strength or Magic required
+            250,                                   // Damage Radius (projectiles)
+            250,                                   // Alt Damage Radius (projectiles)
+            DFALSE,                                // Alt fire zoom
+            DFALSE,                                // Semi-auto
+            "Sounds\\Weapons\\remotes\\fire.wav",  // Fire sound
+            "Sounds\\Weapons\\remotes\\alt.wav",   // Alt Fire sound
+            "",                                    // Empty weapon sound
+            "",                                    // Alt Empty weapon sound
+            "CRemoteBomb",                         // Projectile class
+            "CRemoteBomb",                         // Alt Projectile class
+            0,                                     // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                    // Muzzle Flash color
+            "Remote Bomb",                         // Name
+            369,                                   // Muzzle Flash radius
+            "",                                    // flash sprite name
+            "",                                    // alt flash Sprite name
+            0.25f,                                 // Flash duration
+            0.0f,                                  // Flash scale
+            {0.0f, 0.0f, 0.0f},                    // 3rd person gun offset
+            {-0.7f, 0.0f, 2.4f},                   // Gun Offset
+            {0.0f, 0.375f, 12.0f},                 // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                 // Recoil
+            {3.0f, -7.5f, 5.0f},                   // Flash position
+            0.0f,                                  // Eject interval
+            0.0f,                                  // View kick
+            DFALSE,                                // View kick is Cumulative
+            DTRUE,                                 // Animation looping
+            DFALSE,                                // Alt anim looping
+            nullptr,                               // Icon for status bar
+            nullptr,                               // Highlighted icon for status bar
+        },
+
         // ProximityBomb
         {
             "Models\\Weapons\\C4proximity_pv.abc",    // Model

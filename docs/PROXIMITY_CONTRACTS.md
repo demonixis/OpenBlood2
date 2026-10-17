@@ -118,3 +118,12 @@ shader, reference repository or commercial asset is added.
 Remote bombs, flashlight, missing fallengrills geometry, full composite lighting,
 bomb projectile save/restore, original item HUD and complete M2 acceptance remain
 open. This increment is not a completed CityHub playthrough or campaign transfer.
+
+The [remote-bomb continuation](REMOTE_BOMB_CONTRACTS.md) adds weapon50 in reserved
+slot11, ammo11/item8, RemotesPU, R selection and the separate B detonation command.
+Charged/secondary throws share the source sequence without proximity overhold
+explosion. Listed remotes belong to player teardown/Respawn; already signalled
+charges have left that list. Restore/KeepAlive preserve weapon/ammo, never old bomb
+handles. The shared model-projectile solver now admits CGrenade, CProximityBomb
+and CRemoteBomb. Earlier remote omissions are historical; time bombs and the
+complete M2 gate remain open.

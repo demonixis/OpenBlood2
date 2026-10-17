@@ -992,3 +992,14 @@ physics rejection bounds remain unchanged.
 ## Original proximity bombs
 
 Selected original pickup, inventory, weapon and client charge/projectile rules are integrated with typed transport and checked ownership. [Contracts](PROXIMITY_CONTRACTS.md) and [source hashes](M2_PROXIMITY_SOURCES.json) distinguish source behavior from the shared replacement box solver, menu-node compression and bounded validation. No donor codebase, dependency or commercial asset is imported.
+
+## Original remote bombs
+
+Original RemotesPU, inventory slot11, CWeapRemoteBomb, client charge rules and
+CRemoteBomb are selectively ported from the Blood II baseline. Original player
+list ownership, deferred COMMAND_DETONATE and destructor/Respawn cleanup are
+preserved. [Source hashes](M2_REMOTE_SOURCES.json) cover fourteen consulted files.
+[Contracts](REMOTE_BOMB_CONTRACTS.md) separate source behavior from typed commands,
+checked identities, the existing replacement box solver and the pending-owner
+link notification adaptation. The shared explosion publisher preserves proximity
+behavior. No source repository, commercial resource or dependency pin changes.

@@ -137,6 +137,12 @@ class CGideonWind final : public CWeapon
         return last_shot.result = FireResult::Unavailable;
     }
 };
+class CWeapRemoteBomb final : public CWeapon
+{
+  public:
+    CWeapRemoteBomb() : CWeapon(WEAP_REMOTEBOMB) {}
+    FireResult FireProjectile() override;
+};
 class CWeapProximityBomb final : public CWeapon
 {
   public:

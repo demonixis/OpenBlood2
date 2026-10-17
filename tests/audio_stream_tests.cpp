@@ -295,7 +295,7 @@ namespace
             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
-            CHECK(created == 450 && transferred == 31 && unknown == 3 && failed == 1 && fx == 5 && fx_voices == 4);
+            CHECK(created == 452 && transferred == 31 && unknown == 1 && failed == 1 && fx == 5 && fx_voices == 4);
             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
                   !g.server.audio.cached_bytes());
         }

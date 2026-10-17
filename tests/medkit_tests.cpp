@@ -291,7 +291,7 @@ namespace
                 unknown += entry.state == EntryState::Unsupported;
                 failed += entry.state == EntryState::Failed;
             }
-            CHECK(created == 450 && unknown == 3 && failed == 1);
+            CHECK(created == 452 && unknown == 1 && failed == 1);
             for (auto id : g.objects.snapshot())
                 if (dynamic_cast<MedKitPU*>(g.objects.get(id)->game.get()))
                     h = g.objects.get(id)->handle;

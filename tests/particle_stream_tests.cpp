@@ -296,7 +296,7 @@ namespace
                 unknown += entry.state == EntryState::Unsupported;
                 failed += entry.state == EntryState::Failed;
             }
-            CHECK(created == 450 && unknown == 3 && failed == 1);
+            CHECK(created == 452 && unknown == 1 && failed == 1);
             auto& streams = g.server.particle_streams;
             CHECK(streams.active.size() == 8 && !streams.failed);
             unsigned initial = 0;

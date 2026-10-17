@@ -25,3 +25,11 @@ ProximitiesPU::ProximitiesPU()
     display_name = "Proximity Bomb";
     resource_id = 306;
 }
+
+RemotesPU::RemotesPU()
+{
+    value = {OpenBlood2::PickupKind::Item, 8, 1};
+    file = "Remotes_pu";
+    display_name = "Remote Bomb";
+    resource_id = 307;
+}

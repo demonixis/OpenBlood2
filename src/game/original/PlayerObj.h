@@ -51,6 +51,13 @@ class CPlayerObj : public CBaseCharacter
 {
   public:
     ~CPlayerObj() override;
+    bool AddRemoteBomb(HOBJECT);
+    void RemoveRemoteBomb(HOBJECT);
+    void ClearRemoteBombs();
+    bool OnCommandDetonate();
+    ObjectList* remote_bombs = nullptr;
+    std::uint64_t remote_commands = 0, remote_signals = 0;
+    std::string remote_error;
     // Original activation storage/query only; collection/timing is still unported.
     std::array<bool, PU_MAXTYPES> m_bPowerupActivated{};
     bool IsPowerupActive(int index) const

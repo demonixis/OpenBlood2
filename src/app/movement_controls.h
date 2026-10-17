@@ -17,7 +17,8 @@ namespace OpenBlood2
     {
         std::array<bool, SDL_SCANCODE_COUNT> keys{};
         bool focused = false, enabled = true, use_suppressed = false;
-        bool medkit_suppressed = false, proximity_suppressed = false;
+        bool medkit_suppressed = false, proximity_suppressed = false, remote_suppressed = false,
+             detonate_suppressed = false;
         bool mouse_requested = false, mouse_captured = false;
         std::array<bool, 2> mouse_buttons{}, fire_suppressed{};
         float mouse_x = 0, mouse_y = 0;
@@ -40,7 +41,7 @@ namespace OpenBlood2
         void player_changed(bool play = false)
         {
             keys = {};
-            use_suppressed = medkit_suppressed = proximity_suppressed = false;
+            use_suppressed = medkit_suppressed = proximity_suppressed = remote_suppressed = detonate_suppressed = false;
             release_mouse();
             if (play)
                 request_play();
@@ -87,6 +88,8 @@ namespace OpenBlood2
                 case SDL_SCANCODE_RCTRL:
                 case SDL_SCANCODE_F:
                 case SDL_SCANCODE_G:
+                case SDL_SCANCODE_R:
+                case SDL_SCANCODE_B:
                 case SDL_SCANCODE_P:
                 case SDL_SCANCODE_H:
                 case SDL_SCANCODE_E:
@@ -132,8 +135,9 @@ namespace OpenBlood2
                 if (!focused && event.type == SDL_EVENT_KEY_DOWN)
                     return;
                 const int code = event.key.scancode;
-                if ((code == SDL_SCANCODE_P || code == SDL_SCANCODE_H || code == SDL_SCANCODE_E ||
-                     code == SDL_SCANCODE_F || code == SDL_SCANCODE_G) &&
+                if ((code == SDL_SCANCODE_R || code == SDL_SCANCODE_B || code == SDL_SCANCODE_P ||
+                     code == SDL_SCANCODE_H || code == SDL_SCANCODE_E || code == SDL_SCANCODE_F ||
+                     code == SDL_SCANCODE_G) &&
                     event.type == SDL_EVENT_KEY_DOWN && event.key.repeat && !keys[static_cast<unsigned>(code)])
                     return; // A held key after focus loss is not a fresh USE press.
                 if (code > SDL_SCANCODE_UNKNOWN && code < SDL_SCANCODE_COUNT)
@@ -165,6 +169,28 @@ namespace OpenBlood2
                     keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT],
                     keys[SDL_SCANCODE_SPACE],
                     keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL]};
+        }
+        bool sample_remote(bool text_editing)
+        {
+            if (!keys[SDL_SCANCODE_R])
+                remote_suppressed = false;
+            if (!focused || !enabled || text_editing)
+            {
+                remote_suppressed = keys[SDL_SCANCODE_R];
+                return false;
+            }
+            return keys[SDL_SCANCODE_R] && !remote_suppressed;
+        }
+        bool sample_detonate(bool text_editing)
+        {
+            if (!keys[SDL_SCANCODE_B])
+                detonate_suppressed = false;
+            if (!focused || !enabled || text_editing)
+            {
+                detonate_suppressed = keys[SDL_SCANCODE_B];
+                return false;
+            }
+            return keys[SDL_SCANCODE_B] && !detonate_suppressed;
         }
         bool sample_proximity(bool text_editing)
         {

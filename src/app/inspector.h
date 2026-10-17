@@ -87,6 +87,7 @@ namespace OpenBlood2
              add_flares_request = false, add_ammo_request = false, add_assault_request = false,
              add_charges_request = false;
         int weapon_slot_request = -1;
+        bool detonate_request = false;
         bool weapon_left = false;
         std::optional<WeaponInput> weapon_input_request;
         std::optional<PlayerRotation> weapon_aim_request;

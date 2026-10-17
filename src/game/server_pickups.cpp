@@ -60,7 +60,7 @@ namespace OpenBlood2
             return DE_INVALIDPARAMS;
         const auto limit = value.kind == PickupKind::Ammo     ? 8
                            : value.kind == PickupKind::Weapon ? 255
-                           : value.kind == PickupKind::Item   ? 7
+                           : value.kind == PickupKind::Item   ? 8
                                                               : 4;
         const auto request = value.kind == PickupKind::Ammo     ? add_ammo_message
                              : value.kind == PickupKind::Weapon ? add_weapon_message
@@ -73,8 +73,8 @@ namespace OpenBlood2
             !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit ||
             (value.kind == PickupKind::Weapon && !WeaponPickupClass(value.type)) || !std::isfinite(value.amount) ||
             value.amount < 0 || value.amount > 1e6f ||
-            (value.kind == PickupKind::Item &&
-             ((value.type != 1 && value.type != 7) || value.amount > 255 || std::floor(value.amount) != value.amount)))
+            (value.kind == PickupKind::Item && ((value.type != 1 && value.type != 7 && value.type != 8) ||
+                                                value.amount > 255 || std::floor(value.amount) != value.amount)))
         {
             m->bad = true;
             return DE_INVALIDPARAMS;

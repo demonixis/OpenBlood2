@@ -36,6 +36,11 @@ class ItemPickupWeapon : public ItemPickup
         return ItemPickup::EngineMessageFn(message, data, reason);
     }
 };
+class RemotesPU : public ItemPickupWeapon
+{
+  public:
+    RemotesPU();
+};
 class ProximitiesPU : public ItemPickupWeapon
 {
   public:

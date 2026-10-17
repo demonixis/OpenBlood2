@@ -41,6 +41,7 @@ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
 }
 CPlayerObj::~CPlayerObj()
 {
+    ClearRemoteBombs();
     AI_Mgr::RemovePlayer(*this);
     auto* server = GetServerDE();
     if (m_hCurSound)
@@ -162,6 +163,7 @@ bool CPlayerObj::Respawn()
     for (DBYTE i = 1; i <= 12; ++i)
         m_InventoryMgr.SetAmmoCount(i, 0);
     m_InventoryMgr.SetAmmoCount(1, 50);
+    ClearRemoteBombs();
     ++respawns;
     return UpdateClientPhysics() && TeleportClientToServerPos();
 }
@@ -426,6 +428,12 @@ DDWORD CPlayerObj::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
         }
         case MID_INITIALUPDATE:
             result = InitialUpdate(static_cast<int>(fData));
+            break;
+        case MID_LINKBROKEN:
+            // This engine also notifies a pending owner before its destructor.
+            // Keep that owner's list intact so original destruction removes charges.
+            if (g_pServerDE->IsObjectAlive(m_hObject))
+                RemoveRemoteBomb(static_cast<HOBJECT>(data));
             break;
         case MID_TOUCHNOTIFY:
             ObjectTouchDoor(static_cast<HOBJECT>(data));

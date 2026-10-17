@@ -1,37 +1,11 @@
 #include "ProximityBomb.h"
 #include "AI_Mgr.h"
+#include "BombExplosion.h"
 #include "InventoryMgr.h"
 #include "PlayerObj.h"
 #include "engine/collision.h"
 #include <numbers>
 using namespace OpenBlood2;
-namespace
-{
-    // Existing component publishers preserve independent failures and detached lifetimes.
-    void explosion(HOBJECT source, DVector p, DVector n, unsigned type, const char* sound, float damage, float radius)
-    {
-        SceneExplosionReport r;
-        r.source = g_pServerDE->GetObjectName(source);
-        r.position = p;
-        r.normal = n;
-        r.type = type;
-        r.damage = damage;
-        r.radius = radius;
-        r.model_event = g_pServerDE->PublishExplosionModels(source, type, p, n, r.model_error);
-        r.sprite_event = g_pServerDE->PublishExplosionSprites(source, type, p, n, r.sprite_error);
-        r.ring_event = g_pServerDE->PublishExplosionRings(source, type, p, n, r.ring_error);
-        r.fragment_event = g_pServerDE->PublishExplosionFragments(source, type, p, n, r.fragment_error);
-        r.flame_event = g_pServerDE->PublishExplosionFlames(source, type, p, n, r.flame_error);
-        r.light_event = g_pServerDE->PublishExplosionLights(source, type, p, n, r.light_error);
-        SoundRequest request;
-        r.sound = request.resource = sound;
-        request.inner_radius = 100;
-        request.outer_radius = 1000;
-        request.priority = 1;
-        r.voice = g_pServerDE->PlayDetachedSound(source, request, p, r.sound_error);
-        g_pServerDE->RecordSceneExplosion(r);
-    }
-} // namespace
 CProximityBomb::CProximityBomb() : CProjectile(OT_MODEL)
 {
     filename = "Models\\Ammo\\c4.abc";
@@ -171,8 +145,8 @@ void CProximityBomb::HandleContact(const SegmentHit& hit)
 }
 void CProximityBomb::AddExplosion(DVector p, DVector n)
 {
-    explosion(m_hObject, p, n, 1, "Sounds\\Weapons\\proximities\\explode.wav", m_fDamage,
-              static_cast<float>(m_nRadius));
+    PublishBombExplosion(m_hObject, p, n, 1, "Sounds\\Weapons\\proximities\\explode.wav", m_fDamage,
+                         static_cast<float>(m_nRadius));
 }
 FireResult CWeapProximityBomb::FireProjectile()
 {
@@ -183,8 +157,8 @@ FireResult CWeapProximityBomb::FireProjectile()
         DVector p;
         if (g_pServerDE->GetObjectPos(m_hOwner, &p) != DE_OK)
             return last_shot.result = FireResult::Unavailable;
-        explosion(m_hOwner, p, {0, 1, 0}, 0, "Sounds\\Weapons\\time\\explode.wav",
-                  last_shot.damage * m_pInventoryMgr->damage_multiplier, 0);
+        PublishBombExplosion(m_hOwner, p, {0, 1, 0}, 0, "Sounds\\Weapons\\time\\explode.wav",
+                             last_shot.damage * m_pInventoryMgr->damage_multiplier, 0);
         if (!g_pServerDE->IsObjectAlive(m_hOwner))
             return last_shot.result = FireResult::Fired;
         auto* owner = g_pServerDE->HandleToObject(m_hOwner);

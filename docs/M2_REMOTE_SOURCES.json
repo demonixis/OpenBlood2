@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "e7726e99f70fadad2487885894ba8505b770dd06",
+  "status": "M2 incomplete; original remote bomb subset",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/GameProjectiles.cpp",
+      "source_sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f",
+      "purpose": "Original CRemoteBomb constructor, Update, character/solid contact and small explosion."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameProjectiles.h",
+      "source_sha256": "9acd38645c28d90b508a0a55a02760bcea5c6c40318b6266635711d2ba1f1bc0",
+      "purpose": "Original inline Detonate latches explode without immediate damage."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameWeapons.cpp",
+      "source_sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd",
+      "purpose": "CWeapRemoteBomb throw/drop, player registration, exhaustion; in-hand explosion disabled."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameWeapons.h",
+      "source_sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19",
+      "purpose": "Weapon special-float initialization/dispatch."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "purpose": "AddRemoteBomb, RemoveRemoteBomb, COMMAND_REMOTES/DETONATE, link break, destructor and Respawn cleanup."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "purpose": "Reserved inventory weapon slot11, item8/ammo11 acquisition, selection and saved slots."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
+      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
+      "purpose": "Original RemotesPU constructor and ancestry."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ItemPickups.h",
+      "source_sha256": "ce1dacd1cf4829c39cfdfbeb27ae4873e1f2b6a4895b532b820d587ab7eaa17e",
+      "purpose": "ItemPickupWeapon quantity and pickup sound."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameInvItems.cpp",
+      "source_sha256": "b2a72cdf5bd9e23ec496c6f6af3ed5bd4449e3b84d8cc088c33c1e1bbe081ee8",
+      "purpose": "Original CInvRemoteBomb selection; menu node replaced by checked weapon/pool."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/GameWeapons.cpp",
+      "source_sha256": "292753e7a91be363aa955731d552f967845c6a783dd6aeec954db59e2d2128d7",
+      "purpose": "Original client remote before/after base animation update; disabled overhold branch."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/GameWeapons.h",
+      "source_sha256": "c5f9176a2f6ad7c28dedb5ec24c710a16f1c2f4957d1efb793cf77e42e8378e0",
+      "purpose": "Original charge constants and initial speed."
+    },
+    {
+      "source": "sources/blood2/Shared/WeaponDefs.cpp",
+      "source_sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
+      "purpose": "Complete original weapon50 entry."
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "purpose": "Base-game weapon50, ammo11 and item8 identifiers."
+    },
+    {
+      "source": "sources/blood2/Shared/ClientRes.h",
+      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
+      "purpose": "Original name resources307 and369."
+    }
+  ]
+}

@@ -130,11 +130,12 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
          type == WEAP_GIDEON_SHIELD) &&
         dynamic_cast<CPlayerObj*>(BaseClass::GetServerDE()->HandleToObject(m_hOwner)))
         return InventoryResult::NotAvailable; // Player view/save support is a separate contract.
-    if (type == WEAP_PROXIMITYBOMB)
+    if (inventory_bomb(type))
     {
-        if (slot != -1 && slot != 10)
+        const auto reserved = 10 + type - WEAP_PROXIMITYBOMB;
+        if (slot != -1 && slot != reserved)
             return InventoryResult::Invalid;
-        slot = 10;
+        slot = 10 + type - WEAP_PROXIMITYBOMB;
     }
     else if (slot >= 10)
         return InventoryResult::Invalid;
@@ -156,7 +157,7 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
                 return InventoryResult::AlreadyHave;
         }
     }
-    if (empty < 0 && type != WEAP_PROXIMITYBOMB)
+    if (empty < 0 && !inventory_bomb(type))
         for (unsigned i = 0; i < 10; ++i)
         {
             auto* weapon = GetWeapon(i);
@@ -177,7 +178,9 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         return InventoryResult::Full;
     // Original strength gate was commented out; do not introduce a new one.
     std::unique_ptr<CWeapon> weapon;
-    if (type == WEAP_PROXIMITYBOMB)
+    if (type == WEAP_REMOTEBOMB)
+        weapon = std::make_unique<CWeapRemoteBomb>();
+    else if (type == WEAP_PROXIMITYBOMB)
         weapon = std::make_unique<CWeapProximityBomb>();
     else if (type == WEAP_BERETTA)
         weapon = std::make_unique<CBeretta>();
@@ -381,8 +384,8 @@ InventoryResult CInventoryMgr::AddItem(DBYTE type, DBYTE value)
 }
 InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
 {
-    if (type == 7)
-        return SelectInventoryWeapon(WEAP_PROXIMITYBOMB);
+    if (type == 7 || type == 8)
+        return SelectInventoryWeapon(WEAP_PROXIMITYBOMB + type - 7);
     if (type != 1 || !medkit)
         return InventoryResult::NotAvailable;
     const auto before = medkit->count;
@@ -399,14 +402,15 @@ InventoryResult CInventoryMgr::AddInventoryWeapon(DBYTE type, DBYTE count)
     auto* server = BaseClass::GetServerDE();
     if (!server || !server->IsObjectAlive(m_hOwner))
         return InventoryResult::Invalid;
-    if (type != 7)
+    if (type != 7 && type != 8)
         return InventoryResult::NotAvailable;
-    if (GetWeapon(10))
-        return AddAmmo(AMMO_PROXIMITYBOMB, count);
-    auto result = ObtainWeapon(WEAP_PROXIMITYBOMB, 10);
+    const DBYTE ammo = AMMO_PROXIMITYBOMB + type - 7;
+    if (GetWeapon(ammo))
+        return AddAmmo(ammo, count);
+    auto result = ObtainWeapon(WEAP_PROXIMITYBOMB + type - 7, ammo);
     if (result != InventoryResult::Ok)
         return result;
-    AddAmmo(AMMO_PROXIMITYBOMB, count); // Source ignores the first addition's return.
+    AddAmmo(ammo, count); // Source ignores the first addition's return.
     return InventoryResult::Ok;
 }
 InventoryResult CInventoryMgr::SelectInventoryWeapon(DBYTE type)
@@ -414,13 +418,16 @@ InventoryResult CInventoryMgr::SelectInventoryWeapon(DBYTE type)
     auto* server = BaseClass::GetServerDE();
     if (!server || !server->IsObjectAlive(m_hOwner))
         return InventoryResult::Invalid;
-    if (type != WEAP_PROXIMITYBOMB || !GetWeapon(10))
+    if (!inventory_bomb(type))
         return InventoryResult::NotAvailable;
-    if (m_nCurWeaponSlot == 10)
+    const DBYTE slot = 10 + type - WEAP_PROXIMITYBOMB;
+    if (!GetWeapon(slot))
+        return InventoryResult::NotAvailable;
+    if (m_nCurWeaponSlot == slot)
         return InventoryResult::Current;
-    if (!GetAmmoCount(AMMO_PROXIMITYBOMB))
+    if (!GetAmmoCount(slot))
         return InventoryResult::NotAvailable;
-    return ChangeWeaponSlot(10);
+    return ChangeWeaponSlot(slot);
 }
 InventoryResult CInventoryMgr::SelectNextWeapon()
 {

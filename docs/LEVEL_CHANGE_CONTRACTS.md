@@ -92,3 +92,12 @@ loading briefly holds both worlds in memory; asynchronous loading is not added.
 
 See [evidence](../../Documentation/Implementation/M2_LEVEL_CHANGE.md) and
 [source ledger](M2_LEVEL_CHANGE_SOURCES.json).
+
+The [remote-bomb continuation](REMOTE_BOMB_CONTRACTS.md) adds weapon50 in reserved
+slot11, ammo11/item8, RemotesPU, R selection and the separate B detonation command.
+Charged/secondary throws share the source sequence without proximity overhold
+explosion. Listed remotes belong to player teardown/Respawn; already signalled
+charges have left that list. Restore/KeepAlive preserve weapon/ammo, never old bomb
+handles. The shared model-projectile solver now admits CGrenade, CProximityBomb
+and CRemoteBomb. Earlier remote omissions are historical; time bombs and the
+complete M2 gate remain open.

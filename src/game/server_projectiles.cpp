@@ -1,6 +1,7 @@
 #include "game/original/Grenade.h"
 #include "game/original/Projectile.h"
 #include "game/original/ProximityBomb.h"
+#include "game/original/RemoteBomb.h"
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
@@ -13,7 +14,8 @@ namespace OpenBlood2
         auto* grenade =
             record && record->life == Life::Alive ? dynamic_cast<CProjectile*>(record->game.get()) : nullptr;
         auto* bomb = dynamic_cast<CProximityBomb*>(grenade);
-        if (!dynamic_cast<CGrenade*>(grenade) && !bomb)
+        auto* remote = dynamic_cast<CRemoteBomb*>(grenade);
+        if (!dynamic_cast<CGrenade*>(grenade) && !bomb && !remote)
             return false;
         if (!grenade || !grenade->configured || moving_ || objects_.busy() || !collision || !collision_ready ||
             !std::isfinite(seconds) || seconds <= 0 || seconds > .5 || record->attachment ||
@@ -33,8 +35,9 @@ namespace OpenBlood2
         const auto ids = objects_.snapshot();
         const auto steps = static_cast<unsigned>(std::max(1.0, std::ceil(seconds * 120)));
         const float dt = static_cast<float>(seconds / steps);
-        for (unsigned step = 0;
-             step < steps && record->life == Life::Alive && !grenade->m_bExplode && (!bomb || !bomb->armed); ++step)
+        for (unsigned step = 0; step < steps && record->life == Life::Alive && !grenade->m_bExplode &&
+                                (!bomb || !bomb->armed) && (!remote || !remote->armed);
+             ++step)
         {
             ContainerPhysics physics{
                 h,    record->velocity, record->acceleration, dt, (record->state.m_Flags & FLAG_GRAVITY) != 0, false,
@@ -108,6 +111,8 @@ namespace OpenBlood2
                     ++g->contacts;
                 if (bomb)
                     ++bomb->contacts;
+                if (remote)
+                    ++remote->contacts;
                 grenade->HandleContact(contact);
                 auto* target = objects_.get(hit.object);
                 if (record->life == Life::Alive && target && target->life == Life::Alive &&
@@ -148,8 +153,9 @@ namespace OpenBlood2
                 ok = projectile->AdvanceFlight(seconds) && ok;
                 const auto* target = objects_.get(projectile->m_hHitObject);
                 if (!dynamic_cast<CGrenade*>(projectile) && !dynamic_cast<CProximityBomb*>(projectile) &&
-                    !was_contact && projectile->contacted && record->life == Life::Alive && target &&
-                    target->life == Life::Alive && (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
+                    !dynamic_cast<CRemoteBomb*>(projectile) && !was_contact && projectile->contacted &&
+                    record->life == Life::Alive && target && target->life == Life::Alive &&
+                    (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
                     objects_.engine_message(target->handle, MID_TOUCHNOTIFY, record->handle);
             }
         }

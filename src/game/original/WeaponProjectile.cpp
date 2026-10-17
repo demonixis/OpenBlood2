@@ -23,7 +23,7 @@ FireResult CWeapon::FireProjectile()
         return last_shot.result = FireResult::Unavailable;
     }
     if (!instance->Setup(last_shot.direction, data.m_nType, last_shot.damage * m_pInventoryMgr->damage_multiplier,
-                         data.m_nType == WEAP_PROXIMITYBOMB
+                         inventory_bomb(data.m_nType)
                              ? (alt ? data.m_fAltProjVelocity : last_shot.request.projectile_speed)
                              : (alt ? data.m_fAltProjVelocity : data.m_fProjVelocity),
                          alt ? data.m_nAltDamageRadius : data.m_nDamageRadius, m_hOwner))

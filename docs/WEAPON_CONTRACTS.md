@@ -178,3 +178,12 @@ The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier mo
 The [Naga weapon continuation](NAGA_WEAPON_CONTRACTS.md) extends the supported NPC weapon subset with original eye-beam damage, head_gun aiming and red-small beam presentation. Gideon and the eye impact composite remain unavailable; earlier blanket weapon omissions are superseded only for this subset.
 
 The [shield/powerup continuation](SHIELD_WEAPON_CONTRACTS.md) now implements original CGideonShield and owner-bound ObjectFX19/36. Earlier blanket shield/ramp/object-particle omissions are superseded only for these selected recipes. Boss actions, required remaining services and M2 stay open.
+
+The [remote-bomb continuation](REMOTE_BOMB_CONTRACTS.md) adds weapon50 in reserved
+slot11, ammo11/item8, RemotesPU, R selection and the separate B detonation command.
+Charged/secondary throws share the source sequence without proximity overhold
+explosion. Listed remotes belong to player teardown/Respawn; already signalled
+charges have left that list. Restore/KeepAlive preserve weapon/ammo, never old bomb
+handles. The shared model-projectile solver now admits CGrenade, CProximityBomb
+and CRemoteBomb. Earlier remote omissions are historical; time bombs and the
+complete M2 gate remain open.

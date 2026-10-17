@@ -238,6 +238,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     communication.Reset(server_);
     medkit_down = medkit_was_down = false;
     proximity_down = proximity_was_down = false;
+    remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     item_actions = item_sounds = item_voice = 0;
     item_audio_error.clear();
     objectives = {};
@@ -278,6 +279,7 @@ void CBloodClientShell::OnExitWorld()
     communication.Reset(server_);
     medkit_down = medkit_was_down = false;
     proximity_down = proximity_was_down = false;
+    remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     item_actions = item_sounds = item_voice = 0;
     item_audio_error.clear();
     objectives = {};
@@ -477,8 +479,21 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerItemCo
     auto* owner = Player(client);
     return owner && owner->OnCommandItem(command.type);
 }
+bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerDetonate&)
+{
+    auto* owner = Player(client);
+    return owner && owner->OnCommandDetonate();
+}
 bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
 {
+    const bool remote_pressed = remote_down && !remote_was_down;
+    remote_was_down = remote_down;
+    if (remote_pressed)
+        server.OnMessage(client_, OpenBlood2::PlayerItemCommand{8});
+    const bool detonate_pressed = detonate_down && !detonate_was_down;
+    detonate_was_down = detonate_down;
+    if (detonate_pressed)
+        server.OnMessage(client_, OpenBlood2::PlayerDetonate{});
     const bool proximity_pressed = proximity_down && !proximity_was_down;
     proximity_was_down = proximity_down;
     if (proximity_pressed)

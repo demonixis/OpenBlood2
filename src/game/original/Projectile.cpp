@@ -3,6 +3,7 @@
 #include "FlareProjectile.h"
 #include "Grenade.h"
 #include "ProximityBomb.h"
+#include "RemoteBomb.h"
 #include "SurfaceTypes.h"
 #include "engine/collision.h"
 #include "engine/objects.h"
@@ -42,6 +43,13 @@ void CProjectile::Finish(const char* outcome)
         report.query = wave->ground_result;
         report.blast_position = wave->blast_position;
         report.blast_normal = wave->blast_normal;
+    }
+    if (const auto* remote = dynamic_cast<const CRemoteBomb*>(this))
+    {
+        report.remote = true;
+        report.armed = remote->armed;
+        report.falling = remote->falling;
+        report.contacts = remote->contacts;
     }
     if (const auto* bomb = dynamic_cast<const CProximityBomb*>(this))
     {
@@ -278,8 +286,8 @@ bool CProjectile::AddImpact(DVector position)
     m_vDir = vector_scale(m_vDir, 20);
     SegmentHit impact;
     auto normal = vector_scale(m_vDir, -1), point = position;
-    if (m_hHitObject || (!dynamic_cast<CGrenade*>(this) && !dynamic_cast<CProximityBomb*>(this) && !contact.object &&
-                         contact.polygon != UINT32_MAX))
+    if (m_hHitObject || (!dynamic_cast<CGrenade*>(this) && !dynamic_cast<CProximityBomb*>(this) &&
+                         !dynamic_cast<CRemoteBomb*>(this) && !contact.object && contact.polygon != UINT32_MAX))
     {
         const auto query = g_pServerDE->IntersectSegment(from, vector_add(position, m_vDir), nullptr, impact);
         if (query != SegmentResult::Hit && query != SegmentResult::Miss)

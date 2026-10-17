@@ -96,7 +96,7 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
         if (!server.Player(client))
             return true;
         if (state != WS_FIRING && state != WS_ALT_FIRING &&
-            !(type == WEAP_PROXIMITYBOMB && (state == WS_STOP_FIRING || state == WS_STOP_ALT_FIRING)))
+            !(inventory_bomb(type) && (state == WS_STOP_FIRING || state == WS_STOP_ALT_FIRING)))
             return true;
         const bool alternate = state == WS_ALT_FIRING || state == WS_STOP_ALT_FIRING;
         if (player->m_InventoryMgr.CurrentWeapon(left) != weapon)
@@ -121,7 +121,7 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
     };
     const float time = engine.GetTime();
     const bool primary = input.primary && input.left == left, alternate = input.alternate && input.left == left;
-    if (type == WEAP_PROXIMITYBOMB && state == WS_STOP_FIRING)
+    if (inventory_bomb(type) && state == WS_STOP_FIRING)
     {
         if (!PlayAnimation(stop_[0]))
         {
@@ -242,7 +242,7 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
         default:
             break;
     }
-    if (type == WEAP_PROXIMITYBOMB)
+    if (inventory_bomb(type))
     {
         if (state == WS_START_FIRING)
             bomb_start = time;
@@ -250,7 +250,7 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
         {
             bomb_held = time - bomb_start;
             bomb_speed = 250 + 1500 * std::min(bomb_held / .75f, 1.f);
-            if (bomb_held > 1.25f)
+            if (type == WEAP_PROXIMITYBOMB && bomb_held > 1.25f)
             {
                 bomb_speed = 0;
                 bomb_held = 0;

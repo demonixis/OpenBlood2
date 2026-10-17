@@ -13,6 +13,7 @@
 #include "game/original/KeyPickup.h"
 #include "game/original/Projectile.h"
 #include "game/original/ProximityBomb.h"
+#include "game/original/RemoteBomb.h"
 #include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
 #include "game/original/SoundFX.h"
@@ -55,6 +56,7 @@ namespace OpenBlood2
         spawn_request.clear();
         world_error.clear();
         weapon_slot_request = -1;
+        detonate_request = false;
         // Commands were drained before the owner boundary; do not carry an identity
         // selection into the new object's independent slot/generation namespace.
     }
@@ -404,6 +406,11 @@ namespace OpenBlood2
                     world_error = player->entry_error;
             }
             respawn_request = false;
+        }
+        if (detonate_request)
+        {
+            game.server_shell.OnMessage(game.local_client, PlayerDetonate{});
+            detonate_request = false;
         }
         if (weapon_slot_request >= 0)
         {
@@ -842,6 +849,13 @@ namespace OpenBlood2
                                         game.server.IsObjectAlive(projectile->m_hFiredFrom) ? "yes" : "no",
                                         game.server.IsObjectAlive(projectile->m_hHitObject) ? "yes" : "no",
                                         projectile->contact.polygon);
+                            if (const auto* remote = dynamic_cast<const CRemoteBomb*>(projectile))
+                            {
+                                ImGui::Text("Remote: armed %d / falling %d / contacts %llu", remote->armed,
+                                            remote->falling, (unsigned long long)remote->contacts);
+                                ImGui::Text("Pitch %.3f / yaw %.3f / spin %.3f %.3f / no fuse", remote->pitch,
+                                            remote->yaw, remote->pitch_velocity, remote->yaw_velocity);
+                            }
                             if (const auto* bomb = dynamic_cast<const CProximityBomb*>(projectile))
                             {
                                 ImGui::Text("Proximity: armed %d / direct contact %d / scans %llu / contacts %llu",
@@ -987,6 +1001,9 @@ namespace OpenBlood2
                             ImGui::Text("%.3f %s: %s at %.2f %.2f %.2f / delivered %u", report.time,
                                         report.source.c_str(), report.outcome.c_str(), report.position.x,
                                         report.position.y, report.position.z, report.delivered);
+                            if (report.remote)
+                                ImGui::Text("Remote: armed %d / falling %d / contacts %llu", report.armed,
+                                            report.falling, (unsigned long long)report.contacts);
                             if (report.proximity)
                                 ImGui::Text(
                                     "Proximity: armed %d / character impact %d / scans %llu / contacts %llu / audio %s",
@@ -1980,7 +1997,8 @@ namespace OpenBlood2
     }
     void Inspector::draw_weapons(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextUnformatted("Original inventory / Beretta / Mac-10 / Flare / M16 / Knife / Proximity Bomb");
+        ImGui::TextUnformatted(
+            "Original inventory / Beretta / Mac-10 / Flare / M16 / Knife / Proximity + Remote Bombs");
         auto* player = game.server_shell.Player(game.local_client);
         if (!player)
         {
@@ -1991,9 +2009,20 @@ namespace OpenBlood2
         auto& inventory = player->m_InventoryMgr;
         ImGui::TextWrapped("P selects collected proximity bombs. Hold primary to charge, then release; holding over "
                            "1.25 seconds explodes in hand. Secondary drops a bomb.");
-        if (game.client_shell.weapons[0].type == WEAP_PROXIMITYBOMB)
+        ImGui::TextWrapped(
+            "R selects collected remote bombs; B detonates all registered charges, regardless of selected weapon or "
+            "ammo. Primary charges/throws, secondary drops. Remotes have no overhold explosion.");
+        ImGui::Text("Remote list %u / commands %llu / signalled %llu",
+                    player->remote_bombs ? player->remote_bombs->m_nInList : 0,
+                    (unsigned long long)player->remote_commands, (unsigned long long)player->remote_signals);
+        if (!player->remote_error.empty())
+            ImGui::TextWrapped("Remote error: %s", player->remote_error.c_str());
+        if (ImGui::Button("Detonate remote bombs"))
+            detonate_request = true;
+        if (inventory_bomb(game.client_shell.weapons[0].type))
             ImGui::Text("Bomb charge %.3f s / speed %.1f / ammo %.0f", game.client_shell.weapons[0].bomb_held,
-                        game.client_shell.weapons[0].bomb_speed, inventory.GetAmmoCount(10));
+                        game.client_shell.weapons[0].bomb_speed,
+                        inventory.GetAmmoCount(game.client_shell.weapons[0].type == WEAP_PROXIMITYBOMB ? 10 : 11));
         ImGui::TextWrapped("Hold a fire button to drive original animation, shots, decoded fire sounds and AI hearing. "
                            "The model preview is diagnostic; remaining impact FX and audio reverb are unavailable.");
         if (!world_error.empty())

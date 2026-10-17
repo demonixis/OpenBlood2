@@ -344,8 +344,8 @@ namespace OpenBlood2
         }
         auto& inventory = player->m_InventoryMgr;
         const auto previous = inventory.m_nCurWeaponSlot;
-        const auto changed =
-            slot == 10 ? inventory.SelectInventoryWeapon(WEAP_PROXIMITYBOMB) : inventory.ChangeWeaponSlot(slot);
+        const auto changed = slot >= 10 ? inventory.SelectInventoryWeapon(WEAP_PROXIMITYBOMB + slot - 10)
+                                        : inventory.ChangeWeaponSlot(slot);
         if (changed != InventoryResult::Ok && changed != InventoryResult::Current)
         {
             error = "Inventory weapon has no ammo";
