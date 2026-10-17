@@ -79,6 +79,8 @@ namespace OpenBlood2
                     return physics_vector(value.position);
                 else if constexpr (std::is_same_v<T, PlayerStats>)
                     return std::isfinite(value.health) && std::isfinite(value.armor) && std::isfinite(value.bullets);
+                else if constexpr (std::is_same_v<T, BossHealth>)
+                    return std::isfinite(value.fraction);
                 else if constexpr (std::is_same_v<T, WorldExit>)
                     return value.next_world.size() <= 100 && value.next_world.find('\0') == std::string::npos &&
                            static_cast<DBYTE>(value.type) <= static_cast<DBYTE>(WorldExitType::Episode);
@@ -104,6 +106,19 @@ namespace OpenBlood2
             return DE_ERROR;
         events.push_back(event);
         return DE_OK;
+    }
+    DRESULT ServerAdapter::SendBossHealth(const BossHealth& value)
+    {
+        trace_service("SendBossHealth");
+        if (!std::isfinite(value.fraction))
+            return DE_INVALIDPARAMS;
+        for (const auto& [client, state] : clients_)
+        {
+            (void)state;
+            if (GetClientUserData(client))
+                return SendToClient(client, value);
+        }
+        return DE_NOTFOUND;
     }
     bool ServerAdapter::take_client_events(HCLIENT client, std::vector<PlayerEvent>& events)
     {

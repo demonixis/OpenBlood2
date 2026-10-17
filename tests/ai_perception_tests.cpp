@@ -400,7 +400,7 @@ namespace
             CHECK(a);
             auto* r = g.objects.get(a->m_hObject);
             CHECK(g.models.load("models/enemies/m_cultist1.abc", r->model, error));
-            CHECK(AI_Mgr::m_dwNumCabal == 17 && AI_Mgr::m_dwNumMonster == 1);
+            CHECK(AI_Mgr::m_dwNumCabal == 17 && AI_Mgr::m_dwNumMonster == 2);
             a->m_fSensingDist = 200;
             CHECK(a->ComputeStimuli() == 4 && a->GetTarget() == p->m_hObject);
             CHECK(a->RefreshTargetPosition() && a->MC_FaceTarget());
@@ -410,7 +410,7 @@ namespace
             p->m_bPowerupActivated[PU_INVISIBLE] = true;
             CHECK(a->ComputeStimuli() == 4 && a->stimulus_queries[0].rays == 0);
             old = p->m_hObject;
-            CHECK(g.leave_player() && !a->GetTarget() && AI_Mgr::m_dwNumMonster == 0);
+            CHECK(g.leave_player() && !a->GetTarget() && AI_Mgr::m_dwNumMonster == 1);
             CHECK(g.enter_player(error));
             p = g.server_shell.Player(g.local_client);
             CHECK(p && p->m_hObject != old && a->ComputeStimuli() > 0 && a->GetTarget() == p->m_hObject);

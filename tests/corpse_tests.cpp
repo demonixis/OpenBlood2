@@ -151,6 +151,13 @@ namespace
         CHECK(!a->DispatchState() && !a->m_bRemoveMe && (g.server.GetObjectFlags(h) & FLAG_VISIBLE));
         CHECK(g.objects.finish_frame() && g.objects.snapshot().size() == before && a->corpses_created == 0);
         a->m_vScale = {1, 1, 1};
+        DVector penetrating{0, 59, 0};
+        CHECK(g.server.TeleportObject(h, &penetrating) == DE_OK && a->m_MoveObj.Update());
+        CHECK(!a->DispatchState() && !a->m_bRemoveMe && (g.server.GetObjectFlags(h) & FLAG_VISIBLE));
+        CHECK(g.objects.finish_frame() && g.objects.snapshot().size() == before && a->corpses_created == 0);
+        CHECK(!a->death_error.empty() && !a->last_corpse);
+        DVector clear{0, 60, 0};
+        CHECK(g.server.TeleportObject(h, &clear) == DE_OK && a->m_MoveObj.Update());
         a->m_nCorpseType = 9999;
         CHECK(!a->DispatchState() && g.objects.snapshot().size() == before);
         a->m_nCorpseType = 0;

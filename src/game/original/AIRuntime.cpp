@@ -9,7 +9,7 @@
 using namespace OpenBlood2;
 namespace
 {
-    std::array<std::shared_ptr<CAnim_Sound>, 4> tables; // Reset after world objects are destroyed.
+    AI_Mgr::RuntimeTables tables; // Reset after world objects are destroyed.
     bool weapon(std::string_view name, DBYTE& id)
     {
         if (name.starts_with("NONE"))
@@ -31,7 +31,7 @@ namespace
         return true;
     }
 } // namespace
-void AI_Mgr::ExchangeRuntimeTables(std::array<std::shared_ptr<CAnim_Sound>, 4>& other)
+void AI_Mgr::ExchangeRuntimeTables(AI_Mgr::RuntimeTables& other)
 {
     tables.swap(other);
 }
@@ -55,6 +55,16 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
     npc_ammo[2] = type == NPCType::Cultist ? 60 : 0;
     npc_ammo[5] = type == NPCType::Cultist ? 20 : 0;
     npc_ammo[6] = type == NPCType::Civilian ? 100 : 0;
+    if (type == NPCType::Gideon)
+    {
+        m_fHearingDist = 0;
+        m_fSeeingDist = m_fSensingDist = 10000;
+        m_bCabal = false;
+        npc_hp = 4000;
+        npc_armor = 200;
+        npc_weapons = {"GIDEON_SHIELD", "ENERGY_BLAST", "NAGA_BLAST", "GIDEON_WIND", "NONE"};
+        m_damage.apply_damage_physics = false;
+    }
 }
 bool AI_Mgr::RuntimeFailure(std::string_view why)
 {
@@ -99,7 +109,7 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         text("TriggerRelayTarget", trigger_relay_target);
     }
     // Source subclass booleans are read only for world-file creation.
-    if (reason == PRECREATE_WORLDFILE)
+    if (reason == PRECREATE_WORLDFILE && npc_type != NPCType::Gideon)
     {
         auto flag = [&](const char* key, bool& out)
         {
@@ -138,7 +148,12 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         return RuntimeFailure("Invalid NPC authored state");
     std::string model, skin;
     int variant = 1;
-    if (npc_type == NPCType::Cultist)
+    if (npc_type == NPCType::Gideon)
+    {
+        model = "Models/Enemies/gideon.abc";
+        skin = "Skins/Enemies/gideon.dtx";
+    }
+    else if (npc_type == NPCType::Cultist)
     {
         if (npc_robe)
             return RuntimeFailure("Add-on robe Cultist initialization is not integrated");
@@ -187,7 +202,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
         return RuntimeFailure("Invalid or repeated NPC initialization");
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
-    const auto group = (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
+    const auto group = npc_type == NPCType::Gideon ? 4 : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
     auto initialize_table = [&](unsigned slot, bool refresh, const char* root)
     {
         if (!refresh)
@@ -215,12 +230,14 @@ bool AI_Mgr::RuntimeInitialize(int reason)
             return RuntimeFailure("NPC female animation table initialization failed");
     }
     else if (!initialize_table(group, !tables[group],
-                               male_group ? "sounds/enemies/m_cultist" : "sounds/enemies/f_cultist"))
+                               npc_type == NPCType::Gideon ? "sounds/enemies/Gideon"
+                               : male_group                ? "sounds/enemies/m_cultist"
+                                                           : "sounds/enemies/f_cultist"))
         return RuntimeFailure("NPC shared animation table initialization failed");
     auto table = tables[group];
     if (!InitStatics(table) || !m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
         return RuntimeFailure("NPC aggregates unavailable");
-    m_InventoryMgr.SetStrength(5);
+    m_InventoryMgr.SetStrength(npc_type == NPCType::Gideon ? 10 : 5);
     // Original weapon IDs are sparse (Gideon's loadout reaches 42). Track the
     // at-most-five requested IDs, not an array sized for player-only weapons.
     std::array<DBYTE, 5> obtained{};
@@ -283,7 +300,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         return RuntimeFailure("NPC initial model dimensions/scale/animation failed: " + state_error);
     s->SetNextUpdate(m_hObject, .001f);
     m_bSetShutdown = false;
-    if (reason == INITIALUPDATE_WORLDFILE && s->MoveObjectToGround(m_hObject) != DE_OK)
+    if (reason == INITIALUPDATE_WORLDFILE && npc_type != NPCType::Gideon && s->MoveObjectToGround(m_hObject) != DE_OK)
         return RuntimeFailure("NPC world ground placement failed");
     m_fLastUpdate = s->GetTime();
     m_damage.ai_hit_localization = true;

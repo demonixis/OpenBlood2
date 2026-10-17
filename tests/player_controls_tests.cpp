@@ -187,7 +187,15 @@ namespace
             controls.look(g.client_shell.rotation, 1. / 60, false);
             const auto fire = controls.sample_fire(false);
             g.client_shell.weapon_input = {fire.primary, fire.alternate, false};
-            return g.step(1. / 60);
+            const float hp_before = p->m_damage.m_fHitPoints;
+            if (g.step(1. / 60))
+                return true;
+            std::cerr << "Input session failed at " << g.objects.time() << " hp before " << hp_before << '\n';
+            for (const auto& line : g.trace)
+                std::cerr << "Trace " << line << '\n';
+            for (const auto& line : g.objects.diagnostics())
+                std::cerr << "Object " << line << '\n';
+            return false;
         };
         auto steps = [&](unsigned count)
         {
@@ -229,7 +237,11 @@ namespace
         else
         {
             const auto before = w->shots;
-            CHECK(event(key(SDL_SCANCODE_G, true, id)) && steps(90) && w->shots > before);
+            CHECK(event(key(SDL_SCANCODE_G, true, id)) && steps(90));
+            std::cout << "Alternate input: hp=" << p->m_damage.m_fHitPoints << " dead=" << p->m_damage.IsDead()
+                      << " ammo=" << p->m_InventoryMgr.GetAmmoCount(1) << " shots=" << w->shots << " before=" << before
+                      << '\n';
+            CHECK(w->shots > before);
             CHECK(event(key(SDL_SCANCODE_G, false, id)) && steps(60));
         }
         CHECK(w->sounds_played == w->shots && !w->sound_failures);

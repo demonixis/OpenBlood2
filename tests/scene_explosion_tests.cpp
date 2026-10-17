@@ -312,12 +312,12 @@ namespace
                 ++n;
                 CHECK(e.state == EntryState::Created);
             }
-            CHECK(n == 9 && counts[EntryState::Created] == 203 && counts[EntryState::WorldSound] == 4 &&
-                  counts[EntryState::EditorOnly] == 372 && counts[EntryState::Unsupported] == 1 &&
+            CHECK(n == 9 && counts[EntryState::Created] == 204 && counts[EntryState::WorldSound] == 4 &&
+                  counts[EntryState::EditorOnly] == 372 && counts[EntryState::Unsupported] == 0 &&
                   counts[EntryState::Failed] == 0);
-            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228 &&
+            CHECK(g.objects.snapshot().size() == 227 && g.enter_player(error) && g.objects.snapshot().size() == 230 &&
                   g.step(.02));
-            CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
+            CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11);
             auto* player = g.server_shell.Player(g.local_client);
             CHECK(player);
             auto health = player->m_damage.m_fHitPoints;
@@ -334,7 +334,7 @@ namespace
             CHECK(g.server.scene_explosions.size() == 9 && player->m_damage.m_fHitPoints == health && g.step(.11));
             for (auto h : emitted)
                 CHECK(!g.objects.get(h));
-            CHECK(!g.run_world(error) && error.find("1 uninstantiated") != std::string::npos);
+            CHECK(!g.run_world(error) && error.find("0 uninstantiated") != std::string::npos);
             CHECK(g.unload_world() && g.server.scene_explosions.empty() && g.server.audio.voices().empty() &&
                   g.server.string_count() == 0 && g.server.message_count() == 0 && g.server.list_count() == 0);
             std::cout << "cycle=" << cycle

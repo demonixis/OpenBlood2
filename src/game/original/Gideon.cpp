@@ -1,10 +1,88 @@
-// Original ObjectDLL/Gideon.cpp:323-473,583-600,770-808 (Monolith, 1998).
-// Typed failure/lifetime adaptations are documented in GIDEON_COMBAT_CONTRACTS.md.
+// Original ObjectDLL/Gideon.cpp:15-240,323-473,583-600,770-808 (Monolith, 1998).
+// Typed failure/lifetime adaptations are documented in GIDEON_RUNTIME_CONTRACTS.md.
 #include "Gideon.h"
 #include "engine/collision.h"
 #include <cmath>
 #include <limits>
 using namespace OpenBlood2;
+
+bool Gideon::PublishHealth(float fraction)
+{
+    ++health_requests;
+    health_error.clear();
+    auto* server = GetServerDE();
+    if (!server || !server->IsObjectAlive(m_hObject) || !std::isfinite(fraction) || !std::isfinite(m_fFullHealth) ||
+        !std::isfinite(m_damage.m_fHitPoints))
+    {
+        health_result = DE_INVALIDPARAMS;
+        health_error = "Gideon health owner or ratio unavailable";
+        return StateFailure(health_error.c_str());
+    }
+    boss_health_fraction = fraction; // Keep the source ratio, including values outside [0,1].
+    health_result = server->SendBossHealth({fraction});
+    if (health_result == DE_OK)
+        ++health_deliveries;
+    else if (health_result == DE_NOTFOUND)
+        ++health_no_client; // A null-client broadcast with no audience is not a delivery.
+    else
+    {
+        health_error = "Gideon boss-health delivery failed";
+        return StateFailure(health_error.c_str());
+    }
+    return true;
+}
+DDWORD Gideon::EngineMessageFn(DDWORD message, void* data, DFLOAT value)
+{
+    if (npc_type != NPCType::Gideon)
+        return AI_Mgr::EngineMessageFn(message, data, value);
+    if (message == MID_INITIALUPDATE)
+    {
+        // Source subclass InitialUpdate precedes base health/difficulty initialization.
+        m_fFullHealth = m_damage.m_fHitPoints;
+        m_bCreateHealth = true;
+    }
+    if (message == MID_UPDATE && RuntimeReady() && m_bCreateHealth)
+    {
+        const float fraction = m_fFullHealth == 0 ? 1 : m_damage.m_fHitPoints / m_fFullHealth;
+        if (!PublishHealth(fraction))
+        {
+            RuntimeFailure(health_error);
+            return 0;
+        }
+        if (m_fFullHealth == 0)
+        {
+            m_bCreateHealth = false;
+            m_fFullHealth = m_damage.m_fHitPoints;
+        }
+        // The original nonzero branch deliberately keeps m_bCreateHealth set.
+    }
+    const auto result = AI_Mgr::EngineMessageFn(message, data, value);
+    if (message == MID_INITIALUPDATE && RuntimeReady() && GetServerDE()->IsObjectAlive(m_hObject))
+        GetServerDE()->SetObjectFlags(m_hObject, GetServerDE()->GetObjectFlags(m_hObject) & ~FLAG_GRAVITY);
+    return result;
+}
+bool Gideon::OnAcceptedDamage()
+{
+    if (npc_type != NPCType::Gideon)
+        return true;
+    // One accepted typed damage application, then Gideon, then base AI reaction.
+    // The source forwards the same consumed reader twice without ResetRead; never
+    // replay our immutable damage value as a second independent packet.
+    if (m_fFullHealth == 0)
+    {
+        health_result = DE_INVALIDPARAMS;
+        health_error = "Gideon damage health denominator is zero";
+        return StateFailure(health_error.c_str());
+    }
+    if (!PublishHealth(m_damage.m_fHitPoints / m_fFullHealth))
+        return false;
+    if (m_damage.m_fLastDamageAmount > 20)
+    {
+        ++damage_specials;
+        return SetNewState(StateSpecial1);
+    }
+    return true;
+}
 
 bool Gideon::ComputeState(int value)
 {

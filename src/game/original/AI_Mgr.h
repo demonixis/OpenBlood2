@@ -101,10 +101,12 @@ class AI_Mgr : public CBaseCharacter
     {
         Diagnostic,
         Cultist,
-        Civilian
+        Civilian,
+        Gideon
     };
     static void ResetRuntimeTables();
-    static void ExchangeRuntimeTables(std::array<std::shared_ptr<CAnim_Sound>, 4>&);
+    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 5>;
+    static void ExchangeRuntimeTables(RuntimeTables&);
     void ConfigureRuntime(NPCType); // Original constructor defaults, selected by production factories only.
     bool AI_Update();
     bool RuntimeReady() const
@@ -453,6 +455,10 @@ class AI_Mgr : public CBaseCharacter
 
   protected:
     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
+    virtual bool OnAcceptedDamage()
+    {
+        return true;
+    }
     bool TriggerFailure(const char*);
     bool StateFailure(const char*);
     bool AnimationCommand(DDWORD clip, int command);

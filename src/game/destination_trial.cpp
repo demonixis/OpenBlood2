@@ -26,7 +26,7 @@ namespace OpenBlood2
             std::array<DLink, 7> saved_heads{};
             std::array<DDWORD, 7> saved_counts{};
             HOBJECT camera = nullptr;
-            std::array<std::shared_ptr<CAnim_Sound>, 4> tables;
+            AI_Mgr::RuntimeTables tables;
             void exchange()
             {
                 for (std::size_t i = 0; i < heads.size(); ++i)

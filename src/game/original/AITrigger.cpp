@@ -278,7 +278,7 @@ DDWORD AI_Mgr::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read
         const auto result = CBaseCharacter::ObjectMessageFn(sender, message, read);
         // Safety adaptation: refused/nested packets never replay stale hit metadata.
         if (!nested && m_damage.ai_hit_localization && !runtime_failed && before != m_damage.accepted_damage &&
-            GetServerDE()->IsObjectAlive(m_hObject) && !HandleDamage())
+            GetServerDE()->IsObjectAlive(m_hObject) && (!OnAcceptedDamage() || !HandleDamage()))
             RuntimeFailure(damage_reaction_error.empty() ? state_error : damage_reaction_error);
         return result;
     }

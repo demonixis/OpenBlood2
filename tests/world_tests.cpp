@@ -912,12 +912,12 @@ namespace
                           << " triangles / " << d.collision_nodes << " collision nodes\n";
                 CHECK(d.scan_complete && d.source_world == path && d.source_revision == revision);
                 if (d.destination == "worlds/01_subwaya.dat")
-                    CHECK(d.entries.size() == 580 && d.schema_checked == 207 && d.editor_only == 372 &&
-                          d.unknown == 1 && d.invalid == 0 && d.models == 116);
+                    CHECK(d.entries.size() == 580 && d.schema_checked == 208 && d.editor_only == 372 &&
+                          d.unknown == 0 && d.invalid == 0 && d.models == 116);
                 else
                 {
-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 247 && d.editor_only == 541 &&
-                          d.unknown == 207 && d.invalid == 31 && d.models == 100 && d.triangles == 39724);
+                    CHECK(d.entries.size() == 1026 && d.schema_checked == 248 && d.editor_only == 541 &&
+                          d.unknown == 206 && d.invalid == 31 && d.models == 100 && d.triangles == 39724);
                     for (const auto& e : d.entries)
                         if (e.state == DestinationEntryState::InvalidProperties)
                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
@@ -1100,7 +1100,7 @@ namespace
             for (auto id : game.objects.snapshot())
                 if (auto* a = dynamic_cast<AI_Mgr*>(game.objects.get(id)->game.get()))
                     tables.emplace_back(a, a->AnimSound());
-            CHECK(tables.size() == 15);
+            CHECK(tables.size() == 16);
             CAnim_Sound* voiced_table = nullptr;
             for (const auto& [actor, table] : tables)
                 if (table->GetSoundRoot() == "sounds/enemies/m_cultist")
@@ -1112,13 +1112,26 @@ namespace
                 }
             CHECK(voiced_table && voiced_table->m_hVoxSound);
             const auto voice_id = voiced_table->m_hVoxSound;
+            CAnim_Sound* boss_table = nullptr;
+            for (const auto& [actor, table] : tables)
+                if (actor->npc_type == AI_Mgr::NPCType::Gideon)
+                {
+                    boss_table = const_cast<CAnim_Sound*>(table);
+                    CHECK(boss_table->PlayVoice(actor->m_hObject, "shield.wav", 1000, 100));
+                    break;
+                }
+            CHECK(boss_table && boss_table->m_hVoxSound);
+            const auto boss_voice = boss_table->m_hVoxSound;
+            const auto boss_messages = game.client_shell.boss_health_messages;
+            const auto boss_fraction = game.client_shell.boss_health.fraction;
             // Explicit diagnostic audio, not a shot through the intro camera's input gate.
             auto* weapon = player->m_InventoryMgr.CurrentWeapon();
             weapon->PlayFireSound(false, game.client_shell.position);
             const auto fire_voices = weapon->fire_sounds;
             CHECK(weapon->sounds_played == 1 && game.server.audio.get(weapon->last_fire_sound));
-            std::array<std::shared_ptr<CAnim_Sound>, 4> slots;
+            AI_Mgr::RuntimeTables slots;
             AI_Mgr::ExchangeRuntimeTables(slots);
+            CHECK(slots[4] && slots[4].get() == boss_table);
             auto original_slots = slots;
             AI_Mgr::ExchangeRuntimeTables(slots);
             const auto ids = game.objects.snapshot();
@@ -1148,9 +1161,9 @@ namespace
                 {
                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
                     if (std::string_view(name) == "02_cityhub")
-                        CHECK(d.created == 243 && d.unknown == 207 && d.failed == 35);
+                        CHECK(d.created == 244 && d.unknown == 206 && d.failed == 35);
                     else
-                        CHECK(d.created == 203 && d.unknown == 1 && d.failed == 0);
+                        CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
                 }
                 CHECK(game.objects.snapshot() == ids && game.local_client == client && game.world_revision == revision);
                 CHECK(game.objects.time() == time && game.client_shell.player == player->m_hObject);
@@ -1161,6 +1174,9 @@ namespace
                 for (const auto& [ai, table] : tables)
                     CHECK(ai->AnimSound() == table);
                 CHECK(voiced_table->m_hVoxSound == voice_id && game.server.audio.get(voice_id));
+                CHECK(boss_table->m_hVoxSound == boss_voice && game.server.audio.get(boss_voice));
+                CHECK(game.client_shell.boss_health_messages == boss_messages &&
+                      game.client_shell.boss_health.fraction == boss_fraction);
                 CHECK(weapon->fire_sounds == fire_voices);
                 AI_Mgr::ExchangeRuntimeTables(slots);
                 CHECK(slots == original_slots);
@@ -1184,7 +1200,7 @@ namespace
         CHECK(game.world.version == 56);
         CHECK(game.world.objects.size() == 580);
         CHECK(game.world.models.size() == 116);
-        CHECK(game.objects.snapshot().size() == 225);
+        CHECK(game.objects.snapshot().size() == 227);
         CHECK(game.world.models[0].points.size() == 4996);
         CHECK(game.world.models[0].polygons.size() == 3367);
         CHECK(game.resources.find(game.world_path)->overrides == 1);
@@ -1201,8 +1217,10 @@ namespace
                 CHECK(game.objects.get(id)->activity == OBJSTATE_INACTIVE);
                 std::cout << "No-player NPC " << game.objects.get(id)->state.m_Name << ": " << a->runtime_error << '\n';
             }
-        CHECK(suspended == 3);
-        CHECK(game.server.service_calls["SetObjectDims"] == 54);
+        std::cout << "No-player suspended=" << suspended << " dims calls=" << game.server.service_calls["SetObjectDims"]
+                  << '\n';
+        CHECK(suspended == 0); // Gideon supplies a real opposite-faction candidate; no self fallback.
+        CHECK(game.server.service_calls["SetObjectDims"] == 57);
         CHECK(game.server.service_calls["GetPropGeneric"] > 0);
         for (const auto& [name, count] : game.server.service_calls)
             std::cout << "Service " << name << ": " << count << '\n';

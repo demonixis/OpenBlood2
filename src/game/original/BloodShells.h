@@ -100,6 +100,9 @@ class CBloodClientShell
         std::uint64_t received = 0, ignored_dead = 0, blocked = 0;
         bool pending = false;
     } world_exit;
+    OpenBlood2::BossHealth boss_health;
+    std::uint64_t boss_health_messages = 0;
+    bool boss_health_visible = false;
     OpenBlood2::MissionObjectives objectives;
     std::string objectives_error;
     std::uint64_t objective_messages = 0;

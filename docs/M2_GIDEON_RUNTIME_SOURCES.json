@@ -1,0 +1,56 @@
+{
+  "baseline_commit": "e34525eeaf6bb7d55dd59ce310e15e6ef3c6de3b",
+  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
+      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
+      "use": "Constructor, EngineMessageFn, ObjectMessageFn, PostPropRead and InitialUpdate (15-240)"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "Base initialization and damage dispatch/reaction"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "use": "Initial HP=1 and sequential damage reads (47,395-406)"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/engineobjects.c",
+      "sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
+      "use": "bc_ObjectMessageFn aggregate forwarding (129-142)"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/CSBase.h",
+      "sha256": "e07e05c7a94ae38c68329293ed3d45a8ad4361c805b6471aaff07ca7a597610b",
+      "use": "Explicit ResetRead interface"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "use": "SMSG_BOSSHEALTH visibility at4141"
+    },
+    {
+      "path": "sources/lithtech/runtime/model/src/model.cpp",
+      "sha256": "47340a20b31acee4748dc6d171873df7560ae444bf485153cf4f86d6ac1b9cf8",
+      "use": "Later engine Model::FindAnim case-insensitive first-match policy (841-866); compatibility reference, not original Blood II engine proof"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "use": "SetStrength raw NPC value with bounded decrease-table index (1233-1243)"
+    }
+  ],
+  "adaptations": [
+    "Production factory uses existing typed NPC initialization and resource services; no new dependency.",
+    "Fifth shared table participates in unload and disposable destination isolation.",
+    "Owned finite-only boss-health messages, bounded queue, explicit no-audience and failure inspection.",
+    "One accepted typed damage application then Gideon hook then base AI reaction; exhausted retail reader behavior unverified.",
+    "Original HUD artwork and complete boss death/encounter behavior remain unavailable.",
+    "ASCII case-insensitive first-match animation lookup connects authored TALKING_02 to external talking_02; no alias or resource modification.",
+    "SetStrength retains high NPC values; ammo columns remain bounded and the existing typed minimum is retained.",
+    "Corpse setup validates primary-world placement with a stationary move, rolling back rejected children and preserving visible source failure; no depenetration fabricated."
+  ]
+}

@@ -40,7 +40,7 @@ namespace
                 CHECK(a->RuntimeReady() && (!untouched || !a->runtime_updates));
                 ++count;
             }
-        CHECK(count == 15);
+        CHECK(count == 16);
         return true;
     }
     bool private_entry(const char* root)

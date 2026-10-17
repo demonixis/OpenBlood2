@@ -92,6 +92,12 @@ namespace
               inv.m_nCurWeaponSlot == 1);
         CHECK(inv.MaxAmmo(1) == 500 && inv.AddAmmo(1, 1000) == InventoryResult::Ok && inv.GetAmmoCount(1) == 500);
         CHECK(inv.AddAmmo(1, 1) == InventoryResult::Full);
+        inv.SetStrength(10);
+        CHECK(inv.m_nAttribStrength == 10 && inv.MaxAmmo(1) == 600);
+        CHECK(inv.AddAmmo(1, 1000) == InventoryResult::Ok && inv.GetAmmoCount(1) == 600);
+        inv.SetStrength(255);
+        inv.SetStrength(7); // Decrease above the table range must not index beyond column five.
+        CHECK(inv.m_nAttribStrength == 7 && inv.MaxAmmo(1) == 600 && inv.GetAmmoCount(1) == 600);
         inv.SetStrength(1);
         CHECK(inv.GetAmmoCount(1) == 100);
         CHECK(inv.AddAmmo(1, -1) == InventoryResult::Invalid && inv.AddAmmo(0, 1) == InventoryResult::Invalid);

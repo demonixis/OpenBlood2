@@ -44,7 +44,7 @@ single-threaded diagnostic only, suspend and exchange exactly these runtime glob
 - Cabal and Monster faction heads/counts;
 - destructible, smell, exit-hint, ammo-pickup and camera heads/counts;
 - active camera handle;
-- the four ported class/gender AI animation/sound table owners;
+- the five ported class/gender AI animation/sound table owners (including Gideon);
 - active server adapter binding and `g_pServerDE`.
 
 Sentinel addresses do not move. Source nodes keep their original endpoint addresses
@@ -66,7 +66,7 @@ capture diagnostics/caches; the contract is not a bitwise rollback of all counte
 
 Cleanup checks binding release, all seven empty list counts and active-camera reset.
 Lifetime tests additionally compare every source intrusive node's address, previous,
-next and data pointers, all shared table owners, and a live shared Cultist voice.
+next and data pointers, all shared table owners, and live shared Cultist/Gideon voices.
 No destination failure reloads the source DAT or reconstructs its NPCs.
 
 ## Inspection and evidence
@@ -84,13 +84,15 @@ missing marker/ground/resource/data, source key preservation with destination ke
 removal, repeat attempts, foreign-session rejection and report lifetime. Existing
 `world.destination_lifetime` also rejects callback rehearsal. Private tests repeat
 SubwayA -> temporary CityHub/SubwayA/malformed Bridge -> unchanged SubwayA three
-times, with 15 production NPCs and a diagnostic live shared Cultist voice. The GPU
+times, with 16 production NPCs and diagnostic live shared Cultist/Gideon voices. The GPU
 objectives scenario executes CityHub entry and cleanup with hidden UI and reload.
 See [source ledger](M2_DESTINATION_TRIAL_SOURCES.json) and
 [implementation evidence](../../Documentation/Implementation/M2_DESTINATION_TRIAL.md).
 
 A rehearsal cannot promote the staged runtime, preserve all client presentation
 state, guarantee subsequent updates or make an incomplete destination playable.
-Automatic NEW_LEVEL, Gideon, required remaining FX/illumination and other required
+Automatic NEW_LEVEL, complete boss encounter/death behavior, required remaining FX/illumination and other required
 services still block M2. This isolation is new engine adaptation, not recovered
 retail transition code or proof of retail behavior equivalence.
+
+The fifth-table extension is documented in [Gideon runtime contracts](GIDEON_RUNTIME_CONTRACTS.md).

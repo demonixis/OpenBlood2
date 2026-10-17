@@ -378,7 +378,8 @@ namespace OpenBlood2
         if (blocked_start)
         {
             objects_.fail(ObjectError::Unsupported,
-                          "MoveObject starts penetrating geometry; depenetration is not implemented");
+                          "MoveObject starts penetrating geometry; depenetration is not implemented: " + r->type->name +
+                              " / " + r->state.m_Name);
             return DE_ERROR;
         }
         return DE_OK;

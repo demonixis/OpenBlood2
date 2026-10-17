@@ -499,7 +499,7 @@ namespace
         for (int load = 0; load < 2; ++load)
         {
             CHECK(g.request_world("01_SubwayA", e) && !g.objects.get(old));
-            unsigned cultists = 0, civilians = 0, failed = 0, unsupported = 0, created = 0;
+            unsigned cultists = 0, civilians = 0, bosses = 0, failed = 0, unsupported = 0, created = 0;
             for (auto& entry : g.entries)
             {
                 failed += entry.state == EntryState::Failed;
@@ -516,14 +516,15 @@ namespace
                 old = id;
                 cultists += a->npc_type == AI_Mgr::NPCType::Cultist;
                 civilians += a->npc_type == AI_Mgr::NPCType::Civilian;
+                bosses += a->npc_type == AI_Mgr::NPCType::Gideon;
             }
-            CHECK(cultists == 10 && civilians == 5 && failed == 0 && unsupported == 1 && created == 203);
-            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(e) && g.objects.snapshot().size() == 228);
+            CHECK(cultists == 10 && civilians == 5 && bosses == 1 && failed == 0 && unsupported == 0 && created == 204);
+            CHECK(g.objects.snapshot().size() == 227 && g.enter_player(e) && g.objects.snapshot().size() == 230);
             for (int tick = 0; tick < 600; ++tick)
             {
                 CHECK(g.step(1.0 / 60));
                 if (!tick)
-                    CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
+                    CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11);
             }
             std::uint64_t updates = 0, pings = 0;
             for (auto id : g.objects.snapshot())

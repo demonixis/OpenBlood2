@@ -1,12 +1,17 @@
 #pragma once
 #include "AI_Mgr.h"
 
-// Selected original Gideon combat methods. Not registered for world creation:
-// initialization and boss-health delivery remain pending.
+// Original Gideon lifecycle and selected combat methods.
+// See GIDEON_RUNTIME_CONTRACTS.md for message ordering and remaining services.
 // See GIDEON_COMBAT_CONTRACTS.md before extending this subclass.
 class Gideon : public AI_Mgr
 {
   public:
+    float m_fFullHealth = 0, boss_health_fraction = 0;
+    bool m_bCreateHealth = true;
+    std::uint64_t health_requests = 0, health_deliveries = 0, health_no_client = 0, damage_specials = 0;
+    DRESULT health_result = DE_NOTFOUND;
+    std::string health_error;
     bool ComputeState(int stimulus = -1) override;
     bool MC_Fire_Stand() override;
     bool Fire(bool alternate = false) override;
@@ -38,7 +43,12 @@ class Gideon : public AI_Mgr
     std::string powerup_error;
     InventoryResult completion_selection = InventoryResult::NotAvailable;
 
+  protected:
+    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+    bool OnAcceptedDamage() override;
+
   private:
+    bool PublishHealth(float);
     bool Dodge(bool right);
     bool AttackReady(bool distance);
     bool TeleportStep(bool special);

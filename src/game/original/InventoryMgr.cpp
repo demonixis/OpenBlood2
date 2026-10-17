@@ -90,10 +90,13 @@ float CInventoryMgr::MaxAmmo(DBYTE type) const
 }
 void CInventoryMgr::SetStrength(DBYTE strength)
 {
-    strength = std::clamp<DBYTE>(strength, 1, 6);
+    // NPCs such as Gideon store strength 10. Only the ammo-table column is
+    // capped at six; keep the typed boundary's existing minimum of one.
+    strength = std::max<DBYTE>(strength, 1);
+    const auto column = std::min<unsigned>(strength - 1, 5);
     if (m_nAttribStrength > strength)
         for (DBYTE i = 1; i <= 8; ++i)
-            m_fAmmo[i] = std::min(m_fAmmo[i], fMaxAmmoCount[i][strength - 1]);
+            m_fAmmo[i] = std::min(m_fAmmo[i], fMaxAmmoCount[i][column]);
     m_nAttribStrength = strength;
     ++revision;
 }

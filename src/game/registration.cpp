@@ -13,6 +13,7 @@
 #include "game/original/ExitHint.h"
 #include "game/original/ExitTrigger.h"
 #include "game/original/GameStartPoint.h"
+#include "game/original/Gideon.h"
 #include "game/original/HandWeaponModel.h"
 #include "game/original/Key.h"
 #include "game/original/KeyFramer.h"
@@ -320,6 +321,11 @@ namespace OpenBlood2
                                   {"Scared", false},
                                   {"Dims", DVector{21, 37, 21}},
                                   {"SororitySkin", false}}};
+        const ClassInfo gideon{
+            "Gideon",
+            &ai_manager,
+            construct_npc<Gideon, AI_Mgr::NPCType::Gideon>,
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}}};
         const ClassInfo player{"CPlayerObj", &character, construct<CPlayerObj>, {}};
         const ClassInfo world_properties{
             "WorldProperties",
@@ -663,10 +669,10 @@ namespace OpenBlood2
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(exit_hint) && objects.register_class(character) &&
                objects.register_class(ai_manager) && objects.register_class(cultist) &&
-               objects.register_class(civilian) && objects.register_class(player) && objects.register_class(volume) &&
-               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
-               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
-               objects.register_class(freefall) && objects.register_class(trigger) &&
+               objects.register_class(civilian) && objects.register_class(gideon) && objects.register_class(player) &&
+               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
+               objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
+               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
                objects.register_class(key_pickup) && objects.register_class(pickup) &&
                objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&

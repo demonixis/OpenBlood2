@@ -345,8 +345,14 @@ namespace OpenBlood2
     std::uint32_t animation_index(const Model& model, std::string_view name)
     {
         for (std::uint32_t i = 0; i < model.animations.size(); ++i)
-            if (model.animations[i].name == name)
-                return i;
+            if (std::equal(model.animations[i].name.begin(), model.animations[i].name.end(), name.begin(), name.end(),
+                           [](unsigned char a, unsigned char b)
+                           {
+                               const auto lower = [](unsigned char c)
+                               { return c >= 'A' && c <= 'Z' ? c + ('a' - 'A') : c; };
+                               return lower(a) == lower(b);
+                           }))
+                return i; // Original authored scripts use uppercase clip names; retain first matching index.
         return no_animation;
     }
     namespace

@@ -179,7 +179,7 @@ namespace
             for (const auto& entry : scene.entries)
                 std::cout << entry.label << " visible=" << entry.visible << " triangles=" << entry.triangles
                           << " error=" << entry.error << '\n';
-            CHECK(scene.world_draws.size() == 27 && scene.close_draws.empty());
+            CHECK(scene.world_draws.size() == 28 && scene.close_draws.empty());
             std::size_t failures = 0;
             for (const auto& entry : scene.entries)
             {
@@ -215,8 +215,8 @@ namespace
             CHECK(update_model_scene(g, scene, e));
             for (const auto& entry : scene.entries)
                 CHECK(!(entry.object.slot == id.slot && entry.object.generation == id.generation));
-            CHECK(scene.world_draws.size() == 26 &&
-                  scene.close_draws.empty()); // 25 NPC draws + independent player child.
+            CHECK(scene.world_draws.size() == 27 &&
+                  scene.close_draws.empty()); // 26 NPC draws (including Gideon) + independent player child.
             CHECK(g.unload_world());
             scene.clear();
             CHECK(scene.revision > revision);

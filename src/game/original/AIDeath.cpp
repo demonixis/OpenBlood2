@@ -113,8 +113,13 @@ bool AI_Mgr::CreateCorpse()
         s->SetModelAnimation(h, m_nCorpseType);
         s->SetModelLooping(h, false);
     }
+    // A stationary move checks the corpse's actual primary-world body before
+    // accepting transfer. Raw death dimensions may overlap a wall/floor even
+    // when the live actor fitted. Preserve explicit failure and deferred rollback;
+    // never leave a penetrating child to abort an unrelated player's next tick.
     if (!configured || s->GetModelAnimation(h) != m_nCorpseType || s->GetModelLooping(h) ||
-        !s->ScaleObject(h, m_vScale) || s->SetObjectDims(h, &dims) != DE_OK || s->TeleportObject(h, &position) != DE_OK)
+        !s->ScaleObject(h, m_vScale) || s->SetObjectDims(h, &dims) != DE_OK ||
+        s->TeleportObject(h, &position) != DE_OK || s->MoveObject(h, &position) != DE_OK)
     {
         s->RemoveObject(h); // Deferred rollback; source remains inspectable.
         return fail("Corpse setup failed; incomplete child removed");

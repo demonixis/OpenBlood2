@@ -176,7 +176,7 @@ int main(int argc, char** argv)
         game.client_shell.weapons_visible = false;
         ModelView scene;
         CHECK(update_model_scene(game, scene, error));
-        CHECK(scene.world_draws.size() == 27);
+        CHECK(scene.world_draws.size() == 28); // Includes the original Gideon model.
         const auto* player = game.objects.get(game.client_shell.player);
         CHECK(player);
         DVector eye = player->state.m_Pos;

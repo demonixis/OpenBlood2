@@ -1,5 +1,7 @@
 # Original NPC hit localization and recoil
 
+> Extended by [Gideon lifecycle contracts](GIDEON_RUNTIME_CONTRACTS.md): production initialization, AI_Update, health delivery and fifth-table isolation are now integrated. Earlier blanket boss-registration omissions are historical. M2 remains incomplete.
+
 > Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
 > original named resets now affect rendering/hit candidates, and the selected Load
 > model/flags/velocity tail is available before client association. Earlier blanket

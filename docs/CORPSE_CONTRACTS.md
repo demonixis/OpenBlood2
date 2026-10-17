@@ -1,5 +1,7 @@
 # Ordinary original NPC death and CCorpse
 
+> Extended by [Gideon runtime integration](GIDEON_RUNTIME_CONTRACTS.md): corpse setup now checks primary-world placement before accepting transfer. Penetrating bodies fail visibly and roll back deferred, retaining the source; depenetration is still unavailable.
+
 Selected original `AI_Mgr::HandleDamage`, `MC_Dead`, `AI_STATE_Dying`,
 `CreateCorpse` and `CCorpse` now handle ordinary Cultist/Civilian death.
 [Source selections](M2_CORPSE_SOURCES.json) and

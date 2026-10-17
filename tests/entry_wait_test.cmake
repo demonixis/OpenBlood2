@@ -1,7 +1,7 @@
 execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --frames 12 --capture "${CAPTURE}"
     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
 message("${out}${err}")
-if(NOT status EQUAL 0 OR NOT out MATCHES "Session playback: waiting=12 time=0 npc-ready=15 npc-failed=0 npc-updates=0")
+if(NOT status EQUAL 0 OR NOT out MATCHES "Session playback: waiting=12 time=0 npc-ready=16 npc-failed=0 npc-updates=0")
     message(FATAL_ERROR "Interactive world advanced before player entry: ${status}")
 endif()
 if(out MATCHES "Validation Error|VUID-" OR err MATCHES "Validation Error|VUID-")

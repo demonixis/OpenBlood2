@@ -197,10 +197,10 @@ namespace
             std::map<EntryState, unsigned> counts;
             for (const auto& entry : g.entries)
                 ++counts[entry.state];
-            CHECK(counts[EntryState::Created] == 203 && counts[EntryState::Unsupported] == 1 &&
+            CHECK(counts[EntryState::Created] == 204 && counts[EntryState::Unsupported] == 0 &&
                   counts[EntryState::WorldSound] == 4 && counts[EntryState::EditorOnly] == 372 &&
                   counts[EntryState::Failed] == 0);
-            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228);
+            CHECK(g.objects.snapshot().size() == 227 && g.enter_player(error) && g.objects.snapshot().size() == 230);
             unsigned exits = 0;
             for (const auto& entry : g.entries)
             {
@@ -228,10 +228,10 @@ namespace
                 CHECK(t->deliveries == 0 && g.step(.05) && t->deliveries == 1);
             }
             CHECK(exits == 1);
-            CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
+            CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11);
             CHECK(g.client_shell.world_exit.received == 1 && g.client_shell.world_exit.blocked == 1);
             CHECK(g.world_path == "worlds/01_subwaya.dat" && g.client_shell.m_bInWorld);
-            CHECK(!g.run_world(error) && error.find("1 uninstantiated") != std::string::npos);
+            CHECK(!g.run_world(error) && error.find("0 uninstantiated") != std::string::npos);
             CHECK(g.unload_world() && g.server.string_count() == 0 && g.objects.snapshot().empty());
         }
         return true;

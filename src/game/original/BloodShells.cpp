@@ -232,6 +232,9 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     physics = {};
     stats = {};
     world_exit = {};
+    boss_health = {};
+    boss_health_messages = 0;
+    boss_health_visible = false;
     objectives = {};
     objectives_error.clear();
     objective_messages = 0;
@@ -264,6 +267,9 @@ void CBloodClientShell::OnExitWorld()
     physics = {};
     stats = {};
     world_exit = {};
+    boss_health = {};
+    boss_health_messages = 0;
+    boss_health_visible = false;
     objectives = {};
     objectives_error.clear();
     objective_messages = 0;
@@ -328,6 +334,15 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     }
     else if (const auto* value = std::get_if<OpenBlood2::PlayerStats>(&event))
         stats = *value;
+    else if (const auto* value = std::get_if<OpenBlood2::BossHealth>(&event))
+    {
+        if (!std::isfinite(value->fraction))
+            return false;
+        boss_health = *value;
+        ++boss_health_messages;
+        // Original SMSG_BOSSHEALTH hides the bar at full health or zero.
+        boss_health_visible = value->fraction > 0 && value->fraction < 1;
+    }
     else if (const auto* value = std::get_if<OpenBlood2::MissionObjectives>(&event))
     {
         // SMSG_OBJECTIVES: single/custom only; resource IDs override authored strings.

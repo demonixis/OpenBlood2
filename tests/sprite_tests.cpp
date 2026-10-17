@@ -380,10 +380,10 @@ namespace
                       !r->sprite->translucent);
                 weak = r->sprite;
             }
-            CHECK(sprites == 12 && counts[EntryState::Created] == 203 && counts[EntryState::WorldSound] == 4 &&
-                  counts[EntryState::Unsupported] == 1 && counts[EntryState::EditorOnly] == 372 &&
+            CHECK(sprites == 12 && counts[EntryState::Created] == 204 && counts[EntryState::WorldSound] == 4 &&
+                  counts[EntryState::Unsupported] == 0 && counts[EntryState::EditorOnly] == 372 &&
                   counts[EntryState::Failed] == 0);
-            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228 &&
+            CHECK(g.objects.snapshot().size() == 227 && g.enter_player(error) && g.objects.snapshot().size() == 230 &&
                   g.step(.02));
             for (auto id : g.objects.snapshot())
             {
@@ -391,8 +391,8 @@ namespace
                 if (r->sprite)
                     CHECK(r->sprite_track.frame == 0 && std::abs(r->sprite_track.milliseconds - 20) < 1e-6);
             }
-            CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11 && !g.run_world(error) &&
-                  error.find("1 uninstantiated") != std::string::npos);
+            CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11 && !g.run_world(error) &&
+                  error.find("0 uninstantiated") != std::string::npos);
             CHECK(g.unload_world() && weak.expired() && g.objects.snapshot().empty() && g.server.string_count() == 0 &&
                   g.server.message_count() == 0 && g.server.list_count() == 0);
             std::cout << "cycle=" << cycle

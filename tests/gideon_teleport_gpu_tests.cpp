@@ -169,6 +169,30 @@ int main(int argc, char** argv)
     CHECK(std::abs(record->state.m_Pos.x - start.x - 3.5f) < .003f && record->velocity.x == 3.5f);
     CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame() && update_model_scene(g, view, error));
     CHECK(view.entries.empty() && render(runtime, renderer, view, eye, camera, capture, again, error) && again == zero);
+    if (argc == 3)
+    {
+        // Production factory/scheduler with the actual external model. No inspector
+        // or manual AI dispatch drives this check; INACTIVE is an explicit fixture state.
+        auto boss_handle = g.objects.create(g.objects.find_class("Gideon"), {}, Creation::World,
+                                            {{"AIState", std::string("INACTIVE")}});
+        auto* boss = dynamic_cast<Gideon*>(g.server.HandleToObject(boss_handle));
+        CHECK(boss && boss->RuntimeReady() && g.step(.016));
+        const auto updates = boss->runtime_updates;
+        const auto health = boss->health_requests;
+        CHECK(updates == 1 && health == 1 && boss->health_no_client == 1);
+        CHECK(update_model_scene(g, view, error) && view.entries.size() == 1 && !view.world_draws.empty());
+        CHECK(render(runtime, renderer, view, eye, camera, capture, again, error) && again != zero);
+        CHECK(capture.save((std::filesystem::path(argv[1]) / "gideon-runtime.png").c_str()));
+        clock = g.objects.get(boss_handle)->animation.time;
+        CHECK(update_model_scene(g, view, error) && render(runtime, renderer, view, eye, camera, capture, half, error));
+        CHECK(again == half && boss->runtime_updates == updates && boss->health_requests == health &&
+              g.objects.get(boss_handle)->animation.time == clock);
+        CHECK(g.objects.remove(boss_handle) && g.objects.finish_frame() && update_model_scene(g, view, error));
+        CHECK(view.entries.empty() && render(runtime, renderer, view, eye, camera, capture, again, error) &&
+              again == zero);
+        std::cout << "Production Gideon: real initialization, scheduled AI_Update, no-audience health, read-only GPU "
+                     "and deferred removal verified.\n";
+    }
     CHECK(g.unload_world());
     view.clear();
     renderer.clear_geometry();

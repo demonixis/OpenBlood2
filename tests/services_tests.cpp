@@ -33,6 +33,12 @@ namespace
         CHECK(m.vertices.size() == 3 && m.faces[0].vertices[2] == 2);
         CHECK(m.faces[0].uv[1][0] == 1);
         CHECK(animation_index(m, "walk") == 0 && animation_index(m, "missing") == no_animation);
+        CHECK(animation_index(m, "WaLk") == 0 && animation_index(m, "WALK") == 0);
+        CHECK(animation_index(m, "wal") == no_animation && animation_index(m, "walk ") == no_animation);
+        auto duplicate = m;
+        duplicate.animations.push_back(m.animations[0]);
+        duplicate.animations.back().name = "WALK";
+        CHECK(animation_index(duplicate, "WALK") == 0); // Same first-match rule as the reference engine.
         std::vector<NodePose> pose;
         CHECK(sample_pose(m, 0, 25, pose));
         CHECK(std::abs(pose[1].position.x - 5) < .0001 && pose[1].position.y == 2);

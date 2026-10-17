@@ -1460,7 +1460,7 @@ namespace
                     "Model viewport: frames={}, world hidden={}, weapon hidden={}, instances={}, close={}, vertices={}",
                     model_frames, models_hidden, close_weapon_hidden, model_scene.world_draws.size(),
                     model_scene.close_draws.size(), model_scene.mesh.vertices.size());
-                if (!close_weapon_hidden || model_scene.world_draws.size() != 25 ||
+                if (!close_weapon_hidden || model_scene.world_draws.size() != 26 ||
                     model_frames != world_renderer.stats.frames)
                     return 4;
                 std::size_t decoded = 0, missing = 0;
@@ -1580,7 +1580,7 @@ namespace
                     "and after reload; angular paths and world rendering remain unavailable");
             else if (options.keyframes_smoke)
                 spdlog::info("KEYFRAMES smoke: authored camera path and owned key lifetime checked while UI hidden and "
-                             "after reload; missing Gideon message exposed");
+                             "after reload; authored Gideon message recipient resolved");
             if (options.cameras_smoke)
                 spdlog::info("CAMERAS smoke: original camera tracks player while UI hidden; selected view, movement "
                              "gate and reload checked");

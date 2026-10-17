@@ -76,6 +76,10 @@ namespace OpenBlood2
     {
         float health = 0, armor = 0, bullets = 0;
     };
+    struct BossHealth
+    {
+        float fraction = 0;
+    };
     struct MissionObjectives
     {
         std::uint32_t resource = 0;
@@ -93,5 +97,5 @@ namespace OpenBlood2
         WorldExitType type = WorldExitType::World;
     };
     using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
-                                     MissionObjectives, WorldExit>;
+                                     MissionObjectives, WorldExit, BossHealth>;
 } // namespace OpenBlood2

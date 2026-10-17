@@ -1,5 +1,7 @@
 # Original Cultist/Civilian initialization and AI_Update
 
+> Extended by [Gideon lifecycle contracts](GIDEON_RUNTIME_CONTRACTS.md): production initialization, AI_Update, health delivery and fifth-table isolation are now integrated. Earlier blanket boss-registration omissions are historical. M2 remains incomplete.
+
 > Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
 > transfer ordinary deaths. Earlier blanket corpse omissions are historical;
 > fire/gibs, corpse damage, required FX and complete M2 remain unavailable.

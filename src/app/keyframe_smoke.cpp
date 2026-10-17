@@ -36,7 +36,7 @@ namespace OpenBlood2
         const auto* f = r ? dynamic_cast<const KeyFramer*>(r->game.get()) : nullptr;
         if (!f || !f->initialized || f->keys.size() != (world_path ? 3 : 2) || f->targets.size() != 1 || !f->active ||
             !f->targets[0].moves || f->targets[0].result != MoverResult::Moved ||
-            f->unresolved_messages != (world_path ? 0 : 1))
+            f->unresolved_messages != 0) // The authored Gideon recipient is now instantiated.
             return false;
         const auto* target = game.objects.get(f->targets[0].object);
         if (!target || (!world_path && game.client_shell.view.object != target->handle))

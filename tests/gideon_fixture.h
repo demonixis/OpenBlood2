@@ -27,8 +27,8 @@ namespace test_gideon
     {
         using namespace OpenBlood2;
         static ClassInfo type{
-            "Gideon", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
-        type.parent = g.objects.find_class("CBaseCharacter");
+            "DiagnosticGideon", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
+        type.parent = g.objects.find_class("Gideon");
         if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
             return nullptr;
         ObjectCreateStruct state;

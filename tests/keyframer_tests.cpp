@@ -361,17 +361,17 @@ namespace
         {
             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
             const float entered = g.server.GetTime();
-            CHECK(g.objects.snapshot().size() == 228);
+            CHECK(g.objects.snapshot().size() == 230);
             auto* list = g.server.FindNamedObjects("tracking1");
             CHECK(list && list->m_pFirstLink);
             auto h = list->m_pFirstLink->m_hObject;
             g.server.RelinquishList(list);
             auto* f = framer(g, h);
             CHECK(g.step(1.0 / 60) && f->keys.size() == 2 && f->targets.size() == 1 && f->active && f->time == 0);
-            CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
+            CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11);
             auto camera = f->targets[0].object;
             auto start = g.objects.get(camera)->state.m_Pos;
-            CHECK(g.step(1.0 / 60) && f->targets[0].moves == 1 && f->processed == 1 && f->unresolved_messages == 1);
+            CHECK(g.step(1.0 / 60) && f->targets[0].moves == 1 && f->processed == 1 && f->unresolved_messages == 0);
             CHECK(!close(start, g.objects.get(camera)->state.m_Pos));
             auto expected =
                 vector_add(f->keys[0].position, vector_scale(vector_subtract(f->keys[1].position, f->keys[0].position),

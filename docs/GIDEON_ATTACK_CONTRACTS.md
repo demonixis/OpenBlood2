@@ -1,5 +1,7 @@
 # Original Gideon attack, dodge and recoil sequencing
 
+> Extended by [Gideon lifecycle contracts](GIDEON_RUNTIME_CONTRACTS.md): production initialization, AI_Update, health delivery and fifth-table isolation are now integrated. Earlier blanket boss-registration omissions are historical. M2 remains incomplete.
+
 Selected `AI_STATE_AttackClose`, `AI_STATE_AttackFar`, `MC_Dodge_Left/Right`
 and the inline Recoil override now execute through the original virtual state
 dispatcher. The shared original `MC_Taunt_Bold` is also connected. See the

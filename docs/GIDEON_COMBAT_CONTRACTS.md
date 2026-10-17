@@ -1,5 +1,7 @@
 # Original Gideon combat actions
 
+> Extended by [Gideon lifecycle contracts](GIDEON_RUNTIME_CONTRACTS.md): production initialization, AI_Update, health delivery and fifth-table isolation are now integrated. Earlier blanket boss-registration omissions are historical. M2 remains incomplete.
+
 Selected original `Gideon::ComputeState`, `MC_Fire_Stand`, `Fire`, `MC_Extra`
 and `MagicPowerup` now use the typed engine services. See the
 [source ledger](M2_GIDEON_COMBAT_SOURCES.json) and

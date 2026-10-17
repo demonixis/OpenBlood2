@@ -420,8 +420,18 @@ namespace OpenBlood2
         if (const auto* boss = dynamic_cast<const Gideon*>(target_ai);
             boss && ImGui::CollapsingHeader("Original Gideon combat actions", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            ImGui::TextWrapped("Selected original combat/fade/teleport methods; diagnostic actor. Boss initialization "
-                               "and full AI_Update remain unavailable.");
+            ImGui::Text("Driver: %s",
+                        boss->npc_type == AI_Mgr::NPCType::Gideon ? "production AI_Update" : "diagnostic actor");
+            ImGui::Text("Health %.3f / captured %.3f | raw ratio %.3f | create-health %s", boss->m_damage.m_fHitPoints,
+                        boss->m_fFullHealth, boss->boss_health_fraction, boss->m_bCreateHealth ? "yes" : "no");
+            ImGui::Text("Health requests %llu | queued %llu | no audience %llu | result %d | damage specials %llu",
+                        (unsigned long long)boss->health_requests, (unsigned long long)boss->health_deliveries,
+                        (unsigned long long)boss->health_no_client, boss->health_result,
+                        (unsigned long long)boss->damage_specials);
+            if (!boss->health_error.empty())
+                ImGui::TextWrapped("%s", boss->health_error.c_str());
+            ImGui::TextWrapped(
+                "Captured health precedes base AI initialization. Raw ratios outside (0,1) hide the client bar.");
             ImGui::Text("Node %s | selected weapon %u | chance draw %d", boss->m_szFireNode.c_str(),
                         boss->selected_weapon, boss->attack_roll);
             ImGui::Text("Armor %.2f | grants %llu | last shield %.3f / interval %.3f | last panic %.3f",

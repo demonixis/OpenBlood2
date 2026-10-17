@@ -74,10 +74,11 @@ namespace test_energy
     inline Actor* actor(OpenBlood2::GameSession& g, DVector pos, bool gideon = false, DDWORD flags = FLAG_SOLID)
     {
         static OpenBlood2::ClassInfo owner{
-            "Gideon", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
+            "EnergyGideonProbe", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
         static OpenBlood2::ClassInfo target{
             "EnergyTarget", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
-        owner.parent = target.parent = g.objects.find_class("BaseClass");
+        owner.parent = g.objects.find_class("Gideon");
+        target.parent = g.objects.find_class("BaseClass");
         auto& type = gideon ? owner : target;
         if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
             return nullptr;

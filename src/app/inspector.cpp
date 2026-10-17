@@ -1224,6 +1224,13 @@ namespace OpenBlood2
                     game.client_shell.m_bInWorld ? "yes" : "no",
                     static_cast<unsigned long long>(game.client_shell.messages),
                     static_cast<unsigned long long>(game.client_shell.updates));
+        const auto& boss_client = game.client_shell;
+        ImGui::Text("Boss health messages %llu | raw ratio %.3f | bar %s",
+                    (unsigned long long)boss_client.boss_health_messages, boss_client.boss_health.fraction,
+                    boss_client.boss_health_visible ? "visible" : "hidden");
+        if (boss_client.boss_health_visible)
+            ImGui::ProgressBar(boss_client.boss_health.fraction, ImVec2(-1, 0), "Original boss-health state");
+        ImGui::TextUnformatted("Inspection bar; original HUD artwork is not implemented.");
         draw_paths(game, selection);
         if (player)
         {

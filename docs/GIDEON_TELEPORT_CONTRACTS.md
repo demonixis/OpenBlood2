@@ -1,5 +1,7 @@
 # Original Gideon fade and teleport states
 
+> Extended by [Gideon lifecycle contracts](GIDEON_RUNTIME_CONTRACTS.md): production initialization, AI_Update, health delivery and fifth-table isolation are now integrated. Earlier blanket boss-registration omissions are historical. M2 remains incomplete.
+
 Selected `MC_FadeOut`, `AI_STATE_Teleport` and `AI_STATE_Special1` now execute
 through the original state dispatcher. See the [source ledger](M2_GIDEON_TELEPORT_SOURCES.json),
 [combat contracts](GIDEON_COMBAT_CONTRACTS.md) and
