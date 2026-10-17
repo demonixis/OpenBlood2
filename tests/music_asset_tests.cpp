@@ -233,6 +233,74 @@ namespace
         catalog.inspect(root, props);
         CHECK(catalog.assets.back().error.find("budget") != std::string::npos);
         CHECK(catalog.bytes_read < initial);
+        Bytes sh(94), sc(120);
+        sh[32] = 4;
+        sh[34] = 4;
+        sh[46] = 7;
+        sc[36] = 120;
+        sc[40] = 1;
+        sc[43] = 3;
+        sc[44] = 192;
+        sc[56] = 7;
+        auto complete_section = [&]
+        {
+            auto parts = chunk("sref", text("Shared"));
+            const auto header = chunk("secn", sc);
+            parts.insert(parts.end(), header.begin(), header.end());
+            return container("AASE", parts);
+        };
+        CHECK(write(root / "Music/Test/a1.sec", complete_section()));
+        auto find_section = [&]() -> const MusicAssetRecord*
+        {
+            for (const auto& a : catalog.assets)
+                if (a.filename == "a1.sec")
+                    return &a;
+            return nullptr;
+        };
+        // The still-oversized style cannot yield a successful timeline.
+        catalog.inspect(root, props);
+        CHECK(find_section() && find_section()->section && !find_section()->timeline &&
+              !find_section()->timeline_error.empty());
+        fs::remove(root / "Music/Test/shared.sty", ec);
+        CHECK(!ec);
+        catalog.inspect(root, props);
+        CHECK(!find_section()->timeline && !find_section()->timeline_error.empty());
+        CHECK(write(root / "Music/Test/SHARED.STY", container("AASY", chunk("styl", sh))));
+        catalog.inspect(root, props);
+        CHECK(find_section()->timeline && find_section()->timeline_error.empty() &&
+              find_section()->timeline->mutes.size() == 4);
+        const std::weak_ptr<const ImaTimeline> old_timeline = find_section()->timeline;
+        sh[46] = 8;
+        CHECK(write(root / "Music/Test/SHARED.STY", container("AASY", chunk("styl", sh))));
+        catalog.inspect(root, props);
+        CHECK(old_timeline.expired() && !find_section()->timeline &&
+              find_section()->timeline_error.find("disagree") != std::string::npos);
+        sc[56] = 0;
+        CHECK(write(root / "Music/Test/a1.sec", complete_section()));
+        catalog.inspect(root, props);
+        CHECK(find_section()->timeline); // Explicit zero identity: exact filename profile.
+        sc[40] = 0;
+        sc[41] = 8; // 2048 measures -> 8192 mutes per section; 32768 survey limit.
+        for (const auto& r : plan.requests)
+            if (r.kind == MusicAssetKind::Section)
+                CHECK(write(root / "Music/Test" / r.filename, complete_section()));
+        catalog.inspect(root, props);
+        std::size_t prepared = 0, limited = 0, total = 0;
+        for (const auto& a : catalog.assets)
+            if (a.section)
+            {
+                if (a.timeline)
+                {
+                    ++prepared;
+                    total += a.timeline->records();
+                }
+                else
+                {
+                    CHECK(a.timeline_error.find("budget") != std::string::npos);
+                    ++limited;
+                }
+            }
+        CHECK(prepared == 4 && limited == 12 && total == 32768);
         catalog.inspect(root, {});
         CHECK(!catalog.error.empty() && catalog.assets.empty() && catalog.bytes_read == 0);
         std::cout
@@ -296,6 +364,7 @@ namespace
             std::weak_ptr<const ImaStyle> style_lifetime;
             const std::weak_ptr<const ImaBands> bands_lifetime = catalog.assets[1].bands;
             std::weak_ptr<const ImaSection> section_lifetime;
+            std::weak_ptr<const ImaTimeline> timeline_lifetime;
             std::size_t section_index = 0;
             const ImaNote* first_note = nullptr;
             std::size_t style_index = 0, style_notes = 0;
@@ -313,6 +382,9 @@ namespace
                     CHECK(asset.section && asset.section_error.empty() && asset.section->commands.size() == 1);
                     ImaSectionTiming timing;
                     CHECK(ima_section_timing(*asset.section, timing, error));
+                    CHECK(asset.timeline && asset.timeline_error.empty() && !asset.timeline->mutes.empty() &&
+                          asset.timeline->duration == timing.duration_ticks && asset.timeline->chords.size() == 1);
+                    timeline_lifetime = asset.timeline;
                     section_lifetime = asset.section;
                     section_index = i;
                 }
@@ -341,9 +413,11 @@ namespace
             CHECK(!bands_lifetime.expired() && catalog.assets[1].bands.get() == bands_lifetime.lock().get());
             CHECK(!section_lifetime.expired() &&
                   catalog.assets[section_index].section.get() == section_lifetime.lock().get());
+            CHECK(!timeline_lifetime.expired() &&
+                  catalog.assets[section_index].timeline.get() == timeline_lifetime.lock().get());
             CHECK(game.unload_world() && game.music_catalog.assets.empty() && game.music_catalog.plan.requests.empty());
             CHECK(bank_lifetime.expired() && style_lifetime.expired() && bands_lifetime.expired() &&
-                  section_lifetime.expired());
+                  section_lifetime.expired() && timeline_lifetime.expired());
             CHECK(game.objects.snapshot().empty() && !game.server.message_count() && !game.server.string_count());
         }
         return true;

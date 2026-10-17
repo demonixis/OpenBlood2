@@ -32,3 +32,5 @@ the original log or patch.
 - [IMA pattern-note decoding](../../../Documentation/Implementation/m2_music_notes.md): original loader equivalence, 7,030 inspected note records and explicit remaining sequencing gaps.
 - [IMA band decoding and channel setup](../../../Documentation/Implementation/m2_music_bands.md): original executable equivalence and separate style/section inspection.
 - [IMA sections and authored timing](../../../Documentation/Implementation/m2_music_sections.md): original header/event-reader equivalence and explicit remaining sequence semantics.
+
+- [IMA style meter and section timeline](../../../Documentation/Implementation/m2_music_timeline.md): original reconciliation, explicit missing style bindings and pending sequence playback.

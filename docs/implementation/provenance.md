@@ -1247,3 +1247,14 @@ remain distinct from effective style reconciliation and sequence playback.
 See [source ledger](sources/m2_music_sections_sources.json),
 [contracts](../contracts/music_section_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_sections.md).
+
+## IMA style meter and section timeline
+
+Independent typed reconciliation checked against the installed external
+IMUSIC25.DLL style-header copy and meter/mute/chord-time/command routines in
+isolated x86 emulation. No original binary bytes or source imports. The original
+Music.cpp request plan remains unchanged. Exact filename plus identifier checks
+are a bounded binding profile; chord pitch harmonization and playback remain
+unimplemented. See [source ledger](sources/m2_music_timeline_sources.json),
+[contracts](../contracts/music_timeline_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_timeline.md).

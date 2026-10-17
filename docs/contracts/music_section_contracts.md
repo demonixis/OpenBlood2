@@ -95,3 +95,7 @@ sequence playback remain unavailable. M2 remains incomplete.
 See [evidence](../../../Documentation/Implementation/m2_music_sections.md),
 [asset contracts](music_asset_contracts.md), [notes](music_note_contracts.md) and
 [bands](music_band_contracts.md).
+
+The [timeline continuation](music_timeline_contracts.md) now reconciles decoded
+style meter and record times separately. The authored data/timing contract above
+remains unchanged; pitch harmonization and playback are still unavailable.

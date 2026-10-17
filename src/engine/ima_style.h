@@ -35,6 +35,11 @@ namespace OpenBlood2
     {
         std::string name;
         MusicAssetInfo source; // All source ranges, including partially decoded/opaque records.
+        std::int16_t beats_per_measure = 0, beat_unit = 0, ticks_per_grid = 0;
+        std::int16_t authored_ticks_per_beat = 0, authored_ticks_per_measure = 0, tempo = 0;
+        std::uint16_t word44 = 0;
+        std::array<std::uint8_t, 16> identifier{};
+        std::array<std::uint8_t, 32> tail{};
         std::vector<ImaPattern> patterns;
         std::size_t notes = 0, grids = 0, curve_chunks = 0;
     };

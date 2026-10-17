@@ -116,7 +116,21 @@ namespace
         auto p = pattern(grids);
         append(p, pattern(grid(note(record())))); // Same names do not merge patterns.
         auto bytes = style(p);
+        // styl is first, payload starts at 20. Preserve signed fields and opaque bytes.
+        const std::array<std::int16_t, 6> fields{6, 8, 48, -32768, 32767, 176};
+        for (std::size_t i = 0; i < fields.size(); ++i)
+        {
+            const auto v = static_cast<std::uint16_t>(fields[i]);
+            bytes[20 + 32 + 2 * i] = static_cast<std::uint8_t>(v);
+            bytes[20 + 33 + 2 * i] = static_cast<std::uint8_t>(v >> 8);
+        }
+        for (unsigned i = 44; i < 94; ++i)
+            bytes[20 + i] = i;
         CHECK(read_ima_style(bytes, decoded, error));
+        CHECK(decoded.beats_per_measure == 6 && decoded.beat_unit == 8 && decoded.ticks_per_grid == 48 &&
+              decoded.authored_ticks_per_beat == -32768 && decoded.authored_ticks_per_measure == 32767 &&
+              decoded.tempo == 176 && decoded.word44 == 0x2d2c && decoded.identifier[0] == 46 &&
+              decoded.identifier[15] == 61 && decoded.tail.back() == 93);
         CHECK(decoded.name == "Synthetic" && decoded.patterns.size() == 2 && decoded.notes == 3 && decoded.grids == 3 &&
               decoded.curve_chunks == 1);
         const auto& pat = decoded.patterns.front();

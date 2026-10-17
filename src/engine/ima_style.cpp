@@ -152,6 +152,17 @@ namespace OpenBlood2
                         if (header || c.size != 94 || !name(r, style.name))
                             return false;
                         header = true;
+                        style.beats_per_measure = signed16(r);
+                        style.beat_unit = signed16(r);
+                        style.ticks_per_grid = signed16(r);
+                        style.authored_ticks_per_beat = signed16(r);
+                        style.authored_ticks_per_measure = signed16(r);
+                        style.tempo = signed16(r);
+                        style.word44 = r.u16();
+                        for (auto& v : style.identifier)
+                            v = r.u8();
+                        for (auto& v : style.tail)
+                            v = r.u8();
                     }
                     else if (c.id == "RIFF" && c.form == "AAPT" && !pattern(i))
                         return false;

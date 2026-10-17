@@ -178,6 +178,8 @@ namespace OpenBlood2
                         ImGui::TextWrapped("IMA note decoding failed: %s", asset.style_error.c_str());
                     if (!asset.section_error.empty())
                         ImGui::TextWrapped("IMA section decoding failed: %s", asset.section_error.c_str());
+                    if (!asset.timeline_error.empty())
+                        ImGui::TextWrapped("IMA timeline unavailable: %s", asset.timeline_error.c_str());
                     if (!asset.bands_error.empty())
                         ImGui::TextWrapped("IMA band decoding failed: %s", asset.bands_error.c_str());
                     if (!asset.bank_error.empty())
@@ -188,8 +190,8 @@ namespace OpenBlood2
         }
         if (ImGui::TreeNode("IMA sections (authored data only)"))
         {
-            ImGui::TextWrapped("Header timing precedes the original style's meter override. Commands and mute "
-                               "values remain raw; chords are not final note pitches. No sequence is scheduled.");
+            ImGui::TextWrapped("Authored records and the style-reconciled timeline are separate. Mutes are sampled "
+                               "at each effective beat; chords are not final pitches. No sequence is scheduled.");
             for (const auto& asset : music.assets)
             {
                 if (!asset.section || !ImGui::TreeNode(asset.filename.c_str()))
@@ -212,6 +214,42 @@ namespace OpenBlood2
                 ImGui::Text("%zu commands / %zu mutes / %zu chords | opaque notes %zu / curves %zu",
                             section.commands.size(), section.mutes.size(), section.chords.size(),
                             section.opaque_note_chunks, section.opaque_curve_chunks);
+                if (!asset.timeline_error.empty())
+                    ImGui::TextWrapped("Timeline unavailable: %s", asset.timeline_error.c_str());
+                if (asset.timeline && ImGui::TreeNode("Style-reconciled timeline (not playback)"))
+                {
+                    const auto& t = *asset.timeline;
+                    ImGui::Text("%d ticks/beat | %d ticks/measure | %d total ticks | default beat unit: %s",
+                                t.ticks_per_beat, t.ticks_per_measure, t.duration, t.default_beat_unit ? "yes" : "no");
+                    ImGui::Text("%zu commands / %zu sampled mutes / %zu chords / %zu discarded chord beats",
+                                t.commands.size(), t.mutes.size(), t.chords.size(), t.discarded_chords.size());
+                    if (ImGui::TreeNode("Reconciled commands/chords"))
+                    {
+                        for (const auto& c : t.commands)
+                            ImGui::Text("Command source %zu: tick %d", c.source, c.time);
+                        for (const auto& c : t.chords)
+                            ImGui::Text("Chord source %zu: tick %d", c.source, c.time);
+                        for (auto i : t.discarded_chords)
+                            ImGui::Text("Discarded chord source %zu: beat %d", i, section.chords[i].beat);
+                        ImGui::TreePop();
+                    }
+                    if (ImGui::TreeNode("Mutes at effective beats"))
+                    {
+                        ImGuiListClipper clipper;
+                        clipper.Begin(static_cast<int>(t.mutes.size()), ImGui::GetTextLineHeightWithSpacing());
+                        while (clipper.Step())
+                            for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
+                            {
+                                const auto& m = t.mutes[i];
+                                if (m.source == std::numeric_limits<std::size_t>::max())
+                                    ImGui::Text("tick %d | value %04x | no authored mute", m.time, m.value);
+                                else
+                                    ImGui::Text("tick %d | value %04x | source %zu", m.time, m.value, m.source);
+                            }
+                        ImGui::TreePop();
+                    }
+                    ImGui::TreePop();
+                }
                 if (ImGui::TreeNode("Commands in file order"))
                 {
                     for (const auto& c : section.commands)
@@ -313,6 +351,10 @@ namespace OpenBlood2
                 const auto& style = *asset.style;
                 ImGui::Text("%s: %zu patterns / %zu grids / %zu notes / %zu opaque curves", style.name.c_str(),
                             style.patterns.size(), style.grids, style.notes, style.curve_chunks);
+                ImGui::Text("Meter %d/%d | grid %d ticks | authored beat/measure %d/%d ticks | tempo %d",
+                            style.beats_per_measure, style.beat_unit, style.ticks_per_grid,
+                            style.authored_ticks_per_beat, style.authored_ticks_per_measure, style.tempo);
+                ImGui::Text("Raw word44 %04x | identifier retained; header tail uninterpreted", style.word44);
                 for (const auto& pattern : style.patterns)
                 {
                     ImGui::PushID(static_cast<int>(pattern.offset));

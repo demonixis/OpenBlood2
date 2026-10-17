@@ -25,7 +25,9 @@ namespace OpenBlood2
             }
             if (asset.kind == MusicAssetKind::Section)
             {
-                if (!asset.section || !asset.section_error.empty() || asset.section->commands.size() != 1 ||
+                if (!asset.timeline || !asset.timeline_error.empty() || asset.timeline->mutes.empty() ||
+                    asset.timeline->chords.size() != 1 || !asset.timeline->discarded_chords.empty() || !asset.section ||
+                    !asset.section_error.empty() || asset.section->commands.size() != 1 ||
                     asset.section->chords.size() != 1 || asset.section->mutes.empty())
                     return false;
                 ImaSectionTiming timing;

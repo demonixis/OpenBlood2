@@ -4,6 +4,7 @@
 #include "engine/ima_band.h"
 #include "engine/ima_section.h"
 #include "engine/ima_style.h"
+#include "engine/ima_timeline.h"
 #include "game/original/Music.h"
 #include <memory>
 
@@ -11,11 +12,13 @@ namespace OpenBlood2
 {
     struct MusicAssetRecord
     {
-        std::string filename, error, style_reference, bank_error, style_error, bands_error, section_error;
+        std::string filename, error, style_reference, bank_error, style_error, bands_error, section_error,
+            timeline_error;
         std::shared_ptr<const DlsBank> bank;
         std::shared_ptr<const ImaStyle> style;
         std::shared_ptr<const ImaBands> bands;
         std::shared_ptr<const ImaSection> section;
+        std::shared_ptr<const ImaTimeline> timeline;
         MusicAssetKind kind = MusicAssetKind::Section;
         std::size_t bytes = 0, chunks = 0, patterns = 0, note_chunks = 0;
         bool container_valid = false;

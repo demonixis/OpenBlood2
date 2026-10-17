@@ -1,5 +1,6 @@
 #include "game/music_catalog.h"
 #include "engine/resources.h"
+#include <algorithm>
 #include <fstream>
 #include <set>
 
@@ -169,6 +170,44 @@ namespace OpenBlood2
                 }
             }
             assets.push_back(std::move(record));
+        }
+        // All exact-path style requests have now been processed. Never resolve labels or search other directories.
+        std::size_t timeline_records = 0;
+        for (auto& asset : assets)
+        {
+            if (!asset.section)
+                continue;
+            std::string key;
+            if (!resource_path(asset.style_reference + ".sty", key))
+            {
+                asset.timeline_error = "IMA timeline: invalid style reference";
+                continue;
+            }
+            const ImaStyle* style = nullptr;
+            for (const auto& candidate : assets)
+            {
+                std::string candidate_key;
+                if (candidate.kind == MusicAssetKind::Style && resource_path(candidate.filename, candidate_key) &&
+                    candidate_key == key)
+                    style = candidate.style.get();
+            }
+            if (!style)
+            {
+                asset.timeline_error = "IMA timeline: referenced style missing or undecoded";
+                continue;
+            }
+            const auto& id = asset.section->style_id;
+            if (std::any_of(id.begin(), id.end(), [](auto b) { return b != 0; }) && id != style->identifier)
+            {
+                asset.timeline_error = "IMA timeline: style name and identifier disagree";
+                continue;
+            }
+            auto timeline = std::make_shared<ImaTimeline>();
+            if (prepare_ima_timeline(*asset.section, *style, *timeline, asset.timeline_error, 32768 - timeline_records))
+            {
+                timeline_records += timeline->records();
+                asset.timeline = std::move(timeline);
+            }
         }
     }
 } // namespace OpenBlood2
