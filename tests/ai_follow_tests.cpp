@@ -377,7 +377,7 @@ namespace
         CHECK(!a->SetFollowPathCmd(g.server_shell.paths, "missing"));
         CHECK(point(g, "route1", {0, 10, 100}) && select(g, a));
         a->m_dwScriptFlags = 4;
-        CHECK(!a->UpdateFollowPathCmd() && a->script_motion_error.find("opportunity") != std::string::npos);
+        CHECK(a->UpdateFollowPathCmd() && !a->script_fire_engaged && a->velocity_commands == 1);
         a->m_dwScriptFlags = 0;
         CHECK(select(g, a));
         a->m_fWalkSpeed = std::numeric_limits<float>::quiet_NaN();
@@ -387,7 +387,7 @@ namespace
         CHECK(target && object(g, "wall", {0, 10, 25}, {4, 5, 5}));
         CHECK(a->SetMoveToObjectCmd("goal") && !a->UpdateMoveToObjectCmd() && a->m_MoveObj.path().size() == 1);
         CHECK(!a->UpdateMoveToObjectCmd() &&
-              a->velocity_commands == 0); // Partial source route must not become success.
+              a->velocity_commands == 1); // Partial source route must not become success.
         CHECK(a->SetMoveToObjectCmd("goal") && g.objects.remove(target) && !a->UpdateMoveToObjectCmd());
         CHECK(!a->HandleTrigger(nullptr, "SCRIPT FOLLOWPATH route"));
         auto* b = actor(g, {100, 10, 0});

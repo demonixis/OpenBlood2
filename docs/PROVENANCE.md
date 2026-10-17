@@ -1,5 +1,14 @@
 # Source and Dependency Provenance
 
+## Original scripted opportunity fire
+
+AI_Mgr Script_Fire_Stand/Walk/Run and their FOLLOWPATH/MOVETOOBJECT callers now use
+the existing typed perception, weapon, animation and movement services. A small
+shared helper preserves their different target-refresh, cadence and phase rules;
+checked failures and deferred callback lifetime are explicit adaptations. See
+[source hashes](M2_AI_SCRIPT_FIRE_SOURCES.json) and [contracts](AI_SCRIPT_FIRE_CONTRACTS.md).
+No reference files, shader artifacts or dependency pins changed.
+
 ## Original movement alignment
 
 The Blood II SDK requires a fallback up vector for parallel AlignRotation inputs.

@@ -87,7 +87,9 @@ trigger deliveries/removals and owned remaining points/actions. It reports live 
 removed historical identities without dereferencing stale handles. Hidden, inactive
 and missing-model objects remain selectable. Inspection runs no commands or queries.
 
-OPPORTFIRE moving branches return an explicit unavailable error when required.
+The [opportunity-fire continuation](AI_SCRIPT_FIRE_CONTRACTS.md) now connects
+standing fire in FOLLOWPATH and moving fire in MOVETOOBJECT, preserving their
+different aim, cadence and phase rules. Earlier OPPORTFIRE refusals are superseded.
 MC_Walk/MC_Run obstacle recovery, shade queries, full SCRIPT parsing/dispatch,
 AI initialization/update/deactivation, production CivilianAI/CultistAI/Gideon,
 death, required client FX and ExitTrigger remain open. Existing authored counts and

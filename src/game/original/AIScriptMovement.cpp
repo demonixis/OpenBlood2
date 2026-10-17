@@ -317,9 +317,10 @@ bool AI_Mgr::UpdateFollowPathCmd()
     }
     else
     {
-        if (m_dwScriptFlags & (1u << 2))
-            return MotionFailure("Script opportunity fire is unavailable");
-        if (!ScriptLocomotion(m_eScriptMovement == SM_RUN))
+        bool engaged = false;
+        if ((m_dwScriptFlags & (1u << 2)) && !ScriptFire(ScriptFireMode::Stand, engaged))
+            return false;
+        if (!engaged && !ScriptLocomotion(m_eScriptMovement == SM_RUN))
             return false;
         script_motion_outcome = MotionOutcome::Moving;
     }
@@ -390,8 +391,12 @@ bool AI_Mgr::UpdateMoveToObjectCmd()
             else
             {
                 if (m_dwScriptFlags & (1u << 2))
-                    return MotionFailure("Script moving opportunity fire is unavailable");
-                if (!ScriptLocomotion(m_eScriptMovement == SM_RUN))
+                {
+                    bool engaged = false;
+                    if (!ScriptFire(m_eScriptMovement == SM_RUN ? ScriptFireMode::Run : ScriptFireMode::Walk, engaged))
+                        return false;
+                }
+                else if (!ScriptLocomotion(m_eScriptMovement == SM_RUN))
                     return false;
                 Metacmd = 2;
             }

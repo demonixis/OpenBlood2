@@ -357,6 +357,12 @@ namespace OpenBlood2
             }
             if (!a.script_motion_error.empty())
                 ImGui::TextWrapped("Unavailable: %s", a.script_motion_error.c_str());
+            const char* fire_modes[]{"None", "Stand", "Walk", "Run"};
+            ImGui::Text("Script opportunity fire: %s | engaged %s | calls %llu",
+                        fire_modes[static_cast<unsigned>(a.script_fire_mode)], a.script_fire_engaged ? "yes" : "no",
+                        (unsigned long long)a.script_fire_calls);
+            ImGui::Text("Reload %.3f | last attempt %.3f | shots %llu | blocked %llu", a.m_fAttackLoadTime,
+                        a.m_fLoadTimeStart, (unsigned long long)a.fire_shots, (unsigned long long)a.fire_blocked);
         }
         if (character && ImGui::CollapsingHeader("Original CMovement cache / path", ImGuiTreeNodeFlags_DefaultOpen))
         {

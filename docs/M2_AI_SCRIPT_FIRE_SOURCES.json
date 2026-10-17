@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "6aeb63750107c064c1b612d9be1399f0e19a8e17",
+  "status": "M2 incomplete; original scripted standing/walking/running opportunity fire",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "purpose": "Original opportunity acquisition, FOLLOWPATH/MOVETOOBJECT and Script_Fire_Stand/Walk/Run bodies."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "source_sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "purpose": "Original OPPORTFIRE flag and metacommand values 7/8/9."
+    }
+  ],
+  "adaptations": [
+    "Direct source methods share a small checked helper; no source repository files or dependencies imported.",
+    "Return success plus engaged for standing fire, keeping no-target separate from service failure.",
+    "Preserve source cached moving aim, distinct standing/moving blocked-shot cadence, phase increments and residual velocity.",
+    "Existing typed model/physics/weapon services replace SDK calls; resize, missing-service and numeric failures remain explicit.",
+    "Guard recursive fire and detect owner removal, state replacement or nested script failure after damage callbacks before further mutation.",
+    "Inspection records last-call state and existing shot counters; diagnostic actors remain explicitly separate from authored scene acceptance."
+  ]
+}

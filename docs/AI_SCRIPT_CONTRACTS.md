@@ -95,6 +95,8 @@ rejections) and complete one real animation on each of six character models.
 Parsing authored text does not prove those scripts execute against production NPCs.
 
 Full AI_Update/initialization/deactivation, autonomous attack/death actions, shade
-queries and opportunity-fire movement branches remain unavailable. Required client
+queries remain unavailable at this historical snapshot. The
+[opportunity-fire continuation](AI_SCRIPT_FIRE_CONTRACTS.md) now supplies the original
+standing/walking/running scripted firing branches. Required client
 FX, ExitTrigger and complete session services also keep M2 open. Source object counts
 remain 187 created, 4 transferred sounds, 372 editor-only, 17 unsupported, 0 failed.

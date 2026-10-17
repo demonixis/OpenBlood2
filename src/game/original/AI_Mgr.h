@@ -324,6 +324,19 @@ class AI_Mgr : public CBaseCharacter
     bool Move(DVector direction, float speed);
     bool Script_Walk();
     bool Script_Run();
+    enum class ScriptFireMode
+    {
+        None,
+        Stand,
+        Walk,
+        Run
+    };
+    bool Script_Fire_Stand(bool& engaged);
+    bool Script_Fire_Walk();
+    bool Script_Fire_Run();
+    ScriptFireMode script_fire_mode = ScriptFireMode::None;
+    bool script_fire_engaged = false;
+    std::uint64_t script_fire_calls = 0;
     bool SetSetMovementCmd(std::string_view);
     bool SetFollowPathCmd(PathMgr&, std::string_view);
     bool UpdateFollowPathCmd();
@@ -506,6 +519,7 @@ class AI_Mgr : public CBaseCharacter
     bool MotionFailure(const char*);
     bool MotionReady();
     bool ScriptLocomotion(bool run);
+    bool ScriptFire(ScriptFireMode, bool& engaged);
     bool FaceScriptPoint(DVector);
     bool DeliverPathAction(const PathListData&);
     DLink m_Link{};

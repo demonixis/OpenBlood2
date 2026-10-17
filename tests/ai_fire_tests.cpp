@@ -38,6 +38,26 @@ namespace
     struct Probe : AI_Mgr
     {
         bool scheduled = false;
+        int scheduled_script = 0;
+        bool scheduled_ok = true;
+        int script_fault = 0; // Labelled branch/callback probes; ordinary tests use the real Fire service.
+        bool Fire(bool alternate = false) override
+        {
+            if (!script_fault)
+                return AI_Mgr::Fire(alternate);
+            if (script_fault == 1 || script_fault == 2)
+            {
+                fire_result = script_fault == 1 ? FireResult::Blocked : FireResult::Unavailable;
+                return false;
+            }
+            if (script_fault == 3)
+                GetServerDE()->RemoveObject(m_hObject);
+            else if (script_fault == 4)
+                Script_Fire_Run(); // Deliberate reentry while the caller owns the motion guard.
+            else
+                PrepareScript("SCRIPT; WAIT 1"); // Replace a directly driven command during its shot.
+            return true;
+        }
         inline static unsigned destroyed = 0;
         inline static std::uint64_t final_calls = 0, final_shots = 0;
         ~Probe() override
@@ -51,7 +71,12 @@ namespace
             if (m == MID_UPDATE && scheduled)
             {
                 GetServerDE()->SetNextUpdate(m_hObject, .001f);
-                if (!MC_Fire_Stand())
+                bool engaged = false;
+                scheduled_ok = scheduled_script == 1   ? Script_Fire_Stand(engaged)
+                               : scheduled_script == 2 ? Script_Fire_Walk()
+                               : scheduled_script == 3 ? Script_Fire_Run()
+                                                       : MC_Fire_Stand();
+                if (!scheduled_ok)
                     GetServerDE()->SetNextUpdate(m_hObject, 0);
             }
             return AI_Mgr::EngineMessageFn(m, d, f);
@@ -144,6 +169,200 @@ namespace
         CHECK(a);
         CHECK(a->m_InventoryMgr.ObtainWeapon(type, 0) == InventoryResult::Ok);
         a->m_InventoryMgr.SetAmmoCount(AMMO_BULLET, 100);
+        return true;
+    }
+    Probe* script_actor(GameSession& g, DVector pos = {0, 10, 0}, bool cabal = true)
+    {
+        auto* a = actor(g);
+        if (!a)
+            return nullptr;
+        auto* r = g.objects.get(a->m_hObject);
+        r->state.m_Pos = pos;
+        r->state.m_Flags |= FLAG_SOLID;
+        a->m_bCabal = cabal;
+        a->m_damage.Init(a->m_hObject);
+        a->m_damage.m_fHitPoints = a->m_damage.m_fMaxHitPoints = 1000;
+        a->m_fSeeingDist = 1000;
+        return a->InsertMe() && a->m_MoveObj.Init(a->m_hObject) ? a : nullptr;
+    }
+    bool script_stand(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto* a = script_actor(g);
+        auto* enemy = script_actor(g, {0, 10, 100}, false);
+        CHECK(a && enemy);
+        g.objects.get(enemy->m_hObject)->dimensions = {10, 10, 5};
+        bool engaged = true;
+        CHECK(a->Script_Fire_Stand(engaged) && !engaged && a->fire_calls == 0);
+        CHECK(armed(a));
+        a->Metacmd = 5;
+        CHECK(a->Move({0, 2, 3}, 1e-11f));
+        CHECK(a->Script_Fire_Stand(engaged) && engaged && a->Metacmd == 5 && a->m_nCurMetacmd == 7);
+        CHECK(!g.server.GetModelLooping(a->m_hObject) && near(g.objects.get(a->m_hObject)->velocity.z, 3));
+        CHECK(g.objects.advance(a->m_fAttackLoadTime) && a->Script_Fire_Stand(engaged) && a->fire_calls == 0);
+        CHECK(g.objects.advance(.001) && a->Script_Fire_Stand(engaged) && a->fire_shots == 1 && a->Metacmd == 6);
+        CHECK(enemy->m_damage.m_fHitPoints < 1000 && a->m_InventoryMgr.GetAmmoCount(AMMO_BULLET) == 99);
+        a->m_InventoryMgr.SetAmmoCount(AMMO_BULLET, 0);
+        CHECK(g.objects.advance(1) && a->Script_Fire_Stand(engaged) && a->fire_dry == 1 && a->m_bAnimating);
+        // No opportunity is a valid decision, including after a previous target.
+        g.objects.get(enemy->m_hObject)->state.m_Pos = {0, 10, 2000};
+        const auto phase = a->Metacmd;
+        CHECK(a->Script_Fire_Stand(engaged) && !engaged && !a->GetTarget() && a->Metacmd == phase);
+        CHECK(g.unload_world() && !AI_Mgr::m_dwNumCabal && !AI_Mgr::m_dwNumMonster);
+        return true;
+    }
+    bool script_moving(const char*)
+    {
+        for (bool run : {false, true})
+        {
+            GameSession g;
+            CHECK(setup(g));
+            auto* a = script_actor(g);
+            CHECK(a && script_actor(g, {0, 10, 100}, false) && armed(a));
+            a->m_fWalkSpeed = 20;
+            a->m_fRunSpeed = 40;
+            a->m_nInjuredLeg = 10;
+            a->m_vTargetPos = {10, 10, 100}; // Source moving fire keeps this old position after reacquisition.
+            auto tick = [&]() { return run ? a->Script_Fire_Run() : a->Script_Fire_Walk(); };
+            CHECK(tick() && !a->script_fire_engaged && !a->perception_calls && g.server.GetModelLooping(a->m_hObject));
+            CHECK(near(g.objects.get(a->m_hObject)->velocity.z, run ? 40 : 20));
+            CHECK(a->m_nCurMetacmd == (run ? 9 : 8));
+            a->Metacmd = 5;
+            CHECK(g.objects.advance(a->m_fAttackLoadTime) && tick() && !a->fire_calls);
+            CHECK(g.objects.advance(.001) && tick() && a->fire_shots == 1 && a->Metacmd == 6);
+            CHECK(a->script_fire_engaged && near(a->face_position.x, 10) && !a->target_position_valid);
+            CHECK(near(a->script_motion_velocity.x, 0)); // Previous cached forward, before facing.
+            const auto phase = a->Metacmd;
+            g.server.SetModelLooping(a->m_hObject, false);
+            CHECK(g.server.advance_models(1));
+            a->m_fLoadTimeStart = g.server.GetTime();
+            CHECK(tick() && !a->m_bAnimating && a->Metacmd == phase &&
+                  near(g.objects.get(a->m_hObject)->velocity.z, 0));
+        }
+        return true;
+    }
+    bool script_refusal(const char*)
+    {
+        for (bool moving : {false, true})
+        {
+            GameSession g;
+            CHECK(setup(g));
+            auto* a = script_actor(g);
+            CHECK(a && script_actor(g, {0, 10, 100}, false) && armed(a));
+            bool engaged = false;
+            auto tick = [&]() { return moving ? a->Script_Fire_Walk() : a->Script_Fire_Stand(engaged); };
+            CHECK(tick() && g.objects.advance(1));
+            a->script_fault = 1;
+            CHECK(tick() && a->m_bAnimating == moving && near(a->m_fLoadTimeStart, moving ? 1 : 0));
+            a->m_bAnimating = false;
+            CHECK(tick() && g.objects.advance(1));
+            a->script_fault = 2;
+            CHECK(!tick() && a->script_motion_outcome == AI_Mgr::MotionOutcome::Failed);
+        }
+        return true;
+    }
+    bool script_lifetime(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        HOBJECT old = nullptr;
+        for (int fault : {3, 4, 5})
+        {
+            auto* a = script_actor(g);
+            CHECK(a && !g.objects.get(old) && script_actor(g, {0, 10, 100}, false) && armed(a));
+            old = a->m_hObject;
+            bool engaged = false;
+            CHECK(a->Script_Fire_Stand(engaged) && g.objects.advance(1));
+            a->script_fault = fault;
+            CHECK(!a->Script_Fire_Stand(engaged) && a->script_motion_outcome == AI_Mgr::MotionOutcome::Failed);
+            CHECK(g.unload_world() && !g.objects.get(old) && !g.server.string_count() && !g.server.message_count());
+            CHECK(setup(g));
+        }
+        auto* a = script_actor(g);
+        CHECK(a && script_actor(g, {0, 10, 100}, false) && armed(a));
+        bool engaged = false;
+        g.server.collision_ready = false;
+        CHECK(!a->Script_Fire_Stand(engaged) && !a->m_bAnimating);
+        g.server.collision_ready = true;
+        a->Metacmd = std::numeric_limits<int>::max();
+        CHECK(!a->Script_Fire_Stand(engaged));
+        a->Metacmd = 1;
+        auto bad = std::make_shared<CAnim_Sound>();
+        bad->m_nAnim_FIRE_RUN[TYPE_PISTOL] = UINT32_MAX;
+        CHECK(a->InitStatics(bad) && !a->Script_Fire_Run() && a->m_nState != AI_Mgr::StateCrawlUnder);
+        CHECK(g.objects.remove(a->m_hObject) && !a->Script_Fire_Run() && g.objects.finish_frame());
+        return true;
+    }
+    bool script_private(const char* root)
+    {
+        GameSession g;
+        CHECK(g.initialize());
+        Config c;
+        c.data_dir = root;
+        std::string error;
+        CHECK(g.resources.mount_game(c, error));
+        HOBJECT old = nullptr;
+        for (int mode : {1, 2, 3})
+        {
+            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error) && !g.objects.get(old));
+            auto* a = script_actor(g, {0, 10000, 0});
+            auto* enemy = script_actor(g, {0, 10000, 400}, false);
+            CHECK(a && enemy && armed(a));
+            enemy->m_damage.m_fHitPoints = enemy->m_damage.m_fMaxHitPoints = 10000;
+            g.objects.get(enemy->m_hObject)->dimensions = {60, 100, 30};
+            auto* body = g.objects.get(a->m_hObject);
+            CHECK(g.models.load("models/enemies/m_cultist1.abc", body->model, error));
+            auto table = std::make_shared<CAnim_Sound>();
+            CHECK(table->SetAnimationIndexes(a->m_hObject) && table->SetSoundRoot("sounds/enemies/m_cultist") &&
+                  a->InitStatics(table));
+            a->m_vTargetPos = {0, 10000, 400};
+            a->m_fWalkSpeed = 20;
+            a->m_fRunSpeed = 40;
+            a->scheduled = true;
+            a->scheduled_script = mode;
+            g.server.SetNextUpdate(a->m_hObject, .001f);
+            for (unsigned i = 0; i < 240; ++i)
+                CHECK(g.step(1. / 60));
+            std::cout << "Script fire mode=" << mode << " shots=" << a->fire_shots
+                      << " target HP=" << enemy->m_damage.m_fHitPoints << " position Z=" << body->state.m_Pos.z
+                      << " failures=" << a->script_motion_failures << " error=" << a->script_motion_error << '\n';
+            CHECK(a->scheduled_ok && a->fire_shots > 2 && enemy->m_damage.m_fHitPoints < 10000 &&
+                  !a->script_motion_failures && !a->fire_failures);
+            CHECK(mode == 1 ? near(body->state.m_Pos.z, 0) : body->state.m_Pos.z > 60);
+            old = a->m_hObject;
+            CHECK(g.unload_world() && !g.objects.get(old) && !g.server.string_count() && !g.server.message_count() &&
+                  !g.server.client_count());
+        }
+        return true;
+    }
+    bool script_routes(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto* a = script_actor(g);
+        auto* enemy = script_actor(g, {0, 10, 100}, false);
+        CHECK(a && enemy && armed(a));
+        ObjectCreateStruct s;
+        s.m_Pos = {0, 10, 200};
+        CHECK(g.objects.create(g.objects.find_class("PathPoint"), s, Creation::World,
+                               {{"Name", std::string("opportunity1")}, {"Pos", s.m_Pos}}));
+        CHECK(g.server_shell.paths.BuildPathList() && a->PrepareScript("SCRIPT 4; FOLLOWPATH opportunity"));
+        CHECK(a->AI_STATE_Script(g.server_shell.paths) && a->script_fire_engaged && a->m_nCurMetacmd == 7 &&
+              a->velocity_commands == 0);
+        CHECK(g.objects.advance(.5) && a->AI_STATE_Script(g.server_shell.paths) && a->fire_shots == 1 &&
+              !a->path_arrivals);
+        g.objects.get(enemy->m_hObject)->state.m_Pos = {0, 10, 2000};
+        CHECK(a->AI_STATE_Script(g.server_shell.paths) && !a->script_fire_engaged && a->m_nCurMetacmd == 1 &&
+              a->velocity_commands == 1);
+        SAFE_STRCPY(g.objects.get(enemy->m_hObject)->state.m_Name, "moving goal");
+        g.objects.get(enemy->m_hObject)->state.m_Pos = {0, 10, 100};
+        CHECK(a->SetMoveToObjectCmd("moving goal") && a->SetSetMovementCmd("RUN"));
+        CHECK(a->UpdateMoveToObjectCmd() && a->Metacmd == 2);
+        CHECK(a->UpdateMoveToObjectCmd() && a->Metacmd == 3);
+        CHECK(a->UpdateMoveToObjectCmd() && a->Metacmd == 2 && a->m_nCurMetacmd == 9);
+        CHECK(g.objects.advance(.5) && a->UpdateMoveToObjectCmd() && a->UpdateMoveToObjectCmd());
+        CHECK(a->Metacmd == 2 && a->script_fire_engaged && a->script_motion_failures == 0);
         return true;
     }
     bool selection(const char*)
@@ -520,7 +739,13 @@ int main(int argc, char** argv)
 {
     if (argc < 2)
         return 2;
-    const std::map<std::string, std::function<bool(const char*)>> tests{{"selection", selection},
+    const std::map<std::string, std::function<bool(const char*)>> tests{{"script_private", script_private},
+                                                                        {"script_stand", script_stand},
+                                                                        {"script_moving", script_moving},
+                                                                        {"script_refusal", script_refusal},
+                                                                        {"script_lifetime", script_lifetime},
+                                                                        {"script_routes", script_routes},
+                                                                        {"selection", selection},
                                                                         {"clearance", clearance},
                                                                         {"filters", filters},
                                                                         {"head", head},
