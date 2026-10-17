@@ -56,6 +56,10 @@ DDWORD SoundFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
     {
         if (!data || reason == 3)
             return 0; // Save/restore is unavailable.
+        // Observed historical metadata is retained, not mapped to a guessed audio behavior.
+        GenericProp legacy_voice;
+        if (g_pServerDE->GetPropGeneric("VoiceType", &legacy_voice) == DE_OK && legacy_voice.m_Long != 0)
+            return 0;
         const auto result = B2BaseClass::EngineMessageFn(message, data, reason);
         if (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP)
             ReadProp();
@@ -163,9 +167,8 @@ void SoundFX::UpdateSound()
     request.space = ambient ? SoundSpace::Ambient : SoundSpace::Spatial;
     request.loop = state == On && ambient;
     request.reverb_requested = !ambient;
-    if (file_stream)
-        error = "SoundFX FileStream/TIMESYNC playback is not implemented";
-    else if (g_pServerDE->GetObjectPos(m_hObject, &last_position) != DE_OK)
+    request.streaming = file_stream;
+    if (g_pServerDE->GetObjectPos(m_hObject, &last_position) != DE_OK)
         error = "SoundFX source position unavailable";
     else
         sound = g_pServerDE->PlaySoundAt(m_hObject, request, last_position, error);

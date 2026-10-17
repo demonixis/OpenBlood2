@@ -15,6 +15,10 @@ DDWORD Sound::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
     {
         if (!data || reason == 3)
             return 0; // Save/restore is unavailable; runtime filename is safely empty.
+        // Observed historical metadata is retained, not mapped to a guessed audio behavior.
+        GenericProp legacy_voice;
+        if (g_pServerDE->GetPropGeneric("VoiceType", &legacy_voice) == DE_OK && legacy_voice.m_Long != 0)
+            return 0;
         static_cast<ObjectCreateStruct*>(data)->m_ObjectType = OT_NORMAL;
         if (reason != 0)
         {

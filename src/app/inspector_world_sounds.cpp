@@ -1,3 +1,4 @@
+#include "engine/audio_stream.h"
 #include "inspector.h"
 #include <imgui.h>
 namespace OpenBlood2
@@ -40,19 +41,31 @@ namespace OpenBlood2
             const auto id = voice.id;
             const auto& r = voice.request;
             ImGui::Text("Voice %llu | %s | %s | wraps %llu", (unsigned long long)id,
-                        r.space == SoundSpace::Ambient ? "ambient" : "spatial", voice.done ? "finished" : "looping",
+                        r.space == SoundSpace::Ambient ? "ambient" : "spatial",
+                        !voice.error.empty() ? "failed"
+                        : voice.done         ? "finished"
+                                             : "looping",
                         (unsigned long long)voice.loops);
             ImGui::TextWrapped("%s | %.3f / %.3f s | %u Hz / %u channels", r.resource.c_str(),
                                voice.cursor / voice.clip->rate, voice.clip->duration(), voice.clip->rate,
                                voice.clip->channels);
+            if (const auto& stream = voice.clip->stream)
+                ImGui::Text("Disk PCM | buffers %zu KiB | read %llu bytes / %llu refills",
+                            PcmStream::buffer_bytes / 1024, (unsigned long long)stream->bytes_read,
+                            (unsigned long long)stream->refills);
+            else
+                ImGui::TextUnformatted("Decoded whole clip");
+            if (!voice.error.empty())
+                ImGui::TextWrapped("Playback failure: %s", voice.error.c_str());
             ImGui::Text("Position %.1f %.1f %.1f | radii %.1f / %.1f | volume %.0f%%", voice.position.x,
                         voice.position.y, voice.position.z, r.inner_radius, r.outer_radius, r.volume * 100);
             ImGui::Text("Gains %.3f / %.3f | priority request %u (arbitration unavailable)", voice.left, voice.right,
                         unsigned(r.priority));
         }
         ImGui::TextWrapped(
-            "Whole-clip decoded playback only. FileStream/TIMESYNC and region-loop metadata reject playback. "
-            "Unknown VoiceType schemas remain failures. Authored properties and missing resources remain in World. "
+            "PCM FileStream reads bounded REZ windows on the local simulation clock. Compressed streams and region "
+            "loops reject. "
+            "VoiceType=0 is retained historical metadata unused by the available original code; other values reject. "
             "Dry mixing, without reverb/Doppler/occlusion. M2 remains incomplete.");
     }
 } // namespace OpenBlood2

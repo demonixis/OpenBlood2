@@ -1,4 +1,5 @@
 #include "world_sound_smoke.h"
+#include "engine/audio_stream.h"
 #include "game/original/SoundFX.h"
 namespace OpenBlood2
 {
@@ -26,9 +27,11 @@ namespace OpenBlood2
                 resource = g.server.audio.get(entry.sound)->request.resource;
                 break;
             }
-        auto h =
-            g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::World,
-                             {{"Name", std::string("diagnostic_soundfx")}, {"StartOn", false}, {"Sound", resource}});
+        auto h = g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::World,
+                                  {{"Name", std::string("diagnostic_soundfx")},
+                                   {"StartOn", false},
+                                   {"Sound", resource},
+                                   {"FileStream", true}});
         auto* sound = dynamic_cast<SoundFX*>(g.server.HandleToObject(h));
         if (!sound)
             return false;
@@ -47,8 +50,9 @@ namespace OpenBlood2
         const auto submitted = g.server.audio.submitted_frames;
         if (!g.server.advance_audio(.02, {}, {}) || g.server.audio.submitted_frames <= submitted ||
             !g.server.audio.get(voice) || g.server.audio.get(voice)->cursor <= 0 ||
-            !g.server.audio.get(voice)->request.loop || !command("OFF") || sound->state != SoundFX::Off ||
-            g.server.audio.get(voice) || !g.objects.remove(h))
+            !g.server.audio.get(voice)->request.loop || !g.server.audio.get(voice)->clip->stream ||
+            !g.server.audio.get(voice)->clip->stream->refills || !g.server.audio.get(voice)->clip->samples.empty() ||
+            !command("OFF") || sound->state != SoundFX::Off || g.server.audio.get(voice) || !g.objects.remove(h))
             return false;
         g.objects.finish_frame();
         return !g.objects.get(h) && g.server.audio.output_error.empty();

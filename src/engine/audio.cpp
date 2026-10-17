@@ -1,4 +1,5 @@
 #include "engine/audio.h"
+#include "engine/audio_stream.h"
 #include "engine/collision.h"
 #include <SDL3/SDL.h>
 #include <algorithm>
@@ -176,7 +177,7 @@ namespace OpenBlood2
             error = "Missing or oversized sound resource";
             return false;
         }
-        if (clips_.size() >= 128)
+        if (cached_clips() >= 128)
         {
             error = "Sound cache exceeds 128 clips";
             return false;
@@ -196,6 +197,48 @@ namespace OpenBlood2
         out = std::move(clip);
         return true;
     }
+    bool AudioMixer::load_stream(const Resources& resources, std::string_view path,
+                                 std::shared_ptr<const AudioClip>& out, std::string& error)
+    {
+        std::string name;
+        if (!resource_path(path, name))
+        {
+            error = "Invalid streaming sound resource path";
+            return false;
+        }
+        if (auto it = streams_.find(name); it != streams_.end())
+        {
+            if (!it->second->stream->validate(error))
+                return false;
+            out = it->second;
+            return true;
+        }
+        const auto* resource = resources.find(name);
+        if (!resource)
+        {
+            error = "Missing streaming sound resource";
+            return false;
+        }
+        if (cached_clips() >= 128 || PcmStream::buffer_bytes > 256 * 1024 * 1024 - cached_bytes_)
+        {
+            error = "Streaming sound cache budget exceeded";
+            return false;
+        }
+        auto stream = PcmStream::open(*resource, error);
+        if (!stream)
+            return false;
+        auto clip = std::make_shared<AudioClip>();
+        clip->rate = stream->rate;
+        clip->channels = stream->channels;
+        clip->encoding = 1;
+        clip->stream_frames = stream->frames;
+        clip->loop_metadata = stream->loop_metadata;
+        clip->stream = std::move(stream);
+        streams_.emplace(name, clip);
+        cached_bytes_ += PcmStream::buffer_bytes;
+        out = std::move(clip);
+        return true;
+    }
     SoundId AudioMixer::play(const Resources& resources, HOBJECT owner, const SoundRequest& request, DVector position,
                              std::string& error)
     {
@@ -212,7 +255,8 @@ namespace OpenBlood2
             return 0;
         }
         std::shared_ptr<const AudioClip> clip;
-        if (!load(resources, request.resource, clip, error))
+        if (!(request.streaming ? load_stream(resources, request.resource, clip, error)
+                                : load(resources, request.resource, clip, error)))
             return 0;
         if (request.loop && clip->loop_metadata)
         {
@@ -220,7 +264,13 @@ namespace OpenBlood2
             return 0;
         }
         const auto id = next_sound++;
-        voices_.emplace(id, AudioVoice{id, owner, request, std::move(clip), position});
+        AudioVoice voice;
+        voice.id = id;
+        voice.owner = owner;
+        voice.request = request;
+        voice.clip = std::move(clip);
+        voice.position = position;
+        voices_.emplace(id, std::move(voice));
         return id;
     }
     const AudioVoice* AudioMixer::get(SoundId id) const
@@ -254,11 +304,22 @@ namespace OpenBlood2
         mixed.assign(count * 2, 0);
         peak = 0;
         const auto right = rotate_vector({1, 0, 0}, rotation);
+        bool stream_failed = false;
         for (auto& [id, v] : voices_)
         {
             (void)id;
+            if (!v.error.empty())
+            {
+                stream_failed = true;
+                continue;
+            }
             if (v.done)
                 continue;
+            if (v.clip->stream && !v.clip->stream->validate(v.error))
+            {
+                stream_failed = true;
+                continue;
+            }
             float gain = v.request.volume, pan = 0;
             if (v.request.space != SoundSpace::Local)
             {
@@ -284,14 +345,30 @@ namespace OpenBlood2
                 const auto a = std::size_t(cursor);
                 const auto b = v.request.loop ? (a + 1) % clip.frames() : std::min(a + 1, clip.frames() - 1);
                 const float blend = float(cursor - a);
-                auto sample = [&](unsigned channel)
+                float x[2]{}, y[2]{};
+                bool ok = true;
+                for (unsigned channel = 0; channel < clip.channels; ++channel)
                 {
-                    auto x = clip.samples[a * clip.channels + channel], y = clip.samples[b * clip.channels + channel];
-                    return x + (y - x) * blend;
-                };
-                mixed[frame * 2] += sample(0) * v.left;
-                mixed[frame * 2 + 1] += sample(clip.channels - 1) * v.right;
+                    if (clip.stream)
+                        ok = ok && clip.stream->sample(a, channel, x[channel], v.error) &&
+                             clip.stream->sample(b, channel, y[channel], v.error);
+                    else
+                    {
+                        x[channel] = clip.samples[a * clip.channels + channel];
+                        y[channel] = clip.samples[b * clip.channels + channel];
+                    }
+                }
+                if (!ok)
+                {
+                    stream_failed = true;
+                    break;
+                }
+                mixed[frame * 2] += (x[0] + (y[0] - x[0]) * blend) * v.left;
+                auto channel = clip.channels - 1;
+                mixed[frame * 2 + 1] += (x[channel] + (y[channel] - x[channel]) * blend) * v.right;
             }
+            if (!v.error.empty())
+                continue;
             const auto advanced = v.cursor + frames * increment;
             if (v.request.loop)
             {
@@ -305,6 +382,13 @@ namespace OpenBlood2
                 v.done = v.cursor >= clip.frames();
             }
         }
+        if (stream_failed)
+        {
+            mixed.clear();
+            peak = 0;
+            output_error = "Streaming audio resource read failed; inspect voice errors";
+            return false;
+        } // Never submit a partial failed read.
         for (auto& value : mixed)
         {
             value = std::clamp(value, -1.0f, 1.0f);
@@ -366,11 +450,13 @@ namespace OpenBlood2
     {
         voices_.clear();
         clips_.clear();
+        streams_.clear();
         cached_bytes_ = 0;
         mixed.clear();
         remainder_ = 0;
         peak = 0;
         mixed_frames = submitted_frames = dropped_frames = 0;
+        output_error.clear();
         if (output_ && !SDL_ClearAudioStream(output_))
             output_error = SDL_GetError();
     }

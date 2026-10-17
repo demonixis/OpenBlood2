@@ -898,3 +898,12 @@ See [ledger](M2_SOUND_FX_SOURCES.json) and [contracts](SOUND_FX_CONTRACTS.md).
 Owned strings fix the original duplicate destructor release; null commands are
 checked. FileStream/TIMESYNC, historical VoiceType, reverb and save remain explicit
 limits. No reference source, mutable game global or new dependency is introduced.
+
+## PCM streaming and historical audio metadata
+
+The original FILESTREAM request now uses a new bounded REZ-slice PCM window reader
+with the existing local sound clock. This is replacement engine code, not imported
+retail implementation. Sound/SoundFX preserve observed VoiceType=0 as documented
+unused metadata; no voice-category behavior is invented. Nonzero values and
+TypeAction still reject. See [ledger](M2_AUDIO_STREAM_SOURCES.json) and
+[contracts](AUDIO_STREAM_CONTRACTS.md). No new dependency or mutable global is added.

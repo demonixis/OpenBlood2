@@ -1,4 +1,5 @@
 #include "audio_fixture.h"
+#include "engine/audio_stream.h"
 #include "game/original/Sound.h"
 #include <cmath>
 #include <functional>
@@ -164,7 +165,6 @@ namespace
         GameSession g;
         CHECK(test_audio::setup(g, root));
         for (const auto& p : std::vector<Properties>{{{"Filename", std::string("absent.wav")}},
-                                                     {{"Filename", std::string("cue.wav")}, {"FileStream", true}},
                                                      {{"Filename", std::string("cue.wav")}, {"InnerRadius", 100.0f}},
                                                      {{"Filename", std::string("cue.wav")}, {"OuterRadius", -1.0f}}})
         {
@@ -173,7 +173,7 @@ namespace
             CHECK(c && !c->sound && !c->error.empty());
             CHECK(g.objects.finish_frame() && !g.objects.get(h) && g.server.audio.voices().empty());
         }
-        CHECK(!make(g, {{"VoiceType", std::int32_t(0)}})); // Unknown historical schema remains explicit.
+        CHECK(!make(g, {{"VoiceType", std::int32_t(1)}})); // Nonzero historical behavior is not guessed.
         CHECK(g.objects.finish_frame());
         auto owner = g.objects.create(g.objects.find_class("BaseClass"), {}, Creation::Runtime);
         CHECK(owner);
@@ -233,7 +233,10 @@ namespace
             r.resource = "region.wav";
             r.loop = true;
             CHECK(!g.server.PlayWorldSound(h, r, false, error) && error.find("region-loop") != std::string::npos);
+            CHECK(!g.server.PlayWorldSound(h, r, true, error) && error.find("region-loop") != std::string::npos);
             r.loop = false;
+            CHECK(g.server.PlaySoundAt(h, r, {}, error));
+            r.streaming = true;
             CHECK(g.server.PlaySoundAt(h, r, {}, error));
             w.b.pop_back();
             AudioClip untouched;
@@ -304,6 +307,19 @@ namespace
                     {
                         ++started;
                         CHECK(g.server.audio.get(c->sound)->world_owned);
+                        const auto* voice = g.server.audio.get(c->sound);
+                        CHECK(voice->request.streaming == stream && voice->clip->frames() == clip->frames());
+                        if (stream)
+                        {
+                            CHECK(voice->clip->stream && voice->clip->samples.empty());
+                            for (auto frame : {std::size_t(0), clip->frames() / 2, clip->frames() - 1})
+                                for (unsigned ch = 0; ch < clip->channels; ++ch)
+                                {
+                                    float sample = 0;
+                                    CHECK(voice->clip->stream->sample(frame, ch, sample, error));
+                                    CHECK(std::abs(sample - clip->samples[frame * clip->channels + ch]) < 1e-6f);
+                                }
+                        }
                         if (path == "worlds/01_subwaya.dat")
                             std::cout << path << ' ' << file << " world loop=" << c->sound
                                       << " frames=" << clip->frames() << " rate=" << clip->rate << '\n';
@@ -316,7 +332,7 @@ namespace
                   << " invalid=" << invalid << " metadata=" << metadata << " started=" << started
                   << " rejected=" << rejected << " failed=" << failed << '\n';
         CHECK(worlds == 57 && sounds == 792 && streams == 302 && missing == 15 && !invalid && !metadata);
-        CHECK(started == 7 && rejected == 781 && failed == 4);
+        CHECK(started == 696 && rejected == 0 && failed == 96);
         return true;
     }
     bool subway(const std::filesystem::path& root)

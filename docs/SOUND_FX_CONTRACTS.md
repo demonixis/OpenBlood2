@@ -1,5 +1,7 @@
 # Original SoundFX controllers
 
+> The later [PCM streaming contracts](AUDIO_STREAM_CONTRACTS.md) supersede blanket FileStream and VoiceType=0 omissions below for Sound/SoundFX only. Compressed streams, nonzero historical metadata, TypeAction and M2 remain open.
+
 This is the original ObjectDLL `SoundFX`, distinct from built-in `Sound` and
 `RandomSoundFX`. Read [audio ownership](WORLD_SOUND_CONTRACTS.md),
 [object lifetime](OBJECT_CONTRACTS.md), [source ledger](M2_SOUND_FX_SOURCES.json)

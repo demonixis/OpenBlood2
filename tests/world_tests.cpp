@@ -148,7 +148,7 @@ namespace
             w.append(object("DestinationProbe", {string_prop("Name", "owned"), prop("Pos", 1, pos)}));
             w.append(object("DirLight", {string_prop("Name", "spot")}));
             w.append(object("NotPorted", {string_prop("Name", "unknown")}));
-            w.append(object("Sound", {prop("VoiceType", 6, integer)}));
+            w.append(object("Sound", {prop("TypeAction", 6, integer)}));
             w.append(object("GameStartPoint", {string_prop("Name", "arrival"), prop("Pos", 1, pos)}));
         }
         else if (sprites)
@@ -576,15 +576,22 @@ namespace
             const auto* voice = game.server.audio.get(id);
             CHECK(voice && voice->world_owned && voice->position.x == 5 && voice->position.y == 6 &&
                   voice->position.z == 7);
-            for (unsigned i = 1; i < 4; ++i)
+            for (unsigned i : {1u, 3u})
                 CHECK(game.entries[i].state == EntryState::Failed && !game.entries[i].sound &&
                       !game.entries[i].detail.empty());
             CHECK(game.entries[1].detail.find("Missing") != std::string::npos);
-            CHECK(game.entries[2].detail.find("FileStream") != std::string::npos);
-            CHECK(game.entries[3].detail.find("VoiceType") != std::string::npos);
-            CHECK(game.server.audio.voices().size() == 1 && game.step(.25));
+            CHECK(game.entries[3].detail.find("Rejected precreate") != std::string::npos);
+            CHECK(game.entries[2].state == EntryState::WorldSound && !game.entries[2].object);
+            const auto streamed = game.entries[2].sound;
+            const auto* stream_voice = game.server.audio.get(streamed);
+            CHECK(stream_voice && stream_voice->world_owned && stream_voice->clip->stream &&
+                  stream_voice->clip->samples.empty());
+            std::weak_ptr<const AudioClip> clip = stream_voice->clip;
+            CHECK(game.server.audio.voices().size() == 2 && game.step(.25));
             CHECK(game.server.audio.get(id)->loops == 2);
+            CHECK(game.server.audio.get(streamed)->loops == 2);
             CHECK(game.unload_world() && game.entries.empty() && !game.server.audio.get(id));
+            CHECK(!game.server.audio.get(streamed) && clip.expired() && game.server.audio.cached_bytes() == 0);
         }
         return true;
     }
@@ -831,7 +838,7 @@ namespace
         CHECK(d.models == 1 && d.triangles == 1 && d.collision_nodes == 1);
         CHECK(d.source_world == path && d.source_revision == revision && d.requested_start == "arrival");
         CHECK(d.entries[0].has_position && d.entries[0].position.x == 5 && d.entries[0].name == "owned");
-        CHECK(d.entries[3].detail.find("VoiceType") != std::string::npos);
+        CHECK(d.entries[3].detail.find("TypeAction") != std::string::npos);
         CHECK(destination_constructed == construction && game.server.service_calls == calls);
         CHECK(game.objects.snapshot() == ids && game.local_client == client && game.world_revision == revision);
         CHECK(game.objects.time() == clock && game.world_path == path && game.server.string_count() == string_count);
@@ -916,8 +923,8 @@ namespace
                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
                 else
                 {
-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 417 && d.editor_only == 541 &&
-                          d.unknown == 32 && d.invalid == 36 && d.models == 100 && d.triangles == 39724);
+                    CHECK(d.entries.size() == 1026 && d.schema_checked == 453 && d.editor_only == 541 &&
+                          d.unknown == 32 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
                     for (const auto& e : d.entries)
                         if (e.state == DestinationEntryState::InvalidProperties)
                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
@@ -1161,7 +1168,7 @@ namespace
                 {
                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
                     if (std::string_view(name) == "02_cityhub")
-                        CHECK(d.created == 413 && d.unknown == 32 && d.failed == 40);
+                        CHECK(d.created == 418 && d.unknown == 32 && d.failed == 4);
                     else
                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
                 }

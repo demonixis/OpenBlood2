@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "70070b764bb71153033f3b281b54b47659aa806f",
+  "status": "M2 incomplete; local PCM streaming and explicit zero historical audio metadata",
+  "references": [
+    {
+      "source": "sources/blood2/AppHeaders/basedefs_de.h",
+      "source_sha256": "10f543764aa94339f2e48edcba384dda3cdce2d738f0be2731dcff3a1117fb72",
+      "purpose": "Original FILESTREAM disk-read contract, local TIME/TIMESYNC semantics and current PlaySoundInfo without VoiceType."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/engineobjects.c",
+      "source_sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
+      "purpose": "Original Sound flags/properties and world-owned lifetime; no VoiceType read."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/SoundFX.cpp",
+      "source_sha256": "0e9115b1a3d8fc3ff85298dd99c9d3c09c12d1a5fa8ed8aa9d231cfe766bf5ce",
+      "purpose": "Original conditional streaming/TIMESYNC request and retained source state rules; no VoiceType read."
+    },
+    {
+      "source": "sources/lithtech/runtime/server/src/serverde_impl.cpp",
+      "source_sha256": "5e1973f36bea781f23f99d7e0bb32ddb474ebf83c142c6877b15c157ba2fd53f",
+      "purpose": "Later-generation read-only property lookup corroboration, not imported or asserted Blood II binary compatibility."
+    },
+    {
+      "source": "sources/Shogo_Aegis/ObjectDLL/AdvSound.cpp",
+      "source_sha256": "bc211d2bb7384057a5270e2f70045c05a2735132baac7e2b4014308338f8580f",
+      "purpose": "Modified Shogo read-only corroboration: retains VoiceType but omits it from PlaySoundInfo. Not an original Blood II behavior authority."
+    }
+  ],
+  "implementation": [
+    "src/engine/audio_stream.cpp",
+    "src/engine/audio_stream.h",
+    "src/engine/audio.cpp",
+    "src/game/server_audio.cpp"
+  ],
+  "adaptations": [
+    "New bounded synchronous REZ-slice PCM windows, no whole-file decode for streams",
+    "Keep existing local sample clocks; no late-network TIMESYNC claim",
+    "Only Sound/SoundFX retain observed integer VoiceType=0 as unused metadata; nonzero rejects",
+    "No reference/commercial asset change or new mutable game global"
+  ],
+  "unsupported": [
+    "Compressed streaming, region loops, late network client synchronization",
+    "TypeAction historical schema, nonzero VoiceType semantics",
+    "Reverb/priority arbitration, complete M2 and safe NEW_LEVEL"
+  ]
+}

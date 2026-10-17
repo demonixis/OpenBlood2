@@ -156,7 +156,7 @@ namespace
         GameSession g;
         CHECK(test_audio::setup(g, root));
         CHECK(!g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::Restore));
-        CHECK(!make(g, {{"VoiceType", std::int32_t(0)}})); // Do not silently discard unknown historical properties.
+        CHECK(!make(g, {{"VoiceType", std::int32_t(1)}})); // Nonzero historical behavior is not guessed.
         auto p = props();
         p["RampUpSound"] = std::string("missing.wav");
         auto h = make(g, p);
@@ -170,9 +170,11 @@ namespace
         h = make(g, p);
         CHECK(h);
         s = get(g, h);
-        CHECK(trigger(g, h, "ON") && s->state == SoundFX::On && !s->sound &&
-              s->error.find("TIMESYNC") != std::string::npos);
-        CHECK(!g.objects.get(h)->scheduled && s->failures == 1);
+        CHECK(trigger(g, h, "ON") && s->state == SoundFX::On && s->sound && s->error.empty());
+        CHECK(g.server.audio.get(s->sound)->request.streaming && g.server.audio.get(s->sound)->clip->samples.empty());
+        CHECK(g.objects.get(h)->scheduled && s->failures == 0);
+        CHECK(trigger(g, h, "OFF")); // Ramp-down stream still owns a retained voice.
+        CHECK(g.step(.101) && !s->sound);
         p = props();
         p["StartOn"] = true;
         p["OuterRadius"] = -1.0f;
@@ -300,8 +302,8 @@ namespace
                   << " rejected=" << rejected << " starts=" << attempts << " failures=" << failures
                   << " references=" << references << " unreadable=" << missing << " city=" << city
                   << " VoiceType=" << voice_schema << " TypeAction=" << action_schema << '\n';
-        CHECK(worlds == 57 && entries == 124 && rejected == 124 && created == 0 && attempts == 0 && failures == 0 &&
-              references == 124 && missing == 1 && voice_schema == 121 && action_schema == 3 && city == 5 &&
+        CHECK(worlds == 57 && entries == 124 && rejected == 3 && created == 121 && attempts == 100 && failures == 0 &&
+              references == 124 && missing == 1 && voice_schema == 0 && action_schema == 3 && city == 5 &&
               !g.server.string_count());
         return true;
     }

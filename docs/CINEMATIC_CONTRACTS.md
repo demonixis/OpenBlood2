@@ -1,5 +1,7 @@
 # Original cinematic cues and bounded audio
 
+> The later [PCM streaming contracts](AUDIO_STREAM_CONTRACTS.md) supersede blanket FileStream and VoiceType=0 omissions below for Sound/SoundFX only. Compressed streams, nonzero historical metadata, TypeAction and M2 remain open.
+
 > Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
 > voice helpers, player sound keys and material/liquid footsteps now execute.
 > Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.

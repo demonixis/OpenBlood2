@@ -80,14 +80,12 @@ namespace OpenBlood2
             error = "World sound requires a live source and an unattached ambient/spatial loop";
             return 0;
         }
-        if (file_stream)
-        {
-            error = "FileStream/TIMESYNC playback is not implemented";
-            return 0;
-        }
+
         DVector position{};
         GetObjectPos(source, &position);
-        const auto id = audio.play(*client_resources, source, request, position, error);
+        auto actual = request;
+        actual.streaming = file_stream;
+        const auto id = audio.play(*client_resources, source, actual, position, error);
         if (auto* voice = audio.get(id))
             voice->world_owned = true;
         return id;
@@ -104,7 +102,7 @@ namespace OpenBlood2
     {
         trace_service("IsSoundDone");
         const auto* voice = audio.get(id);
-        if (!voice)
+        if (!voice || !voice->error.empty())
             return false;
         done = voice->done;
         return true;

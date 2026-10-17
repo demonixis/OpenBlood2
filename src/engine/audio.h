@@ -5,15 +5,18 @@
 #include <memory>
 namespace OpenBlood2
 {
+    class PcmStream;
     using SoundId = std::uint64_t;
     struct AudioClip
     {
         unsigned rate = 0, channels = 0, encoding = 0;
         bool loop_metadata = false; // Region loops require a separate validated reader; never silently ignore them.
         std::vector<float> samples;
+        std::shared_ptr<PcmStream> stream;
+        std::size_t stream_frames = 0;
         std::size_t frames() const
         {
-            return channels ? samples.size() / channels : 0;
+            return stream ? stream_frames : (channels ? samples.size() / channels : 0);
         }
         double duration() const
         {
@@ -34,6 +37,7 @@ namespace OpenBlood2
         SoundSpace space = SoundSpace::Spatial;
         float inner_radius = 250, outer_radius = 1000, volume = 1;
         bool loop = false;
+        bool streaming = false;       // Bounded disk-backed PCM, using the same local simulation clock.
         DBYTE priority = 0;           // Authored intent; priority arbitration is unavailable.
         bool reverb_requested = true; // Original cinematic flag; dry output currently only.
     };
@@ -50,6 +54,7 @@ namespace OpenBlood2
         bool world_owned = false; // Owner is provenance only for transferred, unattached sounds.
         bool auto_remove = false; // Fire-and-forget one-shots release their voice on completion.
         std::uint64_t loops = 0;
+        std::string error; // A failed stream is not successful sound completion.
     };
     class AudioMixer
     {
@@ -75,7 +80,7 @@ namespace OpenBlood2
         }
         std::size_t cached_clips() const
         {
-            return clips_.size();
+            return clips_.size() + streams_.size();
         }
         std::size_t cached_bytes() const
         {
@@ -91,6 +96,8 @@ namespace OpenBlood2
 
       private:
         std::map<std::string, std::shared_ptr<const AudioClip>> clips_;
+        std::map<std::string, std::shared_ptr<const AudioClip>> streams_;
+        bool load_stream(const Resources&, std::string_view, std::shared_ptr<const AudioClip>&, std::string&);
         std::map<SoundId, AudioVoice> voices_;
         std::size_t cached_bytes_ = 0;
         double remainder_ = 0;

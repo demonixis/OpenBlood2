@@ -1,5 +1,7 @@
 # Original world-owned Sound loops
 
+> The later [PCM streaming contracts](AUDIO_STREAM_CONTRACTS.md) supersede blanket FileStream and VoiceType=0 omissions below for Sound/SoundFX only. Compressed streams, nonzero historical metadata, TypeAction and M2 remain open.
+
 M2 remains incomplete. Read [object lifetime](OBJECT_CONTRACTS.md),
 [world loading](WORLD_CONTRACTS.md), [cinematic audio](CINEMATIC_CONTRACTS.md),
 [random emitters](RANDOM_SOUND_CONTRACTS.md), [source selections](M2_WORLD_SOUND_SOURCES.json)
