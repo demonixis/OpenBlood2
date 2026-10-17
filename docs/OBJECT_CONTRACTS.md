@@ -1,5 +1,7 @@
 # M1 Object Boundary
 
+The [bound-container index](CONTAINER_INDEX_CONTRACTS.md) now avoids full object-slot scans while preserving fresh owned snapshots, slot order and deferred lifetime.
+
 The [CityHub entry continuation](CITYHUB_ENTRY_CONTRACTS.md) supersedes earlier
 missing-named-world-model and CityHub refusal statements: absent named BSPs are
 explicitly omitted before initial update, with no runtime instance. All other

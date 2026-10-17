@@ -409,7 +409,12 @@ namespace OpenBlood2
             object->state.m_Pos = shape->origin;
             object->dimensions = vector_scale(vector_subtract(shape->max, shape->min), .5f);
             if (state.m_ObjectType == OT_CONTAINER)
-                object->container = std::move(shape);
+            {
+                object->container_ = std::move(shape);
+                const auto at = std::lower_bound(containers_.begin(), containers_.end(), object->id.slot,
+                                                 [](ObjectId id, std::uint32_t slot) { return id.slot < slot; });
+                containers_.insert(at, object->id); // Visible to nested initial-update callbacks.
+            }
             else
             {
                 object->world_model = std::move(shape);
@@ -583,14 +588,9 @@ namespace OpenBlood2
     }
     std::vector<ObjectId> Objects::container_snapshot() const
     {
-        // Same checked identities and slot order as snapshot(), freshly gathered
-        // for each query. Unrelated effects need no copied ID or subsequent lookup.
-        std::vector<ObjectId> ids;
-        ids.reserve(std::min<std::size_t>(8, slots_.size()));
-        for (const auto& slot : slots_)
-            if (slot.object && slot.object->container)
-                ids.push_back(slot.object->id);
-        return ids;
+        // Copy current bound identities before callbacks. Callers still check live
+        // state/geometry; no membership, hidden flag or physics result is cached.
+        return containers_;
     }
     HOBJECT Objects::next_alive(HOBJECT previous) const
     {
@@ -719,6 +719,10 @@ namespace OpenBlood2
             ++callback_depth_;
             record->game.reset();
             --callback_depth_;
+            // The original destructor can query volumes or create another object.
+            // Keep this binding visible until it returns; do not retain an iterator.
+            if (record->container_)
+                std::erase(containers_, id);
             identities_.erase(h);
             slots_[id.slot].object.reset();
             ++slots_[id.slot].generation;

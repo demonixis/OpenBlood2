@@ -137,7 +137,7 @@ namespace OpenBlood2
                 auto& body = *push.body;
                 if (body.life != Life::Alive)
                     break;
-                if (!sensor || sensor->life != Life::Alive || sensor->handle == body.handle || sensor->container ||
+                if (!sensor || sensor->life != Life::Alive || sensor->handle == body.handle || sensor->container() ||
                     sensor->world_model || (sensor->state.m_Flags & FLAG_SOLID) ||
                     !(sensor->state.m_Flags & FLAG_TOUCH_NOTIFY))
                     continue;

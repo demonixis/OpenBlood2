@@ -184,7 +184,7 @@ if(BLOOD2_TEST_DATA_DIR)
         set_tests_properties(gpu.compound_shell PROPERTIES LABELS "private;gpu;containers" TIMEOUT 90 RUN_SERIAL TRUE)
     endif()
 endif()
-foreach(case IN ITEMS geometry concave membership lifetime physics swimming surface ladders air_damage
+foreach(case IN ITEMS geometry concave membership lifetime index_lifetime index_callbacks physics swimming surface ladders air_damage
         specialized_defaults conveyor_motion conveyor_bodies specialized_damage freefall_motion)
     add_test(NAME containers.${case} COMMAND container_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/container-fixtures/${case}")
     set_tests_properties(containers.${case} PROPERTIES LABELS "headless;containers" TIMEOUT 30)

@@ -139,7 +139,7 @@ namespace
         auto h = door(g, {{"BoxPhysics", false}});
         CHECK(h);
         auto* r = g.objects.get(h);
-        CHECK(r->state.m_ObjectType == OT_WORLDMODEL && r->world_model && !r->container);
+        CHECK(r->state.m_ObjectType == OT_WORLDMODEL && r->world_model && !r->container());
         SegmentHit hit;
         CHECK(g.server.IntersectSegment({-100, 20, 0}, {100, 20, 0}, nullptr, hit) == SegmentResult::Hit);
         CHECK(hit.object == h && std::abs(hit.point.x + 10) < .001f);

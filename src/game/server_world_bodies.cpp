@@ -8,7 +8,7 @@ namespace OpenBlood2
     {
         trace_service("ConfigureWorldBody");
         auto* r = objects_.get(handle);
-        if (!r || r->life != Life::Alive || !r->world_model || r->container || r->world_body ||
+        if (!r || r->life != Life::Alive || !r->world_model || r->container() || r->world_body ||
             (!properties.rotating_debris && !(r->state.m_Flags & FLAG_BOXPHYSICS)) ||
             (r->state.m_Flags & FLAG_GOTHRUWORLD) || !std::isfinite(properties.mass) || properties.mass < 0 ||
             properties.mass > 1e6f || !std::isfinite(properties.friction) || properties.friction < 0 ||
@@ -23,7 +23,7 @@ namespace OpenBlood2
         trace_service("ConfigureModelBody");
         auto* r = objects_.get(handle);
         if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL || !r->model || r->attachment ||
-            r->client_movement || r->world_model || r->container || r->world_body || r->character_body ||
+            r->client_movement || r->world_model || r->container() || r->world_body || r->character_body ||
             r->model_body || properties.rotating_debris || (r->state.m_Flags & FLAG_GOTHRUWORLD) ||
             !physics_vector(r->dimensions) || r->dimensions.x < 0 || r->dimensions.y < 0 || r->dimensions.z < 0 ||
             !std::isfinite(properties.mass) || properties.mass < 0 || properties.mass > 1e6f ||
@@ -205,8 +205,8 @@ namespace OpenBlood2
                 auto* other = objects_.get(id);
                 if (body.life != Life::Alive)
                     break;
-                if (!other || other == &body || other->life != Life::Alive || other->container || other == plan.body ||
-                    other->handle == plan.initiator ||
+                if (!other || other == &body || other->life != Life::Alive || other->container() ||
+                    other == plan.body || other->handle == plan.initiator ||
                     !((other->state.m_Flags | body.state.m_Flags) & FLAG_TOUCH_NOTIFY))
                     continue;
                 if (mover &&

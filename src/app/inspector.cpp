@@ -215,7 +215,7 @@ namespace OpenBlood2
         if (container_toggle_request)
         {
             if (auto* record = game.objects.get(container_toggle_request);
-                record && record->container && record->life == Life::Alive)
+                record && record->container() && record->life == Life::Alive)
             {
                 auto text = game.server.CreateString("TOGGLE");
                 auto message = game.server.StartMessageToObject(nullptr, record->handle, 1000);
@@ -690,7 +690,7 @@ namespace OpenBlood2
                             ImGui::Text("Model additive RGB (lighting pending) %.3f %.3f %.3f | alpha %.3f",
                                         object->color.x, object->color.y, object->color.z, object->alpha);
                         if (const auto* shape =
-                                object->world_model ? object->world_model.get() : object->container.get())
+                                object->world_model ? object->world_model.get() : object->container().get())
                             ImGui::Text("Geometry: %zu closed components | %zu shared edges | %zu triangles",
                                         shape->closed_components, shape->shared_edges, shape->triangles.size());
                         if (const auto* sound = dynamic_cast<const SoundFX*>(object->game.get()))
@@ -2254,14 +2254,16 @@ namespace OpenBlood2
         }
         else if (ImGui::Button("Enter original player"))
             enter_player_request = true;
+        ImGui::Text("Bound container index: %zu (slot ordered; includes pending destruction)",
+                    game.objects.bound_container_count());
         if (!ImGui::BeginTable("Volumes", 2, ImGuiTableFlags_Resizable))
             return;
         ImGui::TableNextColumn();
         unsigned count = 0;
-        for (auto id : game.objects.snapshot())
+        for (auto id : game.objects.container_snapshot())
         {
             const auto* r = game.objects.get(id);
-            if (!r || !r->container || r->life != Life::Alive)
+            if (!r || !r->container() || r->life != Life::Alive)
                 continue;
             const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get());
             if (!brush)
@@ -2284,9 +2286,9 @@ namespace OpenBlood2
                                "and missing classes remain listed in World.");
         const auto* r = game.objects.get(container_selection);
         const auto* brush = r ? dynamic_cast<const VolumeBrush*>(r->game.get()) : nullptr;
-        if (r && brush && r->container)
+        if (r && brush && r->container())
         {
-            const auto& shape = *r->container;
+            const auto& shape = *r->container();
             ImGui::TextUnformatted("Volume + player body / front (+Y up)");
             const auto origin = ImGui::GetCursorScreenPos();
             const ImVec2 size{std::max(160.0f, ImGui::GetContentRegionAvail().x), 100};
@@ -2320,9 +2322,9 @@ namespace OpenBlood2
             draw->PopClipRect();
         }
         ImGui::TableNextColumn();
-        if (r && brush && r->container)
+        if (r && brush && r->container())
         {
-            const auto& shape = *r->container;
+            const auto& shape = *r->container();
             ImGui::Text("%s | code %u | %s", r->state.m_Name, unsigned(brush->info.code),
                         brush->info.hidden ? "hidden" : "active");
             if (ImGui::Button("Trigger ON / OFF"))

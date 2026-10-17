@@ -1,5 +1,7 @@
 # Container, liquid and ladder boundary
 
+The [bound-container index](CONTAINER_INDEX_CONTRACTS.md) now avoids full object-slot scans while preserving fresh owned snapshots, slot order and deferred lifetime.
+
 > [Compound-shell validation](COMPOUND_SHELL_CONTRACTS.md) now accepts independently closed components sharing edges; ambiguous/non-manifold components still fail. Geometry and authored BoxPhysics are unchanged.
 
 > Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original

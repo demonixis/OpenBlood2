@@ -140,7 +140,10 @@ namespace OpenBlood2
         std::shared_ptr<const Model> model;
         std::shared_ptr<const Sprite> sprite;
         SpriteTrack sprite_track;
-        std::shared_ptr<const ContainerShape> container;
+        const std::shared_ptr<const ContainerShape>& container() const
+        {
+            return container_;
+        }
         // Current posed shell plus immutable authored basis for drift-free rotation.
         std::shared_ptr<const ContainerShape> world_model_base;
         DRotation world_model_basis;
@@ -161,6 +164,10 @@ namespace OpenBlood2
         double due = 0;
         bool scheduled = false;
         std::uint64_t updates = 0;
+
+      private:
+        friend class Objects;
+        std::shared_ptr<const ContainerShape> container_; // Binding and index membership change together.
     };
 
     class Objects
@@ -200,6 +207,10 @@ namespace OpenBlood2
         HOBJECT handle_of(const BaseClass* instance) const;
         std::vector<ObjectId> snapshot() const;
         std::vector<ObjectId> container_snapshot() const;
+        std::size_t bound_container_count() const
+        {
+            return containers_.size();
+        }
         HOBJECT next_alive(HOBJECT previous) const;
         const PropertyValue* property(std::string_view name) const;
         DRESULT attach(HOBJECT, HOBJECT, const char*, const DVector*, const DRotation*, HATTACHMENT*);
@@ -242,6 +253,7 @@ namespace OpenBlood2
         HATTACHMENT next_attachment_ = 1;
         std::map<std::string, HCLASS, CaseLess> classes_;
         std::vector<Slot> slots_;
+        std::vector<ObjectId> containers_; // Bound shapes, in slot order, including deferred destruction.
         std::vector<std::unique_ptr<DObject>> handles_;
         std::unordered_map<HOBJECT, ObjectId> identities_;
         std::vector<const Properties*> contexts_;

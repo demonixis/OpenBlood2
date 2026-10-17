@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "d1ddceb972fa0052b93abe27eaed2f786c1531df",
+  "status": "M2 incomplete; replacement engine enumeration optimization, no original rule change",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/VolumeBrush.cpp",
+      "sha256": "ef2392f8e42f9f8185e94d0712a91c96c3a1dc89f5615ef00ff4f31bcfb6a94f",
+      "purpose": "Original volume callbacks and physical/damage behavior; unchanged."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MoveMgr.cpp",
+      "sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a",
+      "purpose": "Original bounded head/body membership consumers; unchanged."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/server_de.h",
+      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "purpose": "Original container-query boundary; no retail traversal order claimed."
+    }
+  ]
+}

@@ -125,7 +125,7 @@ namespace OpenBlood2
                     active().objects_.fail(ObjectError::Unsupported, "Physical attached children are unsupported");
                     return;
                 }
-                if (r->container && (flags & (FLAG_SOLID | FLAG_GRAVITY)))
+                if (r->container() && (flags & (FLAG_SOLID | FLAG_GRAVITY)))
                 {
                     active().objects_.fail(ObjectError::Unsupported, "Container solid/gravity flags are unsupported");
                     return;
@@ -167,7 +167,7 @@ namespace OpenBlood2
             active().trace_service("SetObjectDims");
             auto& o = active().objects_;
             auto* r = o.get(h);
-            if (!r || r->life != Life::Alive || (r->container || r->world_model) || !dims || !physics_vector(*dims) ||
+            if (!r || r->life != Life::Alive || (r->container() || r->world_model) || !dims || !physics_vector(*dims) ||
                 dims->x < 0 || dims->y < 0 || dims->z < 0)
             {
                 o.fail(ObjectError::InvalidProperty, "Invalid object dimensions");

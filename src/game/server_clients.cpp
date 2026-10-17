@@ -157,7 +157,7 @@ namespace OpenBlood2
     {
         trace_service("SetObjectRotation");
         auto* r = objects_.get(h);
-        if (!r || r->life != Life::Alive || r->attachment || (r->container || r->world_model) || !rotation ||
+        if (!r || r->life != Life::Alive || r->attachment || (r->container() || r->world_model) || !rotation ||
             !physics_vector(rotation->m_Vec) || !std::isfinite(rotation->m_Spin))
             return DE_INVALIDPARAMS;
         const auto& v = rotation->m_Vec;

@@ -1,3 +1,4 @@
+#include "brush_fixture.h"
 #include "camera_fixture.h"
 #include "engine/container.h"
 #include "game/game_settings.h"
@@ -212,9 +213,12 @@ namespace
         const auto pos = r->state.m_Pos;
         CHECK(g.server.MoveKeyframedObject(h, {1, 2, 3}, &DRotationZero) == MoverResult::Invalid);
         CHECK(close(r->state.m_Pos, pos));
-        r->container = std::make_shared<ContainerShape>();
-        CHECK(g.server.MoveKeyframedObject(h, {1, 2, 3}, &b) == MoverResult::Unavailable && close(r->state.m_Pos, pos));
-        r->container.reset();
+        g.world.models.push_back(test_brush::box("static_water", {-10, -10, -10}, {10, 10, 10}));
+        auto water = create(g, "Water", {{"Name", std::string("static_water")}});
+        CHECK(water && g.objects.get(water)->container());
+        const auto water_position = g.objects.get(water)->state.m_Pos;
+        CHECK(g.server.MoveKeyframedObject(water, {1, 2, 3}, &b) == MoverResult::Unavailable &&
+              close(g.objects.get(water)->state.m_Pos, water_position));
         r->world_model = std::make_shared<ContainerShape>();
         CHECK(g.server.MoveKeyframedObject(h, {1, 2, 3}, &b) == MoverResult::Unavailable && close(r->state.m_Pos, pos));
         r->world_model.reset();

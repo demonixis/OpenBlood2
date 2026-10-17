@@ -37,7 +37,7 @@ namespace OpenBlood2
     {
         trace_service("ResizeObject");
         auto* r = objects_.get(h);
-        if (!r || r->life != Life::Alive || r->attachment || (r->container || r->world_model) ||
+        if (!r || r->life != Life::Alive || r->attachment || (r->container() || r->world_model) ||
             !physics_vector(dimensions) || dimensions.x <= 0 || dimensions.y <= 0 || dimensions.z <= 0 ||
             !physics_vector(r->state.m_Pos) || moving_)
             return ResizeResult::Invalid;
@@ -67,7 +67,7 @@ namespace OpenBlood2
         report.requested = report.candidate = requested;
         report.result = BodyPlacementResult::Invalid;
         auto* r = objects_.get(h);
-        if (!r || r->life != Life::Alive || moving_ || r->attachment || r->container || r->world_model ||
+        if (!r || r->life != Life::Alive || moving_ || r->attachment || r->container() || r->world_model ||
             r->state.m_ObjectType != OT_MODEL || !r->character_body || (r->state.m_Flags & FLAG_SOLID))
             return false;
         if (!collision || !collision_ready)
@@ -137,7 +137,7 @@ namespace OpenBlood2
             auto& a = active();
             a.trace_service("TeleportObject");
             auto* r = a.objects_.get(h);
-            if (!r || r->life != Life::Alive || r->attachment || (r->container || r->world_model) || !position ||
+            if (!r || r->life != Life::Alive || r->attachment || (r->container() || r->world_model) || !position ||
                 !physics_vector(*position))
                 return DE_INVALIDPARAMS;
             r->state.m_Pos = *position;
@@ -163,8 +163,8 @@ namespace OpenBlood2
     {
         trace_service("SetVelocity");
         auto* r = objects_.get(h);
-        if (!r || r->life != Life::Alive || r->attachment || r->container || (r->world_model && !r->world_body) || !v ||
-            !physics_vector(*v))
+        if (!r || r->life != Life::Alive || r->attachment || r->container() || (r->world_model && !r->world_body) ||
+            !v || !physics_vector(*v))
             return DE_INVALIDPARAMS;
         r->velocity = *v;
         return DE_OK;
@@ -184,8 +184,8 @@ namespace OpenBlood2
     {
         trace_service("SetAcceleration");
         auto* r = objects_.get(h);
-        if (!r || r->life != Life::Alive || r->attachment || r->container || (r->world_model && !r->world_body) || !v ||
-            !physics_vector(*v))
+        if (!r || r->life != Life::Alive || r->attachment || r->container() || (r->world_model && !r->world_body) ||
+            !v || !physics_vector(*v))
             return DE_INVALIDPARAMS;
         r->acceleration = *v;
         return DE_OK;
@@ -282,7 +282,7 @@ namespace OpenBlood2
                     {
                         const auto* other = objects_.get(id);
                         CollisionHit hit;
-                        if (other && other->life == Life::Alive && other->handle != h && !other->container &&
+                        if (other && other->life == Life::Alive && other->handle != h && !other->container() &&
                             ((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY) &&
                             sweep_object(*other, position, actor_end, r->dimensions, hit) == CollisionQuery::Hit)
                             touch(other->handle);
@@ -318,7 +318,7 @@ namespace OpenBlood2
                     {
                         const auto* other = objects_.get(id);
                         if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
-                            other->container || !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
+                            other->container() || !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
                             continue;
                         if (sweep_object(*other, position, up, r->dimensions, probe) == CollisionQuery::Hit ||
                             sweep_object(*other, up, across, r->dimensions, probe) == CollisionQuery::Hit ||
@@ -345,7 +345,7 @@ namespace OpenBlood2
             {
                 const auto* other = objects_.get(id);
                 if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
-                    other->container || !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
+                    other->container() || !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
                     continue;
                 CollisionHit hit;
                 if (sweep_object(*other, position, reached, r->dimensions, hit) == CollisionQuery::Hit)
@@ -436,7 +436,7 @@ namespace OpenBlood2
         {
             auto* r = objects_.get(id);
             if (!r || r->life != Life::Alive || r->attachment || r->activity != OBJSTATE_ACTIVE || r->client_movement ||
-                r->container || dynamic_cast<CProjectile*>(r->game.get()) || (r->world_model && !r->world_body) ||
+                r->container() || dynamic_cast<CProjectile*>(r->game.get()) || (r->world_model && !r->world_body) ||
                 (!r->world_body && r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
                 continue;
             ContainerState containers;

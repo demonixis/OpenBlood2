@@ -1,5 +1,7 @@
 # Original scene explosion emitters
 
+The [bound-container index](CONTAINER_INDEX_CONTRACTS.md) now avoids full object-slot scans while preserving fresh owned snapshots, slot order and deferred lifetime.
+
 Continuation: [explosion point lights](EXPLOSION_LIGHT_CONTRACTS.md) now evaluate
 selected original transient colors/radii with independent lifetime. Earlier light
 omissions are superseded only for that state; surface illumination stays unavailable.

@@ -170,7 +170,7 @@ namespace
         CHECK(game.objects.finish_frame());
         auto h = volume(game, "Ladder", "ladder", {0, 0, 0}, {10, 200, 10});
         CHECK(h);
-        auto shape = game.objects.get(h)->container;
+        auto shape = game.objects.get(h)->container();
         DVector pos{100, 100, 100};
         DRotation rot;
         CHECK(game.server.ResizeObject(h, {10, 10, 10}) == ResizeResult::Invalid);
@@ -188,6 +188,154 @@ namespace
         CHECK(!game.objects.get(h));
         CHECK(game.server.string_count() == 0);
         CHECK(game.server.message_count() == 0);
+        return true;
+    }
+    struct IndexHooks
+    {
+        bool reject = false;
+        std::function<void(HOBJECT)> initial, destroy, physics;
+    };
+    IndexHooks* index_hooks = nullptr;
+    struct IndexHookScope
+    {
+        explicit IndexHookScope(IndexHooks& hooks)
+        {
+            index_hooks = &hooks;
+        }
+        ~IndexHookScope()
+        {
+            index_hooks = nullptr;
+        }
+    };
+    class IndexVolume : public VolumeBrush
+    {
+      public:
+        ~IndexVolume() override
+        {
+            if (index_hooks && index_hooks->destroy)
+                index_hooks->destroy(m_hObject);
+        }
+        void UpdatePhysics(ContainerPhysics& physics) override
+        {
+            VolumeBrush::UpdatePhysics(physics);
+            if (index_hooks && index_hooks->physics)
+                index_hooks->physics(m_hObject);
+        }
+
+      protected:
+        DDWORD EngineMessageFn(DDWORD id, void* data, DFLOAT reason) override
+        {
+            const auto result = VolumeBrush::EngineMessageFn(id, data, reason);
+            if (id == MID_PRECREATE && index_hooks && index_hooks->reject)
+                return 0;
+            if (id == MID_INITIALUPDATE && index_hooks && index_hooks->initial)
+                index_hooks->initial(m_hObject);
+            return result;
+        }
+    };
+    bool index_matches(const Objects& objects)
+    {
+        std::vector<ObjectId> slow;
+        for (auto id : objects.snapshot())
+            if (const auto* r = objects.get(id); r && r->container())
+                slow.push_back(id);
+        return objects.container_snapshot() == slow && objects.bound_container_count() == slow.size();
+    }
+    bool register_index_volume(GameSession& game)
+    {
+        static ClassInfo type{
+            "IndexVolume", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<IndexVolume>(); }, {}};
+        type.parent = game.objects.find_class("VolumeBrush");
+        return game.objects.register_class(type);
+    }
+    bool index_lifetime(const std::filesystem::path& root)
+    {
+        IndexHooks hooks;
+        GameSession game;
+        IndexHookScope scope(hooks); // Disable captured callbacks before implicit teardown on CHECK failure.
+        CHECK(test_player::setup(game, root, false) && register_index_volume(game));
+        auto ordinary = game.objects.create(game.objects.find_class("BaseClass"));
+        auto a = volume(game, "Water", "a", {-10, -10, -10}, {10, 10, 10});
+        auto b = volume(game, "Water", "b", {-10, -10, -10}, {10, 10, 10});
+        CHECK(ordinary && a && b && index_matches(game.objects));
+        const auto old = game.objects.get(a)->id;
+        const auto held = game.objects.container_snapshot();
+        CHECK(game.objects.remove(a) && index_matches(game.objects));
+        CHECK(game.objects.container_snapshot() == held); // Pending records remain indexed, queries exclude them.
+        CHECK(game.objects.finish_frame() && index_matches(game.objects));
+        auto reused = volume(game, "Water", "reused", {-10, -10, -10}, {10, 10, 10});
+        CHECK(reused && game.objects.get(reused)->id.slot == old.slot && !game.objects.get(old));
+        CHECK(game.objects.container_snapshot().front() == game.objects.get(reused)->id && index_matches(game.objects));
+        CHECK(held.front() == old); // Already returned snapshots remain owned and unchanged.
+        hooks.reject = true;
+        CHECK(!volume(game, "IndexVolume", "rejected", {-10, -10, -10}, {10, 10, 10}));
+        hooks.reject = false;
+        CHECK(!game.objects.create(game.objects.find_class("Water"), {}, Creation::World,
+                                   {{"Name", std::string("missing")}}));
+        game.world.models.push_back(box("invalid", {-10, -10, -10}, {10, 10, 10}));
+        game.world.models.back().polygons.pop_back();
+        CHECK(!game.objects.create(game.objects.find_class("Water"), {}, Creation::World,
+                                   {{"Name", std::string("invalid")}}));
+        CHECK(index_matches(game.objects) && game.objects.bound_container_count() == 2);
+        CHECK(game.objects.finish_frame());
+        HOBJECT nested = nullptr, from_destructor = nullptr;
+        bool initial_ok = false, destructor_ok = false;
+        hooks.initial = [&](HOBJECT h)
+        {
+            initial_ok = game.objects.get(h)->container() && index_matches(game.objects);
+            nested = volume(game, "Water", "nested", {-10, -10, -10}, {10, 10, 10});
+            initial_ok = initial_ok && nested && game.objects.remove(h) && index_matches(game.objects);
+        };
+        auto pending = volume(game, "IndexVolume", "pending", {-10, -10, -10}, {10, 10, 10});
+        CHECK(pending && initial_ok && game.objects.bound_container_count() == 4);
+        hooks.destroy = [&](HOBJECT h)
+        {
+            destructor_ok = game.objects.get(h)->life == Life::Destroying && index_matches(game.objects);
+            from_destructor = volume(game, "Water", "destructor_child", {-10, -10, -10}, {10, 10, 10});
+            destructor_ok =
+                destructor_ok && from_destructor && game.objects.remove(nested) && index_matches(game.objects);
+        };
+        CHECK(game.objects.finish_frame() && destructor_ok && index_matches(game.objects));
+        CHECK(!game.objects.get(pending) && !game.objects.get(nested) && game.objects.get(from_destructor));
+        CHECK(game.objects.bound_container_count() == 3);
+        hooks = {};
+        CHECK(game.unload_world() && index_matches(game.objects) && !game.objects.bound_container_count());
+        for (unsigned i = 0; i < 3; ++i)
+        {
+            game.objects.world = &game.world;
+            CHECK(volume(game, "Water", "reload" + std::to_string(i), {-10, -10, -10}, {10, 10, 10}));
+            CHECK(index_matches(game.objects) && game.objects.bound_container_count() == 1);
+            CHECK(game.unload_world() && index_matches(game.objects) && !game.objects.bound_container_count());
+        }
+        return true;
+    }
+    bool index_callbacks(const std::filesystem::path& root)
+    {
+        IndexHooks hooks;
+        GameSession game;
+        IndexHookScope scope(hooks);
+        CHECK(test_player::setup(game, root, false) && register_index_volume(game));
+        auto first = volume(game, "IndexVolume", "first", {-10, -10, -10}, {10, 10, 10});
+        auto removed = volume(game, "Water", "removed", {-10, -10, -10}, {10, 10, 10});
+        auto body = game.objects.create(game.objects.find_class("BaseClass"));
+        CHECK(first && removed && body);
+        HOBJECT spawned = nullptr;
+        bool callback_ok = false;
+        hooks.physics = [&](HOBJECT)
+        {
+            if (spawned)
+                return;
+            spawned = volume(game, "Water", "spawned", {-10, -10, -10}, {10, 10, 10});
+            callback_ok = spawned && game.objects.remove(removed) && index_matches(game.objects);
+        };
+        CHECK(game.server.damage_containers() && callback_ok);
+        auto* skipped = dynamic_cast<VolumeBrush*>(game.objects.get(removed)->game.get());
+        auto* fresh = dynamic_cast<VolumeBrush*>(game.objects.get(spawned)->game.get());
+        CHECK(skipped && fresh && !skipped->physics_calls && !fresh->physics_calls);
+        CHECK(game.server.damage_containers() && fresh->physics_calls == 1);
+        CHECK(game.objects.finish_frame() && !game.objects.get(removed) && index_matches(game.objects));
+        hooks = {};
+        CHECK(game.unload_world() && !game.objects.bound_container_count());
         return true;
     }
     bool physics(const std::filesystem::path& root)
@@ -575,10 +723,10 @@ namespace
                     for (const auto& diagnostic : game.objects.diagnostics())
                         std::cerr << diagnostic << "\n";
                 }
-                CHECK(r && r->life == Life::Alive && r->container);
+                CHECK(r && r->life == Life::Alive && r->container());
                 const auto* brush = dynamic_cast<VolumeBrush*>(r->game.get());
                 CHECK(brush);
-                const auto& s = *r->container;
+                const auto& s = *r->container();
                 std::cout << path << " " << source.class_name << " " << r->state.m_Name << " bounds " << s.min.x << ","
                           << s.min.y << "," << s.min.z << " / " << s.max.x << "," << s.max.y << "," << s.max.z
                           << " current " << brush->info.current.x << "," << brush->info.current.y << ","
@@ -631,7 +779,7 @@ namespace
             {
                 DVector candidate{-32, y + .001f, 0};
                 CollisionHit hit;
-                if (!game.objects.get(belt)->container->overlaps(candidate, dims) ||
+                if (!game.objects.get(belt)->container()->overlaps(candidate, dims) ||
                     game.collision.sweep(candidate, candidate, dims, hit) != CollisionQuery::Miss)
                     continue;
                 CHECK(place(game, candidate));
@@ -713,7 +861,7 @@ namespace
         CHECK(game.request_world("02_CityHub", error));
         unsigned created = 0;
         for (auto id : game.objects.snapshot())
-            if (game.objects.get(id)->container)
+            if (game.objects.get(id)->container())
                 ++created;
         if (created != 11)
         {
@@ -724,7 +872,7 @@ namespace
             for (auto& d : game.objects.diagnostics())
                 std::cerr << d << "\n";
         }
-        CHECK(created == 11);
+        CHECK(created == 11 && index_matches(game.objects));
         CHECK(game.enter_player(error));
         CHECK(place(game, {0, 80, 0}));
         CHECK(game.server_shell.Player(game.local_client)->containers.head.code == CC_WATER);
@@ -734,7 +882,7 @@ namespace
         for (auto id : game.objects.snapshot())
         {
             const auto* record = game.objects.get(id);
-            if (record->container && std::string_view(record->state.m_Name) == "Ladder1")
+            if (record->container() && std::string_view(record->state.m_Name) == "Ladder1")
                 ladder = record;
         }
         CHECK(ladder);
@@ -746,7 +894,7 @@ namespace
         {
             DVector candidate{x, 700, -1536};
             CollisionHit hit;
-            if (ladder->container->overlaps(candidate, dimensions) &&
+            if (ladder->container()->overlaps(candidate, dimensions) &&
                 game.collision.sweep(candidate, candidate, dimensions, hit) == CollisionQuery::Miss)
             {
                 found = true;
@@ -776,6 +924,8 @@ int main(int argc, char** argv)
         {"concave", concave},
         {"membership", membership},
         {"lifetime", lifetime},
+        {"index_lifetime", index_lifetime},
+        {"index_callbacks", index_callbacks},
         {"physics", physics},
         {"swimming", swimming},
         {"surface", surface},

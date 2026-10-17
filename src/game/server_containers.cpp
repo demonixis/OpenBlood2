@@ -14,7 +14,7 @@ namespace OpenBlood2
         for (auto id : objects_.container_snapshot())
         {
             const auto* r = objects_.get(id);
-            if (!r || r->life != Life::Alive || !r->container || !r->container->contains(point))
+            if (!r || r->life != Life::Alive || !r->container() || !r->container()->contains(point))
                 continue;
             if (const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get()))
             {
@@ -37,12 +37,12 @@ namespace OpenBlood2
         for (auto id : objects_.container_snapshot())
         {
             const auto* r = objects_.get(id);
-            if (!r || r->life != Life::Alive || !r->container)
+            if (!r || r->life != Life::Alive || !r->container())
                 continue;
             const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get());
             if (!brush)
                 continue;
-            if (r->container->overlaps(object_bounds_center(*body), body->dimensions))
+            if (r->container()->overlaps(object_bounds_center(*body), body->dimensions))
             {
                 ++state.total;
                 if (state.count < state.body.size())
@@ -50,7 +50,7 @@ namespace OpenBlood2
             }
             // Original camera asks for one point container, then checks Hidden.
             // Stable object-slot order replaces the unavailable retail BSP ordering.
-            if (!head_found && r->container->contains(head))
+            if (!head_found && r->container()->contains(head))
             {
                 head_found = true;
                 state.head = brush->info;
@@ -68,8 +68,8 @@ namespace OpenBlood2
         for (auto id : objects_.container_snapshot())
         {
             auto* r = objects_.get(id);
-            if (!r || r->life != Life::Alive || !r->container ||
-                !r->container->overlaps(object_bounds_center(*body), body->dimensions))
+            if (!r || r->life != Life::Alive || !r->container() ||
+                !r->container()->overlaps(object_bounds_center(*body), body->dimensions))
                 continue;
             if (!objects_.engine_message(r->handle, MID_AFFECTPHYSICS, &physics))
                 return false;
@@ -85,7 +85,7 @@ namespace OpenBlood2
         for (auto id : objects_.snapshot())
         {
             const auto* r = objects_.get(id);
-            if (!r || r->life != Life::Alive || r->container || r->activity != OBJSTATE_ACTIVE ||
+            if (!r || r->life != Life::Alive || r->container() || r->activity != OBJSTATE_ACTIVE ||
                 (!r->world_body && r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
                 continue;
             ContainerPhysics physics;
