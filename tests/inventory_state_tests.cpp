@@ -97,7 +97,7 @@ namespace
             [](auto& s) { s.strength = 0; },
             [](auto& s) { s.magic = 7; },
             [](auto& s) { s.current_slot = 10; },
-            [](auto& s) { s.right[2] = 3; },
+            [](auto& s) { s.right[2] = 4; },
             [](auto& s) { s.left[2] = WEAP_BERETTA; },
             [](auto& s) { s.left[0] = WEAP_MELEE; },
             [](auto& s) { s.left[7] = WEAP_MELEE; },

@@ -17,7 +17,7 @@ namespace OpenBlood2
     {
         trace_service("GetObjectColor");
         const auto* r = objects_.get(h);
-        if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL)
+        if (!r || r->life != Life::Alive || (r->state.m_ObjectType != OT_MODEL && r->state.m_ObjectType != OT_SPRITE))
             return false;
         color = r->color;
         alpha = r->alpha;
@@ -28,8 +28,8 @@ namespace OpenBlood2
         trace_service("SetObjectColor");
         auto* r = objects_.get(h);
         auto channel = [](float v) { return std::isfinite(v) && v >= 0 && v <= 1; };
-        if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL || !channel(color.x) ||
-            !channel(color.y) || !channel(color.z) || !channel(alpha))
+        if (!r || r->life != Life::Alive || (r->state.m_ObjectType != OT_MODEL && r->state.m_ObjectType != OT_SPRITE) ||
+            !channel(color.x) || !channel(color.y) || !channel(color.z) || !channel(alpha))
             return false;
         r->color = color;
         r->alpha = alpha;

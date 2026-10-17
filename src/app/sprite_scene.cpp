@@ -12,7 +12,8 @@ namespace OpenBlood2
             if (!record || record->life != Life::Alive || record->state.m_ObjectType != OT_SPRITE)
                 continue;
             if (!scene.add(record->sprite.get(), record->sprite_track, {record->state.m_Pos, record->state.m_Rotation},
-                           record->state.m_Scale, record->state.m_Flags, id, game.resources, error))
+                           record->state.m_Scale, record->state.m_Flags, id, game.resources, error, record->alpha,
+                           record->color))
                 return false;
         }
         for (const auto& fx : game.server.explosion_sprites.active)

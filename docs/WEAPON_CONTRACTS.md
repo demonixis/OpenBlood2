@@ -1,5 +1,7 @@
 # Original Inventory and Vector Weapon Boundary
 
+The [Flare Gun continuation](FLARE_CONTRACTS.md) adds original ID 3, primary sticking/burn ticks, alternate fragments, pickup/drop and sprite tint/alpha. Earlier blanket omissions are historical for this subset; remaining effects, death services and M2 stay open.
+
 The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.
 
 > Extended by [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md): original multi-hit

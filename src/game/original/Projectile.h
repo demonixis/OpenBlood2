@@ -10,8 +10,10 @@ class CProjectile : public BaseClass
     explicit CProjectile(DBYTE type = OT_SPRITE);
     bool Setup(DVector, DBYTE, float damage, float speed, int radius, HOBJECT);
     virtual bool AdvanceFlight(double seconds);
-    void HandleContact(const OpenBlood2::SegmentHit&);
+    virtual void HandleContact(const OpenBlood2::SegmentHit&);
     void Explode();
+    bool contacted = false;
+    OpenBlood2::DamageType damage_type = OpenBlood2::DamageType::Explode;
     CDestructable m_damage;
     HOBJECT m_hFiredFrom = nullptr, m_hHitObject = nullptr;
     DVector m_vDir{};
@@ -33,6 +35,7 @@ class CProjectile : public BaseClass
     virtual bool InitialUpdate();
     virtual bool Update();
     virtual void AddExplosion(DVector, DVector) = 0;
+    bool AddImpact(DVector);
     void Finish(const char*);
     bool Fail(const char*);
 };

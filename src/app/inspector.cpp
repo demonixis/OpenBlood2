@@ -7,6 +7,7 @@
 #include "game/original/ClientLightFX.h"
 #include "game/original/DestructableModel.h"
 #include "game/original/Door.h"
+#include "game/original/FlareProjectile.h"
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
 #include "game/original/Projectile.h"
@@ -373,6 +374,10 @@ namespace OpenBlood2
         {
             if (add_beretta_request)
                 player->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA);
+            if (add_flare_request)
+                player->m_InventoryMgr.ObtainWeapon(WEAP_FLAREGUN);
+            if (add_flares_request)
+                player->m_InventoryMgr.AddAmmo(AMMO_FLARE, 20);
             if (add_mac10_request)
                 player->m_InventoryMgr.ObtainWeapon(WEAP_SUBMACHINEGUN);
             if (add_ammo_request)
@@ -384,7 +389,7 @@ namespace OpenBlood2
             if (movement_input_request)
                 game.client_shell.movement_input = *movement_input_request;
         }
-        add_beretta_request = add_mac10_request = add_ammo_request = false;
+        add_beretta_request = add_mac10_request = add_flare_request = add_flares_request = add_ammo_request = false;
         weapon_input_request.reset();
         weapon_aim_request.reset();
         movement_input_request.reset();
@@ -713,6 +718,21 @@ namespace OpenBlood2
                                         game.server.IsObjectAlive(projectile->m_hFiredFrom) ? "yes" : "no",
                                         game.server.IsObjectAlive(projectile->m_hHitObject) ? "yes" : "no",
                                         projectile->contact.polygon);
+                            if (const auto* flare = dynamic_cast<const CFlareProjectile*>(projectile))
+                            {
+                                ImGui::Text("Flare tracking %s / start %.3f / last tick %.3f / damage deliveries %u",
+                                            flare->tracking ? "yes" : "no", flare->track_start, flare->last_damage_time,
+                                            flare->ticks);
+                                ImGui::Text("World offset %.2f %.2f %.2f / loop voice %llu (%s)", flare->offset.x,
+                                            flare->offset.y, flare->offset.z, (unsigned long long)flare->sound,
+                                            game.server.audio.get(flare->sound) ? "resolved" : "absent");
+                                if (!flare->sound_error.empty())
+                                    ImGui::TextWrapped("Loop: %s", flare->sound_error.c_str());
+                            }
+                            if (const auto* flare = dynamic_cast<const CFlareAltProjectile*>(projectile))
+                                ImGui::Text(
+                                    "Alternate flare: cached velocity %s / emitted children %u / effect type %u",
+                                    flare->get_velocity ? "pending" : "yes", flare->children, flare->explosion_type);
                             ImGui::TextWrapped("Pending: %s", projectile->trail_error.c_str());
                             if (!projectile->error.empty())
                                 ImGui::TextWrapped("Failure: %s", projectile->error.c_str());
@@ -818,6 +838,9 @@ namespace OpenBlood2
                             ImGui::Text("%.3f %s: %s at %.2f %.2f %.2f / delivered %u", report.time,
                                         report.source.c_str(), report.outcome.c_str(), report.position.x,
                                         report.position.y, report.position.z, report.delivered);
+                            if (report.flare)
+                                ImGui::Text("Flare: tracking %s / burn deliveries %u / burst children %u",
+                                            report.tracked ? "yes" : "no", report.burn_ticks, report.burst_children);
                             if (report.shockwave)
                             {
                                 ImGui::Text("Shockwave ground query %d: %.1f %.1f %.1f -> %.1f %.1f %.1f",
@@ -1794,7 +1817,7 @@ namespace OpenBlood2
     }
     void Inspector::draw_weapons(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextUnformatted("Original inventory / Beretta 92F / Ingram Mac-10 / Chosen Knife");
+        ImGui::TextUnformatted("Original inventory / Beretta 92F / Ingram Mac-10 / Flare Gun / Chosen Knife");
         auto* player = game.server_shell.Player(game.local_client);
         if (!player)
         {
@@ -1864,8 +1887,14 @@ namespace OpenBlood2
                 add_beretta_request = true;
             if (ImGui::Button("Obtain Mac-10 (inspection)"))
                 add_mac10_request = true;
-            ImGui::TextWrapped("These diagnostic grants call inventory directly. Beretta/Mac-10 world pickups also use "
-                               "original collection rules; chrome and muzzle flashes remain unavailable.");
+            if (ImGui::Button("Obtain Flare Gun (inspection)"))
+                add_flare_request = true;
+            ImGui::SameLine();
+            if (ImGui::Button("Add 20 flares (inspection)"))
+                add_flares_request = true;
+            ImGui::TextWrapped(
+                "These diagnostic grants call inventory directly. Beretta/Mac-10/Flare Gun world pickups also use "
+                "original collection rules; chrome and muzzle flashes remain unavailable.");
         }
         auto aim = game.client_shell.rotation;
         if (ImGui::SliderAngle("Inspection yaw", &aim.yaw, -180, 180) |

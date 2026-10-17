@@ -15,6 +15,27 @@ SubMachineGunPU::SubMachineGunPU()
     display_name = "Sub-machine Gun";
     resource_id = IDS_WEAPON_MAC10;
 }
+FlareGunPU::FlareGunPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_FLAREGUN, 8};
+    file = "FlarePistol_pu";
+    display_name = "Flare Pistol";
+    resource_id = IDS_WEAPON_FLAREGUN;
+}
+const char* WeaponPickupClass(DDWORD type)
+{
+    switch (type)
+    {
+        case WEAP_BERETTA:
+            return "BerettaPU";
+        case WEAP_SUBMACHINEGUN:
+            return "SubMachineGunPU";
+        case WEAP_FLAREGUN:
+            return "FlareGunPU";
+        default:
+            return nullptr;
+    }
+}
 DDWORD WeaponPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
     // The source string-spawn path bounces by default; that path is not imported.
@@ -34,15 +55,14 @@ DDWORD WeaponPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector position, DRotation rotation, bool include_ammo)
 {
     auto* server = BaseClass::GetServerDE();
-    if (!server || !server->IsObjectAlive(source) || (type != WEAP_BERETTA && type != WEAP_SUBMACHINEGUN))
+    if (!server || !server->IsObjectAlive(source) || !WeaponPickupClass(type))
         return nullptr;
     ObjectCreateStruct state;
     state.m_Pos = position;
     state.m_Rotation = rotation;
     state.m_Flags = FLAG_VISIBLE | FLAG_TOUCH_NOTIFY;
-    SAFE_STRCPY(state.m_Name, type == WEAP_BERETTA ? "Dropped Beretta pickup" : "Dropped Mac-10 pickup");
-    auto* pickup = dynamic_cast<WeaponPickup*>(
-        server->CreateObject(server->GetClass(type == WEAP_BERETTA ? "BerettaPU" : "SubMachineGunPU"), &state));
+    SAFE_STRCPY(state.m_Name, WeaponPickupClass(type));
+    auto* pickup = dynamic_cast<WeaponPickup*>(server->CreateObject(server->GetClass(WeaponPickupClass(type)), &state));
     if (!pickup)
         return nullptr;
     if (!server->IsObjectAlive(pickup->m_hObject) || !pickup->error.empty())

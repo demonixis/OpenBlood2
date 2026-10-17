@@ -26,6 +26,8 @@ namespace
             id = WEAP_NAGA_EYEBEAM;
         else if (name.starts_with("SUBMA"))
             id = WEAP_SUBMACHINEGUN;
+        else if (name.starts_with("FLARE"))
+            id = WEAP_FLAREGUN;
         else if (name.starts_with("MELEE"))
             id = WEAP_MELEE;
         else

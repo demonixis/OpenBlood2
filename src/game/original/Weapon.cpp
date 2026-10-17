@@ -76,6 +76,21 @@ FireResult CWeapon::Fire(const WeaponFire& request)
             DVector eye;
             server->GetObjectPos(m_hOwner, &eye);
             eye.y += player->eye_level;
+            last_shot.request.position = request.position;
+            if (data.m_nType == WEAP_FLAREGUN)
+            {
+                SegmentHit close_hit;
+                const auto close = server->IntersectSegment(eye, vector_add(eye, vector_scale(forward, 60)), m_hOwner,
+                                                            close_hit, false, SegmentObjects::SolidOnly,
+                                                            SegmentFilter::IgnoreVolumes, SegmentStart::SkipInterior);
+                if (close == SegmentResult::Invalid || close == SegmentResult::Unavailable)
+                {
+                    last_shot.result = FireResult::Unavailable;
+                    return false;
+                }
+                if (close == SegmentResult::Hit)
+                    last_shot.request.position = eye;
+            }
             auto aim = vector_add(eye, vector_scale(aim_direction, range));
             SegmentHit aim_hit;
             const auto query =
@@ -88,7 +103,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
             }
             if (query == SegmentResult::Hit)
                 aim = aim_hit.point;
-            aim_direction = vector_subtract(aim, request.position);
+            aim_direction = vector_subtract(aim, last_shot.request.position);
             const auto aim_length = std::sqrt(vector_dot(aim_direction, aim_direction));
             if (aim_length < 1e-6f)
             {
@@ -98,14 +113,14 @@ FireResult CWeapon::Fire(const WeaponFire& request)
             aim_direction = vector_scale(aim_direction, 1 / aim_length);
         }
         last_shot.direction = aim_direction;
-        last_shot.end = vector_add(request.position, vector_scale(aim_direction, range));
+        last_shot.end = vector_add(last_shot.request.position, vector_scale(aim_direction, range));
         if (data.m_nType == WEAP_GIDEON_SHIELD)
         {
             last_shot.collision = SegmentResult::Unavailable; // Visual-only source branch: no damage ray.
             return true;
         }
         const auto query =
-            server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, false,
+            server->IntersectSegment(last_shot.request.position, last_shot.end, m_hOwner, last_shot.hit, false,
                                      SegmentObjects::SolidOrRayHit, SegmentFilter::None, SegmentStart::SkipInterior);
         last_shot.collision = query;
         if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
@@ -117,7 +132,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     };
     if (!trace())
         return last_shot.result;
-    // Selected definitions fire exactly one vector and use one unit (AMMO_NONE stays unlimited).
+    // Selected definitions emit one shot; alternate Flare Gun consumes eight rounds.
     m_pInventoryMgr->SetAmmoCount(data.m_nAmmoType, ammo - use);
     m_fLastShotTime = server->GetTime();
     m_bLastFireAlt = request.alternate;

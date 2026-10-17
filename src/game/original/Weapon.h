@@ -138,6 +138,11 @@ class CBeretta final : public CWeapon
   public:
     CBeretta() : CWeapon(WEAP_BERETTA) {}
 };
+class CFlareGun final : public CWeapon
+{
+  public:
+    CFlareGun() : CWeapon(WEAP_FLAREGUN) {}
+};
 class CSubMachineGun final : public CWeapon
 {
   public:

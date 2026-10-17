@@ -415,6 +415,7 @@ namespace OpenBlood2
         }
         if (state.m_ObjectType == OT_SPRITE)
         {
+            object->color = {1, 1, 1}; // Sprites use multiplicative RGB; models retain additive zero.
             std::string error = "Sprite services are not attached";
             if (!sprites || !sprites->load(state.m_Filename, object->sprite, error))
             {

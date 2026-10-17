@@ -22,4 +22,10 @@ class SubMachineGunPU : public WeaponPickup
   public:
     SubMachineGunPU();
 };
+class FlareGunPU : public WeaponPickup
+{
+  public:
+    FlareGunPU();
+};
+const char* WeaponPickupClass(DDWORD type);
 HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector, DRotation, bool include_ammo);

@@ -1,5 +1,7 @@
 # Original energy projectile boundary
 
+The [Flare Gun continuation](FLARE_CONTRACTS.md) adds original ID 3, primary sticking/burn ticks, alternate fragments, pickup/drop and sprite tint/alpha. Earlier blanket omissions are historical for this subset; remaining effects, death services and M2 stay open.
+
 Read [object lifetime](OBJECT_CONTRACTS.md), [weapon/audio](WEAPON_AUDIO_CONTRACTS.md),
 [collision](MODEL_AND_COLLISION_CONTRACTS.md), [sprite presentation](SPRITE_VIEW_CONTRACTS.md),
 [source ledger](M2_ENERGY_PROJECTILE_SOURCES.json) and

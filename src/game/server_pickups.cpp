@@ -57,7 +57,7 @@ namespace OpenBlood2
         auto* m = writable(h);
         if (!m)
             return DE_INVALIDPARAMS;
-        const auto limit = value.kind == PickupKind::Ammo ? 8 : value.kind == PickupKind::Weapon ? 2 : 4;
+        const auto limit = value.kind == PickupKind::Ammo ? 8 : value.kind == PickupKind::Weapon ? 3 : 4;
         const auto request = value.kind == PickupKind::Ammo     ? add_ammo_message
                              : value.kind == PickupKind::Weapon ? add_weapon_message
                                                                 : add_powerup_message;

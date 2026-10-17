@@ -22,10 +22,10 @@ namespace OpenBlood2
                                    : nullptr;
             if (projectile)
             {
-                const bool was_contact = projectile->m_bExplode;
+                const bool was_contact = projectile->contacted;
                 ok = projectile->AdvanceFlight(seconds) && ok;
                 const auto* target = objects_.get(projectile->m_hHitObject);
-                if (!was_contact && projectile->m_bExplode && record->life == Life::Alive && target &&
+                if (!was_contact && projectile->contacted && record->life == Life::Alive && target &&
                     target->life == Life::Alive && (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
                     objects_.engine_message(target->handle, MID_TOUCHNOTIFY, record->handle);
             }

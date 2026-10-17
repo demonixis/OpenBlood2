@@ -12,8 +12,8 @@ bool CHandWeaponModel::Drop(HATTACHMENT attachment)
     HATTACHMENT actual = 0;
     DVector position, dims;
     DRotation rotation;
-    if (!s || dropped || (type != WEAP_BERETTA && type != WEAP_SUBMACHINEGUN) || !s->IsObjectAlive(owner) ||
-        !s->IsObjectAlive(m_hObject) || s->FindAttachment(owner, m_hObject, &actual) != DE_OK || actual != attachment ||
+    if (!s || dropped || !WeaponPickupClass(type) || !s->IsObjectAlive(owner) || !s->IsObjectAlive(m_hObject) ||
+        s->FindAttachment(owner, m_hObject, &actual) != DE_OK || actual != attachment ||
         s->GetObjectPos(owner, &position) != DE_OK || s->GetObjectRotation(owner, &rotation) != DE_OK ||
         s->GetModelAnimUserDims(m_hObject, &dims, s->GetModelAnimation(m_hObject)) != DE_OK || !physics_vector(dims) ||
         dims.x <= 0 || dims.y <= 0 || dims.z <= 0)
@@ -82,7 +82,7 @@ DDWORD CHandWeaponModel::EngineMessageFn(DDWORD message, void* data, DFLOAT reas
                 {
                     pickup = SpawnWeaponPickup(type, m_hObject, position, rotation, !player_owned);
                     server->RecordSpawn({"CHandWeaponModel",
-                                         type == WEAP_BERETTA ? "BerettaPU" : "SubMachineGunPU",
+                                         WeaponPickupClass(type),
                                          pickup ? "Dropped weapon transferred" : "Dropped weapon pickup failed",
                                          pickup,
                                          position,

@@ -1,5 +1,7 @@
 # Sprite presentation contracts
 
+The [Flare Gun continuation](FLARE_CONTRACTS.md) adds original ID 3, primary sticking/burn ticks, alternate fragments, pickup/drop and sprite tint/alpha. Earlier blanket omissions are historical for this subset; remaining effects, death services and M2 stay open.
+
 Continuation: [original explosion sprites](EXPLOSION_SPRITE_CONTRACTS.md). Client explosion sprites now join the same read-only scene and use per-instance alpha multiplied by decoded DTX alpha. This supersedes the blanket alpha-service omission only for typed client FX state, not generic object tint/alpha or other composite services.
 
 M2 remains incomplete. This extends [original sprite placement/clocks](SPRITE_CONTRACTS.md)

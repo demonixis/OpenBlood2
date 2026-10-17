@@ -1,5 +1,6 @@
 // Original ObjectDLL/Projectile.cpp and GameProjectiles.cpp, selected non-Zealot energy path.
 #include "Projectile.h"
+#include "FlareProjectile.h"
 #include "SurfaceTypes.h"
 #include "engine/collision.h"
 #include "engine/objects.h"
@@ -34,6 +35,17 @@ void CProjectile::Finish(const char* outcome)
         report.query = wave->ground_result;
         report.blast_position = wave->blast_position;
         report.blast_normal = wave->blast_normal;
+    }
+    if (const auto* flare = dynamic_cast<const CFlareProjectile*>(this))
+    {
+        report.flare = true;
+        report.tracked = flare->tracking;
+        report.burn_ticks = flare->ticks;
+    }
+    if (const auto* flare = dynamic_cast<const CFlareAltProjectile*>(this))
+    {
+        report.flare = true;
+        report.burst_children = flare->children;
     }
     g_pServerDE->RecordProjectile(report);
     g_pServerDE->RemoveObject(m_hObject); // Destruction stays deferred through all callbacks.
@@ -141,6 +153,7 @@ void CProjectile::HandleContact(const SegmentHit& hit)
     else if (hit.polygon == UINT32_MAX)
         return; // No invented world HOBJECT.
     contact = hit;
+    contacted = true;
     if (!hit.object && hit.texture_flags == SURFTYPE_SKY)
     {
         Finish("sky");
@@ -196,36 +209,17 @@ void CProjectile::Explode()
     exploded = true;
     DVector position;
     g_pServerDE->GetObjectPos(m_hObject, &position);
-    // AddImpact mutates the stored source direction: normalized *2, then *10.
-    m_vDir = vector_scale(m_vDir, 1 / std::sqrt(vector_dot(m_vDir, m_vDir)));
-    const auto from = vector_subtract(position, vector_scale(m_vDir, 2));
-    m_vDir = vector_scale(m_vDir, 20);
-    SegmentHit impact;
-    auto normal = vector_scale(m_vDir, -1), point = position;
-    if (m_hHitObject || (!contact.object && contact.polygon != UINT32_MAX))
-    {
-        const auto query = g_pServerDE->IntersectSegment(from, vector_add(position, m_vDir), nullptr, impact);
-        if (query != SegmentResult::Hit && query != SegmentResult::Miss)
-        {
-            Fail("Projectile impact normal query unavailable");
-            return;
-        }
-        if (query == SegmentResult::Hit)
-        {
-            normal = impact.normal;
-            point = impact.point;
-        }
-    }
-    AddExplosion(point, normal);
+    if (!AddImpact(position))
+        return;
     if (m_nRadius)
-        targets = DamageObjectsInRadius(m_hFiredFrom, this, position, float(m_nRadius), m_fDamage, DamageType::Explode);
+        targets = DamageObjectsInRadius(m_hFiredFrom, this, position, float(m_nRadius), m_fDamage, damage_type);
     else if (m_hHitObject && g_pServerDE->IsObjectAlive(m_hHitObject))
     {
         const auto message = g_pServerDE->StartMessageToObject(this, m_hHitObject, damage_message);
         if (message)
         {
             const auto written =
-                g_pServerDE->WriteDamage(message, {m_vDir, position, m_fDamage, DamageType::Explode, m_hFiredFrom});
+                g_pServerDE->WriteDamage(message, {m_vDir, position, m_fDamage, damage_type, m_hFiredFrom});
             const auto delivered = g_pServerDE->EndMessage(message);
             targets.delivered = written == DE_OK && delivered == DE_OK;
             targets.cancelled = !targets.delivered;
@@ -241,6 +235,31 @@ void CProjectile::Explode()
         m_hHitObject = nullptr;
     }
 }
+bool CProjectile::AddImpact(DVector position)
+{
+    // AddImpact mutates the stored source direction: normalized *2, then *10.
+    m_vDir = vector_scale(m_vDir, 1 / std::sqrt(vector_dot(m_vDir, m_vDir)));
+    const auto from = vector_subtract(position, vector_scale(m_vDir, 2));
+    m_vDir = vector_scale(m_vDir, 20);
+    SegmentHit impact;
+    auto normal = vector_scale(m_vDir, -1), point = position;
+    if (m_hHitObject || (!contact.object && contact.polygon != UINT32_MAX))
+    {
+        const auto query = g_pServerDE->IntersectSegment(from, vector_add(position, m_vDir), nullptr, impact);
+        if (query != SegmentResult::Hit && query != SegmentResult::Miss)
+        {
+            return Fail("Projectile impact normal query unavailable");
+        }
+        if (query == SegmentResult::Hit)
+        {
+            normal = impact.normal;
+            point = impact.point;
+        }
+    }
+    AddExplosion(point, normal);
+    return true;
+}
+
 bool CEnergyBlastProjectile::InitialUpdate()
 {
     // Source CreateObject delivers INITIALUPDATE before weapon Setup; the default

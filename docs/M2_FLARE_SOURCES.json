@@ -1,0 +1,88 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "4b8444ac9557de0fb3c882403cb3029206429d48",
+  "status": "M2 incomplete; original Flare Gun and three projectile classes",
+  "references": [
+    {
+      "source": "sources/blood2/Shared/WeaponDefs.cpp",
+      "source_sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
+      "purpose": "Complete Flare Gun definition"
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "purpose": "Weapon/ammo identifiers"
+    },
+    {
+      "source": "sources/blood2/Shared/ClientRes.h",
+      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
+      "purpose": "Resource 355"
+    },
+    {
+      "source": "sources/blood2/Shared/SFXMsgIds.h",
+      "source_sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f",
+      "purpose": "Flare explosion/trail IDs"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameWeapons.cpp",
+      "source_sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd",
+      "purpose": "CFlareGun::FireSpread and player-only near-wall branch"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameWeapons.h",
+      "source_sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19",
+      "purpose": "Original CFlareGun declaration"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameProjectiles.cpp",
+      "source_sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f",
+      "purpose": "CFlareProjectile, CFlareAltProjectile and CFlareBurstProjectile constructors, Update, contacts and effects"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameProjectiles.h",
+      "source_sha256": "9acd38645c28d90b508a0a55a02760bcea5c6c40318b6266635711d2ba1f1bc0",
+      "purpose": "Original projectile family fields"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Projectile.cpp",
+      "source_sha256": "52b805c67775579b5703e0ad1099a8ea44d76b245349c8f6d1fac0a1b3b74ef2",
+      "purpose": "AddImpact, explosion damage type and lifetime"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "source_sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "purpose": "One-shot ammo accounting and FiringTooClose"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "purpose": "FLARE prefix and generic firing"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/WeaponPickups.cpp",
+      "source_sha256": "116eac417209ee2cc523044e02ff615406b597164df9df5d5f2e0be80cfbc1d4",
+      "purpose": "FlareGunPU eight-round pickup and spawn case"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/HandWeaponModel.cpp",
+      "source_sha256": "480adb2a0ad140120bb9ddb160cf8f8112508abdf70e218067213e0f04c8ed96",
+      "purpose": "Drop-to-pickup ownership"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
+      "source_sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
+      "purpose": "Generic original view animation and FIRE_KEY rules"
+    }
+  ],
+  "adaptations": [
+    "Checked object identities, independent child ownership and deferred removal",
+    "Body-eye near-wall query replaces unavailable server view-model proxy",
+    "Lost alternate shooter/failed child setup explicitly fails instead of original unchecked allocation",
+    "Replacement single point-flight integrator and bounded sprite color service; no new global/dependency"
+  ],
+  "unsupported": [
+    "OBJFX_SPARKS_1/3, owner lights, flare explosion recipes 13\u201315",
+    "Chrome, muzzle illumination, view-key sounds, fire/gib death presentation",
+    "Player drops, projectile save/load, complete combat/retail parity, safe NEW_LEVEL and M2"
+  ]
+}

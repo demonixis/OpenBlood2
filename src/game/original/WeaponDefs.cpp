@@ -2,6 +2,65 @@
 namespace
 {
     constexpr WeaponData definitions[] = {
+        // Original Flare Gun (complete definition).
+        {
+            "Models\\Weapons\\Flarepistol_pv.abc",           // Model
+            "Models\\Weapons\\lh_Flarepistol_pv.abc",        // Model
+            "Skins\\Weapons\\C_Flare_pv_t.dtx",              // Skin
+            "Models\\Powerups\\Flarepistol_pu.abc",          // 3rd person model
+            "Skins\\Powerups\\Flarepistol_pu.dtx",           // 3rd person skin
+            WEAP_FLAREGUN,                                   // Type
+            TYPE_PISTOL,                                     // Fire type
+            AMMO_FLARE,                                      // Ammo type
+            1,                                               // Ammo Use
+            8,                                               // Alt Ammo Use
+            10.0f,                                           // Min Damage
+            15.0f,                                           // Max Damage
+            20.0f,                                           // Min Alt damage
+            30.0f,                                           // Max Alt damage
+            0.75f,                                           // Reload time
+            1.5f,                                            // Alt reload time
+            {0.0f, 0.0f},                                    // Spread
+            {0.0f, 0.0f},                                    // Alt Spread
+            2000.0f,                                         // Projectile Velocity
+            2000.0f,                                         // Alt Projectile Velocity
+            5000.0f,                                         // Range
+            5000.0f,                                         // Alt Range
+            1,                                               // Shots per fire
+            1,                                               // Alt Shots per fire
+            2,                                               // Strength or Magic required
+            3,                                               // Two-handed Strength or Magic required
+            100,                                             // Damage Radius (projectiles)
+            100,                                             // Alt Damage Radius (projectiles)
+            DFALSE,                                          // Alt fire zoom
+            DFALSE,                                          // Semi-auto
+            "Sounds\\Weapons\\flare\\fire.wav",              // Fire sound
+            "Sounds\\Weapons\\flare\\alt.wav",               // Alt Fire sound
+            "",                                              // Empty weapon sound
+            "",                                              // Alt Empty weapon sound
+            "CFlareProjectile",                              // Projectile class
+            "CFlareAltProjectile",                           // Alt Projectile class
+            150,                                             // Muzzle Flash radius
+            {1.0f, 0.68f, 0.35f},                            // Muzzle Flash color
+            "Flare Gun",                                     // Name
+            IDS_WEAPON_FLAREGUN,                             // Name ID (resource)
+            "Sprites\\FlaregunFlare.spr",                    // flash sprite name
+            "Sprites\\FlaregunFlare.spr",                    // alt flash Sprite name
+            0.05f,                                           // Flash duration
+            0.175f,                                          // Flash scale
+            {0.0f, 0.0f, 0.0f},                              // 3rd person gun offset
+            {0.8f, -0.7f, 1.6f},                             // Gun Offset
+            {0.0f, 0.275f, 1.0f},                            // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                           // Recoil
+            {6.5f, -4.5f, 28.0f},                            // Flash position
+            0.625f,                                          // Eject interval
+            0.0f,                                            // View kick
+            DFALSE,                                          // View kick is Cumulative
+            DFALSE,                                          // Animation looping
+            DFALSE,                                          // Alt anim looping
+            "interface\\statusbar\\weapons\\flaregun.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\flaregun_h.pcx", // Highlighted icon for status bar
+        },
         // Ingram Mac-10 Sub-machine Gun
         {
             "Models\\Weapons\\Mac10_pv.abc",              // Model

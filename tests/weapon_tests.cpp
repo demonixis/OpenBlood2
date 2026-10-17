@@ -104,7 +104,7 @@ namespace
         CHECK(inv.ObtainWeapon(WEAP_BERETTA) == InventoryResult::Ok && inv.GetWeapon(1, true));
         CHECK(inv.ObtainWeapon(WEAP_BERETTA) == InventoryResult::AlreadyHave);
         CHECK(inv.ObtainWeapon(WEAP_MELEE) == InventoryResult::AlreadyHave);
-        CHECK(inv.ObtainWeapon(3) == InventoryResult::NotAvailable &&
+        CHECK(inv.ObtainWeapon(4) == InventoryResult::NotAvailable &&
               inv.ObtainWeapon(1, 99) == InventoryResult::Invalid);
         CHECK(inv.ChangeWeaponSlot(99) == InventoryResult::NotAvailable && inv.m_nCurWeaponSlot == 1);
         std::string error;
