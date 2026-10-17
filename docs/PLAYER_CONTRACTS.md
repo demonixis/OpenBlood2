@@ -1,5 +1,7 @@
 # Original Player Entry Boundary
 
+> The [smell-trail continuation](AI_SMELL_CONTRACTS.md) now supplies periodic player hints and the original SearchSmellTarget body. Its source guards do not automatically seed a tracking cursor. Earlier blanket smell omissions are historical; M2 remains incomplete.
+
 > Continued by [player restore contracts](PLAYER_RESTORE_CONTRACTS.md): supported
 > engine state and original restored-client association now execute in the same
 > loaded world. Earlier blanket omissions below are historical. Full client/world

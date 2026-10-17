@@ -1,3 +1,4 @@
+#include "camera_fixture.h"
 #include "game/original/SmellHint.h"
 #include "game/server_adapter.h"
 #include "player_fixture.h"
@@ -84,6 +85,86 @@ namespace
         CHECK(game.server.string_count() == 0 && game.server.list_count() == 0 && game.server.message_count() == 0);
         CHECK(game.objects.snapshot().empty() && SmellHint::m_dwNumSmells == 0 &&
               CDestructable::m_dwNumDestructables == 0);
+        return true;
+    }
+    bool smell(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(setup(g, root));
+        std::string error;
+        CHECK(g.enter_player(error));
+        auto* p = g.server_shell.Player(g.local_client);
+        auto* r = g.objects.get(p->m_hObject);
+        CHECK(p->smell_drops == 1 && SmellHint::m_dwNumSmells == 1);
+        HOBJECT tail;
+        CHECK(SmellHint::LastLive(tail) && tail == p->last_smell);
+        const auto first = tail;
+        // Isolate the original update block from movement/respawn placement.
+        r->state.m_Pos = g.objects.get(first)->state.m_Pos;
+        r->state.m_Pos.y += 10;                              // Full 3D distance, not horizontal distance.
+        CHECK(g.objects.advance(.5) && p->smell_drops == 1); // strict boundary
+        CHECK(g.objects.advance(.002) && p->smell_drops == 2 && p->smell_error.empty());
+        CHECK(std::abs(p->smell_distance - 10) < .001f);
+        const auto time = p->m_fSmellTime;
+        CHECK(g.objects.advance(.501) && p->smell_drops == 2 && p->m_fSmellTime == time);
+        ObjectCreateStruct other;
+        other.m_Pos = r->state.m_Pos;
+        other.m_Pos.x += 20;
+        auto hint = g.objects.create(g.objects.find_class("SmellHint"), other);
+        CHECK(hint && p->UpdateSmellTrail() && p->smell_drops == 3); // global tail, not own last hint
+        const auto pending = p->last_smell;
+        CHECK(g.objects.remove(pending) && !g.server.IsObjectAlive(pending));
+        CHECK(SmellHint::LastLive(tail) && tail == hint); // pending last entry skipped
+        p->m_damage.m_bDead = true;
+        CHECK(g.objects.advance(.501) && p->smell_drops == 3);
+        p->m_damage.m_bDead = false;
+        p->m_bSpectatorMode = true; // Guard storage only; no spectator implementation claimed.
+        CHECK(p->UpdateSmellTrail() && p->smell_drops == 3);
+        p->m_bSpectatorMode = false;
+        CHECK(p->UpdateSmellTrail() && p->smell_drops == 4);
+        p->m_fSmellDelay = std::numeric_limits<float>::quiet_NaN();
+        CHECK(!p->UpdateSmellTrail() && !p->smell_error.empty());
+        p->m_fSmellDelay = .5f;
+        auto last = p->last_smell;
+        CHECK(g.leave_player() && g.server.IsObjectAlive(last)); // world owns trail
+        CHECK(g.objects.advance(19) && g.objects.finish_frame());
+        CHECK(!g.objects.get(first) && g.objects.get(last));
+        CHECK(g.objects.advance(1.01) && g.objects.finish_frame());
+        CHECK(SmellHint::m_dwNumSmells == 0 && SmellHint::LastLive(tail) && !tail);
+        CHECK(g.enter_player(error));
+        CHECK(g.client_shell.player && !g.objects.get(last));
+        CHECK(g.unload_world() && SmellHint::m_dwNumSmells == 0);
+        return true;
+    }
+    bool smell_private(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(g.initialize());
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(g.resources.mount_game(config, error));
+        for (unsigned cycle = 0; cycle < 2; ++cycle)
+        {
+            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+            CHECK(test_camera::complete_subway_intro(g));
+            auto* p = g.server_shell.Player(g.local_client);
+            CHECK(p && p->smell_checks > 700 && p->smell_error.empty());
+            const auto before = p->smell_drops;
+            const auto position = g.client_shell.position;
+            g.client_shell.movement_input.forward = true;
+            for (unsigned frame = 0; frame < 120; ++frame)
+                CHECK(g.step(1.0 / 60));
+            g.client_shell.movement_input = {};
+            CHECK(p->smell_drops > before && p->smell_error.empty());
+            const auto current = g.client_shell.position;
+            CHECK(std::hypot(current.x - position.x, current.z - position.z) >= 10);
+            HOBJECT last;
+            CHECK(SmellHint::LastLive(last) && last == p->last_smell && g.objects.get(last));
+            std::cout << "SubwayA smell cycle " << cycle << ": original intro, forward movement, " << p->smell_drops
+                      << " drops, " << p->smell_checks << " checks, " << SmellHint::m_dwNumSmells << " live hints\n";
+            CHECK(g.unload_world() && SmellHint::m_dwNumSmells == 0 && !g.objects.get(last));
+        }
         return true;
     }
     bool failure_rollback(const std::filesystem::path& root)
@@ -241,6 +322,10 @@ int main(int argc, char** argv)
         ok = messages(argv[2]);
     else if (name == "callbacks")
         ok = callbacks(argv[2]);
+    else if (name == "smell")
+        ok = smell(argv[2]);
+    else if (name == "smell_private")
+        ok = smell_private(argv[2]);
     else if (name == "private")
         ok = private_player(argv[2]);
     return ok ? 0 : 1;

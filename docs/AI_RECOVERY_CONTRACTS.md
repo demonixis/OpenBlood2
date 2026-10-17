@@ -1,5 +1,7 @@
 # Original AI recovery and navigation states
 
+> The [smell-trail continuation](AI_SMELL_CONTRACTS.md) now supplies periodic player hints and the original SearchSmellTarget body. Its source guards do not automatically seed a tracking cursor. Earlier blanket smell omissions are historical; M2 remains incomplete.
+
 Selected original AI_Mgr jump/crouch/crawl commands and seven navigation states
 are integrated. Read [source selections](M2_AI_RECOVERY_SOURCES.json),
 [evidence](../../Documentation/Implementation/M2_AI_RECOVERY.md),

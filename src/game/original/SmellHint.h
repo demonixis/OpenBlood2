@@ -32,6 +32,8 @@ class SmellHint : public B2BaseClass
     }
 
     static DLink* HandleToLink(HOBJECT hObj);
+    static bool LastLive(HOBJECT&);
+    static bool NextLive(HOBJECT, HOBJECT&);
 
   protected:
     DDWORD EngineMessageFn(DDWORD messageID, void* pData, DFLOAT lData);

@@ -1,5 +1,6 @@
 #include "brush_fixture.h"
 #include "game/original/CultistAI.h"
+#include "game/original/SmellHint.h"
 #include "game/server_adapter.h"
 #include "model_fixture.h"
 #include <cmath>
@@ -335,7 +336,7 @@ namespace
             CHECK(a->ledge_queries == 0); // last-point short circuit
             a->Metacmd = 2;
             CHECK(a->DispatchState() && a->m_nState == AI_Mgr::StateSearchSmell);
-            CHECK(!a->DispatchState()); // this distinct state remains unavailable
+            CHECK(a->DispatchState() && a->smell_exit == 1 && a->decisions == 2);
         }
         return true;
     }
@@ -520,6 +521,104 @@ namespace
         }
         return true;
     }
+    HOBJECT scent(GameSession& g, DVector pos)
+    {
+        ObjectCreateStruct state;
+        state.m_Pos = pos;
+        return g.objects.create(g.objects.find_class("SmellHint"), state);
+    }
+    bool remember_dead_attacker(GameSession& g, RecoveryProbe* a)
+    {
+        // Exercise a source path that retains its prior target. No perception override.
+        auto* dead = actor(g, {500, -8, 500});
+        auto* live = actor(g, {500, -8, 600});
+        CHECK(dead && live);
+        auto msg = g.server.StartMessageToObject(dead, a->m_hObject, damage_message);
+        CHECK(msg && g.server.WriteDamage(msg, {{}, {}, 1, DamageType::Normal, dead->m_hObject}) == DE_OK);
+        g.server.EndMessage(msg);
+        dead->m_damage.m_bDead = true;
+        CHECK(a->SetNewTarget(live->m_hObject));
+        CHECK(a->ComputeStimuli() == 0 && a->GetTarget() == live->m_hObject && a->from_damage);
+        return true;
+    }
+    bool smell_guards(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto* a = actor(g);
+        CHECK(a && scent(g, {0, 10, 20}));
+        a->m_fSeeingDist = a->m_fSensingDist = 0;
+        a->m_fSmellingDist = 100;
+        CHECK(a->SetNewState(AI_Mgr::StateSearchSmell) && a->DispatchState());
+        CHECK(a->stimulus == 3 && !a->GetTarget() && !a->smell_cursor && a->smell_exit == 1);
+        CHECK(a->decisions == 1 && a->requested_stimulus == -1 && a->velocity_commands == 0);
+        a->m_fSmellingDist = std::numeric_limits<float>::quiet_NaN();
+        CHECK(!a->DispatchState() && a->decisions == 1 && !a->navigation_error.empty());
+        a->m_fSmellingDist = 100;
+        CHECK(remember_dead_attacker(g, a));
+        CHECK(a->DispatchState() && a->smell_exit == 3 && a->decisions == 2);
+        auto* dead = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(a->m_damage.GetLastDamager()));
+        CHECK(dead);
+        dead->m_damage.m_bDead = false;
+        CHECK(a->DispatchState() && a->smell_exit == 2 && a->requested_stimulus == 1);
+        a->recurse = true;
+        CHECK(!a->DispatchState() && !a->nested_ok);
+        return true;
+    }
+    bool smell_route(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto* a = actor(g, {0, -8, 0});
+        CHECK(a && remember_dead_attacker(g, a));
+        auto first = scent(g, {0, -8, 20});
+        auto skipped = scent(g, {0, -8, 30});
+        auto next = scent(g, {0, -8, 40});
+        CHECK(first && skipped && next && a->SetSmellCursor(first));
+        CHECK(a->SetNewState(AI_Mgr::StateSearchSmell));
+        a->m_fSmellingDist = 100;
+        // Ordinary hints are not ray-hit objects. Preserve the failed visible-search decision.
+        CHECK(a->DispatchState() && a->smell_exit == 4 && a->decisions == 1);
+        // Diagnostic-only ray-hit hint exercises successful original phase 1.
+        g.objects.get(first)->state.m_Flags |= FLAG_RAYHIT;
+        g.objects.get(first)->dimensions = {1, 1, 1};
+        CHECK(a->DispatchState() && a->Metacmd == 2 && a->smell_cursor == first);
+        CHECK(a->DispatchState() && a->m_nCurMetacmd == 2 && a->velocity_commands == 1);
+        CHECK(g.objects.get(a->m_hObject)->state.m_Pos.z == 0); // commands never integrate
+        CHECK(g.objects.advance(.051));
+        CHECK(a->DispatchState() && a->ledge_queries == 1 && !a->ledge_sampled);
+        auto* r = g.objects.get(a->m_hObject);
+        r->state.m_Pos.z = 20 - a->navigation_threshold;
+        CHECK(a->m_MoveObj.Update() && g.objects.remove(skipped));
+        CHECK(a->DispatchState() && a->smell_cursor == next && a->smell_advances == 1 && a->Metacmd == 3);
+        CHECK(g.objects.remove(first) && g.objects.finish_frame());
+        CHECK(a->smell_cursor == next && a->m_nState == AI_Mgr::StateSearchSmell); // old link released
+        CHECK(a->DispatchState() && a->decisions == 2);
+        a->Metacmd = 2;
+        r->state.m_Pos.z = 40;
+        CHECK(a->m_MoveObj.Update() && a->DispatchState() && a->Metacmd == 3 && a->smell_advances == 1);
+        CHECK(!a->SetSmellCursor(a->m_hObject) && a->smell_cursor == next);
+        CHECK(g.objects.remove(next) && g.objects.finish_frame());
+        CHECK(!a->smell_cursor && a->smell_invalidations == 1 && a->m_nState == AI_Mgr::StateIdle);
+        CHECK(SmellHint::m_dwNumSmells == 0);
+        return true;
+    }
+    bool smell_lifetime(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto* a = actor(g);
+        auto h = scent(g, {0, 10, 10});
+        CHECK(a && h && a->SetSmellCursor(h) && a->SetSmellCursor(h));
+        CHECK(g.objects.advance(20) && g.objects.finish_frame());
+        CHECK(!a->smell_cursor && a->smell_invalidations == 1 && !g.objects.get(h));
+        auto next = scent(g, {0, 10, 10});
+        CHECK(next && next != h && !a->SetSmellCursor(h) && a->SetSmellCursor(next));
+        CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame() && g.objects.get(next));
+        CHECK(g.unload_world() && SmellHint::m_dwNumSmells == 0 && g.server.string_count() == 0 &&
+              g.server.message_count() == 0 && g.server.list_count() == 0);
+        return true;
+    }
     bool catalog(const char* root)
     {
         GameSession g;
@@ -551,6 +650,7 @@ namespace
                 CHECK(!ok || r->animation.animation == clip);
                 std::cout << name << " command=" << cmd << " clip=" << clip << " available=" << ok << '\n';
             }
+            CHECK(a->SetNewState(AI_Mgr::StateSearchSmell) && a->DispatchState() && a->smell_exit == 1);
             CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame());
         }
         return true;
@@ -573,6 +673,9 @@ int main(int argc, char** argv)
                                                                         {"moving_fire", moving_fire},
                                                                         {"keys", keys},
                                                                         {"fire_lifetime", fire_lifetime},
+                                                                        {"smell_guards", smell_guards},
+                                                                        {"smell_route", smell_route},
+                                                                        {"smell_lifetime", smell_lifetime},
                                                                         {"catalog", catalog}};
     auto t = cases.find(argv[1]);
     return t != cases.end() && t->second(argc > 2 ? argv[2] : "") ? 0 : 1;

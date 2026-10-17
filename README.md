@@ -1,5 +1,7 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The [original smell-trail continuation](../Documentation/Implementation/M2_AI_SMELL.md) connects the original periodic player trail and shared AI SearchSmellTarget state, with checked hint lifetime and inspection. Original no-target/no-cursor exits and zero NPC smell ranges are preserved; no automatic trail acquisition is invented. Required remaining services and the actual M2 gate stay open.
+
 The [burning death and dismemberment continuation](../Documentation/Implementation/M2_DEATH_EFFECTS.md) connects original lethal fire/gib decisions, burning corpses, postmortem limb loss and visible client flesh fragments, with checked cleanup and in-game inspection. These paths no longer fail solely because fire/gib services were missing. Blood-spurt/splat effects, generic gib/save services and the actual M2 gate remain open. Earlier blanket fire/gib omissions are historical.
 
 The [scripted opportunity-fire continuation](../Documentation/Implementation/M2_AI_SCRIPT_FIRE.md) connects original standing/walking/running fire to FOLLOWPATH and MOVETOOBJECT, with inspection and checked lifetime. Real Cultist model diagnostics verify shots, damage and movement through reloads; these are not authored encounter or traversal proofs. M2 remains incomplete.

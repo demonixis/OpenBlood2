@@ -160,6 +160,12 @@ class CPlayerObj : public CBaseCharacter
     std::string entry_error;
     float m_fYaw = 0, m_fPitch = 0, m_fMoveVel = 0, m_fJumpVel = 600;
     float m_fAirLevel = 100, m_fSmellTime = 0, m_fSmellDelay = 0.5f;
+    bool UpdateSmellTrail();
+    bool m_bSpectatorMode = false; // Guard storage only; spectator mode is not integrated.
+    HOBJECT last_smell = nullptr;
+    std::uint64_t smell_drops = 0, smell_checks = 0;
+    float smell_distance = 0;
+    std::string smell_error;
     DBYTE m_nCharacter = 0, m_nSkin = 0;
     DBYTE m_nAttribStrength = 1, m_nAttribSpeed = 1, m_nAttribResistance = 1, m_nAttribMagic = 1;
     DBOOL m_bFirstUpdate = DTRUE, m_bDead = DFALSE;

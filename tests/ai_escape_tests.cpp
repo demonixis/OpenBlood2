@@ -267,7 +267,7 @@ namespace
         CHECK(a->SetNewState(AI_Mgr::StateEscapeRun) && a->DispatchState());
         auto calls = a->perception_calls;
         CHECK(a->DispatchState() && a->decisions == 0 && a->perception_calls == calls);
-        // Guard uses actual smell precedence; it selects the still-unported smell state.
+        // Guard uses actual smell precedence; the original search guard now requests a new decision.
         ObjectCreateStruct s;
         s.m_Pos = {100, 10, 0};
         auto smell = g.objects.create(g.objects.find_class("SmellHint"), s);
@@ -275,7 +275,7 @@ namespace
         a->m_fSeeingDist = 0;
         a->m_fSmellingDist = 200;
         CHECK(a->SetNewState(AI_Mgr::StateGuard) && a->DispatchState() && a->m_nState == AI_Mgr::StateSearchSmell);
-        CHECK(!a->DispatchState());
+        CHECK(a->DispatchState() && a->smell_exit == 1 && !a->smell_cursor && a->decisions == 1);
         c->Metacmd = 2;
         g.server.collision_ready = false;
         auto decisions = c->decisions;

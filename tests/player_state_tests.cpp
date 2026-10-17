@@ -133,7 +133,7 @@ namespace
         CHECK(next->LoadFields(saved, error) && next->m_fSmellTime == -70);
         saved.smell_time_offset = 4;
         CHECK(next->LoadFields(saved, error) && next->m_fSmellTime == 34);
-        // State preservation does not claim the unported periodic smell-spawning loop.
+        // These detached actors verify relative clocks; player.smell tests periodic spawning.
         return true;
     }
     bool initialization(const std::filesystem::path& root)

@@ -50,6 +50,8 @@ bool AI_Mgr::NavigationStep(int state)
                                                            : MC_Crawl();
         return ok || NavigationFailure(locomotion_error);
     }
+    if (state == StateSearchSmell)
+        return SmellStep();
     if (state == StateGuard)
         return GuardStep();
     const bool search = state == StateSearchVisual;

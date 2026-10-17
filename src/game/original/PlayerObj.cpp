@@ -93,7 +93,10 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
     ObjectCreateStruct state;
     server->GetObjectPos(m_hObject, &state.m_Pos);
     if (auto* smell = server->CreateObject(server->GetClass("SmellHint"), &state))
-        initial_smell_ = smell->m_hObject;
+    {
+        initial_smell_ = last_smell = smell->m_hObject;
+        ++smell_drops;
+    }
     else
         return DFALSE;
     DVector dims{12, 82.0f / 2, 12};
@@ -387,7 +390,7 @@ DBOOL CPlayerObj::Update(DVector*)
         if (!server->PingObjects(observer))
             ++activation_ping_failures;
     }
-    return UpdateStats();
+    return UpdateStats() && UpdateSmellTrail();
 }
 bool CPlayerObj::InitializeClientState()
 {

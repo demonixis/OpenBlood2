@@ -210,6 +210,13 @@ class AI_Mgr : public CBaseCharacter
     bool AI_STATE_WalkToPos();
     bool AI_STATE_RunToPos();
     bool AI_STATE_SearchVisualTarget();
+    bool AI_STATE_SearchSmellTarget();
+    bool SetSmellCursor(HOBJECT);
+    HOBJECT smell_cursor = nullptr;
+    DVector smell_position{};
+    std::uint64_t smell_searches = 0, smell_advances = 0, smell_invalidations = 0;
+    int smell_exit = 0; // Last call: 1 no target, 2 other stimulus, 3 no cursor, 4 no visible hint.
+
     DVector m_vDestPos{};
     float m_fJumpSpeed = 500;
     int navigation_state = StateInactive;
@@ -512,6 +519,7 @@ class AI_Mgr : public CBaseCharacter
     bool EscapeRunStep(bool civilian);
     bool EscapeHideStep();
     bool GuardStep();
+    bool SmellStep();
     bool NavigationDecision(int stimulus = -1);
     bool NavigationFailure(std::string_view);
     bool script_busy = false;

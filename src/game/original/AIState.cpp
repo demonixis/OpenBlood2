@@ -280,6 +280,8 @@ bool AI_Mgr::DispatchState()
             return AI_STATE_RunToPos();
         case StateSearchVisual:
             return AI_STATE_SearchVisualTarget();
+        case StateSearchSmell:
+            return AI_STATE_SearchSmellTarget();
         default:
             break;
     }

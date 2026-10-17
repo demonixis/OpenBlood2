@@ -3,6 +3,7 @@
 #include "game/original/CultistAI.h"
 #include "game/original/Gib.h"
 #include "game/original/Gideon.h"
+#include "game/original/SmellHint.h"
 #include "inspector.h"
 #include <algorithm>
 #include <imgui.h>
@@ -147,6 +148,14 @@ namespace OpenBlood2
                 ImGui::TextWrapped("%s", player->restore_model_error.c_str());
             ImGui::Text("Air %.2f | smell timestamp %.3f / delay %.3f", player->m_fAirLevel, player->m_fSmellTime,
                         player->m_fSmellDelay);
+            const auto* scent = game.objects.get(player->last_smell);
+            ImGui::Text("Smell drops %llu | checks %llu | last distance %.3f | world hints %u",
+                        (unsigned long long)player->smell_drops, (unsigned long long)player->smell_checks,
+                        player->smell_distance, SmellHint::m_dwNumSmells);
+            ImGui::Text("Last drop slot:generation %u:%u (max:0 = absent) | lifetime %.1fs",
+                        scent ? scent->id.slot : UINT32_MAX, scent ? scent->id.generation : 0, MAX_SMELL_LIFE);
+            if (!player->smell_error.empty())
+                ImGui::TextWrapped("Smell trail failure: %s", player->smell_error.c_str());
             if (player->restore_initialization)
                 ImGui::TextWrapped(
                     "Selected restore operations only; body, scheduling and client restoration remain incomplete.");
@@ -263,8 +272,17 @@ namespace OpenBlood2
         if (target_ai && ImGui::CollapsingHeader("Original navigation and recovery", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto& a = *target_ai;
-            ImGui::TextWrapped("Original jump/crouch/crawl and selected route states. Smell following "
-                               "and shade-based detours remain unavailable.");
+            ImGui::TextWrapped("Original navigation and smell-state guards. Smell perception does not seed "
+                               "a tracking cursor; shade-based detours remain unavailable.");
+            const auto* cursor = game.objects.get(a.smell_cursor);
+            ImGui::Text("Smell cursor slot:generation %u:%u (max:0 = absent)", cursor ? cursor->id.slot : UINT32_MAX,
+                        cursor ? cursor->id.generation : 0);
+            ImGui::Text("Searches %llu | advances %llu | invalidations %llu", (unsigned long long)a.smell_searches,
+                        (unsigned long long)a.smell_advances, (unsigned long long)a.smell_invalidations);
+            ImGui::TextWrapped("Smell exit %d: 0 none, 1 no target, 2 other stimulus, 3 no cursor, 4 no visible hint",
+                               a.smell_exit);
+            ImGui::Text("Cached smell point (%.2f %.2f %.2f)", a.smell_position.x, a.smell_position.y,
+                        a.smell_position.z);
             ImGui::Text("Last driven state %d | current %d | phase %d", a.navigation_state, a.m_nState, a.Metacmd);
             ImGui::Text("Updates %llu | arrivals %llu | failures %llu", (unsigned long long)a.navigation_updates,
                         (unsigned long long)a.navigation_arrivals, (unsigned long long)a.navigation_failures);

@@ -135,6 +135,12 @@ DDWORD AI_Mgr::EngineMessageFn(DDWORD message, void* data, DFLOAT value)
                 AI_Update(); // Required failures retain an inspectable, quiescent actor.
         }
     }
+    if (message == MID_LINKBROKEN && data == smell_cursor && smell_cursor)
+    {
+        smell_cursor = nullptr;
+        ++smell_invalidations;
+        SetNewState(StateIdle); // Checked cursor ownership repairs the source's stale DLink/wrong target clear.
+    }
     if (message == MID_LINKBROKEN && data == m_hTarget && m_hTarget)
     {
         m_hTarget = nullptr;

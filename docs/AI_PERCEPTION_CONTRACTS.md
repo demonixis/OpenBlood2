@@ -1,5 +1,7 @@
 # Original AI perception and candidate lists
 
+> The [smell-trail continuation](AI_SMELL_CONTRACTS.md) now supplies periodic player hints and the original SearchSmellTarget body. Its source guards do not automatically seed a tracking cursor. Earlier blanket smell omissions are historical; M2 remains incomplete.
+
 > Extended by [AI state/action contracts](AI_STATE_CONTRACTS.md): selected original
 > state decisions, transitions and stationary animation commands now execute.
 > Full AI_Update and production NPCs remain unavailable; M2 is still open.

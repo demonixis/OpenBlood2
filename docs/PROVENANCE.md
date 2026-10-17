@@ -1051,3 +1051,11 @@ Blood II source. [Hashes](M2_DEATH_EFFECTS_SOURCES.json) and
 [contracts](DEATH_EFFECT_CONTRACTS.md) separate source rules, typed ownership,
 replacement physics, bounded client storage and remaining blood/generic-gib FX.
 No source repository, commercial asset, dependency pin or shader artifact changes.
+
+## Original player scent and AI smell search
+
+Selected PlayerObj periodic smell creation and AI_Mgr SearchSmellTarget bodies are
+ported from original Blood II, retaining existing SmellHint timeout/list ownership.
+[Source hashes](M2_AI_SMELL_SOURCES.json) and [contracts](AI_SMELL_CONTRACTS.md)
+record original guards, cadence, phase quirks and the checked cursor/link repair.
+No reference source, dependency, shader or commercial asset is modified.

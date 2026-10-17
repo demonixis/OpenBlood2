@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "10e24b394a296446e3235948a2875da3ffedf59f",
+  "status": "M2 incomplete; original player smell trail and guarded AI search state",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "purpose": "SearchSmellTarget 5959\u20136078, ComputeStimuli and MID_LINKBROKEN source rules."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "source_sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
+      "purpose": "Original smell cursor, cached point and state declarations."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "purpose": "Periodic auto-smell block 1692\u20131736 and initial hint/clock."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/SmellHint.cpp",
+      "source_sha256": "65989aab4012e0b67e7f13403fb59a5260f9435b8a792d40a3dfbe1d2db7241e",
+      "purpose": "Insertion order, scheduled 20-second removal and HandleToLink."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/SmellHint.h",
+      "source_sha256": "69fae52a36a95e2b66016cc334b4c8436748b803df4c0a5a8b034615a729006c",
+      "purpose": "List ownership and MAX_SMELL_LIFE."
+    }
+  ],
+  "adaptations": [
+    "Direct typed integration with explicit failure results; original cadence, global order, phase and guard behavior preserved.",
+    "Bounded same-callback list traversal skips pending entries. Stable non-owning hint identity replaces retained DLink.",
+    "Balance cursor links and clear the correct cursor before the original Idle transition on removal; source bookkeeping defects are documented.",
+    "Preserve normal smell perception clearing its combat target without initializing a cursor; no invented automatic acquisition.",
+    "Inspector fields are historical observations and do not drive simulation. Spectator storage implements the source guard only."
+  ]
+}
