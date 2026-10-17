@@ -400,7 +400,8 @@ namespace
         tall->animations[9 + TYPE_MELEE].dimensions = {1, 20, 1};
         body->model = tall;
         CHECK(object(g, "ceiling", {100, 20, 0}, {5, 1, 5}));
-        CHECK(!b->Script_Run() && b->animation_blocked && !b->m_bAnimating && near(body->velocity.z, 0));
+        CHECK(b->Script_Run() && b->animation_blocked && b->m_bAnimating && near(body->velocity.z, b->m_fRunSpeed) &&
+              near(body->dimensions.y, 2));
         return true;
     }
     bool physics(const char*)

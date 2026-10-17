@@ -1,5 +1,11 @@
 # Original AI recovery and navigation states
 
+> The [animation-clearance correction](AI_ANIMATION_CLEARANCE_CONTRACTS.md) supersedes
+> earlier blocked-resize failures/CrawlUnder fallback claims: original SetAnimation
+> continues a valid clip while physical bounds stay unchanged on collision refusal.
+> The AI caches retained physical dimensions; the request remains inspectable.
+> Invalid/unavailable services still fail; the replacement resize solver is unchanged.
+
 > The [smell-trail continuation](AI_SMELL_CONTRACTS.md) now supplies periodic player hints and the original SearchSmellTarget body. Its source guards do not automatically seed a tracking cursor. Earlier blanket smell omissions are historical; M2 remains incomplete.
 
 Selected original AI_Mgr jump/crouch/crawl commands and seven navigation states

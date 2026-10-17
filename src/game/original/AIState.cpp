@@ -98,13 +98,22 @@ bool AI_Mgr::SetAnimation(DDWORD clip)
         DVector authored;
         if (server->GetModelAnimUserDims(m_hObject, &authored, clip) == DE_OK)
             dimensions = {authored.x * m_vScale.x, authored.y * m_vScale.y, authored.z * m_vScale.z};
-        // Explicit replacement for the old SetObjectDims2: existing atomic,
-        // foot-anchored clearance, no partial pushing or fabricated successful resize.
+        // Source SetAnimation ignores SetObjectDims2's result and selects the
+        // clip. The legacy dimensions argument is in/out (corroborated by later
+        // LithTech). Our atomic solver keeps the old body on Blocked, so cache
+        // those actual dimensions, not the impossible request. Invalid or
+        // unavailable services still fail. See AI_ANIMATION_CLEARANCE_CONTRACTS.
+        animation_requested_dims = dimensions;
         const auto result = server->ResizeObject(m_hObject, dimensions);
         animation_blocked = result == ResizeResult::Blocked;
-        if (result != ResizeResult::Resized)
-            return StateFailure(result == ResizeResult::Blocked ? "AI animation resize blocked"
-                                                                : "AI animation resize unavailable or invalid");
+        if (result != ResizeResult::Resized && !animation_blocked)
+            return StateFailure("AI animation resize unavailable or invalid");
+        if (animation_blocked)
+        {
+            if (server->GetObjectDims(m_hObject, &dimensions) != DE_OK)
+                return StateFailure("AI retained animation dimensions unavailable");
+            ++animation_resize_blocks;
+        }
         server->SetModelAnimation(m_hObject, clip); // Validated above, no callbacks.
         m_vDims = dimensions;
         m_nCurAnimation = clip;

@@ -109,6 +109,134 @@ namespace
         g.server.SetNextUpdate(h, .001f);
         return a;
     }
+    bool animation_clearance(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto* a = actor(g);
+        CHECK(a);
+        const auto h = a->m_hObject;
+        auto* r = g.objects.get(h);
+        auto model = std::make_shared<Model>(*r->model);
+        model->animations.push_back(model->animations.front());
+        model->animations[1].name = "tall_idle";
+        model->animations[1].dimensions = {1, 8, 1};
+        r->model = model;
+        auto table = std::make_shared<CAnim_Sound>();
+        for (auto& clip : table->m_nAnim_IDLE)
+            clip = 1;
+        CHECK(a->InitStatics(table));
+        const auto ceiling = object(g, {0, 14, 0}, "ceiling");
+        CHECK(ceiling);
+        g.objects.get(ceiling)->dimensions = {10, .5f, 10};
+        a->m_bSetShutdown = true;
+        a->m_bCabal = false;
+        CHECK(a->SetNewState(AI_Mgr::StatePassive));
+        const auto position = r->state.m_Pos;
+        r->state.m_Flags &= ~FLAG_VISIBLE; // Animation/lifecycle does not depend on rendering.
+        for (int i = 0; i < 40; ++i)
+            CHECK(g.step(.1));
+        CHECK(a->RuntimeReady() && a->runtime_updates > 10 && a->animation_finishes > 0);
+        CHECK(a->animation_resize_blocks == 1 && r->animation.animation == 1 && a->state_failures == 0);
+        CHECK(near(r->dimensions.y, 2) && near(r->state.m_Pos.y, position.y) && near(a->m_vDims.y, 2) &&
+              near(a->animation_requested_dims.y, 8));
+        CHECK(g.objects.remove(ceiling) && g.objects.finish_frame());
+        CHECK(a->SetAnimation(0) && a->SetAnimation(1) && near(r->dimensions.y, 8));
+        CHECK(near(r->state.m_Pos.y, position.y + 6));
+        CHECK(g.objects.remove(h) && !a->SetAnimation(0));
+        CHECK(g.objects.finish_frame() && !g.objects.get(h));
+        return true;
+    }
+    bool clearance_private(const char* root)
+    {
+        GameSession g;
+        CHECK(g.initialize());
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(g.resources.mount_game(config, error));
+        ObjectId previous{};
+        for (int cycle = 0; cycle < 2; ++cycle)
+        {
+            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error) && !g.objects.get(previous));
+            auto* player = g.server_shell.Player(g.local_client);
+            CHECK(player);
+            player->m_damage.can_damage = false; // Diagnostic relocation, not a retail playthrough.
+            for (int frame = 0; frame < 780; ++frame)
+                CHECK(g.step(1. / 60)); // Authored intro completes normally.
+            unsigned encounters = 0;
+            const auto ids = g.objects.snapshot();
+            for (auto id : ids)
+            {
+                auto* r = g.objects.get(id);
+                auto* ai = r ? dynamic_cast<AI_Mgr*>(r->game.get()) : nullptr;
+                if (!ai || ai->npc_type != AI_Mgr::NPCType::Cultist)
+                    continue;
+                auto position = r->state.m_Pos;
+                position.z += 150;
+                position.y = 170; // Existing train-floor encounter height, not the NPC's scaled center.
+                CHECK(g.server.TeleportObject(player->m_hObject, &position) == DE_OK &&
+                      player->TeleportClientToServerPos());
+                for (int frame = 0; frame < 600; ++frame)
+                {
+                    const bool stepped = g.step(1. / 60);
+                    if (!stepped)
+                        std::cerr << "Encounter " << encounters << ": " << g.trace.back() << '\n';
+                    CHECK(stepped);
+                }
+                if (++encounters == 2)
+                    break;
+            }
+            CHECK(encounters == 2);
+            std::uint64_t blocks = 0, shots = 0;
+            for (auto id : ids)
+            {
+                auto* r = g.objects.get(id);
+                auto* ai = r ? dynamic_cast<AI_Mgr*>(r->game.get()) : nullptr;
+                if (!ai || ai->npc_type != AI_Mgr::NPCType::Cultist)
+                    continue;
+                if (ai->runtime_failed)
+                    std::cerr << ai->runtime_error << '\n';
+                CHECK(ai->RuntimeReady());
+                blocks += ai->animation_resize_blocks;
+                shots += ai->fire_shots;
+                if (ai->animation_resize_blocks)
+                    previous = id;
+            }
+            std::cout << "SubwayA relocation cycle " << cycle << ": " << blocks << " blocked resizes, " << shots
+                      << " original AI shots; no suspended Cultist\n";
+            CHECK(blocks > 0 && shots > 0);
+            auto* body = g.objects.get(previous);
+            auto* victim = body ? dynamic_cast<AI_Mgr*>(body->game.get()) : nullptr;
+            CHECK(victim);
+            const auto handle = body->handle;
+            // Explicit ordinary-death probe after blocked clip changes. Avoid
+            // random gib selection so requested/physical bounds reach CreateCorpse.
+            victim->m_dwFlags |= 0x800u; // Source NEVERGIB.
+            victim->m_damage.node_hit = 2;
+            auto message = g.server.StartMessageToObject(player, handle, damage_message);
+            CHECK(message &&
+                  g.server.WriteDamage(
+                      message, {{0, 0, 1}, body->state.m_Pos, 1, DamageType::Death, player->m_hObject}) == DE_OK &&
+                  g.server.EndMessage(message) == DE_OK);
+            HOBJECT corpse = nullptr;
+            for (int frame = 0; frame < 180 && g.objects.get(previous); ++frame)
+            {
+                CHECK(g.step(1. / 60));
+                if (const auto* remaining = g.objects.get(previous))
+                    corpse = dynamic_cast<AI_Mgr*>(remaining->game.get())->last_corpse;
+            }
+            if (auto* remaining = g.objects.get(previous))
+                std::cerr << dynamic_cast<AI_Mgr*>(remaining->game.get())->runtime_error << '\n';
+            CHECK(!g.objects.get(previous)); // Dead actor cannot remain a frozen solid blocker.
+            CHECK(g.server.IsObjectAlive(corpse) &&
+                  g.server.IsKindOf(g.server.GetObjectClass(corpse), g.server.GetClass("CCorpse")) &&
+                  !(g.server.GetObjectFlags(corpse) & FLAG_SOLID));
+        }
+        CHECK(g.unload_world() && !g.objects.get(previous) && g.objects.snapshot().empty());
+        CHECK(g.server.string_count() == 0 && g.server.message_count() == 0 && g.server.client_count() == 0);
+        return true;
+    }
     bool activation(const char*)
     {
         GameSession g;
@@ -659,6 +787,8 @@ int main(int argc, char** argv)
     const std::map<std::string, std::function<bool(const char*)>> tests{{"body", body},
                                                                         {"missing", missing},
                                                                         {"activation", activation},
+                                                                        {"animation_clearance", animation_clearance},
+                                                                        {"clearance_private", clearance_private},
                                                                         {"visibility", visibility},
                                                                         {"visibility_filter", visibility_filter},
                                                                         {"visibility_atomic", visibility_atomic},

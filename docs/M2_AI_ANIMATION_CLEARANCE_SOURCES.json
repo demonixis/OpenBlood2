@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "444035f86168a586c91c4b0ff5c6a77448a8b457",
+  "status": "M2 incomplete; correct original NPC animation control flow on ordinary resize blockage",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "purpose": "SetAnimation:1950\u20131977 ignores the resize result but selects the clip and caches requested dimensions; shared original animation command callers."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/CultistAI.cpp",
+      "source_sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
+      "purpose": "Original attack, escape and dodge sequencing retained."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/server_de.h",
+      "source_sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
+      "purpose": "Original SetObjectDims2 API returns DRESULT, separate from model-animation selection."
+    },
+    {
+      "source": "sources/lithtech/runtime/server/src/server_iltphysics.cpp",
+      "source_sha256": "1c8bb992ad3508dea015255e5e089e369420973fcf0f2217f0191b9f1c4727ee",
+      "purpose": "Later SetObjectDims writes a failed result back through the mutable vector; corroboration of in/out behavior only."
+    },
+    {
+      "source": "sources/lithtech/runtime/shared/src/moveobject.cpp",
+      "source_sha256": "ab363eba59ebfd89865a1d5619ffb95a82c474c319adc8d89c921da63b2d79f9",
+      "purpose": "Later ChangeObjectDimensions returns the attempted partial dimensions but restores the physical body; our atomic solver instead reports/caches retained physical dimensions."
+    }
+  ],
+  "adaptations": [
+    "No reference source files or dependencies imported/modified.",
+    "Retain atomic body on Blocked; no partial resize or object pushing, not claimed retail physics parity.",
+    "Continue the original animation on Blocked; cache actual retained dimensions for the atomic solver, with the request separately inspected. No retail partial-size parity claim.",
+    "Invalid/unavailable services still fail explicitly; no retry or animation advancement from inspector.",
+    "Per-object blocked-resize counter and requested/cached/physical extents expose the replacement policy."
+  ]
+}

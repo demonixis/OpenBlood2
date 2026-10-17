@@ -1,5 +1,11 @@
 # Original AI state decisions and stationary actions
 
+> The [animation-clearance correction](AI_ANIMATION_CLEARANCE_CONTRACTS.md) supersedes
+> earlier blocked-resize failures/CrawlUnder fallback claims: original SetAnimation
+> continues a valid clip while physical bounds stay unchanged on collision refusal.
+> The AI caches retained physical dimensions; the request remains inspectable.
+> Invalid/unavailable services still fail; the replacement resize solver is unchanged.
+
 Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
 this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
 The existing action/service limitations remain unless explicitly superseded.

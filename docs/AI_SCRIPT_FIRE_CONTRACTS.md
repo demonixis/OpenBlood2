@@ -56,7 +56,8 @@ the path/aim to repair these source quirks.
 ## Safety and inspection
 
 Existing object, model, animation-resize, time, speed, path and query bounds remain.
-No missing clip or blocked resize becomes successful playback. The existing motion
+Missing clips still fail. The [animation-clearance correction](AI_ANIMATION_CLEARANCE_CONTRACTS.md)
+continues valid clips after ordinary resize blockage, retaining the physical body. The existing motion
 guard rejects recursive script-fire calls. After Fire, verify the owner and command
 failure state and detect state changes or nested script failure before updating
 cadence or playback. Destruction remains deferred. Missing weapon during ordinary

@@ -1,5 +1,11 @@
 # Original scripted locomotion and route following
 
+> The [animation-clearance correction](AI_ANIMATION_CLEARANCE_CONTRACTS.md) supersedes
+> earlier blocked-resize failures/CrawlUnder fallback claims: original SetAnimation
+> continues a valid clip while physical bounds stay unchanged on collision refusal.
+> The AI caches retained physical dimensions; the request remains inspectable.
+> Invalid/unavailable services still fail; the replacement resize solver is unchanged.
+
 Selected AI_Mgr helpers now connect original velocity, Script_Walk/Script_Run,
 SETMOVEMENT, FOLLOWPATH and MOVETOOBJECT rules to existing typed services. See
 [source selections](M2_AI_FOLLOW_SOURCES.json), [navigation](AI_NAVIGATION_CONTRACTS.md),

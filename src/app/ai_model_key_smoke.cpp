@@ -415,6 +415,17 @@ namespace OpenBlood2
         auto table = std::make_shared<CAnim_Sound>();
         if (!table->SetAnimationIndexes(h) || !table->SetSoundRoot("sounds/enemies/f_civ") || !ai->InitStatics(table))
             return false;
+        // Labelled clearance fixture: source actions must keep playing even
+        // when their larger requested bounds cannot replace this small body.
+        DVector small{1, 1, 1}, ceiling_dims{100, .5f, 100};
+        ObjectCreateStruct ceiling;
+        ceiling.m_Pos = {0, 10005, 0};
+        ceiling.m_Flags = FLAG_SOLID;
+        SAFE_STRCPY(ceiling.m_Name, "AI animation clearance ceiling (diagnostic)");
+        const auto blocker = g.objects.create(g.objects.find_class("BaseClass"), ceiling);
+        if (!blocker || g.server.SetObjectDims(blocker, &ceiling_dims) != DE_OK ||
+            g.server.SetObjectDims(h, &small) != DE_OK)
+            return false;
         ai->m_szAIState = "SPECIAL4";
         if (!ai->ComputeState(0))
             return false;
@@ -427,7 +438,8 @@ namespace OpenBlood2
         const auto* r = g.objects.get(id);
         const auto* ai = r ? dynamic_cast<const AIStateProbe*>(r->game.get()) : nullptr;
         return ai && ai->state_dispatches > 1 && ai->animation_starts > 1 && ai->animation_finishes > 0 &&
-               ai->state_changes > 1 && ai->state_failures == 0 && ai->m_nState == AI_Mgr::StateSpecial4;
+               ai->state_changes > 1 && ai->state_failures == 0 && ai->m_nState == AI_Mgr::StateSpecial4 &&
+               ai->animation_resize_blocks > 0 && r->dimensions.y == 1;
     }
     bool prepare_ai_model_key_smoke(GameSession& g, ObjectId& id)
     {

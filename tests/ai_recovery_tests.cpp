@@ -241,8 +241,9 @@ namespace
         auto m = std::make_shared<Model>(*r->model);
         m->animations[59 + TYPE_PISTOL].dimensions.y = 5;
         r->model = m;
-        CHECK(!a->MC_Crawl() && a->animation_blocked && near(r->dimensions.y, 2) && near(r->velocity.z, 0));
-        CHECK(!a->m_bAnimating);
+        CHECK(a->MC_Crawl() && a->animation_blocked && near(r->dimensions.y, 2) &&
+              near(r->velocity.z, a->m_fWalkSpeed));
+        CHECK(a->m_bAnimating && near(a->m_vDims.y, 2) && near(a->animation_requested_dims.y, 5));
         CHECK(a->MC_Jump()); // separate valid short clip still works
         auto h = a->m_hObject;
         CHECK(g.objects.remove(h));

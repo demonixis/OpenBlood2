@@ -311,6 +311,8 @@ class AI_Mgr : public CBaseCharacter
     std::string m_szAIState = "IDLE";
     std::uint64_t state_changes = 0, state_dispatches = 0, state_failures = 0;
     std::uint64_t animation_starts = 0, animation_finishes = 0;
+    std::uint64_t animation_resize_blocks = 0; // Clip continued; physical bounds were retained.
+    DVector animation_requested_dims{};        // Last different-clip resize request, before collision.
     int requested_state = StateIdle, dispatched_state = StateIdle, animation_choice = -1;
     DDWORD requested_animation = UINT32_MAX;
     std::string state_error;

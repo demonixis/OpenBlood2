@@ -1,5 +1,11 @@
 # Original AI weapon choice and standing fire
 
+> The [animation-clearance correction](AI_ANIMATION_CLEARANCE_CONTRACTS.md) supersedes
+> earlier blocked-resize failures/CrawlUnder fallback claims: original SetAnimation
+> continues a valid clip while physical bounds stay unchanged on collision refusal.
+> The AI caches retained physical dimensions; the request remains inspectable.
+> Invalid/unavailable services still fail; the replacement resize solver is unchanged.
+
 The [Flare Gun continuation](FLARE_CONTRACTS.md) adds original ID 3, primary sticking/burn ticks, alternate fragments, pickup/drop and sprite tint/alpha. Earlier blanket omissions are historical for this subset; remaining effects, death services and M2 stay open.
 
 The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.

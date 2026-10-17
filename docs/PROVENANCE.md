@@ -1070,3 +1070,5 @@ Selected Weapon.cpp flags, WeaponFX.cpp flesh/metal recipes and SparksFX.cpp bur
 ## Compact HUD and weapon commands
 
 [HUD contracts](HUD_CONTRACTS.md) and [source hashes](M2_HUD_SOURCES.json) record the selected original player stats, command-slot mapping and client visibility rules. The compact ImGui presentation and shared UI lifetime are new engine/application code; original PCX artwork is not ported.
+
+[NPC animation clearance](M2_AI_ANIMATION_CLEARANCE_SOURCES.json): correct the selective original SetAnimation adaptation; see [contracts](AI_ANIMATION_CLEARANCE_CONTRACTS.md).

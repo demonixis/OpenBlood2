@@ -1,5 +1,11 @@
 # Original Cultist/Civilian initialization and AI_Update
 
+> The [animation-clearance correction](AI_ANIMATION_CLEARANCE_CONTRACTS.md) supersedes
+> earlier blocked-resize failures/CrawlUnder fallback claims: original SetAnimation
+> continues a valid clip while physical bounds stay unchanged on collision refusal.
+> The AI caches retained physical dimensions; the request remains inspectable.
+> Invalid/unavailable services still fail; the replacement resize solver is unchanged.
+
 > Extended by [activation visibility contracts](ACTIVATION_VISIBILITY_CONTRACTS.md): replacement player/camera pings now reuse the original glass/volume object filter, with atomic refresh, checked inspection and authored Gideon intro acceptance. This is not retail PVS; M2 remains incomplete.
 
 

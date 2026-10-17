@@ -618,6 +618,13 @@ namespace OpenBlood2
                         (unsigned long long)ai.animation_finishes);
             ImGui::Text("Cached half extents %.2f %.2f %.2f | scale %.2f %.2f %.2f", ai.m_vDims.x, ai.m_vDims.y,
                         ai.m_vDims.z, ai.m_vScale.x, ai.m_vScale.y, ai.m_vScale.z);
+            ImGui::Text("Last resize requested %.2f %.2f %.2f", ai.animation_requested_dims.x,
+                        ai.animation_requested_dims.y, ai.animation_requested_dims.z);
+            ImGui::Text("Blocked resizes with continued animation %llu | last call blocked: %s",
+                        (unsigned long long)ai.animation_resize_blocks, ai.animation_blocked ? "yes" : "no");
+            DVector actual_dims;
+            game.server.GetObjectDims(ai.m_hObject, &actual_dims);
+            ImGui::Text("Physical half extents %.2f %.2f %.2f", actual_dims.x, actual_dims.y, actual_dims.z);
             if (!ai.state_error.empty())
                 ImGui::TextWrapped("Unavailable/failed: %s", ai.state_error.c_str());
         }

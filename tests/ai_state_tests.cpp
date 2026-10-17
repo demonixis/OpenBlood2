@@ -218,11 +218,21 @@ namespace
         CHECK(g.collision.build(ceiling, error));
         a->m_vScale = {3, 3, 3};
         const auto before = r->state.m_Pos;
-        CHECK(!a->SetAnimation(2) && r->animation.animation == 1 && r->state.m_Pos.y == before.y &&
-              r->dimensions.y == 8);
+        // AI_Mgr::SetAnimation in the original ignores SetObjectDims2 refusal.
+        // The physical body remains safe, but the clip advances and the AI caches the retained physical dimensions.
+        CHECK(a->SetAnimation(2) && r->animation.animation == 2 && r->state.m_Pos.y == before.y &&
+              r->dimensions.y == 8 && near(a->m_vDims.y, 8) && near(a->animation_requested_dims.y, 12));
+        CHECK(a->animation_blocked && a->animation_resize_blocks == 1 && a->state_error.empty());
+        CHECK(g.server.advance_models(.025) && near(r->animation.time, 25.f));
+        CHECK(a->SetAnimation(2) && !a->animation_blocked && a->animation_resize_blocks == 1);
+        CHECK(r->animation.time == 0 && r->dimensions.y == 8); // Same-clip reset does not retry the resize.
         a->m_vScale = {-1, 1, 1};
-        CHECK(!a->SetAnimation(2));
-        CHECK(!a->SetAnimation(UINT32_MAX) && a->m_nCurAnimation == 1);
+        CHECK(!a->SetAnimation(3));
+        CHECK(!a->SetAnimation(UINT32_MAX) && a->m_nCurAnimation == 2);
+        CHECK(setup(g)); // Remove ceiling; a different valid clip can resize normally again.
+        a->m_vScale = {3, 3, 3};
+        CHECK(a->SetAnimation(3) && !a->animation_blocked && near(r->dimensions.y, 12));
+        CHECK(near(r->state.m_Pos.y, before.y + 4) && a->animation_resize_blocks == 1);
         return true;
     }
     bool decisions(const char*)

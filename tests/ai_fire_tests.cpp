@@ -585,13 +585,16 @@ namespace
             surface.flags = 1;
         std::string error;
         CHECK(g.collision.build(ceiling, error));
-        CHECK(a->MC_Fire_Stand() && a->animation_blocked && a->m_nState == AI_Mgr::StateCrawlUnder);
-        CHECK(!a->m_bAnimating && r->dimensions.y == 1 && r->state.m_Pos.y == 10);
+        const auto state = a->m_nState;
+        CHECK(a->MC_Fire_Stand() && a->animation_blocked && a->m_nState == state);
+        CHECK(a->m_bAnimating && r->dimensions.y == 1 && r->state.m_Pos.y == 10 && a->m_vDims.y == 1 &&
+              a->animation_requested_dims.y == 5);
+        a->m_bAnimating = false;
         CHECK(setup(g));
         auto table = std::make_shared<CAnim_Sound>();
         table->m_nAnim_FIRE_STAND[TYPE_PISTOL] = UINT32_MAX;
         CHECK(a->InitStatics(table));
-        CHECK(!a->MC_Fire_Stand() && !a->animation_blocked && a->m_nState == AI_Mgr::StateCrawlUnder);
+        CHECK(!a->MC_Fire_Stand() && !a->animation_blocked && a->m_nState == state);
         table->m_nAnim_FIRE_STAND[TYPE_PISTOL] = 0;
         CHECK(a->MC_Fire_Stand());
         a->Metacmd = std::numeric_limits<int>::max();

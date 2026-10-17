@@ -1,5 +1,11 @@
 # Original autonomous locomotion and Cultist attacks
 
+> The [animation-clearance correction](AI_ANIMATION_CLEARANCE_CONTRACTS.md) supersedes
+> earlier blocked-resize failures/CrawlUnder fallback claims: original SetAnimation
+> continues a valid clip while physical bounds stay unchanged on collision refusal.
+> The AI caches retained physical dimensions; the request remains inspectable.
+> Invalid/unavailable services still fail; the replacement resize solver is unchanged.
+
 This increment ports AI_Mgr obstruction/ledge queries, MC_Walk/Run/Fire_Walk/Fire_Run
 and CultistAI close/far attack sequencing. Read [source selections](M2_AI_LOCOMOTION_SOURCES.json),
 [evidence](../../Documentation/Implementation/M2_AI_LOCOMOTION.md),

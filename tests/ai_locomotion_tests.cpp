@@ -334,10 +334,10 @@ namespace
         auto model = std::make_shared<Model>(*r->model);
         model->animations[TYPE_MELEE].dimensions.y = 5;
         r->model = model;
-        CHECK(a->MC_Walk() && a->animation_blocked && a->m_nState == AI_Mgr::StateCrawlUnder &&
-              near(r->dimensions.y, 2));
-        CHECK(a->DispatchState() && a->m_nCurMetacmd == 5 && r->animation.animation == 0 &&
-              near(r->dimensions.y, 2)); // actual short crawl clip fits below the ceiling
+        const auto state = a->m_nState;
+        CHECK(a->MC_Walk() && a->animation_blocked && a->m_nState == state && near(r->dimensions.y, 2));
+        CHECK(a->m_bAnimating && a->m_nCurMetacmd == 1 && r->animation.animation == TYPE_MELEE &&
+              near(a->m_vDims.y, 2) && near(a->animation_requested_dims.y, 5) && near(r->velocity.z, a->m_fWalkSpeed));
         return true;
     }
     struct Victim : BaseClass
