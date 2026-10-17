@@ -1,4 +1,4 @@
-// Original ObjectDLL/SoundFX.cpp rules; see docs/sound_fx_contracts.md.
+// Original ObjectDLL/SoundFX.cpp rules; see docs/contracts/sound_fx_contracts.md.
 #include "SoundFX.h"
 #include "game/key_messages.h"
 #include <algorithm>

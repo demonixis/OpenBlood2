@@ -1,5 +1,5 @@
 // Original movement/control/container branches, adapted to typed local services.
-// Source attribution and deliberate differences: docs/m2_movement_sources.json.
+// Source attribution and deliberate differences: docs/implementation/sources/m2_movement_sources.json.
 #include "MoveMgr.h"
 #include "BloodShells.h"
 #include "engine/collision.h"

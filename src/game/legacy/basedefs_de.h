@@ -1,6 +1,6 @@
 #pragma once
 // Source-level subset of Blood II AppHeaders/basedefs_de.h, basetypes_de.h
-// and de_codes.h. No retail DLL ABI is exposed. See docs/provenance.md.
+// and de_codes.h. No retail DLL ABI is exposed. See docs/implementation/provenance.md.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>

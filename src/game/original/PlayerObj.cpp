@@ -1,5 +1,5 @@
 // Selected original entry code; source ranges and adaptations are recorded in
-// docs/m2_player_sources.json. This is an executable lifecycle port, not the
+// docs/implementation/sources/m2_player_sources.json. This is an executable lifecycle port, not the
 // complete 7,657-line PlayerObj gameplay implementation.
 #include "PlayerObj.h"
 #include "AI_Mgr.h"

@@ -1,4 +1,4 @@
-// Selected from original ObjectDLL/Trigger.cpp; see docs/provenance.md.
+// Selected from original ObjectDLL/Trigger.cpp; see docs/implementation/provenance.md.
 #include "trigger_helpers.h"
 #include "engine/objects.h"
 #include "game/legacy/cpp_engineobjects_de.h"

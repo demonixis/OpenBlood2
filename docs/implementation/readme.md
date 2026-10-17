@@ -1,0 +1,26 @@
+# Implementation records
+
+This directory holds work-in-progress history and source evidence. Start with the
+[developer guides](../readme.md) for routine development and the
+[contracts](../contracts/readme.md) for subsystem behavior.
+
+| Record | Location |
+| --- | --- |
+| Imports and portability adaptations | [Provenance](provenance.md) |
+| Donor selections, commits and hashes | [Source ledgers](sources/readme.md) |
+| Current M2 progress and limitations | [Workspace M2 report](../../../Documentation/Implementation/m2.md) |
+| M0 / M1 validation | [M0](../../../Documentation/Implementation/m0.md), [M1](../../../Documentation/Implementation/m1.md) |
+| Increment reports | [Workspace implementation directory](../../../Documentation/Implementation) |
+| Logs, measurements, patches and validation ledgers | [Workspace evidence directory](../../../Documentation/Implementation/evidence) |
+| Milestone acceptance criteria | [Roadmap](../../../Documentation/Roadmap/03_milestones.md) |
+
+Workspace links require the parent documentation repository; it is separate from
+Blood2 and is not a build dependency. Keep the existing reports/evidence there
+instead of copying them into both repositories. New source ledgers belong in
+`sources/`; new reports and measured results belong in the workspace implementation
+and evidence directories. Keep the top-level `docs/` for developer guides.
+
+Reports are chronological evidence, not blanket support claims. M2 remains
+incomplete. Preserve failed attempts, platform limitations and historical hashes;
+later verified records may supersede an earlier limitation without rewriting
+the original log or patch.

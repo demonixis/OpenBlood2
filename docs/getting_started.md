@@ -59,7 +59,7 @@ VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json \
 The ICD path is machine-specific and is not a production requirement. On macOS,
 use Apple Clang and the same CMake/Ninja presets. Bundled MSL shaders enable Metal;
 ordinary builds do not require SDL_shadercross. Native execution is user-confirmed,
-but automated Apple validation remains pending. See [Metal contracts](metal_shader_contracts.md)
+but automated Apple validation remains pending. See [Metal contracts](contracts/metal_shader_contracts.md)
 for regeneration. Windows, mobile and VR are unverified; D3D12 shader artifacts
 are not bundled. SDL's OpenXR code is pinned, but the app does not start an XR session.
 

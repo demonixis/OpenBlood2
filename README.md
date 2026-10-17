@@ -25,7 +25,7 @@ Linux/NVIDIA is tested; macOS/Metal works according to user testing. The full ga
 other platforms and later milestones remain incomplete.
 
 See the [workspace roadmap](../Documentation/Roadmap/readme.md) and
-[latest validation](../Documentation/Implementation/m2_message_lifetime.md).
+[implementation and validation records](docs/implementation/readme.md).
 
 ## Build
 
@@ -45,7 +45,7 @@ NVIDIA selection, Metal and validation commands.
 
 ## Contributing
 
-- Read [AGENTS.md](AGENTS.md) and the relevant service contracts before changing code.
+- Read [AGENTS.md](AGENTS.md) and the [developer documentation](docs/readme.md) before changing code.
 - Preserve original behavior and record source provenance; keep portability fixes
   distinct from gameplay changes. Use the supplied formatting rules and small changes.
 - Run relevant behavioral/lifetime tests, document results and limitations in English,
@@ -62,4 +62,4 @@ generated code and claims are not evidence of original-game fidelity.
 Original work contributed to this reconstruction is licensed under the
 [MIT License](LICENSE). Imported game code, reference repositories, dependencies
 and commercial assets retain their respective rights and notices; the MIT license
-does not relicense them. See [source provenance](docs/provenance.md).
+does not relicense them. See [source provenance](docs/implementation/provenance.md).
