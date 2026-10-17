@@ -1,5 +1,9 @@
 # Animated model presentation
 
+> [Prepared model geometry](MODEL_PREPARATION_CONTRACTS.md) extends the per-frame
+> rebuilding policy below with bounded exact reuse for immutable shared assets.
+> CPU skinning, current visibility and world-revision teardown remain explicit.
+
 Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supplies
 selected model components with independent lifetime and alpha rendering. The earlier
 model omission is superseded only for that subset; complete composite FX remain unavailable.

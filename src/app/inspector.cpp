@@ -602,6 +602,11 @@ namespace OpenBlood2
                         ImGui::Text("Model snapshot: %zu world / %zu close draws / %zu vertices / %zu skin bytes",
                                     model_view->world_draws.size(), model_view->close_draws.size(),
                                     model_view->mesh.vertices.size(), model_view->mesh.texture_bytes);
+                        ImGui::Text("CPU preparation: %zu sampled / %zu reused / %zu uncached; %zu reused vertices",
+                                    model_view->preparation.sampled, model_view->preparation.reused,
+                                    model_view->preparation.uncached, model_view->preparation.reused_vertices);
+                        ImGui::Text("Prepared cache: %zu assets / %zu vertex bytes (weak asset ownership)",
+                                    model_view->preparation.cached_assets, model_view->preparation.cached_bytes);
                         ImGui::TextWrapped(
                             "Current ABC poses; first-person body/held children follow local camera visibility. "
                             "View weapons use original offsets with zero bob; no lighting, chrome or muzzle FX.");
@@ -609,10 +614,11 @@ namespace OpenBlood2
                         {
                             for (const auto& entry : model_view->entries)
                                 ImGui::TextWrapped(
-                                    "%s: %s, %zu triangles / %zu hidden triangles / %zu hidden nodes, skin %s%s%s",
+                                    "%s: %s, %zu triangles / %zu hidden triangles / %zu hidden nodes, skin %s%s%s%s",
                                     entry.label.c_str(), entry.visible ? "visible" : "hidden", entry.triangles,
                                     entry.hidden_triangles, entry.hidden_nodes, entry.skin.c_str(),
-                                    entry.error.empty() ? "" : " / ", entry.error.c_str());
+                                    entry.error.empty() ? "" : " / ", entry.error.c_str(),
+                                    entry.reused_geometry ? " / reused geometry" : "");
                             ImGui::TreePop();
                         }
                     }

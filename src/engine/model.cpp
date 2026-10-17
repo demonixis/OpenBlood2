@@ -398,6 +398,24 @@ namespace OpenBlood2
                                   x.rotation.m_Spin * (1 - t) + y.rotation.m_Spin * t})};
             return p;
         }
+        bool fill_pose(const Model& model, const ModelAnimation& a, std::size_t lo, std::size_t hi, float t,
+                       std::span<NodePose> out)
+        {
+            for (std::size_t i = 0; i < model.nodes.size(); ++i)
+            {
+                const auto parent = model.nodes[i].parent;
+                if (a.nodes[i].frames.size() <= hi || (parent >= 0 && static_cast<std::size_t>(parent) >= i))
+                    return false;
+                NodePose p = local_pose(a, i, lo, hi, t);
+                if (parent >= 0)
+                {
+                    p.position = add(out[parent].position, rotate_vector(out[parent].rotation, p.position));
+                    p.rotation = compose(out[parent].rotation, p.rotation);
+                }
+                out[i] = p;
+            }
+            return true;
+        }
     } // namespace
     DRotation compose_rotation(DRotation parent, DRotation child)
     {
@@ -447,48 +465,43 @@ namespace OpenBlood2
         float t;
         if (!pose_interval(model, animation, milliseconds, lo, hi, t))
             return false;
-        const auto& a = model.animations[animation];
-        for (std::size_t i = 0; i < model.nodes.size(); ++i)
+        out.resize(model.nodes.size());
+        if (!fill_pose(model, model.animations[animation], lo, hi, t, out))
         {
-            if (a.nodes[i].frames.size() <= hi)
-            {
-                out.clear();
-                return false;
-            }
-            NodePose p = local_pose(a, i, lo, hi, t);
-            auto parent = model.nodes[i].parent;
-            if (parent >= 0)
-            {
-                p.position = add(out[parent].position, rotate_vector(out[parent].rotation, p.position));
-                p.rotation = compose(out[parent].rotation, p.rotation);
-            }
-            out.push_back(p);
+            out.clear();
+            return false;
         }
         return true;
     }
     bool sample_vertices(const Model& model, std::uint32_t animation, double milliseconds, std::vector<DVector>& out)
     {
         out.clear();
-        std::vector<NodePose> pose;
-        if (!sample_pose(model, animation, milliseconds, pose))
+        std::size_t lo, hi;
+        float t;
+        if (model.nodes.size() > 256 || !pose_interval(model, animation, milliseconds, lo, hi, t))
             return false;
         const auto& a = model.animations[animation];
-        auto upper = std::upper_bound(a.keys.begin(), a.keys.end(), milliseconds,
-                                      [](double time, const ModelKey& k) { return time < k.time; });
-        std::size_t hi = static_cast<std::size_t>(upper - a.keys.begin());
-        if (hi == a.keys.size())
-            --hi;
-        std::size_t lo = hi ? hi - 1 : 0;
-        float t = a.keys[hi].time > a.keys[lo].time
-                      ? static_cast<float>(std::clamp(
-                            (milliseconds - a.keys[lo].time) / (a.keys[hi].time - a.keys[lo].time), 0.0, 1.0))
-                      : 0;
-        std::array<std::size_t, 256> nodes{};
+        // The bounded reader permits at most 256 nodes. No per-sample heap scratch or second key search.
+        std::array<NodePose, 256> pose;
+        if (!fill_pose(model, a, lo, hi, t, pose))
+            return false;
+        std::array<int, 256> nodes;
+        nodes.fill(-1);
         for (std::size_t i = 0; i < model.nodes.size(); ++i)
-            nodes[model.nodes[i].index] = i;
+        {
+            const auto index = model.nodes[i].index;
+            if (index >= nodes.size() || nodes[index] != -1)
+                return false;
+            nodes[index] = static_cast<int>(i);
+        }
         out.reserve(model.vertices.size());
         for (const auto& vertex : model.vertices)
         {
+            if (nodes[vertex.node] < 0)
+            {
+                out.clear();
+                return false;
+            }
             const auto& bone = pose[nodes[vertex.node]];
             out.push_back(add(bone.position, rotate_vector(bone.rotation, vertex.position)));
         }
@@ -496,10 +509,20 @@ namespace OpenBlood2
         {
             const auto& list = model.nodes[i].deformed_vertices;
             const auto& data = a.nodes[i];
+            if (!list.empty() && data.deformation.size() / 3 / list.size() <= hi)
+            {
+                out.clear();
+                return false;
+            }
             // Repeated indices are present in retail data. Preserve the file's
             // write order instead of merging/deduplicating its animation samples.
             for (std::size_t v = 0; v < list.size(); ++v)
             {
+                if (list[v] >= out.size())
+                {
+                    out.clear();
+                    return false;
+                }
                 auto at = (lo * list.size() + v) * 3, next = (hi * list.size() + v) * 3;
                 auto component = [&](unsigned axis)
                 { return data.deformation[at + axis] * (1 - t) + data.deformation[next + axis] * t; };

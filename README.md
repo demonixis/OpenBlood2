@@ -1,3 +1,15 @@
+| Milestone | Estimated task completion |
+| --- | ---: |
+| M0 | 100% |
+| M1 | 100% |
+| M2 | ~85% |
+| M3 | ~60% |
+| M4 | ~35% |
+| M5 | ~10% |
+| M6 | ~15% |
+| M7 | 0% |
+| M8 | 0% |
+
 # Blood II Reconstruction aka OpenBlood2
 
 The [original smell-trail continuation](../Documentation/Implementation/M2_AI_SMELL.md) connects the original periodic player trail and shared AI SearchSmellTarget state, with checked hint lifetime and inspection. Original no-target/no-cursor exits and zero NPC smell ranges are preserved; no automatic trail acquisition is invented. Required remaining services and the actual M2 gate stay open.
@@ -638,3 +650,5 @@ The [original pickup-audio continuation](../Documentation/Implementation/M2_PICK
 The [collision traversal continuation](../Documentation/Implementation/M2_COLLISION_TRAVERSAL.md) addresses measured post-transition activation spikes with conservative BVH/triangle interval rejection. Read [contracts](docs/COLLISION_TRAVERSAL_CONTRACTS.md); preserve exact SAT results, equal-time ordering, placement and original AI cadence. Services exposes bounded work counters. CPU model preparation and other frame costs remain; M2 stays open.
 
 The [bound-container index](../Documentation/Implementation/M2_CONTAINER_INDEX.md) reduces repeated post-transition object scans while retaining fresh checked snapshots, original volume order and deferred destruction. Read [contracts](docs/CONTAINER_INDEX_CONTRACTS.md); never mutate a bound shape outside Objects. Container inspection includes the index count. CPU model preparation and other playtest reports remain; M2 stays incomplete.
+
+The [model preparation optimization](../Documentation/Implementation/M2_MODEL_PREPARATION.md) reuses exact local geometry for immutable shared ABC assets and removes temporary heap pose scratch. Read [contracts](docs/MODEL_PREPARATION_CONTRACTS.md); preserve weak ownership, current visibility/materials, packed-deformation order and world-revision clearing. Inspection reports actual reuse and retained vertex bytes. Skinning remains on the CPU; remaining frame costs and the M2 exit gate stay open.

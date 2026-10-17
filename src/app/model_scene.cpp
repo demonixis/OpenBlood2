@@ -8,15 +8,15 @@ namespace OpenBlood2
         for (const auto& fx : game.server.explosion_models.active)
         {
             const bool visible = fx.scale.x > 0 && fx.scale.y > 0 && fx.scale.z > 0;
-            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.settings.position, fx.rotation}, fx.scale,
-                           visible, false, {}, fx.model_path, game.resources, error, {}, fx.alpha, true))
+            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.settings.position, fx.rotation}, fx.scale, visible,
+                           false, {}, fx.model_path, game.resources, error, {}, fx.alpha, true))
                 return false;
             scene.entries.back().client_effect = fx.id;
         }
         for (const auto& fx : game.server.explosion_fragments.active)
         {
             const auto scale = fx.settings.scale;
-            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.position, fx.rotation}, scale,
+            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation}, scale,
                            scale.x > 0 && scale.y > 0 && scale.z > 0, false, {}, fx.model_path, game.resources, error,
                            {}, fx.alpha, true))
                 return false;
@@ -24,14 +24,14 @@ namespace OpenBlood2
         }
         for (const auto& fx : game.server.flesh_gibs.active)
         {
-            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, true,
-                           false, {}, fx.model_path, game.resources, error))
+            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, true, false, {},
+                           fx.model_path, game.resources, error))
                 return false;
         }
         for (const auto& fx : game.server.laser_beams.active)
         {
-            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale,
-                           fx.updates != 0, false, {}, "Original red beam", game.resources, error, {}, fx.alpha, true))
+            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, fx.updates != 0,
+                           false, {}, "Original red beam", game.resources, error, {}, fx.alpha, true))
                 return false;
             scene.entries.back().laser_effect = fx.id;
         }
@@ -75,7 +75,7 @@ namespace OpenBlood2
                         visible = false;
                 }
             }
-            if (!scene.add(record->model.get(), record->animation, record->state.m_SkinName,
+            if (!scene.add(record->model, record->animation, record->state.m_SkinName,
                            {record->state.m_Pos, record->state.m_Rotation}, record->state.m_Scale, visible, false, id,
                            record->state.m_Filename, game.resources, error, record->hidden_nodes, record->alpha))
                 return false;
@@ -101,7 +101,7 @@ namespace OpenBlood2
                 error = "Original view-weapon placement failed";
                 return false;
             }
-            if (!scene.add(weapon.model.get(), weapon.animation, definition->m_szViewModelSkin, pose, {1, 1, 1},
+            if (!scene.add(weapon.model, weapon.animation, definition->m_szViewModelSkin, pose, {1, 1, 1},
                            owner && !owner->m_damage.IsDead() && client.weapons_visible, true, {},
                            weapon.left ? "left view weapon" : "right view weapon", game.resources, error))
                 return false;

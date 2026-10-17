@@ -110,15 +110,18 @@ int main(int argc, char** argv)
             }
         }
         model.animations.push_back(animation);
+        const std::shared_ptr<const Model> asset = std::make_shared<Model>(model);
         Resources resources;
         ModelView scene;
         models.clear_geometry();
-        for (unsigned frame = 0; frame < 4; ++frame)
+        for (unsigned iteration = 0; iteration < 8; ++iteration)
         {
+            const auto frame = iteration / 2;
             const std::array<std::uint8_t, 2> hidden{std::uint8_t(frame == 1 || frame == 2), std::uint8_t(frame == 2)};
             scene.begin_frame();
-            CHECK(scene.add(&model, {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "node pixel probe", resources,
+            CHECK(scene.add(asset, {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "node pixel probe", resources,
                             error, hidden));
+            CHECK(scene.entries[0].reused_geometry == (iteration % 2 != 0));
             CHECK(scene.entries[0].hidden_triangles == (frame == 1 ? 2 : frame == 2 ? 4 : 0));
             Capture capture;
             CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240));

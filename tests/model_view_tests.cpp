@@ -115,6 +115,140 @@ namespace
         }
         return true;
     }
+    bool same_geometry(const ModelView& a, const ModelView& b)
+    {
+        CHECK(a.mesh.vertices.size() == b.mesh.vertices.size());
+        CHECK(a.world_draws.size() == b.world_draws.size() && a.close_draws.size() == b.close_draws.size());
+        CHECK(a.entries.size() == b.entries.size());
+        for (std::size_t i = 0; i < a.mesh.vertices.size(); ++i)
+        {
+            const auto& x = a.mesh.vertices[i];
+            const auto& y = b.mesh.vertices[i];
+            CHECK(x.position.x == y.position.x && x.position.y == y.position.y && x.position.z == y.position.z);
+            CHECK(x.color.x == y.color.x && x.color.y == y.color.y && x.color.z == y.color.z && x.uv == y.uv);
+        }
+        for (std::size_t i = 0; i < a.entries.size(); ++i)
+        {
+            CHECK(a.entries[i].error == b.entries[i].error && a.entries[i].range == b.entries[i].range);
+            CHECK(a.entries[i].triangles == b.entries[i].triangles &&
+                  a.entries[i].hidden_triangles == b.entries[i].hidden_triangles);
+        }
+        return true;
+    }
+    bool prepared_cache()
+    {
+        Model m;
+        std::string e;
+        CHECK(read_model(test_model::abc(false, false, 2, 2, -1).b, m, e));
+        std::shared_ptr<const Model> model = std::make_shared<Model>(m);
+        Resources resources;
+        ModelView cached, reference;
+        AnimationTrack track;
+        for (const double time : {0., 50., 100., 1000.})
+            for (const DVector scale : {DVector{1, 1, 1}, DVector{2, 3, 4}})
+                for (const auto& mask : {std::vector<std::uint8_t>{}, std::vector<std::uint8_t>{0, 1}})
+                    for (int repeat = 0; repeat < 2; ++repeat)
+                    {
+                        cached.begin_frame();
+                        reference.begin_frame();
+                        track.time = time;
+                        const NodePose pose{{float(repeat * 100), 20, 30}, rotation_from_euler({0, float(repeat), 0})};
+                        const float alpha = repeat ? .25f : 1;
+                        CHECK(cached.add(model, track, "missing.dtx", pose, scale, true, repeat, {}, "cached",
+                                         resources, e, mask, alpha));
+                        CHECK(reference.add(model.get(), track, "missing.dtx", pose, scale, true, repeat, {},
+                                            "reference", resources, e, mask, alpha));
+                        CHECK(same_geometry(cached, reference));
+                        CHECK(cached.preparation.reused == std::size_t(repeat));
+                        CHECK(track.time == time && track.first && track.revision == 0);
+                        if (!cached.close_draws.empty())
+                            CHECK(cached.close_draws[0].alpha == alpha &&
+                                  cached.close_draws[0].position.x == pose.position.x);
+                    }
+        for (const auto animation : {1u, 0u})
+        {
+            cached.begin_frame();
+            reference.begin_frame();
+            track.animation = animation;
+            track.time = 0;
+            CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "clip", resources, e));
+            CHECK(
+                reference.add(model.get(), track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "clip", resources, e));
+            CHECK(!cached.entries[0].reused_geometry && same_geometry(cached, reference));
+        }
+        // A cache hit cannot bypass invalid current transforms/alpha or failed pose selection.
+        cached.begin_frame();
+        CHECK(!cached.add(model, track, "missing.dtx", {}, {0, 1, 1}, true, false, {}, "bad", resources, e));
+        CHECK(cached.entries.empty() && cached.mesh.vertices.empty());
+        track.animation = UINT32_MAX;
+        CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "bad", resources, e));
+        CHECK(cached.entries.back().error == "Model animation pose is unavailable" && cached.mesh.vertices.empty());
+        track.animation = 0;
+        track.time = std::numeric_limits<double>::quiet_NaN();
+        CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "bad", resources, e));
+        CHECK(cached.mesh.vertices.empty());
+        track.time = 50;
+        CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, false, false, {}, "hidden", resources, e));
+        CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "skin required", resources, e, {},
+                         1, true));
+        CHECK(cached.mesh.vertices.empty());
+        // Releasing the last asset owner must work even while the inspector retains prepared geometry.
+        std::weak_ptr<const Model> weak = model;
+        model.reset();
+        CHECK(weak.expired());
+        cached.begin_frame();
+        CHECK(cached.preparation.cached_assets == 0 && cached.preparation.cached_bytes == 0);
+        // Simulate address reuse with a different control block, without a begin_frame prune.
+        auto no_delete = [](const Model*) {};
+        model = std::shared_ptr<const Model>(&m, no_delete);
+        CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "first", resources, e));
+        model.reset();
+        m.faces[0].uv[0][0] += .125f;
+        model = std::shared_ptr<const Model>(&m, no_delete);
+        CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "replacement", resources, e));
+        CHECK(!cached.entries.back().reused_geometry && cached.mesh.vertices.back().uv == m.faces[0].uv[2]);
+        CHECK(cached.mesh.vertices[3].uv == m.faces[0].uv[0]);
+        cached.clear();
+        CHECK(cached.preparation.cached_assets == 0 && cached.preparation.cached_bytes == 0);
+        return true;
+    }
+    bool cache_budget()
+    {
+        Model m;
+        std::string e;
+        CHECK(read_model(test_model::abc().b, m, e));
+        Resources resources;
+        ModelView scene;
+        std::vector<std::shared_ptr<const Model>> models;
+        for (std::size_t i = 0; i <= ModelView::cache_asset_limit; ++i)
+        {
+            models.push_back(std::make_shared<Model>(m));
+            scene.begin_frame();
+            CHECK(scene.add(models.back(), {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "small", resources, e));
+            CHECK(scene.mesh.vertices.size() == 3);
+        }
+        CHECK(scene.preparation.cached_assets == ModelView::cache_asset_limit && scene.preparation.uncached == 1);
+        models.clear();
+        scene.begin_frame();
+        CHECK(scene.preparation.cached_assets == 0);
+        m.faces.resize(200000, m.faces.front());
+        for (int i = 0; i < 2; ++i)
+        {
+            models.push_back(std::make_shared<Model>(m));
+            scene.begin_frame();
+            CHECK(scene.add(models.back(), {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "large", resources, e));
+            CHECK(scene.mesh.vertices.size() == 600000);
+        }
+        CHECK(scene.preparation.cached_assets == 1 && scene.preparation.uncached == 1);
+        CHECK(scene.preparation.cached_bytes <= ModelView::cache_vertex_limit * sizeof(WorldVertex));
+        CHECK(!scene.add(models.back(), {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "frame overflow", resources,
+                         e));
+        CHECK(scene.mesh.vertices.empty());
+        CHECK(scene.add(models.front(), {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "all hidden", resources, e,
+                        std::array<std::uint8_t, 2>{1, 1}));
+        CHECK(scene.mesh.vertices.empty() && scene.preparation.cached_bytes == 600000 * sizeof(WorldVertex));
+        return true;
+    }
     bool weapon_pose()
     {
         CViewWeapon weapon;
@@ -201,6 +335,21 @@ namespace
             CHECK(ids.size() == 47 && models.size() == 2);
             CHECK(g.server.advance_models(.025)); // No NPC tick, exercise engine clocks without UI.
             CHECK(update_model_scene(g, scene, error));
+            CHECK(scene.preparation.reused > 0);
+            // A changed skin's failure color is geometry state; its material index is draw state.
+            const auto* probe = g.objects.get(ids.front());
+            ModelView skins, uncached;
+            for (const auto* skin : {probe->state.m_SkinName, probe->state.m_SkinName, "missing.dtx", "missing.dtx",
+                                     probe->state.m_SkinName})
+            {
+                skins.begin_frame();
+                uncached.begin_frame();
+                CHECK(skins.add(probe->model, probe->animation, skin, {}, {1, 1, 1}, true, false, {}, "skin",
+                                g.resources, error));
+                CHECK(uncached.add(probe->model.get(), probe->animation, skin, {}, {1, 1, 1}, true, false, {}, "skin",
+                                   g.resources, error));
+                CHECK(same_geometry(skins, uncached));
+            }
             std::size_t triangles = 0;
             for (auto id : ids)
             {
@@ -336,6 +485,8 @@ int main(int argc, char** argv)
     return (c == "legacy_pose"                      ? legacy_pose()
             : c == "builtin_resources" && argc == 3 ? builtin_resources(argv[2])
             : c == "builtin_city" && argc == 3      ? builtin_city(argv[2])
+            : c == "prepared_cache"                 ? prepared_cache()
+            : c == "cache_budget"                   ? cache_budget()
             : c == "sample"                         ? sample()
             : c == "rejects"                        ? rejects()
             : c == "weapon_pose"                    ? weapon_pose()

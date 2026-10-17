@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "2c82c1fc2c744bced9847dc66b9c4b7b51f1bd93",
+  "status": "M2 incomplete; CPU preparation optimization, original rules unchanged",
+  "baseline_files": [
+    {
+      "path": "src/engine/model.cpp",
+      "commit": "2c82c1fc2c744bced9847dc66b9c4b7b51f1bd93",
+      "sha256": "d8bc213841f91ada6e4ce74d3877931c668ddca68493c71ac779f7f6fc02a271",
+      "purpose": "Existing implementation is the before/after equivalence control; no reference engine code imported."
+    },
+    {
+      "path": "src/engine/model_view.cpp",
+      "commit": "2c82c1fc2c744bced9847dc66b9c4b7b51f1bd93",
+      "sha256": "13573c102bac7889b4ebaf0c4ec821e7e07ad3b256f71ceaefc8083c802ee20b",
+      "purpose": "Existing implementation is the before/after equivalence control; no reference engine code imported."
+    },
+    {
+      "path": "src/app/model_scene.cpp",
+      "commit": "2c82c1fc2c744bced9847dc66b9c4b7b51f1bd93",
+      "sha256": "0cb8889fd9f7a7242057a1fb34c60d50af6a825c2dd4b5b9280c11fae1f2c184",
+      "purpose": "Existing implementation is the before/after equivalence control; no reference engine code imported."
+    }
+  ],
+  "format_provenance": "M2_MODEL_VIEW_SOURCES.json; no format interpretation changes"
+}
