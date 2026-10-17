@@ -6,9 +6,9 @@ namespace OpenBlood2
     {
         trace_service("ConfigureCharacterBody");
         auto* r = objects_.get(h);
-        if (!r || r->life != Life::Alive || r->attachment || r->world_body || r->state.m_ObjectType != OT_MODEL ||
-            !std::isfinite(mass) || mass <= 0 || mass > 1e6f || !std::isfinite(friction) || friction < 0 ||
-            friction > 20005)
+        if (!r || r->life != Life::Alive || r->attachment || r->world_body || r->model_body ||
+            r->state.m_ObjectType != OT_MODEL || !std::isfinite(mass) || mass <= 0 || mass > 1e6f ||
+            !std::isfinite(friction) || friction < 0 || friction > 20005)
             return false;
         r->character_body = true;
         r->body_properties = {mass, friction, false};

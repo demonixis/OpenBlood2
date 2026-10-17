@@ -9,6 +9,7 @@
 #include "game/original/ClientLightFX.h"
 #include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
+#include "game/original/DestructableModel.h"
 #include "game/original/DetailSprite.h"
 #include "game/original/Door.h"
 #include "game/original/ExitHint.h"
@@ -588,6 +589,46 @@ namespace OpenBlood2
                     p.push_back({name, false});
                 return p;
             }()};
+        const ClassInfo destructable_model{
+            "CDestructableModel", &b2base, construct<CDestructableModel>, []
+            {
+                std::vector<PropertySpec> p{{"DebrisStuff", std::int32_t(0), false},
+                                            {"Visible", true},
+                                            {"Solid", true},
+                                            {"Gravity", true},
+                                            {"Shadow", true},
+                                            {"DestroyVisible", true},
+                                            {"DestroySolid", true},
+                                            {"DestroyGravity", true},
+                                            {"HitPoints", 100.0f},
+                                            {"DamageHitPoints", 50.0f},
+                                            {"ObjectMass", 100.0f},
+                                            {"Alpha", 1.0f},
+                                            {"Destructable", true},
+                                            {"Pushable", false},
+                                            {"SurfaceType", std::int32_t(0)},
+                                            {"ModelScale", 1.0f},
+                                            {"TintColor", DVector{}},
+                                            {"Chrome", false},
+                                            {"TriggerDestroyOnly", false},
+                                            {"CanDamage", true},
+                                            {"SpawnObjectVel", DVector{}},
+                                            {"Amount", std::int32_t(10)},
+                                            {"Scale", 1.0f},
+                                            {"ExplodeDamage", 100.0f},
+                                            {"DamageRadius", 200.0f}};
+                for (auto name : {"InitDims", "DamageDims", "DestroyDims"})
+                    p.push_back({name, DVector{}});
+                for (auto name :
+                     {"InitFilename", "InitSkin", "DamageFilename", "DamageSkin", "DestroyFilename", "DestroySkin",
+                      "SlidingSound", "DamageTriggerTarget", "DamageTriggerMessage", "DeathTriggerTarget",
+                      "DeathTriggerMessage", "SpawnObject", "CustomTexture", "CustomSound", "CustomModel"})
+                    p.push_back({name, std::string{}});
+                for (auto name : {"Stone", "Metal", "Wood", "Energy", "Glass", "Terrain", "Plastic", "Flesh", "Liquid",
+                                  "Exploding", "Custom"})
+                    p.push_back({name, false});
+                return p;
+            }()};
         const ClassInfo rotating_brush{"RotatingBrush", &destructable_brush, construct<RotatingBrush>, []
                                        {
                                            std::vector<PropertySpec> p{{"RotatingStuff", std::int32_t(0), false},
@@ -693,9 +734,10 @@ namespace OpenBlood2
                objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
                objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
                objects.register_class(door) && objects.register_class(rotating_door) &&
-               objects.register_class(destructable_brush) && objects.register_class(rotating_brush) &&
-               objects.register_class(hand_model) && objects.register_class(corpse) &&
-               objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
+               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
+               objects.register_class(rotating_brush) && objects.register_class(hand_model) &&
+               objects.register_class(corpse) && objects.register_class(energy_projectile) &&
+               objects.register_class(shockwave_projectile);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

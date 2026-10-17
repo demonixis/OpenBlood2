@@ -1,0 +1,55 @@
+{
+  "baseline_commit": "24ae2d4d627d297ebc84ebd145e8a3d615af3cad",
+  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/ObjectDLL/DestructableModel.cpp",
+      "sha256": "220ccdb45e7ff287cde5cb9a416d14e99e95b01eb11666b94214b9d120e91f54",
+      "use": "Registration, property/initialization/update/damage/destruction/fade/sliding rules; save/load excluded."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/DestructableModel.h",
+      "sha256": "9812c402961f9b68ebc349e5b317fe378185a7940d1b1cd27dfb669303ce244a",
+      "use": "Original class members and aggregate ownership."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "CheckClearShot requests IGNORE_DESTRUCTABLE in addition to liquid/glass."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
+      "use": "GlobalFilterFn destructible model exclusion and source ground-placement helper."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "use": "SFX_DESTRUCTABLEMODEL sets client physics dimensions, sharing one body in this integration."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "use": "Existing shared damage/mass/friction/cascade rules reused."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Debris.cpp",
+      "sha256": "65cd8053b79a6ae5c9107d8997fb4a157debc1427afb2c5ba26acc7bbf60575b",
+      "use": "Existing debris and area-damage requests reused."
+    },
+    {
+      "path": "sources/blood2/Shared/SoundTypes.h",
+      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "use": "MISC_LOW priority zero."
+    }
+  ],
+  "adaptations": [
+    "Owned strings and typed direct service calls; callback/aggregate order preserved.",
+    "Model bodies reuse bounded box motion and atomic push/rider solver; no invented contact forces.",
+    "Shared client/server dimensions replace dimension-only client SFX.",
+    "Debris before deferred removal maintains checked callback lifetime; nested destruction guarded.",
+    "Bounded command parser repairs repeated initial pointer; malformed numeric groups reject before mutation.",
+    "Chrome, partial destroy pairs, save/restore and invalid properties fail explicitly; runtime failures remain inspectable.",
+    "Real ceilingfan2.abc contains an unnamed clip; accept empty authored clip names without changing count/pose/length validation or supplying an invented name."
+  ]
+}

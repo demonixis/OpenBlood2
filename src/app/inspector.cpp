@@ -4,6 +4,7 @@
 #include "engine/world_model.h"
 #include "game/original/AI_Mgr.h"
 #include "game/original/ClientLightFX.h"
+#include "game/original/DestructableModel.h"
 #include "game/original/Door.h"
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
@@ -595,6 +596,42 @@ namespace OpenBlood2
                         if (state.m_ObjectType == OT_MODEL)
                             ImGui::Text("Model additive RGB (lighting pending) %.3f %.3f %.3f | alpha %.3f",
                                         object->color.x, object->color.y, object->color.z, object->alpha);
+                        if (const auto* model = dynamic_cast<const CDestructableModel*>(object->game.get()))
+                        {
+                            ImGui::SeparatorText("Original destructible model");
+                            ImGui::Text("HP %.2f / %.2f | damage threshold %.2f | dead %s | destructible %s",
+                                        model->m_damage.m_fHitPoints, model->hit_points, model->damage_hit_points,
+                                        model->dead_state ? "yes" : "no", model->destructable ? "yes" : "no");
+                            ImGui::Text("Body %s | pushable %s | mass %.2f | friction %.2f | priority %u",
+                                        object->model_body ? "configured" : "unavailable",
+                                        model->pushable ? "yes" : "no", object->body_properties.mass,
+                                        object->body_properties.friction, object->blocking_priority);
+                            ImGui::Text("Dimensions %.2f %.2f %.2f | shared client/body publications %u",
+                                        object->dimensions.x, object->dimensions.y, object->dimensions.z,
+                                        model->dimensions_publications);
+                            ImGui::Text("Velocity %.2f %.2f %.2f | body steps %llu | pushes %llu | blocks %llu",
+                                        object->velocity.x, object->velocity.y, object->velocity.z,
+                                        static_cast<unsigned long long>(object->body_steps),
+                                        static_cast<unsigned long long>(object->body_pushes),
+                                        static_cast<unsigned long long>(object->mover_blocks));
+                            ImGui::Text("Alpha %.3f -> %.3f | cascade delay %.3f | destruction callbacks %u",
+                                        model->alpha, model->target_alpha, model->m_damage.m_fDeathDelay,
+                                        model->destructions);
+                            ImGui::Text("Ground placement result %d | sliding %s / standing %s | loop %llu",
+                                        model->ground_result, model->sliding ? "yes" : "no",
+                                        model->standing ? "yes" : "no",
+                                        static_cast<unsigned long long>(model->sliding_sound));
+                            ImGui::TextWrapped("Replacement models: damage %s / %s; destroyed %s / %s",
+                                               model->damage_model.c_str(), model->damage_skin.c_str(),
+                                               model->destroy_model.c_str(), model->destroy_skin.c_str());
+                            ImGui::TextWrapped(
+                                "Sliding WAV: %s. Contact forces are unavailable; ordinary zero-force touches do not "
+                                "start a sliding loop. Gib requests are not rendered debris.",
+                                model->sliding_path.c_str());
+                            for (const auto* detail : {&model->error, &model->trigger_error, &model->sound_error})
+                                if (!detail->empty())
+                                    ImGui::TextWrapped("%s", detail->c_str());
+                        }
                         if (object->type->name == "Model")
                         {
                             ImGui::TextWrapped("Original built-in Model: BaseClass properties and engine animation. "

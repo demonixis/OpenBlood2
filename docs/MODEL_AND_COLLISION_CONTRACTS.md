@@ -174,3 +174,12 @@ and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
 Visibility queries do not implement target selection, AI states or complete M2.
 
 The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.
+
+## Destructible model continuation
+
+[Destructible-model contracts](DESTRUCTABLE_MODEL_CONTRACTS.md) add original authored
+model dimensions and a separate typed model-body flag reusing bounded box motion.
+Models do not become character bodies or world meshes. Real ceilingfan2.abc has an
+empty animation name; the reader preserves that name and its ordinal while retaining
+all structural, key-count, pose and payload validation. This is not an absent clip
+or a synthesized bind pose. Required services and M2 remain incomplete.

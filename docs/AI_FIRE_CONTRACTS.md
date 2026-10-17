@@ -1,5 +1,9 @@
 # Original AI weapon choice and standing fire
 
+> [Destructible model contracts](DESTRUCTABLE_MODEL_CONTRACTS.md) now implement
+> the CDestructableModel-only IGNORE_DESTRUCTABLE branch in CheckClearShot.
+> Earlier absence statements below are historical; CanSee keeps its own filter.
+
 This selective source port connects `FindBestWeapon`, type-based `ChangeWeapon`,
 `MC_BestWeapon`, the Beretta/knife default `Fire` aiming branch, `CheckClearShot`,
 `MC_Fire_Stand` and AI `fire_key` dispatch. [Source ranges](M2_AI_FIRE_SOURCES.json)

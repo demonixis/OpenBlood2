@@ -1,5 +1,6 @@
 #include "engine/world_model.h"
 #include "game/original/DestructableBrush.h"
+#include "game/original/DestructableModel.h"
 #include "game/original/Door.h"
 #include "game/original/PlayerObj.h"
 #include "game/original/Projectile.h"
@@ -18,8 +19,9 @@ namespace OpenBlood2
         out = {};
         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
         if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility &&
-             filter != SegmentFilter::IgnoreCharacters && filter != SegmentFilter::IgnoreVolumes &&
-             filter != SegmentFilter::IgnoreOwnerClass && filter != SegmentFilter::ProjectileContact) ||
+             filter != SegmentFilter::AIShot && filter != SegmentFilter::IgnoreCharacters &&
+             filter != SegmentFilter::IgnoreVolumes && filter != SegmentFilter::IgnoreOwnerClass &&
+             filter != SegmentFilter::ProjectileContact) ||
             (start != SegmentStart::IncludeInterior && start != SegmentStart::SkipInterior) ||
             (objects != SegmentObjects::SolidOnly && objects != SegmentObjects::SolidOrRayHit &&
              objects != SegmentObjects::All) ||
@@ -53,9 +55,12 @@ namespace OpenBlood2
             // IGNORE_LIQUID excludes every VolumeBrush subclass, not just liquids.
             // Glass only passes when the object is a destructible brush. Baked
             // world polygons, doors, CanDamage and FireThrough do not define this filter.
-            if (filter == SegmentFilter::AIVisibility &&
+            if ((filter == SegmentFilter::AIVisibility || filter == SegmentFilter::AIShot) &&
                 (dynamic_cast<const VolumeBrush*>(record->game.get()) ||
                  (brush && brush->destructable && brush->GetSurfaceType() == SURFTYPE_GLASS)))
+                continue;
+            const auto* model = dynamic_cast<const CDestructableModel*>(record->game.get());
+            if (filter == SegmentFilter::AIShot && model && model->destructable)
                 continue;
             if (filter == SegmentFilter::IgnoreVolumes && dynamic_cast<const VolumeBrush*>(record->game.get()))
                 continue;

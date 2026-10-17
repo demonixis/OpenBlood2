@@ -230,8 +230,9 @@ namespace OpenBlood2
             anim.max = a.vec();
             auto frames = a.u32();
             pose_count += static_cast<std::size_t>(frames) * model.nodes.size();
-            if (!a.good() || anim.name.empty() || !bounds(anim.min, anim.max) || !frames || frames > 65536 ||
-                frames > a.remaining() / 30 || pose_count > 3000000)
+            // Retail ceilingfan2.abc has an unnamed clip; its ordinal and poses remain valid.
+            if (!a.good() || !bounds(anim.min, anim.max) || !frames || frames > 65536 || frames > a.remaining() / 30 ||
+                pose_count > 3000000)
                 return fail("invalid animation/key count");
             for (std::uint32_t j = 0; j < frames; ++j)
             {

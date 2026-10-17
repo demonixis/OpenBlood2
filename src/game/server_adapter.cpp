@@ -136,6 +136,11 @@ namespace OpenBlood2
                                            "Dynamic world body requires BoxPhysics without GOTHRUWORLD");
                     return;
                 }
+                if (r->model_body && (flags & FLAG_GOTHRUWORLD))
+                {
+                    active().objects_.fail(ObjectError::Unsupported, "Model body cannot bypass world collision");
+                    return;
+                }
                 if (r->world_model && !r->world_body && ((flags ^ r->state.m_Flags) & FLAG_GRAVITY))
                 {
                     active().objects_.fail(ObjectError::Unsupported,

@@ -68,6 +68,8 @@ class ServerDE : public CSBase
     virtual DRESULT WritePickupMessage(HMESSAGEWRITE, const OpenBlood2::PickupMessage&) = 0;
     virtual bool ReadPickupMessage(HMESSAGEREAD, OpenBlood2::PickupMessage&) = 0;
     virtual bool ConfigureWorldBody(HOBJECT, const OpenBlood2::WorldBodyProperties&) = 0;
+    virtual bool ConfigureModelBody(HOBJECT, const OpenBlood2::WorldBodyProperties&) = 0;
+    virtual OpenBlood2::SoundId PlayObjectLoopSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
     virtual bool SetBlockingPriority(HOBJECT, DBYTE) = 0;
     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;

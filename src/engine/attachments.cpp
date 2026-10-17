@@ -17,7 +17,7 @@ namespace OpenBlood2
         if (!std::isfinite(norm) || norm < 1e-6f)
             return DE_INVALIDPARAMS;
         // Bounded visual children only. Do not silently replace physics or permit cycles/chains.
-        if (p->attachment || c->attachment || c->container || c->world_model || c->client_movement ||
+        if (p->attachment || c->attachment || c->container || c->world_model || c->client_movement || c->model_body ||
             (c->state.m_ObjectType != OT_MODEL && c->state.m_ObjectType != OT_NORMAL &&
              c->state.m_ObjectType != OT_SPRITE) ||
             (c->state.m_Flags & (FLAG_SOLID | FLAG_GRAVITY | FLAG_RAYHIT | FLAG_TOUCH_NOTIFY)) ||

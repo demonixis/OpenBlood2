@@ -1,4 +1,5 @@
 #include "game/original/AI_Mgr.h"
+#include "game/original/DestructableModel.h"
 #include "game/original/DetailSprite.h"
 #include "game/original/Sound.h"
 #include "game/server_adapter.h"
@@ -109,6 +110,14 @@ namespace OpenBlood2
                     entry.state = EntryState::Failed;
                     entry.detail = sprite->error;
                 }
+                else if (const auto* model = r ? dynamic_cast<const CDestructableModel*>(r->game.get()) : nullptr;
+                         model && !model->error.empty())
+                {
+                    entry.state = EntryState::Failed;
+                    entry.detail = model->error;
+                    if (!r->model_error.empty())
+                        entry.detail += ": " + r->model_error;
+                }
                 else if (r && dynamic_cast<const B2BaseClass*>(r->game.get()) &&
                          static_cast<const B2BaseClass*>(r->game.get())->filtered)
                 {
@@ -147,8 +156,10 @@ namespace OpenBlood2
             for (const auto& path : model.textures)
                 use(path, "BSP texture");
         for (const auto& source : world.objects)
-            for (auto key : {"Filename", "Skin", "SoundName", "SpriteSurfaceName", "OpenBusySound", "OpenStopSound",
-                             "CloseBusySound", "CloseStopSound", "LockedSound", "UnlockedSound"})
+            for (auto key :
+                 {"Filename", "Skin", "SoundName", "SpriteSurfaceName", "OpenBusySound", "OpenStopSound",
+                  "CloseBusySound", "CloseStopSound", "LockedSound", "UnlockedSound", "InitFilename", "InitSkin",
+                  "DamageFilename", "DamageSkin", "DestroyFilename", "DestroySkin", "SlidingSound"})
                 if (const auto* p = source.find(key))
                     if (const auto* path = std::get_if<std::string>(p))
                         use(*path, key);

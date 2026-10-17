@@ -54,10 +54,9 @@ bool AI_Mgr::CheckClearShot(DVector origin, DVector& direction, bool alternate)
     auto query = [&](DVector ray, SegmentHit& hit, SegmentResult& result)
     {
         ++clear_shot.rays;
-        // Same liquid/glass rules as CanSee. Original IGNORE_DESTRUCTABLE
-        // concerns CDestructableModel, which is not registered in this port.
+        // Original IGNORE_LIQUID | IGNORE_GLASS | IGNORE_DESTRUCTABLE.
         result = server->IntersectSegment(origin, vector_add(origin, vector_scale(ray, range)), m_hObject, hit, false,
-                                          SegmentObjects::SolidOrRayHit, SegmentFilter::AIVisibility);
+                                          SegmentObjects::SolidOrRayHit, SegmentFilter::AIShot);
         if (result == SegmentResult::Invalid)
             clear_shot.outcome = AIClearOutcome::Invalid;
         else if (result == SegmentResult::Unavailable)

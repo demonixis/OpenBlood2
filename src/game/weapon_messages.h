@@ -54,6 +54,7 @@ namespace OpenBlood2
     enum class SegmentFilter
     {
         None,
+        AIShot,            // Original visibility filter plus IGNORE_DESTRUCTABLE models.
         AIVisibility,      // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
         IgnoreCharacters,  // Original CMovement clearance filter.
         IgnoreVolumes,     // Original LiquidFilterFn excludes every VolumeBrush subclass.

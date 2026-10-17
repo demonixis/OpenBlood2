@@ -82,6 +82,8 @@ namespace OpenBlood2
         std::vector<SpawnReport> spawn_reports;
         std::vector<PickupReport> pickup_reports;
         bool ConfigureWorldBody(HOBJECT, const WorldBodyProperties&) override;
+        bool ConfigureModelBody(HOBJECT, const WorldBodyProperties&) override;
+        SoundId PlayObjectLoopSound(HOBJECT, const SoundRequest&, std::string&) override;
         bool SetBlockingPriority(HOBJECT, DBYTE) override;
         void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE) override;
         void RecordDebrisEffect(const DebrisEffect&) override;

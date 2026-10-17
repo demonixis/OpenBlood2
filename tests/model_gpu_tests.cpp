@@ -219,7 +219,7 @@ int main(int argc, char** argv)
         scene.clear();
         models.clear_geometry();
     }
-    if (argc == 4 && std::string_view(argv[3]) == "builtin_city")
+    if (argc == 4 && (std::string_view(argv[3]) == "builtin_city" || std::string_view(argv[3]) == "destructable_city"))
     {
         GameSession game;
         CHECK(game.initialize());
@@ -231,14 +231,18 @@ int main(int argc, char** argv)
         {
             CHECK(game.request_world("02_CityHub", error));
             CHECK(update_model_scene(game, scene, error));
-            for (auto asset : {"lightbulb1.abc", "redlight.abc"})
+            const bool destructable = std::string_view(argv[3]) == "destructable_city";
+            for (auto asset : destructable ? std::vector{"garbagecan2.abc", "barrel.abc", "ceilingfan2.abc"}
+                                           : std::vector{"lightbulb1.abc", "redlight.abc"})
             {
-                auto selected = std::find_if(scene.entries.begin(), scene.entries.end(),
-                                             [&](const auto& entry)
-                                             {
-                                                 const auto* r = game.objects.get(entry.object);
-                                                 return r && r->type->name == "Model" && entry.label.ends_with(asset);
-                                             });
+                auto selected =
+                    std::find_if(scene.entries.begin(), scene.entries.end(),
+                                 [&](const auto& entry)
+                                 {
+                                     const auto* r = game.objects.get(entry.object);
+                                     return r && r->type->name == (destructable ? "CDestructableModel" : "Model") &&
+                                            entry.label.ends_with(asset);
+                                 });
                 CHECK(selected != scene.entries.end() && selected->error.empty());
                 auto* r = game.objects.get(selected->object);
                 CHECK(r && r->model && selected->triangles > 0);

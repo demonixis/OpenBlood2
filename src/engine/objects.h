@@ -127,7 +127,7 @@ namespace OpenBlood2
         std::uint32_t contact_polygon = UINT32_MAX;
         HOBJECT contact_object = nullptr;
         bool grounded = false;
-        bool world_body = false, character_body = false;
+        bool world_body = false, character_body = false, model_body = false;
         WorldBodyProperties body_properties;
         DBYTE blocking_priority = 0;
         std::uint64_t body_steps = 0, body_pushes = 0;

@@ -61,8 +61,9 @@ namespace OpenBlood2
         const auto* record = player ? objects.get(player->m_hObject) : nullptr;
         if (objects.busy() || !record || record->life != Life::Alive || !record->client_movement ||
             !player->attributes_received || !client_shell.m_bInWorld || client_shell.player != record->handle ||
-            record->attachment || record->world_body || record->character_body || record->activity != OBJSTATE_ACTIVE ||
-            record->auto_deactivate || !record->scheduled || !std::isfinite(record->due) || player->door_push_pending)
+            record->attachment || record->world_body || record->character_body || record->model_body ||
+            record->activity != OBJSTATE_ACTIVE || record->auto_deactivate || !record->scheduled ||
+            !std::isfinite(record->due) || player->door_push_pending)
         {
             error = "Player capture requires an active associated player outside callbacks/pending pushes";
             return false;

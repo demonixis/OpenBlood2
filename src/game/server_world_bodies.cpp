@@ -17,6 +17,21 @@ namespace OpenBlood2
         r->body_properties = properties;
         return true;
     }
+    bool ServerAdapter::ConfigureModelBody(HOBJECT handle, const WorldBodyProperties& properties)
+    {
+        trace_service("ConfigureModelBody");
+        auto* r = objects_.get(handle);
+        if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL || !r->model || r->attachment ||
+            r->client_movement || r->world_model || r->container || r->world_body || r->character_body ||
+            r->model_body || (r->state.m_Flags & FLAG_GOTHRUWORLD) || !physics_vector(r->dimensions) ||
+            r->dimensions.x < 0 || r->dimensions.y < 0 || r->dimensions.z < 0 || !std::isfinite(properties.mass) ||
+            properties.mass < 0 || properties.mass > 1e6f || !std::isfinite(properties.friction) ||
+            properties.friction < 0 || properties.friction > 20005)
+            return objects_.fail(ObjectError::Unsupported, "Invalid model-body configuration");
+        r->model_body = true;
+        r->body_properties = properties;
+        return true;
+    }
     bool ServerAdapter::SetBlockingPriority(HOBJECT handle, DBYTE priority)
     {
         trace_service("SetBlockingPriority");
@@ -34,7 +49,7 @@ namespace OpenBlood2
         plan.initiator = ignore;
         plan.origin = plan.destination = body.state.m_Pos;
         plan.velocity = body.velocity;
-        if (!body.world_body || !physics_vector(destination) || !physics_vector(plan.velocity))
+        if ((!body.world_body && !body.model_body) || !physics_vector(destination) || !physics_vector(plan.velocity))
             return MoverResult::Invalid;
         const auto offset = vector_subtract(object_bounds_center(body), body.state.m_Pos);
         auto position = object_bounds_center(body);

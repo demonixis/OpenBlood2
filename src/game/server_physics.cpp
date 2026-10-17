@@ -204,7 +204,7 @@ namespace OpenBlood2
             objects_.fail(ObjectError::Busy, "Recursive MoveObject during contact dispatch");
             return DE_ERROR;
         }
-        if (r->world_body)
+        if (r->world_body || r->model_body)
             return move_world_body(*r, *destination);
         if (r->world_model)
             return MoveWorldModel(h, *destination) == MoverResult::Moved ? DE_OK : DE_ERROR;
@@ -247,7 +247,7 @@ namespace OpenBlood2
             const bool found = query == CollisionQuery::Hit;
             auto* obstacle = found ? objects_.get(nearest.object) : nullptr;
             if (found && !nearest.start_solid && std::abs(nearest.normal.y) < .01f && obstacle &&
-                obstacle->world_body && obstacle->body_properties.pushable &&
+                (obstacle->world_body || obstacle->model_body) && obstacle->body_properties.pushable &&
                 r->blocking_priority > obstacle->blocking_priority)
             {
                 const auto into = vector_dot(remaining, nearest.normal);
@@ -461,7 +461,7 @@ namespace OpenBlood2
                 if (physics.gravity)
                     acceleration = vector_add(acceleration, gravity);
                 DVector displacement;
-                if (r->world_body || r->character_body)
+                if (r->world_body || r->character_body || r->model_body)
                 {
                     ++r->body_steps;
                     MovementState support;

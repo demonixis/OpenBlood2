@@ -880,3 +880,12 @@ See [contracts](ACTIVATION_VISIBILITY_CONTRACTS.md) and [source ledger](M2_ACTIV
 ## Initial corpse placement
 
 The [source ledger](M2_CORPSE_PLACEMENT_SOURCES.json) records original CreateCorpse/CCorpse references. Cached transforms, raw death dimensions, scale and foot offset remain source-driven. [Bounded initial placement](CORPSE_PLACEMENT_CONTRACTS.md) is new replacement-engine SAT clearance, not imported or recovered retail physics. No reference file or commercial asset was changed.
+
+## Original destructible models
+
+CDestructableModel property, initialization, damage/model replacement, destruction,
+alpha and sliding rules are adapted from the original ObjectDLL. Shared typed model
+bodies reuse the existing atomic box solver; source contact forces remain absent.
+AI CheckClearShot now includes the original model-only destructible exclusion.
+See [ledger](M2_DESTRUCTABLE_MODEL_SOURCES.json) and [contracts](DESTRUCTABLE_MODEL_CONTRACTS.md).
+No new dependency or mutable global is introduced.

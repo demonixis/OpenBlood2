@@ -52,7 +52,7 @@ namespace test_model
         }
     };
     inline Writer abc(bool weapon = false, bool character = false, float quaternion_w = 2, float quaternion_z = 0,
-                      int transform_flags = -1, float quaternion_y = 0)
+                      int transform_flags = -1, float quaternion_y = 0, bool unnamed_first_clip = false)
     {
         Writer file, header, g, n, a, d;
         header.str("MonolithExport Model File v6");
@@ -134,7 +134,11 @@ namespace test_model
         for (int clip = 0; clip < count; ++clip)
         {
             const bool single = !weapon && !character && clip;
-            a.str(character ? character_names[clip] : weapon ? names[clip] : clip ? "static" : "walk");
+            a.str(unnamed_first_clip && clip == 0 ? ""
+                  : character                     ? character_names[clip]
+                  : weapon                        ? names[clip]
+                  : clip                          ? "static"
+                                                  : "walk");
             a.u32(single ? 0 : 100);
             a.vec(-10, -10, -10);
             a.vec(10, 10, 10);

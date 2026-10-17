@@ -1,6 +1,19 @@
 #include "game/server_adapter.h"
 namespace OpenBlood2
 {
+    SoundId ServerAdapter::PlayObjectLoopSound(HOBJECT owner, const SoundRequest& request, std::string& error)
+    {
+        trace_service("PlayObjectLoopSound");
+        if (!IsObjectAlive(owner) || !client_resources || request.speaker != owner ||
+            request.space != SoundSpace::Spatial || !request.loop)
+        {
+            error = "Object loop requires a live attached owner and a spatial looping request";
+            return 0;
+        }
+        DVector position{};
+        GetObjectPos(owner, &position);
+        return audio.play(*client_resources, owner, request, position, error);
+    }
     SoundId ServerAdapter::PlayCharacterSound(HOBJECT object, const SoundRequest& request, bool retain,
                                               std::string& error)
     {

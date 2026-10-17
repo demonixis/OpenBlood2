@@ -237,7 +237,8 @@ namespace
         g.server.SetObjectFlags(h, FLAG_SOLID);
         DVector direction{0, 0, 1};
         CHECK(a->CheckClearShot({0, 10, 0}, direction) && a->clear_shot.first_hit.object == t->m_hObject);
-        CHECK(!g.objects.find_class("CDestructableModel")); // That original filter category remains unported.
+        CHECK(g.objects.find_class(
+            "CDestructableModel")); // Its filter behavior is covered by destructable_models.filters.
         return true;
     }
     bool head(const char*)
