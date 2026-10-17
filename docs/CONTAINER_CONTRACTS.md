@@ -128,3 +128,7 @@ unported. A generic VolumeBrush can carry supported Damage/FreeFall codes; this
 does not implement those specialized classes. The inspector labels effect
 properties as requests. No full textured world or retail movement parity is
 claimed, and no new dependency or ECS was introduced.
+
+The [original PolyGrid continuation](POLYGRID_CONTRACTS.md) supersedes the blanket
+liquid-surface omission for static VolumeBrush surfaces. Underwater fog, moving
+volumes, rendering parity and the actual M2 gate remain open.

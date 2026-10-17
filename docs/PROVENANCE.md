@@ -1,5 +1,14 @@
 # Source and Dependency Provenance
 
+## Original liquid PolyGrids
+
+Selected VolumeBrush/PolyGrid/CPolyGridFX rules now create and animate independent
+liquid surfaces through typed services. Rendering is new SDL_GPU mesh preparation;
+later LithTech only corroborates coordinate/UV conventions. Explicit high-detail
+always-update clocks, scoped phases and publisher physics exclusion are adaptations.
+See [source hashes](M2_POLYGRID_SOURCES.json) and [contracts](POLYGRID_CONTRACTS.md).
+Reference trees, commercial assets, dependency pins and shaders remain unchanged.
+
 ## Original scripted opportunity fire
 
 AI_Mgr Script_Fire_Stand/Walk/Run and their FOLLOWPATH/MOVETOOBJECT callers now use

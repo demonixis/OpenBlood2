@@ -1,5 +1,6 @@
 #include "VolumeBrush.h"
 #include "PlayerObj.h"
+#include "PolyGrid.h"
 #include "engine/collision.h"
 #include <algorithm>
 #include <cmath>
@@ -27,9 +28,23 @@ bool VolumeBrush::ReadProp(ObjectCreateStruct& state)
     real("SurfaceHeight", surface_height);
     real("SurfaceAlpha", surface_alpha);
     real("Damage", damage);
+    real("XScaleMin", surface.scale_min[0]);
+    real("YScaleMin", surface.scale_min[1]);
+    real("XScaleMax", surface.scale_max[0]);
+    real("YScaleMax", surface.scale_max[1]);
+    real("XScaleDuration", surface.duration[0]);
+    real("YScaleDuration", surface.duration[1]);
+    g_pServerDE->GetPropVector("SurfaceColor1", &surface.color1);
+    g_pServerDE->GetPropVector("SurfaceColor2", &surface.color2);
     g_pServerDE->GetPropVector("Current", &info.current);
     g_pServerDE->GetPropVector("FogColor", &fog_color);
     GenericProp prop;
+    if (g_pServerDE->GetPropGeneric("NumSurfacePolies", &prop) == DE_OK)
+    {
+        if (prop.m_Long < 0)
+            return false;
+        surface.polies = unsigned(prop.m_Long);
+    }
     if (g_pServerDE->GetPropGeneric("Code", &prop) == DE_OK)
     {
         if (prop.m_Long < CC_NOTHING || prop.m_Long > CC_FREEFALL || prop.m_Long == CC_CRANECONTROL)
@@ -73,11 +88,45 @@ DDWORD VolumeBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         info.object = m_hObject;
         saved_flags_ = g_pServerDE->GetObjectFlags(m_hObject);
         g_pServerDE->SetObjectUserFlags(m_hObject, (1u << 3) | (info.hidden ? 0 : FLAG_VISIBLE));
-        // PolyGrid, fog rendering and key handshakes remain explicit pending requests.
+        if (show_surface && reason != INITIALUPDATE_SAVEGAME)
+            CreateSurface();
+        // Static volume transforms remain unavailable; no pointless polling updates.
+        // Fog rendering and key handshakes remain explicit pending requests.
     }
     if (message == MID_AFFECTPHYSICS && data)
         UpdatePhysics(*static_cast<ContainerPhysics*>(data));
     return B2BaseClass::EngineMessageFn(message, data, reason);
+}
+void VolumeBrush::CreateSurface()
+{
+    ObjectCreateStruct state;
+    if (g_pServerDE->GetObjectPos(m_hObject, &state.m_Pos) != DE_OK ||
+        g_pServerDE->GetObjectRotation(m_hObject, &state.m_Rotation) != DE_OK ||
+        g_pServerDE->GetObjectDims(m_hObject, &surface.dims) != DE_OK)
+    {
+        surface_error = "Volume surface pose/dimensions unavailable";
+        return;
+    }
+    state.m_Pos.y += surface.dims.y - surface_height / 2;
+    surface.dims.y = surface_height;
+    surface.pan = {1 + info.current.x * .01f, 1 + info.current.y * .01f}; // Source uses Y, not Z.
+    surface.alpha = surface_alpha;
+    surface.sprite = sprite;
+    if (!valid_polygrid(surface))
+    {
+        surface_error = "Invalid volume surface settings";
+        return;
+    }
+    auto* child = dynamic_cast<PolyGrid*>(g_pServerDE->CreateObject(g_pServerDE->GetClass("PolyGrid"), &state));
+    if (!child)
+    {
+        surface_error = "PolyGrid runtime creation failed";
+        return;
+    }
+    surface_object = child->m_hObject;
+    if (!child->Setup(surface))
+        surface_error = child->error;
+    g_pServerDE->SetObjectUserFlags(surface_object, (1u << 3) | (info.hidden ? 0 : FLAG_VISIBLE));
 }
 void VolumeBrush::UpdatePhysics(ContainerPhysics& value)
 {
@@ -159,6 +208,8 @@ DDWORD VolumeBrush::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD
                 info.hidden = command == "OFF" || (command == "TOGGLE" && !info.hidden);
                 g_pServerDE->SetObjectFlags(m_hObject, info.hidden ? saved_flags_ & ~FLAG_VISIBLE : saved_flags_);
                 g_pServerDE->SetObjectUserFlags(m_hObject, (1u << 3) | (info.hidden ? 0 : FLAG_VISIBLE));
+                if (g_pServerDE->IsObjectAlive(surface_object))
+                    g_pServerDE->SetObjectUserFlags(surface_object, (1u << 3) | (info.hidden ? 0 : FLAG_VISIBLE));
                 ++triggers;
             }
             g_pServerDE->FreeString(string);

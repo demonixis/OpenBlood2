@@ -1,5 +1,6 @@
 #pragma once
 #include "B2BaseClass.h"
+#include "PolyGridFX.h"
 #include "game/container_messages.h"
 #include "game/weapon_messages.h"
 #include <string>
@@ -15,6 +16,9 @@ class VolumeBrush : public B2BaseClass
     DVector fog_color{};
     bool fog = false, show_surface = true, locked = false, remove_key = false;
     std::string sprite, unlock_key;
+    OpenBlood2::PolyGridSettings surface;
+    HOBJECT surface_object = nullptr; // Independent runtime object, as in original VolumeBrush.
+    std::string surface_error;
     std::uint64_t physics_calls = 0, damage_events = 0, triggers = 0;
     virtual void UpdatePhysics(OpenBlood2::ContainerPhysics&);
 
@@ -24,6 +28,7 @@ class VolumeBrush : public B2BaseClass
 
   private:
     bool ReadProp(ObjectCreateStruct&);
+    void CreateSurface();
     float last_damage_time_ = 0;
     DDWORD saved_flags_ = 0;
 };

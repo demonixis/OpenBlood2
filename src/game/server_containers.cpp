@@ -1,5 +1,6 @@
 #include "engine/container.h"
 #include "engine/world_model.h"
+#include "game/original/PolyGrid.h"
 #include "game/original/VolumeBrush.h"
 #include "game/server_adapter.h"
 
@@ -85,7 +86,8 @@ namespace OpenBlood2
         for (auto id : objects_.snapshot())
         {
             const auto* r = objects_.get(id);
-            if (!r || r->life != Life::Alive || r->container() || r->activity != OBJSTATE_ACTIVE ||
+            if (!r || r->life != Life::Alive || r->container() || dynamic_cast<const PolyGrid*>(r->game.get()) ||
+                r->activity != OBJSTATE_ACTIVE ||
                 (!r->world_body && r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
                 continue;
             ContainerPhysics physics;

@@ -465,7 +465,7 @@ namespace OpenBlood2
                         "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
                         "the player in Session first, or launch --view-world.");
                     ImGui::TextWrapped(
-                        "World textures/models, glass and alpha sprites are unlit. Lightmaps, liquid surfaces "
+                        "World textures/models, glass, PolyGrids and alpha sprites are unlit. Lightmaps "
                         "remain unavailable. Bound sky world models render in index order. World alpha uses sorted "
                         "faces; FX sort separately.");
                     ImGui::Text("Interactive clock: %llu limited frames / %.3f discarded wall seconds",
@@ -2227,6 +2227,24 @@ namespace OpenBlood2
     {
         auto* player = game.server_shell.Player(game.local_client);
         ImGui::TextUnformatted("Original volumes / liquids, ladders, conveyors and damage");
+        if (ImGui::CollapsingHeader("All PolyGrid surfaces / failures"))
+        {
+            ImGui::TextUnformatted("High detail / always update; independent server surface lifetime.");
+            for (const auto& i : game.server.polygrids.active)
+            {
+                const auto& f = i.effect;
+                ImGui::Text("#%llu | %u x %u | %s | frame %u | updates %llu", (unsigned long long)f.id, f.width,
+                            f.width, f.visible ? "visible" : "hidden", f.track.frame, (unsigned long long)f.updates);
+                ImGui::TextWrapped("%s", f.settings.sprite.c_str());
+            }
+            for (const auto& report : game.server.polygrids.reports)
+                if (!report.error.empty())
+                    ImGui::TextWrapped("%s: %s", report.source.c_str(), report.error.c_str());
+            if (polygrid_view)
+                for (const auto& e : polygrid_view->entries)
+                    if (!e.error.empty())
+                        ImGui::TextWrapped("Texture %s: %s", e.texture.c_str(), e.error.c_str());
+        }
         if (!world_error.empty())
             ImGui::TextWrapped("%s", world_error.c_str());
         ImGui::TextWrapped(
@@ -2356,14 +2374,44 @@ namespace OpenBlood2
                         brush->fog_far);
             ImGui::Text("Surface %s | height %.1f | alpha %.2f", brush->show_surface ? "requested" : "off",
                         brush->surface_height, brush->surface_alpha);
+            ImGui::TextWrapped("SPR: %s", brush->sprite.c_str());
+            if (!brush->surface_error.empty())
+                ImGui::TextWrapped("Surface failure: %s", brush->surface_error.c_str());
+            const auto* child = game.objects.get(brush->surface_object);
+            ImGui::Text("Independent PolyGrid: %s", child && child->life == Life::Alive ? "alive" : "absent/removed");
+            for (const auto& i : game.server.polygrids.active)
+                if (i.owner == brush->surface_object)
+                {
+                    const auto& fx = i.effect;
+                    ImGui::Text("Grid %u x %u | %s | updates %llu", fx.width, fx.width,
+                                fx.visible ? "visible" : "hidden", static_cast<unsigned long long>(fx.updates));
+                    ImGui::Text("Position %.1f %.1f %.1f | scale %.3f %.3f", fx.pose.position.x, fx.pose.position.y,
+                                fx.pose.position.z, fx.scale[0], fx.scale[1]);
+                    ImGui::Text("Frame %u | plasma %u | alpha %.2f", fx.track.frame, fx.settings.plasma,
+                                fx.settings.alpha);
+                    if (polygrid_view)
+                        for (const auto& e : polygrid_view->entries)
+                            if (e.id == fx.id)
+                            {
+                                ImGui::Text("Prepared triangles: %u",
+                                            e.range == UINT32_MAX ? 0 : polygrid_view->mesh.ranges[e.range].count / 3);
+                                if (!e.error.empty())
+                                    ImGui::TextWrapped("Texture failure: %s", e.error.c_str());
+                            }
+                }
+            ImGui::Text("World PolyGrids: %zu active | %llu failed", game.server.polygrids.active.size(),
+                        static_cast<unsigned long long>(game.server.polygrids.failed));
+            if (polygrid_render)
+                ImGui::Text("Previous GPU surface pass: %zu cells", polygrid_render->alpha_batches);
             if (brush->locked)
                 ImGui::TextWrapped("Key lock pending: %s (remove key %s)", brush->unlock_key.c_str(),
                                    brush->remove_key ? "yes" : "no");
         }
         ImGui::EndTable();
         if (ImGui::CollapsingHeader("Container limits / pending effects"))
-            ImGui::TextWrapped("Static closed DAT shells; four body containers in stable object order. PolyGrid liquid "
-                               "surfaces, underwater fog/audio/color effects, key handshakes, crane "
+            ImGui::TextWrapped("Static closed DAT shells; four body containers in stable object order. PolyGrid "
+                               "surfaces use high-detail, always-update simulation. Underwater "
+                               "fog/audio/color effects, key handshakes, crane "
                                "controls, minefields and moving volume transforms are not implemented. Queries and "
                                "movement use the real shell, not its bounding box.");
     }

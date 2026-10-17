@@ -71,6 +71,19 @@ namespace OpenBlood2
         return flesh_gibs.publish(owner, pos, dir, dims, scale, count, *this, *objects_.models, *client_resources,
                                   objects_.time(), error);
     }
+    std::uint64_t ServerAdapter::PublishPolyGrid(HOBJECT owner, const PolyGridSettings& settings, std::string& error)
+    {
+        trace_service("PublishPolyGrid (original surface)");
+        if (!objects_.sprites)
+        {
+            error = "PolyGrid sprite store unavailable";
+            return 0;
+        }
+        auto id = polygrids.publish(owner, settings, *this, *objects_.sprites, objects_.time(), error);
+        if (!id)
+            ++unavailable_services["PolyGrid: " + error];
+        return id;
+    }
     std::uint64_t ServerAdapter::PublishParticleStream(HOBJECT owner, const ParticleStreamSettings& settings,
                                                        std::string& error)
     {

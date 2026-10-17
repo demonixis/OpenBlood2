@@ -2,6 +2,7 @@
 #include "app/hud.h"
 #include "app/model_scene.h"
 #include "app/movement_controls.h"
+#include "app/polygrid_scene.h"
 #include "app/session_playback.h"
 #include "app/sprite_scene.h"
 #include "app/ui_runtime.h"
@@ -358,6 +359,8 @@ namespace
         OpenBlood2::ModelView model_scene, explosion_model_scene;
         OpenBlood2::WorldRenderer explosion_model_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
         bool explosion_model_drawn_hidden = false, explosion_fragments_drawn_hidden = false;
+        OpenBlood2::PolyGridView polygrid_scene;
+        OpenBlood2::WorldRenderer polygrid_renderer(runtime.gpu);
         OpenBlood2::SpriteView sprite_scene;
         OpenBlood2::WorldRenderer sprite_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
         bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false, explosion_rings_drawn_hidden = false,
@@ -379,6 +382,8 @@ namespace
         inspector.world_mesh = &world_mesh;
         inspector.model_view = &model_scene;
         inspector.explosion_model_view = &explosion_model_scene;
+        inspector.polygrid_view = &polygrid_scene;
+        inspector.polygrid_render = &polygrid_renderer.stats;
         inspector.sprite_view = &sprite_scene;
         inspector.sprite_render = &sprite_renderer.stats;
         inspector.world_render = &world_renderer.stats;
@@ -820,6 +825,8 @@ namespace
                 model_scene.clear();
                 explosion_model_scene.clear();
                 explosion_model_renderer.clear_geometry();
+                polygrid_scene.clear();
+                polygrid_renderer.clear_geometry();
                 sprite_scene.clear();
                 sprite_renderer.clear_geometry();
                 world_mesh = {};
@@ -856,6 +863,11 @@ namespace
             if (!OpenBlood2::update_explosion_model_scene(*game, explosion_model_scene, error))
             {
                 spdlog::error("Explosion model presentation: {}", error);
+                return 5;
+            }
+            if (!OpenBlood2::update_polygrid_scene(*game, polygrid_scene, error))
+            {
+                spdlog::error("PolyGrid presentation: {}", error);
                 return 5;
             }
             if (!OpenBlood2::update_sprite_scene(*game, sprite_scene, error))
@@ -1025,6 +1037,19 @@ namespace
                                                                 entry.range != UINT32_MAX && entry.triangles > 0 &&
                                                                 entry.alpha < .75f;
                         }
+                    }
+                    if (!polygrid_renderer.prepare(polygrid_scene.mesh, polygrid_scene.revision,
+                                                   SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
+                                                   height, error, true) ||
+                        !polygrid_renderer.draw(commands, capture_frame ? capture.texture : swapchain,
+                                                polygrid_scene.mesh, polygrid_scene.draws, view.position, view.rotation,
+                                                view.object && view.settings.type == 1, error,
+                                                OpenBlood2::DrawLoad::Load, world_renderer.depth_target(),
+                                                OpenBlood2::WorldPass::Translucent))
+                    {
+                        spdlog::error("PolyGrid viewport: {}", error);
+                        SDL_SubmitGPUCommandBuffer(commands);
+                        return 3;
                     }
                     if (!sprite_renderer.prepare(sprite_scene.mesh, sprite_scene.revision,
                                                  SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,

@@ -38,6 +38,7 @@ namespace OpenBlood2
     struct BloodSpurtSettings;
     struct WeaponSpriteSettings;
     struct ParticleStreamSettings;
+    struct PolyGridSettings;
     struct SkyDefinition;
 } // namespace OpenBlood2
 class PathMgr;
@@ -85,6 +86,7 @@ class ServerDE : public CSBase
     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount, unsigned started = 0,
                                         unsigned failed = 0) = 0;
     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
+    virtual std::uint64_t PublishPolyGrid(HOBJECT, const OpenBlood2::PolyGridSettings&, std::string&) = 0;
     virtual std::uint64_t PublishParticleStream(HOBJECT, const OpenBlood2::ParticleStreamSettings&, std::string&) = 0;
     virtual std::uint64_t PublishSparks(HOBJECT, const OpenBlood2::SparkSettings&, std::string&) = 0;
     virtual std::uint64_t PublishClientBloodSplat(const OpenBlood2::BloodSplatSettings&, std::string_view,

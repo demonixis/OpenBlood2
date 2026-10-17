@@ -108,3 +108,7 @@ active-only charge, local audio, checked child lifetime and forced-inactive
 Restore/KeepAlive. One radial point light is rendered over the unlit world/models;
 GetPointShade, shadows and general dynamic illumination remain unavailable.
 Earlier blanket flashlight omissions are superseded only by this bounded subset.
+
+The [original PolyGrid continuation](POLYGRID_CONTRACTS.md) supersedes the blanket
+liquid-surface omission for static VolumeBrush surfaces. Underwater fog, moving
+volumes, rendering parity and the actual M2 gate remain open.

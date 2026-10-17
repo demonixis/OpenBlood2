@@ -520,6 +520,7 @@ namespace OpenBlood2
         ok = server.explosion_fragments.advance(objects.time(), server) && ok;
         ok = server.object_particles.advance(objects.time(), server) && ok;
         ok = server.particle_streams.advance(objects.time(), server) && ok;
+        ok = server.polygrids.advance(objects.time(), server) && ok;
         if (ok && preview_model && preview_playing &&
             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
             preview_playing = false;

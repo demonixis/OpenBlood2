@@ -19,6 +19,7 @@
 #include "game/original/LightFX.h"
 #include "game/particle_streams.h"
 #include "game/player_restore.h"
+#include "game/polygrids.h"
 #include "game/projectile_report.h"
 #include "game/session.h"
 #include "game/sparks.h"
@@ -114,6 +115,8 @@ namespace OpenBlood2
         bool SetSkyDefinition(const SkyDefinition&) override;
         bool AddSkyObject(HOBJECT, unsigned) override;
         void ReportSkyFailure(std::string_view) override;
+        PolyGrids polygrids;
+        std::uint64_t PublishPolyGrid(HOBJECT, const PolyGridSettings&, std::string&) override;
         ParticleStreams particle_streams;
         std::uint64_t PublishParticleStream(HOBJECT, const ParticleStreamSettings&, std::string&) override;
         std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) override;
@@ -170,6 +173,7 @@ namespace OpenBlood2
             laser_beams.clear();
             object_particles.clear();
             particle_streams.clear();
+            polygrids.clear();
             sky = {};
             explosion_lights.clear();
             explosion_rings.clear();

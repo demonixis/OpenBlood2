@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "43aeaf8032dfb9cc7db5ad3277ce5cdc1904ec45",
+  "status": "M2 incomplete; original static liquid PolyGrids rendered and inspected",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/VolumeBrush.cpp",
+      "source_sha256": "ef2392f8e42f9f8185e94d0712a91c96c3a1dc89f5615ef00ff4f31bcfb6a94f",
+      "purpose": "ReadProp, InitialUpdate, CreateSurface, TriggerMsg and destructor; placement, independent lifetime and Current.y pan."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/VolumeBrush.h",
+      "source_sha256": "2749de8b1dc88b896a894ab67ceefc262818712039c072aacbcc038878a05036",
+      "purpose": "Surface settings and server child identity."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PolyGrid.cpp",
+      "source_sha256": "f35302d82c3cd8aacc1d387a05fc3260db452cf01cf9db2b7c3aa9786d5a24ad",
+      "purpose": "Registration, Setup, 32767 cap, typed publication and initial properties."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ClientSFX.cpp",
+      "source_sha256": "6e3731e0371a886cb02a22ba7aa5145f67b47080ed74805150d09206d41b6d54",
+      "purpose": "Original publisher ancestry and force-client-update flag."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/PolyGridFX.cpp",
+      "source_sha256": "d61ca839ab78861c585ed705694acf79b369f2339a1e210f83ab037794b35ea1",
+      "purpose": "Original lattice size, visibility, scale clocks, palette and normal/four-ring plasma."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/PolyGridFX.h",
+      "source_sha256": "58f90f9b0f2355a650665d77df65004e9caa3b7062bcbba2733927ec8fddde45",
+      "purpose": "Defaults, plasma identifiers and always-update option."
+    },
+    {
+      "source": "sources/blood2/Shared/ClientServerShared.h",
+      "source_sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
+      "purpose": "5:6:5 color packing/unpacking."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/client_de.h",
+      "source_sha256": "d4bd76f15d1689a0314f832bcba0877d2bbabcdf830a8a44da9d662b4aa534e1",
+      "purpose": "Original PolyGrid sample, sprite, texture-info and FitPolyGrid API contracts."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/drawpolygrid.cpp",
+      "source_sha256": "4f9bad22ea043c64eade1a75cf1131eedf71786755f60d7e8fdb42aac6ad71e6",
+      "purpose": "Later-generation height/127, palette+128, XZ spacing and repeat UV corroboration only; renderer not imported."
+    }
+  ],
+  "adaptations": [
+    "Typed owned publication and checked identity instead of binary messages.",
+    "High detail / always-update simulation; hidden clocks pause; bounded modulo phases scoped per world/session.",
+    "Runtime Setup after construction; duplicate publication rejected.",
+    "Visual server publishers excluded from replacement generic physics/damage polling.",
+    "Static containers only; no source polling for unavailable transforms.",
+    "New simple dynamic mesh using existing world alpha shader; no renderer/dependency imported."
+  ]
+}

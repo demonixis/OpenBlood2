@@ -29,6 +29,7 @@
 #include "game/original/KeyPickup.h"
 #include "game/original/ObjectivesTrigger.h"
 #include "game/original/PathPoint.h"
+#include "game/original/PolyGrid.h"
 #include "game/original/PowerupPickups.h"
 #include "game/original/Projectile.h"
 #include "game/original/ProximityBomb.h"
@@ -444,6 +445,28 @@ namespace OpenBlood2
              {"PanSkyScaleZ", 10.0f},
              {"Gravity", DVector{0, -2000, 0}},
              {"SoftSky", std::string("textures\\environmentmaps\\clouds\\clouds"), true, 499}}};
+        const ClassInfo polygrid{"PolyGrid",
+                                 &client_sfx,
+                                 construct<PolyGrid>,
+                                 {{"Dims", DVector{}},
+                                  {"Color1", DVector{255, 255, 255}},
+                                  {"Color2", DVector{255, 255, 255}},
+                                  {"SpriteSurfaceName", std::string("Sprites\\VolumeBrushSprites\\Water1.spr")},
+                                  {"XScaleMin", 15.f},
+                                  {"XScaleMax", 15.f},
+                                  {"YScaleMin", 15.f},
+                                  {"YScaleMax", 15.f},
+                                  {"XScaleDuration", 10.f},
+                                  {"YScaleDuration", 10.f},
+                                  {"XPan", 10.f},
+                                  {"YPan", 10.f},
+                                  {"Alpha", .7f},
+                                  {"NumPolies", std::int32_t(160)},
+                                  {"PlasmaType", std::int32_t(1)},
+                                  {"Ring1Rate", std::int32_t(50)},
+                                  {"Ring2Rate", std::int32_t(10)},
+                                  {"Ring3Rate", std::int32_t(30)},
+                                  {"Ring4Rate", std::int32_t(20)}}};
         const ClassInfo volume{"VolumeBrush",
                                &b2base,
                                construct<VolumeBrush>,
@@ -832,32 +855,32 @@ namespace OpenBlood2
                objects.register_class(exit_hint) && objects.register_class(character) &&
                objects.register_class(ai_manager) && objects.register_class(cultist) &&
                objects.register_class(civilian) && objects.register_class(gideon) && objects.register_class(player) &&
-               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
-               objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
-               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
-               objects.register_class(key_pickup) && objects.register_class(pickup) &&
-               objects.register_class(item_pickup) && objects.register_class(item_weapon) &&
-               objects.register_class(proximity_pickup) && objects.register_class(remote_pickup) &&
-               objects.register_class(charged_pickup) && objects.register_class(medkit_pickup) &&
-               objects.register_class(flashlight_pickup) && objects.register_class(weapon_pickup) &&
-               objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
-               objects.register_class(flare_pickup) && objects.register_class(mac10_pickup) &&
-               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
-               objects.register_class(health_base) && objects.register_class(armor_base) &&
-               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
-               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
-               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
-               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
-               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
-               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
-               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
-               objects.register_class(conversation_trigger) && objects.register_class(big_trigger) &&
-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
-               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
-               objects.register_class(world_debris) && objects.register_class(hand_model) &&
-               objects.register_class(gib) && objects.register_class(corpse) && objects.register_class(proximity) &&
-               objects.register_class(remote) && objects.register_class(grenade) &&
+               objects.register_class(polygrid) && objects.register_class(volume) && objects.register_class(water) &&
+               objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
+               objects.register_class(conveyor) && objects.register_class(damage) && objects.register_class(freefall) &&
+               objects.register_class(trigger) && objects.register_class(key_pickup) &&
+               objects.register_class(pickup) && objects.register_class(item_pickup) &&
+               objects.register_class(item_weapon) && objects.register_class(proximity_pickup) &&
+               objects.register_class(remote_pickup) && objects.register_class(charged_pickup) &&
+               objects.register_class(medkit_pickup) && objects.register_class(flashlight_pickup) &&
+               objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
+               objects.register_class(assault_pickup) && objects.register_class(flare_pickup) &&
+               objects.register_class(mac10_pickup) && objects.register_class(ammo_pickup) &&
+               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
+               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
+               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
+               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
+               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
+               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
+               objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
+               objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
+               objects.register_class(objectives_trigger) && objects.register_class(conversation_trigger) &&
+               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+               objects.register_class(door) && objects.register_class(rotating_door) &&
+               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
+               objects.register_class(rotating_brush) && objects.register_class(world_debris) &&
+               objects.register_class(hand_model) && objects.register_class(gib) && objects.register_class(corpse) &&
+               objects.register_class(proximity) && objects.register_class(remote) && objects.register_class(grenade) &&
                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
                objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
                objects.register_class(shockwave_projectile);
