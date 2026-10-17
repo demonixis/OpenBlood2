@@ -1,5 +1,6 @@
 // Selected original brush lifecycle; bounded BoxPhysics body services support Pushable/Gravity.
 #include "DestructableBrush.h"
+#include "WorldModelDebris.h"
 #include "engine/collision.h"
 #include <cmath>
 CDestructableBrush::CDestructableBrush() : B2BaseClass(OT_WORLDMODEL)
@@ -57,7 +58,7 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
             create.m_Flags |= FLAG_GRAVITY;
         }
         if ((create.m_Flags & FLAG_GRAVITY) &&
-            (!(create.m_Flags & FLAG_BOXPHYSICS) || (create.m_Flags & FLAG_GOTHRUWORLD)))
+            ((!dynamic_debris && !(create.m_Flags & FLAG_BOXPHYSICS)) || (create.m_Flags & FLAG_GOTHRUWORLD)))
             return 0; // Polygon dynamics / world bypass are not this body solver.
         return 1;
     }
@@ -69,11 +70,11 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
         m_damage.m_fMass = mass;
         m_damage.apply_damage_physics = pushable;
         server->SetBlockingPriority(m_hObject, pushable ? 40 : 100);
-        if (server->GetObjectFlags(m_hObject) & FLAG_GRAVITY)
+        if (dynamic_debris || (server->GetObjectFlags(m_hObject) & FLAG_GRAVITY))
         {
             // Source SetMass clamps its local parameter, but uses the unclamped
             // member in this formula. Preserve friction above mass 500 too.
-            if (!server->ConfigureWorldBody(m_hObject, {mass, 5 + mass * 10 / 500, pushable}))
+            if (!server->ConfigureWorldBody(m_hObject, {mass, 5 + mass * 10 / 500, pushable, dynamic_debris}))
             {
                 server->RemoveObject(m_hObject);
                 return 0;
@@ -84,9 +85,10 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
     }
     if (message == MID_UPDATE && destructable && m_damage.IsDead())
     {
-        server->RecordBrushDestruction(m_hObject, m_damage.last_damage.direction, m_damage.m_fLastDamageAmount,
-                                       debris.amount);
         debris.Create(m_damage.last_damage.direction, m_damage.m_fLastDamageAmount);
+        CreateWorldModelDebris();
+        server->RecordBrushDestruction(m_hObject, m_damage.last_damage.direction, m_damage.m_fLastDamageAmount,
+                                       debris.amount, world_debris_started, world_debris_failed);
         server->RemoveObject(m_hObject);
     }
     return B2BaseClass::EngineMessageFn(message, data, reason);
@@ -98,4 +100,41 @@ DDWORD CDestructableBrush::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESS
         GetServerDE()->IsObjectAlive(m_hObject))
         GetServerDE()->SetNextUpdate(m_hObject, .001f);
     return accepted;
+}
+
+void CDestructableBrush::CreateWorldModelDebris()
+{
+    auto* server = GetServerDE();
+    const auto* raw = server->GetObjectName(m_hObject);
+    const std::string name = raw ? raw : "";
+    if (name.empty())
+        return;
+    // Source contiguous numbering, all same-name matches, stop on the first
+    // empty list (not on a wrong-class match). Own the name across callbacks.
+    for (unsigned n = 0; n < 65536; ++n)
+    {
+        const auto key = name + "debris" + std::to_string(n);
+        if (key.size() > 100)
+            return; // No legal object name can match.
+        auto* list = server->FindNamedObjects(key.c_str());
+        if (!list)
+        {
+            ++world_debris_failed;
+            return;
+        }
+        const bool found = list->m_pFirstLink != nullptr;
+        for (auto* link = list->m_pFirstLink; link; link = link->m_pNext)
+            if (server->IsObjectAlive(link->m_hObject))
+                if (auto* piece = dynamic_cast<WorldModelDebris*>(server->HandleToObject(link->m_hObject)))
+                {
+                    if (piece->Start())
+                        ++world_debris_started;
+                    else
+                        ++world_debris_failed;
+                }
+        server->RelinquishList(list); // Also release the source's leaked terminal empty list.
+        if (!found)
+            return;
+    }
+    ++world_debris_failed; // Bounded traversal; never report truncated work as complete.
 }

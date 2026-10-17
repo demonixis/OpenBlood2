@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "9a37206a25da6bc38bd23cd2491682a326dd7bb4",
+  "status": "M2 incomplete",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/WorldModelDebris.cpp",
+      "source_sha256": "db38e043abdf1334833db90d57841c7d85c7ae18a60006329159086a2f12ecb7",
+      "purpose": "Original properties, Start, Update and subclass callback order."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/WorldModelDebris.h",
+      "source_sha256": "2d1633cb5a402c24474ead56dc5697966583b6d8d5ffff60e989dbb8ecd8437e",
+      "purpose": "Original inheritance and Rotating ownership."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
+      "source_sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
+      "purpose": "Original destruction order and contiguous CreateWorldModelDebris name traversal."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Rotating.cpp",
+      "source_sha256": "06159a27c104c57aa2e2d44e356533f74d6bb0aab7b19817322ea485611973f5",
+      "purpose": "Existing original aggregate ramp/scheduling/rotation rules."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "purpose": "Existing Heal and mass/friction rules."
+    },
+    {
+      "source": "sources/lithtech/runtime/shared/src/moveobject.cpp",
+      "source_sha256": "ab363eba59ebfd89865a1d5619ffb95a82c474c319adc8d89c921da63b2d79f9",
+      "purpose": "Later-generation force-ignore contact notification reference only; no source imported."
+    }
+  ],
+  "implementation": [
+    "src/game/original/WorldModelDebris.cpp",
+    "src/game/original/WorldModelDebris.h",
+    "src/game/original/DestructableBrush.cpp",
+    "src/game/registration.cpp",
+    "src/game/server_world_bodies.cpp",
+    "src/game/server_rotation.cpp",
+    "src/app/inspector.cpp"
+  ],
+  "adaptations": [
+    "Checked return values and explicit failed-service scheduling stop",
+    "Bounded owned-name traversal and terminal empty-list leak fix",
+    "Conservative moving bounds with authored polygon recipient queries",
+    "Atomic conservative primary-world angular envelope; existing integration and deferred contacts",
+    "No fabricated force magnitudes, no new globals/dependencies or reference modifications"
+  ],
+  "unsupported": [
+    "Save/restore, full dynamic polygon/stack/crushing/force services and retail parity",
+    "Client gibs and rotator audio",
+    "Missing CityHub geometry, remaining classes/services and safe NEW_LEVEL"
+  ]
+}

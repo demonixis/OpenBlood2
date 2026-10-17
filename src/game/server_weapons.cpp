@@ -94,15 +94,17 @@ namespace OpenBlood2
         out = {nearest.point, nearest.normal, nearest.object, nearest.polygon, nearest.fraction, nearest.texture_flags};
         return SegmentResult::Hit;
     }
-    void ServerAdapter::RecordBrushDestruction(HOBJECT handle, DVector direction, float damage, DBYTE amount)
+    void ServerAdapter::RecordBrushDestruction(HOBJECT handle, DVector direction, float damage, DBYTE amount,
+                                               unsigned started, unsigned failed)
     {
         trace_service("RecordBrushDestruction");
         auto* object = objects_.get(handle);
-        if (!object || object->life != Life::Alive || !physics_vector(direction) || !std::isfinite(damage))
+        if (!object || !physics_vector(direction) || !std::isfinite(damage))
             return;
         if (brush_destructions.size() == 32)
             brush_destructions.erase(brush_destructions.begin());
-        brush_destructions.push_back({object->state.m_Name, object->state.m_Pos, direction, damage, amount});
+        brush_destructions.push_back(
+            {object->state.m_Name, object->state.m_Pos, direction, damage, amount, started, failed});
     }
     DRESULT ServerAdapter::WriteDamage(HMESSAGEWRITE h, const Damage& value)
     {

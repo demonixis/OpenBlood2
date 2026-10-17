@@ -130,7 +130,8 @@ namespace OpenBlood2
                     active().objects_.fail(ObjectError::Unsupported, "Container solid/gravity flags are unsupported");
                     return;
                 }
-                if (r->world_body && (!(flags & FLAG_BOXPHYSICS) || (flags & FLAG_GOTHRUWORLD)))
+                if (r->world_body &&
+                    ((!r->body_properties.rotating_debris && !(flags & FLAG_BOXPHYSICS)) || (flags & FLAG_GOTHRUWORLD)))
                 {
                     active().objects_.fail(ObjectError::Unsupported,
                                            "Dynamic world body requires BoxPhysics without GOTHRUWORLD");

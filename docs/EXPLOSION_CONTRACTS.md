@@ -1,5 +1,9 @@
 # Original brush explosions and debris requests
 
+> [World-model debris](WORLD_DEBRIS_CONTRACTS.md) now connects the selected original
+> fragment activation/lifecycle with bounded replacement motion. Earlier blanket
+> WorldModelDebris omissions below are historical; full retail physics remains open.
+
 > Extended by [scene explosion contracts](SCENE_EXPLOSION_CONTRACTS.md): original
 > CClientExplosionSFX activation/removal and detached audio, preserving its null
 > damager (zero delivered damage). Client FX and complete M2 remain unavailable.

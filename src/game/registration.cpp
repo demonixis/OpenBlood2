@@ -34,6 +34,7 @@
 #include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
 #include "game/original/WeaponPickups.h"
+#include "game/original/WorldModelDebris.h"
 #include "game/original/WorldProperties.h"
 #include "game/server_adapter.h"
 
@@ -668,6 +669,19 @@ namespace OpenBlood2
                                            }
                                            return p;
                                        }()};
+        const ClassInfo world_debris{"WorldModelDebris", &destructable_brush, construct<WorldModelDebris>, []
+                                     {
+                                         auto p = rotating_brush.properties;
+                                         for (auto& prop : p)
+                                             if (prop.name == "AllowMarks")
+                                                 prop.value = true;
+                                         p.push_back({"Visible", false});
+                                         p.push_back({"Solid", false});
+                                         p.push_back({"Gravity", false});
+                                         p.push_back({"InitialVelocity", DVector{}});
+                                         p.push_back({"GravityMultiplier", 1.0f});
+                                         return p;
+                                     }()};
         const ClassInfo rotating_door{"RotatingDoor",
                                       &door,
                                       construct<RotatingDoor>,
@@ -758,10 +772,11 @@ namespace OpenBlood2
                objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
                objects.register_class(door) && objects.register_class(rotating_door) &&
                objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
-               objects.register_class(rotating_brush) && objects.register_class(hand_model) &&
-               objects.register_class(corpse) && objects.register_class(flare_projectile) &&
-               objects.register_class(flare_alt) && objects.register_class(flare_burst) &&
-               objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
+               objects.register_class(rotating_brush) && objects.register_class(world_debris) &&
+               objects.register_class(hand_model) && objects.register_class(corpse) &&
+               objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
+               objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
+               objects.register_class(shockwave_projectile);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

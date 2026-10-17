@@ -1,5 +1,9 @@
 # Original pushable brushes and bounded box physics
 
+> [World-model debris](WORLD_DEBRIS_CONTRACTS.md) now connects the selected original
+> fragment activation/lifecycle with bounded replacement motion. Earlier blanket
+> WorldModelDebris omissions below are historical; full retail physics remains open.
+
 > Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
 > pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
 

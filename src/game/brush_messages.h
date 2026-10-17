@@ -10,6 +10,7 @@ namespace OpenBlood2
         DVector position{}, direction{};
         float damage = 0;
         DDWORD debris_amount = 0;
+        unsigned world_debris_started = 0, world_debris_failed = 0;
     };
     struct RadiusDamageReport
     {

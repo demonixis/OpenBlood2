@@ -16,6 +16,7 @@
 #include "game/original/SoundFX.h"
 #include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
+#include "game/original/WorldModelDebris.h"
 
 #include <algorithm>
 #include <cmath>
@@ -2447,7 +2448,7 @@ namespace OpenBlood2
     void Inspector::draw_brushes(GameSession& game, ObjectSelection& selection)
     {
         ImGui::TextWrapped(
-            "Original CDestructableBrush / RotatingBrush. Commands are queued to the simulation. "
+            "Original CDestructableBrush / RotatingBrush / WorldModelDebris. Commands are queued to the simulation. "
             "Failed source entries and authored properties remain in World. CDebris requests are inspectable below.");
         ImGui::Text("Explosion requests: %zu | debris requests: %zu (FX/audio pending)",
                     game.server.explosion_effects.size(), game.server.debris_effects.size());
@@ -2509,9 +2510,23 @@ namespace OpenBlood2
         if (b)
         {
             ImGui::Text("%s / %s", r->state.m_Name, r->type->name.c_str());
-            if (const auto* rotating = dynamic_cast<const RotatingBrush*>(b))
+            const auto* debris = dynamic_cast<const WorldModelDebris*>(b);
+            const auto* rotating = dynamic_cast<const RotatingBrush*>(b);
+            if (debris)
             {
-                const auto& v = rotating->rotating;
+                ImGui::Text("World debris: %s | starts %u | landings %u",
+                            debris->failed ? "failed"
+                            : debris->on   ? "flying"
+                                           : "off",
+                            debris->starts, debris->landings);
+                ImGui::Text("Initial velocity %.2f %.2f %.2f | gravity multiplier %.3f", debris->initial_velocity.x,
+                            debris->initial_velocity.y, debris->initial_velocity.z, debris->gravity_multiplier);
+                ImGui::TextWrapped("%s", debris->error.c_str());
+            }
+            ImGui::Text("Named debris starts %u | failures %u", b->world_debris_started, b->world_debris_failed);
+            if (rotating || debris)
+            {
+                const auto& v = rotating ? rotating->rotating : debris->rotating;
                 constexpr const char* states[] = {"off", "normal", "spin up", "spin down"};
                 constexpr const char* results[] = {"moved", "blocked", "invalid", "unavailable"};
                 ImGui::Text("%s | last motion %s", states[v.state], results[unsigned(v.last_move)]);
@@ -2542,8 +2557,9 @@ namespace OpenBlood2
             if (r->world_body)
             {
                 constexpr const char* results[] = {"moved", "blocked", "invalid", "unavailable"};
-                ImGui::Text("Dynamic box | pushable %s | priority %u", b->pushable ? "yes" : "no",
-                            unsigned(r->blocking_priority));
+                ImGui::Text("%s | pushable %s | priority %u",
+                            r->body_properties.rotating_debris ? "Dynamic debris bounds" : "Dynamic box",
+                            b->pushable ? "yes" : "no", unsigned(r->blocking_priority));
                 ImGui::Text("Mass %.1f | friction %.3f | gravity %s", r->body_properties.mass,
                             r->body_properties.friction, r->state.m_Flags & FLAG_GRAVITY ? "yes" : "no");
                 ImGui::Text("Position %.2f %.2f %.2f", r->state.m_Pos.x, r->state.m_Pos.y, r->state.m_Pos.z);
@@ -2569,7 +2585,7 @@ namespace OpenBlood2
                         b->m_damage.m_fDeathDelay, b->m_damage.m_bDead);
             ImGui::Text("Destructable %s | TriggerDestroyOnly %s", b->destructable ? "yes" : "no",
                         b->m_damage.trigger_only ? "yes" : "no");
-            ImGui::Text("Collision %s | FireThrough %s", b->box_physics ? "box" : "polygon",
+            ImGui::Text("Collision %s | FireThrough %s", r->state.m_Flags & FLAG_BOXPHYSICS ? "box" : "polygon",
                         b->fire_through ? "yes" : "no");
             ImGui::Text("Surface %u (authored %u) | debris amount %u / scale %.2f", b->GetSurfaceType(), b->surface,
                         unsigned(b->debris.amount), b->debris.scale);
@@ -2642,11 +2658,12 @@ namespace OpenBlood2
             }
             ImGui::TreePop();
         }
-        if (ImGui::TreeNode("Destruction requests (not rendered)"))
+        if (ImGui::TreeNode("Brush destruction history"))
         {
             for (const auto& event : game.server.brush_destructions)
-                ImGui::Text("%s: damage %.1f, authored amount %u", event.name.c_str(), event.damage,
-                            event.debris_amount);
+                ImGui::Text("%s: damage %.1f, authored amount %u | world debris %u started / %u failed",
+                            event.name.c_str(), event.damage, event.debris_amount, event.world_debris_started,
+                            event.world_debris_failed);
             ImGui::TreePop();
         }
     }

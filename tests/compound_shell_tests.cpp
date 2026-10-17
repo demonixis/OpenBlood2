@@ -229,7 +229,7 @@ namespace
             }
             std::cout << "CityHub: " << created << " created / " << transferred << " sounds / " << unknown
                       << " unsupported / " << failed << " failed\n";
-            CHECK(created == 422 && transferred == 31 && unknown == 31 && failed == 1);
+            CHECK(created == 432 && transferred == 31 && unknown == 21 && failed == 1);
             WorldMesh mesh;
             CHECK(mesh.build(g.world, error, &g.resources));
             if (gpu)

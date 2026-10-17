@@ -85,7 +85,7 @@ namespace OpenBlood2
         bool ConfigureModelBody(HOBJECT, const WorldBodyProperties&) override;
         SoundId PlayObjectLoopSound(HOBJECT, const SoundRequest&, std::string&) override;
         bool SetBlockingPriority(HOBJECT, DBYTE) override;
-        void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE) override;
+        void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE, unsigned = 0, unsigned = 0) override;
         void RecordDebrisEffect(const DebrisEffect&) override;
         std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         ExplosionSprites explosion_sprites;

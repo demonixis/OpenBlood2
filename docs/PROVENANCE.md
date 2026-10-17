@@ -916,3 +916,12 @@ SetupViewModel fallback restores missing alternate/idle animation handling, incl
 the actual left Mac-10. See [ledger](M2_MAC10_SOURCES.json) and
 [contracts](MAC10_CONTRACTS.md). Chrome, multiplayer boost and view-key audio remain
 explicitly unavailable. No source asset, dependency or mutable game global is added.
+
+## Original WorldModelDebris
+
+Selected WorldModelDebris properties/Start/Update and CDestructableBrush named-fragment
+activation are ported from sources/blood2/ObjectDLL. Rotating and destruction remain
+original callbacks. The enclosing-bound motion and primary-world angular envelope
+are explicit replacement engine policies, not recovered retail physics. The terminal
+empty-list leak is fixed and traversal is bounded. See [ledger](M2_WORLD_DEBRIS_SOURCES.json)
+and [contracts](WORLD_DEBRIS_CONTRACTS.md). Reference repositories/assets are unchanged.

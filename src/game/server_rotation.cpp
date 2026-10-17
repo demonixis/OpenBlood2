@@ -9,7 +9,8 @@ namespace OpenBlood2
     {
         trace_service("RotateWorldModel");
         auto* mover = objects_.get(handle);
-        if (!mover || mover->life != Life::Alive || !mover->world_model_base || mover->world_body || moving_ ||
+        if (!mover || mover->life != Life::Alive || !mover->world_model_base ||
+            (mover->world_body && !mover->body_properties.rotating_debris) || moving_ ||
             !physics_vector(move.from_angles) || !physics_vector(move.to_angles) ||
             !physics_vector(move.original_position) || !physics_vector(move.pivot))
             return MoverResult::Invalid;
@@ -98,6 +99,24 @@ namespace OpenBlood2
             shape = std::make_shared<ContainerShape>(base);
             if (!shape->transform(multiply_rotation(rotation, inverse_rotation(mover->world_model_basis)), position))
                 return MoverResult::Invalid;
+            if (mover->world_body)
+            {
+                // Unlike a kinematic brush, free debris must not rotate into the
+                // primary world. Sweep a conservative bound over this angular step.
+                const auto center = vector_scale(vector_add(shape->min, shape->max), .5f);
+                const auto previous_center = vector_add(vector_scale(vector_add(previous->min, previous->max), .5f),
+                                                        vector_subtract(old_position, previous->origin));
+                const auto old_half = vector_scale(vector_subtract(previous->max, previous->min), .5f);
+                const auto half = vector_scale(vector_subtract(shape->max, shape->min), .5f);
+                const DVector extent{std::max(old_half.x, half.x) + padding.x, std::max(old_half.y, half.y) + padding.y,
+                                     std::max(old_half.z, half.z) + padding.z};
+                CollisionHit hit;
+                const auto result = collision->sweep(previous_center, center, extent, hit);
+                if (result == CollisionQuery::Invalid)
+                    return MoverResult::Unavailable;
+                if (result == CollisionQuery::Hit)
+                    return blocked(nullptr);
+            }
             const auto delta_rotation = multiply_rotation(rotation, inverse_rotation(old_rotation));
             for (auto& body : bodies)
             {

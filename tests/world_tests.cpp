@@ -923,8 +923,8 @@ namespace
                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
                 else
                 {
-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 454 && d.editor_only == 541 &&
-                          d.unknown == 31 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                    CHECK(d.entries.size() == 1026 && d.schema_checked == 464 && d.editor_only == 541 &&
+                          d.unknown == 21 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
                     for (const auto& e : d.entries)
                         if (e.state == DestinationEntryState::InvalidProperties)
                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
@@ -1168,7 +1168,7 @@ namespace
                 {
                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
                     if (std::string_view(name) == "02_cityhub")
-                        CHECK(d.created == 422 && d.unknown == 31 && d.failed == 1);
+                        CHECK(d.created == 432 && d.unknown == 21 && d.failed == 1);
                     else
                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
                 }

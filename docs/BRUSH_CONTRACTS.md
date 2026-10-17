@@ -1,5 +1,9 @@
 # Rotating and destructible world-model brushes
 
+> [World-model debris](WORLD_DEBRIS_CONTRACTS.md) now connects the selected original
+> fragment activation/lifecycle with bounded replacement motion. Earlier blanket
+> WorldModelDebris omissions below are historical; full retail physics remains open.
+
 > Continued by [damage state contracts](DAMAGE_STATE_CONTRACTS.md): original damage
 > Save/Load values and death counter/delay/nigh-invulnerability now execute.
 > Earlier blanket damage-save omissions are historical. Whole player restoration

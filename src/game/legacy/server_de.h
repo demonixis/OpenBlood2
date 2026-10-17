@@ -71,7 +71,8 @@ class ServerDE : public CSBase
     virtual bool ConfigureModelBody(HOBJECT, const OpenBlood2::WorldBodyProperties&) = 0;
     virtual OpenBlood2::SoundId PlayObjectLoopSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
     virtual bool SetBlockingPriority(HOBJECT, DBYTE) = 0;
-    virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
+    virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount, unsigned started = 0,
+                                        unsigned failed = 0) = 0;
     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
     virtual std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) = 0;
     virtual std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&) = 0;
