@@ -92,13 +92,13 @@ namespace
         }
         if ((options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
              options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke ||
-             options.pickups_smoke || (!options.gpu_smoke && !options.world_smoke)) &&
+             options.pickups_smoke || options.doors_smoke || (!options.gpu_smoke && !options.world_smoke)) &&
             !game->server.audio.open_output(error))
         {
             spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
             if (options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
                 options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke ||
-                options.pickups_smoke)
+                options.doors_smoke || options.pickups_smoke)
                 return 4;
         }
         HOBJECT key = nullptr;
@@ -173,14 +173,15 @@ namespace
         OpenBlood2::ObjectId smoke_door{}, smoke_trigger{};
         bool key_unlocked_hidden = false;
         DVector hidden_door_position{};
-        bool door_moved_hidden = false;
+        bool door_moved_hidden = false, door_sound_hidden = false;
         if (options.doors_smoke)
         {
             for (auto id : game->objects.snapshot())
             {
                 auto* r = game->objects.get(id);
                 const auto* door = dynamic_cast<const Door*>(r->game.get());
-                if (door && door->speed > 0 && door->move_dist > 0 && door->open_delay < .05f)
+                if (door && door->speed > 0 && door->move_dist > 0 && door->open_delay < .05f &&
+                    !door->open_busy.empty())
                 {
                     smoke_door = selection.id = id;
                     auto text = game->server.CreateString("TRIGGER");
@@ -710,6 +711,12 @@ namespace
             inspector.limited_frames = limited_frames;
             inspector.discarded_wall_time = discarded_wall_time;
 #endif
+            // Audio samples attached positions before original object motion in
+            // GameSession::step. Check that sampled pose, not the later render pose.
+            DVector sampled_door_position{};
+            if (options.doors_smoke)
+                if (const auto* record = game->objects.get(smoke_door))
+                    sampled_door_position = record->state.m_Pos;
             if (!OpenBlood2::step_app_session(*game, delta, smoke))
             {
                 spdlog::error("Object simulation step failed (frame={}, delta={}, time={})", frames, delta,
@@ -1257,6 +1264,23 @@ namespace
                     const auto delta =
                         OpenBlood2::vector_subtract(game->objects.get(smoke_door)->state.m_Pos, hidden_door_position);
                     door_moved_hidden = OpenBlood2::vector_dot(delta, delta) > .01f;
+                    if (options.doors_smoke)
+                    {
+                        const auto* record = game->objects.get(smoke_door);
+                        const auto* door = dynamic_cast<const Door*>(record->game.get());
+                        const auto* voice = game->server.audio.get(door->last_voice);
+                        door_sound_hidden = door->sound_starts > 0 && !door->sound_failures && voice &&
+                                            voice->request.speaker == record->handle && voice->cursor > 0 &&
+                                            voice->position.x == sampled_door_position.x &&
+                                            voice->position.y == sampled_door_position.y &&
+                                            voice->position.z == sampled_door_position.z &&
+                                            game->server.audio.submitted_frames > 0 &&
+                                            game->server.audio.output_error.empty();
+                        spdlog::info("Door audio hidden: starts={}, failures={}, cursor={}, submitted frames={}, "
+                                     "sampled attachment verified={}",
+                                     door->sound_starts, door->sound_failures, voice ? voice->cursor : 0,
+                                     game->server.audio.submitted_frames, door_sound_hidden);
+                    }
                 }
                 if (options.interaction_smoke && (frames == hide_frame || frames == show_frame - 1))
                 {
@@ -1667,7 +1691,8 @@ namespace
                   !ai_sight_reentered || !ai_state_hidden || !ai_state_reentered || !ai_target_hidden ||
                   !ai_target_reentered || !hand_hidden || !hand_reentered)) ||
                 (options.gpu_smoke && (game->server.string_count() != 0 || game->objects.snapshot().size() != 1)) ||
-                (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                (options.containers_smoke && !container_hidden) ||
+                (options.doors_smoke && (!door_moved_hidden || !door_sound_hidden)) ||
                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
                 (options.scene_explosions_smoke &&
                  (!scene_explosion_hidden || !explosion_sprites_drawn_hidden || !explosion_model_drawn_hidden ||
@@ -1797,7 +1822,8 @@ namespace
                              "hidden, door motion, inspector, reload");
             if (options.doors_smoke)
                 spdlog::info(
-                    "Door smoke passed: original trigger, translation while hidden, inspection, unload/reload");
+                    "Door smoke passed: original trigger, hidden translation and attached decoded audio/SDL output, "
+                    "inspection, unload/reload");
             if (options.containers_smoke)
                 spdlog::info("Container smoke passed: {}, MoveMgr while hidden, volume inspector, unload/re-entry",
                              conveyor_smoke ? "Subway conveyor current and gravity" : "CityHub canal and air");

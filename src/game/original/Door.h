@@ -4,7 +4,7 @@
 #include <string>
 
 // Selected original Door.cpp/Door.h rules, with typed translation results.
-// Audio, portals and save restoration remain pending.
+// Portals and save restoration remain pending.
 class Door : public B2BaseClass
 {
   public:
@@ -31,6 +31,9 @@ class Door : public B2BaseClass
     float sound_radius = 1000;
     bool sound_loop = false;
     std::uint64_t triggers = 0, sound_requests = 0;
+    OpenBlood2::SoundId loop_voice = 0, last_voice = 0; // Only loop_voice is owned by the caller.
+    std::uint64_t sound_starts = 0, sound_failures = 0;
+    std::string sound_error;
     OpenBlood2::MoverResult last_move = OpenBlood2::MoverResult::Moved;
     static float GetWaveValue(float speed, float percent, unsigned wave);
 

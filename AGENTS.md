@@ -619,3 +619,5 @@ Owned documentation filenames are lowercase. Keep README concise (description,
 status, build, contribution, AI-use note and scoped MIT license); implementation
 updates belong in docs and workspace Documentation. Preserve historical evidence
 snapshots and original/third-party notices when updating references.
+
+The [door-audio continuation](../Documentation/Implementation/m2_door_audio.md) connects original attached busy loops and stop sounds. Read [contracts](docs/door_audio_contracts.md); preserve stop-before-empty/failure, unretained one-shot overlap, fixed 500/1500 radii, priority 1 and checked owner lifetime. Inspect actual voices and failures; reverb/arbitration, lock sounds and music remain separate. The exact exit population now includes the original periodic smell hint. M2 remains incomplete.

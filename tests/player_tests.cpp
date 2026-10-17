@@ -293,7 +293,7 @@ namespace
             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
             CHECK(!game.run_world(error) && error.find("0 uninstantiated") != std::string::npos &&
-                  error.find("autosave") != std::string::npos);
+                  error.find("acceptance gate not passed") != std::string::npos && game.state == SessionState::Blocked);
             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()

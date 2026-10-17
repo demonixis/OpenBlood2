@@ -100,14 +100,46 @@ float Door::GetWaveValue(float speed, float percent, unsigned wave)
 }
 void Door::StartSound(const std::string& sound, bool loop)
 {
-    // Record requests without claiming a connected audio backend.
+    // Original Door.cpp:935-973. Stop only the retained busy loop, even if the
+    // replacement is empty or fails. Unretained stop sounds can overlap.
+    auto* server = GetServerDE();
+    if (!server)
+        return;
+    if (loop_voice)
+    {
+        server->KillSound(loop_voice);
+        loop_voice = 0;
+    }
     last_sound = sound;
     sound_loop = loop && !sound.empty();
-    if (!sound.empty())
-        ++sound_requests;
+    last_voice = 0;
+    sound_error.clear();
+    if (sound.empty())
+        return;
+    ++sound_requests;
+    SoundRequest request;
+    request.resource = sound;
+    request.speaker = m_hObject;
+    request.space = SoundSpace::Spatial;
+    // Source StartSound ignores the authored SoundRadius property.
+    request.inner_radius = 500;
+    request.outer_radius = 1500;
+    request.volume = 1;
+    request.priority = 1; // SOUNDPRIORITY_MISC_MEDIUM
+    request.reverb_requested = true;
+    request.loop = loop;
+    last_voice = loop ? server->PlayObjectLoopSound(m_hObject, request, sound_error)
+                      : server->PlayCharacterSound(m_hObject, request, false, sound_error);
+    loop_voice = loop ? last_voice : 0;
+    if (last_voice)
+        ++sound_starts;
+    else
+        ++sound_failures; // Sound failure never changes original door motion/state.
 }
 Door::~Door()
 {
+    if (loop_voice)
+        g_pServerDE->KillSound(loop_voice);
     if (trigger)
         g_pServerDE->RemoveObject(trigger);
 }

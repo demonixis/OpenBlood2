@@ -1119,3 +1119,7 @@ The archive and revision pins remain unchanged, as does SDL's zlib notice.
 and verifies graceful refusal afterward. This is a local dependency correction,
 not an upstream commit or an original-game adaptation. See the
 [execution evidence](../../Documentation/Implementation/m2_message_lifetime.md).
+
+## M2 Door Audio Continuation
+
+[m2_door_audio_sources.json](m2_door_audio_sources.json) records original Door::StartSound and destructor loop cleanup, including fixed radii and MISC_MEDIUM priority. Existing attached-loop/one-shot services replace PlaySoundInfo without importing an audio backend or changing door rules. See [contracts](door_audio_contracts.md).

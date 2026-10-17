@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete; original Door attached busy/stop playback connected",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/Door.cpp",
+      "source_line_ranges": [
+        [
+          172,
+          177
+        ],
+        [
+          935,
+          974
+        ]
+      ],
+      "target": "src/game/original/Door.cpp",
+      "selection": "Original retained-loop replacement/destruction and attached busy/stop playback.",
+      "source_sha256": "d96ba29e12f1892008725e02ad02c9a9c314d86db85d7bb7cdc2a7823b3961e0",
+      "target_sha256": "56602097dfecfcfed77a612b6131b45e717293df4ba3f5c02f73b041fa058f38"
+    },
+    {
+      "source": "sources/blood2/Shared/SoundTypes.h",
+      "source_line_ranges": [
+        [
+          14,
+          24
+        ]
+      ],
+      "target": "src/game/original/Door.cpp",
+      "selection": "Original MISC_MEDIUM priority = 1; no new priority arbitration.",
+      "source_sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "target_sha256": "56602097dfecfcfed77a612b6131b45e717293df4ba3f5c02f73b041fa058f38"
+    }
+  ],
+  "adaptations": [
+    "Existing typed loop and attached one-shot services replace PlaySoundInfo/GETHANDLE; same original call ordering.",
+    "Owned strings and checked monotonic sound identities replace old handles.",
+    "Non-owning last-voice inspection and explicit start failures do not alter motion.",
+    "Dry audio: original requested reverb and priority intent remain visible; no arbitration claimed."
+  ]
+}

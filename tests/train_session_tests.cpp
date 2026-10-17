@@ -5,6 +5,7 @@
 #include "engine/runtime.h"
 #include "engine/world_renderer.h"
 #include "game/original/AI_Mgr.h"
+#include "game/original/Door.h"
 #include "game/original/Trigger.h"
 #include <cmath>
 #include <map>
@@ -83,6 +84,16 @@ namespace
         }
         CHECK(g.server.unavailable_history.empty());
         CHECK(g.server.message_stats.refused == 0);
+        std::uint64_t door_sounds = 0;
+        for (auto id : g.objects.snapshot())
+            if (const auto* door = dynamic_cast<const Door*>(g.objects.get(id)->game.get()))
+            {
+                CHECK(door->sound_failures == 0 && door->sound_requests == door->sound_starts);
+                door_sounds += door->sound_starts;
+            }
+        if (std::string_view(phase) == "SubwayA")
+            CHECK(door_sounds > 0);
+        std::cout << "TRAIN_DOOR_AUDIO\t" << phase << '\t' << door_sounds << " decoded starts, zero failures\n";
         return true;
     }
 

@@ -98,4 +98,6 @@ synthetic, private-data and GPU evidence, failed attempts and unverified paths.
 Passing a selected regression set does not imply every project test or milestone
 passes. The [message-lifetime report](../../Documentation/Implementation/m2_message_lifetime.md)
 records an additional GPU LeakSanitizer failure separately from the passing
-headless sanitizer checks.
+headless sanitizer checks. The [door-audio audit](../../Documentation/Implementation/m2_door_audio.md)
+reproduces it without a world/player and attributes the reported allocation
+sites to NVIDIA/DBus mappings. It remains an unsuppressed failed GPU leak check.

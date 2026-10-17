@@ -1316,8 +1316,9 @@ namespace OpenBlood2
                     game.resources.mounts().size());
         for (const auto& mount : game.resources.mounts())
             ImGui::TextDisabled("%s: %zu entries", path_text(mount.path.filename()).c_str(), mount.entries);
-        ImGui::TextWrapped("Later archives override exact normalized paths. Loaded DAT and ABC data are identified "
-                           "below. Texture/skin and sound payloads remain undecoded.");
+        ImGui::TextWrapped("Later archives override exact normalized paths. This index identifies loaded DAT and ABC "
+                           "data. Texture and sound decoding/playback are reported in their subsystem views; "
+                           "an indexed resource alone does not imply successful use.");
         if (ImGui::CollapsingHeader("World resource references / missing content"))
         {
             for (const auto& use : game.resource_uses)
@@ -2600,8 +2601,20 @@ namespace OpenBlood2
                     select_triggers = true;
                 }
             }
-            ImGui::TextWrapped("Audio request: %s (%s, not played)", d->last_sound.c_str(),
-                               d->sound_loop ? "loop" : "once");
+            ImGui::TextWrapped("Audio request: %s (%s)", d->last_sound.c_str(), d->sound_loop ? "loop" : "once");
+            ImGui::Text("Sound attempts %llu | started %llu | failed %llu", (unsigned long long)d->sound_requests,
+                        (unsigned long long)d->sound_starts, (unsigned long long)d->sound_failures);
+            ImGui::Text("Retained loop %llu | last voice %llu", (unsigned long long)d->loop_voice,
+                        (unsigned long long)d->last_voice);
+            if (const auto* voice = game.server.audio.get(d->last_voice))
+                ImGui::Text("Decoded frames %zu | cursor %.1f | wraps %llu | position %.1f %.1f %.1f",
+                            static_cast<std::size_t>(voice->clip->frames()), voice->cursor,
+                            (unsigned long long)voice->loops, voice->position.x, voice->position.y, voice->position.z);
+            else
+                ImGui::TextUnformatted("Last voice is absent, completed or removed.");
+            ImGui::TextWrapped("%s", d->sound_error.c_str());
+            ImGui::TextWrapped("Attached sound uses original 500/1500 radii; SoundRadius is not used by StartSound. "
+                               "Reverb and priority are requested metadata; playback is dry.");
             ImGui::TextWrapped("Portal: %s / requested %s (visibility pending)", d->portal.c_str(),
                                d->portal_open ? "open" : "closed");
         }
@@ -2609,7 +2622,7 @@ namespace OpenBlood2
             ImGui::TextUnformatted("No supported live Door selected.");
         ImGui::EndTable();
         ImGui::TextWrapped("Bounded translating/rotating collision. Crushing damage, chained pushers, "
-                           "audio, portals and save/restore remain pending. M2 is not complete.");
+                           "portals and save/restore remain pending. M2 is not complete.");
     }
 } // namespace OpenBlood2
 

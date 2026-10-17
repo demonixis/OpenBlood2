@@ -125,3 +125,5 @@ not fabricated as a direct Door lock: the source forwards it to its child.
 Audio requests are not played; portal state does not alter visibility.
 Automatic deactivation, save/restore, RotatingDoor/RotatingBrush, trains/path
 controllers, rotating rider transport, crushing and full gameplay remain pending.
+
+[Door audio](door_audio_contracts.md) now supersedes request-only busy/stop playback above. Portal and crushing limitations are unchanged.

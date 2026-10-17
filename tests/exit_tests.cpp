@@ -1,4 +1,5 @@
 #include "game/original/ExitTrigger.h"
+#include "game/original/SmellHint.h"
 #include "player_fixture.h"
 #include <functional>
 using namespace OpenBlood2;
@@ -201,6 +202,8 @@ namespace
                   counts[EntryState::WorldSound] == 4 && counts[EntryState::EditorOnly] == 372 &&
                   counts[EntryState::Failed] == 0);
             CHECK(g.objects.snapshot().size() == 227 && g.enter_player(error) && g.objects.snapshot().size() == 230);
+            const auto* player = g.server_shell.Player(g.local_client);
+            CHECK(player && player->smell_drops == 1 && SmellHint::m_dwNumSmells == 1);
             unsigned exits = 0;
             for (const auto& entry : g.entries)
             {
@@ -228,11 +231,21 @@ namespace
                 CHECK(t->deliveries == 0 && g.step(.05) && t->deliveries == 1);
             }
             CHECK(exits == 1);
-            CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11);
+            // The original periodic trail now adds one world-owned SmellHint
+            // after initial start-point placement and the first trail deadline.
+            // Retain the exact population check and account for that live child.
+            CHECK(player->smell_drops == 2 && player->smell_error.empty());
+            CHECK(SmellHint::m_dwNumSmells == 2 &&
+                  dynamic_cast<SmellHint*>(g.server.HandleToObject(player->last_smell)));
+            std::cout << "Exit snapshot: objects=" << g.objects.snapshot().size()
+                      << " attachments=" << g.objects.attachments().size() << " smells=" << SmellHint::m_dwNumSmells
+                      << '\n';
+            CHECK(g.objects.snapshot().size() == 233 && g.objects.attachments().size() == 11);
             CHECK(g.client_shell.world_exit.received == 1 && g.client_shell.world_exit.queued == 1);
             CHECK(g.world_path == "worlds/01_subwaya.dat" && g.client_shell.m_bInWorld);
             CHECK(!g.run_world(error) && error.find("0 uninstantiated") != std::string::npos);
             CHECK(g.unload_world() && g.server.string_count() == 0 && g.objects.snapshot().empty());
+            CHECK(SmellHint::m_dwNumSmells == 0);
         }
         return true;
     }
