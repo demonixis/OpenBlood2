@@ -61,7 +61,9 @@ namespace OpenBlood2
         const auto* record = player ? objects.get(player->m_hObject) : nullptr;
         if (objects.busy() || !record || record->life != Life::Alive || !record->client_movement ||
             !player->attributes_received || !client_shell.m_bInWorld || client_shell.player != record->handle ||
-            record->attachment || record->world_body || record->character_body || record->model_body ||
+            record->attachment || record->world_body || !record->character_body || record->model_body ||
+            record->body_properties.mass != player->m_damage.m_fMass || record->body_properties.friction != 0 ||
+            record->body_properties.pushable || record->body_properties.rotating_debris ||
             record->activity != OBJSTATE_ACTIVE || record->auto_deactivate || !record->scheduled ||
             !std::isfinite(record->due) || player->door_push_pending)
         {
@@ -165,8 +167,9 @@ namespace OpenBlood2
         }
         if (!player->m_InventoryMgr.Load(
                 s.inventory, keep_alive ? InventoryLoadType::KeepAlive : InventoryLoadType::Restore, error) ||
-            !player->m_damage.Load(s.damage, error) || !player->LoadFields(s.player, error) ||
-            !player->RestoreModelState(error))
+            !player->m_damage.Load(s.damage, error) ||
+            !server.ConfigureCharacterBody(object, player->m_damage.m_fMass, 0) ||
+            !player->LoadFields(s.player, error) || !player->RestoreModelState(error))
             return rollback();
         player->crouched = s.crouched;
         player->eye_level = s.eye_level;

@@ -41,6 +41,8 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Play entry and first Cultist combat corrections](playtest_input_contracts.md)
 - [Interactive world entry and NPC preservation](session_playback_contracts.md)
 
+- [Stopping contacts and original falling damage](fall_damage_contracts.md)
+
 ## World objects and interaction
 
 - [Rotating and destructible world-model brushes](brush_contracts.md)

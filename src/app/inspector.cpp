@@ -806,6 +806,10 @@ namespace OpenBlood2
                             ImGui::TextWrapped("Model unavailable: %s", object->model_error.c_str());
                         ImGui::Text("Velocity %.2f %.2f %.2f / Grounded: %s", object->velocity.x, object->velocity.y,
                                     object->velocity.z, object->grounded ? "yes" : "no");
+                        ImGui::Text("Stopping force %.1f | incoming %.1f %.1f %.1f | notifications %llu",
+                                    object->last_impact_force, object->last_impact_velocity.x,
+                                    object->last_impact_velocity.y, object->last_impact_velocity.z,
+                                    static_cast<unsigned long long>(object->impact_notifications));
                         ImGui::Text("Contact normal %.2f %.2f %.2f / Polygon %u", object->contact_normal.x,
                                     object->contact_normal.y, object->contact_normal.z, object->contact_polygon);
                         if (const auto* projectile = dynamic_cast<const CProjectile*>(object->game.get()))
@@ -1735,10 +1739,17 @@ namespace OpenBlood2
                             static_cast<unsigned long long>(player->landing_contacts),
                             static_cast<unsigned long long>(player->landing_requests),
                             static_cast<unsigned long long>(player->landing_starts), player->landing_distance);
-                ImGui::Text("Fall tracking: %d / start %.3f / min %.2f / max %.2f", player->m_bFalling,
-                            player->m_startFall, player->m_fMinFallPos, player->m_fMaxFallPos);
+                ImGui::Text("Fall tracking: client %d / server %d / start %.3f / min %.2f / max %.2f",
+                            player->m_bFalling, player->m_bServerFalling, player->m_startFall, player->m_fMinFallPos,
+                            player->m_fMaxFallPos);
                 ImGui::Text("Landing surface %d / foot container %d | %s", player->landing_surface,
                             player->landing_container, player->landing_resource.c_str());
+                ImGui::Text("Fall damage: requests %llu / deliveries %llu | force %.1f / incoming Y %.1f / raw %.2f",
+                            static_cast<unsigned long long>(player->fall_damage_requests),
+                            static_cast<unsigned long long>(player->fall_damage_deliveries), player->fall_damage_force,
+                            player->fall_damage_speed, player->fall_damage_amount);
+                if (!player->fall_damage_error.empty())
+                    ImGui::TextWrapped("%s", player->fall_damage_error.c_str());
                 if (!player->landing_error.empty())
                     ImGui::TextWrapped("%s", player->landing_error.c_str());
             }

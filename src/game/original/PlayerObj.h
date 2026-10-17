@@ -77,7 +77,11 @@ class CPlayerObj : public CBaseCharacter
     bool GetFootstepSound(std::string&);
     bool GetLandingSound(std::string&);
     bool UpdateLandingSound();
-    bool m_bFalling = false;
+    bool m_bFalling = false, m_bServerFalling = false;
+    void ObjectTouch(HOBJECT, float force);
+    std::uint64_t fall_damage_requests = 0, fall_damage_deliveries = 0;
+    float fall_damage_force = 0, fall_damage_speed = 0, fall_damage_amount = 0;
+    std::string fall_damage_error;
     float m_startFall = -1, m_fMinFallPos = 0, m_fMaxFallPos = 0;
     SurfaceType landing_surface = SURFTYPE_UNKNOWN;
     ContainerCode landing_container = CC_NOTHING;
@@ -164,7 +168,7 @@ class CPlayerObj : public CBaseCharacter
     bool door_push_pending = false;
     DVector door_push_velocity{};
     std::uint64_t door_pushes = 0;
-    void ObjectTouchDoor(HOBJECT);
+    bool ObjectTouchDoor(HOBJECT);
     bool ApplyDoorPush();
     DVector use_from{}, use_to{};
     OpenBlood2::SegmentHit use_hit;

@@ -94,3 +94,9 @@ retail physics or binary-save compatibility is claimed. NEW_LEVEL still refuses
 before teardown; Gideon and required FX/services keep M2 incomplete.
 
 The [Gideon fade/teleport continuation](gideon_teleport_contracts.md) adds the original selected states, live model color/alpha, real transparent model presentation and supported player color preservation. Earlier blanket omissions are historical; production boss lifecycle and M2 remain incomplete.
+
+The [stopping-contact and falling-damage continuation](fall_damage_contracts.md)
+now supplies accepted ordinary-movement impulses, original player falling damage,
+engine mass/friction and saved server-falling state. Earlier blanket omissions are
+superseded only for this boundary; dedicated mover/body/projectile forces, retail
+physics parity and the M2 gate remain open.

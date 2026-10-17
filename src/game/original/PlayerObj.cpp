@@ -88,6 +88,9 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
     m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = 100;
     m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = 100;
     m_damage.m_fMass = 250;
+    // Original SetMass(PA_DEFAULT_MASS), followed by player friction zero.
+    if (!server->ConfigureCharacterBody(m_hObject, m_damage.m_fMass, 0))
+        return DFALSE;
     m_fSmellTime = server->GetTime();
     m_fSmellDelay = .5f;
     ObjectCreateStruct state;
@@ -464,7 +467,7 @@ DDWORD CPlayerObj::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
                 RemoveRemoteBomb(static_cast<HOBJECT>(data));
             break;
         case MID_TOUCHNOTIFY:
-            ObjectTouchDoor(static_cast<HOBJECT>(data));
+            ObjectTouch(static_cast<HOBJECT>(data), fData);
             break;
         case MID_UPDATE:
             result = Update(static_cast<DVector*>(data));

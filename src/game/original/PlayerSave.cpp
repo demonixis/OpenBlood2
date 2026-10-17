@@ -82,6 +82,7 @@ bool CPlayerObj::SaveFields(OpenBlood2::PlayerState& output, std::string& error)
     state.dead = m_bDead != 0; // Player death flag is distinct from its damage aggregate.
     state.movement_blocked = movement_blocked;
     state.falling = m_bFalling;
+    state.server_falling = m_bServerFalling;
     state.fall_start_offset = m_startFall - now;
     state.min_fall_y = m_fMinFallPos;
     state.max_fall_y = m_fMaxFallPos;
@@ -163,6 +164,7 @@ bool CPlayerObj::LoadFields(const OpenBlood2::PlayerState& state, std::string& e
     m_bDead = state.dead;
     movement_blocked = state.movement_blocked;
     m_bFalling = state.falling;
+    m_bServerFalling = state.server_falling;
     m_startFall = state.fall_start_offset + now;
     m_fMinFallPos = state.min_fall_y;
     m_fMaxFallPos = state.max_fall_y;

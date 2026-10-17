@@ -130,6 +130,10 @@ namespace OpenBlood2
         std::uint32_t contact_polygon = UINT32_MAX;
         HOBJECT contact_object = nullptr;
         bool grounded = false;
+        // Last nonzero delivered stopping force; historical values, never support authority.
+        float last_impact_force = 0;
+        DVector last_impact_velocity{};
+        std::uint64_t impact_notifications = 0;
         bool world_body = false, character_body = false, model_body = false;
         WorldBodyProperties body_properties;
         DBYTE blocking_priority = 0;

@@ -1,0 +1,116 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "implementation_parent": "ecd2b769d4956da2bd5a37e94818fe01e691be0c",
+  "imports": [
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          2390,
+          2471
+        ],
+        [
+          1120,
+          1130
+        ]
+      ],
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target": "src/game/original/PlayerLanding.cpp",
+      "target_sha256": "d688fc011fad12d76b0a37bf231b16a4b45be03d1248e7b278a07696030ccb5d",
+      "selection": "Active single-player ObjectTouch thresholds/self damage and server-falling support sampling; typed messages and checked support replace SDK calls."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          662,
+          681
+        ]
+      ],
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target": "src/game/original/PlayerObj.cpp",
+      "target_sha256": "1a574ec915c016dba59435582292da14b6c38ad1ac71da267273e51e4fd7bff5",
+      "selection": "Connect original player mass 250 and friction zero through existing typed character-body service."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          6564,
+          6570
+        ],
+        [
+          6705,
+          6711
+        ]
+      ],
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target": "src/game/original/PlayerSave.cpp",
+      "target_sha256": "ee572e7bd0407a79fa3075a6420cbda79b02e3258ccd94518f176554c43caaf6",
+      "selection": "Preserve separate server-falling flag in existing owned value snapshot."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PhysicalAttributes.h",
+      "source_line_ranges": [
+        [
+          6,
+          8
+        ]
+      ],
+      "source_sha256": "bb58c0afd5e3175a9007063a64fbe31089a1a595851c61e3bfee7a19f72dda55",
+      "target": "src/game/original/PlayerLanding.cpp",
+      "target_sha256": "d688fc011fad12d76b0a37bf231b16a4b45be03d1248e7b278a07696030ccb5d",
+      "selection": "Original force threshold 3000 and player mass 250."
+    }
+  ],
+  "engine_reference": [
+    {
+      "source": "sources/blood2/AppHeaders/serverobj_de.h",
+      "source_line_ranges": [
+        [
+          94,
+          97
+        ]
+      ],
+      "source_sha256": "e29c864dcac89d88076264a67196d7a6191ebacecc339e57466d19781885eeb4"
+    },
+    {
+      "source": "sources/lithtech/runtime/shared/src/collision.h",
+      "source_line_ranges": [
+        [
+          25,
+          25
+        ]
+      ],
+      "source_sha256": "3ffdfd7879216451a88a7f60dbf1cab95ee461f30a35975670ad059dd38cb09f"
+    },
+    {
+      "source": "sources/lithtech/runtime/shared/src/collision.cpp",
+      "source_line_ranges": [
+        [
+          2408,
+          2445
+        ],
+        [
+          2500,
+          2564
+        ]
+      ],
+      "source_sha256": "9ff8fd1e49b47d56ed90c584bb6af377fd99f671d1999bd2f8adf1e1dc375944"
+    },
+    {
+      "source": "sources/lithtech/runtime/shared/src/moveobject.cpp",
+      "source_line_ranges": [
+        [
+          200,
+          234
+        ]
+      ],
+      "source_sha256": "ab363eba59ebfd89865a1d5619ffb95a82c474c319adc8d89c921da63b2d79f9"
+    }
+  ],
+  "engine_reference_commit": "0eab18289bed72879eddb648d3311075b108cf46",
+  "engine_adaptation": "Formula/order evidence only; new swept-body engine code, no donor engine module imported. Later LithTech is not a verified Blood II 1998 executable trace. Dedicated pusher/body/projectile force paths remain unavailable."
+}

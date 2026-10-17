@@ -87,3 +87,9 @@ are separately recorded regressions; human audible playback is not claimed.
 
 Fall/contact damage still requires a real impact-force service, and interactive
 IMA music, whole-world saves and other required M2 services remain incomplete.
+
+The [stopping-contact and falling-damage continuation](fall_damage_contracts.md)
+now supplies accepted ordinary-movement impulses, original player falling damage,
+engine mass/friction and saved server-falling state. Earlier blanket omissions are
+superseded only for this boundary; dedicated mover/body/projectile forces, retail
+physics parity and the M2 gate remain open.

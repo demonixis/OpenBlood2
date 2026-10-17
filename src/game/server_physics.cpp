@@ -219,11 +219,39 @@ namespace OpenBlood2
                               destination->y <= r->state.m_Pos.y + 0.001f;
         moving_ = true;
         const auto ids = objects_.snapshot();
-        std::map<std::uint32_t, HOBJECT> touched;
+        struct Contact
+        {
+            HOBJECT other = nullptr;
+            DVector force{};
+            bool world = false;
+        };
+        std::map<std::uint32_t, Contact> touched;
+        const auto incoming_velocity = r->velocity;
+        auto velocity = incoming_velocity;
+        auto mass = [](const ObjectRecord& body)
+        { return body.character_body || body.world_body || body.model_body ? body.body_properties.mass : 1.f; };
         auto touch = [&](HOBJECT target)
         {
             if (const auto* o = objects_.get(target))
-                touched.emplace(o->id.slot, target);
+                touched.try_emplace(o->id.slot, Contact{target});
+        };
+        auto impact = [&](const CollisionHit& hit)
+        {
+            const float into = vector_dot(velocity, hit.normal);
+            if (into >= 0 || hit.start_solid)
+                return;
+            auto* other = objects_.get(hit.object);
+            const bool world = !other || bool(other->world_model);
+            // SDK stopping-force convention, corroborated by later LithTech:
+            // world: normal delta-v * .01 * mass; boxes: relative normal speed
+            // * .01 * combined mass. The swept solver remains replacement physics.
+            const float scale = world ? -into * .01f * mass(*r)
+                                      : std::abs(vector_dot(vector_subtract(velocity, other->velocity), hit.normal)) *
+                                            .01f * (mass(*r) + mass(*other));
+            auto& contact = touched[other ? other->id.slot : UINT32_MAX];
+            contact.other = hit.object;
+            contact.world = world;
+            contact.force = vector_add(contact.force, vector_scale(hit.normal, scale));
         };
         BodyPlan pushed;
         auto position = r->state.m_Pos, remaining = vector_subtract(*destination, position);
@@ -289,7 +317,7 @@ namespace OpenBlood2
                             touch(other->handle);
                     }
                     if (flatten)
-                        r->velocity.y = 0;
+                        velocity.y = 0;
                     position = actor_end;
                     break;
                 }
@@ -333,9 +361,10 @@ namespace OpenBlood2
                     r->contact_polygon = landing.polygon;
                     r->contact_object = landing.object;
                     r->grounded = true;
-                    const auto into = vector_dot(r->velocity, landing.normal);
+                    impact(landing);
+                    const auto into = vector_dot(velocity, landing.normal);
                     if (into < 0)
-                        r->velocity = vector_subtract(r->velocity, vector_scale(landing.normal, into));
+                        velocity = vector_subtract(velocity, vector_scale(landing.normal, into));
                     if (landing.object)
                         touch(landing.object);
                     break;
@@ -374,9 +403,10 @@ namespace OpenBlood2
             auto into = vector_dot(remaining, nearest.normal);
             if (into < 0)
                 remaining = vector_subtract(remaining, vector_scale(nearest.normal, into));
-            auto velocity_into = vector_dot(r->velocity, nearest.normal);
+            impact(nearest);
+            auto velocity_into = vector_dot(velocity, nearest.normal);
             if (velocity_into < 0)
-                r->velocity = vector_subtract(r->velocity, vector_scale(nearest.normal, velocity_into));
+                velocity = vector_subtract(velocity, vector_scale(nearest.normal, velocity_into));
             // Source flag requests first-contact placement without a tangential slide.
             // Velocity keeps the ordinary normal projection; this is replacement physics.
             if (r->state.m_Flags & FLAG_NOSLIDING)
@@ -391,20 +421,43 @@ namespace OpenBlood2
             ++pushed.body->body_pushes;
             dispatch_world_body(pushed, ids);
         }
-        for (const auto& contact : touched)
+        for (const auto& [slot, contact] : touched)
         {
-            auto other = contact.second;
+            const auto other = contact.other;
             auto* target = objects_.get(other);
             if (r->life != Life::Alive)
                 break;
-            if (!target || target->life != Life::Alive)
+            if (other && (!target || target->life != Life::Alive))
                 continue;
-            // Touch remains a typed object identity; no collision force is fabricated.
+            const float force = std::sqrt(vector_dot(contact.force, contact.force));
+            // Final positions are committed, but source callbacks see velocity
+            // before the stopping impulse. Apply it afterwards, preserving any
+            // callback velocity delta and keeping all removal deferred.
             if (r->state.m_Flags & FLAG_TOUCH_NOTIFY)
-                objects_.engine_message(h, MID_TOUCHNOTIFY, other);
-            if (r->life == Life::Alive && target->life == Life::Alive && (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
-                objects_.engine_message(other, MID_TOUCHNOTIFY, h);
+            {
+                const auto before_callback = r->velocity;
+                if (objects_.engine_message(h, MID_TOUCHNOTIFY, other, force) && force > 0)
+                {
+                    r->last_impact_force = force;
+                    r->last_impact_velocity = before_callback;
+                    ++r->impact_notifications;
+                }
+            }
+            if (target && r->life == Life::Alive && target->life == Life::Alive &&
+                (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
+            {
+                const float reciprocal = contact.world ? force : -force;
+                const auto before_callback = target->velocity;
+                if (objects_.engine_message(other, MID_TOUCHNOTIFY, h, reciprocal) && force > 0)
+                {
+                    target->last_impact_force = reciprocal;
+                    target->last_impact_velocity = before_callback;
+                    ++target->impact_notifications;
+                }
+            }
         }
+        if (r->life == Life::Alive)
+            r->velocity = vector_add(velocity, vector_subtract(r->velocity, incoming_velocity));
         moving_ = false;
         if (blocked_start)
         {

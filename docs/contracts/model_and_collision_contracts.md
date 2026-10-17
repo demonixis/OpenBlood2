@@ -185,3 +185,9 @@ Models do not become character bodies or world meshes. Real ceilingfan2.abc has 
 empty animation name; the reader preserves that name and its ordinal while retaining
 all structural, key-count, pose and payload validation. This is not an absent clip
 or a synthesized bind pose. Required services and M2 remain incomplete.
+
+The [stopping-contact and falling-damage continuation](fall_damage_contracts.md)
+now supplies accepted ordinary-movement impulses, original player falling damage,
+engine mass/friction and saved server-falling state. Earlier blanket omissions are
+superseded only for this boundary; dedicated mover/body/projectile forces, retail
+physics parity and the M2 gate remain open.

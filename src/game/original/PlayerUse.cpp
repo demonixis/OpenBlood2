@@ -42,18 +42,19 @@ bool CPlayerObj::OnCommandUse()
 }
 
 // PlayerObj.cpp ObjectTouch / UpdateClientPhysics rotating-door push branch.
-void CPlayerObj::ObjectTouchDoor(HOBJECT object)
+bool CPlayerObj::ObjectTouchDoor(HOBJECT object)
 {
     if (door_push_pending || !g_pServerDE->IsObjectAlive(object))
-        return;
+        return false;
     const auto* door = dynamic_cast<RotatingDoor*>(g_pServerDE->HandleToObject(object));
     if (!door || door->state != Door::Opening || !door->push_player_back)
-        return;
+        return false;
     DRotation rotation;
     g_pServerDE->GetObjectRotation(m_hObject, &rotation);
     door_push_velocity = rotate_vector({0, 0, -500}, rotation);
     door_push_pending = true;
     ++door_pushes;
+    return true;
 }
 bool CPlayerObj::ApplyDoorPush()
 {

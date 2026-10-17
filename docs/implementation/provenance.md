@@ -1161,3 +1161,12 @@ draw order and all client gates are preserved. See [contracts](../contracts/comb
 [m2_player_death_sources.json](sources/m2_player_death_sources.json) records selected CPlayerObj death/corpse/gib paths, inventory item removal and CPlayerCamera death orbit. Typed notifications, checked identities and existing bounded body/ray/fragment services replace historical engine calls. Constructor-default corpse audio and source decision quirks remain explicit. See [contracts](../contracts/player_death_contracts.md).
 
 Original player movement audio: selected ClientShellDLL/MoveMgr.cpp Jump caller and ObjectDLL/PlayerObj.cpp landing/material/save blocks are integrated through existing checked movement, VoiceMgr and character audio services. See [source ledger](sources/m2_movement_audio_sources.json) and [contracts](../contracts/movement_audio_contracts.md); replacement support queries and source frame-sampled spans remain explicit.
+
+## Original falling damage and stopping contacts
+
+Selected PlayerObj::ObjectTouch uses its active speed/force gates and self Normal
+damage path; player mass/friction and server-falling preservation now reach the
+engine. See [source ledger](sources/m2_fall_damage_sources.json) and
+[contracts](../contracts/fall_damage_contracts.md). Later LithTech supplies formula
+and callback-order evidence only; its engine modules were not imported and retail
+physics parity is not claimed.

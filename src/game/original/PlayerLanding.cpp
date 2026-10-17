@@ -3,6 +3,7 @@
 #include "PlayerObj.h"
 #include "engine/collision.h"
 #include <algorithm>
+#include <cmath>
 
 bool CPlayerObj::GetLandingSound(std::string& sound)
 {
@@ -107,6 +108,8 @@ bool CPlayerObj::UpdateLandingSound()
     }
     else if (free_movement)
         m_startFall = -1;
+    // Primary world support deliberately has no synthetic HOBJECT in this engine.
+    m_bServerFalling = !body.standing;
     m_bFalling = !on_ground;
     if (m_bFalling)
     {
@@ -122,4 +125,52 @@ bool CPlayerObj::UpdateLandingSound()
         }
     }
     return true; // Missing cosmetic audio does not stop movement or rearm a landing.
+}
+
+// Original PlayerObj.cpp ObjectTouch active single-player falling-damage block.
+// The older elapsed-fall-time branch in the donor is commented out.
+void CPlayerObj::ObjectTouch(HOBJECT other, float force)
+{
+    if (ObjectTouchDoor(other))
+        return; // Original newly queued rotating-door push takes priority.
+    auto* server = GetServerDE();
+    DVector velocity{}, position{};
+    if (!server || !server->IsObjectAlive(m_hObject) || !std::isfinite(force) ||
+        server->GetVelocity(m_hObject, &velocity) != DE_OK)
+    {
+        fall_damage_error = "Invalid falling contact or unavailable velocity";
+        return;
+    }
+    if (!(m_bFalling || m_bServerFalling) || velocity.y >= -1100.f)
+        return;
+    const float amount = (force - 3000.f) / 25.f; // PA_MIN_DAMAGE_FORCE, original SDK force units.
+    if (amount <= 0)
+        return;
+    ++fall_damage_requests;
+    fall_damage_force = force;
+    fall_damage_speed = velocity.y;
+    fall_damage_amount = amount;
+    fall_damage_error.clear();
+    if (server->GetObjectPos(m_hObject, &position) != DE_OK)
+    {
+        fall_damage_error = "Falling damage position unavailable";
+        return;
+    }
+    const auto message = server->StartMessageToObject(this, m_hObject, OpenBlood2::damage_message);
+    if (!message)
+    {
+        fall_damage_error = "Falling damage message unavailable";
+        return;
+    }
+    if (server->WriteDamage(message, {{0, -1, 0}, position, amount, OpenBlood2::DamageType::Normal, m_hObject}) !=
+        DE_OK)
+    {
+        server->EndHMessageWrite(message);
+        fall_damage_error = "Falling damage payload rejected";
+        return;
+    }
+    if (server->EndMessage(message) != DE_OK)
+        fall_damage_error = "Falling damage delivery failed";
+    else
+        ++fall_damage_deliveries; // Delivery is not necessarily a health change.
 }

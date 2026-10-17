@@ -25,6 +25,7 @@ namespace
         PlayerState s;
         s.smell_time_offset = -2.5f;
         s.falling = true;
+        s.server_falling = true;
         s.fall_start_offset = -.75f;
         s.min_fall_y = -40;
         s.max_fall_y = 400;

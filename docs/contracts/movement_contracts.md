@@ -144,3 +144,9 @@ single body integration. Private gameplay tests await SubwayA's natural two-came
 intro before issuing their movement sequence; normal entry retains that intro.
 
 The [jump/landing audio continuation](movement_audio_contracts.md) connects original grounded Jump voices and sampled-height landing sounds. Earlier blanket landing-audio omissions are superseded; impact-force/fall damage remains unavailable. M2 stays open.
+
+The [stopping-contact and falling-damage continuation](fall_damage_contracts.md)
+now supplies accepted ordinary-movement impulses, original player falling damage,
+engine mass/friction and saved server-falling state. Earlier blanket omissions are
+superseded only for this boundary; dedicated mover/body/projectile forces, retail
+physics parity and the M2 gate remain open.
