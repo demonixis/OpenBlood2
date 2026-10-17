@@ -30,9 +30,9 @@ namespace OpenBlood2
     } // namespace
     void Inspector::draw_skeleton(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextWrapped(
-            "Original hit spheres at current ABC node poses. Initialized NPCs use them for hit "
-            "localization. Burning corpses and dismemberment are integrated; blood-spurt/splat FX remain unavailable.");
+        ImGui::TextWrapped("Original hit spheres at current ABC node poses. Initialized NPCs use them for hit "
+                           "localization. Burning corpses and dismemberment are integrated; blood spurts and impact "
+                           "splats are inspected in Sprites.");
         if (ImGui::CollapsingHeader("Original flesh fragments"))
         {
             const auto& fx = game.server.flesh_gibs;
@@ -42,11 +42,15 @@ namespace OpenBlood2
                                    report.source.c_str(), report.created, report.requested, report.scale,
                                    report.error.c_str(), report.unavailable.c_str());
             for (const auto& g : fx.active)
+            {
                 ImGui::TextWrapped("#%llu %s | resting %d / liquid %d / impacts %llu | pos %.1f %.1f %.1f | speed %.1f "
                                    "%.1f %.1f | %s %s",
                                    (unsigned long long)g.id, g.model_path.c_str(), g.resting, g.liquid,
                                    (unsigned long long)g.impacts, g.position.x, g.position.y, g.position.z,
                                    g.velocity.x, g.velocity.y, g.velocity.z, g.error.c_str(), g.sound_error.c_str());
+                ImGui::TextWrapped("Spurt %llu / splat %llu | %s %s", (unsigned long long)g.spurt_event,
+                                   (unsigned long long)g.splat_event, g.spurt_error.c_str(), g.splat_error.c_str());
+            }
         }
         if (ImGui::CollapsingHeader("Live attachments"))
         {
@@ -138,6 +142,8 @@ namespace OpenBlood2
                         gib->damage.m_fHitPoints, gib->kickable, (unsigned long long)gib->kicks,
                         (unsigned long long)gib->impacts);
             draw_placement(gib->placement);
+            ImGui::TextWrapped("Pending blood %d / spurt event %llu | %s", gib->add_blood_spurt,
+                               (unsigned long long)gib->spurt_event, gib->spurt_error.c_str());
             ImGui::TextWrapped("%s %s", gib->error.c_str(), gib->sound_error.c_str());
         }
         if (const auto* player = character ? dynamic_cast<const CPlayerObj*>(character) : nullptr)

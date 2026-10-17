@@ -1963,6 +1963,10 @@ namespace OpenBlood2
                                 (unsigned long long)impact.effect.sprite_event);
                     if (!impact.effect.sprite_error.empty())
                         ImGui::TextWrapped("Visual failure: %s", impact.effect.sprite_error.c_str());
+                    ImGui::TextWrapped(
+                        "Blood roll %d / requested %d | events %llu, %llu | %s", impact.effect.blood_roll,
+                        impact.effect.blood_requested, (unsigned long long)impact.effect.blood_events[0],
+                        (unsigned long long)impact.effect.blood_events[1], impact.effect.blood_error.c_str());
                     ImGui::Text("Impact hearing: %u deliveries / %s", impact.alert.delivered,
                                 impact.alert.complete ? "complete" : "not completed");
                     if (!impact.alert.error.empty())

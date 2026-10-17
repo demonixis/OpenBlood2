@@ -2,6 +2,41 @@
 #include <cmath>
 namespace OpenBlood2
 {
+    std::uint64_t ServerAdapter::PublishClientBloodSplat(const BloodSplatSettings& settings, std::string_view source,
+                                                         std::string& error)
+    {
+        trace_service("PublishClientBloodSplat (detached impact)");
+        error.clear();
+        if (!objects_.sprites)
+        {
+            error = "Blood splat store unavailable";
+            return 0;
+        }
+        return blood_splats.publish(settings, source, *objects_.sprites, objects_.time(), error);
+    }
+    std::uint64_t ServerAdapter::PublishClientBloodSpurt(const BloodSpurtSettings& settings, std::string_view source,
+                                                         bool immediate, std::string& error)
+    {
+        trace_service("PublishClientBloodSpurt (original particle explosion)");
+        error.clear();
+        if (!client_resources)
+        {
+            error = "Blood spurt resources unavailable";
+            return 0;
+        }
+        return blood_spurts.publish(settings, source, immediate, *client_resources, *this, objects_.time(), error);
+    }
+    std::uint64_t ServerAdapter::PublishBloodSpurt(HOBJECT source, const BloodSpurtSettings& settings,
+                                                   std::string& error)
+    {
+        error.clear();
+        if (!IsObjectAlive(source))
+        {
+            error = "Blood spurt source unavailable";
+            return 0;
+        }
+        return PublishClientBloodSpurt(settings, GetObjectName(source), false, error);
+    }
     std::uint64_t ServerAdapter::PublishBloodSplat(HOBJECT source, const BloodSplatSettings& settings,
                                                    std::string& error)
     {

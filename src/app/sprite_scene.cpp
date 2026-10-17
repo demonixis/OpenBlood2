@@ -23,6 +23,16 @@ namespace OpenBlood2
                 return false;
             scene.entries.back().client_effect = fx.id;
         }
+        for (const auto& fx : game.server.blood_spurts.active)
+            for (unsigned i = 0; i < fx.particles.size(); ++i)
+            {
+                const auto& p = fx.particles[i];
+                if (!scene.add_particle(fx.texture, vector_add(fx.settings.position, p.position), 200.f / 640, p.color,
+                                        fx.alpha, fx.id, i, game.resources, error))
+                    return false;
+                scene.entries.back().particle_system = 0;
+                scene.entries.back().blood_spurt = fx.id;
+            }
         for (const auto& fx : game.server.blood_splats.active)
         {
             if (!scene.add(fx.sprite.get(), fx.track, {fx.position, fx.rotation}, fx.scale,

@@ -9,6 +9,7 @@ namespace OpenBlood2
         ImGui::TextWrapped("Original DetailSprite placement and SPR clock; decoded DTX alpha on world-depth quads. "
                            "Rotatable sprites use their object pose; others face the camera. Unlit replacement "
                            "presentation: glow, view bias, no-Z and sky modes remain unavailable.");
+        draw_blood_spurts(game);
         draw_blood_splats(game);
         draw_weapon_sprites(game);
         if (sprite_view && sprite_render)
@@ -206,7 +207,8 @@ namespace OpenBlood2
         ImGui::Text("Active %zu | created %llu / reused %llu / expired %llu / failed %llu", effects.active.size(),
                     (unsigned long long)effects.started, (unsigned long long)effects.reused,
                     (unsigned long long)effects.expired, (unsigned long long)effects.failed);
-        ImGui::TextWrapped("Detached rotatable sprites. Blood spurts, gib impact callers and general SFX-list eviction "
+        ImGui::TextWrapped("Detached rotatable sprites. Original blood spurts and gib impacts are connected; general "
+                           "SFX-list eviction "
                            "remain unavailable.");
         if (!effects.update_error.empty())
             ImGui::TextWrapped("%s", effects.update_error.c_str());
@@ -229,5 +231,51 @@ namespace OpenBlood2
             ImGui::TextWrapped("Event %llu / %s -> splat %llu (%s): %s", (unsigned long long)report.id,
                                report.source.c_str(), (unsigned long long)report.effect,
                                report.reused ? "moved existing" : "creation", report.error.c_str());
+    }
+} // namespace OpenBlood2
+
+namespace OpenBlood2
+{
+    void Inspector::draw_blood_spurts(const GameSession& game)
+    {
+        if (!ImGui::CollapsingHeader("Original blood spurts"))
+            return;
+        const auto& effects = game.server.blood_spurts;
+        ImGui::Text("Systems %zu / 128 | drops %zu / 16384 | started %llu / ended %llu / failed %llu",
+                    effects.active.size(), effects.live_particles(), (unsigned long long)effects.started,
+                    (unsigned long long)effects.expired, (unsigned long long)effects.failed);
+        ImGui::TextWrapped("Six samples/two drops, half-gravity emitter, one impact then fade. Detached from actors. "
+                           "Outside-world classification and separate flesh sparks remain unavailable.");
+        ImGui::TextWrapped("%s", effects.update_error.c_str());
+        for (const auto& fx : effects.active)
+        {
+            ImGui::PushID(static_cast<int>(fx.id));
+            if (ImGui::TreeNode("Spurt", "#%llu %s", (unsigned long long)fx.id, fx.texture.c_str()))
+            {
+                ImGui::Text("Emitter %.2f %.2f %.2f | velocity %.2f %.2f %.2f", fx.position.x, fx.position.y,
+                            fx.position.z, fx.velocity.x, fx.velocity.y, fx.velocity.z);
+                ImGui::Text("Emitting %d / liquid %d | drops %zu | alpha %.3f | updates %llu", fx.emitting, fx.liquid,
+                            fx.particles.size(), fx.alpha, (unsigned long long)fx.updates);
+                ImGui::Text("Impact splat event %llu | lifetime %.2f / fade %.2f", (unsigned long long)fx.splat_event,
+                            fx.settings.lifetime, fx.settings.fade_time);
+                ImGui::TextWrapped("%s | %s | %s", fx.error.c_str(), fx.splat_error.c_str(), fx.sound_error.c_str());
+                if (sprite_view)
+                    for (const auto& entry : sprite_view->entries)
+                        if (entry.blood_spurt == fx.id && !entry.error.empty())
+                        {
+                            ImGui::TextWrapped("Texture: %s", entry.error.c_str());
+                            break;
+                        }
+                ImGui::TreePop();
+            }
+            ImGui::PopID();
+        }
+        for (const auto& r : effects.reports)
+            ImGui::TextWrapped("Event %llu %s -> #%llu | immediate %d / ended %d | drops %llu / impacts %llu / "
+                               "splat %llu | %s %s %s",
+                               (unsigned long long)r.id, r.source.c_str(), (unsigned long long)r.effect, r.immediate,
+                               r.ended, (unsigned long long)r.emitted, (unsigned long long)r.impacts,
+                               (unsigned long long)r.splat_event, r.error.c_str(), r.splat_error.c_str(),
+                               r.sound_error.c_str());
     }
 } // namespace OpenBlood2

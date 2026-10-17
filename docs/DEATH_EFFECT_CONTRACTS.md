@@ -137,3 +137,5 @@ cleanup. Inspection never advances simulation.
 
 
 Continuation: [original corpse blood pools](BLOOD_SPLAT_CONTRACTS.md) supersedes the pool omission for corpse ground hits. Blood-spurt particles, gib impact callers, shared SFX eviction and other required services remain incomplete. The M2 exit gate is unchanged.
+
+The [blood-spurt continuation](BLOOD_SPURT_CONTRACTS.md) extends the selected original weapon/fragment/limb callers and impact splats. Earlier blanket omissions are historical; separate flesh sparks, generic debris and M2 remain incomplete.

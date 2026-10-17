@@ -87,3 +87,5 @@ position/scale, resource/frame and prepared-quad errors, including with hidden U
 Blood-spurt particles, gib impact callers, generic/recursive gib templates, global
 SFX-list eviction, complete save/restore and the remaining required M2 services
 remain unavailable. This increment does not claim complete combat or M2 acceptance.
+
+The [blood-spurt continuation](BLOOD_SPURT_CONTRACTS.md) extends the selected original weapon/fragment/limb callers and impact splats. Earlier blanket omissions are historical; separate flesh sparks, generic debris and M2 remain incomplete.

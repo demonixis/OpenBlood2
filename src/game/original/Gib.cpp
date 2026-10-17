@@ -1,6 +1,7 @@
 // Selected original AI_Shared.CPP / Gib.cpp. See DEATH_EFFECT_CONTRACTS.md.
 #include "Gib.h"
 #include "AI_Mgr.h"
+#include "ParticleExplosionFX.h"
 #include "engine/collision.h"
 #include "game/game_settings.h"
 #include <cmath>
@@ -172,7 +173,18 @@ bool CGib::Update()
             axis = 3;
         first_update = false;
     }
-    s->GetObjectPos(m_hObject, &last_position);
+    if (s->GetObjectPos(m_hObject, &last_position) != DE_OK)
+        return false;
+    if (add_blood_spurt)
+    {
+        OpenBlood2::BloodSpurtSettings spurt;
+        spurt.position = last_position;
+        // Server sends .1 * velocity; original client SFXMgr multiplies it by .6.
+        spurt.min_velocity = spurt.max_velocity = vector_scale(vector_scale(velocity, .1f), .6f);
+        spurt.texture = 0; // Client selection, independent of the server gameplay random stream.
+        spurt_event = s->PublishBloodSpurt(m_hObject, spurt, spurt_error);
+        add_blood_spurt = false;
+    }
     const float dt = s->GetFrameTime();
     rotate_time -= dt;
     constexpr float pi = std::numbers::pi_v<float>;
@@ -256,6 +268,7 @@ void CGib::Touch(HOBJECT other)
     v = vector_scale(v, .5f);
     s->SetVelocity(m_hObject, &v);
     rotate_time = 1;
+    add_blood_spurt = true;
     ++impacts;
     s->SetNextUpdate(m_hObject, .01f);
 }

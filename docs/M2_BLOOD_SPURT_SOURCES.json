@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "933a422252e4a9eb39c23aa6267535171c173670",
+  "status": "M2 incomplete; original blood spurts and debris impacts",
+  "references": [
+    {
+      "source": "sources/blood2/ClientShellDLL/ParticleExplosionFX.cpp",
+      "source_sha256": "68ba5c98212936d16d940834ea0d0f2967b189d338b612f48b96a55379a8f60f",
+      "purpose": "Emitter initialization, six-step emission, first collision, impact audio/splat and fade."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ParticleExplosionFX.h",
+      "source_sha256": "2c3c36d00e6e9b528dac1ab84f45da1c72be83dbeb8c7711b70698682cf3f53f",
+      "purpose": "Original settings/defaults."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/client_physics.cpp",
+      "source_sha256": "a2d7fcae81f82df02406aa3b586897aff9c409e803e315f233fbe33e3d65de16",
+      "purpose": "Initial contents, half gravity, integration and bounce."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
+      "source_sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13",
+      "purpose": "Radius conversion and original random color."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/WeaponFX.cpp",
+      "source_sha256": "95230fcffd888751528e1a9f1d4353844ebfce5dbf5ef0a46cb0cf0a8a1b0e25",
+      "purpose": "Two entry/exit blood-spurt recipes and immediate callbacks."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Weapon.cpp",
+      "source_sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
+      "purpose": "Flesh selection, random-before-damage test and raw damage payload."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/gibfx.cpp",
+      "source_sha256": "4e448e2303e82eed903ae31a557a83963ea424f0c0a69406947ef5e6793858c5",
+      "purpose": "Launch spurt and larger impact splat."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Gib.cpp",
+      "source_sha256": "56af4e2090149c4f1deb9da33a6f64bc8f741f85b383723a766510bc13b85c0c",
+      "purpose": "Deferred blood request after qualified contact."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
+      "source_sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
+      "purpose": "Server gib decode and deferred particle update."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "purpose": "Normal and liquid client gravity."
+    }
+  ],
+  "adaptations": [
+    "Checked copied recipes and per-session values replace client object/packet ownership.",
+    "Portable independent client random streams are not retail global-random parity.",
+    "Primary-world ray/particle integration and existing SDL_GPU sprite presentation; no outside-world classification.",
+    "Explicit bounded systems/particles/reports and finite clocks; no silent shared-list eviction.",
+    "Source-independent particles and splats release on session unload; inspector is read-only.",
+    "Original server-side flesh chance uses the existing per-weapon cosmetic RNG in this integration; adding visuals must not perturb AI/damage RNG. Range/probability/order preserved, retail global stream not claimed."
+  ]
+}

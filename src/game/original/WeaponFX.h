@@ -13,6 +13,12 @@ class CWeaponFX
     OpenBlood2::SoundId sound = 0;
     std::string resource, error, sprite_error;
     std::uint64_t sprite_event = 0;
+    int blood_roll = -1;
+    bool blood_requested = false;
+    std::uint64_t blood_events[2]{};
+    std::string blood_error;
+    bool SelectBloodSpurt(float damage, std::minstd_rand&);
+    bool CreateBloodSpurt(ServerDE&, HOBJECT, DVector normal, float damage, std::minstd_rand&);
     bool CreateSprites(ServerDE&, HOBJECT, DVector normal, std::minstd_rand&);
     bool PlayImpactSound(ServerDE&, HOBJECT source, std::minstd_rand&);
     std::string GetImpactSound(std::minstd_rand&) const;

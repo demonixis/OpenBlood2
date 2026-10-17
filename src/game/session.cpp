@@ -497,6 +497,7 @@ namespace OpenBlood2
         ok = server.explosion_rings.advance(objects.time()) && ok;
         ok = server.explosion_flames.advance(objects.time()) && ok;
         ok = server.flesh_gibs.advance(objects.time(), server) && ok;
+        ok = server.blood_spurts.advance(objects.time(), server) && ok;
         ok = server.explosion_fragments.advance(objects.time(), server) && ok;
         ok = server.object_particles.advance(objects.time(), server) && ok;
         ok = server.particle_streams.advance(objects.time(), server) && ok;

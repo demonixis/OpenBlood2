@@ -1,10 +1,12 @@
 // Original WeaponFX.cpp PlayImpactSound (977-992), GetImpactSound (1104-1152).
 #include "WeaponFX.h"
+#include "ParticleExplosionFX.h"
 #include "engine/collision.h"
 #include "game/original/Weapon.h"
 #include "game/weapon_sprites.h"
 #include "server_de.h"
 #include <cmath>
+using namespace OpenBlood2;
 std::string CWeaponFX::GetImpactSound(std::minstd_rand& random) const
 {
     const char* material = nullptr;
@@ -109,4 +111,67 @@ bool CWeaponFX::CreateSprites(ServerDE& server, HOBJECT source, DVector normal, 
     }
     sprite_event = server.PublishWeaponSprites(source, settings, sprite_error);
     return sprite_event && sprite_error.empty();
+}
+
+// Original Weapon::UpdateWeaponFX and CWeaponFX::CreateBloodSpurt.
+bool CWeaponFX::SelectBloodSpurt(float damage, std::minstd_rand& random)
+{
+    blood_roll = -1;
+    blood_requested = false;
+    blood_error.clear();
+    blood_events[0] = blood_events[1] = 0;
+    if (m_eSurfaceType != SURFTYPE_FLESH)
+        return true;
+    if (!std::isfinite(damage) || damage < 0)
+    {
+        blood_error = "Blood-spurt selection unavailable";
+        return false;
+    }
+    // Preserve the original draw/condition; use the existing cosmetic stream so
+    // newly connected visuals cannot perturb established AI/damage randomness.
+    blood_roll = std::uniform_int_distribution<int>(0, 3)(random);
+    // The random draw precedes the damage >25 test even for a high-damage shot.
+    blood_requested = !blood_roll || damage > 25;
+    return true;
+}
+bool CWeaponFX::CreateBloodSpurt(ServerDE& server, HOBJECT source, DVector normal, float damage,
+                                 std::minstd_rand& random)
+{
+    if (!blood_requested)
+        return blood_error.empty();
+    if (!server.IsObjectAlive(source) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f ||
+        !std::isfinite(damage) || damage < 0)
+    {
+        blood_error = "Invalid weapon blood-spurt source/normal/damage";
+        return false;
+    }
+    normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+    OpenBlood2::BloodSpurtSettings s;
+    s.position = m_vDestPos;
+    s.min_velocity = vector_scale(normal, 30);
+    s.max_velocity = vector_scale(normal, 50);
+    s.min_velocity.y = 40;
+    s.max_velocity.y = 50;
+    s.min_velocity.x -= 20;
+    s.min_velocity.z -= 20;
+    s.max_velocity.x += 20;
+    s.max_velocity.z += 20;
+    s.lifetime = 1;
+    s.texture = std::uniform_int_distribution<int>(1, 3)(random);
+    blood_events[0] = server.PublishClientBloodSpurt(s, "weapon entry", true, blood_error);
+    s.min_velocity = vector_scale(normal, -2.5f * damage);
+    s.max_velocity = vector_scale(normal, -3 * damage);
+    s.min_velocity.y += 30;
+    s.max_velocity.y += 40;
+    s.min_velocity.x -= 20;
+    s.min_velocity.z -= 20;
+    s.max_velocity.x += 20;
+    s.max_velocity.z += 20;
+    s.lifetime = 1.2f;
+    s.fade_time = .8f;
+    std::string second_error;
+    blood_events[1] = server.PublishClientBloodSpurt(s, "weapon exit", true, second_error);
+    if (!second_error.empty())
+        blood_error = second_error;
+    return blood_error.empty();
 }

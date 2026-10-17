@@ -8,12 +8,12 @@ namespace OpenBlood2
     // Selected original CGibFX flesh path. Client-only models never block gameplay.
     struct FleshGib
     {
-        std::uint64_t id = 0, impacts = 0;
+        std::uint64_t id = 0, impacts = 0, spurt_event = 0, splat_event = 0;
         std::shared_ptr<const Model> model;
         AnimationTrack animation;
         DVector position{}, velocity{}, scale{1, 1, 1}, angles{}, angular_velocity{};
         DRotation rotation;
-        std::string model_path, skin_path, sound_path, error, sound_error;
+        std::string model_path, skin_path, sound_path, error, sound_error, spurt_error, splat_error;
         int bounces = 0;
         bool resting = false, liquid = false;
         double last_time = 0;
@@ -25,7 +25,7 @@ namespace OpenBlood2
         float scale = 1;
         unsigned requested = 0, adjusted = 0, created = 0;
         std::string source, error;
-        std::string unavailable = "Original blood-spurt particles and impact splats are not rendered";
+        std::string unavailable = "Generic non-flesh debris and recursive templates remain unavailable";
     };
     class FleshGibs
     {

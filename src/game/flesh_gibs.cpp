@@ -2,6 +2,8 @@
 #include "game/flesh_gibs.h"
 #include "engine/collision.h"
 #include "game/legacy/server_de.h"
+#include "game/original/BloodSplatFX.h"
+#include "game/original/ParticleExplosionFX.h"
 #include <algorithm>
 #include <cmath>
 #include <numbers>
@@ -111,6 +113,11 @@ namespace OpenBlood2
                     break;
                 }
                 g.liquid = IsLiquid(code);
+                BloodSpurtSettings spurt;
+                spurt.position = g.position;
+                spurt.min_velocity = spurt.max_velocity = vector_scale(g.velocity, .6f);
+                spurt.texture = integer(random_, 1, 3);
+                g.spurt_event = server.PublishClientBloodSpurt(spurt, "flesh fragment launch", true, g.spurt_error);
                 g.id = next_id_++;
                 active.push_back(std::move(g));
                 ++report.created;
@@ -190,6 +197,15 @@ namespace OpenBlood2
                 std::string sound_error;
                 server.PlayClientSound(request, next, sound_error);
                 g.sound_error = sound_error;
+                BloodSplatSettings splat;
+                splat.resource = "sprites/blood" + std::to_string(integer(random_, 1, 3)) + ".spr";
+                splat.position = next;
+                splat.scale = .14f + draw(random_, -.1f, .1f);
+                splat.grow_scale = hit.normal.y >= .5f ? .01f : 0;
+                if (align_rotation(hit.normal, hit.normal, splat.rotation))
+                    g.splat_event = server.PublishClientBloodSplat(splat, "flesh fragment impact", g.splat_error);
+                else
+                    g.splat_error = "Invalid flesh-fragment impact normal";
                 g.angular_velocity = {draw(random_, -2 * std::numbers::pi_v<float>, 2 * std::numbers::pi_v<float>),
                                       draw(random_, -2 * std::numbers::pi_v<float>, 2 * std::numbers::pi_v<float>), 0};
             }
