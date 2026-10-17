@@ -1,5 +1,13 @@
 # Source and Dependency Provenance
 
+## Metal shader packaging
+
+Project-owned GLSL is compiled to SPIR-V and translated offline using pinned
+SDL_shadercross and its exact SPIRV-Cross submodule. The generated MSL and reflected
+bindings are bundled beside SPIR-V; no runtime compiler dependency or game-code
+import is added. See [source/tool ledger](M2_METAL_SOURCES.json) and
+[contracts](METAL_SHADER_CONTRACTS.md). Native Apple execution remains unverified.
+
 ## Original fragment smoke trails
 
 Selected CObjectParticleFX methods and CObjectGeneralFX's high-detail smoke-trail 1

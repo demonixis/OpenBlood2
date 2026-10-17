@@ -262,7 +262,7 @@ before extending rendering, camera presentation or GPU lifetime. Preserve origin
 coordinates, base rings, current checked visibility, world revisions and the single
 player integrator. `--view-world` is navigable inspection, not the M3 playable slice;
 texture/model/FX rendering and required NPC/ExitTrigger services remain unavailable. Current
-world shaders support Vulkan/SPIR-V only; M2 stays incomplete.
+world shaders now bundle Vulkan/SPIR-V and Metal/MSL (native Apple validation pending); M2 stays incomplete.
 
 The [DTX world-texture continuation](../Documentation/Implementation/M2_TEXTURES.md) adds bounded version -2 palette decoding, exact-path material caching and opaque SDL_GPU sampling. Read [texture contracts](docs/TEXTURE_CONTRACTS.md) before extending images/materials. Preserve the -2/-5 generation boundary, strict lengths, pre-pivot UVs, world-revision ownership and explicit failed resources. Alpha/sky markers, unlit mip-zero sampling and unsupported version-0 assets remain visible limitations. Models, required original services and the M2 gate remain open.
 
@@ -550,3 +550,5 @@ For GPU validation on this developer machine, select the NVIDIA GPU (for example
 
 
 The [surface panning correction](../Documentation/Implementation/M2_SURFACE_EFFECTS.md) connects authored Pan effects and restores the missing tunnel/rail motion cue. Read [contracts](docs/SURFACE_EFFECT_CONTRACTS.md). Preserve original P/Q origin speeds (direction labels convert to zero), independent shared-material rates, session-only clocks, bounded raw metadata and explicit unsupported effects. Do not move happytrain or the collision world to imitate the intro. GPU tests use NVIDIA on this machine; required services and safe NEW_LEVEL keep M2 incomplete.
+
+The [Metal shader continuation](../Documentation/Implementation/M2_METAL.md) packages SDL_shadercross-generated MSL beside SPIR-V. Read [contracts](docs/METAL_SHADER_CONTRACTS.md) before changing shaders or backend selection. Regenerate all six artifacts together, preserve reflected bindings and SDL coordinate conventions, and advertise only bundled formats. Ordinary game builds do not require ShaderCross. Linux NVIDIA checks do not establish native Metal execution; D3D12 and M2 remain incomplete.

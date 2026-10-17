@@ -59,12 +59,11 @@ cache owns an original object or advances simulation. Sampler/pipeline/depth may
 persist through unload. The capture blit uses the acquired swapchain dimensions,
 which can lag a window resize request; readback dimensions remain independent.
 
-The Vulkan/SPIR-V shaders sample mip zero with nearest repeat and output unlit
+The shared packaged shaders sample mip zero with nearest repeat and output unlit
 opaque RGB. Color-space/retail filtering/lightmap parity is not claimed. Transparent
 faces and sky retain explicit opaque diagnostic colors; no alpha blending, alpha
 test, animated material, fullbright pass, lighting, liquid, sprite or model rendering
-is implied. No implicit sun or DirLight behavior is inferred. Later cross-backend
-artifacts remain unavailable.
+is implied. No implicit sun or DirLight behavior is inferred. [Metal artifacts](METAL_SHADER_CONTRACTS.md) are now packaged; native Apple execution remains unverified.
 
 ## Inspection and verification
 

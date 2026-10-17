@@ -1,5 +1,7 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The [Metal shader continuation](../Documentation/Implementation/M2_METAL.md) removes Vulkan-only world entry by bundling SDL_shadercross-generated MSL for world/model/FX rendering. Shader tools remain optional and offline. Linux NVIDIA validation is recorded; native macOS execution remains pending. M2 stays incomplete.
+
 The [conversation continuation](../Documentation/Implementation/M2_CONVERSATIONS.md) connects original ConversationTrigger sequencing, typed client delivery and CCommLink timing/real WAV playback, with inspection. CityHub has 434 created / 31 transferred sounds / 541 editor-only / 19 unsupported / one failed. All seven authored conversation cues in the base-world catalog remain unmapped and missing; separately labelled diagnostics verify actual audio without altering them. Original communication HUD/VoiceMgr arbitration, required services and safe NEW_LEVEL keep M2 incomplete.
 
 The [M16 continuation](../Documentation/Implementation/M2_ASSAULT.md) connects original primary fire, alternate grenade charges, pickup/drop, independent grenade lifetime and inspection. CityHub has 433 created / 31 transferred sounds / 20 unsupported / one failed. Finite inverted ABC key bounds remain visible metadata warnings. The original Cultist lacks rifle animations; direct AI firing is tested separately from unavailable autonomous M16 combat. Replacement grenade physics, required services and safe NEW_LEVEL keep M2 open.
@@ -128,12 +130,13 @@ The three runtime targets remain small: `engine` (resources, world/object runtim
 The [diagnostic 3D view](docs/WORLD_VIEW_CONTRACTS.md) now renders actual level
 geometry and current moving brushes through SDL_GPU. Run `./build/debug/blood2 --view-world` to enter the original player/cameras with
 keyboard controls enabled and mouse capture requested. F1/Escape release the cursor for inspection. [Original DTX textures](docs/TEXTURE_CONTRACTS.md) now appear as unlit opaque materials. [Existing models and first-person weapons](docs/MODEL_VIEW_CONTRACTS.md) now render too;
-full combat and M2 completion remain pending. The world shader currently requires
-Vulkan/SPIR-V; other backend artifacts remain unimplemented.
+full combat and M2 completion remain pending. The renderer bundles Vulkan/SPIR-V and Metal/MSL shaders; see
+[Metal setup and regeneration](docs/METAL_SHADER_CONTRACTS.md). Native Metal execution
+remains unverified here; D3D12 artifacts remain unavailable.
 
 ## Build and Run
 
-Requirements: CMake 3.28+, Ninja, a C++20 compiler and SDL's platform development dependencies. Only Linux/Wayland/Vulkan has been tested. Windows/D3D12 and macOS/Metal remain target configurations, not verified platforms.
+Requirements: CMake 3.28+, Ninja, a C++20 compiler and SDL's platform development dependencies. Linux/Wayland/Vulkan is tested. Packaged MSL enables the Metal path on macOS, but native execution still needs validation. Windows currently requires Vulkan; D3D12 artifacts are not supplied.
 
 ```sh
 cmake --preset debug
@@ -227,9 +230,9 @@ cmake --build --preset release -j8
 ctest --preset release
 ```
 
-Public `release` disables Dear ImGui. It still loads the world and executes original object callbacks but presents a clear background until game rendering is implemented. `BLOOD2_SANITIZERS=ON` instruments project code with ASan/UBSan; [M2 evidence](../Documentation/Implementation/M2.md) gives Clang commands and actual results. Sanitizer checks do not cover a GPU session or its driver.
+Public `release` disables Dear ImGui. It uses the same world/model/FX rendering and original object callbacks as Debug. `BLOOD2_SANITIZERS=ON` instruments project code with ASan/UBSan; [M2 evidence](../Documentation/Implementation/M2.md) gives Clang commands and actual results. Sanitizer checks do not cover a GPU session or its driver.
 
-On Windows use an MSVC Developer PowerShell and the same CMake/Ninja commands, then `build/debug/blood2.exe`; on macOS use Apple Clang. These procedures, mobile and headset builds have not been executed.
+On Windows use an MSVC Developer PowerShell and the same CMake/Ninja commands, then `build/debug/blood2.exe`; on macOS use Apple Clang. The user reported successful macOS compilation/startup before this Metal fix; native world rendering has not been verified by this project. Windows, mobile and headset builds remain unverified. See [Metal launch and validation](docs/METAL_SHADER_CONTRACTS.md).
 
 ## Contracts and Remaining Work
 

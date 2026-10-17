@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-17",
+  "scope": "Offline MSL generation and bundled SDL GPU shader selection; no original gameplay imports",
+  "tools": {
+    "SDL_shadercross": {
+      "revision": "1ff05bec573988a98ef9e0260b4da44f512b8367",
+      "source": "https://github.com/libsdl-org/SDL_shadercross",
+      "selection": "main resolved 2026-10-17",
+      "archive_sha256": "60aae35ff71bd1d5f85b363e9d077a86bb27dd36333c42685e56c2fd541174d2"
+    },
+    "SPIRV-Cross": {
+      "revision": "1a6169566c73d3da552748fc372fe2bbb856e46e",
+      "source": "https://github.com/KhronosGroup/SPIRV-Cross",
+      "selection": "exact SDL_shadercross external/SPIRV-Cross submodule",
+      "archive_sha256": "0f295b214b164e42a1d21537c8da7b44569806c16220dda9798558edfaacd11e"
+    },
+    "glslangValidator": {
+      "version": "16.2.0",
+      "target": "Vulkan 1.0"
+    },
+    "MSL": {
+      "target": "1.2.0",
+      "entrypoint": "main0"
+    }
+  },
+  "SDL_runtime_revision": "6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1",
+  "inputs": {
+    "src/engine/shaders/world.vert": "13ee9ae709847963c34149501624b6656228c1843329a2938cad4e654946038c",
+    "src/engine/shaders/world.frag": "eb5fd75cfbf50b4422ae3648128c00e7edc5b936555218df44fd1f5aed1e3fa6",
+    "src/engine/shaders/sprite.frag": "bc78f0b35a4dfd000d8f1f81c853222a1d1cfb4079a2f86fd880eb3ac9d084bd"
+  },
+  "generated": {
+    "world_vert.h": {
+      "sha256": "5d8260a372590a0865a32c92de5cb18da62f1cc1603b0b1b3fa3848b98f68abd",
+      "bytes": 8895
+    },
+    "world_frag.h": {
+      "sha256": "ff1638c1aae70c7e00175e9c2c1144454da9cf369e0b284e1150cc47d2090d05",
+      "bytes": 2358
+    },
+    "sprite_frag.h": {
+      "sha256": "a6ad01fead2743a0d3989483003a9cce384ad63820496bf07a583696704d9645",
+      "bytes": 3922
+    },
+    "world_vert_msl.h": {
+      "sha256": "2ef4a2cfe9476ac1ba7eeab495f77ff72298ae98ba3a9219fa554b269fe99771",
+      "bytes": 1395
+    },
+    "world_frag_msl.h": {
+      "sha256": "3e950e7a872d3c389a88e826ed93c85f6b740cbcb787f148ffd77b8fc0384726",
+      "bytes": 751
+    },
+    "sprite_frag_msl.h": {
+      "sha256": "49032f5642dd03d6927dcaff8726f915cd99f280944602f729af346d12d812c3",
+      "bytes": 942
+    }
+  },
+  "native_metal_validation": "Not executed; Linux host has no native Metal driver/compiler"
+}

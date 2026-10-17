@@ -1,7 +1,5 @@
 #include "engine/world_renderer.h"
-#include "engine/shaders/sprite_frag.h"
-#include "engine/shaders/world_frag.h"
-#include "engine/shaders/world_vert.h"
+#include "engine/world_shaders.h"
 #include <cmath>
 #include <cstring>
 
@@ -52,32 +50,26 @@ namespace OpenBlood2
         if (selected)
             return true;
         const bool alpha = translucent || style_ == DrawStyle::SpriteAlpha;
-        if (!(SDL_GetGPUShaderFormats(device_) & SDL_GPU_SHADERFORMAT_SPIRV))
+        SDL_GPUShaderCreateInfo vertex_info{}, fragment_info{};
+        const auto formats = SDL_GetGPUShaderFormats(device_);
+        if (!world_shader_info(WorldShader::Vertex, formats, vertex_info) ||
+            !world_shader_info(alpha ? WorldShader::AlphaFragment : WorldShader::OpaqueFragment, formats,
+                               fragment_info))
         {
-            error = "Diagnostic world renderer currently requires the Vulkan/SPIR-V backend";
+            error = "No bundled world shader for this GPU backend (SPIR-V or MSL required)";
             return false;
         }
-        SDL_GPUShaderCreateInfo info{};
-        info.entrypoint = "main";
-        info.format = SDL_GPU_SHADERFORMAT_SPIRV;
-        info.stage = SDL_GPU_SHADERSTAGE_VERTEX;
-        info.code = reinterpret_cast<const Uint8*>(world_vert);
-        info.code_size = sizeof(world_vert);
-        info.num_uniform_buffers = 1;
-        auto* vertex = SDL_CreateGPUShader(device_, &info);
-        info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
-        info.code = reinterpret_cast<const Uint8*>(alpha ? sprite_frag : world_frag);
-        info.code_size = alpha ? sizeof(sprite_frag) : sizeof(world_frag);
-        info.num_uniform_buffers = alpha ? 1 : 0;
-        info.num_samplers = 1;
-        auto* fragment = SDL_CreateGPUShader(device_, &info);
-        if (!vertex || !fragment)
+        auto* vertex = SDL_CreateGPUShader(device_, &vertex_info);
+        if (!vertex)
         {
             error = SDL_GetError();
-            if (vertex)
-                SDL_ReleaseGPUShader(device_, vertex);
-            if (fragment)
-                SDL_ReleaseGPUShader(device_, fragment);
+            return false;
+        }
+        auto* fragment = SDL_CreateGPUShader(device_, &fragment_info);
+        if (!fragment)
+        {
+            error = SDL_GetError();
+            SDL_ReleaseGPUShader(device_, vertex);
             return false;
         }
         SDL_GPUVertexBufferDescription buffer{};

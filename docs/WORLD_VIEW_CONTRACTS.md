@@ -61,18 +61,11 @@ bounded to 8,192 per axis. The world pass precedes a separate ImGui color-load p
 UI visibility has no effect on rendering or simulation; no-ImGui Release uses the
 same world path. Presentation without an entered player remains inspection-only.
 
-The current packaged world shaders support Vulkan/SPIR-V. Other SDL backends report
-an explicit unsupported renderer error when entering this view; D3D12/Metal shader
-artifacts and platform validation remain M4 work. The pinned SDL/ImGui/spdlog stack is
-unchanged. GLSL sources and generated SPIR-V word headers are checked in; ordinary
-builds need no shader compiler or runtime shader-file paths. Regenerate explicitly:
-
-```sh
-cmake -P cmake/GenerateWorldShaders.cmake
-```
-
-The checked headers were produced with glslangValidator 16.2.0, targeting Vulkan 1.0.
-The shader compiler is an offline tool, not a new runtime dependency.
+The packaged world shaders now support Vulkan/SPIR-V and Metal/MSL. See
+[Metal shader contracts](METAL_SHADER_CONTRACTS.md) for backend selection, generated
+bindings and optional SDL_shadercross regeneration. Both artifacts are checked in;
+ordinary builds need no shader toolchain. Native Metal execution remains pending,
+while Linux Vulkan has actual GPU evidence. D3D12 artifacts remain unavailable.
 
 ## Use and evidence
 

@@ -1,4 +1,5 @@
 #include "engine/runtime.h"
+#include "engine/world_shaders.h"
 
 namespace OpenBlood2
 {
@@ -19,9 +20,7 @@ namespace OpenBlood2
             error = SDL_GetError();
             return false;
         }
-        gpu = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_MSL |
-                                      SDL_GPU_SHADERFORMAT_METALLIB,
-                                  gpu_debug, nullptr);
+        gpu = SDL_CreateGPUDevice(WorldShaderFormats, gpu_debug, nullptr);
         if (!gpu || !SDL_ClaimWindowForGPUDevice(gpu, window))
         {
             error = SDL_GetError();
