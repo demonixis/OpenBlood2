@@ -1,7 +1,16 @@
 #include "cpp_engineobjects_de.h"
+#include "game/original/BuiltinModel.h"
 
 #include "engineobjects_de.h"
 #include "serverobj_de.h"
+
+DDWORD OpenBlood2::BuiltinModel::EngineMessageFn(DDWORD message, void* data, float reason)
+{
+    // Original mdl_MessageFn forces the type even for a non-normal incoming type.
+    if (message == MID_PRECREATE)
+        static_cast<ObjectCreateStruct*>(data)->m_ObjectType = OT_MODEL;
+    return bc_EngineMessageFn(this, message, data, reason);
+}
 
 void bc_AddAggregate(LPBASECLASS pObject, LPAGGREGATE pAggregate)
 {

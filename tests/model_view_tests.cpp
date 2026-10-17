@@ -1,5 +1,7 @@
 #include "app/model_scene.h"
 #include "model_fixture.h"
+#include "player_fixture.h"
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <limits>
@@ -131,6 +133,106 @@ namespace
         CHECK(!weapon.AdjustAngleAndSetPos(0, 0, {}, pose));
         return true;
     }
+    bool builtin_resources(const char* root)
+    {
+        GameSession g;
+        CHECK(test_player::setup(g, root, false));
+        std::string error;
+        ModelView scene;
+        auto h = g.objects.create_props(g.objects.find_class("Model"), {},
+                                        "Filename models/characters/caleb.abc; Skin skins/characters/caleb1.dtx");
+        auto* record = g.objects.get(h);
+        CHECK(record && record->model && record->model_error.empty());
+        std::weak_ptr<const Model> retained = record->model;
+        CHECK(update_model_scene(g, scene, error));
+        CHECK(scene.entries.size() == 1 && !scene.entries[0].error.empty()); // Malformed synthetic DTX.
+        CHECK(scene.world_draws.size() == 1);                                // Existing explicit magenta fallback.
+        record->state.m_Flags &= ~FLAG_VISIBLE;
+        CHECK(g.server.advance_models(.025));
+        const auto time = record->animation.time;
+        CHECK(time == 25 && update_model_scene(g, scene, error));
+        CHECK(scene.entries.size() == 1 && !scene.entries[0].visible && scene.world_draws.empty());
+        CHECK(record->animation.time == time); // Rendering is read-only even when hidden.
+        auto bad = g.objects.create_props(g.objects.find_class("Model"), {},
+                                          "Filename skins/characters/caleb1.dtx; Skin missing.dtx");
+        auto* missing = g.objects.get(bad);
+        CHECK(missing && !missing->model && !missing->model_error.empty());
+        CHECK(update_model_scene(g, scene, error) && scene.entries.size() == 2 && !scene.entries.back().error.empty() &&
+              scene.world_draws.empty());
+        const auto id = record->id;
+        CHECK(g.objects.remove(h) && update_model_scene(g, scene, error) && scene.entries.size() == 1);
+        CHECK(!retained.expired() && g.objects.finish_frame() && retained.expired() && !g.objects.get(id));
+        CHECK(g.objects.remove(bad) && g.objects.finish_frame());
+        CHECK(update_model_scene(g, scene, error) && scene.entries.empty());
+        return true;
+    }
+    bool builtin_city(const char* root)
+    {
+        GameSession g;
+        CHECK(g.initialize());
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(g.resources.mount_game(config, error));
+        ModelView scene;
+        ObjectId old;
+        for (unsigned cycle = 0; cycle < 2; ++cycle)
+        {
+            CHECK(g.request_world("02_CityHub", error) && !g.objects.get(old));
+            std::map<std::string, std::weak_ptr<const Model>> models;
+            std::vector<ObjectId> ids;
+            for (std::size_t i = 0; i < g.world.objects.size(); ++i)
+            {
+                const auto& source = g.world.objects[i];
+                if (source.class_name != "Model")
+                    continue;
+                const auto& entry = g.entries[i];
+                auto* r = g.objects.get(entry.object);
+                CHECK(entry.state == EntryState::Created && r && r->model && r->model_error.empty());
+                CHECK(r->state.m_ObjectType == OT_MODEL && r->state.m_Flags == FLAG_VISIBLE && !r->scheduled);
+                CHECK(near(r->state.m_Pos, std::get<DVector>(*source.find("Pos"))));
+                CHECK(std::string(r->state.m_Filename) == std::get<std::string>(*source.find("Filename")));
+                CHECK(std::string(r->state.m_SkinName) == std::get<std::string>(*source.find("Skin")));
+                CHECK(near(r->dimensions, {}) && !r->world_body && !r->character_body);
+                auto [it, inserted] = models.emplace(r->state.m_Filename, r->model);
+                CHECK(inserted || it->second.lock() == r->model);
+                ids.push_back(r->id);
+            }
+            CHECK(ids.size() == 47 && models.size() == 2);
+            CHECK(g.server.advance_models(.025)); // No NPC tick, exercise engine clocks without UI.
+            CHECK(update_model_scene(g, scene, error));
+            std::size_t triangles = 0;
+            for (auto id : ids)
+            {
+                const auto* r = g.objects.get(id);
+                const auto found = std::find_if(scene.entries.begin(), scene.entries.end(),
+                                                [&](const auto& e) { return e.object == id; });
+                CHECK(found != scene.entries.end() && found->visible && found->error.empty());
+                CHECK(found->triangles == r->model->faces.size() && found->triangles > 0);
+                CHECK(found->range < scene.world_draws.size());
+                const auto& draw = scene.world_draws[found->range];
+                CHECK(near(draw.position, r->state.m_Pos));
+                CHECK(near(rotate_vector(draw.rotation, {0, 0, 1}), rotate_vector(r->state.m_Rotation, {0, 0, 1})));
+                triangles += found->triangles;
+            }
+            std::cout << "CityHub cycle " << cycle << ": " << ids.size() << " built-in Models / " << models.size()
+                      << " shared ABC assets / " << triangles << " triangles / zero model or skin failures\n";
+            old = ids.front();
+            auto* hidden = g.objects.get(old);
+            const auto time = hidden->animation.time;
+            hidden->state.m_Flags &= ~FLAG_VISIBLE;
+            CHECK(update_model_scene(g, scene, error) && hidden->animation.time == time);
+            const auto found = std::find_if(scene.entries.begin(), scene.entries.end(),
+                                            [&](const auto& e) { return e.object == old; });
+            CHECK(found != scene.entries.end() && !found->visible && found->error.empty());
+            CHECK(g.unload_world() && !g.objects.get(old));
+            for (const auto& [path, model] : models)
+                CHECK(model.expired());
+            scene.clear();
+            CHECK(update_model_scene(g, scene, error) && scene.entries.empty() && scene.world_draws.empty());
+        }
+        return true;
+    }
     bool private_world(const char* root)
     {
         GameSession g;
@@ -231,12 +333,14 @@ int main(int argc, char** argv)
     if (argc < 2)
         return 2;
     std::string_view c = argv[1];
-    return (c == "legacy_pose"           ? legacy_pose()
-            : c == "sample"              ? sample()
-            : c == "rejects"             ? rejects()
-            : c == "weapon_pose"         ? weapon_pose()
-            : c == "subway" && argc == 3 ? private_world(argv[2])
-                                         : false)
+    return (c == "legacy_pose"                      ? legacy_pose()
+            : c == "builtin_resources" && argc == 3 ? builtin_resources(argv[2])
+            : c == "builtin_city" && argc == 3      ? builtin_city(argv[2])
+            : c == "sample"                         ? sample()
+            : c == "rejects"                        ? rejects()
+            : c == "weapon_pose"                    ? weapon_pose()
+            : c == "subway" && argc == 3            ? private_world(argv[2])
+                                                    : false)
                ? 0
                : 1;
 }

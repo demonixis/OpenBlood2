@@ -1,5 +1,7 @@
 # Blood II Reconstruction aka OpenBlood2
 
+The [original built-in Model continuation](../Documentation/Implementation/M2_BUILTIN_MODELS.md) renders 47 authored CityHub lamps with real ABC/DTX resources and inspection. CityHub now has 291 created, 159 unsupported and 35 failed entries; the source session remains intact during rehearsal. Destructible models, safe NEW_LEVEL and M2 remain incomplete.
+
 Current continuation: [original fragment smoke trails](../Documentation/Implementation/M2_OBJECT_PARTICLES.md) adds
 distance-based emission, source stop/lifetime rules and actual DTX particle rendering.
 Other required FX/illumination and safe NEW_LEVEL keep M2 incomplete.

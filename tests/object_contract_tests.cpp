@@ -1,3 +1,4 @@
+#include "game/original/BuiltinModel.h"
 #include "game/original/CameraSpot.h"
 #include "game/original/Key.h"
 #include "game/server_adapter.h"
@@ -130,6 +131,56 @@ namespace
         auto string_key = s.objects.create_props(s.objects.find_class("Key"), {}, "TimeStamp 9; Name \"string key\"");
         CHECK(string_key && dynamic_cast<Key*>(s.objects.get(string_key)->game.get())->m_fTimeStamp == 0);
         CHECK(std::string(s.objects.get(string_key)->state.m_Name) == "string key");
+        return true;
+    }
+    bool builtin_model()
+    {
+        GameSession s;
+        CHECK(setup(s));
+        const auto* type = s.objects.find_class("Model");
+        CHECK(type && type->parent == s.objects.find_class("BaseClass"));
+        ObjectCreateStruct input;
+        input.m_ObjectType = OT_SPRITE; // The source callback unconditionally replaces this.
+        input.m_Flags = FLAG_SHADOW;
+        input.m_Pos = {7, 8, 9};
+        SAFE_STRCPY(input.m_Name, "runtime");
+        SAFE_STRCPY(input.m_Filename, "missing.abc");
+        SAFE_STRCPY(input.m_SkinName, "missing.dtx");
+        const auto runtime = s.objects.create(type, input);
+        auto* r = s.objects.get(runtime);
+        CHECK(r && dynamic_cast<BuiltinModel*>(r->game.get()));
+        CHECK(r->state.m_ObjectType == OT_MODEL && r->state.m_Flags == FLAG_SHADOW);
+        CHECK(r->state.m_Pos.x == 7 && std::string(r->state.m_Name) == "runtime");
+        CHECK(std::string(r->state.m_Filename) == "missing.abc" && !r->model_error.empty() && !r->model);
+        s.server.SetModelAnimation(runtime, 0);
+        CHECK(r->animation.animation == no_animation && s.objects.error() == ObjectError::InvalidProperty);
+        for (auto reason : {Creation::World, Creation::String})
+        {
+            auto h = s.objects.create(type, input, reason);
+            auto* o = s.objects.get(h);
+            CHECK(o && o->state.m_ObjectType == OT_MODEL && o->state.m_Flags == FLAG_VISIBLE);
+            CHECK(o->state.m_Pos.x == 0 && std::string(o->state.m_Name) == "noname");
+            CHECK(!o->state.m_Filename[0] && !o->state.m_SkinName[0] && !o->model);
+            CHECK(o->model_error.empty() && !o->scheduled);
+        }
+        auto h = s.objects.create_props(type, input,
+                                        "Name lamp; Flags 3; Visible false; Shadow false; Pos \"1 2 3\"; "
+                                        "Filename absent.abc; Skin absent.dtx");
+        const auto* o = s.objects.get(h);
+        CHECK(o && o->state.m_Flags == 0 && o->state.m_ObjectType == OT_MODEL && o->state.m_Pos.y == 2);
+        CHECK(std::string(o->state.m_Filename) == "absent.abc" && !o->model_error.empty());
+        CHECK(!s.objects.create(type, {}, Creation::World, {{"DifficultyMed", false}}));
+        CHECK(!s.objects.create(type, {}, Creation::World, {{"Flags", std::string("wrong type")}}));
+        // The original C callback delegates to the aggregate chain exactly once.
+        ProbeAggregate aggregate;
+        bc_AddAggregate(r->game.get(), &aggregate);
+        const auto engine_calls = context.aggregates, message_calls = context.aggregate_messages;
+        CHECK(BaseClass::_EngineMsgFn(r->game.get(), MID_UPDATE, nullptr, 0) == 1);
+        CHECK(BaseClass::_ObjectMsgFn(r->game.get(), nullptr, 999, nullptr) == 1);
+        CHECK(context.aggregates == engine_calls + 1 && context.aggregate_messages == message_calls + 1);
+        r->game->m_pFirstAggregate = nullptr; // Stack-owned probe, not an engine-owned aggregate.
+        const auto id = r->id;
+        CHECK(s.objects.remove(runtime) && s.objects.finish_frame() && !s.objects.get(id));
         return true;
     }
     bool nested_creation()
@@ -472,13 +523,18 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
-    const std::pair<const char*, bool (*)()> cases[] = {
-        {"original_objects", original_objects},     {"nested_creation", nested_creation},
-        {"reasons_properties", reasons_properties}, {"scheduling", scheduling},
-        {"deferred_removal", deferred_removal},     {"aggregate_dispatch", aggregate_dispatch},
-        {"handles_selection", handles_selection},   {"links_lists", links_lists},
-        {"messages_strings", messages_strings},     {"unsupported_teardown", unsupported_teardown},
-        {"creation_failures", creation_failures}};
+    const std::pair<const char*, bool (*)()> cases[] = {{"builtin_model", builtin_model},
+                                                        {"original_objects", original_objects},
+                                                        {"nested_creation", nested_creation},
+                                                        {"reasons_properties", reasons_properties},
+                                                        {"scheduling", scheduling},
+                                                        {"deferred_removal", deferred_removal},
+                                                        {"aggregate_dispatch", aggregate_dispatch},
+                                                        {"handles_selection", handles_selection},
+                                                        {"links_lists", links_lists},
+                                                        {"messages_strings", messages_strings},
+                                                        {"unsupported_teardown", unsupported_teardown},
+                                                        {"creation_failures", creation_failures}};
     if (argc != 2)
         return 2;
     for (const auto& [name, test] : cases)

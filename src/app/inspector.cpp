@@ -595,6 +595,15 @@ namespace OpenBlood2
                         if (state.m_ObjectType == OT_MODEL)
                             ImGui::Text("Model additive RGB (lighting pending) %.3f %.3f %.3f | alpha %.3f",
                                         object->color.x, object->color.y, object->color.z, object->alpha);
+                        if (object->type->name == "Model")
+                        {
+                            ImGui::TextWrapped("Original built-in Model: BaseClass properties and engine animation. "
+                                               "No destructible-object rules or light emission.");
+                            ImGui::Text("Collision half dimensions %.2f %.2f %.2f (no automatic model body)",
+                                        object->dimensions.x, object->dimensions.y, object->dimensions.z);
+                            if (!object->model && object->model_error.empty())
+                                ImGui::TextUnformatted("No ABC resource requested.");
+                        }
                         if (state.m_Filename[0] || state.m_SkinName[0])
                             ImGui::TextWrapped("Model: %s / Skin (decode status in 3D view): %s", state.m_Filename,
                                                state.m_SkinName);

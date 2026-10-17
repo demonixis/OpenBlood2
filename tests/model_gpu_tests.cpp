@@ -2,6 +2,7 @@
 #include "engine/capture.h"
 #include "engine/runtime.h"
 #include "engine/world_renderer.h"
+#include <algorithm>
 #include <iostream>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
@@ -217,6 +218,95 @@ int main(int argc, char** argv)
         CHECK(game.unload_world());
         scene.clear();
         models.clear_geometry();
+    }
+    if (argc == 4 && std::string_view(argv[3]) == "builtin_city")
+    {
+        GameSession game;
+        CHECK(game.initialize());
+        Config config;
+        config.data_dir = argv[2];
+        CHECK(game.resources.mount_game(config, error));
+        ModelView scene;
+        for (unsigned cycle = 0; cycle < 2; ++cycle)
+        {
+            CHECK(game.request_world("02_CityHub", error));
+            CHECK(update_model_scene(game, scene, error));
+            for (auto asset : {"lightbulb1.abc", "redlight.abc"})
+            {
+                auto selected = std::find_if(scene.entries.begin(), scene.entries.end(),
+                                             [&](const auto& entry)
+                                             {
+                                                 const auto* r = game.objects.get(entry.object);
+                                                 return r && r->type->name == "Model" && entry.label.ends_with(asset);
+                                             });
+                CHECK(selected != scene.entries.end() && selected->error.empty());
+                auto* r = game.objects.get(selected->object);
+                CHECK(r && r->model && selected->triangles > 0);
+                auto draw = scene.world_draws[selected->range];
+                // Diagnostic camera only: keep the authored model transform/scale.
+                const auto& clip = r->model->animations[r->animation.animation];
+                const auto center =
+                    rotate_vector(r->state.m_Rotation, {(clip.min.x + clip.max.x) / 2, (clip.min.y + clip.max.y) / 2,
+                                                        (clip.min.z + clip.max.z) / 2});
+                const float span =
+                    std::max({clip.max.x - clip.min.x, clip.max.y - clip.min.y, clip.max.z - clip.min.z, 1.f});
+                const DVector eye{r->state.m_Pos.x + center.x, r->state.m_Pos.y + center.y,
+                                  r->state.m_Pos.z + center.z - span * 2};
+                Capture capture;
+                CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300));
+                std::vector<std::uint8_t> visible_pixels;
+                for (unsigned frame = 0; frame < 3; ++frame)
+                {
+                    CHECK(models.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300,
+                                         error, true));
+                    auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
+                    CHECK(commands);
+                    const std::span<const WorldDraw> draws =
+                        frame == 1 ? std::span<const WorldDraw>{} : std::span(&draw, 1);
+                    CHECK(models.draw(commands, capture.texture, scene.mesh, draws, eye, {}, false, error));
+                    auto* copy = SDL_BeginGPUCopyPass(commands);
+                    CHECK(copy);
+                    SDL_GPUTextureRegion region{};
+                    region.texture = capture.texture;
+                    region.w = 400;
+                    region.h = 300;
+                    region.d = 1;
+                    SDL_GPUTextureTransferInfo target{};
+                    target.transfer_buffer = capture.transfer;
+                    target.pixels_per_row = 400;
+                    target.rows_per_layer = 300;
+                    SDL_DownloadFromGPUTexture(copy, &region, &target);
+                    SDL_EndGPUCopyPass(copy);
+                    CHECK(SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(runtime.gpu));
+                    auto* pixels =
+                        static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
+                    CHECK(pixels);
+                    std::size_t filled = 0, magenta = 0;
+                    for (std::size_t i = 0; i < 400 * 300; ++i)
+                    {
+                        filled += pixels[i * 4] != 6 || pixels[i * 4 + 1] != 9 || pixels[i * 4 + 2] != 13;
+                        magenta += pixels[i * 4] == 255 && pixels[i * 4 + 1] == 0 && pixels[i * 4 + 2] == 255;
+                    }
+                    const bool restored =
+                        frame != 2 || std::equal(visible_pixels.begin(), visible_pixels.end(), pixels);
+                    if (frame == 0)
+                        visible_pixels.assign(pixels, pixels + 400 * 300 * 4);
+                    SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
+                    CHECK(restored && magenta == 0 && (frame == 1 ? filled == 0 : filled > 100));
+                    if (frame == 0)
+                    {
+                        const auto path = std::string(argv[1]) + "-" + asset + ".png";
+                        CHECK(capture.save(path.c_str()));
+                        std::cout << "CityHub Model " << asset << " cycle " << cycle << ": " << filled
+                                  << " textured pixels, no fallback; hidden/restored checked\n";
+                    }
+                }
+            }
+            CHECK(game.unload_world());
+            scene.clear();
+            models.clear_geometry();
+            CHECK(update_model_scene(game, scene, error) && scene.entries.empty());
+        }
     }
     models.clear_geometry();
     world.clear_geometry();

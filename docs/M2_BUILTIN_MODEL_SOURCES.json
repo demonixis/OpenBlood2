@@ -1,0 +1,22 @@
+{
+  "baseline_commit": "996ebbdbadb344239f113ba0c9746de209bdbb9a",
+  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "source_files": [
+    {
+      "path": "sources/blood2/AppHeaders/engineobjects.c",
+      "sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
+      "use": "Model registration and mdl_MessageFn (153-176); existing bc_EngineMessageFn ordering (20-121)."
+    },
+    {
+      "path": "sources/blood2/AppHeaders/cpp_engineobjects_de.h",
+      "sha256": "f4b59f4e7fb11c0704a23ab4144aa06d90b6e55c584173da2f291b22045ee10b",
+      "use": "Original C++ BaseClass and aggregate dispatch boundary, adapted previously."
+    }
+  ],
+  "adaptations": [
+    "C Model callback expressed as a typed C++ BuiltinModel override; original registered name and BaseClass parent retained.",
+    "Static registration replaces CF_ALWAYSLOAD DLL intent; no new dependency or mutable global.",
+    "Existing ABC/DTX cache, animation, rendering, diagnostic failure and deferred lifetime policies reused.",
+    "No invented collision dimensions, damage behavior, light emission or destination promotion."
+  ]
+}

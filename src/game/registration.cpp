@@ -1,5 +1,6 @@
 #include "game/original/AmmoPickups.h"
 #include "game/original/B2BaseClass.h"
+#include "game/original/BuiltinModel.h"
 #include "game/original/CameraObj.h"
 #include "game/original/CameraSpot.h"
 #include "game/original/CinematicTrigger.h"
@@ -65,6 +66,11 @@ namespace OpenBlood2
                               {"Gravity", false, false},
                               {"TouchNotify", false, false},
                               {"Rayhit", false, false}}};
+        const ClassInfo builtin_model{
+            "Model",
+            &base,
+            construct<BuiltinModel>,
+            {{"Filename", std::string{}}, {"Skin", std::string{}}, {"Flags", std::int32_t(FLAG_VISIBLE)}}};
         const ClassInfo shockwave_projectile{
             "CBehemothShockwaveProjectile", &base, construct<CBehemothShockwaveProjectile>, {}};
         const ClassInfo energy_projectile{"CEnergyBlastProjectile", &base, construct<CEnergyBlastProjectile>, {}};
@@ -653,19 +659,20 @@ namespace OpenBlood2
     } // namespace
     bool register_original_classes(Objects& objects)
     {
-        return objects.register_class(base) && objects.register_class(b2base) && objects.register_class(camera) &&
-               objects.register_class(client_sfx) && objects.register_class(scene_explosion) &&
-               objects.register_class(client_light) && objects.register_class(light_SquareWaveLightFX) &&
-               objects.register_class(light_SawWaveLightFX) && objects.register_class(light_RampUpWaveLightFX) &&
-               objects.register_class(light_RampDownWaveLightFX) && objects.register_class(light_SineWaveLightFX) &&
-               objects.register_class(light_Flicker1WaveLightFX) && objects.register_class(light_Flicker2WaveLightFX) &&
-               objects.register_class(light_Flicker3WaveLightFX) && objects.register_class(light_Flicker4WaveLightFX) &&
-               objects.register_class(light_StrobeWaveLightFX) && objects.register_class(light_SearchWaveLightFX) &&
-               objects.register_class(light_FlickerLight) && objects.register_class(light_GlowingLight) &&
-               objects.register_class(camera_object) && objects.register_class(cinematic_trigger) &&
-               objects.register_class(random_sound) && objects.register_class(detail_sprite) &&
-               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
-               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
+        return objects.register_class(base) && objects.register_class(builtin_model) &&
+               objects.register_class(b2base) && objects.register_class(camera) && objects.register_class(client_sfx) &&
+               objects.register_class(scene_explosion) && objects.register_class(client_light) &&
+               objects.register_class(light_SquareWaveLightFX) && objects.register_class(light_SawWaveLightFX) &&
+               objects.register_class(light_RampUpWaveLightFX) && objects.register_class(light_RampDownWaveLightFX) &&
+               objects.register_class(light_SineWaveLightFX) && objects.register_class(light_Flicker1WaveLightFX) &&
+               objects.register_class(light_Flicker2WaveLightFX) && objects.register_class(light_Flicker3WaveLightFX) &&
+               objects.register_class(light_Flicker4WaveLightFX) && objects.register_class(light_StrobeWaveLightFX) &&
+               objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
+               objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
+               objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
+               objects.register_class(detail_sprite) && objects.register_class(sound) &&
+               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
+               objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(exit_hint) && objects.register_class(character) &&
                objects.register_class(ai_manager) && objects.register_class(cultist) &&
