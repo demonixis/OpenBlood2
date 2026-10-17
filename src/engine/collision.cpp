@@ -97,6 +97,7 @@ namespace OpenBlood2
         {
             DVector normal{};
             double distance = 0;
+            bool center_only = false;
         };
         struct Separations
         {
@@ -144,8 +145,22 @@ namespace OpenBlood2
                 const double depth = sign < 0   ? origin - low
                                      : sign > 0 ? high - origin
                                                 : std::numeric_limits<double>::infinity();
-                if (alternatives && sign != 0 && std::isfinite(depth) && depth > 0)
-                    alternatives->values[alternatives->count++] = {vector_scale(axis, static_cast<float>(sign)), depth};
+                if (alternatives)
+                {
+                    // A clear living box can straddle a doorway's end plane
+                    // while fitting between its jambs. Its wider death box may
+                    // need to move along that plane's center-side separation.
+                    // Such candidates require an additional swept living-box
+                    // clearance check before placement can be accepted.
+                    const double side = sign != 0                        ? sign
+                                        : anchor_origin >= high - radius ? 1
+                                        : anchor_origin <= low + radius  ? -1
+                                                                         : 0;
+                    const double distance = side < 0 ? origin - low : high - origin;
+                    if (side != 0 && std::isfinite(distance) && distance > 0)
+                        alternatives->values[alternatives->count++] = {vector_scale(axis, static_cast<float>(side)),
+                                                                       distance, sign == 0};
+                }
                 if (depth < penetration)
                 {
                     penetration = depth;
@@ -432,6 +447,7 @@ namespace OpenBlood2
         constexpr unsigned max_candidates = 128;
         std::array<BodyPlacement, max_candidates> pending;
         std::array<DVector, max_candidates> visited;
+        std::array<bool, max_candidates> visited_center{};
         unsigned count = 1, visited_count = 0;
         pending[0] = report;
         while (count && visited_count < max_candidates)
@@ -441,10 +457,12 @@ namespace OpenBlood2
             for (unsigned i = 0; i < visited_count; ++i)
             {
                 const auto d = vector_subtract(candidate.candidate, visited[i]);
-                repeated |= std::abs(d.x) < 1e-5f && std::abs(d.y) < 1e-5f && std::abs(d.z) < 1e-5f;
+                repeated |= std::abs(d.x) < 1e-5f && std::abs(d.y) < 1e-5f && std::abs(d.z) < 1e-5f &&
+                            candidate.source_sweep == visited_center[i];
             }
             if (repeated || !physics_vector(candidate.candidate))
                 continue;
+            visited_center[visited_count] = candidate.source_sweep;
             visited[visited_count++] = candidate.candidate;
             ++padded.candidates;
             CollisionHit contact;
@@ -454,6 +472,10 @@ namespace OpenBlood2
             if (!found)
             {
                 if (sweep(anchor, candidate.candidate, {}, contact) != CollisionQuery::Miss)
+                    continue;
+                if (candidate.source_sweep &&
+                    sweep(anchor, vector_add(anchor, vector_subtract(candidate.candidate, requested)), anchor_half,
+                          contact) != CollisionQuery::Miss)
                     continue;
                 candidate.result = BodyPlacementResult::Adjusted;
                 candidate.touching_fit = true;
@@ -467,13 +489,14 @@ namespace OpenBlood2
                               &alternatives))
                 continue;
             std::stable_sort(alternatives.values.begin(), alternatives.values.begin() + alternatives.count,
-                             [](const auto& a, const auto& b) { return a.distance < b.distance; });
-            // LIFO explores the shortest correction first; larger source-side
-            // choices remain available when it reaches a previously seen position.
+                             [](const auto& a, const auto& b)
+                             { return a.center_only != b.center_only ? !a.center_only : a.distance < b.distance; });
+            // Prefer whole-source separation, then shorter corrections. Center-only
+            // choices still require the original body to sweep through the offset.
             unsigned eligible = 0;
-            while (eligible < alternatives.count &&
-                   candidate.distance + alternatives.values[eligible].distance <= limit)
-                ++eligible;
+            for (unsigned i = 0; i < alternatives.count; ++i)
+                if (candidate.distance + alternatives.values[i].distance <= limit)
+                    alternatives.values[eligible++] = alternatives.values[i];
             for (unsigned i = std::min(eligible, max_candidates - count); i > 0; --i)
             {
                 const auto& separation = alternatives.values[i - 1];
@@ -481,6 +504,7 @@ namespace OpenBlood2
                 next.candidate = vector_add(candidate.candidate,
                                             vector_scale(separation.normal, static_cast<float>(separation.distance)));
                 next.distance += separation.distance;
+                next.source_sweep |= separation.center_only;
                 ++next.corrections;
                 next.polygon = triangle->polygon;
                 pending[count++] = next;

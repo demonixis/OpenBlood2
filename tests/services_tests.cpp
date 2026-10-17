@@ -357,6 +357,33 @@ namespace
               p.corrections <= 16 && p.distance <= 3 && p.candidates <= 145);
         CHECK(w.sweep(p.candidate, p.candidate, {3, 1, 1}, hit) == CollisionQuery::Miss);
         CHECK(w.sweep(p.anchor, p.candidate, {}, hit) == CollisionQuery::Miss);
+        // A living body straddles the end of a narrow doorway. The wider corpse
+        // fits past the jambs, but neither full-source X separation can find it.
+        // This fixture is generated geometry, not an extracted retail world.
+        auto doorway = floor_model();
+        doorway.points.insert(
+            doorway.points.end(),
+            {{0, 0, -4}, {0, 16, -4}, {0, 16, -2}, {0, 0, -2}, {-10, 0, -2}, {-8, 0, -2}, {-8, 16, -2}, {-10, 16, -2}});
+        doorway.polygons.push_back({0, {4, 5, 6, 7}});
+        doorway.polygons.push_back({0, {8, 9, 10, 11}});
+        CHECK(w.build(doorway, error));
+        const DVector source_half{3.01f, 4, 3.01f}, death_half{5, 2, 5};
+        p = w.place_body({-4, 5, 1}, source_half, {-4, 2, 1}, death_half);
+        CHECK(p.result == BodyPlacementResult::Adjusted && p.source_sweep && p.candidate.z >= 3 && p.distance <= 5 &&
+              p.candidates <= 145);
+        CHECK(w.sweep(p.candidate, p.candidate, death_half, hit) == CollisionQuery::Miss);
+        CHECK(w.sweep(p.anchor, p.candidate, {}, hit) == CollisionQuery::Miss);
+        CHECK(w.sweep(p.anchor, vector_add(p.anchor, vector_subtract(p.candidate, p.requested)), source_half, hit) ==
+              CollisionQuery::Miss);
+        // The short corpse can fit beneath a lintel that the living source box
+        // cannot sweep through. Center-only separation must still refuse it.
+        doorway.points.insert(doorway.points.end(), {{-20, 8, 4.1f}, {20, 8, 4.1f}, {20, 8, 12}, {-20, 8, 12}});
+        doorway.polygons.push_back({0, {12, 13, 14, 15}});
+        CHECK(w.build(doorway, error));
+        CHECK(w.sweep({-4, 2, 3}, {-4, 2, 3}, death_half, hit) == CollisionQuery::Miss);
+        CHECK(w.sweep({-4, 5, 1}, {-4, 5, 3}, source_half, hit) == CollisionQuery::Hit);
+        p = w.place_body({-4, 5, 1}, source_half, {-4, 2, 1}, death_half);
+        CHECK(p.result == BodyPlacementResult::Blocked && p.candidates <= 145);
         return true;
     }
     bool placement_service()

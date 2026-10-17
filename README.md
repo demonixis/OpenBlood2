@@ -597,3 +597,5 @@ checked action delivery and keep-alive retention. Other items/HUD and safe
 NEW_LEVEL remain unavailable; M2 is still incomplete.
 
 The [surface panning correction](../Documentation/Implementation/M2_SURFACE_EFFECTS.md) renders SubwayA's authored tunnel/rail motion from session time, with retained metadata and inspection. Original object/collision motion is unchanged; required services and safe NEW_LEVEL keep M2 incomplete.
+
+The [corpse doorway correction](../Documentation/Implementation/M2_CORPSE_CLEARANCE.md) addresses a reproduced frozen dead Cultist by adding checked source-center separation and swept living-body clearance to initial corpse placement. Original dimensions and bounded failures remain intact; in-game inspection records the extra sweep. Read [the clearance contracts](docs/CORPSE_CLEARANCE_CONTRACTS.md) before extending this policy. This does not certify every later enemy or close M2.

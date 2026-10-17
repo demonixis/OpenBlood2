@@ -1,5 +1,9 @@
 # Initial ordinary corpse placement
 
+> Continued by [doorway clearance](CORPSE_CLEARANCE_CONTRACTS.md): a source-center
+> alternative requires an additional swept living-box check. Existing raw dimensions,
+> bounds and final collision checks remain mandatory.
+
 The original CreateCorpse still supplies the cached CMovement transform, raw death
 animation dimensions, visual scale and foot-offset formula. The new engine service
 only resolves initial primary-world overlap caused by that shape change. It is a

@@ -16,6 +16,7 @@ namespace OpenBlood2
                 return;
             ImGui::Text("Corrections %u | distance %.3f", p.corrections, p.distance);
             ImGui::Text("Candidates tested %u | zero-margin search: %s", p.candidates, p.touching_fit ? "yes" : "no");
+            ImGui::Text("Original-body sweep required: %s", p.source_sweep ? "yes" : "no");
             if (p.polygon != UINT32_MAX)
                 ImGui::Text("Last queried polygon %u", p.polygon);
             ImGui::Text("Source anchor %.2f %.2f %.2f", p.anchor.x, p.anchor.y, p.anchor.z);

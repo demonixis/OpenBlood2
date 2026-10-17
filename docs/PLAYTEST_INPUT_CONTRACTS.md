@@ -1,5 +1,9 @@
 # Play entry and first Cultist combat corrections
 
+> Continued by [doorway clearance](CORPSE_CLEARANCE_CONTRACTS.md): a source-center
+> alternative requires an additional swept living-box check. Existing raw dimensions,
+> bounds and final collision checks remain mandatory.
+
 See [evidence](../../Documentation/Implementation/M2_PLAYTEST_INPUT.md) and the
 [source ledger](M2_PLAYTEST_INPUT_SOURCES.json). M2 remains incomplete.
 

@@ -24,6 +24,7 @@ namespace OpenBlood2
         unsigned corrections = 0, candidates = 0;
         double distance = 0;
         bool touching_fit = false; // Bounded alternative-axis search used no extra clearance margin.
+        bool source_sweep = false; // Center-side correction also requires swept original-body clearance.
         std::uint32_t polygon = UINT32_MAX;
     };
     inline bool placement_succeeded(const BodyPlacement& p)
