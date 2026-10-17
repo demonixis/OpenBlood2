@@ -7,9 +7,9 @@ namespace OpenBlood2
 {
     void Inspector::draw_pickups(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextWrapped(
-            "Original single-player Beretta, ammunition, health and armor. Inventory items, timed bonuses, audio "
-            "and pickup FX remain pending.");
+        ImGui::TextWrapped("Original single-player Beretta, ammunition, health and armor. Other inventory items, timed "
+                           "bonuses, pickup audio "
+                           "and pickup FX remain pending. Medkit: H uses the collected charges (release Shift first).");
         if (!ImGui::BeginTable("Pickup inspection", 2, ImGuiTableFlags_Resizable))
             return;
         ImGui::TableSetupColumn("Objects", ImGuiTableColumnFlags_WidthFixed, 250);
@@ -40,6 +40,21 @@ namespace OpenBlood2
             for (unsigned i = 1; i <= 8; ++i)
                 ImGui::Text("%u: %.0f / %.0f", i, player->m_InventoryMgr.GetAmmoCount(i),
                             player->m_InventoryMgr.MaxAmmo(i));
+            if (const auto& item = player->m_InventoryMgr.medkit)
+            {
+                ImGui::Text("Medkit: %u / 100 charges", item->count);
+                ImGui::TextWrapped("Resource 302 / medkit.pcx (HUD unavailable)");
+                ImGui::TextWrapped("Requested %.3f / healed %.3f", item->requested_gain, item->actual_gain);
+                ImGui::Text("Source result: %d", item->activation_result);
+                ImGui::Text("Attempts %llu / queued actions %llu", (unsigned long long)item->attempts,
+                            (unsigned long long)item->action_messages);
+                ImGui::TextWrapped("Item diagnostic: %s", item->error.c_str());
+            }
+            else
+                ImGui::TextUnformatted("Medkit: not collected (H after collection)");
+            ImGui::Text("Item actions %llu / sounds %llu", (unsigned long long)game.client_shell.item_actions,
+                        (unsigned long long)game.client_shell.item_sounds);
+            ImGui::TextWrapped("Item audio: %s", game.client_shell.item_audio_error.c_str());
             const auto& d = player->m_damage;
             ImGui::Text("Health %.0f / %.0f (mega %.0f)", d.m_fHitPoints, d.m_fMaxHitPoints, d.m_fMaxMegaHitPoints);
             ImGui::Text("Armor %.0f / %.0f (necro %.0f)", d.m_fArmorPoints, d.m_fMaxArmorPoints,
@@ -54,6 +69,7 @@ namespace OpenBlood2
             ImGui::Text("%s / type %u / amount %.0f",
                         p->value.kind == PickupKind::Ammo     ? "Ammo"
                         : p->value.kind == PickupKind::Weapon ? "Weapon"
+                        : p->value.kind == PickupKind::Item   ? "Inventory item"
                                                               : "Powerup",
                         p->value.type, p->value.amount);
             ImGui::Text("%s (resource %d)", p->display_name.c_str(), p->resource_id);

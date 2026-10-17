@@ -948,3 +948,8 @@ remain explicitly unavailable. No authored missing cue is remapped or synthesize
 See [ledger](M2_CONVERSATION_SOURCES.json), [contracts](CONVERSATION_CONTRACTS.md)
 and [evidence](../../Documentation/Implementation/M2_CONVERSATIONS.md). No dependency,
 mutable game global, reference edit or commercial asset import is introduced.
+
+The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisition,
+CInvMedkit recharge/healing, H direct-item input, local activation audio and owned
+charge preservation through Restore/KeepAlive. Other items, original inventory HUD,
+pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.

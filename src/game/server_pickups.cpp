@@ -58,16 +58,22 @@ namespace OpenBlood2
         auto* m = writable(h);
         if (!m)
             return DE_INVALIDPARAMS;
-        const auto limit = value.kind == PickupKind::Ammo ? 8 : value.kind == PickupKind::Weapon ? 255 : 4;
+        const auto limit = value.kind == PickupKind::Ammo     ? 8
+                           : value.kind == PickupKind::Weapon ? 255
+                           : value.kind == PickupKind::Item   ? 1
+                                                              : 4;
         const auto request = value.kind == PickupKind::Ammo     ? add_ammo_message
                              : value.kind == PickupKind::Weapon ? add_weapon_message
+                             : value.kind == PickupKind::Item   ? add_item_message
                                                                 : add_powerup_message;
         if (!m->routed ||
-            (value.kind != PickupKind::Ammo && value.kind != PickupKind::Powerup && value.kind != PickupKind::Weapon) ||
+            (value.kind != PickupKind::Ammo && value.kind != PickupKind::Powerup && value.kind != PickupKind::Weapon &&
+             value.kind != PickupKind::Item) ||
             (m->id != request && m->id != picked_up_message) || !m->bytes.empty() || m->damage || m->key || m->pickup ||
             !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit ||
             (value.kind == PickupKind::Weapon && !WeaponPickupClass(value.type)) || !std::isfinite(value.amount) ||
-            value.amount < 0 || value.amount > 1e6f)
+            value.amount < 0 || value.amount > 1e6f ||
+            (value.kind == PickupKind::Item && (value.amount > 255 || std::floor(value.amount) != value.amount)))
         {
             m->bad = true;
             return DE_INVALIDPARAMS;

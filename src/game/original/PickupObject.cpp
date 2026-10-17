@@ -54,6 +54,7 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         auto packet = g_pServerDE->StartMessageToObject(this, touching_,
                                                         value.kind == PickupKind::Ammo     ? add_ammo_message
                                                         : value.kind == PickupKind::Weapon ? add_weapon_message
+                                                        : value.kind == PickupKind::Item   ? add_item_message
                                                                                            : add_powerup_message);
         if (packet)
         {

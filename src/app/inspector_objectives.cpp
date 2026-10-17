@@ -159,6 +159,10 @@ namespace OpenBlood2
                         ImGui::Text("Slot %u: right %u / left %u", i, inventory.right[i], inventory.left[i]);
                     for (unsigned i = 0; i < inventory.ammo.size(); ++i)
                         ImGui::Text("Ammo %u: %.2f", i, inventory.ammo[i]);
+                    if (inventory.medkit_charge)
+                        ImGui::Text("Saved medkit: %u charges (retained by keep-alive)", *inventory.medkit_charge);
+                    else
+                        ImGui::TextUnformatted("Saved medkit: absent");
                     for (const auto& key : inventory.keys)
                         ImGui::Text("Key %s: %u uses", key.name.c_str(), key.uses);
                     ImGui::TreePop();

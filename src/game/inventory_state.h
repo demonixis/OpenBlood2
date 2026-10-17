@@ -1,6 +1,7 @@
 #pragma once
 #include "game/key_messages.h"
 #include <array>
+#include <optional>
 #include <vector>
 
 namespace OpenBlood2
@@ -12,6 +13,7 @@ namespace OpenBlood2
         std::array<DBYTE, 10> right{}, left{};
         std::array<float, 13> ammo{};
         std::vector<KeyItem> keys;
+        std::optional<DBYTE> medkit_charge;
         DBYTE strength = 1, magic = 1, current_slot = 0;
         bool infinite_ammo = false;
         float damage_multiplier = 1;

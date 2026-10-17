@@ -1,9 +1,11 @@
 #pragma once
 #include "B2BaseClass.h"
+#include "GameInvItems.h"
 #include "Weapon.h"
 #include "game/inventory_state.h"
 #include <array>
 #include <memory>
+#include <optional>
 #include <vector>
 
 enum class InventoryResult
@@ -24,6 +26,9 @@ class CInventoryMgr : public Aggregate
     // Restore before client association: rebuilding live client views is a
     // separate player-transfer responsibility, never silently bypassed here.
     bool Load(const OpenBlood2::InventoryState&, OpenBlood2::InventoryLoadType, std::string&);
+    InventoryResult AddItem(DBYTE, DBYTE);
+    InventoryResult SetActiveItem(DBYTE);
+    std::optional<CInvMedkit> medkit;
     InventoryResult AddKey(const OpenBlood2::KeyItem&);
     InventoryResult QueryKey(std::string_view);
     std::vector<OpenBlood2::KeyItem> keys;

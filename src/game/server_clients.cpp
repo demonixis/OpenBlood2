@@ -80,6 +80,8 @@ namespace OpenBlood2
                     return physics_vector(value.position);
                 else if constexpr (std::is_same_v<T, PlayerStats>)
                     return std::isfinite(value.health) && std::isfinite(value.armor) && std::isfinite(value.bullets);
+                else if constexpr (std::is_same_v<T, InventoryAction>)
+                    return value.type == 1;
                 else if constexpr (std::is_same_v<T, BossHealth>)
                     return std::isfinite(value.fraction);
                 else if constexpr (std::is_same_v<T, WorldExit>)

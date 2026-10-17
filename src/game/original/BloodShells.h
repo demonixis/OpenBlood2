@@ -22,6 +22,7 @@ class CBloodServerShell
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerMove&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerControls&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerUse&);
+    bool OnMessage(HCLIENT, const OpenBlood2::PlayerItemCommand&);
     void Update(float);
     CPlayerObj* Player(HCLIENT);
     bool CapturePlayerInventory(HCLIENT);
@@ -75,6 +76,10 @@ class CBloodClientShell
     bool UpdateMovement(CBloodServerShell&, double, std::string&);
     bool UpdateUse(CBloodServerShell&);
     bool use_down = false, use_was_down = false;
+    bool medkit_down = false, medkit_was_down = false;
+    std::uint64_t item_actions = 0, item_sounds = 0;
+    OpenBlood2::SoundId item_voice = 0; // Checked inspection token, not owned.
+    std::string item_audio_error;
     CMoveMgr move_mgr;
     OpenBlood2::MovementInput movement_input;
     bool SyncWeapons(OpenBlood2::ModelStore&, OpenBlood2::Resources&, CBloodServerShell&, std::string&);

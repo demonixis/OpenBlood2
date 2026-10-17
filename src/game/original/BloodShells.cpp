@@ -236,6 +236,9 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     boss_health_messages = 0;
     boss_health_visible = false;
     communication.Reset(server_);
+    medkit_down = medkit_was_down = false;
+    item_actions = item_sounds = item_voice = 0;
+    item_audio_error.clear();
     objectives = {};
     objectives_error.clear();
     objective_messages = 0;
@@ -272,6 +275,9 @@ void CBloodClientShell::OnExitWorld()
     boss_health_messages = 0;
     boss_health_visible = false;
     communication.Reset(server_);
+    medkit_down = medkit_was_down = false;
+    item_actions = item_sounds = item_voice = 0;
+    item_audio_error.clear();
     objectives = {};
     objectives_error.clear();
     objective_messages = 0;
@@ -297,6 +303,21 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     ++messages;
     if (std::holds_alternative<OpenBlood2::PlayerInitRequest>(event))
         return InitSinglePlayer(server);
+    if (const auto* value = std::get_if<OpenBlood2::InventoryAction>(&event))
+    {
+        if (value->type != 1)
+            return false;
+        ++item_actions;
+        OpenBlood2::SoundRequest request;
+        request.resource = "sounds/powerups/medikit.wav";
+        request.space = OpenBlood2::SoundSpace::Local;
+        request.priority = 4; // SOUNDPRIORITY_PLAYER_LOW.
+        request.reverb_requested = false;
+        item_audio_error.clear();
+        item_voice = server_.PlayLocalSound(player, request, item_audio_error);
+        item_sounds += item_voice != 0;
+        return true; // Failed presentation never reverses original healing.
+    }
     if (const auto* value = std::get_if<OpenBlood2::WorldExit>(&event))
     {
         ++world_exit.received;
@@ -449,8 +470,17 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerUse& c
     owner->m_fYaw = command.rotation.yaw;
     return owner->OnCommandUse();
 }
+bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerItemCommand& command)
+{
+    auto* owner = Player(client);
+    return owner && owner->OnCommandItem(command.type);
+}
 bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
 {
+    const bool item_pressed = medkit_down && !medkit_was_down;
+    medkit_was_down = medkit_down;
+    if (item_pressed)
+        server.OnMessage(client_, OpenBlood2::PlayerItemCommand{1});
     const bool pressed = use_down && !use_was_down;
     use_was_down = use_down;
     if (pressed)

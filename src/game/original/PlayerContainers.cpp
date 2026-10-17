@@ -40,7 +40,7 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
     }
     if (!m_bDead && !m_damage.IsDead() &&
         (message == OpenBlood2::add_ammo_message || message == OpenBlood2::add_powerup_message ||
-         message == OpenBlood2::add_weapon_message))
+         message == OpenBlood2::add_weapon_message || message == OpenBlood2::add_item_message))
     {
         OpenBlood2::PickupMessage pickup;
         if (server->ReadPickupMessage(read, pickup))
@@ -48,6 +48,9 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
             bool accepted = false;
             if (message == OpenBlood2::add_ammo_message)
                 accepted = m_InventoryMgr.AddAmmo(pickup.type, pickup.amount) == InventoryResult::Ok;
+            else if (message == OpenBlood2::add_item_message)
+                accepted =
+                    m_InventoryMgr.AddItem(pickup.type, static_cast<DBYTE>(pickup.amount)) == InventoryResult::Ok;
             else if (message == OpenBlood2::add_weapon_message)
             {
                 if (server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) !=

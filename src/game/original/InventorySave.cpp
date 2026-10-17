@@ -9,7 +9,8 @@ namespace
     {
         if (state.strength < 1 || state.strength > 6 || state.magic < 1 || state.magic > 6 ||
             state.current_slot >= state.right.size() || !std::isfinite(state.damage_multiplier) ||
-            state.damage_multiplier < 0 || state.damage_multiplier > 1000 || state.keys.size() > 256)
+            state.damage_multiplier < 0 || state.damage_multiplier > 1000 || state.keys.size() > 256 ||
+            (state.medkit_charge && *state.medkit_charge > 100))
         {
             error = "Invalid inventory attributes, selection, multiplier or item count";
             return false;
@@ -81,6 +82,8 @@ bool CInventoryMgr::Save(OpenBlood2::InventoryState& output, std::string& error)
             }
     state.ammo = m_fAmmo;
     state.keys = keys;
+    if (medkit)
+        state.medkit_charge = medkit->count;
     state.current_slot = m_nCurWeaponSlot;
     state.damage_multiplier = damage_multiplier;
     if (!valid(state, error))
@@ -137,6 +140,11 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
         staged.keys = state.keys;                 // Source drops INV_KEY only for dwLoadType == 1.
     staged.m_nCurWeaponSlot = state.current_slot; // After recreation, as in source.
     staged.damage_multiplier = state.damage_multiplier;
+    if (state.medkit_charge)
+    {
+        staged.medkit.emplace().Init(m_hOwner);
+        staged.medkit->count = *state.medkit_charge;
+    }
 
     // Commit only after every fallible service. Old child removal is deferred;
     // transferred weapons must point at this aggregate, never the local stage.
@@ -144,6 +152,7 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
     m_LWeapons.swap(staged.m_LWeapons);
     std::swap(m_hMuzzleFlash, staged.m_hMuzzleFlash);
     keys.swap(staged.keys);
+    medkit.swap(staged.medkit);
     m_fAmmo = staged.m_fAmmo;
     m_nAttribStrength = staged.m_nAttribStrength;
     m_nAttribMagic = staged.m_nAttribMagic;

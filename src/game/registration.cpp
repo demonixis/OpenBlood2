@@ -20,6 +20,7 @@
 #include "game/original/Gideon.h"
 #include "game/original/Grenade.h"
 #include "game/original/HandWeaponModel.h"
+#include "game/original/ItemPickups.h"
 #include "game/original/Key.h"
 #include "game/original/KeyFramer.h"
 #include "game/original/KeyPickup.h"
@@ -455,6 +456,9 @@ namespace OpenBlood2
                                &b2base,
                                construct<PickupObject>,
                                {{"PickupTriggerTarget", std::string{}}, {"PickupTriggerMessage", std::string{}}}};
+        const ClassInfo item_pickup{"ItemPickup", &pickup, construct<ItemPickup>, {}};
+        const ClassInfo charged_pickup{"ItemPickupCharged", &item_pickup, construct<ItemPickupCharged>, {}};
+        const ClassInfo medkit_pickup{"MedKitPU", &charged_pickup, construct<MedKitPU>, {}};
         const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}};
         const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
         const ClassInfo assault_pickup{"AssaultRiflePU", &weapon_pickup, construct<AssaultRiflePU>, {}};
@@ -774,26 +778,28 @@ namespace OpenBlood2
                objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
                objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
                objects.register_class(key_pickup) && objects.register_class(pickup) &&
-               objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
-               objects.register_class(assault_pickup) && objects.register_class(flare_pickup) &&
-               objects.register_class(mac10_pickup) && objects.register_class(ammo_pickup) &&
-               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
-               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
-               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
-               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
-               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
-               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
-               objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
-               objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
-               objects.register_class(objectives_trigger) && objects.register_class(conversation_trigger) &&
-               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
-               objects.register_class(door) && objects.register_class(rotating_door) &&
-               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
-               objects.register_class(rotating_brush) && objects.register_class(world_debris) &&
-               objects.register_class(hand_model) && objects.register_class(corpse) &&
-               objects.register_class(grenade) && objects.register_class(flare_projectile) &&
-               objects.register_class(flare_alt) && objects.register_class(flare_burst) &&
-               objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
+               objects.register_class(item_pickup) && objects.register_class(charged_pickup) &&
+               objects.register_class(medkit_pickup) && objects.register_class(weapon_pickup) &&
+               objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
+               objects.register_class(flare_pickup) && objects.register_class(mac10_pickup) &&
+               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+               objects.register_class(health_base) && objects.register_class(armor_base) &&
+               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
+               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
+               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
+               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
+               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
+               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
+               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
+               objects.register_class(conversation_trigger) && objects.register_class(big_trigger) &&
+               objects.register_class(toggle_trigger) && objects.register_class(door) &&
+               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
+               objects.register_class(world_debris) && objects.register_class(hand_model) &&
+               objects.register_class(corpse) && objects.register_class(grenade) &&
+               objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
+               objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
+               objects.register_class(shockwave_projectile);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

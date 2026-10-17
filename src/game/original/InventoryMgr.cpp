@@ -355,3 +355,27 @@ InventoryResult CInventoryMgr::DropCurrentWeapon()
     ++revision;
     return InventoryResult::Ok;
 }
+
+// Selected original AddItem/SetActiveItem branches; other items remain unsupported.
+InventoryResult CInventoryMgr::AddItem(DBYTE type, DBYTE value)
+{
+    if (type != 1 || !BaseClass::GetServerDE()->IsObjectAlive(m_hOwner))
+        return InventoryResult::Invalid;
+    if (!medkit)
+        medkit.emplace().Init(m_hOwner);
+    else if (!medkit->AddItem(value))
+        return InventoryResult::AlreadyHave;
+    ++revision;
+    return InventoryResult::Ok;
+}
+InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
+{
+    if (type != 1 || !medkit)
+        return InventoryResult::NotAvailable;
+    const auto before = medkit->count;
+    const bool activated = medkit->ActivateItem();
+    if (before != medkit->count)
+        ++revision;
+    // Original localized console item-name message / inventory HUD remain unavailable.
+    return activated ? InventoryResult::Ok : InventoryResult::NotAvailable;
+}

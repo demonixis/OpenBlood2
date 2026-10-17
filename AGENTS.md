@@ -536,3 +536,10 @@ The [world-model debris continuation](../Documentation/Implementation/M2_WORLD_D
 The [M16 continuation](../Documentation/Implementation/M2_ASSAULT.md) connects original primary fire, alternate grenade charges, pickup/drop, independent grenade lifetime and inspection. CityHub has 433 created / 31 transferred sounds / 20 unsupported / one failed. Finite inverted ABC key bounds remain visible metadata warnings. The original Cultist lacks rifle animations; direct AI firing is tested separately from unavailable autonomous M16 combat. Replacement grenade physics, required services and safe NEW_LEVEL keep M2 open. Read [contracts](docs/ASSAULT_CONTRACTS.md). Preserve distinct ammo pools, source sequential explosion passes, deferred lifetime, one model-projectile integrator and explicit missing clips.
 
 The [conversation continuation](../Documentation/Implementation/M2_CONVERSATIONS.md) connects original ConversationTrigger sequencing, typed client delivery and CCommLink timing/real WAV playback, with inspection. CityHub has 434 created / 31 transferred sounds / 541 editor-only / 19 unsupported / one failed. All seven authored conversation cues in the base-world catalog remain unmapped and missing; separately labelled diagnostics verify actual audio without altering them. Original communication HUD/VoiceMgr arbitration, required services and safe NEW_LEVEL keep M2 incomplete. Read [contracts](docs/CONVERSATION_CONTRACTS.md). Preserve first-empty waves, backslash-only mapping, repeat precedence, busy drops, text-derived strict deadlines and independent queued/voice lifetime. Never fabricate dialogue for an unmapped authored reference.
+
+The [medkit continuation](../Documentation/Implementation/M2_MEDKIT.md) connects original MedKitPU/CInvMedkit,
+H direct-item activation, local WAV playback and owned charge restoration.
+Read the [contracts](docs/MEDKIT_CONTRACTS.md) before extending inventory items: preserve requested
+versus actual healing, integer charge/return quirks, run/death/camera gates,
+checked action delivery and keep-alive retention. Other items/HUD and safe
+NEW_LEVEL remain unavailable; M2 is still incomplete.

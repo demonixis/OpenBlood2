@@ -18,6 +18,7 @@ bool CPlayerObj::UpdateAnim(const PlayerControls& controls)
     if (server->SetObjectRotation(m_hObject, &rotation) != DE_OK)
         return false;
     const auto& input = controls.movement;
+    command_run = input.run;
     crouch_requested = input.crouch;
     const auto* weapon = m_InventoryMgr.CurrentWeapon(false);
     const bool knife = weapon && weapon->data.m_nFireType == 4;

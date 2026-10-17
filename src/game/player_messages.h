@@ -22,6 +22,14 @@ namespace OpenBlood2
     {
         float pitch = 0, yaw = 0;
     };
+    struct PlayerItemCommand
+    {
+        DBYTE type = 1;
+    };
+    struct InventoryAction
+    {
+        DBYTE type = 1;
+    };
     struct PlayerUse
     {
         PlayerRotation rotation;
@@ -102,5 +110,5 @@ namespace OpenBlood2
         WorldExitType type = WorldExitType::World;
     };
     using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
-                                     MissionObjectives, WorldExit, BossHealth, Conversation>;
+                                     MissionObjectives, WorldExit, BossHealth, Conversation, InventoryAction>;
 } // namespace OpenBlood2

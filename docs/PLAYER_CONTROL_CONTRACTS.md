@@ -56,3 +56,8 @@ Release paths remain checked. No reference source, commercial asset or dependenc
 
 Non-attacking NPCs and the missing train-window material remain next playtest priorities.
 This input fix does not prove NPC combat, all required services, safe NEW_LEVEL or M2.
+
+The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisition,
+CInvMedkit recharge/healing, H direct-item input, local activation audio and owned
+charge preservation through Restore/KeepAlive. Other items, original inventory HUD,
+pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.

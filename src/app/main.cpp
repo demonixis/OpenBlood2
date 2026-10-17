@@ -128,7 +128,8 @@ namespace
                     spdlog::error("Player entry: {}", error);
                     return 6;
                 }
-                if ((options.weapons_smoke || options.movement_smoke || options.interaction_smoke) &&
+                if ((options.weapons_smoke || options.movement_smoke || options.interaction_smoke ||
+                     options.pickups_smoke) &&
                     !OpenBlood2::finish_camera_intro_for_smoke(game))
                 {
                     spdlog::error("Authored intro camera did not release player control");
@@ -522,7 +523,8 @@ namespace
             text_editing = inspector_visible && !inspector.collapsed && ImGui::GetIO().WantTextInput;
 #endif
             if (frames == reload_frame + 1 &&
-                (options.weapons_smoke || options.movement_smoke || options.interaction_smoke) &&
+                (options.weapons_smoke || options.movement_smoke || options.interaction_smoke ||
+                 options.pickups_smoke) &&
                 !OpenBlood2::finish_camera_intro_for_smoke(game))
                 return 4;
             if (frames == reload_frame + 1 && options.viewport_smoke &&
@@ -585,6 +587,7 @@ namespace
             if (!controls.focused && !smoke)
                 game.client_shell.weapon_input = {};
             game.client_shell.use_down = controls.sample_use(text_editing);
+            game.client_shell.medkit_down = controls.sample_medkit(text_editing);
             auto keyboard = controls.sample(text_editing);
             auto& movement = game.client_shell.movement_input;
             movement.forward |= keyboard.forward;

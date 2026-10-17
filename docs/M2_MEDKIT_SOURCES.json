@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "db842761f642bd9bb8dcb8fca6c062f208fae7c2",
+  "status": "M2 incomplete; selected original MedKit pickup, item action and preservation",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/GameInvItems.cpp",
+      "source_sha256": "b2a72cdf5bd9e23ec496c6f6af3ed5bd4449e3b84d8cc088c33c1e1bbe081ee8",
+      "purpose": "CInvMedkit Init/AddItem/Activate/ActivateItem: charge refill, requested healing, integer result and action order."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/GameInvItems.h",
+      "source_sha256": "592488eb133230295961290bc2bfd621429c6ccc11df1de010ba7ccaa0bd7aac",
+      "purpose": "Selected CInvMedkit type and inherited nonactive item semantics."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InvItem.cpp",
+      "source_sha256": "89074a1645a0977cb8961731764d7b54b2b3da1720adc9cfe8ce0b539fff5aaa",
+      "purpose": "SendActionMessage type byte and Save/Load count/owner behavior; typed messages/owned values replace packets and strings."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InvItem.h",
+      "source_sha256": "7b0ffbe822337d7f430466fd469c435e604d2c264c34a9af64e79f938e1329cc",
+      "purpose": "Original owner/count/type fields; selected medkit uses value ownership without an intrusive list."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
+      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
+      "purpose": "Original MedKitPU constructor, charged single-player branch and MID_INVENTORYITEMTOUCH."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ItemPickups.h",
+      "source_sha256": "ce1dacd1cf4829c39cfdfbeb27ae4873e1f2b6a4895b532b820d587ab7eaa17e",
+      "purpose": "Original ancestry, inventory1.wav request, quantity one and unavailable string-spawn bounce."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "purpose": "AddItem, SetActiveItem and Save/Load selected medkit branches; keys-only keep-alive discard."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "purpose": "Alive inventory pickup acknowledgement and COMMAND_INVITEM_1 dead/movement/run restrictions."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
+      "purpose": "Heal refuses at normal maximum; callers retain original requested-charge consumption."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "purpose": "HandleInvAction medkit local sound."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
+      "source_sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
+      "purpose": "PlaySoundLocal flags/default playback semantics."
+    },
+    {
+      "source": "sources/blood2/Shared/SoundTypes.h",
+      "source_sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
+      "purpose": "PLAYER_LOW priority 4."
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "purpose": "INV_MEDKIT identifier 1."
+    },
+    {
+      "source": "sources/blood2/Shared/ClientRes.h",
+      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
+      "purpose": "IDS_ITEM_MEDKIT identifier 302."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/generic_msg_de.h",
+      "source_sha256": "5231003078a5cf58400cebf261efb84132f3733507d336c33d4fae81b015a5f2",
+      "purpose": "MID_INVENTORYITEMTOUCH identifier 1006 and byte payload."
+    }
+  ],
+  "adaptations": [
+    "Value-owned optional selected item instead of intrusive generic item list",
+    "Typed owned request/acknowledgement, direct command and action messages",
+    "Bounded count snapshot staged with existing inventory; owner rebound on restoration",
+    "H device binding with existing focus/text/control suppression",
+    "Source local one-shot owned by world until completion/unload",
+    "Reject unsupported string-spawn bounce and multiplayer behavior; expose missing HUD/console/pickup sound"
+  ]
+}

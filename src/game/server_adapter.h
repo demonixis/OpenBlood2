@@ -46,6 +46,7 @@ namespace OpenBlood2
         AudioMixer audio;
         SoundId PlayCharacterSound(HOBJECT, const SoundRequest&, bool retain, std::string&) override;
         SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
+        SoundId PlayLocalSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) override;
         SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) override;
         SoundId PlaySoundAt(HOBJECT, const SoundRequest&, DVector, std::string&) override;
         SoundId PlayWorldSound(HOBJECT, const SoundRequest&, bool file_stream, std::string&) override;

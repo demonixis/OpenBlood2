@@ -580,3 +580,10 @@ The [production Gideon continuation](../Documentation/Implementation/M2_GIDEON_R
 The [NPC activation correction](../Documentation/Implementation/M2_ACTIVATION_VISIBILITY.md) reuses the original AI glass/volume filter for replacement visibility pings and completes Gideon's authored intro script. Read [contracts](docs/ACTIVATION_VISIBILITY_CONTRACTS.md). Preserve manual inactivity, strict original ping cadence, atomic refresh and checked historical inspection. Center rays are not retail PVS; complete encounters, safe NEW_LEVEL and M2 remain open.
 
 The [initial corpse placement correction](../Documentation/Implementation/M2_CORPSE_PLACEMENT.md) now clears the wider original death-animation body in the SubwayA keyboard-fire encounter, with bounded atomic placement and inspection. Difficult fits still fail explicitly; M2 remains incomplete.
+
+The [medkit continuation](../Documentation/Implementation/M2_MEDKIT.md) connects original MedKitPU/CInvMedkit,
+H direct-item activation, local WAV playback and owned charge restoration.
+Read the [contracts](docs/MEDKIT_CONTRACTS.md) before extending inventory items: preserve requested
+versus actual healing, integer charge/return quirks, run/death/camera gates,
+checked action delivery and keep-alive retention. Other items/HUD and safe
+NEW_LEVEL remain unavailable; M2 is still incomplete.

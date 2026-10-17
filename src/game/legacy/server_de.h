@@ -42,6 +42,7 @@ class ServerDE : public CSBase
     virtual OpenBlood2::SoundId PlayCharacterSound(HOBJECT, const OpenBlood2::SoundRequest&, bool retain,
                                                    std::string&) = 0;
     virtual OpenBlood2::SoundId PlayCinematicSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
+    virtual OpenBlood2::SoundId PlayLocalSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
     virtual OpenBlood2::SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
     virtual OpenBlood2::SoundId PlaySoundAt(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
     virtual OpenBlood2::SoundId PlayWorldSound(HOBJECT, const OpenBlood2::SoundRequest&, bool file_stream,

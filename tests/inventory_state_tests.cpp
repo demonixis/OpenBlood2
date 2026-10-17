@@ -31,6 +31,8 @@ namespace
             inv.m_fAmmo[i] = 700.5f + i;
         inv.m_bInfiniteAmmo = true;
         CHECK(inv.AddKey({"Laboratory", "Lab access", "icon.pcx", "selected.pcx", 3}) == InventoryResult::Ok);
+        CHECK(inv.AddItem(1, 1) == InventoryResult::Ok);
+        inv.medkit->count = 37;
         inv.CurrentWeapon()->shots = 42;
         inv.CurrentWeapon()->m_fLastShotTime = 99;
         return true;
@@ -41,6 +43,9 @@ namespace
         CHECK(inv.m_nAttribStrength == s.strength && inv.m_nAttribMagic == s.magic);
         CHECK(inv.m_bInfiniteAmmo == s.infinite_ammo && inv.damage_multiplier == s.damage_multiplier);
         CHECK(inv.keys.size() == (keys ? s.keys.size() : 0));
+        CHECK(bool(inv.medkit) == bool(s.medkit_charge));
+        if (inv.medkit)
+            CHECK(inv.medkit->count == *s.medkit_charge);
         for (unsigned i = 0; i < 10; ++i)
             for (bool left : {false, true})
             {

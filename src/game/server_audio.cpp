@@ -56,6 +56,20 @@ namespace OpenBlood2
         }
         return audio.play(*client_resources, owner, request, position, error);
     }
+    SoundId ServerAdapter::PlayLocalSound(HOBJECT source, const SoundRequest& request, std::string& error)
+    {
+        trace_service("PlayLocalSound");
+        if (!IsObjectAlive(source) || !client_resources || request.speaker || request.space != SoundSpace::Local ||
+            request.loop || request.streaming)
+        {
+            error = "Local sound requires a live source and a buffered non-looping local request";
+            return 0;
+        }
+        const auto id = audio.play(*client_resources, source, request, {}, error);
+        if (auto* voice = audio.get(id))
+            voice->world_owned = voice->auto_remove = true;
+        return id;
+    }
     SoundId ServerAdapter::PlayDetachedSound(HOBJECT source, const SoundRequest& request, DVector position,
                                              std::string& error)
     {

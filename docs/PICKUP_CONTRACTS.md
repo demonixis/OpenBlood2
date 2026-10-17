@@ -113,3 +113,8 @@ ManaAmmoPU is commented out in the source; RocketAmmoPU is not guessed as an ali
 Legacy TypeAction schemas, missing/ambiguous world models and polygon dynamics
 remain explicit failures. Rendering, retail-executable comparisons, additional
 platforms and XR validation remain pending. M2's exit gate is unchanged.
+
+The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisition,
+CInvMedkit recharge/healing, H direct-item input, local activation audio and owned
+charge preservation through Restore/KeepAlive. Other items, original inventory HUD,
+pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.

@@ -434,8 +434,8 @@ namespace
             rejected += n;
         }
         CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2 &&
-              counts["AssaultRiflePU"] == 5);
-        CHECK(worlds == 57 && created == 1270 && missing == 0 && rejected == 176 && spawns == 60);
+              counts["AssaultRiflePU"] == 5 && counts["MedKitPU"] == 22);
+        CHECK(worlds == 57 && created == 1290 && missing == 0 && rejected == 178 && spawns == 60);
         return true;
     }
 } // namespace

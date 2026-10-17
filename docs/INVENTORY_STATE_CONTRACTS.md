@@ -97,3 +97,8 @@ owner rejection and repeated cleanup. Private tests restore into a detached
 CPlayerObj with real Caleb/held assets; they **do not** claim a whole player or
 world transfer. The existing GPU exit scenario checks inventory capture while UI
 is hidden and after world reload, keeping the current player/world unchanged.
+
+The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisition,
+CInvMedkit recharge/healing, H direct-item input, local activation audio and owned
+charge preservation through Restore/KeepAlive. Other items, original inventory HUD,
+pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.
