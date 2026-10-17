@@ -90,3 +90,7 @@ semantics must be verified before connecting the soundtrack.
 See [evidence](../../../Documentation/Implementation/m2_music_bands.md),
 [note contracts](music_note_contracts.md) and [asset contracts](music_asset_contracts.md).
 M2 remains incomplete.
+
+The [section continuation](music_section_contracts.md) now exposes bounded authored
+section timing, commands, mute and chord records. It does not reconcile the style
+meter, schedule events, resolve personality or implement MUSIC playback.

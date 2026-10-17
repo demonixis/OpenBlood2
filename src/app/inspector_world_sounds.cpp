@@ -140,7 +140,7 @@ namespace OpenBlood2
                                music.plan.directory.c_str(), music.plan.requests.size(), music.assets.size(),
                                music.bytes_read);
             ImGui::TextWrapped(
-                "Decoded IMA bands/pattern notes and DLS sample/region data. Pattern "
+                "Decoded IMA sections/bands/pattern notes and DLS sample/region data. Pattern "
                 "selection, curves, personality "
                 "records and playlist playback are not implemented. MUSIC commands "
                 "still report unsupported. Explicit DLS diagnostic notes above use the existing audio output.");
@@ -176,6 +176,8 @@ namespace OpenBlood2
                     ImGui::TextWrapped("%s", asset.error.empty() ? asset.style_reference.c_str() : asset.error.c_str());
                     if (!asset.style_error.empty())
                         ImGui::TextWrapped("IMA note decoding failed: %s", asset.style_error.c_str());
+                    if (!asset.section_error.empty())
+                        ImGui::TextWrapped("IMA section decoding failed: %s", asset.section_error.c_str());
                     if (!asset.bands_error.empty())
                         ImGui::TextWrapped("IMA band decoding failed: %s", asset.bands_error.c_str());
                     if (!asset.bank_error.empty())
@@ -183,6 +185,63 @@ namespace OpenBlood2
                 }
                 ImGui::EndTable();
             }
+        }
+        if (ImGui::TreeNode("IMA sections (authored data only)"))
+        {
+            ImGui::TextWrapped("Header timing precedes the original style's meter override. Commands and mute "
+                               "values remain raw; chords are not final note pitches. No sequence is scheduled.");
+            for (const auto& asset : music.assets)
+            {
+                if (!asset.section || !ImGui::TreeNode(asset.filename.c_str()))
+                    continue;
+                const auto& section = *asset.section;
+                ImGui::Text("%s | style: %s | personality label: %s", section.name.c_str(),
+                            section.source.style_reference.c_str(), section.personality.c_str());
+                ImGui::Text("Tempo %d + %u/65536 | %d measures | %d ticks/measure | %d ticks/beat", section.tempo,
+                            section.tempo_fraction, section.measures, section.ticks_per_measure,
+                            section.ticks_per_beat);
+                ImaSectionTiming timing;
+                std::string error;
+                if (ima_section_timing(section, timing, error))
+                    ImGui::Text("Authored length %d ticks | original MIDI export %u us/quarter", timing.duration_ticks,
+                                timing.microseconds_per_quarter);
+                else
+                    ImGui::TextWrapped("Timing unavailable: %s", error.c_str());
+                ImGui::Text("Raw word0 %08x / word38 %d / word48 %08x / default chord %02x", section.word0,
+                            section.word38, section.word48, section.default_chord);
+                ImGui::Text("%zu commands / %zu mutes / %zu chords | opaque notes %zu / curves %zu",
+                            section.commands.size(), section.mutes.size(), section.chords.size(),
+                            section.opaque_note_chunks, section.opaque_curve_chunks);
+                if (ImGui::TreeNode("Commands in file order"))
+                {
+                    for (const auto& c : section.commands)
+                    {
+                        std::int16_t measure;
+                        const bool valid = ima_section_command_measure(section, c.time, measure);
+                        ImGui::Text("tick %d | header measure %d (%s) | raw %02x %02x %02x %02x", c.time, measure,
+                                    valid ? "available" : "unavailable", c.value[0], c.value[1], c.value[2],
+                                    c.value[3]);
+                    }
+                    ImGui::TreePop();
+                }
+                if (ImGui::TreeNode("Mutes in file order"))
+                {
+                    for (const auto& m : section.mutes)
+                        ImGui::Text("tick %d | raw value %04x / word6 %04x", m.time, m.value, m.word6);
+                    ImGui::TreePop();
+                }
+                if (ImGui::TreeNode("Chords in file order"))
+                {
+                    for (const auto& c : section.chords)
+                        ImGui::Text(
+                            "%s | measure %d / beat %d / root %d | flags %02x | chord %08x / scale %08x / word44 %08x",
+                            c.name.c_str(), c.measure, c.beat, c.root, c.flags, c.chord_pattern, c.scale_pattern,
+                            c.word44);
+                    ImGui::TreePop();
+                }
+                ImGui::TreePop();
+            }
+            ImGui::TreePop();
         }
         if (ImGui::TreeNode("IMA bands (data and setup only)"))
         {

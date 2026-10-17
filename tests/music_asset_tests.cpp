@@ -185,6 +185,9 @@ namespace
         CHECK(catalog.error.empty() && catalog.assets.size() == 19);
         CHECK(std::all_of(catalog.assets.begin(), catalog.assets.end(),
                           [](const auto& a) { return a.container_valid && a.error.empty(); }));
+        for (const auto& asset : catalog.assets)
+            if (asset.kind == MusicAssetKind::Section)
+                CHECK(asset.container_valid && !asset.section && !asset.section_error.empty());
         CHECK(!catalog.assets.front().bank && !catalog.assets.front().bank_error.empty());
         CHECK(!catalog.assets[1].style && !catalog.assets[1].style_error.empty()); // Structural-only fake style.
 
@@ -292,6 +295,8 @@ namespace
             const std::weak_ptr<const DlsBank> bank_lifetime = catalog.assets.front().bank;
             std::weak_ptr<const ImaStyle> style_lifetime;
             const std::weak_ptr<const ImaBands> bands_lifetime = catalog.assets[1].bands;
+            std::weak_ptr<const ImaSection> section_lifetime;
+            std::size_t section_index = 0;
             const ImaNote* first_note = nullptr;
             std::size_t style_index = 0, style_notes = 0;
             for (std::size_t i = 0; i < catalog.assets.size(); ++i)
@@ -302,6 +307,14 @@ namespace
                     CHECK(asset.bands && asset.bands_error.empty() && asset.bands->bands.size() == 1);
                     std::array<ImaMidiSetup, 80> setup;
                     CHECK(ima_band_setup(asset.bands->bands.front(), setup, error));
+                }
+                if (asset.kind == MusicAssetKind::Section)
+                {
+                    CHECK(asset.section && asset.section_error.empty() && asset.section->commands.size() == 1);
+                    ImaSectionTiming timing;
+                    CHECK(ima_section_timing(*asset.section, timing, error));
+                    section_lifetime = asset.section;
+                    section_index = i;
                 }
                 if (asset.kind != MusicAssetKind::Style)
                     continue;
@@ -326,8 +339,11 @@ namespace
                       samples); // No per-frame/UI-dependent file work.
             CHECK(catalog.assets[style_index].style.get() == style_lifetime.lock().get());
             CHECK(!bands_lifetime.expired() && catalog.assets[1].bands.get() == bands_lifetime.lock().get());
+            CHECK(!section_lifetime.expired() &&
+                  catalog.assets[section_index].section.get() == section_lifetime.lock().get());
             CHECK(game.unload_world() && game.music_catalog.assets.empty() && game.music_catalog.plan.requests.empty());
-            CHECK(bank_lifetime.expired() && style_lifetime.expired() && bands_lifetime.expired());
+            CHECK(bank_lifetime.expired() && style_lifetime.expired() && bands_lifetime.expired() &&
+                  section_lifetime.expired());
             CHECK(game.objects.snapshot().empty() && !game.server.message_count() && !game.server.string_count());
         }
         return true;

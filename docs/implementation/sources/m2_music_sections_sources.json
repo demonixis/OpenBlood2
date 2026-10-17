@@ -1,0 +1,147 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "b7c6c53976e4651d13b64f1e4d6fdbd9a23dfae6",
+  "status": "M2 incomplete; section records and authored timing only",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/IMUSIC25.DLL",
+      "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "section_loader_rva": "0xb2d0",
+      "header_rvas": [
+        "0xb5d3..0xb644",
+        "0xb65c..0xb66a"
+      ],
+      "readers": {
+        "cmnd": "0xba4b",
+        "mute": "0xbb79",
+        "chrd": "0xb899"
+      },
+      "command_measure_rvas": "0xb417..0xb429",
+      "tempo_export_rvas": "0x18ced..0x18d10",
+      "style_meter_reconciliation_rva": "0x19441",
+      "use": "Read-only analysis and isolated bounded x86 emulation; no native DLL, OS execution or commercial payload imports"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/Music.cpp",
+      "sha256": "1024e355e8da92ba670b96fc7cec5a57f301ea45e18f0a43f910a914f6e24ee0",
+      "use": "Unchanged original section/style request plan"
+    }
+  ],
+  "observations": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "header_cases": [
+      {
+        "tempo": 120,
+        "fraction": 0,
+        "microseconds": 500000
+      },
+      {
+        "tempo": 120,
+        "fraction": 65535,
+        "microseconds": 495931
+      },
+      {
+        "tempo": 1,
+        "fraction": 0,
+        "microseconds": 60000000
+      },
+      {
+        "tempo": 32767,
+        "fraction": 65535,
+        "microseconds": 1831
+      }
+    ],
+    "command_measure_cases": [
+      {
+        "ticks_per_measure": 768,
+        "time": -769,
+        "measure": -1
+      },
+      {
+        "ticks_per_measure": 768,
+        "time": -767,
+        "measure": 0
+      },
+      {
+        "ticks_per_measure": 768,
+        "time": 25165824,
+        "measure": -32768
+      },
+      {
+        "ticks_per_measure": 1,
+        "time": -2147483648,
+        "measure": 0
+      },
+      {
+        "ticks_per_measure": 1,
+        "time": 2147483647,
+        "measure": -1
+      }
+    ],
+    "header_rvas": [
+      "0xb5d3..0xb644",
+      "0xb65c..0xb66a",
+      "0x18ced..0x18d10"
+    ],
+    "entries": {
+      "cmnd": "0xba4b",
+      "mute": "0xbb79",
+      "chrd": "0xb899"
+    },
+    "synthetic_cases": 31,
+    "sections": 156,
+    "records": {
+      "cmnd": 156,
+      "mute": 3290,
+      "chrd": 156
+    },
+    "mapped_sha256": "83bcfc3be48726603f525385a18b7e433137a85750fd17427f35d7601636ef72",
+    "mapped_fnv64": 17214005195151465368,
+    "tempo_integers": [
+      74,
+      98,
+      110,
+      120,
+      150,
+      176
+    ],
+    "duration_ticks": [
+      768,
+      1152,
+      1536,
+      1728,
+      2304,
+      3072,
+      3456,
+      4608,
+      6144
+    ],
+    "scope": "Original reader order and mapped fields; chord name conversion intercepted, no personality or sequencer execution"
+  },
+  "replacement_code": [
+    "Independent typed reader; exact installed sizes/strides, owned values, bounded transactional failure",
+    "Original authored length, MIDI-export tempo quantization and command measure arithmetic with explicit valid-divisor guards",
+    "Immutable once-per-world section catalogue and read-only inspector"
+  ],
+  "deliberate_limits": [
+    "Duplicate track chunks and tracks before secn rejected instead of overwritten/ignored",
+    "ASCII terminated labels; no personality/path resolution",
+    "Raw unknown fields retained; no command/mute execution, chord pitch conversion or section note/curve decoding",
+    "Authored meter is not effective post-style meter; no sequencer or MUSIC success",
+    "Optional Unicorn is evidence tooling, never a runtime/build dependency"
+  ],
+  "target_sha256": {
+    "CMakeLists.txt": "4f4b686bacb696774f4066e7d4ccd95f9b20bb940d4c5cfc8f6cd65b70aecc7b",
+    "src/engine/ima_section.h": "21d68e3212a6eb5963acfcd85dc04da8625b492e1a1352097e59b87ebcd81308",
+    "src/engine/ima_section.cpp": "fa00ac4c68938c64d472eb58efd6da22bc12e88075044621caba42cbb1bb6c26",
+    "src/game/music_catalog.h": "5601a9fd9d7163462ed68f17478cc05b98ad79b68a907d7fa83c79da15f69d63",
+    "src/game/music_catalog.cpp": "3a4577b6ad23389caa2ee8df49c6ca19e8420095a9eeba474a858a8b27daccce",
+    "src/app/inspector_world_sounds.cpp": "2f5720b2b5a412c60fcb51c15ae2a34a7ea52cd16cf32c01ec605f84e1573634",
+    "src/app/world_sound_smoke.cpp": "e4f6b445b11cc6031074c41f2c14baa5018718b76cb42fcefb5c54de9ff1ceea",
+    "tests/ima_section_tests.cpp": "0b730a4493473a973d3ad57a6f667832ae541f85235f43937d304a6c86cc5d21",
+    "tests/music_asset_tests.cpp": "41b609fc8418280e11428e26236628fab6add3bdc4876005d873aafa71f90a99",
+    "tests/CMakeLists.txt": "9592967d567657b003716721f7d6ecfd2906d147be9ef6f4a5224b1194c7c5a9"
+  }
+}

@@ -10,7 +10,7 @@ namespace OpenBlood2
         if (!music.error.empty() || music.assets.empty() || !music.assets.front().bank ||
             !music.assets.front().bank_error.empty())
             return false;
-        std::size_t pattern_notes = 0, band_count = 0;
+        std::size_t pattern_notes = 0, band_count = 0, section_count = 0;
         for (const auto& asset : music.assets)
         {
             if (asset.kind != MusicAssetKind::Instruments)
@@ -23,6 +23,17 @@ namespace OpenBlood2
                     return false;
                 ++band_count;
             }
+            if (asset.kind == MusicAssetKind::Section)
+            {
+                if (!asset.section || !asset.section_error.empty() || asset.section->commands.size() != 1 ||
+                    asset.section->chords.size() != 1 || asset.section->mutes.empty())
+                    return false;
+                ImaSectionTiming timing;
+                std::string error;
+                if (!ima_section_timing(*asset.section, timing, error))
+                    return false;
+                ++section_count;
+            }
             if (asset.kind == MusicAssetKind::Style)
             {
                 if (!asset.style || !asset.style_error.empty())
@@ -30,7 +41,7 @@ namespace OpenBlood2
                 pattern_notes += asset.style->notes;
             }
         }
-        if (pattern_notes != 3049 || band_count != 44)
+        if (pattern_notes != 3049 || band_count != 44 || !section_count)
             return false;
         const auto& bank = *music.assets.front().bank;
         if (bank.instruments.size() != 14 || bank.waves.size() != 35 || bank.decoded_bytes != 913403 * sizeof(float) ||

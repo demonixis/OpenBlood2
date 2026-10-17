@@ -96,3 +96,7 @@ are superseded only for that subset; synthesis and music playback remain absent.
 The [IMA note continuation](music_note_contracts.md) now decodes a bounded AASY
 pattern/grid/note profile alongside this structural survey. Its separate failures,
 opaque fields and read-only data do not implement sequence playback or MUSIC.
+
+The [section continuation](music_section_contracts.md) now exposes bounded authored
+section timing, commands, mute and chord records. It does not reconcile the style
+meter, schedule events, resolve personality or implement MUSIC playback.

@@ -1236,3 +1236,14 @@ and immutable catalogue inspection. It does not load collections or play music.
 See [source ledger](sources/m2_music_bands_sources.json),
 [contracts](../contracts/music_band_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_bands.md).
+
+## IMA section data and authored timing
+
+Independent portable AASE decoding, checked against the external installed
+IMUSIC25 section/header/event readers and MIDI-export arithmetic in isolated
+x86 emulation. No source or commercial binary bytes are imported. The original
+Music.cpp request plan is unchanged. Raw commands/mutes/chords and header timing
+remain distinct from effective style reconciliation and sequence playback.
+See [source ledger](sources/m2_music_sections_sources.json),
+[contracts](../contracts/music_section_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_sections.md).

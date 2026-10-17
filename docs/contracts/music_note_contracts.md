@@ -79,3 +79,7 @@ or file streams are retained.
 See [evidence](../../../Documentation/Implementation/m2_music_notes.md),
 [asset contracts](music_asset_contracts.md) and
 [sampler contracts](music_sampler_contracts.md). M2 remains incomplete.
+
+The [section continuation](music_section_contracts.md) now exposes bounded authored
+section timing, commands, mute and chord records. It does not reconcile the style
+meter, schedule events, resolve personality or implement MUSIC playback.

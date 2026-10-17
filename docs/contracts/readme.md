@@ -175,3 +175,4 @@ For everyday setup and contribution guidance, return to the [developer index](..
 
 - [IMA pattern-note data](music_note_contracts.md): original record order, signed fields, opaque events and inspected world ownership.
 - [IMA bands and setup](music_band_contracts.md): source channel records, packed patches, original controller order and explicit sequencing limits.
+- [IMA section records and authored timing](music_section_contracts.md): header timing, command/mute/chord data, original-reader checks and explicit sequencing limits.
