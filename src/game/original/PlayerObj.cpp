@@ -390,7 +390,7 @@ DBOOL CPlayerObj::Update(DVector*)
         if (!server->PingObjects(observer))
             ++activation_ping_failures;
     }
-    if (!UpdateStats() || !UpdateSmellTrail())
+    if (!UpdateStats() || !UpdateLandingSound() || !UpdateSmellTrail())
         return DFALSE;
     // Original Update handles the first death after stats and smell, before
     // aggregate update clears accumulated frame damage.

@@ -86,3 +86,5 @@ all original callers, addon characters, interactive IMA music or the M2 exit gat
 The [combat voice continuation](combat_voice_contracts.md) connects original pain/burning and NPC/corpse kill/gib callers. The remaining caller omissions above still apply.
 
 The [single-player death continuation](player_death_contracts.md) supersedes the missing selected Caleb death/corpse/gib and client death-camera paths above. Active powers, multiplayer death and whole-world/dead-player restoration remain unavailable. M2 is still incomplete.
+
+The [jump/landing audio continuation](movement_audio_contracts.md) connects the original MoveMgr Jump caller. Idle, taunt and other unimplemented callers are not implied by this addition; M2 remains open.

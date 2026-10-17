@@ -463,9 +463,10 @@ bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds
     if (owner->camera_movement_blocked && !owner->m_damage.IsDead() &&
         !server.OnMessage(client_, OpenBlood2::PlayerControls{{}, false, rotation.yaw}))
         return false;
-    if (!owner->ApplyDoorPush() || !move_mgr.Update(server, movement_input, rotation.yaw, seconds,
-                                                    !owner->m_damage.IsDead() && !owner->camera_movement_blocked,
-                                                    weapon_input.primary || weapon_input.alternate, rotation.pitch))
+    if (!owner->ApplyDoorPush() ||
+        !move_mgr.Update(server, voice_manager, view.object != nullptr, movement_input, rotation.yaw, seconds,
+                         !owner->m_damage.IsDead() && !owner->camera_movement_blocked,
+                         weapon_input.primary || weapon_input.alternate, rotation.pitch))
     {
         error = "Original MoveMgr step failed (invalid association, movement message or collision)";
         if (owner && !owner->locomotion_error.empty())

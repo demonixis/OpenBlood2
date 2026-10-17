@@ -155,7 +155,7 @@ void CMoveMgr::UpdateOnConveyor(const ContainerInfo& info)
         body.velocity = vector_scale(body.velocity, std::max(0.0f, speed - m_FrameTime * (m_fLadderVel / .2f)) / speed);
     // Unlike ladders, conveyors retain gravity and ordinary jump controls.
 }
-void CMoveMgr::UpdateMotion(float yaw, float pitch)
+void CMoveMgr::UpdateMotion(float yaw, float pitch, CVoiceMgr& voices, int character, bool external_camera)
 {
     body.acceleration = {};
     m_bUseGravity = true;
@@ -257,6 +257,9 @@ void CMoveMgr::UpdateMotion(float yaw, float pitch)
             else if (m_bOnGround && !steep)
             {
                 body.velocity.y += physics.jump_speed * (m_bForcedCrouch ? .75f : 1.0f);
+                // Original client VME_JUMP: only this ground branch, never swimming/ladder ascent.
+                ++jump_voice_requests;
+                jump_voice_starts += voices.PlayEventSound(object_, character, 11, external_camera);
                 m_bLastJumpCommand = true;
                 m_bOnGround = false;
                 ++jumps;
@@ -321,8 +324,8 @@ bool CMoveMgr::MoveLocalSolidObject(CBloodServerShell& shell)
     m_fVelMagnitude = std::hypot(body.velocity.x, body.velocity.z);
     return true;
 }
-bool CMoveMgr::Update(CBloodServerShell& shell, const MovementInput& input, float yaw, double seconds, bool can_move,
-                      bool firing, float pitch)
+bool CMoveMgr::Update(CBloodServerShell& shell, CVoiceMgr& voices, bool external_camera, const MovementInput& input,
+                      float yaw, double seconds, bool can_move, bool firing, float pitch)
 {
     if (!ready() || !std::isfinite(seconds) || seconds < 0 || seconds > 60 || !std::isfinite(yaw) ||
         !std::isfinite(pitch) || server_->GetClientUserData(client_) != object_)
@@ -349,7 +352,7 @@ bool CMoveMgr::Update(CBloodServerShell& shell, const MovementInput& input, floa
         if (!player->UpdateContainerState())
             return false;
         containers = player->containers;
-        UpdateMotion(yaw, pitch);
+        UpdateMotion(yaw, pitch, voices, player->m_nCharacter, external_camera);
         if (!MoveLocalSolidObject(shell))
             return false;
         ++substeps;

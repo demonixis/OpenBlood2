@@ -1,0 +1,87 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete",
+  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "implementation_parent": "61f0be6c046131db6ebdcaad4ac02348b59a7154",
+  "imports": [
+    {
+      "source": "sources/blood2/ClientShellDLL/MoveMgr.cpp",
+      "source_line_ranges": [
+        [
+          885,
+          937
+        ]
+      ],
+      "source_sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a",
+      "target": "src/game/original/MoveMgr.cpp",
+      "target_sha256": "8418ac8948a155707c945f9fa51449e6ac51c06501dd4a3fa682bc9009d97f4b",
+      "selection": "Grounded jump invokes VME_JUMP before setting the jump latch; swim/free branches remain silent."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          958,
+          958
+        ],
+        [
+          1070,
+          1071
+        ],
+        [
+          1101,
+          1144
+        ],
+        [
+          5832,
+          5881
+        ]
+      ],
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target": "src/game/original/PlayerLanding.cpp",
+      "target_sha256": "b51c021faabb031db594748e06495a038cecb21d4379d80c7e24a13415e87eaa",
+      "selection": "Landing eligibility, sampled extrema, reset order and material/foot-container selection."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          6564,
+          6570
+        ],
+        [
+          6705,
+          6711
+        ]
+      ],
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target": "src/game/original/PlayerSave.cpp",
+      "target_sha256": "f3ddb432c6ff771fb0bfc1bbb3aca2d6c9f6b51ae66e24bb613b24c948deba85",
+      "selection": "Selected fall flag/start/extrema preservation with relative clock."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_line_ranges": [
+        [
+          315,
+          315
+        ],
+        [
+          662,
+          663
+        ]
+      ],
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "target": "src/game/original/PlayerObj.h",
+      "target_sha256": "7cf890a8b2859fa4f7e9665948fbc82033c44a00539cadc14e91eaa03122bfd1",
+      "selection": "Fall start sentinel and initially nonfalling player; portable extrema initialized."
+    }
+  ],
+  "adaptations": [
+    "Existing checked shared-body support replaces the old client on-ground bit; no second integration or impact-force estimate.",
+    "Original client VoiceMgr is passed by reference rather than reached through a process-global client shell.",
+    "Owned strings and explicit errors replace caller buffers; current Caleb-only entry supplies male landing names.",
+    "Fall state validates finite ordered bounded heights and rebased time before mutation; fresh extrema are initialized.",
+    "Audio success and requests remain distinct; original interrupt and hearing-alert order are retained."
+  ]
+}

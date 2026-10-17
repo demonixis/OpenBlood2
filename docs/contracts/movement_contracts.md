@@ -142,3 +142,5 @@ the retail executable has not been run for movement-feel comparison.
 A blocking camera clears commands but gravity/environment still use the same
 single body integration. Private gameplay tests await SubwayA's natural two-camera
 intro before issuing their movement sequence; normal entry retains that intro.
+
+The [jump/landing audio continuation](movement_audio_contracts.md) connects original grounded Jump voices and sampled-height landing sounds. Earlier blanket landing-audio omissions are superseded; impact-force/fall damage remains unavailable. M2 stays open.

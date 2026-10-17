@@ -1726,6 +1726,22 @@ namespace OpenBlood2
                 ImGui::Text("Object support %s / %u", support->type->name.c_str(), support->id.slot);
             else
                 ImGui::TextUnformatted("No support");
+            ImGui::Text("Jump voice requests %llu / starts %llu",
+                        static_cast<unsigned long long>(move.jump_voice_requests),
+                        static_cast<unsigned long long>(move.jump_voice_starts));
+            if (const auto* player = game.server_shell.Player(game.local_client))
+            {
+                ImGui::Text("Landing audio: contacts %llu / requests %llu / starts %llu | fall span %.2f",
+                            static_cast<unsigned long long>(player->landing_contacts),
+                            static_cast<unsigned long long>(player->landing_requests),
+                            static_cast<unsigned long long>(player->landing_starts), player->landing_distance);
+                ImGui::Text("Fall tracking: %d / start %.3f / min %.2f / max %.2f", player->m_bFalling,
+                            player->m_startFall, player->m_fMinFallPos, player->m_fMaxFallPos);
+                ImGui::Text("Landing surface %d / foot container %d | %s", player->landing_surface,
+                            player->landing_container, player->landing_resource.c_str());
+                if (!player->landing_error.empty())
+                    ImGui::TextWrapped("%s", player->landing_error.c_str());
+            }
             ImGui::Text("Jumps %llu | Landings %llu", static_cast<unsigned long long>(move.jumps),
                         static_cast<unsigned long long>(move.landings));
             ImGui::Text("Steps %llu | Messages %llu", static_cast<unsigned long long>(move.substeps),

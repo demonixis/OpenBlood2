@@ -75,6 +75,15 @@ class CPlayerObj : public CBaseCharacter
     SurfaceType m_eLastSurface = SURFTYPE_UNKNOWN, footstep_surface = SURFTYPE_UNKNOWN;
     ContainerCode footstep_container = CC_NOTHING;
     bool GetFootstepSound(std::string&);
+    bool GetLandingSound(std::string&);
+    bool UpdateLandingSound();
+    bool m_bFalling = false;
+    float m_startFall = -1, m_fMinFallPos = 0, m_fMaxFallPos = 0;
+    SurfaceType landing_surface = SURFTYPE_UNKNOWN;
+    ContainerCode landing_container = CC_NOTHING;
+    float landing_distance = 0;
+    std::uint64_t landing_contacts = 0, landing_requests = 0, landing_starts = 0;
+    std::string landing_resource, landing_error;
     bool PlayVoiceGroupEventOnClient(int event, bool single_player_only = false);
     bool PlayVoiceUniqueEventOnClient(int event);
     void PlayWeaponVoiceSoundOnClient(int weapon);

@@ -141,3 +141,5 @@ SubwayA remains 187 live-created source entries, 4 transferred world sounds,
 ExitTrigger, actual client FX, attachments and required services keep M2 open.
 --start-game must still fail. Linux-only testing does not establish retail binary,
 other-platform, XR or audible-device equivalence.
+
+The [jump/landing audio continuation](movement_audio_contracts.md) adds the original landing caller and material mapping with actual attached playback/hearing alerts. Client jump voices remain independently owned by VoiceMgr; fall damage and M2 remain incomplete.

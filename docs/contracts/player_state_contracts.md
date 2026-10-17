@@ -88,3 +88,5 @@ flags, velocity/zoom policy, engine body/animation/scheduling, restored client
 association and safe named destination entry are not implemented by LoadFields.
 General saves, other characters and multiplayer remain unavailable. NEW_LEVEL
 continues to refuse before teardown; M2 remains incomplete.
+
+The [jump/landing audio continuation](movement_audio_contracts.md) extends the selected value snapshot with original falling, relative fall-start time and height extrema. Validated/rebased field preservation does not supply impact forces or whole-world saves.

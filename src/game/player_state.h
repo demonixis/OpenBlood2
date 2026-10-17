@@ -11,6 +11,8 @@ namespace OpenBlood2
     {
         float smell_time_offset = 0, smell_delay = .5f;
         bool dead = false, movement_blocked = false;
+        bool falling = false;
+        float fall_start_offset = -1, min_fall_y = 0, max_fall_y = 0;
         float pitch = 0, yaw = 0, air = 100;
         std::optional<std::string> trigger, name; // Preserve null versus allocated empty HSTRING.
         bool last_crouch = false, forced_crouch = false;

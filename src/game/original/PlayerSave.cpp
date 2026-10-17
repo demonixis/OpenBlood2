@@ -17,6 +17,14 @@ namespace
             error = "Invalid saved player clock, angle or air level";
             return false;
         }
+        if (!std::isfinite(state.fall_start_offset) || !std::isfinite(state.fall_start_offset + now) ||
+            !std::isfinite(state.min_fall_y) || !std::isfinite(state.max_fall_y) ||
+            std::abs(state.min_fall_y) > 1000000 || std::abs(state.max_fall_y) > 1000000 ||
+            state.min_fall_y > state.max_fall_y)
+        {
+            error = "Invalid saved player fall history";
+            return false;
+        }
         if (state.character != 0 || state.skin != 0 || (state.move_state > 14 && state.move_state != 16))
         {
             error = "Unsupported saved player character, skin or movement state";
@@ -73,6 +81,10 @@ bool CPlayerObj::SaveFields(OpenBlood2::PlayerState& output, std::string& error)
     state.smell_delay = m_fSmellDelay;
     state.dead = m_bDead != 0; // Player death flag is distinct from its damage aggregate.
     state.movement_blocked = movement_blocked;
+    state.falling = m_bFalling;
+    state.fall_start_offset = m_startFall - now;
+    state.min_fall_y = m_fMinFallPos;
+    state.max_fall_y = m_fMaxFallPos;
     state.pitch = m_fPitch;
     state.yaw = m_fYaw;
     state.air = m_fAirLevel;
@@ -150,6 +162,10 @@ bool CPlayerObj::LoadFields(const OpenBlood2::PlayerState& state, std::string& e
     m_fSmellDelay = state.smell_delay;
     m_bDead = state.dead;
     movement_blocked = state.movement_blocked;
+    m_bFalling = state.falling;
+    m_startFall = state.fall_start_offset + now;
+    m_fMinFallPos = state.min_fall_y;
+    m_fMaxFallPos = state.max_fall_y;
     m_fPitch = state.pitch;
     m_fYaw = state.yaw;
     m_fAirLevel = state.air;

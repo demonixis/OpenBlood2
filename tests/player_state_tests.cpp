@@ -24,6 +24,10 @@ namespace
     {
         PlayerState s;
         s.smell_time_offset = -2.5f;
+        s.falling = true;
+        s.fall_start_offset = -.75f;
+        s.min_fall_y = -40;
+        s.max_fall_y = 400;
         s.smell_delay = .75f;
         s.dead = true;
         s.movement_blocked = true;
@@ -212,6 +216,9 @@ namespace
         CHECK(p->LoadFields(s, error));
         const auto count = g.server.string_count();
         std::vector<std::function<void(PlayerState&)>> corrupt{
+            [](auto& s) { s.fall_start_offset = std::numeric_limits<float>::infinity(); },
+            [](auto& s) { s.min_fall_y = 401; },
+            [](auto& s) { s.max_fall_y = std::numeric_limits<float>::quiet_NaN(); },
             [](auto& s) { s.air = -1; },
             [](auto& s) { s.air = 101; },
             [](auto& s) { s.smell_time_offset = std::numeric_limits<float>::infinity(); },
