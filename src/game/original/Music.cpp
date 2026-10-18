@@ -5,6 +5,22 @@
 #include "engine/resources.h"
 #include <array>
 
+bool CMusic::SelectLevel(std::uint8_t from, std::uint8_t to, OpenBlood2::MusicLevelRequest& out)
+{
+    out = {};
+    if (from > 3 || to > 3 || (from == to && to != 0))
+        return false;
+    // Original PlayMusicLevel/TransitionToLevel, lines 280-394. Rows are the
+    // requested level, columns the current level. Harddriving -> silence uses cts.
+    constexpr const char* transitions[4][4] = {{"", "ats.sec", "cts.sec", "cts.sec"},
+                                               {"sta.sec", "", "cta.sec", "hta.sec"},
+                                               {"stc.sec", "atc.sec", "", "htc.sec"},
+                                               {"sth.sec", "ath.sec", "cth.sec", ""}};
+    constexpr const char* lists[] = {"SilenceList", "AmbientList", "CruisingList", "HarddrivingList"};
+    out = {from, to, lists[to], transitions[to][from], from == 0 && to != 0, true};
+    return true;
+}
+
 bool CMusic::BuildAssetPlan(const std::map<std::string, std::string>& properties, OpenBlood2::MusicAssetPlan& out,
                             std::string& error)
 {

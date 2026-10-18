@@ -93,6 +93,14 @@ namespace
         CHECK(f.compile(p, error));
         CHECK(p.grids == 4 && p.notes == 4 && p.terminal_notes == 4 && p.events.size() == 88 && p.preroll_ticks == 5 &&
               p.last_tick == 1576);
+        const auto exact_work = p.work_units;
+        CHECK(exact_work > 0);
+        CHECK(!prepare_ima_program(f.section, f.style, f.timeline, f.harmony, f.band, f.curves, f.seed, 1, p, error,
+                                   exact_work - 1) &&
+              p.events.empty());
+        CHECK(prepare_ima_program(f.section, f.style, f.timeline, f.harmony, f.band, f.curves, f.seed, 1, p, error,
+                                  exact_work) &&
+              p.work_units == exact_work);
         // Retained partition reverses each grid. Terminal flush preserves that list order, not chronological order.
         CHECK(p.events[80].time == 0 && p.events[80].status == 0x94);
         std::vector<int> stops;

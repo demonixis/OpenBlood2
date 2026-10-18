@@ -70,3 +70,5 @@ the original log or patch.
 - [IMA runtime clock](../../../Documentation/Implementation/m2_music_clock.md): checked original tempo conversion; running sections/playlists and MUSIC remain incomplete.
 
 - [Finite IMA section playback](../../../Documentation/Implementation/m2_music_program.md): original terminal-note flushing and complete authored audio; playlists/MUSIC remain incomplete.
+
+- [Finite music playlists](../../../Documentation/Implementation/m2_music_playlists.md): original level decisions and one-pass transition/list audio; live MUSIC remains incomplete.

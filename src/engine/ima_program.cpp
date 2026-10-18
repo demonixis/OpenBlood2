@@ -7,7 +7,8 @@ namespace OpenBlood2
     bool prepare_ima_program(std::shared_ptr<const ImaSection> section, std::shared_ptr<const ImaStyle> style,
                              std::shared_ptr<const ImaTimeline> timeline, std::shared_ptr<const ImaHarmony> harmony,
                              const ImaBand& band, const ImaCurves& curves, ImaCursorSeed seed,
-                             std::uint32_t random_seed, ImaSectionProgram& out, std::string& error)
+                             std::uint32_t random_seed, ImaSectionProgram& out, std::string& error,
+                             std::size_t work_budget)
     {
         out = {};
         ImaSectionCursor cursor;
@@ -54,7 +55,8 @@ namespace OpenBlood2
         const auto work_per_grid = pool_size + max_notes + style->source.chunks.size() + curves.curves.size() +
                                    timeline->commands.size() + timeline->chords.size() + timeline->mutes.size() +
                                    style->patterns.size() + 16;
-        const auto grid_limit = std::min<std::size_t>(65536, 16000000 / work_per_grid);
+        const auto grid_limit =
+            std::min<std::size_t>(65536, std::min<std::size_t>(16000000, work_budget) / work_per_grid);
         while (cursor.active())
         {
             if (next.grids == grid_limit)
@@ -73,6 +75,7 @@ namespace OpenBlood2
                 draw(next.random_state);
             next.draws += consumed;
             ++next.grids;
+            next.work_units += work_per_grid;
             next.notes += notes.rows.size() - notes.suppressed;
             next.curve_messages += notes.curve_messages;
             for (const auto& m : notes.dispatch)

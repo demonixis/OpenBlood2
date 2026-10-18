@@ -12,7 +12,8 @@ namespace OpenBlood2
     {
         // The world-owned music data exists independently of inspector visibility/reload.
         auto& music = g.music_catalog;
-        if (!music.audition_file.empty() || !music.audition.events.empty() || !music.error.empty() ||
+        if (!music.audition_file.empty() || !music.audition.events.empty() || music.playlist_request ||
+            !music.playlist_files.empty() || !music.playlist_audition.events.empty() || !music.error.empty() ||
             music.assets.empty() || music.personalities.size() != 1 || !music.personalities.front().metadata ||
             !music.personalities.front().error.empty() || !music.assets.front().bank ||
             !music.assets.front().bank_error.empty())
@@ -283,6 +284,24 @@ namespace OpenBlood2
         sampler.silence();
         music.audition_stopped = true;
         if (!sampler.pending_midi().empty() || !sampler.voices().empty() || sampler.sample_clock() != cancel_frame)
+            return false;
+        // Original level request -> authored transition and ordered playlist, one finite pass.
+        // Runtime selection/repeats are deliberately not claimed by this audition.
+        const auto playlist_started = sampler.started;
+        if (!music.play_level_once(0, 3, sampler) || !music.playlist_request ||
+            music.playlist_files.front() != "sth.sec" || music.playlist_files.size() < 2)
+            return false;
+        std::uint64_t playlist_notes = 0;
+        for (const auto& part : music.playlist_audition.parts)
+            playlist_notes += part.notes;
+        while (sampler.sample_clock() <= music.audition_end + DlsSampler::rate * 4)
+            if (!g.server.advance_audio(.02, {}, {}))
+                return false;
+        for (const auto& voice : sampler.voices())
+            if (voice.gate == UINT64_MAX || voice.amplitude.release > 20)
+                return false;
+        if (!g.server.advance_audio(21, {}, {}) || !sampler.pending_midi().empty() || !sampler.voices().empty() ||
+            sampler.dispatch_failures || sampler.started - playlist_started != playlist_notes)
             return false;
         unsigned count = 0;
         for (const auto& e : g.entries)

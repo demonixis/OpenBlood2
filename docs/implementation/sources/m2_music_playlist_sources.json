@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "f89101114c282223d8a50f7683539ce8b65fd24f",
+  "sources": [
+    {
+      "path": "sources/blood2/ClientShellDLL/Music.cpp",
+      "sha256": "1024e355e8da92ba670b96fc7cec5a57f301ea45e18f0a43f910a914f6e24ee0",
+      "use": "PlayMusicLevel and TransitionToLevel request selection; original logical-level mutation and engine acceptance remain outside the pure selector"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/client_de.h",
+      "sha256": "d4bd76f15d1689a0314f832bcba0877d2bbabcdf830a8a44da9d662b4aa534e1",
+      "use": "Documented PlayList transition-before-list, authored song order, loop and boundary flags"
+    }
+  ],
+  "adaptations": [
+    "Pure four-level selection table; independently checked against compiled unchanged original methods for every byte pair",
+    "Finite one-pass audition; requested repetition and live boundary switching are shown but not claimed",
+    "Shared musical timeline, global preroll, setup at earliest section event and complete tempo map before MIDI conversion",
+    "Local seed/cursor reset per section; gain 20 percent; one immutable instrument bank",
+    "64-section / 65536-message / shared 16-million-work bounds; atomic preparation and queue admission"
+  ],
+  "limits": [
+    "No logical game level mutation, game MUSIC success, repeat transport or live NEXTSONG switching",
+    "No claim of original cross-section activation/state or PCM/listening parity; other DLS bank failures remain"
+  ],
+  "frozen_sources": {
+    "CMakeLists.txt": "3493da8ef14d6479f653de7312830ba1a423b6e60bed7a0956cff9f6eaace334",
+    "tests/CMakeLists.txt": "597ef5f433f77df97a3525a33270517c02de66c483b770ed7d85dc5abb673bba",
+    "src/engine/ima_playlist.h": "d3372aff61344c8024103e80baffd9a9f1f5bafdf538eea7ac6c2941e0b19139",
+    "src/engine/ima_playlist.cpp": "9d2a5f722aac23ca2d3ce527bf56395023df1425ba1886030d8ee82544a27493",
+    "src/engine/ima_program.h": "1b5dbf18b545e64012420b2df35acf5cca88a53d8cff9ed757512ecd0a0db68f",
+    "src/engine/ima_program.cpp": "870664afcc52bfb9f050f3d2d49ab8b57e88cb59d67ee1560bf0c7a63e1c2fd6",
+    "src/game/original/Music.h": "263899d33f4fe6c27a134b6346b76fd34970ff57dbfb51d3b4afb545b75818a1",
+    "src/game/original/Music.cpp": "33b7dd7a1242a6fe28a29dd1c9bd9ef5296e4d5e4a8e1df869f55e9cf77e7fd4",
+    "src/game/music_catalog.h": "f3e6502be176951b86ba93885a5e4f3764f6ff61a3585680a5db33003f13dbb9",
+    "src/game/music_catalog.cpp": "fef7715f9ac2b67ec7cf451078a02f05293207a3eed485351a3bd8d1290b6ac2",
+    "src/app/inspector_world_sounds.cpp": "6cabf3f0c5c0dcdab571e0eab74174130de48a02314212419d7ddde1880cd11b",
+    "src/app/world_sound_smoke.cpp": "729c109acf697ffb55b5f1d64c488c1262d3225edcb7c4cf40ed1d5c96572f23",
+    "tests/ima_playlist_tests.cpp": "93ebb09fc8fc3493b17b00b4ceae726c7024587a9609e4f58d66f72f1de24e42",
+    "tests/ima_program_tests.cpp": "0175c75e8a5d54324523074a7cd0730c90b5638b8cf305c59200f7c0fe6dc002"
+  }
+}

@@ -206,3 +206,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [IMA runtime clock](music_clock_contracts.md): original tempo boundaries and tick-to-sample queue conversion.
 
 - [Finite IMA section playback](music_program_contracts.md): complete authored audition, terminal-note deadlines, explicit preparation policies and audio lifetime.
+
+- [Finite music playlists](music_playlist_contracts.md): original level choices, ordered one-pass playback and shared tempo/lifetime limits.

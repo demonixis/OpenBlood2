@@ -121,6 +121,9 @@ namespace OpenBlood2
                             !sampler.enqueue_ima(asset.band_bank, clock, next.events, .2, audition_error))
                             return false;
                         audition = std::move(next);
+                        playlist_audition = {};
+                        playlist_files.clear();
+                        playlist_request.reset();
                         audition_file = asset.filename;
                         audition_origin = origin;
                         audition_end = end;
@@ -130,6 +133,93 @@ namespace OpenBlood2
                     }
         audition_error = "Section lacks a complete immutable section/style/harmony/curve/band/bank binding";
         return false;
+    }
+    bool MusicCatalog::play_level_once(std::uint8_t from, std::uint8_t to, DlsSampler& sampler)
+    {
+        audition_error.clear();
+        const auto fail = [&](std::string reason)
+        {
+            audition_error = std::move(reason);
+            return false;
+        };
+        MusicLevelRequest request;
+        if (!CMusic::SelectLevel(from, to, request))
+            return fail("Original PlayMusicLevel makes no request for this level pair");
+        if (!sampler.voices().empty() || !sampler.pending_midi().empty())
+            return fail("Stop existing instrument audio before starting a finite playlist");
+        std::vector<std::string> files;
+        if (!request.transition.empty())
+            files.emplace_back(request.transition);
+        const auto first_list_entry = files.size();
+        for (const auto& entry : plan.requests)
+            if (entry.role == request.playlist)
+                files.push_back(entry.filename); // Preserve authored order and duplicates.
+        if (files.size() == first_list_entry || files.size() > 64)
+            return fail("Finite playlist is empty or exceeds 64 transition/list sections");
+        std::vector<ImaSectionProgram> sections;
+        std::shared_ptr<const DlsBank> bank;
+        std::size_t work_remaining = 16000000, messages = 0;
+        for (const auto& file : files)
+        {
+            std::string key;
+            if (!resource_path(file, key))
+                return fail("Invalid finite playlist resource path");
+            const MusicAssetRecord* asset = nullptr;
+            for (const auto& candidate : assets)
+            {
+                std::string candidate_key;
+                if (resource_path(candidate.filename, candidate_key) && candidate_key == key)
+                {
+                    if (asset)
+                        return fail("Ambiguous finite playlist section: " + file);
+                    asset = &candidate;
+                }
+            }
+            if (!asset || !asset->section || !asset->section_style || !asset->selected_band ||
+                !asset->band_setup_ready || !asset->band_bank)
+                return fail("Finite playlist section binding unavailable: " + file);
+            if (bank && bank != asset->band_bank)
+                return fail("Finite playlist requires a single immutable instrument bank");
+            bank = asset->band_bank;
+            const ImaCurves* curves = nullptr;
+            for (const auto& style : assets)
+                if (style.style == asset->section_style && style.curves)
+                    curves = style.curves.get();
+            if (!curves)
+                return fail("Finite playlist exact style curves unavailable: " + file);
+            ImaSectionProgram part;
+            ImaCursorSeed seed;
+            seed.random_channels = 0xffff;
+            // This remains an explicit audition: reset the local seed/cursor per
+            // section. Original cross-section variation/activation is separate.
+            if (!prepare_ima_program(asset->section, asset->section_style, asset->timeline, asset->harmony,
+                                     *asset->selected_band, *curves, seed, 1, part, audition_error, work_remaining))
+                return fail(file + ": " + audition_error);
+            work_remaining -= part.work_units;
+            if (part.events.size() > DlsSampler::max_pending_midi - messages)
+                return fail("Finite playlist combined message budget exceeded");
+            messages += part.events.size();
+            sections.push_back(std::move(part));
+        }
+        ImaPlaylistProgram next;
+        if (!prepare_ima_playlist(sections, next, audition_error))
+            return false;
+        ImaClock clock;
+        const auto origin = sampler.sample_clock();
+        std::uint64_t end;
+        if (!clock.prepare(next.tempos, origin, audition_error) || !clock.sample(next.last_tick, end, audition_error) ||
+            !sampler.enqueue_ima(bank, clock, next.events, .2, audition_error))
+            return false;
+        playlist_audition = std::move(next);
+        playlist_files = std::move(files);
+        playlist_request = request;
+        audition = {};
+        audition_file = request.playlist;
+        audition_origin = origin;
+        audition_end = end;
+        audition_failures = sampler.dispatch_failures;
+        audition_stopped = false;
+        return true;
     }
     void MusicCatalog::inspect(const std::filesystem::path& root, const std::map<std::string, std::string>& properties)
     {

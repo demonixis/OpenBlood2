@@ -135,19 +135,25 @@ namespace OpenBlood2
     void Inspector::draw_world_sounds(GameSession& game)
     {
         auto& music = game.music_catalog;
-        if (ImGui::CollapsingHeader("Single-section music playback", ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader("Finite music playback", ImGuiTreeNodeFlags_DefaultOpen))
         {
             auto& sampler = game.server.audio.instruments;
-            ImGui::TextWrapped("Finite original-section audition, gain 20%%, explicit seed 1. "
-                               "Prepared once, played by the shared audio clock while the inspector is hidden. "
-                               "Game MUSIC playlists/transitions are still unavailable.");
+            ImGui::TextWrapped(
+                "Finite authored music audition, gain 20%%, explicit seed 1 per section. "
+                "Prepared once, played by the shared audio clock while the inspector is hidden. "
+                "Game MUSIC activation, repeating lists and live transition boundaries remain unavailable.");
+            static int from_level = 0, to_level = 3;
+            ImGui::Combo("Preview from level", &from_level, "Silence\0Ambient\0Cruising\0Harddriving\0");
+            ImGui::Combo("Preview requested level", &to_level, "Silence\0Ambient\0Cruising\0Harddriving\0");
+            if (ImGui::Button("Audition transition + playlist once (20% gain)"))
+                music.play_level_once(std::uint8_t(from_level), std::uint8_t(to_level), sampler);
             if (ImGui::Button("Stop all instrument audio"))
             {
                 sampler.silence();
                 music.audition_stopped = true;
             }
             if (!music.audition_error.empty())
-                ImGui::TextWrapped("Section refused: %s", music.audition_error.c_str());
+                ImGui::TextWrapped("Music audition refused: %s", music.audition_error.c_str());
             if (!music.audition_file.empty())
             {
                 const auto& p = music.audition;
@@ -158,12 +164,38 @@ namespace OpenBlood2
                             : sampler.sample_clock() < music.audition_end ? "scheduled / playing"
                             : !sampler.voices().empty()                   ? "release tails / other instrument voices"
                                                                           : "sequence elapsed");
-                ImGui::Text("Grids %llu | notes %llu | curve messages %llu | terminal stops %llu | events %zu",
-                            (unsigned long long)p.grids, (unsigned long long)p.notes,
-                            (unsigned long long)p.curve_messages, (unsigned long long)p.terminal_notes,
-                            p.events.size());
-                ImGui::Text("Preroll %d ticks | last tick %d | draws %llu | pending MIDI %zu", p.preroll_ticks,
-                            p.last_tick, (unsigned long long)p.draws, sampler.pending_midi().size());
+                if (music.playlist_request)
+                {
+                    const auto& request = *music.playlist_request;
+                    const auto& list = music.playlist_audition;
+                    ImGui::Text("Original request: %u -> %u | %s | loop requested %s", unsigned(request.from),
+                                unsigned(request.to), request.immediate ? "IMMEDIATE" : "NEXTSONG",
+                                request.loop ? "yes" : "no");
+                    ImGui::TextWrapped("This audition starts on the idle clock and plays one pass; it does not execute "
+                                       "the original live-switch or repeat request.");
+                    ImGui::Text("Sections %zu | events %zu | global preroll %d | last tick %d", list.parts.size(),
+                                list.events.size(), list.preroll_ticks, list.last_tick);
+                    if (ImGui::TreeNode("Ordered playlist sections and tempo boundaries"))
+                    {
+                        for (std::size_t i = 0; i < list.parts.size(); ++i)
+                            ImGui::Text("%zu: %s | tick %d + %d | BPM %.4f | notes %llu", i,
+                                        music.playlist_files[i].c_str(), list.parts[i].start_tick,
+                                        list.parts[i].duration,
+                                        list.tempos[i].whole + list.tempos[i].fraction / 65536.0,
+                                        (unsigned long long)list.parts[i].notes);
+                        ImGui::TreePop();
+                    }
+                }
+                else
+                {
+                    ImGui::Text("Grids %llu | notes %llu | curve messages %llu | terminal stops %llu | events %zu",
+                                (unsigned long long)p.grids, (unsigned long long)p.notes,
+                                (unsigned long long)p.curve_messages, (unsigned long long)p.terminal_notes,
+                                p.events.size());
+                    ImGui::Text("Preroll %d ticks | last tick %d | draws %llu | pending MIDI %zu", p.preroll_ticks,
+                                p.last_tick, (unsigned long long)p.draws, sampler.pending_midi().size());
+                }
+                ImGui::Text("Actual pending MIDI %zu", sampler.pending_midi().size());
                 ImGui::Text("Audio frame %llu | start %llu / last event or section end %llu",
                             (unsigned long long)sampler.sample_clock(), (unsigned long long)music.audition_origin,
                             (unsigned long long)music.audition_end);

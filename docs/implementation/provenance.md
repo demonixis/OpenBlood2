@@ -1386,3 +1386,7 @@ Independent bounded value arithmetic and queue integration derived from read-onl
 ## Finite original IMA section playback (2026-10-18)
 
 Existing verified readers/cursor/clock/receiver compose a bounded single-section audition. Original finite-termination note flushing is independently checked through isolated IMUSIC25 execution. Explicit draw seed, preparatory output epoch and developer cancellation are documented replacement policies. No commercial bytes imported. See [source ledger](sources/m2_music_program_sources.json), [contracts](../contracts/music_program_contracts.md) and [evidence](../../../Documentation/Implementation/m2_music_program.md).
+
+## Original music level selection and finite playlists (2026-10-18)
+
+The original ClientShellDLL/Music.cpp request matrix is adapted into a pure selector and compared against compiled unchanged original methods. Finite composition uses documented client_de.h ordering and existing verified clock/section services; seed resets, global preroll and one-pass playback are explicit replacement policies. See [source ledger](sources/m2_music_playlist_sources.json), [contracts](../contracts/music_playlist_contracts.md) and [evidence](../../../Documentation/Implementation/m2_music_playlists.md).
