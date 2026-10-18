@@ -80,3 +80,5 @@ the original log or patch.
 The [session-cost audit](../../../Documentation/Implementation/m2_session_cost.md) removes temporary trace-name allocations and zero-depth audio modulation work. Read [contracts](../contracts/session_cost_contracts.md); preserve owned counters, exact scalar PCM/cursor progression and all existing session/test deadlines. The full M2 acceptance review and runtime-start guard remain open.
 
 - [Checked session startup](../../../Documentation/Implementation/m2_session_start.md): actual admission/refusal checks, shared NEW_LEVEL resource validation and startup inspection; M2 remains incomplete.
+
+- [GPU lifetime attribution](../../../Documentation/Implementation/m2_gpu_lifetime.md): SDL-only and standalone Vulkan controls for the retained NVIDIA LeakSanitizer failure.

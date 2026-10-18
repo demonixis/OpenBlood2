@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "c1004fc1e98e0644f98b9df04dcd947c5090b8c0",
+  "original_imports": [],
+  "changes": [
+    "Add SDL-only diagnostic lifetime executable and three optional display-dependent CTest cases.",
+    "Retain standalone system-Vulkan reproduction as evidence, not an engine dependency."
+  ],
+  "production_changes": false,
+  "dependencies_changed": false,
+  "references": [
+    {
+      "path": "src/engine/runtime.cpp",
+      "sha256": "9187b9dfb29c0afd7621b6d97a9a4e0dbb9b462663fa3cbd902703796de67883",
+      "use": "Match explicit GPU idle, release-window, device/window destroy and SDL_Quit ownership order."
+    },
+    {
+      "path": "build/sanitize/_deps/sdl3-src/include/SDL3/SDL_hints.h",
+      "sha256": "33d92747f3ad3067dacd68f9448ad0f61623639022249bce9ad7efe344a5c30c",
+      "use": "Pinned SDL debug-only shutdown hint contract; not enabled in production."
+    },
+    {
+      "path": "build/sanitize/_deps/sdl3-src/src/core/linux/SDL_dbus.c",
+      "sha256": "266c7044bc97f1bf251f7e9f8b58b471a816e8969f3c2693250c5e7586154247",
+      "use": "Pinned SDL connection cleanup and process-global shutdown policy."
+    }
+  ],
+  "frozen_sources": {
+    "tests/platform_lifetime_tests.cpp": "5d5fda23d94320fb5885519aafa5228bee981568a576b37cbb250f429ebb9e3d",
+    "tests/CMakeLists.txt": "1f0475d855427e8025b3b31955b4010688ee7674404d35e0352f9ca2033758d9"
+  }
+}

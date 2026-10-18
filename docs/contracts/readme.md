@@ -213,3 +213,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Repeating music transport](music_transport_contracts.md): bounded continuous audio, fractional clocks, cancellation and remaining live-MUSIC limits.
 
 - [Checked session startup](session_start_contracts.md): original entry, strict resource/service checks, failure ownership and the finite CLI harness.
+
+- [Platform lifetime diagnostics](gpu_lifetime_contracts.md): isolated SDL controls, explicit sanitizer failures and NVIDIA module attribution.
