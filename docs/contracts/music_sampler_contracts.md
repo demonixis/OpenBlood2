@@ -54,10 +54,11 @@ post-loop tail samples are not substituted. One-shot samples end at their actual
 frame count. The sine LFO starts at zero pitch bias after its delay; the unipolar
 gain path ramps its depth over the first cycle to avoid a start-bias step.
 
-Controller values are fixed for these explicit diagnostic notes: volume 100,
-expression 127, pan 64, no modulation or pitch bend. Velocity and volume use the
+Direct diagnostic notes default to volume 100, expression 127 and pan 64.
+[Band-routed notes](music_routing_contracts.md) now capture supplied CC7/CC11/CC10
+values; modulation and pitch bend remain unavailable. Velocity, volume and expression use the
 squared gain law; stereo pan uses the DLS square-root equal-power law. Constant
-pan adds to `64/127`, so the default is slightly right of the exact mathematical
+pan adds to `CC10/127` (default `64/127`), so the default is slightly right of the exact mathematical
 center. No dynamic MIDI controller or same-key exclusivity behavior is claimed.
 The UI's additional 20% gain is an audition setting, not a game music-volume rule.
 

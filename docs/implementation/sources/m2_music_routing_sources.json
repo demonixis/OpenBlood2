@@ -1,0 +1,99 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "c8d122b5fd8d9bd451ff0d0671c0d44d26c4cc4c",
+  "status": "M2 incomplete; original band MIDI values route diagnostic DLS notes, no live MUSIC",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/MSynth25.dll",
+      "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+      "image_base": "0x35490000",
+      "rvas": {
+        "DLS_locale_conversion": [
+          "0x8b96",
+          "0x8be9"
+        ],
+        "resident_patch_key_lookup": "0x7940",
+        "note_lookup_and_percussion_fallback": [
+          "0x36b2",
+          "0x36f8"
+        ],
+        "instrument_download_lookup": "0x6870",
+        "reset_channel_map": "0x2d00"
+      },
+      "use": "Read-only static inspection plus bounded isolated execution of locale conversion and original complete resident list/key lookup with percussion fallback. Critical section imports intercepted. No native DLL loading or code/asset import."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/Music.cpp",
+      "use": "Original InitInstruments configured DLS/style pair; existing plan and external bank loading retained"
+    },
+    {
+      "source": "src/engine/ima_band.cpp",
+      "use": "Previously executable-verified 80-message setup and source-to-MIDI channel remap; no reinterpretation of raw IMA bank flags"
+    },
+    {
+      "source": "docs/implementation/sources/m2_music_sampler_sources.json",
+      "use": "Previously documented DLS full-precision squared controller gain and square-root pan law; note-on CC7/CC11/CC10 now replace fixed defaults"
+    },
+    {
+      "source": "Downloaded DLS Level 1 specification with errata (existing local research copy)",
+      "url": "https://midi.org/dls-level-1",
+      "sha256": "d58664f5f25ea3313e504d2b310464b32453dc9a2fb5e16ad0df105675b663b0",
+      "use": "Volume and Expression sections: separate squared normalized gain factors; existing equal-power pan implementation retained"
+    }
+  ],
+  "replacement_code": [
+    "src/engine/dls_sampler.cpp: checked packed MIDI patch/key routing, percussion fallback and controller snapshots",
+    "src/game/music_catalog.cpp: selected setup to 16 immutable-value channel snapshots with shared configured bank",
+    "src/app/inspector_world_sounds.cpp: selected-band channel auditions and actual voice controller/patch inspection"
+  ],
+  "deliberate_limits": [
+    "Decoded instruments in the supplied configured single bank are treated as resident for diagnostic notes; original download/refcount/GM collection behavior is not implemented",
+    "No collection-label path inference or global resource resolver; failed banks and missing routes remain explicit",
+    "Ambiguous packed locales refuse rather than depend on original linked-list ordering; existing strict region velocity/overlap/articulation rules remain",
+    "Note-on CC7/CC11/CC10 only; later controller messages, sustain/pitchbend, exclusivity, tempo/event scheduling and playlists remain unavailable",
+    "Original isolated lookup probe is not a full synth/audio comparison; existing full-precision gain/pan law remains",
+    "No original source, commercial sample, executable bytes, disassembly or new runtime/build dependency imported"
+  ],
+  "original_probe": {
+    "binary": "MSynth25.dll",
+    "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+    "unicorn": "2.1.4",
+    "packed_locale_cases": 512,
+    "routing_cases": 66,
+    "fnv64": 6386313400906083943,
+    "default_channel_map": [
+      9,
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "default_percussion_midi_channel": 9,
+    "decisions_sha256": "1e96e617d132022020f4aba966009d9bd6213ef8bc13dae8886d9c7b35d29f9a",
+    "scope": "Isolated original locale conversion and resident instrument/key lookup with percussion fallback; no synthesis, residency loader or OS GM collection"
+  },
+  "target_sha256": {
+    "src/app/inspector_world_sounds.cpp": "1f5f5fdaafa196e6a017af378c0b78a2ccac3bdbc4feb6012fdf058eef757766",
+    "src/app/world_sound_smoke.cpp": "92e45a865ee5b3084f963f1d1cc23d0fe96c50f470c4901877c02cea7ac8acff",
+    "src/engine/dls_sampler.cpp": "cc5d58929da3b34f774b76c436f5d2d6721bbfd0d0880641d622b82c5cd563d7",
+    "src/engine/dls_sampler.h": "f3cb462bcd3248988851f1f08bb472febe40e24c569a78b5e31717d7d993b18d",
+    "src/game/music_catalog.cpp": "a7084fba6342b90ea87c1fca41ac714478e44b2045da6267c5690f463e0f3de1",
+    "src/game/music_catalog.h": "bdaf6529b56a59d7655daddeba6a4db8537efa9c59cd1f89b58376e59cec341e",
+    "tests/CMakeLists.txt": "4631cf21f77d768435dd80effac680697467cecabdeedd9c9f693fd6b8b3413d",
+    "tests/dls_sampler_tests.cpp": "e14aa494da3c6c0ec27ffffc12325e3cbd1f3cd7dcc14ec95a9d9a78ef45fcc5",
+    "tests/music_asset_tests.cpp": "31ed164e4572ae0776a8e6d4513f6e5a8d34e340d8d75c29048ad2e7d028eddb"
+  },
+  "lifetime_regression": "Caller can reuse a channel snapshot from an active voice. Standalone ASan probe reproduced heap-use-after-free when the voice vector grew; copy before play fixes it. The routing test now forces repeated reallocations."
+}

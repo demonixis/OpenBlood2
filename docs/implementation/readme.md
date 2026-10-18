@@ -48,3 +48,5 @@ the original log or patch.
 - [IMA grid cursor](../../../Documentation/Implementation/m2_music_cursor.md): original consecutive-grid decisions, inspected manual traversal and explicit remaining playback gaps.
 
 - [IMA effective band selection](../../../Documentation/Implementation/m2_music_band_selection.md): original section/style priority, prepared configuration and owned inspection.
+
+- [IMA band channels and DLS note routing](../../../Documentation/Implementation/m2_music_routing.md): original packed/key lookup, percussion fallback and controller-aware diagnostic PCM; MUSIC and M2 remain incomplete.

@@ -327,6 +327,132 @@ namespace
                      "failure atomicity and local precedence verified\n";
         return true;
     }
+    bool routing()
+    {
+        std::string error;
+        auto bank = fixture();
+        bank->instruments[0].bank = 0x1234;
+        bank->instruments[0].program = 57;
+        CHECK(dls_instrument_patch(bank->instruments[0]) == (0x12U << 14 | 0x34U << 7 | 57U));
+        auto drum = bank->instruments[0];
+        drum.bank = 0x80000000;
+        drum.program = 0;
+        drum.regions[0].key_low = 40;
+        drum.regions[0].key_high = 50;
+        bank->instruments.push_back(drum);
+        drum.bank = 0x80000102;
+        drum.program = 3;
+        drum.regions[0].key_low = 60;
+        drum.regions[0].key_high = 70;
+        bank->instruments.push_back(drum);
+        std::optional<std::size_t> out;
+        DlsMidiChannel melodic{0x12, 0x34, 57, false, {90, 80, 50}};
+        CHECK(find_dls_instrument(*bank, melodic, 60, out, error) && out == 0);
+        DlsMidiChannel drums{1, 2, 3, true, {}};
+        CHECK(find_dls_instrument(*bank, drums, 60, out, error) && out == 2);
+        CHECK(find_dls_instrument(*bank, drums, 40, out, error) && out == 1);
+        CHECK(!find_dls_instrument(*bank, drums, 51, out, error) && !out && !error.empty());
+        CHECK(find_dls_instrument(*bank, drums, 128, out, error) && out == 2);
+        drums.program = 99;
+        CHECK(find_dls_instrument(*bank, drums, 40, out, error) && out == 1);
+        drums.percussion = false;
+        CHECK(!find_dls_instrument(*bank, drums, 40, out, error) && !out);
+        drums.bank_msb = 128;
+        CHECK(!find_dls_instrument(*bank, drums, 40, out, error) && !out);
+        DlsSampler sampler;
+        const auto id = sampler.play_channel(bank, melodic, 60, 100, 1, 1, error);
+        CHECK(id && sampler.voices()[0].channel && sampler.voices()[0].instrument == 0);
+        melodic.program = 99;
+        CHECK(!sampler.play_channel(bank, melodic, 60, 100, 1, 1, error));
+        CHECK(sampler.rejected == 1 && sampler.voices().size() == 1 && sampler.voices()[0].id == id);
+        CHECK(sampler.voices()[0].channel->program == 57); // Owned, not borrowed mutable channel state.
+        CHECK(!sampler.play_channel(bank, {}, 128, 100, 1, 1, error));
+        CHECK(!sampler.play_channel({}, {}, 60, 100, 1, 1, error));
+        melodic.program = 57;
+        sampler.clear();
+        CHECK(sampler.play_channel(bank, melodic, 60, 100, 1, 1, error));
+        // The supplied channel may belong to a voice in the vector that play() grows.
+        for (unsigned i = 0; i < 16; ++i)
+        {
+            CHECK(sampler.play_channel(bank, *sampler.voices().front().channel, 60, 100, 1, 1, error));
+            CHECK(sampler.voices().back().channel->program == 57 &&
+                  sampler.voices().back().controllers == melodic.controllers);
+        }
+        sampler.clear();
+        auto ambiguous = bank->instruments[0];
+        ambiguous.bank |= 0x80; // Raw locale differs but legacy synth masks this reserved bit.
+        bank->instruments.push_back(ambiguous);
+        CHECK(!find_dls_instrument(*bank, melodic, 60, out, error) && !out);
+        bank->instruments.pop_back();
+        // Hash matches the bounded original DLL packing/lookup probe, including ignored bank bits.
+        std::uint64_t hash = 14695981039346656037ULL;
+        auto mix = [&](std::uint32_t value)
+        {
+            for (unsigned byte = 0; byte < 4; ++byte)
+            {
+                hash ^= std::uint8_t(value >> (8 * byte));
+                hash *= 1099511628211ULL;
+            }
+        };
+        for (std::uint32_t i = 0; i < 512; ++i)
+        {
+            DlsInstrument instrument;
+            instrument.bank = i * 0x1020305U;
+            instrument.program = (i * 37) & 127;
+            mix(dls_instrument_patch(instrument));
+        }
+        for (unsigned percussion = 0; percussion < 2; ++percussion)
+            for (unsigned program : {0U, 3U, 99U})
+                for (unsigned key : {0U, 39U, 40U, 50U, 51U, 59U, 60U, 70U, 71U, 127U, 128U})
+                {
+                    DlsMidiChannel c{1, 2, program, bool(percussion), {}};
+                    const bool found = find_dls_instrument(*bank, c, key, out, error);
+                    CHECK(found == bool(out));
+                    mix(out ? std::uint32_t(*out + 1) : 0);
+                }
+        std::cout << "Original routing fingerprint: " << hash << '\n';
+        CHECK(hash == 6386313400906083943ULL);
+        return true;
+    }
+    bool controllers()
+    {
+        std::string error;
+        auto bank = fixture();
+        bank->waves[0].samples.assign(4, 1);
+        DlsSampler sampler;
+        DlsControllers control{127, 127, 0};
+        CHECK(sampler.play(bank, 0, 60, 127, 1, 1, error, control));
+        std::vector<float> out(2);
+        CHECK(sampler.advance(1, out) && out[0] == 1 && out[1] == 0);
+        sampler.clear();
+        control = {64, 32, 127};
+        CHECK(sampler.play(bank, 0, 60, 127, 1, 1, error, control));
+        out.assign(2, 0);
+        CHECK(sampler.advance(1, out) && out[0] == 0 &&
+              near(out[1], std::pow(64.0 / 127, 2) * std::pow(32.0 / 127, 2)));
+        CHECK(sampler.voices()[0].controllers == control);
+        for (auto invalid : {DlsControllers{128, 127, 64}, DlsControllers{100, 128, 64}, DlsControllers{100, 127, 128}})
+            CHECK(!sampler.play(bank, 0, 60, 127, 1, 1, error, invalid));
+        CHECK(sampler.voices().size() == 1 && sampler.rejected == 3);
+        sampler.clear();
+        connection(*bank, 0, 4, 500);
+        control = {127, 127, 127};
+        CHECK(sampler.play(bank, 0, 60, 127, 1, 1, error, control));
+        CHECK(sampler.voices()[0].right == 1 && sampler.voices()[0].left == 0);
+        sampler.clear();
+        control.volume = 0;
+        const auto id = sampler.play(bank, 0, 60, 127, 1, 1, error, control);
+        CHECK(id);
+        out.assign(2, 0);
+        CHECK(sampler.advance(1, out) && out == std::vector<float>(2) && sampler.voices()[0].frames == 1);
+        const std::weak_ptr<const DlsBank> weak = bank;
+        bank.reset();
+        CHECK(!weak.expired() && sampler.release(id));
+        CHECK(sampler.advance(48000 * 21, {}) && sampler.voices().empty() && weak.expired());
+        std::cout << "Controller PCM endpoints, squared volume/expression, clamping, silence clock, failure atomicity "
+                     "and lifetime verified\n";
+        return true;
+    }
     bool private_data(const std::filesystem::path& root)
     {
         std::string error;
@@ -381,6 +507,8 @@ int main(int argc, char** argv)
                     : test == "envelopes"            ? envelopes()
                     : test == "lifetime"             ? lifetime()
                     : test == "legacy_pan"           ? legacy_pan()
+                    : test == "routing"              ? routing()
+                    : test == "controllers"          ? controllers()
                     : test == "private" && argc == 3 ? private_data(argv[2])
                                                      : false;
     return ok ? 0 : 1;

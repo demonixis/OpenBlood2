@@ -1,6 +1,7 @@
 #pragma once
 #include "engine/config.h"
 #include "engine/dls_bank.h"
+#include "engine/dls_sampler.h"
 #include "engine/ima_band.h"
 #include "engine/ima_cursor.h"
 #include "engine/ima_harmony.h"
@@ -25,6 +26,9 @@ namespace OpenBlood2
         std::string selected_band_file;
         std::array<ImaMidiSetup, 80> band_setup{}; // Prepared, not submitted to a MIDI device.
         bool band_setup_ready = false;
+        std::array<DlsMidiChannel, 16> band_channels{}; // Source order, MIDI channel (source+4)&15.
+        std::shared_ptr<const DlsBank> band_bank;       // Configured bank; collection labels never load files.
+        std::string band_bank_file, band_bank_error;
         std::shared_ptr<const ImaSection> section;
         std::shared_ptr<const ImaTimeline> timeline;
         std::shared_ptr<const ImaHarmony> harmony;

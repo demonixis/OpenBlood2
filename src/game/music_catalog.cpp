@@ -238,6 +238,39 @@ namespace OpenBlood2
             asset.selected_band = std::shared_ptr<const ImaBand>(source, &source->bands[asset.band_choice->index]);
             asset.selected_band_file = own ? asset.filename : style_file;
             asset.band_setup_ready = ima_band_setup(*asset.selected_band, asset.band_setup, asset.band_setup_error);
+            if (asset.band_setup_ready)
+            {
+                for (unsigned ch = 0; ch < 16; ++ch)
+                {
+                    const auto* setup = asset.band_setup.data() + ch * 5;
+                    asset.band_channels[ch] = {
+                        setup[2].data2, setup[3].data2, setup[4].data1, ch == 5, {setup[0].data2, 127, setup[1].data2}};
+                }
+                // The original InitInstruments plan supplies one DLS bank. This explicit
+                // diagnostic treats its decoded instruments as resident; download tracking
+                // and the OS GM collection remain separate, unavailable services.
+                const MusicAssetRecord* bank = nullptr;
+                for (const auto& candidate : assets)
+                    if (candidate.kind == MusicAssetKind::Instruments)
+                    {
+                        if (bank)
+                        {
+                            asset.band_bank_error = "Multiple configured DLS banks are unsupported";
+                            break;
+                        }
+                        bank = &candidate;
+                    }
+                if (asset.band_bank_error.empty())
+                {
+                    if (!bank || !bank->bank)
+                        asset.band_bank_error = "Configured DLS bank unavailable";
+                    else
+                    {
+                        asset.band_bank = bank->bank;
+                        asset.band_bank_file = bank->filename;
+                    }
+                }
+            }
         }
         // Bounded installed-file profile, not the historical general UUID/resource resolver.
         // Never turn a personality label into a directory or resolve it across music folders.

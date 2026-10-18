@@ -683,3 +683,5 @@ The [IMA grid-cursor continuation](../Documentation/Implementation/m2_music_curs
 
 
 The [IMA band-selection continuation](../Documentation/Implementation/m2_music_band_selection.md) connects original last-section-band priority and reverse-order marked style fallback. Read [contracts](docs/contracts/music_band_selection_contracts.md); preserve header-before-band guards, any-nonzero byte104, absent-default failure and immutable source ownership. Selection and controller-setup errors remain distinct. No live MIDI/soundtrack is claimed; remaining music services and M2 stay incomplete.
+
+The [original music routing continuation](../Documentation/Implementation/m2_music_routing.md) connects selected-band MIDI snapshots to DLS patch/key lookup and controller-aware diagnostic notes. Read [contracts](docs/contracts/music_routing_contracts.md); preserve packed-bank conversion, percussion-only fallback, missing/ambiguous failures, immutable bank ownership and note-on controller snapshots. Decoded instruments are treated as resident for this diagnostic; dynamic controllers, original transport/playlists and MUSIC remain unavailable. M2 stays incomplete.

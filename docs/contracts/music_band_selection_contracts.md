@@ -58,3 +58,5 @@ See [band data/setup](music_band_contracts.md),
 [verification](../../../Documentation/Implementation/m2_music_band_selection.md).
 Live tempo/transport, controller application and curves, DLS instrument routing,
 active-note lifetime, original playlists/transitions and M2 acceptance remain open.
+
+[Selected-band routing](music_routing_contracts.md) now applies these prepared values to owned diagnostic MIDI snapshots and the configured DLS bank. Automatic transport, residency and MUSIC remain unfinished.

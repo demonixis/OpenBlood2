@@ -158,6 +158,11 @@ namespace OpenBlood2
                             v.envelope_pitch, v.lfo_hz);
                 ImGui::Text("Constant pan %.3f (0.1%% units) | last destination %u | legacy record %s | L/R %.3f/%.3f",
                             v.pan, v.pan_destination, v.legacy_pan ? "yes" : "no", v.left, v.right);
+                ImGui::Text("Note-on CC7 %u / CC11 %u / CC10 %u", v.controllers.volume, v.controllers.expression,
+                            v.controllers.pan);
+                if (v.channel)
+                    ImGui::Text("MIDI bank %u:%u / program %u / percussion %s", v.channel->bank_msb,
+                                v.channel->bank_lsb, v.channel->program, v.channel->percussion ? "yes" : "no");
                 if (ImGui::SmallButton("Release note"))
                     sampler.release(v.id);
                 ImGui::PopID();
@@ -497,7 +502,7 @@ namespace OpenBlood2
             }
             ImGui::TreePop();
         }
-        if (ImGui::TreeNode("IMA bands (data and setup only)"))
+        if (ImGui::TreeNode("IMA bands and routed diagnostic notes"))
         {
             ImGui::TextWrapped(
                 "Style and section bands stay separate, in file order. Collection names are labels; "
@@ -519,6 +524,44 @@ namespace OpenBlood2
                                     asset.band_setup_ready ? "80 messages prepared, not sent" : "unavailable");
                         if (!asset.band_setup_error.empty())
                             ImGui::TextWrapped("%s", asset.band_setup_error.c_str());
+                        if (!asset.band_bank_error.empty())
+                            ImGui::TextWrapped("DLS route unavailable: %s", asset.band_bank_error.c_str());
+                        if (asset.band_bank && ImGui::TreeNode("Selected-band channel auditions"))
+                        {
+                            ImGui::TextWrapped("Configured bank %s; decoded instruments treated as resident. "
+                                               "A one-second midpoint note uses the band's CC7/CC10, expression 127, "
+                                               "velocity 100 and diagnostic gain 20%%. No playlist is running.",
+                                               asset.band_bank_file.c_str());
+                            for (unsigned ch = 0; ch < 16; ++ch)
+                            {
+                                ImGui::PushID(int(ch));
+                                const auto& channel = asset.band_channels[ch];
+                                ImGui::Text("Source %u -> MIDI %u | bank %u:%u program %u | volume %u pan %u%s", ch,
+                                            (ch + 4) & 15, channel.bank_msb, channel.bank_lsb, channel.program,
+                                            channel.controllers.volume, channel.controllers.pan,
+                                            channel.percussion ? " | percussion" : "");
+                                std::optional<std::size_t> instrument;
+                                std::string error;
+                                if (!find_dls_instrument(*asset.band_bank, channel, 128, instrument, error))
+                                    ImGui::TextWrapped("Unavailable: %s", error.c_str());
+                                else
+                                {
+                                    ImGui::Text("DLS instrument %zu", *instrument);
+                                    const auto& regions = asset.band_bank->instruments[*instrument].regions;
+                                    if (!regions.empty() && ImGui::SmallButton("Audition channel"))
+                                    {
+                                        const auto& region = regions.front();
+                                        game.server.audio.instruments.play_channel(
+                                            asset.band_bank, channel, (region.key_low + region.key_high) / 2,
+                                            std::clamp(100U, unsigned(region.velocity_low),
+                                                       unsigned(region.velocity_high)),
+                                            1, .2, error);
+                                    }
+                                }
+                                ImGui::PopID();
+                            }
+                            ImGui::TreePop();
+                        }
                     }
                     else
                         ImGui::TextWrapped("Selection unavailable: %s", asset.selected_band_error.c_str());

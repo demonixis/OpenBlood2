@@ -2,6 +2,7 @@
 #include "game/original/Music.h"
 #include "game/server_adapter.h"
 #include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 using namespace OpenBlood2;
@@ -290,6 +291,7 @@ namespace
               find_section()->band_choice->scope == ImaBandScope::Style &&
               find_section()->selected_band_file == "Shared.sty" && find_section()->band_setup_ready &&
               find_section()->band_setup[0].data2 == 80);
+        CHECK(!find_section()->band_bank && !find_section()->band_bank_error.empty());
         const std::weak_ptr<const ImaBand> old_selected = find_section()->selected_band;
         band_header[56] = 255; // Valid raw data and selection, invalid controller setup.
         CHECK(write(root / "Music/Test/SHARED.STY", style_with_band()));
@@ -439,6 +441,7 @@ namespace
         {
             CHECK(game.request_world(world, error));
             const auto& catalog = game.music_catalog;
+            unsigned routed_notes = 0, missing_routes = 0;
             std::cout << world << " music directory " << catalog.plan.directory
                       << " requests=" << catalog.plan.requests.size() << " files=" << catalog.assets.size()
                       << " bytes=" << catalog.bytes_read << " error=" << catalog.error << '\n';
@@ -480,6 +483,41 @@ namespace
                           asset.selected_band.get() == &asset.bands->bands.front() &&
                           asset.selected_band_error.empty() && asset.selected_band_file == asset.filename &&
                           asset.band_setup_ready && asset.band_setup_error.empty());
+                    CHECK(asset.band_bank == catalog.assets.front().bank && asset.band_bank &&
+                          asset.band_bank_error.empty() && asset.band_bank_file == catalog.assets.front().filename);
+                    for (unsigned ch = 0; ch < 16; ++ch)
+                    {
+                        const auto& route = asset.band_channels[ch];
+                        CHECK(route.controllers.volume == asset.band_setup[ch * 5].data2 &&
+                              route.controllers.pan == asset.band_setup[ch * 5 + 1].data2 &&
+                              route.controllers.expression == 127 &&
+                              route.bank_msb == asset.band_setup[ch * 5 + 2].data2 &&
+                              route.bank_lsb == asset.band_setup[ch * 5 + 3].data2 &&
+                              route.program == asset.band_setup[ch * 5 + 4].data1 && route.percussion == (ch == 5));
+                        std::optional<std::size_t> instrument;
+                        const bool found = find_dls_instrument(*asset.band_bank, route, 128, instrument, error);
+                        CHECK(found == (ch != 5));
+                        if (!found)
+                            ++missing_routes;
+                        if (found)
+                        {
+                            ++routed_notes;
+                            const auto& region = bank.instruments[*instrument].regions.front();
+                            DlsSampler sampler, hidden;
+                            const auto key = (region.key_low + region.key_high) / 2;
+                            CHECK(sampler.play_channel(asset.band_bank, route, key, 100, 1, .2, error));
+                            CHECK(hidden.play_channel(asset.band_bank, route, key, 100, 1, .2, error));
+                            CHECK(sampler.voices().back().controllers == route.controllers &&
+                                  sampler.voices().back().channel && sampler.voices().back().instrument == *instrument);
+                            std::vector<float> pcm(4800);
+                            CHECK(sampler.advance(2400, pcm) && hidden.advance(2400, {}));
+                            CHECK(sampler.voices().size() == hidden.voices().size());
+                            if (!sampler.voices().empty())
+                                CHECK(sampler.voices()[0].cursor == hidden.voices()[0].cursor);
+                            CHECK(std::all_of(pcm.begin(), pcm.end(), [](auto x) { return std::isfinite(x); }));
+                            CHECK(std::any_of(pcm.begin(), pcm.end(), [](auto x) { return x != 0; }));
+                        }
+                    }
                     selected_band_lifetime = asset.selected_band;
                     CHECK(asset.section && asset.section_error.empty() && asset.section->commands.size() == 1);
                     ImaSectionTiming timing;
@@ -530,6 +568,9 @@ namespace
                                                   cursor_asset.timeline, cursor_asset.harmony, cursor_seed, error));
             const std::array<std::uint16_t, 16> cursor_draws{};
             CHECK(game.music_catalog.cursor.step(cursor_draws, error));
+            std::cout << world << " band-routed notes=" << routed_notes
+                      << " missing percussion routes=" << missing_routes << '\n';
+            CHECK(routed_notes == 15 * missing_routes && missing_routes > 0);
             CHECK(game.unload_world() && game.music_catalog.personalities.empty() &&
                   game.music_catalog.assets.empty() && game.music_catalog.plan.requests.empty() &&
                   !game.music_catalog.cursor.active() && !game.music_catalog.cursor.last_step());

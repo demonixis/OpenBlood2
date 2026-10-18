@@ -144,7 +144,7 @@ namespace OpenBlood2
                 return false;
             }
             // DLS equal-power pan: CC10/127 plus the constant offset in 0.1 percent units.
-            const double position = std::clamp(64.0 / 127 + voice.pan / 1000, 0.0, 1.0);
+            const double position = std::clamp(voice.controllers.pan / 127.0 + voice.pan / 1000, 0.0, 1.0);
             voice.left = std::sqrt(1 - position);
             voice.right = std::sqrt(position);
             return true;
@@ -186,8 +186,77 @@ namespace OpenBlood2
             return v.frames > 0 && v.amplitude.sustain == 0 && time >= v.amplitude.attack + v.amplitude.decay;
         }
     } // namespace
+    std::uint32_t dls_instrument_patch(const DlsInstrument& instrument)
+    {
+        return instrument.program | ((instrument.bank & 0x7f) << 7) | ((instrument.bank & 0x7f00) << 6) |
+               (instrument.bank & 0x80000000);
+    }
+    bool find_dls_instrument(const DlsBank& bank, const DlsMidiChannel& channel, unsigned key,
+                             std::optional<std::size_t>& out, std::string& error)
+    {
+        out.reset();
+        error.clear();
+        if (key > 128 || channel.program > 127 || channel.bank_msb > 127 || channel.bank_lsb > 127 ||
+            bank.instruments.size() > 256)
+        {
+            error = "Invalid DLS MIDI route or instrument budget";
+            return false;
+        }
+        const auto patch = (channel.bank_msb << 14) | (channel.bank_lsb << 7) | channel.program |
+                           (channel.percussion ? 0x80000000U : 0U);
+        for (unsigned pass = 0; pass < (channel.percussion && patch != 0x80000000U ? 2U : 1U); ++pass)
+        {
+            const auto wanted = pass ? 0x80000000U : patch;
+            std::optional<std::size_t> candidate;
+            for (std::size_t i = 0; i < bank.instruments.size(); ++i)
+            {
+                const auto& instrument = bank.instruments[i];
+                if (dls_instrument_patch(instrument) != wanted)
+                    continue;
+                if (candidate || instrument.program > 127 || instrument.regions.size() > 4096)
+                {
+                    error = "Ambiguous DLS packed patch or invalid instrument";
+                    return false;
+                }
+                candidate = i;
+            }
+            if (candidate)
+            {
+                const auto& regions = bank.instruments[*candidate].regions;
+                if (key == 128 || std::any_of(regions.begin(), regions.end(), [&](const auto& region)
+                                              { return key >= region.key_low && key <= region.key_high; }))
+                {
+                    out = candidate;
+                    return true;
+                }
+            }
+        }
+        error = "No DLS instrument for this MIDI patch/key";
+        return false;
+    }
+    std::uint64_t DlsSampler::play_channel(std::shared_ptr<const DlsBank> bank, const DlsMidiChannel& channel,
+                                           unsigned key, unsigned velocity, double gate, double gain,
+                                           std::string& error)
+    {
+        std::optional<std::size_t> instrument;
+        if (!bank || key > 127 || !find_dls_instrument(*bank, channel, key, instrument, error))
+        {
+            if (!bank || key > 127)
+                error = "Invalid DLS MIDI note/bank";
+            last_error = error;
+            ++rejected;
+            return 0;
+        }
+        // channel may alias an existing voice; play() can reallocate that vector.
+        const auto snapshot = channel;
+        const auto id = play(std::move(bank), *instrument, key, velocity, gate, gain, error, snapshot.controllers);
+        if (id)
+            voices_.back().channel = snapshot;
+        return id;
+    }
     std::uint64_t DlsSampler::play(std::shared_ptr<const DlsBank> bank, std::size_t instrument, unsigned key,
-                                   unsigned velocity, double gate_seconds, double gain, std::string& error)
+                                   unsigned velocity, double gate_seconds, double gain, std::string& error,
+                                   DlsControllers controllers)
     {
         error.clear();
         auto fail = [&](std::string reason) -> std::uint64_t
@@ -198,7 +267,7 @@ namespace OpenBlood2
         };
         if (!bank || instrument >= bank->instruments.size() || key > 127 || velocity == 0 || velocity > 127 ||
             !std::isfinite(gate_seconds) || gate_seconds <= 0 || gate_seconds > 10 || !std::isfinite(gain) ||
-            gain < 0 || gain > 1)
+            gain < 0 || gain > 1 || controllers.volume > 127 || controllers.expression > 127 || controllers.pan > 127)
             return fail("Invalid DLS diagnostic note request");
         if (voices_.size() >= max_voices || next_id_ == std::numeric_limits<std::uint64_t>::max())
             return fail("DLS voice/identity limit reached");
@@ -231,6 +300,7 @@ namespace OpenBlood2
         v.region = selected;
         v.key = key;
         v.velocity = velocity;
+        v.controllers = controllers;
         // DirectMusic DMUS_REGION documents a local articulation, with global fallback only if absent.
         // This also supports the installed banks' melodic per-region art1 records.
         if (!configure(region.articulation.present ? region.articulation : inst.articulation, v, error))
@@ -242,7 +312,8 @@ namespace OpenBlood2
         // DLS 1.1 errata: signed centibel values are gain, capped at unity.
         const double sample_gain =
             sample.attenuation == zero_time ? 0 : std::pow(10.0, std::min(0.0, sample.attenuation / fixed) / 200);
-        v.gain = gain * sample_gain * std::pow(velocity / 127.0, 2) * std::pow(100.0 / 127, 2);
+        v.gain = gain * sample_gain * std::pow(velocity / 127.0, 2) * std::pow(controllers.volume / 127.0, 2) *
+                 std::pow(controllers.expression / 127.0, 2);
         v.gate = std::max<std::uint64_t>(1, std::uint64_t(std::llround(gate_seconds * rate)));
         v.bank = std::move(bank);
         v.id = next_id_++;

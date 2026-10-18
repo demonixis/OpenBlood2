@@ -146,9 +146,29 @@ namespace OpenBlood2
         if (!note || !note_error.empty() || !sampler.voices().back().legacy_pan || sampler.voices().back().pan != 6 ||
             sampler.voices().back().pan_destination != 4)
             return false;
+        const MusicAssetRecord* routed = nullptr;
+        for (const auto& asset : music.assets)
+            if (asset.kind == MusicAssetKind::Section && asset.band_bank)
+            {
+                routed = &asset;
+                break;
+            }
+        if (!routed || routed->band_bank != music.assets.front().bank || !routed->band_bank_error.empty())
+            return false;
+        const auto& channel = routed->band_channels[0];
+        std::optional<std::size_t> instrument;
+        if (!find_dls_instrument(*routed->band_bank, channel, 128, instrument, note_error))
+            return false;
+        const auto& routed_region = routed->band_bank->instruments[*instrument].regions.front();
+        const auto routed_note = sampler.play_channel(
+            routed->band_bank, channel, (routed_region.key_low + routed_region.key_high) / 2, 100, 1, .2, note_error);
+        if (!routed_note || sampler.voices().back().controllers != channel.controllers ||
+            !sampler.voices().back().channel)
+            return false;
         const auto before_note = g.server.audio.submitted_frames;
-        if (!g.server.advance_audio(.02, {}, {}) || sampler.voices().size() != 1 || sampler.voices()[0].frames != 960 ||
-            g.server.audio.submitted_frames <= before_note || !sampler.release(note))
+        if (!g.server.advance_audio(.02, {}, {}) || sampler.voices().size() != 2 || sampler.voices()[0].frames != 960 ||
+            sampler.voices()[1].frames != 960 || g.server.audio.submitted_frames <= before_note ||
+            !sampler.release(note) || !sampler.release(routed_note))
             return false;
         if (!g.server.advance_audio(4, {}, {}) || !sampler.voices().empty() || sampler.completed == 0)
             return false;
