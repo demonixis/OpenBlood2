@@ -5,9 +5,33 @@
 
 namespace OpenBlood2
 {
-    enum class MenuPage { Main, Solo, Character, Difficulty, Options, Audio, Mouse, Save, Load, Quit };
-    enum class MenuAction { None, Resume, NewGame, Quit, Settings };
-    enum class MenuCue { Select, Enter, Back };
+    enum class MenuPage
+    {
+        Main,
+        Solo,
+        Character,
+        Difficulty,
+        Options,
+        Audio,
+        Mouse,
+        Save,
+        Load,
+        Quit
+    };
+    enum class MenuAction
+    {
+        None,
+        Resume,
+        NewGame,
+        Quit,
+        Settings
+    };
+    enum class MenuCue
+    {
+        Select,
+        Enter,
+        Back
+    };
     struct MenuCommand
     {
         MenuAction action = MenuAction::None;
@@ -43,7 +67,10 @@ namespace OpenBlood2
         void activate();
         void adjust(int direction);
         void pointer(float x, float y, bool press, bool release, bool motion);
-        void cancel_pointer() { pressed_ = -1; }
+        void cancel_pointer()
+        {
+            pressed_ = -1;
+        }
         MenuCommand take_command();
         bool active = false, in_world = false, alive = true;
         MenuPage page = MenuPage::Main;
@@ -57,6 +84,7 @@ namespace OpenBlood2
         std::uint64_t revision = 0;
         bool small() const;
         const char* title() const;
+
       private:
         void AddLargeTextItemOption(unsigned string_id, int command);
         void setting(unsigned string_id, int id);
@@ -80,6 +108,7 @@ namespace OpenBlood2
         HudSurface* surface = nullptr;
         StringResources strings;
         std::uint64_t revision = 0;
+
       private:
         const Resources& resources_;
         HudFont small_, normal_, selected_, disabled_;
@@ -89,4 +118,4 @@ namespace OpenBlood2
         std::map<std::string, const HudSurface*> titles_;
         std::uint64_t composed_ = UINT64_MAX;
     };
-}
+} // namespace OpenBlood2

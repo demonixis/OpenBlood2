@@ -295,6 +295,8 @@ namespace OpenBlood2
         const float norm = vector_dot(rotation.m_Vec, rotation.m_Vec) + rotation.m_Spin * rotation.m_Spin;
         if (!std::isfinite(norm) || std::abs(norm - 1) > 0.001f)
             return false;
+        if (paused_)
+            return true;
         const double total = seconds * rate + remainder_;
         const auto frames = std::uint64_t(std::floor(total + 1e-8));
         remainder_ = std::max(0.0, total - double(frames));
@@ -443,7 +445,7 @@ namespace OpenBlood2
         audio_initialized_ = true;
         SDL_AudioSpec spec{SDL_AUDIO_F32, 2, int(rate)};
         output_ = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, nullptr, nullptr);
-        if (!output_ || !SDL_ResumeAudioStreamDevice(output_))
+        if (!output_ || (!paused_ && !SDL_ResumeAudioStreamDevice(output_)))
         {
             error = output_error = SDL_GetError();
             if (output_)
@@ -454,6 +456,17 @@ namespace OpenBlood2
             return false;
         }
         output_error.clear();
+        return true;
+    }
+    bool AudioMixer::pause_output(bool paused, std::string& error)
+    {
+        if (paused == paused_) return true;
+        if (output_ && !(paused ? SDL_PauseAudioStreamDevice(output_) : SDL_ResumeAudioStreamDevice(output_)))
+        {
+            error = output_error = SDL_GetError();
+            return false;
+        }
+        paused_ = paused;
         return true;
     }
     bool AudioMixer::transfer_output_to(AudioMixer& destination, std::string& error)
@@ -473,6 +486,7 @@ namespace OpenBlood2
         destination.output_ = output_;
         destination.audio_initialized_ = audio_initialized_;
         destination.inspect_pcm = inspect_pcm;
+        destination.paused_ = paused_;
         output_ = nullptr;
         audio_initialized_ = false;
         return true;

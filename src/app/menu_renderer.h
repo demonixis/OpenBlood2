@@ -11,10 +11,11 @@ namespace OpenBlood2
         MenuRenderer(const MenuRenderer&) = delete;
         MenuRenderer& operator=(const MenuRenderer&) = delete;
         bool draw(MenuCanvas&, std::string& error);
+
       private:
         SDL_GPUDevice* device_;
         SDL_GPUTexture* texture_ = nullptr;
         SDL_GPUTransferBuffer* transfer_ = nullptr;
         std::uint64_t uploaded_ = 0;
     };
-}
+} // namespace OpenBlood2

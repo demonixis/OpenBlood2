@@ -1,5 +1,6 @@
 #include "ai_model_key_smoke.h"
 #include "app/bench.h"
+#include "app/frontend.h"
 #include "app/hud.h"
 #include "app/movement_controls.h"
 #include "app/scene_presenter.h"
@@ -1839,5 +1840,7 @@ int main(int argc, char** argv)
             return 5;
         return 0;
     }
+    if (!options.gpu_smoke && !options.world_smoke)
+        return OpenBlood2::run_frontend(options, config, data);
     return run(options, config, data);
 }

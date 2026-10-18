@@ -35,3 +35,29 @@ Foundation tests cover navigation, commands, pointer cancellation, viewport mapp
 F10/repeat/input isolation, font bounds and all real menu artwork. Application pause,
 new-game replacement, profiles, preferences and menu audio are subsequent steps;
 this foundation alone does not claim them operational.
+
+## UI-M1/UI-M2 application integration
+
+Normal launch now enters the main menu, without constructing a playable world.
+`--view-world` retains direct startup; headless/smoke/benchmark dispatch is unchanged.
+F10 opens the inspector only when built/enabled; menus also run without it.
+Esc opens the opaque root and returns through parents. Inspector input has priority.
+Focus loss cancels pending input and pauses an active game. Menus skip simulation,
+level replacement and scene preparation entirely; the application clock still ticks.
+The game SDL stream is paused independently of the menu mixer. No zero-delta game
+update is used. AudioMixer also refuses cursor advancement while paused.
+
+Menu ambience and select/enter/back cues use original files and an application-owned
+mixer; the ambience has independent randomness and survives submenu changes.
+Failures are logged/counted; no synthetic successful playback is substituted.
+
+New-game requests execute after event dispatch. A prepared stable-address session
+owns destination objects, original globals and resources before promotion. Failure
+restores the source binding and globals; success transfers the SDL output and
+retires the old owner under its own globals. UI-M2 intentionally uses Caleb/medium
+for both paths. The later UI-M3 replaces that temporary selection policy.
+
+`menus.session` checks real source entry, failed replacement retention, successful
+replacement, independent menu cursor advancement and paused game output. NVIDIA
+normal-launch capture exercises the application frontend; this is not a human
+playthrough or native macOS qualification.

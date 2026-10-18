@@ -67,6 +67,11 @@ namespace OpenBlood2
         AudioMixer& operator=(const AudioMixer&) = delete;
         ~AudioMixer();
         bool open_output(std::string& error);
+        bool pause_output(bool paused, std::string& error);
+        bool paused() const
+        {
+            return paused_;
+        }
         bool transfer_output_to(AudioMixer& destination, std::string& error);
         bool has_output() const
         {
@@ -109,5 +114,6 @@ namespace OpenBlood2
         double remainder_ = 0;
         SDL_AudioStream* output_ = nullptr;
         bool audio_initialized_ = false;
+        bool paused_ = false;
     };
 } // namespace OpenBlood2
