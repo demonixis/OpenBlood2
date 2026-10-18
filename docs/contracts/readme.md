@@ -76,6 +76,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Original SoulDrudge](souldrudge_contracts.md)
 - [Original ShikariAI](shikari_contracts.md)
 - [Original MadScientistAI](madscientist_contracts.md)
+- [Original Tchernotronic](tchernotronic_contracts.md)
 - [Original Spawner](spawner_contracts.md)
 - [Original world-model debris](world_debris_contracts.md)
 - [Keyframed translating world models](worldpath_contracts.md)

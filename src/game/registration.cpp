@@ -22,6 +22,7 @@
 #include "game/original/SoulDrudge.h"
 #include "game/original/ShikariAI.h"
 #include "game/original/MadScientistAI.h"
+#include "game/original/Tchernotronic.h"
 #include "game/original/FlareProjectile.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Gib.h"
@@ -200,6 +201,14 @@ namespace OpenBlood2
                                        {"RepeatY", std::int32_t(1)},
                                        {"SpacingX", 0.0f},
                                        {"SpacingY", 0.0f}}};
+        // Original BEGIN_CLASS(Tchernotronic): hidden Technoberg model/skin, destroy trigger.
+        const ClassInfo tchernotronic{"Tchernotronic",
+                                      &b2base,
+                                      construct<Tchernotronic>,
+                                      {{"Filename", std::string("Models\\WorldObjects\\Technoberg.abc")},
+                                       {"Skin", std::string("Skins\\WorldObjects\\Technoberg.dtx")},
+                                       {"DestroyTriggerTarget", std::string{}},
+                                       {"DestroyTriggerMessage", std::string{}}}};
         const ClassInfo trip_laser{"TripLaser",
                                    &b2base,
                                    construct<TripLaser>,
@@ -997,7 +1006,8 @@ namespace OpenBlood2
                objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
                objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
                objects.register_class(sound_fx) && objects.register_class(detail_sprite) &&
-               objects.register_class(spawner) && objects.register_class(trip_laser) && objects.register_class(sound) && objects.register_class(keyframer) &&
+               objects.register_class(spawner) && objects.register_class(trip_laser) &&
+               objects.register_class(tchernotronic) && objects.register_class(sound) && objects.register_class(keyframer) &&
                objects.register_class(key) && objects.register_class(start) && objects.register_class(game_start) &&
                objects.register_class(path) && objects.register_class(world_properties) &&
                objects.register_class(smell) && objects.register_class(exit_hint) &&
