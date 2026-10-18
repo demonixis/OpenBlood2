@@ -78,11 +78,11 @@ namespace OpenBlood2
                     std::copy_n(src.rgba.begin() + s, 4, dst.rgba.begin() + d);
             }
     }
-    bool HudFont::read_widths(std::span<const std::uint8_t> b, const HudSurface& bitmap, std::string& error)
+    bool HudFont::read_widths(std::span<const std::uint8_t> b, const HudSurface& bitmap, std::string& error, unsigned terminal_overhang)
     {
         *this = {};
         error = "FNT: expected height and 94 bounded little-endian glyph widths";
-        if (b.size() != 190)
+        if (b.size() != 190 || terminal_overhang > 1)
             return false;
         auto word = [&](unsigned p) { return unsigned(b[p]) | (unsigned(b[p + 1]) << 8); };
         HudFont result;
@@ -93,10 +93,10 @@ namespace OpenBlood2
         {
             result.widths[i] = word(2 + i * 2);
             result.offsets[i + 1] = result.offsets[i] + result.widths[i];
-            if (result.offsets[i + 1] > bitmap.width)
+            if (result.offsets[i + 1] > bitmap.width + (i == 93 ? terminal_overhang : 0))
                 return false;
         }
-        if (result.offsets[94] != bitmap.width)
+        if (result.offsets[94] < bitmap.width || result.offsets[94] > bitmap.width + terminal_overhang)
             return false;
         result.surface = &bitmap;
         *this = result;
@@ -196,7 +196,7 @@ namespace OpenBlood2
         if (d && s)
             hud_blit(*d, *s, r, x, y, true, key);
     }
-    bool HudCanvas::load_font(const char* bitmap, const char* widths, HudFont& font)
+    bool HudCanvas::load_font(const char* bitmap, const char* widths, HudFont& font, unsigned terminal_overhang)
     {
         auto* image = CreateSurfaceFromBitmap(bitmap);
         if (!image)
@@ -208,6 +208,6 @@ namespace OpenBlood2
             error = std::string("Missing/invalid FNT: ") + widths;
             return false;
         }
-        return resources_.read(widths, bytes, error) && font.read_widths(bytes, *image, error);
+        return resources_.read(widths, bytes, error) && font.read_widths(bytes, *image, error, terminal_overhang);
     }
 } // namespace OpenBlood2

@@ -22,7 +22,7 @@ namespace OpenBlood2
         unsigned height = 0;
         std::array<unsigned, 95> offsets{};
         std::array<unsigned, 94> widths{};
-        bool read_widths(std::span<const std::uint8_t>, const HudSurface&, std::string&);
+        bool read_widths(std::span<const std::uint8_t>, const HudSurface&, std::string&, unsigned terminal_overhang = 0);
         void draw(HudSurface&, std::string_view, int x, int y, unsigned justify) const;
     };
     // Typed CPU surface service; no legacy client ABI.
@@ -37,7 +37,7 @@ namespace OpenBlood2
         void DrawSurfaceToSurface(HudSurface*, const HudSurface*, const HudRect*, int x, int y);
         void DrawSurfaceToSurfaceTransparent(HudSurface*, const HudSurface*, const HudRect*, int x, int y,
                                              std::uint32_t key);
-        bool load_font(const char* bitmap, const char* widths, HudFont&);
+        bool load_font(const char* bitmap, const char* widths, HudFont&, unsigned terminal_overhang = 0);
         std::string error;
         const auto& images() const
         {

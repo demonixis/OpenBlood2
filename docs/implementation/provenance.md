@@ -1418,3 +1418,7 @@ The original ClientShellDLL/Music.cpp request matrix is adapted into a pure sele
 The [session-cost audit](../../../Documentation/Implementation/m2_session_cost.md) removes temporary trace-name allocations and zero-depth audio modulation work. Read [contracts](../contracts/session_cost_contracts.md); preserve owned counters, exact scalar PCM/cursor progression and all existing session/test deadlines. The full M2 acceptance review and runtime-start guard remain open.
 
 The [M2 acceptance review](../../../Documentation/Implementation/m2_acceptance.md) changes no original rule or import. It retains the exact blood-impact sound request in inspection and strengthens the selected route audit; see [source ledger](sources/m2_acceptance_sources.json).
+
+## Original menu frontend (2026-10-18)
+
+Selective original menu construction and command identifiers with typed replacement controls. See [source ledger](sources/original_menu_sources.json), [contracts](../contracts/menu_contracts.md) and [validation](../../../Documentation/Implementation/original_menus.md). Commercial images, fonts, strings and audio remain external.

@@ -1,0 +1,135 @@
+#include "app/menu_renderer.h"
+#include "app/menu_input.h"
+#include "app/ui_runtime.h"
+#include "engine/capture.h"
+#include "game/original/MenuIds.h"
+#include <imgui.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_sdlgpu3.h>
+#include <iostream>
+using namespace OpenBlood2;
+#define CHECK(x) do { if (!(x)) { std::cerr << __LINE__ << ": " #x << " " << error << '\n'; return false; } } while(false)
+namespace
+{
+    bool state()
+    {
+        std::string error;
+        Menu menu;
+        menu.open(false);
+        CHECK(menu.items.size()==5 && menu.items[0].string_id==IDS_MENU_MAIN_SINGLEPLAYER);
+        menu.back(); CHECK(menu.active && menu.take_command().action==MenuAction::None);
+        menu.activate(); CHECK(menu.page==MenuPage::Solo && menu.items.size()==5);
+        menu.selected=0; menu.activate(); CHECK(menu.page==MenuPage::Difficulty && menu.selected==1);
+        menu.activate(); const auto start=menu.take_command();
+        CHECK(start.action==MenuAction::NewGame && start.character==0 && start.story && start.difficulty==1);
+        CHECK(menu.take_command().action==MenuAction::None);
+        menu.back(); menu.selected=1; menu.activate();
+        CHECK(menu.page==MenuPage::Character);
+        for (int i=0; i<4; ++i)
+        {
+            menu.build(MenuPage::Character); menu.selected=i; menu.activate(); menu.selected=2; menu.activate();
+            auto command=menu.take_command();
+            CHECK(command.action==MenuAction::NewGame && !command.story && command.difficulty==2);
+            CHECK(command.character==unsigned(i==1 ? 3 : i==3 ? 1 : i));
+        }
+        menu.open(true);
+        menu.items[0].rect={100,100,300,140};
+        menu.pointer(120,110,false,true,false); CHECK(menu.page==MenuPage::Main);
+        menu.pointer(120,110,true,false,false);
+        menu.pointer(500,110,false,true,false); CHECK(menu.page==MenuPage::Main);
+        menu.pointer(120,110,true,false,false); menu.cancel_pointer();
+        menu.pointer(120,110,false,true,false); CHECK(menu.page==MenuPage::Main);
+        menu.pointer(120,110,true,false,false); menu.pointer(120,110,false,true,false);
+        CHECK(menu.page==MenuPage::Solo);
+        menu.back(); menu.back(); CHECK(!menu.active && menu.take_command().action==MenuAction::Resume);
+        menu.open(false); menu.selected=4; menu.activate(); CHECK(menu.page==MenuPage::Quit && menu.selected==1);
+        menu.activate(); CHECK(menu.page==MenuPage::Main && menu.take_command().action==MenuAction::None);
+        menu.selected=4; menu.activate(); menu.selected=0; menu.activate(); CHECK(menu.take_command().action==MenuAction::Quit);
+        menu.build(MenuPage::Save); CHECK(menu.items.size()==8);
+        for (int i=0; i<8; ++i) { menu.selected=i; menu.activate(); CHECK(menu.take_command().action==MenuAction::None); }
+        menu.build(MenuPage::Load); CHECK(menu.items.size()==10);
+        menu.build(MenuPage::Audio); menu.selected=1; menu.adjust(-1);
+        CHECK(menu.settings.sound_volume==45 && menu.take_command().action==MenuAction::Settings);
+        menu.selected=0; menu.adjust(1); menu.selected=1; menu.adjust(-1); CHECK(menu.settings.sound_volume==45);
+        menu.build(MenuPage::Mouse); menu.selected=0;
+        for (int i=0; i<100; ++i) menu.adjust(-1);
+        CHECK(menu.settings.sensitivity==100);
+        for (int i=0; i<100; ++i) menu.adjust(1);
+        CHECK(menu.settings.sensitivity==1500);
+        auto fit=MenuViewport::fit(1920,1080); float x=240,y=0;
+        CHECK(fit.point(x,y) && x==0 && y==0);
+        x=200; y=20; CHECK(!fit.point(x,y));
+        fit=MenuViewport::fit(320,240); x=90; y=70; CHECK(fit.point(x,y) && x==180 && y==140);
+        MenuInput input; input.controls.focused=true; menu.open(true);
+        SDL_Event key{}; key.type=SDL_EVENT_KEY_DOWN; key.key.windowID=42; key.key.scancode=SDL_SCANCODE_F10;
+        CHECK(!input.event(key,42,menu,true,true,true,640,480) && input.inspector && menu.active);
+        key.key.repeat=true; input.event(key,42,menu,true,true,true,640,480); CHECK(input.inspector);
+        key.key.repeat=false; input.event(key,42,menu,true,true,true,640,480); CHECK(!input.inspector && menu.active);
+        key.key.scancode=SDL_SCANCODE_ESCAPE; input.event(key,42,menu,true,true,true,640,480);
+        CHECK(!menu.active && input.controls.mouse_requested);
+        key.key.scancode=SDL_SCANCODE_W; input.event(key,42,menu,true,true,true,640,480);
+        CHECK(input.controls.sample(false).forward);
+        key.key.scancode=SDL_SCANCODE_F10; input.event(key,42,menu,true,true,true,640,480);
+        CHECK(input.inspector && !input.controls.sample(false).forward && !input.controls.mouse_requested);
+        key.key.scancode=SDL_SCANCODE_F; CHECK(input.event(key,42,menu,true,true,true,640,480));
+        CHECK(!input.controls.sample_fire(false).primary);
+        HudSurface bitmap{1,1,std::vector<std::uint8_t>(4)}; HudFont font;
+        std::vector<std::uint8_t> widths(190); widths[0]=1; widths[188]=2;
+        CHECK(!font.read_widths(widths,bitmap,error));
+        CHECK(font.read_widths(widths,bitmap,error,1));
+        widths[188]=3; CHECK(!font.read_widths(widths,bitmap,error,1));
+        widths[188]=0; widths[2]=2; CHECK(!font.read_widths(widths,bitmap,error,1));
+        Resources missing; MenuCanvas canvas(missing); CHECK(!canvas.initialize(error) && !error.empty());
+        return true;
+    }
+    bool artwork(const std::filesystem::path& content, bool gpu, const std::filesystem::path& output)
+    {
+        std::string error;
+        Resources resources; Config config; config.data_dir=content;
+        CHECK(resources.mount_game(config,error));
+        Menu menu; menu.open(true); MenuCanvas canvas(resources);
+        CHECK(canvas.initialize(error));
+        Runtime runtime;
+        if (gpu) CHECK(runtime.initialize(true,error));
+        std::unique_ptr<UiRuntime> ui;
+        std::unique_ptr<MenuRenderer> renderer;
+        if (gpu)
+        {
+            ui=std::make_unique<UiRuntime>(runtime); CHECK(ui->initialize(error));
+            renderer=std::make_unique<MenuRenderer>(runtime.gpu);
+            std::cout << "GPU: " << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu), SDL_PROP_GPU_DEVICE_NAME_STRING,"unknown") << '\n';
+            std::filesystem::create_directories(output);
+        }
+        for (unsigned page=0; page<=unsigned(MenuPage::Quit); ++page)
+        {
+            menu.build(MenuPage(page));
+            CHECK(canvas.compose(menu,0,error));
+            const auto rev=canvas.revision; CHECK(canvas.compose(menu,0,error) && canvas.revision==rev);
+            CHECK(canvas.surface->rgba.size()==640*480*4);
+            for (const auto& item:menu.items) CHECK(item.rect.bottom<=425 && item.rect.right<=625);
+            if (!gpu) continue;
+            SDL_Event event; while(SDL_PollEvent(&event)) ImGui_ImplSDL3_ProcessEvent(&event);
+            ImGui_ImplSDLGPU3_NewFrame(); ImGui_ImplSDL3_NewFrame(); ImGui::NewFrame();
+            CHECK(renderer->draw(canvas,error)); ImGui::Render();
+            auto* commands=SDL_AcquireGPUCommandBuffer(runtime.gpu); CHECK(commands);
+            SDL_GPUTexture* swapchain=nullptr; Uint32 w=0,h=0;
+            CHECK(SDL_WaitAndAcquireGPUSwapchainTexture(commands,runtime.window,&swapchain,&w,&h) && swapchain);
+            Capture capture; CHECK(capture.initialize(runtime.gpu,SDL_GetGPUSwapchainTextureFormat(runtime.gpu,runtime.window),w,h));
+            ImGui_ImplSDLGPU3_PrepareDrawData(ImGui::GetDrawData(),commands);
+            SDL_GPUColorTargetInfo color{}; color.texture=capture.texture; color.load_op=SDL_GPU_LOADOP_CLEAR; color.store_op=SDL_GPU_STOREOP_STORE;
+            auto* pass=SDL_BeginGPURenderPass(commands,&color,1,nullptr); CHECK(pass);
+            ImGui_ImplSDLGPU3_RenderDrawData(ImGui::GetDrawData(),commands,pass); SDL_EndGPURenderPass(pass);
+            CHECK(capture.enqueue(commands,swapchain,w,h)); CHECK(SDL_SubmitGPUCommandBuffer(commands));
+            CHECK(capture.save(path_text(output/("menu-"+std::to_string(page)+".png")).c_str()));
+        }
+        return true;
+    }
+}
+int main(int argc,char** argv)
+{
+    if(argc<2) return 2;
+    const std::string mode=argv[1];
+    if(mode=="state") return state()?0:1;
+    if(argc<3) return 2;
+    return artwork(path_from_utf8(argv[2]),mode=="gpu",argc>3?path_from_utf8(argv[3]):std::filesystem::path{})?0:1;
+}

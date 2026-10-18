@@ -1,5 +1,7 @@
 # Service contracts
 
+- [Original menu frontend](menu_contracts.md)
+
 - [Original default crosshair](crosshair_contracts.md)
 
 - [Original PCX player statistics HUD](original_hud_contracts.md)

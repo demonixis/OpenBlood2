@@ -1,0 +1,60 @@
+{
+  "baseline": "bb98fd74f214c4b43abee7f96c4ce38c8f5a6174",
+  "source": "sources/blood2",
+  "files": [
+    {
+      "path": "ClientShellDLL/MainMenus.cpp",
+      "sha256": "8ee76af4b06a037093e04df5e3be33cdab6d03f49018884d5385a429b270db07"
+    },
+    {
+      "path": "ClientShellDLL/MenuMain.cpp",
+      "sha256": "5333fe0cc6a98782b9c1695d075556fd9f23f3ba8edfe8b279ab2c9aef3a0f5a"
+    },
+    {
+      "path": "ClientShellDLL/MenuSinglePlayer.cpp",
+      "sha256": "a9fa9fa9c0fdbcc0372ee76a64662bc9892c0df2a840c969e72472c96e861cd3"
+    },
+    {
+      "path": "ClientShellDLL/MenuCharacterSelect.cpp",
+      "sha256": "a4eb57a1d7b271695c1d449b87647c86a21b2db5cda3542738721d2d9f5b135a"
+    },
+    {
+      "path": "ClientShellDLL/MenuDifficulty.cpp",
+      "sha256": "ff8c3eedfedd127586b4bdc1d7c091f8cac6b31865f3ed1244e9f89ca7caa2f6"
+    },
+    {
+      "path": "ClientShellDLL/MenuOptions.cpp",
+      "sha256": "4338c381cce6f2b835be51549c92428b482fe7c00f16104910990265f9fdeab1"
+    },
+    {
+      "path": "ClientShellDLL/MenuSound.cpp",
+      "sha256": "b700999dc6a899bfc0f6b4c7493032b6ca2bf3b0eef659961db5e92860ab4e21"
+    },
+    {
+      "path": "ClientShellDLL/MenuMouse.cpp",
+      "sha256": "25fb721cc12f5fa788972ef4e071040e89dd667091ad37a2cc099afe2458a4f9"
+    },
+    {
+      "path": "ClientShellDLL/MenuSaveGame.cpp",
+      "sha256": "41da1643b9207515e7ba1e4a969a75f830add7c376bc9ef756db3af83dcb607a"
+    },
+    {
+      "path": "ClientShellDLL/MenuLoadGame.cpp",
+      "sha256": "bafc7838f399e39441b11c869623397fdad474ffd0d8f763ee83d889f1834039"
+    },
+    {
+      "path": "ClientShellDLL/MenuCommands.h",
+      "sha256": "e90a35aa88f76862d5b7bf5d5fcaf51e27be99c83b4761bef6c443962e8cf6ae"
+    },
+    {
+      "path": "Shared/ClientRes.h",
+      "sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b"
+    }
+  ],
+  "adaptations": [
+    "Typed menu/control service replaces unavailable binary LTGUI implementation; original Build ordering and identifiers retained.",
+    "Mouse picking, viewport scaling and independent menu lifetime are replacement services.",
+    "mm_font.fnt final glyph advances one pixel beyond the 1345-pixel bitmap; bounded final-glyph overhang only.",
+    "Quarter-height spacing replaces the unavailable CoolFont space implementation; not retail pixel equivalence."
+  ]
+}

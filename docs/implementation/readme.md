@@ -1,5 +1,7 @@
 # Implementation records
 
+- [Original menu validation](../../../Documentation/Implementation/original_menus.md)
+
 - [Original crosshair validation](../../../Documentation/Implementation/crosshair.md)
 
 - [Original statistics HUD validation](../../../Documentation/Implementation/original_hud.md)
