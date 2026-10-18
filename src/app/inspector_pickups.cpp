@@ -2,6 +2,7 @@
 #include "game/original/AI_Mgr.h"
 #include "game/original/AmmoPickups.h"
 #include "game/original/HandWeaponModel.h"
+#include "game/original/Spawner.h"
 #include <imgui.h>
 namespace OpenBlood2
 {
@@ -131,11 +132,28 @@ namespace OpenBlood2
             if (!v.sound_error.empty())
                 ImGui::TextWrapped("Audio failure: %s", v.sound_error.c_str());
         }
-        ImGui::SeparatorText("Destruction spawns / latest 32");
+        ImGui::SeparatorText("Destruction and Spawner spawns / latest 32");
         for (const auto& v : game.server.spawn_reports)
         {
             ImGui::TextWrapped("%s -> %s: %s", v.source.c_str(), v.request.c_str(), v.outcome.c_str());
             ImGui::Text("Child currently %s", game.server.IsObjectAlive(v.child) ? "alive" : "absent");
+        }
+        ImGui::SeparatorText("Original Spawners");
+        for (auto id : game.objects.snapshot())
+        {
+            const auto* r = game.objects.get(id);
+            const auto* s = r ? dynamic_cast<const Spawner*>(r->game.get()) : nullptr;
+            if (!s)
+                continue;
+            ImGui::TextWrapped("%s: \"%s\" | count %u | rate %.2f | %s", r->state.m_Name, s->m_hstrSpawnObject.c_str(),
+                               s->m_dwRespawnCount, s->m_fRespawnRate, r->scheduled ? "scheduled" : "idle");
+            ImGui::Text("  triggers %llu / attempts %llu / spawned %llu / failed %llu / rift unavailable %llu",
+                        static_cast<unsigned long long>(s->triggers),
+                        static_cast<unsigned long long>(s->spawn_attempts), static_cast<unsigned long long>(s->spawned),
+                        static_cast<unsigned long long>(s->spawn_failures),
+                        static_cast<unsigned long long>(s->rift_unavailable));
+            if (!s->error.empty())
+                ImGui::TextWrapped("  %s", s->error.c_str());
         }
         ImGui::SeparatorText("NPC weapon drops");
         for (auto id : game.objects.snapshot())

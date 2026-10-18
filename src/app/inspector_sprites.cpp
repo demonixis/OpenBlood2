@@ -1,3 +1,4 @@
+#include "game/original/BuiltinSprite.h"
 #include "game/original/DetailSprite.h"
 #include "inspector.h"
 #include <algorithm>
@@ -6,7 +7,8 @@ namespace OpenBlood2
 {
     void Inspector::draw_sprites(GameSession& game, ObjectSelection& selection)
     {
-        ImGui::TextWrapped("Original DetailSprite placement and SPR clock; decoded DTX alpha on world-depth quads. "
+        ImGui::TextWrapped("Original DetailSprite and built-in Sprite objects, SPR clock; decoded DTX alpha on "
+                           "world-depth quads. "
                            "Rotatable sprites use their object pose; others face the camera. Unlit replacement "
                            "presentation: glow, view bias, no-Z and sky modes remain unavailable.");
         draw_sparks(game);
@@ -21,10 +23,11 @@ namespace OpenBlood2
                         static_cast<unsigned long long>(sprite_render->uploads), sprite_view->mesh.texture_bytes);
         if (ImGui::CollapsingHeader("Authored sources (including failed / filtered / removed)"))
             for (size_t i = 0; i < game.entries.size(); ++i)
-                if (game.world.objects[i].class_name == "DetailSprite")
+                if (game.world.objects[i].class_name == "DetailSprite" || game.world.objects[i].class_name == "Sprite")
                 {
                     const auto& e = game.entries[i];
-                    ImGui::Text("Source %zu: %s", i, entry_state_name(e.state));
+                    ImGui::Text("Source %zu %s: %s", i, game.world.objects[i].class_name.c_str(),
+                                entry_state_name(e.state));
                     if (!e.detail.empty())
                         ImGui::TextWrapped("%s", e.detail.c_str());
                 }
@@ -82,6 +85,15 @@ namespace OpenBlood2
                         if (!entry.error.empty())
                             ImGui::TextWrapped("%s", entry.error.c_str());
                     }
+            if (const auto* b = dynamic_cast<const BuiltinSprite*>(r->game.get()))
+            {
+                ImGui::Text("Built-in Sprite RGBA bytes %u %u %u %u | SetObjectColor %s", b->m_Color[0], b->m_Color[1],
+                            b->m_Color[2], b->m_Color[3], b->color_applied ? "applied" : "failed");
+                ImGui::Text("Applied tint %.3f %.3f %.3f / alpha %.3f (source blue uses the green byte)", r->color.x,
+                            r->color.y, r->color.z, r->alpha);
+                if (!b->error.empty())
+                    ImGui::TextWrapped("%s", b->error.c_str());
+            }
             if (const auto* d = dynamic_cast<const DetailSprite*>(r->game.get()))
             {
                 ImGui::Text("Flush %d / rotatable %d / chromakey %d / repeat %d", d->flush, d->rotatable, d->chromakey,

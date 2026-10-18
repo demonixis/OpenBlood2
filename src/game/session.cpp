@@ -1,4 +1,5 @@
 #include "game/original/AI_Mgr.h"
+#include "game/original/BuiltinSprite.h"
 #include "game/original/CharacterProfiles.h"
 #include "game/original/ClientParticleStreamSFX.h"
 #include "game/original/DestructableModel.h"
@@ -118,6 +119,12 @@ namespace OpenBlood2
                     entry.detail = ai->runtime_error;
                 }
                 else if (const auto* sprite = r ? dynamic_cast<const DetailSprite*>(r->game.get()) : nullptr;
+                         sprite && !sprite->error.empty())
+                {
+                    entry.state = EntryState::Failed;
+                    entry.detail = sprite->error;
+                }
+                else if (const auto* sprite = r ? dynamic_cast<const BuiltinSprite*>(r->game.get()) : nullptr;
                          sprite && !sprite->error.empty())
                 {
                     entry.state = EntryState::Failed;

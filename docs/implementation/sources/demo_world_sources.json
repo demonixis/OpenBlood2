@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-18",
+  "baseline_commit": "cf5281b4faeb751a4f8f438ee7fa05700b3f5b1a",
+  "scope": "Demo_02 world initialization: engine Sprite and FastApproxArea, ObjectDLL Spawner; Fanatic/Prophet assessed but not ported",
+  "source_files": [
+    {
+      "path": "sources/lithtech/Blood2/AppHeaders/engineobjects.c",
+      "sha256": "70730e7e8aa704de5c6ddfa40194227832260812f951a49fd76e7735b530f75f",
+      "use": "Sprite registration and spr_MessageFn (254-302): forced OT_SPRITE, Color/Scale/Alpha reads for every reason, green-as-blue SetObjectColor; FastApproxArea CF_NORUNTIME (462-471)."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/Spawner.cpp",
+      "sha256": "9b42ecccd37302dcfe53db45fad529adca65ecc61f9963b49f595eb88e802ffd",
+      "use": "Registration defaults, constructor defaults, world-only ReadProp, initial update, START/STOP/SINGLE commands, Update counting, SpawnObject pose/velocity/rift/sound order."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/Spawner.h",
+      "sha256": "63e3416315f982ae4e18827fd94cb337f1a96befdff8fdd26303585acef1e2e0",
+      "use": "Member types, including the DDWORD respawn count."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "b1b6bf1bb639781dff7bca72c85bb727abf96be2fc26b2ee53146640ef693fe5",
+      "use": "PlaySoundFromPos flags and inner radius = radius * 0.1 (95-122)."
+    },
+    {
+      "path": "sources/lithtech/Blood2/Shared/SoundTypes.h",
+      "sha256": "723df9d723e9344de7ba80b1ba60e2cba863850b4c188a9fc34acf42284892f2",
+      "use": "SOUNDPRIORITY_MISC_LOW = 0."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/Fanatic.cpp",
+      "sha256": "9e2e3f7d19771994fa1c9647df073306e34d317f80ac9e8b5ed9009bcf26c327",
+      "use": "Assessed only: constructor/properties, model, sound root, states, Special1/Dying howitzer and smoke."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/prophet.cpp",
+      "sha256": "2c1a51b01ee1ef386108bf27793a7ae0016e5f5d05b52ec1e45bfd69921e753c",
+      "use": "Assessed only: constructor/properties, model, melee acquisition after base initialization, Fire/MC_Fire_Stand and states."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "7275c3a4f9374926e0a5e7cce4d533ae59ea558027bda1448b223a283e66fb09",
+      "use": "Assessed only: WeaponStrToInt default WEAP_BERETTA and _ADD_ON-only COMBAT/FLAYER branches (377-510); AddInventoryWeapon(INV_PROXIMITY) in initialization (2057)."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "aab29291e988ac7c3e1424f41076b5c0adc6243cd60198ea2cc6381d402d0e53",
+      "use": "Assessed only: WEAP_COMBATSHOTGUN construction under _ADD_ON; _DEMO AddInventoryWeapon returns CHWEAP_NOTAVAIL."
+    }
+  ],
+  "retail_evidence": [
+    {
+      "file": "B2Demo.rez worlds/demo_02.dat (installed 1998 demo)",
+      "sha256": "244f41bbac29f6a5514b0fb6d0813bff31c655938bed0b876041699db1b9c727",
+      "purpose": "28 Sprites, 2 Spawners (Fanatic, count -1, inactive), 1 FastApproxArea, 4 Fanatics (SUBMA/COMBAT and SUBMA-only, Proximity_Bombs 25), 1 Prophet (ASSAULTRIFLE x5, PASSIVE); GameStartPoint 05_egress."
+    },
+    {
+      "file": "BLOOD2.REZ worlds/05_cdmb.dat (retail)",
+      "sha256": "c248c96cc6d568304dd0db2c9fcbb5a6926457c666769c7d67a9ae98e20689be",
+      "purpose": "Retail counterpart of Demo_02 with the same Sprite/Spawner/FastApproxArea/Fanatic/Prophet counts plus SniperRiflePU."
+    },
+    {
+      "file": "B2Demo.rez object.lto (demo server DLL)",
+      "sha256": "81d84b42a7ae36924e15af1b0ab0e655bed439de4fc4f7d6d4718f4fa531bf93",
+      "purpose": "String pool of WeaponStrToInt has no COMBAT or FLAYER prefix; COMBAT occurs only as the Fanatic AIWeapon2 default. Inspected as data; never executed."
+    },
+    {
+      "file": "BLOOD2.REZ object.lto (retail base server DLL)",
+      "sha256": "f7fe5db1d8664872bd051100daa8bf82169aeb11c15408b9fd9db21d8390efa7",
+      "purpose": "Same absence of the COMBAT/FLAYER WeaponStrToInt prefixes in the base retail DLL. Inspected as data; never executed."
+    }
+  ],
+  "adaptations": [
+    "C Sprite callback expressed as a typed BuiltinSprite override; registered name, BaseClass parent and defaults retained.",
+    "Out-of-range Color/Alpha byte casts reject creation instead of an undefined wrap.",
+    "FastApproxArea joins the existing CF_NORUNTIME editor-only list.",
+    "Spawner strings are value-owned; velocity draws use one unit draw per axis with the linear interval formula.",
+    "The rift explosion request is counted and reported as unavailable; the spawn and sound still follow the source order.",
+    "Spawner velocity, sound radius and respawn rate are bounded; restore creation rejects."
+  ]
+}

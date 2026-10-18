@@ -1451,3 +1451,7 @@ The original flag usage and the shipped detail configuration (`MaxModelShadows`)
 ## Original demo edition (2026-10-18)
 
 Selected `_DEMO` branches of original `InventoryMgr.cpp` (IsDemoWeapon, bomb construction, AddInventoryWeapon), `ItemPickups.cpp` and `PlayerObj.cpp` (COMMAND_DETONATE) are ported as a runtime edition, together with the `Demo_01` first level. The single-archive layout comes from the installed demo. The compile-time define becomes a session constant; no demo menu text is substituted. See [source ledger](sources/demo_sources.json) and [contracts](../contracts/demo_contracts.md).
+
+## Demo_02 world objects (2026-10-18)
+
+The engine `Sprite` callback and the `FastApproxArea` CF_NORUNTIME registration come from original `AppHeaders/engineobjects.c`; the `Spawner` class comes from `ObjectDLL/Spawner.cpp`, reusing the earlier `SpawnObject` helper and `PlaySoundFromPos` rules. Fanatic and Prophet were assessed but not imported. The demo and retail `object.lto` string pools were inspected as data (never executed) to establish that `WeaponStrToInt` lacks the `_ADD_ON` COMBAT branch. See [source ledger](sources/demo_world_sources.json), [Sprite contracts](../contracts/builtin_sprite_contracts.md) and [Spawner contracts](../contracts/spawner_contracts.md).

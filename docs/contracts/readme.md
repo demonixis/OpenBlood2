@@ -69,6 +69,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Original pushable brushes and bounded box physics](pushable_contracts.md)
 - [Conveyor, Damage and FreeFall boundary](specialized_volume_contracts.md)
 - [Original triggers, door SelfTrigger and keys](trigger_contracts.md)
+- [Original Spawner](spawner_contracts.md)
 - [Original world-model debris](world_debris_contracts.md)
 - [Keyframed translating world models](worldpath_contracts.md)
 
@@ -145,6 +146,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Original corpse blood pools and client splats](blood_splat_contracts.md)
 - [Original blood spurts and debris impact contracts](blood_spurt_contracts.md)
 - [Original built-in Model](builtin_model_contracts.md)
+- [Original built-in Sprite and FastApproxArea](builtin_sprite_contracts.md)
 - [Original character animations and node queries](character_animation_contracts.md)
 - [Original character motion keys](character_motion_contracts.md)
 - [Character node visibility and selected player Load tail](character_node_contracts.md)

@@ -62,8 +62,19 @@ Both demo worlds are DAT v56, but the world initialization gate rejects them:
   27 failed entries. CGib rejects its `DamageTriggerMessage` property, three
   CDestructableModels fail, and the first update rejects HealthPU0 overlapping
   geometry.
-- `Demo_02` ("Movin' On Up"): 36 unsupported classes (Sprite ×28, Fanatic ×4,
-  Spawner ×2, Prophet, FastApproxArea).
+- `Demo_02` ("Movin' On Up", the demo cut of retail `05_CDMB`): the engine
+  [Sprite ×28 and FastApproxArea](builtin_sprite_contracts.md) and the two
+  [Spawners](spawner_contracts.md) now initialize. Five unsupported classes remain:
+  Fanatic ×4 and Prophet. Porting them must follow two executable facts: the
+  demo (and retail base) `object.lto` has no `_ADD_ON` COMBAT branch in
+  `WeaponStrToInt`, so the authored `COMBAT` weapons resolve to the source default
+  Beretta, and `_DEMO` `AddInventoryWeapon` refuses the authored `Proximity_Bombs`
+  25. Fanatic Special1/Dying also needs the unported `CHowitzerShell` and the
+  `OBJFX_SMOKING_2` torso smoke.
+- After world initialization, player entry at GameStartPoint `05_egress`
+  (0, -5456, -1520) starts solid against the `endelevator` world model (polygon 78)
+  and fails because the replacement `MoveObject` has no depenetration. Retail
+  `05_CDMB` fails the same way; this is engine collision work, not a class port.
 
 Several source `_DEMO` features are not connected:
 
@@ -77,4 +88,5 @@ Several source `_DEMO` features are not connected:
 Tests: `config.demo` covers parsing, smoke rejection, edition inspection and
 mismatch hints. `world.resource_mount` covers edition-exclusive mounting.
 `remote.demo` covers weapon/bomb/detonate rules and pickup removal on a labelled
-synthetic index. No test plays the real demo worlds.
+synthetic index. `builtin_sprite.demo` and `spawner.demo` load the real Demo_02
+when `BLOOD2_DEMO_DATA_DIR` is set; no test plays the real demo worlds.

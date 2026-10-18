@@ -4,7 +4,7 @@ namespace OpenBlood2
     bool editor_only_world_class(std::string_view name)
     {
         return name == "DirLight" || name == "Light" || name == "OutsideDef" || name == "ObjectLight" ||
-               name == "LightAnimator" || name == "GlobalDirLight";
+               name == "LightAnimator" || name == "GlobalDirLight" || name == "FastApproxArea";
     }
     bool prepare_world(const WorldRequest& request, const Resources& resources, PreparedWorld& output,
                        std::string& error)
