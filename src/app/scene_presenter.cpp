@@ -1,5 +1,6 @@
 #include "app/scene_presenter.h"
 #include <SDL3/SDL_timer.h>
+#include <algorithm>
 
 namespace OpenBlood2
 {
