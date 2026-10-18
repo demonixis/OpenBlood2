@@ -29,6 +29,7 @@
 #include "trigger_smoke.h"
 #include "world_sound_smoke.h"
 
+#include "engine/logging.h"
 #include <SDL3/SDL_main.h>
 #include <algorithm>
 #include <cmath>
@@ -1703,24 +1704,16 @@ namespace
 
 } // namespace
 
-int main(int argc, char** argv)
+static int application_main(const OpenBlood2::Options& options)
 {
-    spdlog::set_pattern("[%l] %v");
-    std::vector<std::string_view> args;
-    for (int i = 1; i < argc; ++i)
-        args.emplace_back(argv[i]);
-    OpenBlood2::Options options;
     std::string error;
-    if (!OpenBlood2::parse_options(args, options, error))
-    {
-        spdlog::error("{}", error);
-        return 2;
-    }
     if (options.help)
     {
         std::cout << "Blood II reconstruction " << OpenBlood2::build::version
                   << " (M2 in progress)\n"
                      "  --config FILE       Configuration file (default: blood2.local.ini in working directory)\n"
+                     "  --log-dir DIR       Log root (default: SDL user directory / logs)\n"
+                     "  --log-level LEVEL   trace, debug, info (default), warn or error\n"
                      "  --data-dir DIR      External Blood II directory; overrides BLOOD2_DATA_DIR and config\n"
                      "  --check-data        Check file metadata without opening a window or parsing archives\n"
                      "  --world NAME        World resource (default: 01_SubwayA)\n"
@@ -1844,4 +1837,30 @@ int main(int argc, char** argv)
     if (!options.gpu_smoke && !options.world_smoke)
         return OpenBlood2::run_frontend(options, config, data);
     return run(options, config, data);
+}
+
+int main(int argc, char** argv)
+{
+    std::vector<std::string_view> args;
+    for (int i = 1; i < argc; ++i)
+        args.emplace_back(argv[i]);
+    OpenBlood2::Options options;
+    std::string error;
+    const bool parsed = OpenBlood2::parse_options(args, options, error);
+    OpenBlood2::LogSession logs;
+    std::string log_error;
+    if (!logs.start({options.log_dir, options.log_level}, log_error))
+        spdlog::error("File logging unavailable; console remains active: {}", log_error);
+    spdlog::info("Requested world={}; config={}; inspector={}; view={}; bench={}; headless={}; frames={}",
+                 options.world, OpenBlood2::path_text(options.config_file), bool(BLOOD2_INSPECTOR) && options.inspector,
+                 options.view_world, options.bench, options.check_data || options.inspect_world || options.start_game,
+                 options.frame_limit);
+    int result = 2;
+    if (!parsed)
+        spdlog::error("{}", error);
+    else
+        result = application_main(options);
+    // All application-owned SDL/GPU/audio objects have been destroyed before completion is recorded.
+    logs.finish(result);
+    return result;
 }

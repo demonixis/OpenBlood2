@@ -226,7 +226,7 @@ namespace OpenBlood2
                 options.bench_height = h;
             }
             else if (arg == "--data-dir" || arg == "--config" || arg == "--frames" || arg == "--capture" ||
-                     arg == "--world")
+                     arg == "--world" || arg == "--log-dir" || arg == "--log-level")
             {
                 if (++i == args.size() || args[i].empty() || args[i].starts_with("--"))
                 {
@@ -235,6 +235,18 @@ namespace OpenBlood2
                 }
                 if (arg == "--world")
                     options.world = args[i];
+                else if (arg == "--log-dir")
+                    options.log_dir = path_from_utf8(args[i]);
+                else if (arg == "--log-level")
+                {
+                    if (args[i] != "trace" && args[i] != "debug" && args[i] != "info" && args[i] != "warn" &&
+                        args[i] != "error")
+                    {
+                        error = "--log-level requires trace, debug, info, warn or error";
+                        return false;
+                    }
+                    options.log_level = args[i];
+                }
                 else if (arg == "--data-dir")
                     options.data_dir = path_from_utf8(args[i]);
                 else if (arg == "--capture")
