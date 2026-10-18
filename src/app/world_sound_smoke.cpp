@@ -1,5 +1,6 @@
 #include "world_sound_smoke.h"
 #include "engine/audio_stream.h"
+#include "engine/ima_curve_event.h"
 #include "engine/ima_note_event.h"
 #include "engine/ima_note_pitch.h"
 #include "engine/ima_selection.h"
@@ -15,7 +16,8 @@ namespace OpenBlood2
             !music.personalities.front().metadata || !music.personalities.front().error.empty() ||
             !music.assets.front().bank || !music.assets.front().bank_error.empty())
             return false;
-        std::size_t pattern_notes = 0, band_count = 0, section_count = 0, curves = 0, curve_points = 0;
+        std::size_t pattern_notes = 0, band_count = 0, section_count = 0, curves = 0, curve_points = 0,
+                    curve_events = 0;
         for (const auto& asset : music.assets)
         {
             if (asset.kind != MusicAssetKind::Instruments)
@@ -104,6 +106,14 @@ namespace OpenBlood2
                     return false;
                 curves += asset.curves->curves.size();
                 curve_points += asset.curves->points;
+                for (const auto& curve : asset.curves->curves)
+                {
+                    std::vector<ImaTimedMidiMessage> messages;
+                    std::string error;
+                    if (!prepare_ima_curve_events(curve, 10000, messages, error))
+                        return false;
+                    curve_events += messages.size();
+                }
                 pattern_notes += asset.style->notes;
                 for (const auto& pattern : asset.style->patterns)
                 {
@@ -142,7 +152,8 @@ namespace OpenBlood2
                 }
             }
         }
-        if (pattern_notes != 3049 || band_count != 44 || !section_count || curves != 2 || curve_points != 2)
+        if (pattern_notes != 3049 || band_count != 44 || !section_count || curves != 2 || curve_points != 2 ||
+            curve_events != 206)
             return false;
         const auto& bank = *music.assets.front().bank;
         if (bank.instruments.size() != 14 || bank.waves.size() != 35 || bank.decoded_bytes != 913403 * sizeof(float) ||

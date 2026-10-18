@@ -1343,3 +1343,11 @@ samples are imported. Raw fields and ordered points are distinct from the origin
 derived summaries and later interpolation. See [source ledger](sources/m2_music_curves_sources.json),
 [contracts](../contracts/music_curve_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_curves.md).
+
+## Original IMA style curve events
+
+Value-only event expansion follows isolated IMUSIC25 style-point execution.
+Lookup tables are regenerated from mathematical expressions and compared with all
+772 original entries; no table bytes are imported. See [source ledger](sources/m2_music_curve_events_sources.json),
+[contracts](../contracts/music_curve_event_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_curve_events.md).

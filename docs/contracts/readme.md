@@ -192,3 +192,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [IMA active note lifetime](music_active_note_contracts.md): original chord deadlines, serial exemption and ordered due/retained lists; live MUSIC remains unavailable.
 
 - [IMA style curves](music_curve_contracts.md): original authored curve/point records, strict bounds and independent world-owned inspection.
+
+- [IMA style curve events](music_curve_event_contracts.md): original point expansion with explicit ticks and raw messages; no controller playback.

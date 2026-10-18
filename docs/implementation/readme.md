@@ -56,3 +56,5 @@ the original log or patch.
 - [IMA active notes and due stops](../../../Documentation/Implementation/m2_music_active_notes.md): original lifetime/dispatch-order comparison and inspected pending tails; M2 remains incomplete.
 
 - [IMA style curve decoding](../../../Documentation/Implementation/m2_music_curves.md): 47 curves checked against the original reader; evaluated controllers and MUSIC remain incomplete.
+
+- [IMA style curve events](../../../Documentation/Implementation/m2_music_curve_events.md): original expansion checked against 1296 generated cases and 47 installed points; MUSIC remains unavailable.

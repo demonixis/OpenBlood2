@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "0b15de19e023a3cbf2b8ecb906c436d61b27c4d3",
+  "status": "M2 incomplete; original style-point event expansion with explicit owner/tick; no live MUSIC",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/IMUSIC25.DLL",
+      "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "rvas": {
+        "style_point_expansion": "0x11ca9..0x12128",
+        "style_send": "0x12168..0x121cb",
+        "curve_point_iteration": "0x121ef..0x12213",
+        "separate_section_path": "0x12214..0x12553"
+      },
+      "use": "Read-only analysis and isolated original execution with bounded allocation/free/send hooks; no native execution or binary/table import"
+    }
+  ],
+  "replacement_code": [
+    "src/engine/ima_curve_event.cpp: bounded value-only event expansion; mathematical table regeneration",
+    "src/app/inspector_world_sounds.cpp: explicit tick and ordered raw message inspection",
+    "src/app/world_sound_smoke.cpp: independent Cabal event preparation during hidden/reload checks"
+  ],
+  "deliberate_limits": [
+    "Explicit owner/tick only; original loader fixups/summary overwrite and variation admission are not implemented",
+    "Original style endpoint rules only; separate section path remains unavailable",
+    "Raw bytes preserved, not automatically validated or submitted to MIDI/synth",
+    "4096 points and 65536 messages maximum; atomic failure instead of partial allocation failure; emitted 32-bit tick overflow rejected",
+    "No curve/note merged order, controller delivery, clocks or playlist transport",
+    "No commercial bytes or new runtime/build dependency imported"
+  ],
+  "original_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "entry_rva": "0x12168 (calls 0x11ca9)",
+    "regenerated_table_entries": 772,
+    "synthetic": {
+      "decisions": 1296,
+      "messages": 39840,
+      "sha256": "7cdeccd1461329d5967a7184adf03ad46ec51c08ed61a5a15fd053f83aaa0148",
+      "fnv64": 11599925503900038861
+    },
+    "private": {
+      "decisions": 47,
+      "messages": 3194,
+      "sha256": "9286e869a76daa634fb43a4c7ef6f554284547d2f75834010953a8c30d8f61c1",
+      "fnv64": 12221266369440151417
+    },
+    "messages_by_bank": {
+      "A1": 2900,
+      "Cabal": 206,
+      "Track1": 88
+    },
+    "scope": "Explicit point owner/controller and tick; original allocation/free intercepted and send captured. No loader summary/owner fixup, admission, merged order, synth or transport claim."
+  },
+  "target_sha256": {
+    "src/engine/ima_curve_event.h": "12901cf33a8d32cf22aa63352dea25807b069530f79dcc6f34a408d2d0d05e0d",
+    "src/engine/ima_curve_event.cpp": "0ff91f8e159d952c86493431a1a6f56887cba6c04d2202be569a9c5068843fa8",
+    "src/app/inspector_world_sounds.cpp": "a3aea4815d551b14fe27e21785991afbae0703a2493774f8fb00f195bef00e95",
+    "src/app/world_sound_smoke.cpp": "343a69cebb0fa0a6006268b46f595818427d8d101b4d715750f27e6f7ad50e55",
+    "tests/ima_curve_event_tests.cpp": "8422dd2f81b9a82d99d77c0c51720eda80b640d651bcd139a6d2758a1b759d51",
+    "CMakeLists.txt": "4aecdf809918de40bacf32a95efaee1481c4a56b9e6be9888e4cb94ee8cbe63a",
+    "tests/CMakeLists.txt": "e62dfffa995d4e04214f5cca8f50a484b1045d54cb960dfc7f758af417b1ad3a"
+  }
+}

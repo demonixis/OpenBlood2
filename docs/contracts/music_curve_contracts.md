@@ -63,3 +63,7 @@ installed records. Allocation/reads/seeks are bounded emulated facilities; the
 original DLL never executes natively. Evaluation tables, interpolation, controller
 scheduling, curve/note merge order, section tracks, transport and MUSIC remain
 unfinished. The actual M2 gate remains incomplete.
+
+The [style event continuation](music_curve_event_contracts.md) adds original point
+expansion with explicit owner/tick inputs. Earlier evaluation omissions are
+superseded only for this helper; admission, merged dispatch and MUSIC stay open.

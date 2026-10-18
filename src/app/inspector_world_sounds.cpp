@@ -1,4 +1,5 @@
 #include "engine/audio_stream.h"
+#include "engine/ima_curve_event.h"
 #include "engine/ima_note_event.h"
 #include "engine/ima_note_pitch.h"
 #include "engine/ima_selection.h"
@@ -708,6 +709,33 @@ namespace OpenBlood2
                                     ImGui::Text("%d: shape %u flags %02x start %d value %d end %d target %d", j,
                                                 p.shape, p.flags, p.start, p.value, p.end, p.target);
                                 }
+                            if (ImGui::TreeNode("Prepared curve events (no playback)"))
+                            {
+                                static int tick = 10000;
+                                ImGui::InputInt("Explicit caller tick", &tick);
+                                ImGui::TextWrapped(
+                                    "Original style-point expansion with this curve as owner. "
+                                    "Header offset/variation admission and note ordering are not applied. "
+                                    "Data bytes are raw original output, not validated MIDI delivery.");
+                                std::vector<ImaTimedMidiMessage> messages;
+                                std::string error;
+                                if (!prepare_ima_curve_events(c, tick, messages, error))
+                                    ImGui::TextWrapped("Unavailable: %s", error.c_str());
+                                else
+                                {
+                                    ImGui::Text("%zu prepared messages in source order", messages.size());
+                                    ImGuiListClipper events;
+                                    events.Begin(static_cast<int>(messages.size()));
+                                    while (events.Step())
+                                        for (int j = events.DisplayStart; j < events.DisplayEnd; ++j)
+                                        {
+                                            const auto& m = messages[static_cast<std::size_t>(j)];
+                                            ImGui::Text("%d: tick %d | status %02x data %u %u", j, m.time, m.status,
+                                                        m.key, m.velocity);
+                                        }
+                                }
+                                ImGui::TreePop();
+                            }
                             ImGui::TreePop();
                         }
                         ImGui::PopID();
