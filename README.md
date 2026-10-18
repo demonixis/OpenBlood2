@@ -41,7 +41,9 @@ cmake --build --preset debug --parallel
 ./build/debug/blood2 --data-dir "/path/to/Blood II" --view-world
 ```
 
-Use the `release` presets for an optimized build without the inspector.
+Use the `dev` presets (optimized, with inspector) for playtesting and the `release`
+presets for an optimized build without the inspector; Debug is several times slower
+in large worlds.
 [Setup, controls and tests](docs/getting_started.md) cover configuration,
 NVIDIA selection, Metal and validation commands.
 

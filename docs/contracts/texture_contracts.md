@@ -100,3 +100,5 @@ authored SPR world materials, decodes/deduplicates all same-size DTX frames and
 binds frames from the read-only world clock. Manifest/frame errors still block
 NEW_LEVEL. Both world passes share the phase; geometry, alpha rules and shader
 artifacts are unchanged.
+
+The [presentation performance continuation](render_performance_contracts.md) supersedes mip-zero-only decoding and sampling: every authored DTX level is decoded with the shared palette/masks and uploaded, and samplers use nearest filtering with point mip selection. Structural validation, generation boundaries and failure diagnostics are unchanged.

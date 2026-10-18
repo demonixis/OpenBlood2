@@ -85,3 +85,5 @@ The [sky continuation](sky_contracts.md) supersedes blanket sky-rendering omissi
 for registered world-model skies. Valid visible skies render behind the world and
 replace bit-4 portal markers; unavailable skies retain diagnostics. No retail
 lighting, fog or complete M2 acceptance is implied.
+
+The [presentation performance continuation](render_performance_contracts.md) keeps one batch per translucent polygon and the far-to-near order, now computed over frustum-visible draws only; submitted counts therefore exclude culled draws. The former separate alpha/FX passes are recorded in one scene pass in the same order.

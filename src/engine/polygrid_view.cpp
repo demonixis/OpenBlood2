@@ -109,12 +109,13 @@ bool PolyGridView::add(std::uint64_t id, bool visible, NodePose pose, DVector di
         for (unsigned x = 0; x + 1 < width; ++x)
         {
             const WorldVertex corners[] = {vertex(x, y), vertex(x + 1, y), vertex(x + 1, y + 1), vertex(x, y + 1)};
-            const auto first = std::uint32_t(mesh.vertices.size());
             for (auto i : {0, 1, 2, 0, 2, 3})
                 mesh.vertices.push_back(corners[i]);
-            const auto center = vector_scale(vector_add(corners[0].position, corners[2].position), .5f);
-            range.batches.push_back({first, 6, material, true, center});
         }
+    // One translucent batch per surface, ordered against other surfaces by its origin.
+    // Cells draw in lattice order, as later LithTech submits a PolyGrid as one indexed list.
+    range.batches.push_back({range.first, count, material, true, {}});
+    bound_range(mesh.vertices, range);
     e.range = std::uint32_t(mesh.ranges.size());
     draws.push_back({e.range, pose.position, pose.rotation, alpha});
     mesh.ranges.push_back(std::move(range));

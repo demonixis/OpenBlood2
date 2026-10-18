@@ -1,5 +1,6 @@
 #include "game/original/NewStatusBar.h"
 #include "app/inspector.h"
+#include "app/scene_presenter.h"
 #include "build_info.h"
 #include "engine/audio_stream.h"
 #include "engine/container.h"
@@ -505,6 +506,14 @@ namespace OpenBlood2
                         }
                         ImGui::Text("GPU: %llu frames / %llu world uploads", (unsigned long long)world_render->frames,
                                     (unsigned long long)world_render->uploads);
+                        if (presentation)
+                        {
+                            ImGui::Text("Last frame: %zu scene pass / %zu draw calls / %zu culled draw records",
+                                        presentation->passes, presentation->draw_calls, presentation->culled);
+                            ImGui::Text("CPU: update %.3f world + %.3f models + %.3f effects ms | record %.3f ms",
+                                        presentation->world_ns / 1e6, presentation->models_ns / 1e6,
+                                        presentation->effects_ns / 1e6, presentation->record_ns / 1e6);
+                        }
                         ImGui::Text("Prepared: %zu triangles / %zu instances / %zu hidden instances",
                                     world_render->triangles, world_render->draws, world_render->hidden);
                         ImGui::Text("Unbound models: %zu / excluded containers: %zu", world_render->unbound,
@@ -2594,7 +2603,7 @@ namespace OpenBlood2
             ImGui::Text("World PolyGrids: %zu active | %llu failed", game.server.polygrids.active.size(),
                         static_cast<unsigned long long>(game.server.polygrids.failed));
             if (polygrid_render)
-                ImGui::Text("Previous GPU surface pass: %zu cells", polygrid_render->alpha_batches);
+                ImGui::Text("Previous GPU surface record: %zu surface batches", polygrid_render->alpha_batches);
             if (brush->locked)
                 ImGui::TextWrapped("Key lock pending: %s (remove key %s)", brush->unlock_key.c_str(),
                                    brush->remove_key ? "yes" : "no");

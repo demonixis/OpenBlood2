@@ -154,6 +154,9 @@ namespace OpenBlood2
         if (reuse)
         {
             mesh.vertices.insert(mesh.vertices.end(), cached->vertices.begin(), cached->vertices.end());
+            range.min = cached->min;
+            range.max = cached->max;
+            range.bounded = cached->bounded;
             entry.hidden_triangles = cached->hidden_triangles;
             entry.reused_geometry = true;
             ++preparation.reused;
@@ -214,6 +217,21 @@ namespace OpenBlood2
                 }
             }
 
+            range.count = static_cast<std::uint32_t>(mesh.vertices.size()) - range.first;
+            // Conservative bounds from the posed vertex set (fewer than face corners); hidden
+            // nodes can only make them larger than the drawn triangles, never smaller.
+            if (range.count && !sampled_.empty())
+            {
+                range.min = range.max = sampled_.front();
+                for (const auto& p : sampled_)
+                {
+                    range.min = {std::min(range.min.x, p.x), std::min(range.min.y, p.y), std::min(range.min.z, p.z)};
+                    range.max = {std::max(range.max.x, p.x), std::max(range.max.y, p.y), std::max(range.max.z, p.z)};
+                }
+                range.min = {range.min.x * scale.x, range.min.y * scale.y, range.min.z * scale.z};
+                range.max = {range.max.x * scale.x, range.max.y * scale.y, range.max.z * scale.z};
+                range.bounded = physics_vector(range.min) && physics_vector(range.max);
+            }
             // Cache admission is optional: exceeding its budget never drops a valid instance.
             const auto count = mesh.vertices.size() - range.first;
             const auto previous = cached ? cached->vertices.capacity() : 0;
@@ -228,6 +246,9 @@ namespace OpenBlood2
                 next.fallback = material == 0;
                 next.hidden_nodes.assign(hidden_nodes.begin(), hidden_nodes.end());
                 next.hidden_triangles = entry.hidden_triangles;
+                next.min = range.min;
+                next.max = range.max;
+                next.bounded = range.bounded;
                 // Reuse storage for changing poses; avoid geometric capacity growth beyond the cache budget.
                 if (count > next.vertices.capacity())
                     next.vertices = std::vector<WorldVertex>(mesh.vertices.begin() + range.first, mesh.vertices.end());

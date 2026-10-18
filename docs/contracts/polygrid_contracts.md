@@ -96,3 +96,5 @@ respectively; water collision/swimming still uses the closed volume below. Origi
 source-entry accounting is unchanged; these are two additional runtime children.
 Save/restore of surfaces, moving volumes, underwater presentation, remaining required
 services and actual M2 acceptance remain open.
+
+The [presentation performance continuation](render_performance_contracts.md) supersedes the per-cell sort: each surface is one translucent batch ordered by its origin and its cells draw in lattice order, as later LithTech submits a grid as one indexed list. Simulation, clocks and resource rules are unchanged.

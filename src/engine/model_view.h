@@ -55,6 +55,8 @@ namespace OpenBlood2
             std::vector<std::uint8_t> hidden_nodes;
             std::size_t hidden_triangles = 0;
             std::vector<WorldVertex> vertices;
+            DVector min{}, max{}; // Local bounds of vertices, reused with them.
+            bool bounded = false;
         };
         bool add_impl(const Model*, const std::shared_ptr<const Model>*, const AnimationTrack&, std::string_view skin,
                       NodePose, DVector scale, bool visible, bool close, ObjectId, std::string_view label,

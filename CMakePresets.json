@@ -15,6 +15,13 @@
       }
     },
     {
+      "name": "dev",
+      "displayName": "Optimized development with inspector",
+      "inherits": "debug",
+      "binaryDir": "${sourceDir}/build/dev",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+    },
+    {
       "name": "release",
       "displayName": "Release without inspector",
       "inherits": "debug",
@@ -24,10 +31,12 @@
   ],
   "buildPresets": [
     { "name": "debug", "configurePreset": "debug" },
+    { "name": "dev", "configurePreset": "dev" },
     { "name": "release", "configurePreset": "release" }
   ],
   "testPresets": [
     { "name": "debug", "configurePreset": "debug", "output": { "outputOnFailure": true } },
+    { "name": "dev", "configurePreset": "dev", "output": { "outputOnFailure": true } },
     { "name": "release", "configurePreset": "release", "output": { "outputOnFailure": true } }
   ]
 }

@@ -200,6 +200,29 @@ namespace OpenBlood2
                 options.world_smoke = true;
             else if (arg == "--gpu-smoke")
                 options.gpu_smoke = true;
+            else if (arg == "--bench")
+                options.bench = true;
+            else if (arg == "--bench-sweep")
+                options.bench = options.bench_sweep = true;
+            else if (arg == "--bench-size")
+            {
+                options.bench = true;
+                const auto value = ++i < args.size() ? args[i] : std::string_view{};
+                const auto x = std::min(value.find('x'), value.size());
+                std::uint32_t w = 0, h = 0;
+                const auto a = std::from_chars(value.data(), value.data() + x, w);
+                const auto b = x == value.size()
+                                   ? std::from_chars_result{value.data(), std::errc::invalid_argument}
+                                   : std::from_chars(value.data() + x + 1, value.data() + value.size(), h);
+                if (a.ec != std::errc{} || b.ec != std::errc{} || a.ptr != value.data() + x ||
+                    b.ptr != value.data() + value.size() || w < 16 || h < 16 || w > 8192 || h > 8192)
+                {
+                    error = "--bench-size requires WIDTHxHEIGHT from 16 to 8192";
+                    return false;
+                }
+                options.bench_width = w;
+                options.bench_height = h;
+            }
             else if (arg == "--data-dir" || arg == "--config" || arg == "--frames" || arg == "--capture" ||
                      arg == "--world")
             {
@@ -241,6 +264,13 @@ namespace OpenBlood2
                                    options.gpu_smoke || options.world_smoke))
         {
             error = "--view-world is a separate interactive inspection mode";
+            return false;
+        }
+        if (options.bench &&
+            (options.view_world || options.inspect_world || options.start_game || options.check_data ||
+             options.gpu_smoke || options.world_smoke || options.player_smoke || !options.capture_file.empty()))
+        {
+            error = "--bench is a separate headless measurement mode";
             return false;
         }
         if (options.world_smoke && options.gpu_smoke)

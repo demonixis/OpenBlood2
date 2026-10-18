@@ -1,10 +1,9 @@
 #include "ai_model_key_smoke.h"
+#include "app/bench.h"
 #include "app/hud.h"
-#include "app/model_scene.h"
 #include "app/movement_controls.h"
-#include "app/polygrid_scene.h"
+#include "app/scene_presenter.h"
 #include "app/session_playback.h"
-#include "app/sprite_scene.h"
 #include "app/ui_runtime.h"
 #include "brush_smoke.h"
 #include "build_info.h"
@@ -14,7 +13,6 @@
 #include "engine/capture.h"
 #include "engine/config.h"
 #include "engine/runtime.h"
-#include "engine/world_renderer.h"
 #include "game/original/AI_Mgr.h"
 #include "game/original/Door.h"
 #include "game/server_adapter.h"
@@ -360,22 +358,18 @@ namespace
         const bool smoke = options.gpu_smoke || options.world_smoke;
         const auto initial_smoke_objects = smoke ? smoke_object_counts() : std::map<std::string, int>{};
         bool inspector_visible = BLOOD2_INSPECTOR && options.inspector && !options.view_world;
-        OpenBlood2::WorldMesh world_mesh;
-        OpenBlood2::WorldRenderer world_renderer(runtime.gpu), model_renderer(runtime.gpu);
-        OpenBlood2::ModelView model_scene, explosion_model_scene;
-        OpenBlood2::WorldRenderer explosion_model_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
+        OpenBlood2::ScenePresenter presenter(runtime.gpu);
+        const auto& world_mesh = presenter.world_mesh;
+        const auto& world_renderer = presenter.world_renderer;
+        const auto& model_scene = presenter.model_scene;
+        const auto& explosion_model_scene = presenter.explosion_model_scene;
+        const auto& sprite_scene = presenter.sprite_scene;
+        const auto& sprite_renderer = presenter.sprite_renderer;
         bool explosion_model_drawn_hidden = false, explosion_fragments_drawn_hidden = false;
-        OpenBlood2::PolyGridView polygrid_scene;
-        OpenBlood2::WorldRenderer polygrid_renderer(runtime.gpu);
-        OpenBlood2::SpriteView sprite_scene;
-        OpenBlood2::WorldRenderer sprite_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
         bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false, explosion_rings_drawn_hidden = false,
              explosion_trails_drawn_hidden = false;
         bool models_hidden = false, close_weapon_hidden = false;
         std::uint64_t model_frames = 0;
-        std::vector<OpenBlood2::WorldDraw> world_draws, sky_draws;
-        DVector sky_eye{};
-        std::uint64_t mesh_revision = UINT64_MAX;
         bool viewport_hidden = false, viewport_reloaded = false, viewport_unloaded = false;
         OpenBlood2::UiRuntime ui(runtime);
         OpenBlood2::HudRenderer hud(runtime.gpu);
@@ -389,11 +383,12 @@ namespace
         inspector.world_mesh = &world_mesh;
         inspector.model_view = &model_scene;
         inspector.explosion_model_view = &explosion_model_scene;
-        inspector.polygrid_view = &polygrid_scene;
-        inspector.polygrid_render = &polygrid_renderer.stats;
+        inspector.polygrid_view = &presenter.polygrid_scene;
+        inspector.polygrid_render = &presenter.polygrid_renderer.stats;
         inspector.sprite_view = &sprite_scene;
         inspector.sprite_render = &sprite_renderer.stats;
         inspector.world_render = &world_renderer.stats;
+        inspector.presentation = &presenter.stats;
         if (options.keepalive_smoke)
             SAFE_STRCPY(inspector.keep_start_name, "01_egressa");
         inspector.select_services = options.gpu_smoke;
@@ -831,67 +826,14 @@ namespace
                 }
             }
             selection.refresh(game->objects);
-            const bool world_preparing = mesh_revision != game->world_revision;
-            const auto previous_model_revision = model_scene.revision;
-            const auto previous_effect_revision = explosion_model_scene.revision;
-            const auto previous_sprite_revision = sprite_scene.revision;
-            if (world_preparing)
+            if (!presenter.update(*game, error))
             {
-                world_renderer.clear_geometry();
-                model_renderer.clear_geometry();
-                model_scene.clear();
-                explosion_model_scene.clear();
-                explosion_model_renderer.clear_geometry();
-                polygrid_scene.clear();
-                polygrid_renderer.clear_geometry();
-                sprite_scene.clear();
-                sprite_renderer.clear_geometry();
-                world_mesh = {};
-                world_draws.clear();
-                if (!game->world_path.empty() && !world_mesh.build(game->world, error, &game->resources))
-                {
-                    spdlog::error("World mesh: {}", error);
-                    return 5;
-                }
-                mesh_revision = game->world_revision;
-                if (game->world_path.empty())
-                    viewport_unloaded = true;
-            }
-            const bool render_world = game->client_shell.m_bInWorld && !world_mesh.ranges.empty();
-            if (!OpenBlood2::world_draws(world_mesh, game->objects, world_draws, world_renderer.stats, error))
-            {
-                spdlog::error("World draw bindings: {}", error);
+                spdlog::error("{}", error);
                 return 5;
             }
-
-            if (!game->server.sky.draws(game->world, world_mesh, game->objects, game->client_shell.view.position,
-                                        sky_draws, sky_eye, error))
-            {
-                spdlog::error("Sky presentation: {}", error);
-                return 5;
-            }
-
-            if (!OpenBlood2::update_model_scene(*game, model_scene, error))
-            {
-                spdlog::error("Model presentation: {}", error);
-                return 5;
-            }
-
-            if (!OpenBlood2::update_explosion_model_scene(*game, explosion_model_scene, error))
-            {
-                spdlog::error("Explosion model presentation: {}", error);
-                return 5;
-            }
-            if (!OpenBlood2::update_polygrid_scene(*game, polygrid_scene, error))
-            {
-                spdlog::error("PolyGrid presentation: {}", error);
-                return 5;
-            }
-            if (!OpenBlood2::update_sprite_scene(*game, sprite_scene, error))
-            {
-                spdlog::error("Sprite presentation: {}", error);
-                return 5;
-            }
+            if (presenter.rebuilt && game->world_path.empty())
+                viewport_unloaded = true;
+            const bool render_world = presenter.render_world;
 
             if (options.skeleton_smoke && !inspector_visible)
                 for (const auto& entry : model_scene.entries)
@@ -986,113 +928,24 @@ namespace
             {
                 if (render_world)
                 {
-                    const auto& view = game->client_shell.view;
-                    const auto flashlight = game->client_shell.flashlight.Current(game->server);
-                    if (!world_renderer.prepare(world_mesh, mesh_revision,
-                                                SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
-                                                height, error) ||
-                        (!sky_draws.empty() &&
-                         !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
-                                              sky_draws, sky_eye, view.rotation, view.object && view.settings.type == 1,
-                                              error, OpenBlood2::DrawLoad::Clear, nullptr, OpenBlood2::WorldPass::Sky,
-                                              game->server.world_time())) ||
-                        !world_renderer.draw(
-                            commands, capture_frame ? capture.texture : swapchain, world_mesh, world_draws,
-                            view.position, view.rotation, view.object && view.settings.type == 1, error,
-                            sky_draws.empty() ? OpenBlood2::DrawLoad::Clear : OpenBlood2::DrawLoad::Load, nullptr,
-                            sky_draws.empty() ? OpenBlood2::WorldPass::Opaque : OpenBlood2::WorldPass::OpaqueWithSky,
-                            game->server.world_time(), flashlight))
+                    if (!presenter.record(*game, commands, capture_frame ? capture.texture : swapchain,
+                                          SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width, height,
+                                          error))
                     {
-                        spdlog::error("World viewport: {}", error);
+                        spdlog::error("{}", error);
                         SDL_SubmitGPUCommandBuffer(commands);
                         return 3;
                     }
-                    if (!model_renderer.prepare(model_scene.mesh, model_scene.revision,
-                                                SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
-                                                height, error, true) ||
-                        !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
-                                             model_scene.world_draws, view.position, view.rotation,
-                                             view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
-                                             world_renderer.depth_target(), OpenBlood2::WorldPass::Opaque, 0,
-                                             flashlight))
+                    if (!inspector_visible && options.scene_explosions_smoke &&
+                        !explosion_model_scene.world_draws.empty())
                     {
-                        spdlog::error("Model viewport: {}", error);
-                        SDL_SubmitGPUCommandBuffer(commands);
-                        return 3;
-                    }
-                    if (world_mesh.blended &&
-                        !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
-                                             world_draws, view.position, view.rotation,
-                                             view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
-                                             nullptr, OpenBlood2::WorldPass::Translucent, game->server.world_time(),
-                                             flashlight))
-                    {
-                        spdlog::error("Transparent world viewport: {}", error);
-                        SDL_SubmitGPUCommandBuffer(commands);
-                        return 3;
-                    }
-                    if (model_scene.mesh.blended &&
-                        !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
-                                             model_scene.world_draws, view.position, view.rotation,
-                                             view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
-                                             world_renderer.depth_target(), OpenBlood2::WorldPass::Translucent, 0,
-                                             flashlight))
-                    {
-                        spdlog::error("Transparent model viewport: {}", error);
-                        SDL_SubmitGPUCommandBuffer(commands);
-                        return 3;
-                    }
-                    if (!explosion_model_scene.world_draws.empty())
-                    {
-                        if (!explosion_model_renderer.prepare(
-                                explosion_model_scene.mesh, explosion_model_scene.revision,
-                                SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width, height, error,
-                                true) ||
-                            !explosion_model_renderer.draw(commands, capture_frame ? capture.texture : swapchain,
-                                                           explosion_model_scene.mesh,
-                                                           explosion_model_scene.world_draws, view.position,
-                                                           view.rotation, view.object && view.settings.type == 1, error,
-                                                           OpenBlood2::DrawLoad::Load, world_renderer.depth_target()))
-                        {
-                            spdlog::error("Explosion model viewport: {}", error);
-                            SDL_SubmitGPUCommandBuffer(commands);
-                            return 3;
-                        }
-                        if (!inspector_visible && options.scene_explosions_smoke)
-                        {
-                            for (const auto& entry : explosion_model_scene.entries)
-                                explosion_fragments_drawn_hidden |=
-                                    entry.fragment_effect && entry.error.empty() && entry.range != UINT32_MAX;
-                            for (const auto& entry : explosion_model_scene.entries)
-                                explosion_model_drawn_hidden |= entry.client_effect && entry.error.empty() &&
-                                                                entry.range != UINT32_MAX && entry.triangles > 0 &&
-                                                                entry.alpha < .75f;
-                        }
-                    }
-                    if (!polygrid_renderer.prepare(polygrid_scene.mesh, polygrid_scene.revision,
-                                                   SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
-                                                   height, error, true) ||
-                        !polygrid_renderer.draw(commands, capture_frame ? capture.texture : swapchain,
-                                                polygrid_scene.mesh, polygrid_scene.draws, view.position, view.rotation,
-                                                view.object && view.settings.type == 1, error,
-                                                OpenBlood2::DrawLoad::Load, world_renderer.depth_target(),
-                                                OpenBlood2::WorldPass::Translucent))
-                    {
-                        spdlog::error("PolyGrid viewport: {}", error);
-                        SDL_SubmitGPUCommandBuffer(commands);
-                        return 3;
-                    }
-                    if (!sprite_renderer.prepare(sprite_scene.mesh, sprite_scene.revision,
-                                                 SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
-                                                 height, error, true) ||
-                        !sprite_renderer.draw(commands, capture_frame ? capture.texture : swapchain, sprite_scene.mesh,
-                                              sprite_scene.draws, view.position, view.rotation,
-                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
-                                              world_renderer.depth_target()))
-                    {
-                        spdlog::error("Sprite viewport: {}", error);
-                        SDL_SubmitGPUCommandBuffer(commands);
-                        return 3;
+                        for (const auto& entry : explosion_model_scene.entries)
+                            explosion_fragments_drawn_hidden |=
+                                entry.fragment_effect && entry.error.empty() && entry.range != UINT32_MAX;
+                        for (const auto& entry : explosion_model_scene.entries)
+                            explosion_model_drawn_hidden |= entry.client_effect && entry.error.empty() &&
+                                                            entry.range != UINT32_MAX && entry.triangles > 0 &&
+                                                            entry.alpha < .75f;
                     }
                     sprites_drawn_hidden |= !inspector_visible && sprite_scene.draws.size() == 12;
                     if (!inspector_visible && options.scene_explosions_smoke)
@@ -1112,15 +965,6 @@ namespace
                                 entry.alpha < 1 && entry.alpha > 0)
                                 ++particles;
                         explosion_rings_drawn_hidden |= particles >= 32;
-                    }
-                    if (!model_scene.close_draws.empty() &&
-                        !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
-                                             model_scene.close_draws, view.position, view.rotation, false, error,
-                                             OpenBlood2::DrawLoad::ClearDepth))
-                    {
-                        spdlog::error("Model viewport: {}", error);
-                        SDL_SubmitGPUCommandBuffer(commands);
-                        return 3;
                     }
                     ++model_frames;
                     models_hidden |= !inspector_visible && !model_scene.world_draws.empty();
@@ -1488,10 +1332,7 @@ namespace
             }
             // Resource preparation/upload and diagnostic GPU readback/PNG encoding
             // are paused loading/tool time, not a later physics/audio catch-up delta.
-            if (change != OpenBlood2::LevelChangeResult::None || world_preparing || capture_frame ||
-                previous_model_revision != model_scene.revision ||
-                previous_effect_revision != explosion_model_scene.revision ||
-                previous_sprite_revision != sprite_scene.revision)
+            if (change != OpenBlood2::LevelChangeResult::None || presenter.resources_changed || capture_frame)
                 previous_tick = SDL_GetTicksNS();
             if (options.frame_limit != 0 && frames >= options.frame_limit)
                 done = true;
@@ -1684,7 +1525,7 @@ namespace
                     world_mesh.materials[i].error.empty() ? ++decoded : ++missing;
                 spdlog::info("World textures: decoded={}, rejected={}, RGBA bytes={}, prepared batches={}", decoded,
                              missing, world_mesh.texture_bytes, world_renderer.stats.batches);
-                spdlog::info("World alpha: prepared={}, submitted={}, passes={}", world_mesh.blended,
+                spdlog::info("World alpha: prepared={}, submitted={}, records={}", world_mesh.blended,
                              world_renderer.stats.alpha_batches, world_renderer.stats.alpha_frames);
                 spdlog::info("World Pan: {} authored effects, {} opaque / {} alpha submitted batches, session clock {}",
                              world_mesh.effects.size(), world_renderer.stats.pan_batches,
@@ -1888,7 +1729,10 @@ int main(int argc, char** argv)
                      "  --viewport-smoke    GPU 3D depth view, movement and unload/reload checks\n"
                      "  --start-game        Validate original entry and one headless update; exits after checks\n"
                      "  --no-inspector      Start with the inspector hidden\n"
-                     "  --frames N          Exit after N presented frames\n"
+                     "  --frames N          Exit after N presented frames (bench: measured frames, default 600)\n"
+                     "  --bench             Headless offscreen timing of --world presentation; no window\n"
+                     "  --bench-size WxH    Bench render size (default 1920x1080); implies --bench\n"
+                     "  --bench-sweep       Bench with a presentation-only 360-degree yaw sweep\n"
                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled\n"
                      "  --gpu-smoke         Exercise GPU presentation, inspector toggle, resize and quit\n"
                      "  --world-smoke       GPU lifecycle with real world unload/reload assertions\n"
@@ -1933,6 +1777,8 @@ int main(int argc, char** argv)
     }
     if (!data.readme_version.empty())
         spdlog::info("Readme declares: {}", data.readme_version);
+    if (options.bench)
+        return OpenBlood2::run_bench(options, config);
     if (options.check_data)
     {
         spdlog::info("Metadata only; no archives mounted, no game objects or resources loaded");

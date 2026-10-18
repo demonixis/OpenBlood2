@@ -12,6 +12,7 @@ class CNewStatusBar;
 
 namespace OpenBlood2
 {
+    struct PresentationStats;
 
     struct Inspector
     {
@@ -25,6 +26,7 @@ namespace OpenBlood2
         const SpriteView* sprite_view = nullptr;
         const WorldViewStats* sprite_render = nullptr;
         const WorldViewStats* world_render = nullptr;
+        const PresentationStats* presentation = nullptr;
         bool select_models = false;
         bool select_services = false;
         bool select_skeleton = false;

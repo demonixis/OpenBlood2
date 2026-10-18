@@ -44,7 +44,12 @@ namespace OpenBlood2
         DVector pivot{};
         std::string name;
         std::vector<WorldBatch> batches;
+        // Local-space vertex bounds for visibility culling; unbounded ranges are never culled.
+        DVector min{}, max{};
+        bool bounded = false;
     };
+    // Sets the range's local bounds from its emitted vertices.
+    void bound_range(std::span<const WorldVertex> vertices, WorldRange&);
     struct WorldMesh
     {
         std::vector<WorldVertex> vertices;
@@ -73,6 +78,9 @@ namespace OpenBlood2
         double surface_time = 0;
         std::uint64_t sky_frames = 0;
         std::size_t sky_batches = 0;
+        // Submitted SDL draw calls and frustum-culled draw records since the owner last reset
+        // them (one presented frame in the application); a draw culled by two records counts twice.
+        std::size_t draw_calls = 0, culled = 0;
     };
     // Never creates objects or advances simulation; current checked identities only.
     bool world_draws(const WorldMesh&, const Objects&, std::vector<WorldDraw>&, WorldViewStats&, std::string&);

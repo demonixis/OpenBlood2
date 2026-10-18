@@ -63,3 +63,5 @@ The Model snapshot inspector reports per-frame sampled/reused/uncached instances
 reused vertices, live cache entries and retained vertex bytes. Entry rows identify
 actual reuse. Counts are not timings, FPS, or a claim that all transition stutter
 is fixed. Hidden/missing entries remain visible, with no sampling side effects.
+
+The [presentation performance continuation](render_performance_contracts.md) adds conservative frustum culling of posed model ranges, with bounds cached alongside reused geometry. Poses and skinning remain on the CPU; GPU skinning is still pending.

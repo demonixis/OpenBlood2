@@ -14,8 +14,9 @@ namespace OpenBlood2
         draw_blood_splats(game);
         draw_weapon_sprites(game);
         if (sprite_view && sprite_render)
-            ImGui::Text("Prepared %zu quads / %zu entries | GPU passes %llu / texture uploads %llu | %zu RGBA bytes",
-                        sprite_view->draws.size(), sprite_view->entries.size(),
+            ImGui::Text("Prepared %zu quads / %zu entries / %zu submitted batches | GPU records %llu / texture "
+                        "uploads %llu | %zu RGBA bytes",
+                        sprite_view->draws.size(), sprite_view->entries.size(), sprite_view->batched_draws.size(),
                         static_cast<unsigned long long>(sprite_render->frames),
                         static_cast<unsigned long long>(sprite_render->uploads), sprite_view->mesh.texture_bytes);
         if (ImGui::CollapsingHeader("Authored sources (including failed / filtered / removed)"))

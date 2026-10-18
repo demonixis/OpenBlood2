@@ -6,6 +6,120 @@
 
 namespace OpenBlood2
 {
+    namespace
+    {
+        // Conservative sphere test against the projection used by world_view_uniform.
+        bool in_frustum(const WorldRange& range, const WorldDraw& draw, DVector eye, DVector right, DVector up,
+                        DVector forward, double aspect, double near, double far)
+        {
+            if (!range.bounded)
+                return true;
+            const DVector local{(range.min.x + range.max.x) * .5f, (range.min.y + range.max.y) * .5f,
+                                (range.min.z + range.max.z) * .5f};
+            const double dx = range.max.x - range.min.x, dy = range.max.y - range.min.y, dz = range.max.z - range.min.z;
+            const double radius = .5 * std::sqrt(dx * dx + dy * dy + dz * dz);
+            const auto center = vector_add(draw.position, rotate_vector(local, draw.rotation));
+            const DVector rel = vector_subtract(center, eye);
+            auto dot = [](DVector a, DVector b) { return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z; };
+            const double x = dot(rel, right), y = dot(rel, up), z = dot(rel, forward);
+            const double side = radius * std::sqrt(2.0), vertical = radius * std::sqrt(1 + aspect * aspect);
+            return std::isfinite(radius) && z + radius >= near && z - radius <= far && z - x >= -side &&
+                   z + x >= -side && z - aspect * y >= -vertical && z + aspect * y >= -vertical;
+        }
+    } // namespace
+    void WorldPipelines::release()
+    {
+        for (auto*& pipeline : pipelines_)
+        {
+            if (pipeline)
+                SDL_ReleaseGPUGraphicsPipeline(device_, pipeline);
+            pipeline = nullptr;
+        }
+        format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
+    }
+    bool WorldPipelines::prepare(SDL_GPUTextureFormat format, std::string& error)
+    {
+        if (format_ == format && pipelines_[0])
+            return true;
+        release();
+        SDL_GPUShaderCreateInfo vertex_info{}, opaque_info{}, alpha_info{};
+        const auto formats = SDL_GetGPUShaderFormats(device_);
+        if (!world_shader_info(WorldShader::Vertex, formats, vertex_info) ||
+            !world_shader_info(WorldShader::OpaqueFragment, formats, opaque_info) ||
+            !world_shader_info(WorldShader::AlphaFragment, formats, alpha_info))
+        {
+            error = "No bundled world shader for this GPU backend (SPIR-V or MSL required)";
+            return false;
+        }
+        auto* vertex = SDL_CreateGPUShader(device_, &vertex_info);
+        auto* opaque = vertex ? SDL_CreateGPUShader(device_, &opaque_info) : nullptr;
+        auto* alpha = opaque ? SDL_CreateGPUShader(device_, &alpha_info) : nullptr;
+        bool success = alpha != nullptr;
+        if (!success)
+            error = SDL_GetError();
+        SDL_GPUVertexBufferDescription buffer{};
+        buffer.pitch = sizeof(WorldVertex);
+        buffer.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
+        SDL_GPUVertexAttribute attributes[3]{};
+        attributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
+        attributes[1].location = 1;
+        attributes[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
+        attributes[1].offset = offsetof(WorldVertex, color);
+        attributes[2].location = 2;
+        attributes[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
+        attributes[2].offset = offsetof(WorldVertex, uv);
+        for (std::size_t i = 0; success && i < pipelines_.size(); ++i)
+        {
+            const auto kind = static_cast<WorldPipeline>(i);
+            const bool blend = kind == WorldPipeline::Alpha || kind == WorldPipeline::SkyAlpha;
+            const bool sky = kind == WorldPipeline::Sky || kind == WorldPipeline::SkyAlpha;
+            SDL_GPUColorTargetDescription target{};
+            target.format = format;
+            if (blend)
+            {
+                target.blend_state.enable_blend = true;
+                target.blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+                target.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+                target.blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
+                target.blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+                target.blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+                target.blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+            }
+            SDL_GPUGraphicsPipelineCreateInfo create{};
+            create.vertex_shader = vertex;
+            create.fragment_shader = blend ? alpha : opaque;
+            create.vertex_input_state = {&buffer, 1, attributes, 3};
+            create.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+            create.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
+            create.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+            create.rasterizer_state.enable_depth_clip = true;
+            create.multisample_state.sample_count = SDL_GPU_SAMPLECOUNT_1;
+            create.depth_stencil_state.enable_depth_test = !sky;
+            create.depth_stencil_state.enable_depth_write = !blend && !sky;
+            create.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
+            create.target_info.color_target_descriptions = &target;
+            create.target_info.num_color_targets = 1;
+            create.target_info.has_depth_stencil_target = true;
+            create.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+            pipelines_[i] = SDL_CreateGPUGraphicsPipeline(device_, &create);
+            if (!pipelines_[i])
+            {
+                error = SDL_GetError();
+                success = false;
+            }
+        }
+        for (auto* shader : {vertex, opaque, alpha})
+            if (shader)
+                SDL_ReleaseGPUShader(device_, shader);
+        if (!success)
+        {
+            release();
+            return false;
+        }
+        format_ = format;
+        ++creations;
+        return true;
+    }
     WorldRenderer::~WorldRenderer()
     {
         clear_geometry();
@@ -13,14 +127,6 @@ namespace OpenBlood2
             SDL_ReleaseGPUSampler(device_, sampler_);
         if (depth_)
             SDL_ReleaseGPUTexture(device_, depth_);
-        if (pipeline_)
-            SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
-        if (alpha_pipeline_)
-            SDL_ReleaseGPUGraphicsPipeline(device_, alpha_pipeline_);
-        if (sky_pipeline_)
-            SDL_ReleaseGPUGraphicsPipeline(device_, sky_pipeline_);
-        if (sky_alpha_pipeline_)
-            SDL_ReleaseGPUGraphicsPipeline(device_, sky_alpha_pipeline_);
     }
     void WorldRenderer::clear_geometry()
     {
@@ -39,101 +145,9 @@ namespace OpenBlood2
         stats.triangles = stats.draws = stats.alpha_batches = stats.pan_batches = stats.alpha_pan_batches = 0;
         stats.surface_time = 0;
         stats.sky_batches = 0;
+        stats.culled = 0;
         alpha_order_.clear();
-    }
-    bool WorldRenderer::pipeline(SDL_GPUTextureFormat format, std::string& error, bool translucent, bool sky)
-    {
-        if (color_format_ != format)
-        {
-            if (pipeline_)
-                SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
-            if (alpha_pipeline_)
-                SDL_ReleaseGPUGraphicsPipeline(device_, alpha_pipeline_);
-            if (sky_pipeline_)
-                SDL_ReleaseGPUGraphicsPipeline(device_, sky_pipeline_);
-            if (sky_alpha_pipeline_)
-                SDL_ReleaseGPUGraphicsPipeline(device_, sky_alpha_pipeline_);
-            sky_pipeline_ = sky_alpha_pipeline_ = nullptr;
-            pipeline_ = alpha_pipeline_ = nullptr;
-            color_format_ = format;
-        }
-        auto*& selected =
-            sky ? (translucent ? sky_alpha_pipeline_ : sky_pipeline_) : (translucent ? alpha_pipeline_ : pipeline_);
-        if (selected)
-            return true;
-        const bool alpha = translucent || style_ == DrawStyle::SpriteAlpha;
-        SDL_GPUShaderCreateInfo vertex_info{}, fragment_info{};
-        const auto formats = SDL_GetGPUShaderFormats(device_);
-        if (!world_shader_info(WorldShader::Vertex, formats, vertex_info) ||
-            !world_shader_info(alpha ? WorldShader::AlphaFragment : WorldShader::OpaqueFragment, formats,
-                               fragment_info))
-        {
-            error = "No bundled world shader for this GPU backend (SPIR-V or MSL required)";
-            return false;
-        }
-        auto* vertex = SDL_CreateGPUShader(device_, &vertex_info);
-        if (!vertex)
-        {
-            error = SDL_GetError();
-            return false;
-        }
-        auto* fragment = SDL_CreateGPUShader(device_, &fragment_info);
-        if (!fragment)
-        {
-            error = SDL_GetError();
-            SDL_ReleaseGPUShader(device_, vertex);
-            return false;
-        }
-        SDL_GPUVertexBufferDescription buffer{};
-        buffer.pitch = sizeof(WorldVertex);
-        buffer.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
-        SDL_GPUVertexAttribute attributes[3]{};
-        attributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
-        attributes[1].location = 1;
-        attributes[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
-        attributes[1].offset = offsetof(WorldVertex, color);
-        attributes[2].location = 2;
-        attributes[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
-        attributes[2].offset = offsetof(WorldVertex, uv);
-        SDL_GPUColorTargetDescription target{};
-        target.format = format;
-        if (alpha)
-        {
-            target.blend_state.enable_blend = true;
-            target.blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
-            target.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
-            target.blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
-            target.blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
-            target.blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
-            target.blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
-        }
-        SDL_GPUGraphicsPipelineCreateInfo create{};
-        create.vertex_shader = vertex;
-        create.fragment_shader = fragment;
-        create.vertex_input_state = {&buffer, 1, attributes, 3};
-        create.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
-        create.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
-        create.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
-        create.rasterizer_state.enable_depth_clip = true;
-        create.multisample_state.sample_count = SDL_GPU_SAMPLECOUNT_1;
-        create.depth_stencil_state.enable_depth_test = !sky;
-        create.depth_stencil_state.enable_depth_write = !alpha && !sky;
-        create.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
-        create.target_info.color_target_descriptions = &target;
-        create.target_info.num_color_targets = 1;
-        create.target_info.has_depth_stencil_target = true;
-        create.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
-        auto* next = SDL_CreateGPUGraphicsPipeline(device_, &create);
-        SDL_ReleaseGPUShader(device_, vertex);
-        SDL_ReleaseGPUShader(device_, fragment);
-        if (!next)
-        {
-            error = SDL_GetError();
-            return false;
-        }
-        selected = next;
-        color_format_ = format;
-        return true;
+        visible_.clear();
     }
     bool WorldRenderer::prepare(const WorldMesh& mesh, std::uint64_t revision, SDL_GPUTextureFormat format,
                                 Uint32 width, Uint32 height, std::string& error, bool dynamic)
@@ -144,9 +158,9 @@ namespace OpenBlood2
             error = "Diagnostic GPU dimensions/geometry exceed limits";
             return false;
         }
-        if (!pipeline(format, error))
+        if (!pipelines_->prepare(format, error))
             return false;
-        if (!depth_ || width_ != width || height_ != height)
+        if (!external_targets_ && (!depth_ || width_ != width || height_ != height))
         {
             SDL_GPUTextureCreateInfo info{};
             info.type = SDL_GPU_TEXTURETYPE_2D;
@@ -165,9 +179,9 @@ namespace OpenBlood2
             if (depth_)
                 SDL_ReleaseGPUTexture(device_, depth_);
             depth_ = next;
-            width_ = width;
-            height_ = height;
         }
+        width_ = width;
+        height_ = height;
         if (revision_ == revision)
             return !dynamic || upload_vertices(mesh, error);
         clear_geometry();
@@ -245,6 +259,7 @@ namespace OpenBlood2
             SDL_GPUSamplerCreateInfo info{};
             info.min_filter = info.mag_filter = SDL_GPU_FILTER_NEAREST;
             info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+            info.max_lod = 1000; // Authored DTX levels; point sampling within each level.
             info.address_mode_u = info.address_mode_v = info.address_mode_w =
                 style_ == DrawStyle::SpriteAlpha ? SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE
                                                  : SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
@@ -272,14 +287,15 @@ namespace OpenBlood2
                                 : nullptr;
             if (const auto* image = images[i])
             {
+                const auto size = image->rgba.size() + image->mip_rgba.size();
                 if (!image->width || !image->height || image->width > 1024 || image->height > 1024 ||
-                    image->rgba.size() != std::size_t(image->width) * image->height * 4 ||
-                    image->rgba.size() > 128 * 1024 * 1024 - bytes)
+                    image->mipmaps > 11 || image->rgba.size() != std::size_t(image->width) * image->height * 4 ||
+                    image->mip_rgba.size() != texture_mip_bytes(*image) || size > 128 * 1024 * 1024 - bytes)
                 {
                     error = "Invalid GPU texture dimensions/payload/budget";
                     return false;
                 }
-                bytes += image->rgba.size();
+                bytes += size;
             }
         }
         if (!images[0])
@@ -312,7 +328,7 @@ namespace OpenBlood2
                     info.width = image->width;
                     info.height = image->height;
                     info.layer_count_or_depth = 1;
-                    info.num_levels = 1;
+                    info.num_levels = std::max(1u, image->mipmaps);
                     textures_[i] = SDL_CreateGPUTexture(device_, &info);
                     if (!textures_[i])
                     {
@@ -321,6 +337,9 @@ namespace OpenBlood2
                     }
                     std::memcpy(mapped + offset, image->rgba.data(), image->rgba.size());
                     offset += image->rgba.size();
+                    if (!image->mip_rgba.empty())
+                        std::memcpy(mapped + offset, image->mip_rgba.data(), image->mip_rgba.size());
+                    offset += image->mip_rgba.size();
                 }
             }
             SDL_UnmapGPUTransferBuffer(device_, transfer);
@@ -333,20 +352,24 @@ namespace OpenBlood2
                         for (std::size_t i = 0; i < count; ++i)
                         {
                             if (const auto* image = images[i])
-                            {
-                                SDL_GPUTextureTransferInfo source{};
-                                source.transfer_buffer = transfer;
-                                source.offset = offset;
-                                source.pixels_per_row = image->width;
-                                source.rows_per_layer = image->height;
-                                SDL_GPUTextureRegion target{};
-                                target.texture = textures_[i];
-                                target.w = image->width;
-                                target.h = image->height;
-                                target.d = 1;
-                                SDL_UploadToGPUTexture(copy, &source, &target, false);
-                                offset += static_cast<Uint32>(image->rgba.size());
-                            }
+                                for (Uint32 level = 0, w = image->width, h = image->height;
+                                     level < std::max(1u, image->mipmaps);
+                                     ++level, w = std::max(1u, w / 2), h = std::max(1u, h / 2))
+                                {
+                                    SDL_GPUTextureTransferInfo source{};
+                                    source.transfer_buffer = transfer;
+                                    source.offset = offset;
+                                    source.pixels_per_row = w;
+                                    source.rows_per_layer = h;
+                                    SDL_GPUTextureRegion target{};
+                                    target.texture = textures_[i];
+                                    target.mip_level = level;
+                                    target.w = w;
+                                    target.h = h;
+                                    target.d = 1;
+                                    SDL_UploadToGPUTexture(copy, &source, &target, false);
+                                    offset += w * h * 4;
+                                }
                         }
                         SDL_EndGPUCopyPass(copy);
                         success = SDL_SubmitGPUCommandBuffer(commands);
@@ -360,11 +383,12 @@ namespace OpenBlood2
             error = SDL_GetError();
         return success;
     }
-    bool WorldRenderer::draw(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target, const WorldMesh& mesh,
-                             std::span<const WorldDraw> draws, DVector eye, DRotation view, bool letterbox,
-                             std::string& error, DrawLoad load, SDL_GPUTexture* shared_depth, WorldPass world_pass,
-                             double surface_time, const PointLight& light)
+    bool WorldRenderer::validate(const WorldMesh& mesh, std::span<const WorldDraw> draws, DVector eye, DRotation view,
+                                 WorldPass world_pass, double surface_time, const PointLight& light, bool letterbox,
+                                 bool close_view, std::string& error)
     {
+        visible_.clear();
+        alpha_order_.clear();
         if (!physics_vector(light.position) || !physics_vector(light.color) || !std::isfinite(light.radius) ||
             light.radius < 0 || light.radius > 1e7 || light.color.x < 0 || light.color.y < 0 || light.color.z < 0 ||
             light.color.x > 1 || light.color.y > 1 || light.color.z > 1)
@@ -372,7 +396,8 @@ namespace OpenBlood2
             error = "Invalid point light";
             return false;
         }
-        if (!pipeline_ || !depth_ || (!vertices_ && !mesh.vertices.empty()))
+        if (!pipelines_->get(WorldPipeline::Opaque) || (!external_targets_ && !depth_) ||
+            (!vertices_ && !mesh.vertices.empty()))
         {
             error = "Diagnostic renderer not prepared";
             return false;
@@ -383,28 +408,20 @@ namespace OpenBlood2
             error = "Invalid surface effect clock";
             return false;
         }
-        std::size_t pan_batches = 0;
         const bool translucent = world_pass == WorldPass::Translucent;
         const bool sky = world_pass == WorldPass::Sky;
-        if (sky && (style_ != DrawStyle::Opaque || load != DrawLoad::Clear ||
-                    !pipeline(color_format_, error, false, true) || !pipeline(color_format_, error, true, true)))
+        if (sky && style_ != DrawStyle::Opaque)
         {
-            if (error.empty())
-                error = "Sky requires an opaque renderer and clear pass";
+            error = "Sky requires an opaque renderer and clear pass";
             return false;
         }
-        if (sky || world_pass == WorldPass::Opaque)
-            stats.sky_batches = 0;
-        if (translucent && (style_ != DrawStyle::Opaque || load != DrawLoad::Load))
+        if (translucent && style_ != DrawStyle::Opaque)
         {
             error = "Transparent world pass requires loaded opaque depth";
             return false;
         }
-        if (translucent &&
-            (!world_alpha_order(mesh, draws, eye, view, alpha_order_, error) || !pipeline(color_format_, error, true)))
-            return false;
-        const Uint32 top = letterbox ? height_ / 6 : 0, height = height_ - 2 * top;
-        const float aspect = float(width_) / float(height);
+        const Uint32 top = letterbox ? height_ / 6 : 0;
+        const float aspect = float(width_) / float(height_ - 2 * top);
         WorldViewUniform uniform;
         for (const auto& d : draws)
         {
@@ -443,6 +460,68 @@ namespace OpenBlood2
                 return false;
             }
         }
+        // Visibility: sky and view-model draws keep their dedicated projections and are never culled.
+        if (sky || close_view)
+            visible_.assign(draws.begin(), draws.end());
+        else
+        {
+            const auto right = rotate_vector({1, 0, 0}, view), up = rotate_vector({0, 1, 0}, view),
+                       forward = rotate_vector({0, 0, 1}, view);
+            for (const auto& d : draws)
+            {
+                if (in_frustum(mesh.ranges[d.range], d, eye, right, up, forward, aspect, 1, 65536))
+                    visible_.push_back(d);
+                else
+                    ++stats.culled;
+            }
+        }
+        if (translucent && !world_alpha_order(mesh, visible_, eye, view, alpha_order_, error))
+        {
+            visible_.clear();
+            return false;
+        }
+        return true;
+    }
+    bool WorldRenderer::record(const WorldRecordTarget& target, const WorldMesh& mesh, std::span<const WorldDraw> draws,
+                               DVector eye, DRotation view, std::string& error, WorldPass world_pass,
+                               double surface_time, const PointLight& light, bool close_view)
+    {
+        error.clear();
+        if (!target.commands || !target.pass || !std::isfinite(target.min_depth) || !std::isfinite(target.max_depth) ||
+            target.min_depth < 0 || target.min_depth >= target.max_depth || target.max_depth > 1)
+        {
+            error = "Invalid world record target";
+            return false;
+        }
+        if (!validate(mesh, draws, eye, view, world_pass, surface_time, light, target.letterbox, close_view, error))
+            return false;
+        encode(target, mesh, eye, view, world_pass, surface_time, light, close_view);
+        return true;
+    }
+    bool WorldRenderer::draw(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target, const WorldMesh& mesh,
+                             std::span<const WorldDraw> draws, DVector eye, DRotation view, bool letterbox,
+                             std::string& error, DrawLoad load, SDL_GPUTexture* shared_depth, WorldPass world_pass,
+                             double surface_time, const PointLight& light)
+    {
+        error.clear();
+        if (world_pass == WorldPass::Sky && load != DrawLoad::Clear)
+        {
+            error = "Sky requires an opaque renderer and clear pass";
+            return false;
+        }
+        if (world_pass == WorldPass::Translucent && style_ == DrawStyle::Opaque && load != DrawLoad::Load)
+        {
+            error = "Transparent world pass requires loaded opaque depth";
+            return false;
+        }
+        if (!shared_depth && !depth_)
+        {
+            error = "Diagnostic renderer not prepared";
+            return false;
+        }
+        if (!validate(mesh, draws, eye, view, world_pass, surface_time, light, letterbox, load == DrawLoad::ClearDepth,
+                      error))
+            return false;
         SDL_GPUColorTargetInfo color{};
         color.texture = target;
         color.clear_color = {.025f, .035f, .05f, 1};
@@ -462,26 +541,58 @@ namespace OpenBlood2
             error = SDL_GetError();
             return false;
         }
-        SDL_GPUViewport viewport{0, float(top), float(width_), float(height), 0, 1};
-        SDL_SetGPUViewport(pass, &viewport);
-        SDL_BindGPUGraphicsPipeline(pass, sky ? sky_pipeline_ : (translucent ? alpha_pipeline_ : pipeline_));
+        encode({commands, pass, letterbox}, mesh, eye, view, world_pass, surface_time, light,
+               load == DrawLoad::ClearDepth);
+        SDL_EndGPURenderPass(pass);
+        return true;
+    }
+    void WorldRenderer::encode(const WorldRecordTarget& target, const WorldMesh& mesh, DVector eye, DRotation view,
+                               WorldPass world_pass, double surface_time, const PointLight& light, bool close_view)
+    {
+        const bool translucent = world_pass == WorldPass::Translucent;
+        const bool sky = world_pass == WorldPass::Sky;
+        if (sky || world_pass == WorldPass::Opaque)
+            stats.sky_batches = 0;
+        const Uint32 top = target.letterbox ? height_ / 6 : 0, height = height_ - 2 * top;
+        const float aspect = float(width_) / float(height);
+        std::size_t pan_batches = 0;
+        SDL_GPUViewport viewport{0, float(top), float(width_), float(height), target.min_depth, target.max_depth};
+        SDL_SetGPUViewport(target.pass, &viewport);
+        auto* bound = pipelines_->get(
+            sky ? WorldPipeline::Sky
+                : (translucent || style_ == DrawStyle::SpriteAlpha ? WorldPipeline::Alpha : WorldPipeline::Opaque));
+        SDL_BindGPUGraphicsPipeline(target.pass, bound);
         if (vertices_)
         {
             SDL_GPUBufferBinding binding{vertices_, 0};
-            SDL_BindGPUVertexBuffers(pass, 0, &binding, 1);
+            SDL_BindGPUVertexBuffers(target.pass, 0, &binding, 1);
+            // Redundant state is skipped within this record; another renderer may have
+            // pushed uniforms or bound samplers in between, so nothing is assumed on entry.
+            SDL_GPUTexture* bound_texture = nullptr;
+            WorldViewUniform uniform, pushed;
+            bool has_pushed = false;
+            auto bind = [&](SDL_GPUGraphicsPipeline* pipeline)
+            {
+                if (pipeline == bound)
+                    return;
+                SDL_BindGPUGraphicsPipeline(target.pass, pipeline);
+                bound = pipeline;
+                bound_texture = nullptr;
+                has_pushed = false;
+            };
             auto emit = [&](const WorldDraw& d, const WorldBatch* face)
             {
                 const auto& r = mesh.ranges[d.range];
                 if (!r.count)
                     return;
                 world_view_uniform(eye, view, aspect, d, uniform);
-                if (sky || load == DrawLoad::ClearDepth)
+                if (sky || close_view)
                 {
                     constexpr float near = .01f, far = 65536;
                     uniform.projection[2] = far / (far - near);
                     uniform.projection[3] = -near * far / (far - near);
                 }
-                const bool illuminate = !sky && style_ == DrawStyle::Opaque && load != DrawLoad::ClearDepth;
+                const bool illuminate = !sky && style_ == DrawStyle::Opaque && !close_view;
                 const std::array<float, 12> fragment{d.alpha,
                                                      0,
                                                      0,
@@ -494,18 +605,28 @@ namespace OpenBlood2
                                                      light.color.y,
                                                      light.color.z,
                                                      0};
-                SDL_PushGPUFragmentUniformData(commands, 0, fragment.data(), sizeof(fragment));
+                SDL_PushGPUFragmentUniformData(target.commands, 0, fragment.data(), sizeof(fragment));
                 auto batch =
                     [&](std::uint32_t first, std::uint32_t count, std::uint32_t material, std::array<double, 2> rate)
                 {
                     world_texture_offset(rate, surface_time, uniform.texture_offset);
-                    SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
+                    if (!has_pushed || std::memcmp(&pushed, &uniform, sizeof(uniform)) != 0)
+                    {
+                        SDL_PushGPUVertexUniformData(target.commands, 0, &uniform, sizeof(uniform));
+                        pushed = uniform;
+                        has_pushed = true;
+                    }
                     pan_batches += rate[0] != 0 || rate[1] != 0;
                     std::uint32_t image = material;
-                    world_material_frame(mesh, material, surface_time, image); // Validated before beginning the pass.
-                    SDL_GPUTextureSamplerBinding texture{textures_[image], sampler_};
-                    SDL_BindGPUFragmentSamplers(pass, 0, &texture, 1);
-                    SDL_DrawGPUPrimitives(pass, count, 1, first, 0);
+                    world_material_frame(mesh, material, surface_time, image); // Validated before recording.
+                    if (textures_[image] != bound_texture)
+                    {
+                        SDL_GPUTextureSamplerBinding texture{textures_[image], sampler_};
+                        SDL_BindGPUFragmentSamplers(target.pass, 0, &texture, 1);
+                        bound_texture = textures_[image];
+                    }
+                    SDL_DrawGPUPrimitives(target.pass, count, 1, first, 0);
+                    ++stats.draw_calls;
                 };
                 if (face)
                     batch(face->first, face->count, face->material, face->uv_rate);
@@ -513,7 +634,7 @@ namespace OpenBlood2
                 {
                     if (sky)
                     {
-                        SDL_BindGPUGraphicsPipeline(pass, sky_pipeline_);
+                        bind(pipelines_->get(WorldPipeline::Sky));
                         ++stats.sky_batches;
                     }
                     batch(r.first, r.count, 0, {});
@@ -523,7 +644,7 @@ namespace OpenBlood2
                     {
                         if (sky)
                         {
-                            SDL_BindGPUGraphicsPipeline(pass, b.translucent ? sky_alpha_pipeline_ : sky_pipeline_);
+                            bind(pipelines_->get(b.translucent ? WorldPipeline::SkyAlpha : WorldPipeline::Sky));
                             batch(b.first, b.count, b.material, b.uv_rate);
                             ++stats.sky_batches;
                         }
@@ -535,14 +656,13 @@ namespace OpenBlood2
             if (translucent)
                 for (const auto& ordered : alpha_order_)
                 {
-                    const auto& d = draws[ordered.draw];
+                    const auto& d = visible_[ordered.draw];
                     emit(d, &mesh.ranges[d.range].batches[ordered.batch]);
                 }
             else
-                for (const auto& d : draws)
+                for (const auto& d : visible_)
                     emit(d, nullptr);
         }
-        SDL_EndGPURenderPass(pass);
         if (sky)
             ++stats.sky_frames;
         else if (translucent)
@@ -557,6 +677,5 @@ namespace OpenBlood2
             stats.pan_batches = pan_batches;
         }
         stats.surface_time = surface_time;
-        return true;
     }
 } // namespace OpenBlood2

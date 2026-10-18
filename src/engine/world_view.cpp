@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <charconv>
 #include <cmath>
+#include <map>
+#include <tuple>
 
 namespace OpenBlood2
 {
@@ -129,6 +131,21 @@ namespace OpenBlood2
         return image < mesh.materials.size() && mesh.materials[image].error.empty() &&
                mesh.materials[image].frames.empty() && mesh.materials[image].fps == 0;
     }
+    void bound_range(std::span<const WorldVertex> vertices, WorldRange& range)
+    {
+        range.bounded = false;
+        range.min = range.max = {};
+        if (range.first > vertices.size() || range.count > vertices.size() - range.first || !range.count)
+            return;
+        range.min = range.max = vertices[range.first].position;
+        for (std::size_t i = range.first + 1; i < std::size_t(range.first) + range.count; ++i)
+        {
+            const auto p = vertices[i].position;
+            range.min = {std::min(range.min.x, p.x), std::min(range.min.y, p.y), std::min(range.min.z, p.z)};
+            range.max = {std::max(range.max.x, p.x), std::max(range.max.y, p.y), std::max(range.max.z, p.z)};
+        }
+        range.bounded = physics_vector(range.min) && physics_vector(range.max);
+    }
     bool WorldMesh::build(const World& world, std::string& error, const Resources* resources)
     {
         *this = {};
@@ -194,6 +211,18 @@ namespace OpenBlood2
             range.first = static_cast<std::uint32_t>(vertices.size());
             range.name = model.name;
             range.pivot = ranges.empty() ? DVector{} : model.translation;
+            // Opaque triangles are grouped by material state in first-appearance order,
+            // preserving polygon order inside each group; translucent faces stay one
+            // batch per polygon in authored order after them. Fewer batches mean fewer
+            // GPU state changes; depth testing makes opaque submission order irrelevant.
+            struct Group
+            {
+                WorldBatch batch;
+                std::vector<WorldVertex> vertices;
+            };
+            std::vector<Group> groups, faces;
+            std::map<std::tuple<std::uint32_t, bool, double, double>, std::size_t> group_ids;
+            std::size_t pending = 0;
             for (const auto& polygon : model.polygons)
             {
                 const auto count = polygon.base_points == UINT16_MAX ? polygon.points.size() : polygon.base_points;
@@ -314,7 +343,7 @@ namespace OpenBlood2
                     if (effect.error.empty())
                         uv_rate = {effect.texel_rate[0] / image.width, effect.texel_rate[1] / image.height};
                 }
-                if ((count - 2) * 3 > max_vertices - vertices.size())
+                if ((count - 2) * 3 > max_vertices - vertices.size() - pending)
                     return fail("Diagnostic triangle budget exceeded");
                 const bool translucent = material && (surface.flags & (1u << 3)) && !(surface.flags & (1u << 4));
                 DVector center{};
@@ -323,7 +352,8 @@ namespace OpenBlood2
                         center = vector_add(
                             center,
                             vector_scale(vector_subtract(model.points[polygon.points[i]], range.pivot), 1.f / count));
-                bool first_triangle = true;
+                const bool sky_portal = (surface.flags & (1u << 4)) != 0;
+                Group* group = nullptr;
                 const auto a = model.points[polygon.points[0]];
                 for (std::size_t i = 1; i + 1 < count; ++i)
                 {
@@ -334,16 +364,22 @@ namespace OpenBlood2
                         ++degenerate;
                         continue;
                     }
-                    if (range.batches.empty() || range.batches.back().material != material ||
-                        range.batches.back().translucent != translucent ||
-                        range.batches.back().sky_portal != bool(surface.flags & (1u << 4)) ||
-                        range.batches.back().uv_rate != uv_rate || (translucent && first_triangle))
-                        range.batches.push_back({static_cast<std::uint32_t>(vertices.size()), 0, material, translucent,
-                                                 center, uv_rate, bool(surface.flags & (1u << 4))});
-                    if (translucent && first_triangle)
+                    if (!group && translucent)
+                    {
+                        faces.push_back({{0, 0, material, true, center, uv_rate, sky_portal}, {}});
+                        group = &faces.back();
                         ++blended;
-                    first_triangle = false;
-                    range.batches.back().count += 3;
+                    }
+                    else if (!group)
+                    {
+                        const auto key = std::make_tuple(material, sky_portal, uv_rate[0], uv_rate[1]);
+                        auto [found, added] = group_ids.emplace(key, groups.size());
+                        if (added)
+                            groups.push_back({{0, 0, material, false, {}, uv_rate, sky_portal}, {}});
+                        group = &groups[found->second];
+                    }
+                    group->batch.count += 3;
+                    pending += 3;
                     for (auto p : {a, b, c})
                     {
                         WorldVertex vertex{vector_subtract(p, range.pivot), color};
@@ -357,11 +393,19 @@ namespace OpenBlood2
                                 std::abs(vertex.uv[0]) > 1e6f || std::abs(vertex.uv[1]) > 1e6f)
                                 return fail("World texture coordinates exceed limits");
                         }
-                        vertices.push_back(vertex);
+                        group->vertices.push_back(vertex);
                     }
                 }
             }
+            for (auto* list : {&groups, &faces})
+                for (auto& group : *list)
+                {
+                    group.batch.first = static_cast<std::uint32_t>(vertices.size());
+                    vertices.insert(vertices.end(), group.vertices.begin(), group.vertices.end());
+                    range.batches.push_back(group.batch);
+                }
             range.count = static_cast<std::uint32_t>(vertices.size()) - range.first;
+            bound_range(vertices, range);
             ranges.push_back(std::move(range));
         }
         return true;

@@ -96,3 +96,5 @@ The [world-alpha correction](world_alpha_contracts.md) supersedes earlier blanke
 Continuation: [original corpse blood pools](blood_splat_contracts.md) supersedes the pool omission for corpse ground hits. Blood-spurt particles, gib impact callers, shared SFX eviction and other required services remain incomplete. The M2 exit gate is unchanged.
 
 The [original impact sparks](spark_contracts.md) continuation supersedes the flesh/metal spark omission only. Underwater bubbles, generic recipes and remaining M2 services stay unavailable.
+
+The [presentation performance continuation](render_performance_contracts.md) submits sorted sprites through `batched_draws`: consecutive draws sharing a texture and opacity are merged into world-space ranges. Per-entry ranges, draws and inspection entries are unchanged, and all sprites share the single scene pass.

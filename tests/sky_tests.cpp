@@ -110,9 +110,11 @@ namespace
         world.models[0].surfaces[1].flags = 1u << 4;
         WorldMesh mesh;
         std::string error;
-        CHECK(mesh.build(world, error) && mesh.sky == 1 && mesh.ranges[0].batches.size() == 3);
-        CHECK(!mesh.ranges[0].batches[0].sky_portal && mesh.ranges[0].batches[1].sky_portal &&
-              !mesh.ranges[0].batches[2].sky_portal);
+        // Opaque faces sharing material state form one batch in first-appearance order; the
+        // sky portal remains its own batch so OpaqueWithSky can omit it.
+        CHECK(mesh.build(world, error) && mesh.sky == 1 && mesh.ranges[0].batches.size() == 2);
+        CHECK(!mesh.ranges[0].batches[0].sky_portal && mesh.ranges[0].batches[1].sky_portal);
+        CHECK(mesh.ranges[0].batches[0].count + mesh.ranges[0].batches[1].count == mesh.ranges[0].count);
         CHECK(!sky_view_position(d, {}, {0, 1, 1}, {}, out) && out.x == 0);
         CHECK(!sky_view_position(d, {}, {1, 1, 1}, {std::numeric_limits<float>::infinity(), 0, 0}, out));
         return true;

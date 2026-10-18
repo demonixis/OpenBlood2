@@ -11,6 +11,7 @@ namespace OpenBlood2
         mesh.texture_bytes = 4;
         materials_.clear();
         draws.clear();
+        batched_draws.clear();
         entries.clear();
         camera_valid_ = false;
         ++revision;
@@ -21,6 +22,7 @@ namespace OpenBlood2
         mesh.vertices.clear();
         mesh.ranges.clear();
         draws.clear();
+        batched_draws.clear();
         entries.clear();
         WorldViewUniform uniform;
         camera_valid_ = world_view_uniform(eye, camera, 1, {}, uniform);
@@ -61,6 +63,7 @@ namespace OpenBlood2
             mesh.vertices.clear();
             mesh.ranges.clear();
             draws.clear();
+            batched_draws.clear();
             entries.clear();
             error = "Sprite camera unavailable or instance budget exceeded";
             return false;
@@ -169,6 +172,7 @@ namespace OpenBlood2
         range.batches.push_back({range.first, 6, material.index});
         for (auto index : {0, 1, 2, 0, 2, 3})
             mesh.vertices.push_back(corners[index]);
+        bound_range(mesh.vertices, range);
         entry.range = draw.range;
         mesh.ranges.push_back(std::move(range));
         draws.push_back(draw);
@@ -182,5 +186,35 @@ namespace OpenBlood2
             return double(d.x) * forward_.x + double(d.y) * forward_.y + double(d.z) * forward_.z;
         };
         std::stable_sort(draws.begin(), draws.end(), [&](const auto& a, const auto& b) { return depth(a) > depth(b); });
+    }
+    void SpriteView::batch()
+    {
+        batched_draws.clear();
+        const auto first_batch = mesh.ranges.size();
+        for (const auto& draw : draws)
+        {
+            const auto source = mesh.ranges[draw.range].first, count = mesh.ranges[draw.range].count;
+            const auto material = mesh.ranges[draw.range].batches.front().material;
+            if (batched_draws.empty() || batched_draws.back().alpha != draw.alpha ||
+                mesh.ranges[batched_draws.back().range].batches.front().material != material)
+            {
+                WorldRange range;
+                range.first = static_cast<std::uint32_t>(mesh.vertices.size());
+                range.batches.push_back({range.first, 0, material});
+                batched_draws.push_back({static_cast<std::uint32_t>(mesh.ranges.size()), {}, {}, draw.alpha});
+                mesh.ranges.push_back(std::move(range));
+            }
+            auto& range = mesh.ranges[batched_draws.back().range];
+            for (std::uint32_t i = source; i < source + count; ++i)
+            {
+                auto vertex = mesh.vertices[i];
+                vertex.position = vector_add(draw.position, rotate_vector(vertex.position, draw.rotation));
+                mesh.vertices.push_back(vertex);
+            }
+            range.count += count;
+            range.batches.front().count += count;
+        }
+        for (auto i = first_batch; i < mesh.ranges.size(); ++i)
+            bound_range(mesh.vertices, mesh.ranges[i]);
     }
 } // namespace OpenBlood2

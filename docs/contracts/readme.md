@@ -156,6 +156,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Original explosion sprite contracts](explosion_sprite_contracts.md)
 - [Original dynamic light contracts](light_contracts.md)
 - [Packaged SPIR-V and Metal shaders](metal_shader_contracts.md)
+- [Presentation performance: single scene pass, batching, culling and mips](render_performance_contracts.md)
 - [Prepared ABC geometry and CPU sampling](model_preparation_contracts.md)
 - [Animated model presentation](model_view_contracts.md)
 - [Current budget continuation](object_particle_contracts.md)

@@ -35,6 +35,9 @@ namespace OpenBlood2
         bool inspector = true;
         bool gpu_smoke = false;
         bool world_smoke = false;
+        // Headless offscreen presentation measurement; never opens a window.
+        bool bench = false, bench_sweep = false;
+        std::uint32_t bench_width = 1920, bench_height = 1080;
     };
 
     struct Config

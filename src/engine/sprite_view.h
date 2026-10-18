@@ -33,8 +33,12 @@ namespace OpenBlood2
         bool add_particle(std::string_view texture, DVector position, float half_extent, DVector color, float alpha,
                           std::uint64_t system, unsigned index, const Resources&, std::string&);
         void sort();
+        // Submission batches after sort(): consecutive draws sharing a texture and opacity are
+        // appended as one world-space range with an identity transform, keeping their order.
+        // Per-entry ranges and draws remain the unchanged inspection snapshot.
+        void batch();
         WorldMesh mesh;
-        std::vector<WorldDraw> draws;
+        std::vector<WorldDraw> draws, batched_draws;
         std::vector<SpriteViewEntry> entries;
         std::uint64_t revision = 0;
 

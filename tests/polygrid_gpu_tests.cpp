@@ -139,7 +139,7 @@ int main(int argc, char** argv)
             CHECK(ink > 1000 && renderer.stats.alpha_batches > 0);
             CHECK(capture.save(
                 (std::filesystem::path(argv[1]) / ("cityhub-water-" + std::to_string(cycle) + ".png")).c_str()));
-            std::cout << "CityHub cycle " << cycle << " cells " << renderer.stats.alpha_batches << " changed pixels "
+            std::cout << "CityHub cycle " << cycle << " surface batches " << renderer.stats.alpha_batches << " changed pixels "
                       << ink << "\n";
             auto prior = pixels;
             CHECK(g.step(.1) && update_polygrid_scene(g, scene, error) &&

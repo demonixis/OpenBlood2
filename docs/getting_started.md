@@ -82,6 +82,23 @@ for GPU tests on this developer machine; dummy audio may be selected for unatten
 checks. The `release` preset disables inspection but keeps the HUD and rendering.
 Run relevant checks there when changing application or UI lifetime.
 
+## Performance measurement
+
+Use the `dev` preset (optimized, with inspector) when judging frame rate; Debug
+builds are several times slower in large worlds. `--bench` measures the same
+presentation path headlessly, without a window or mouse capture:
+
+```sh
+cmake --preset dev
+cmake --build --preset dev --parallel
+./build/dev/blood2 --data-dir "/path/to/Blood II" --world 02_CityHub --bench-size 3440x1440 --frames 600
+./build/dev/blood2 --data-dir "/path/to/Blood II" --world 02_CityHub --bench-sweep
+```
+
+It reports simulation, presentation and GPU completion times per frame plus draw
+call, pass and culling counters. The inspector's 3D view shows the same counters
+for the last presented frame. See [presentation performance](contracts/render_performance_contracts.md).
+
 For a separate Clang sanitizer build:
 
 ```sh

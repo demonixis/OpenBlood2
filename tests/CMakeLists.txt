@@ -91,6 +91,13 @@ if(BLOOD2_TEST_DATA_DIR)
         add_test(NAME gpu.world COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
             --data-dir "${BLOOD2_TEST_DATA_DIR}" --world-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/world.png")
         set_tests_properties(gpu.world PROPERTIES LABELS "private;gpu" TIMEOUT 25 RUN_SERIAL TRUE)
+        # Keeps the headless measurement mode working; timings are reported, not asserted.
+        foreach(bench_world IN ITEMS 01_SubwayA 02_CityHub)
+            add_test(NAME gpu.bench_${bench_world} COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+                --data-dir "${BLOOD2_TEST_DATA_DIR}" --world ${bench_world} --bench-sweep --bench-size 640x360
+                --frames 60)
+            set_tests_properties(gpu.bench_${bench_world} PROPERTIES LABELS "private;gpu;bench" TIMEOUT 60 RUN_SERIAL TRUE)
+        endforeach()
     endif()
 endif()
 

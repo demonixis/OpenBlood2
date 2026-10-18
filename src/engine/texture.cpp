@@ -23,6 +23,18 @@ namespace OpenBlood2
         std::vector<std::uint8_t> bytes;
         return resources.read(path, bytes, error) && read_texture(bytes, out, error);
     }
+    std::size_t texture_mip_bytes(const Texture& image)
+    {
+        std::size_t bytes = 0;
+        auto w = image.width, h = image.height;
+        for (unsigned level = 1; level < image.mipmaps; ++level)
+        {
+            w = std::max(1u, w / 2);
+            h = std::max(1u, h / 2);
+            bytes += std::size_t(w) * h * 4;
+        }
+        return bytes;
+    }
     bool read_texture(std::span<const std::uint8_t> bytes, Texture& out, std::string& error)
     {
         out = {};
@@ -70,14 +82,36 @@ namespace OpenBlood2
         const auto masks_data = r.take(masks ? alpha : 0);
         if (!r.good() || r.remaining())
             return fail("DTX: invalid payload bounds");
-        image.rgba.resize(std::size_t(image.width) * image.height * 4);
-        for (std::size_t i = 0; i < image.rgba.size() / 4; ++i)
+        // Every level uses the same palette; index and 4-bit mask data are stored level by level.
+        auto decode = [&](std::vector<std::uint8_t>& rgba, std::size_t at, std::size_t index_base,
+                          std::size_t mask_base, std::size_t count)
         {
-            const auto p = std::size_t(pixels[i]) * 4;
-            image.rgba[i * 4] = palette[p + 1];
-            image.rgba[i * 4 + 1] = palette[p + 2];
-            image.rgba[i * 4 + 2] = palette[p + 3];
-            image.rgba[i * 4 + 3] = masks ? ((masks_data[i / 2] >> (i % 2 ? 0 : 4)) & 15) * 17 : palette[p];
+            for (std::size_t i = 0; i < count; ++i)
+            {
+                const auto p = std::size_t(pixels[index_base + i]) * 4;
+                rgba[(at + i) * 4] = palette[p + 1];
+                rgba[(at + i) * 4 + 1] = palette[p + 2];
+                rgba[(at + i) * 4 + 2] = palette[p + 3];
+                rgba[(at + i) * 4 + 3] =
+                    masks ? ((masks_data[mask_base + i / 2] >> (i % 2 ? 0 : 4)) & 15) * 17 : palette[p];
+            }
+        };
+        const std::size_t base = std::size_t(image.width) * image.height;
+        image.rgba.resize(base * 4);
+        decode(image.rgba, 0, 0, 0, base);
+        image.mip_rgba.resize(texture_mip_bytes(image));
+        std::size_t index = base, mask = (base + 1) / 2, at = 0;
+        w = image.width;
+        h = image.height;
+        for (unsigned level = 1; level < image.mipmaps; ++level)
+        {
+            w = std::max(1u, w / 2);
+            h = std::max(1u, h / 2);
+            const std::size_t count = std::size_t(w) * h;
+            decode(image.mip_rgba, at, index, mask, count);
+            at += count;
+            index += count;
+            mask += (count + 1) / 2;
         }
         out = std::move(image);
         return true;

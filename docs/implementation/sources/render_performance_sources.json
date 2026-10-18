@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-18",
+  "scope": "Presentation performance phases 0-1: scene presenter, single scene pass, batching, culling, authored DTX mips and measurement mode; no renderer or gameplay code imported",
+  "references": [
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/drawpolygrid.cpp",
+      "source_sha256": "4f9bad22ea043c64eade1a75cf1131eedf71786755f60d7e8fdb42aac6ad71e6",
+      "purpose": "Later-generation corroboration that a PolyGrid is submitted as one indexed list and translucent grids are queued/sorted as objects."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/drawparticles.cpp",
+      "source_sha256": "ab49bac5ad8e60e371a24e091d5280dd0247e3fd19a839f265924a74b6db5759",
+      "purpose": "Later-generation corroboration of CPU-built world-space particle quads submitted in batches."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/d3d_renderworld.cpp",
+      "source_sha256": "a3e8a925bf7d6e191dd9e07245a497aaf08e666c3de479ef7e9cad05f3cfb5b7",
+      "purpose": "Later-generation frustum render-block selection, consulted for the culling direction only."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/d3dmeshrendobj_skel.cpp",
+      "source_sha256": "15e1b13d6341fe17b2f628366c0032d7e70846e9e96f784a05bd7a7c1a3663b1",
+      "purpose": "Later-generation hardware bone-set skinning, recorded for the pending GPU-skinning phase; not implemented here."
+    }
+  ],
+  "reference_revision": {
+    "repository": "https://github.com/jsj2008/lithtech",
+    "revision": "0eab18289bed72879eddb648d3311075b108cf46"
+  },
+  "dependency_patches": {
+    "SDL": {
+      "revision": "6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1",
+      "file": "src/SDL_properties.c",
+      "original_sha256": "67cc7103a51b067a767a2fa8c78154f1cd89b46809c045ded0db1651876171d9",
+      "assignment_fix_sha256": "b4f13bce3c6f5aa33f96ad5b23fd94f701a39e7618d8f6111be8489f5f4e995f",
+      "patched_sha256": "811c3da3a1c8c12d2357524c92d56cc15a2185c5708abb7069fa5bbf2f59febe",
+      "reason": "SDL_SetupPropertyQuery checked its output argument instead of the lookup result; Metal debug devices pass an uninitialized sampler property ID during blit setup. Upstream main checked 2026-10-18 still has both defects."
+    }
+  },
+  "adaptations": [
+    "Opaque world triangles grouped by material state per DAT model; translucent faces remain one batch per polygon.",
+    "One scene render pass with shared depth and eagerly created shared pipelines; view models use a reserved near viewport depth slice instead of a depth clear.",
+    "Conservative bounding-sphere frustum culling of bounded ranges; sky and view-model draws are never culled.",
+    "Sprites/particles pre-transformed to world space and merged per consecutive texture/opacity after sorting.",
+    "Authored DTX mip levels decoded with the shared palette/masks and sampled with point mip selection."
+  ]
+}
