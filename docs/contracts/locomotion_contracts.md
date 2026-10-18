@@ -1,5 +1,11 @@
 # Player Locomotion Boundary
 
+> Known traversal defect, 18 October 2026: the grounded-only stair restriction
+> blocks Caleb's 96-unit planter-to-dumpster jump on CityHub's museum approach;
+> the unobstructed jump rises 90 units. An isolated airborne-step experiment
+> clears that obstacle without changing jump/gravity, but is not integrated or
+> regression-tested. See the [diagnosis and traces](../../../Documentation/Implementation/cityhub_jump.md).
+
 > Extended by [character animation contracts](character_animation_contracts.md):
 > original CAnim_Sound tables now drive locomotion; current model node queries and
 > original sphere measurements are inspectable. AI/damage-localization callers

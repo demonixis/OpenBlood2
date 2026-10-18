@@ -1,5 +1,7 @@
 # Implementation records
 
+- [CityHub museum jump diagnosis; production defect remains open](../../../Documentation/Implementation/cityhub_jump.md)
+
 - [Crash stacks and core-dump validation](../../../Documentation/Implementation/crash_capture.md)
 
 - [Diagnostic file logging validation](../../../Documentation/Implementation/logging.md)
