@@ -190,6 +190,19 @@ namespace
         CHECK(!g.server.PlaySoundAt(h, r, {}, error));
         r.space = SoundSpace(99);
         CHECK(!g.server.PlaySoundAt(h, r, {}, error));
+        // Authored ambient loops use equal radii: a hard edge, full inside and silent beyond.
+        r.space = SoundSpace::Ambient;
+        r.inner_radius = r.outer_radius = 75;
+        id = g.server.PlaySoundAt(h, r, {75, 0, 0}, error);
+        CHECK(id && g.server.advance_audio(.01, {}, {}));
+        v = g.server.audio.get(id);
+        CHECK(v && std::abs(v->left - 1) < .0001 && v->left == v->right);
+        CHECK(g.server.advance_audio(.01, {-1, 0, 0}, {}) && v->left == 0 && v->right == 0);
+        r.inner_radius = r.outer_radius = 0;
+        CHECK(!g.server.PlaySoundAt(h, r, {}, error));
+        r.inner_radius = 80;
+        r.outer_radius = 75;
+        CHECK(!g.server.PlaySoundAt(h, r, {}, error));
         return true;
     }
     bool lifetime(const std::filesystem::path& root)

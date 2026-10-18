@@ -394,8 +394,11 @@ namespace
                 }
             }
         CHECK(prepared == 4 && limited == 12 && total == 32768);
-        catalog.inspect(root, {});
-        CHECK(!catalog.error.empty() && catalog.assets.empty() && catalog.bytes_read == 0);
+        catalog.inspect(root, {{"MusicDirectory", "Music/Cabal"}});
+        CHECK(!catalog.unauthored && !catalog.error.empty() && catalog.assets.empty() && catalog.bytes_read == 0);
+        // A world authoring no music at all (Drop, BB_DeathCanyon) is silent, not a failed plan.
+        catalog.inspect(root, {{"MusicDirectory", ""}, {"AmbientList", ""}});
+        CHECK(catalog.unauthored && catalog.error.empty() && catalog.assets.empty() && catalog.plan.requests.empty());
         std::cout
             << "Catalog: deduplicated reads, explicit missing/ambiguous/symlink/oversize failures and reset verified\n";
         return true;

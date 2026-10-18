@@ -150,9 +150,11 @@ namespace OpenBlood2
                 (unsigned long long)live.requests, (unsigned long long)live.accepted,
                 (unsigned long long)live.failures);
             ImGui::Text(
-                "Messages %llu | source no-ops %llu | refused %llu | committed switches %llu | cancelled MIDI %llu",
+                "Messages %llu | source no-ops %llu | refused %llu | no authored music %llu | committed switches %llu | "
+                "cancelled MIDI %llu",
                 (unsigned long long)live.received, (unsigned long long)live.source_noops,
-                (unsigned long long)live.refused, (unsigned long long)current.switches(),
+                (unsigned long long)live.refused, (unsigned long long)live.unauthored,
+                (unsigned long long)current.switches(),
                 (unsigned long long)sampler.cancelled_messages);
             if (!music.audition_file.empty())
                 ImGui::TextWrapped("Diagnostic audition overrides the stream; the game-level counters are historical.");

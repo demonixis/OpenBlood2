@@ -6,6 +6,7 @@
 #include <cmath>
 #include <limits>
 #include <locale>
+#include <utility>
 #include <sstream>
 
 namespace OpenBlood2
@@ -248,6 +249,11 @@ namespace OpenBlood2
     {
         clear();
     }
+    void Objects::note_rejection(std::string_view reason)
+    {
+        if (precreating_ && rejection_.empty())
+            rejection_ = reason.substr(0, 256);
+    }
     bool Objects::fail(ObjectError error, std::string detail)
     {
         error_ = error;
@@ -370,12 +376,20 @@ namespace OpenBlood2
         }
         object->game->m_hObject = handle;
         contexts_.push_back(&object->properties);
+        // A nested creation inside precreate keeps its own reason, then restores the outer one.
+        auto outer_rejection = std::exchange(rejection_, {});
+        const auto outer_precreating = std::exchange(precreating_, true);
         const auto accepted = dispatch(*object, MID_PRECREATE, &state, static_cast<float>(reason));
+        precreating_ = outer_precreating;
+        auto rejection = std::exchange(rejection_, std::move(outer_rejection));
         if (!accepted || !valid_state(state))
         {
             contexts_.pop_back();
             remove(handle);
-            fail(ObjectError::Rejected, "Rejected precreate: " + type->name);
+            if (accepted)
+                rejection = "invalid creation state";
+            fail(ObjectError::Rejected,
+                 "Rejected precreate: " + type->name + (rejection.empty() ? "" : ": " + rejection));
             return nullptr;
         }
         object->state = state; // Consume AFTER all derived/base/aggregate precreate mutations.

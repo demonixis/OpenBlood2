@@ -106,19 +106,37 @@ bool CDestructableModel::ReadProp(ObjectCreateStruct& create)
     if (s->GetPropGeneric("SurfaceType", &p) == DE_OK)
     {
         if (p.m_Long < 0 || p.m_Long > 255)
-            return false;
+            return Reject("SurfaceType out of range");
         surface = static_cast<unsigned>(p.m_Long);
     }
     // Environment mapping and partial replacement pairs are not silently rendered as opaque skins.
-    return !chrome && model.size() <= MAX_CS_FILENAME_LEN && skin.size() <= MAX_CS_FILENAME_LEN &&
-           damage_model.size() <= MAX_CS_FILENAME_LEN && damage_skin.size() <= MAX_CS_FILENAME_LEN &&
-           destroy_model.size() <= MAX_CS_FILENAME_LEN && destroy_skin.size() <= MAX_CS_FILENAME_LEN &&
-           destroy_model.empty() == destroy_skin.empty() && m_damage.spawn_valid && debris.valid &&
-           dimensions(init_dims) && dimensions(damage_dims) && dimensions(destroy_dims) && physics_vector(tint) &&
-           tint.x >= 0 && tint.y >= 0 && tint.z >= 0 && tint.x <= 255 && tint.y <= 255 && tint.z <= 255 &&
-           std::isfinite(hit_points) && std::abs(hit_points) <= 1e6f && std::isfinite(damage_hit_points) &&
-           std::abs(damage_hit_points) <= 1e6f && std::isfinite(mass) && mass >= 0 && mass <= 1e6f &&
-           std::isfinite(scale) && scale > 0 && scale <= 1e6f && std::isfinite(alpha) && alpha >= 0 && alpha <= 1;
+    if (chrome)
+        return Reject("Chrome environment mapping is unavailable");
+    if (model.size() > MAX_CS_FILENAME_LEN || skin.size() > MAX_CS_FILENAME_LEN ||
+        damage_model.size() > MAX_CS_FILENAME_LEN || damage_skin.size() > MAX_CS_FILENAME_LEN ||
+        destroy_model.size() > MAX_CS_FILENAME_LEN || destroy_skin.size() > MAX_CS_FILENAME_LEN)
+        return Reject("model or skin filename too long");
+    if (destroy_model.empty() != destroy_skin.empty())
+        return Reject("partial DestroyFilename/DestroySkin pair");
+    if (!m_damage.spawn_valid)
+        return Reject("SpawnObject not accepted: " + m_damage.spawn_object);
+    if (!debris.valid)
+        return Reject("invalid debris Scale");
+    if (!dimensions(init_dims) || !dimensions(damage_dims) || !dimensions(destroy_dims))
+        return Reject("invalid authored dimensions");
+    if (!physics_vector(tint) || tint.x < 0 || tint.y < 0 || tint.z < 0 || tint.x > 255 || tint.y > 255 ||
+        tint.z > 255)
+        return Reject("TintColor out of range");
+    if (!std::isfinite(hit_points) || std::abs(hit_points) > 1e6f || !std::isfinite(damage_hit_points) ||
+        std::abs(damage_hit_points) > 1e6f || !std::isfinite(mass) || mass < 0 || mass > 1e6f ||
+        !std::isfinite(scale) || scale <= 0 || scale > 1e6f || !std::isfinite(alpha) || alpha < 0 || alpha > 1)
+        return Reject("invalid HitPoints, ObjectMass, ModelScale or Alpha");
+    return true;
+}
+bool CDestructableModel::Reject(const std::string& reason)
+{
+    GetServerDE()->RejectPrecreate(reason);
+    return false;
 }
 bool CDestructableModel::SetDimensions(DVector& dims, bool rotate, float shadow_limit)
 {

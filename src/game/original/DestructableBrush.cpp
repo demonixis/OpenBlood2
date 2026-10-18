@@ -15,7 +15,11 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
     {
         const auto accepted = B2BaseClass::EngineMessageFn(message, data, reason);
         if (!accepted || !data || reason == 3 || !debris.valid)
+        {
+            if (accepted && data && reason != 3)
+                server->RejectPrecreate("invalid debris Scale");
             return 0;
+        }
         auto& create = *static_cast<ObjectCreateStruct*>(data);
         if (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP)
         {
@@ -36,17 +40,26 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
             if (server->GetPropGeneric("SurfaceType", &prop) == DE_OK)
             {
                 if (prop.m_Long < 0 || prop.m_Long > 255)
+                {
+                    server->RejectPrecreate("SurfaceType out of range");
                     return 0;
+                }
                 surface = static_cast<unsigned>(prop.m_Long);
             }
             // Reject unsupported spawn rules before admitting this brush.
             if (!m_damage.spawn_valid)
+            {
+                server->RejectPrecreate("SpawnObject not accepted: " + m_damage.spawn_object);
                 return 0;
+            }
         }
 
         if (!std::isfinite(hit_points) || !std::isfinite(mass) || std::abs(hit_points) > 1e6f || mass < 0 ||
             mass > 1e6f)
+        {
+            server->RejectPrecreate("invalid HitPoints or ObjectMass");
             return 0;
+        }
         SAFE_STRCPY(create.m_Filename, create.m_Name);
         create.m_SkinName[0] = 0;
         create.m_Flags |= FLAG_FULLPOSITIONRES | FLAG_MODELGOURAUDSHADE;
@@ -59,7 +72,12 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
         }
         if ((create.m_Flags & FLAG_GRAVITY) &&
             ((!dynamic_debris && !(create.m_Flags & FLAG_BOXPHYSICS)) || (create.m_Flags & FLAG_GOTHRUWORLD)))
-            return 0; // Polygon dynamics / world bypass are not this body solver.
+        {
+            // Polygon dynamics / world bypass are not this body solver.
+            server->RejectPrecreate(create.m_Flags & FLAG_GOTHRUWORLD ? "gravity with GOTHRUWORLD"
+                                                                      : "gravity without BoxPhysics (polygon dynamics)");
+            return 0;
+        }
         return 1;
     }
     if (message == MID_INITIALUPDATE)

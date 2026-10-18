@@ -199,6 +199,13 @@ bool CMusic::PlayMusicLevel(std::uint8_t level, OpenBlood2::MusicCatalog& catalo
     // Original TransitionToLevel assigns before the fallible PlayList call.
     // The same-silence direct PlayList branch leaves the identical value intact.
     logical_level = level;
+    if (catalog.unauthored)
+    {
+        // Original InitPlayLists fails without authored music; the ignored PlayList call stays silent.
+        ++unauthored;
+        error = "World authors no music lists";
+        return false;
+    }
     ++requests;
     if (!catalog.request_level(request, audio, error))
     {

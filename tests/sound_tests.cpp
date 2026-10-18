@@ -165,7 +165,7 @@ namespace
         GameSession g;
         CHECK(test_audio::setup(g, root));
         for (const auto& p : std::vector<Properties>{{{"Filename", std::string("absent.wav")}},
-                                                     {{"Filename", std::string("cue.wav")}, {"InnerRadius", 100.0f}},
+                                                     {{"Filename", std::string("cue.wav")}, {"InnerRadius", 150.0f}},
                                                      {{"Filename", std::string("cue.wav")}, {"OuterRadius", -1.0f}}})
         {
             auto h = make(g, p);
@@ -332,7 +332,7 @@ namespace
                   << " invalid=" << invalid << " metadata=" << metadata << " started=" << started
                   << " rejected=" << rejected << " failed=" << failed << '\n';
         CHECK(worlds == 57 && sounds == 792 && streams == 302 && missing == 15 && !invalid && !metadata);
-        CHECK(started == 696 && rejected == 0 && failed == 96);
+        CHECK(started == 769 && rejected == 0 && failed == 23); // Equal authored radii play.
         return true;
     }
     bool subway(const std::filesystem::path& root)

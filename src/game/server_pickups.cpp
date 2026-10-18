@@ -34,6 +34,11 @@ namespace OpenBlood2
         Properties parsed;
         return supported && objects_.parse_properties(objects_.find_class(type), props, parsed);
     }
+    void ServerAdapter::RejectPrecreate(std::string_view reason)
+    {
+        trace_service("RejectPrecreate");
+        objects_.note_rejection(reason);
+    }
     void ServerAdapter::RecordSpawn(const SpawnReport& report)
     {
         trace_service("RecordSpawn");

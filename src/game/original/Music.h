@@ -39,6 +39,7 @@ class CMusic
     void ExitWorld(OpenBlood2::AudioMixer&);
     std::uint8_t logical_level = 0;
     std::uint64_t received = 0, requests = 0, accepted = 0, refused = 0, failures = 0, source_noops = 0;
+    std::uint64_t unauthored = 0; // Level requests in a world without authored music: silent, not failures.
     std::string error;
     OpenBlood2::MusicCommand last_command;
     static bool BuildAssetPlan(const std::map<std::string, std::string>& properties, OpenBlood2::MusicAssetPlan&,

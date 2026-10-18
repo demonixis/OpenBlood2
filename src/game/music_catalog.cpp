@@ -298,6 +298,10 @@ namespace OpenBlood2
     void MusicCatalog::inspect(const std::filesystem::path& root, const std::map<std::string, std::string>& properties)
     {
         *this = {};
+        unauthored = std::all_of(properties.begin(), properties.end(),
+                                 [](const auto& property) { return property.second.empty(); });
+        if (unauthored)
+            return;
         if (!CMusic::BuildAssetPlan(properties, plan, error))
             return;
         // Own all names. Never retain directory iterators, resource spans or game objects.

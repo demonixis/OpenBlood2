@@ -102,3 +102,11 @@ SubwayA tests use actual player messages and external Cabal data, then check cle
 CityHub entry. The continuous train route now requires its authored MUSIC LEVEL 3
 to reach active playback with no music failure instead of accepting an unsupported
 trigger. NVIDIA sound checks exercise typed live switching hidden and after reload.
+
+A world whose WorldProperties author no music (every music property absent or
+empty, e.g. Drop and BB_DeathCanyon) inspects as `unauthored`. Level requests then
+keep the original logical-level assignment, set a diagnostic error and count as
+`unauthored` no-ops instead of failures, matching the original client's ignored
+PlayList result after InitPlayLists fails. Startup is not refused for it. Any
+authored but invalid or missing plan remains a counted failure that refuses
+startup; a catalogue that was never inspected is not `unauthored`.

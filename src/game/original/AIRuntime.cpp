@@ -140,6 +140,8 @@ bool AI_Mgr::RuntimeFailure(std::string_view why)
     runtime_error = why;
     ++runtime_failures;
     auto* s = GetServerDE();
+    if (s)
+        s->RejectPrecreate(why); // Only kept while this object's precreate is refusing.
     if (s && s->IsObjectAlive(m_hObject))
     {
         s->SetNextUpdate(m_hObject, 0);

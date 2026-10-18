@@ -83,3 +83,9 @@ Streaming, region loops, priority arbitration, reverb, Doppler, occlusion, gener
 sound callers/music, save/restore, audible hardware assessment and retail
 executable parity remain open. Unknown historical VoiceType properties are not
 silently discarded. M2's acceptance gate is unchanged.
+
+Distance gain is full at or inside InnerRadius and zero at or beyond OuterRadius,
+linear between. Equal radii (authored on retail ambient loops such as amb7/wind1)
+are therefore a hard edge and never divide by a zero falloff; this branch order is
+later LithTech CSoundInstance behavior, not a verified 1998 trace. Requests still
+reject InnerRadius > OuterRadius and a non-positive OuterRadius.

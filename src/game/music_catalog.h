@@ -50,6 +50,7 @@ namespace OpenBlood2
     struct MusicCatalog
     {
         MusicAssetPlan plan;
+        bool unauthored = false; // Every world music property is absent or empty: no music, not a failure.
         ImaSectionCursor cursor; // Explicit inspection traversal; reset with the world catalogue.
         std::string cursor_file, cursor_error;
         ImaSectionProgram audition;

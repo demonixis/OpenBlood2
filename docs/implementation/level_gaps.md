@@ -8,9 +8,13 @@ tab lists. The counts match the Levels-tab rejection messages.
 
 This is a backlog, not an acceptance record. It covers only world-entry
 validation (class registration and creation). A world that passes here can still
-fail later on presentation resources, runtime services or gameplay; `drop` and
-`multi/bb_deathcanyon` already pass entry validation and fail on client music.
-Earlier per-world counts in the contracts are historical.
+fail later on presentation resources, runtime services or gameplay. Earlier
+per-world counts in the contracts are historical.
+
+Update after L0/L1 (same data, `--start-game`): `drop` and `multi/bb_deathcanyon`
+now start; 17 equal-radius Sounds now play (434 → 417 failed entries over all
+worlds); every precreate rejection names its cause. The tables below are
+regenerated from that run.
 
 ## How to refresh
 
@@ -19,42 +23,39 @@ blood2 --data-dir <Blood2> --inspect-world --world <name>
 ```
 
 The summary lists `Class / Class not ported: N`, and each failed entry is now
-logged as `Failed entry <index> (<class>): <detail>`. A failed entry whose detail
-is only `Rejected precreate: <class>` does not say why; batch L0 fixes that. The
-causes of those rejections below were found with temporary tracing in the
-precreate paths (`CDestructableBrush`, `CDestructableModel::ReadProp`,
-`AI_Mgr::RuntimePrecreate`, `ServerAdapter::ValidateSpawnObject`).
+logged as `Failed entry <index> (<class>): <detail>`. Since L0 a precreate
+refusal reads `Rejected precreate: <class>: <reason>`.
 
 ## Status by world
 
-`starts` means the world already passes entry validation (01_SubwayA,
-02_CityHub, 05_CDMB). Batches are defined in the next section.
+`starts` means the world passes entry validation (01_SubwayA, 02_CityHub,
+05_CDMB, Drop, BB_DeathCanyon). Batches are defined in the next section.
 
 | World | Created | Unported (classes) | Failed | Batches needed |
 |---|---:|---:|---:|---|
 | 01_subwaya | 204 | 0 (0) | 0 | **starts** |
 | 02_cityhub | 453 | 0 (0) | 0 | **starts** |
-| 02_cityhubb | 390 | 19 (3) | 2 | L1, L7 |
+| 02_cityhubb | 390 | 19 (3) | 2 | L7, L13 |
 | 02_cityhubc | 370 | 34 (4) | 2 | L2, L7, L10 |
-| 03_museum | 554 | 86 (6) | 11 | L1, L4, L6, L8, L10, L11, L12 |
-| 04_steamtunnels | 447 | 55 (6) | 9 | L1, L2, L5, L6, L7, L10 |
-| 05_cdm | 508 | 14 (5) | 28 | L1, L3, L6, L7, L10, L11 |
+| 03_museum | 554 | 86 (6) | 11 | L4, L6, L8, L10, L11, L12, L13 |
+| 04_steamtunnels | 447 | 55 (6) | 8 | L2, L5, L6, L7, L10, L13 |
+| 05_cdm | 508 | 14 (5) | 28 | L3, L6, L7, L10, L11, L13 |
 | 05_cdmb | 129 | 0 (0) | 0 | **starts** |
-| 06_airship1 | 187 | 0 (0) | 11 | L1, L4, L6, L12 |
+| 06_airship1 | 187 | 0 (0) | 9 | L4, L6, L12, L13 |
 | 06_airship2 | 243 | 2 (2) | 17 | L6, L10 |
-| 07_cathedral | 205 | 18 (9) | 6 | L1, L2, L6, L7, L8, L10, L11 |
-| 08_subwayb | 174 | 0 (0) | 1 | L1 |
+| 07_cathedral | 205 | 18 (9) | 6 | L2, L6, L7, L8, L10, L11, L13 |
+| 08_subwayb | 174 | 0 (0) | 1 | L13 |
 | 09_abandoned_buildings | 638 | 38 (11) | 35 | L2, L3, L4, L5, L6, L7, L8, L10, L11 |
 | 10_sewagetreatmentplant | 99 | 25 (5) | 1 | L6, L7, L11 |
 | 11_slaughter_house | 465 | 26 (8) | 16 | L4, L6, L7, L8, L10, L12 |
-| 21_laboratory | 280 | 38 (9) | 17 | L1, L4, L6, L7, L8, L11 |
+| 21_laboratory | 280 | 38 (9) | 9 | L4, L6, L7, L8, L11 |
 | 22_office | 482 | 6 (3) | 17 | L2, L4, L6, L7, L8, L10 |
-| 23_rooftop | 136 | 8 (6) | 2 | L1, L8, L9, L10, L11 |
+| 23_rooftop | 136 | 8 (6) | 0 | L8, L9, L10, L11 |
 | 24_ancientcity | 254 | 57 (9) | 2 | L3, L6, L7, L8, L10 |
 | 24b_arena | 149 | 18 (11) | 3 | L3, L7, L9, L10, L11 |
 | 25_ancientone | 123 | 30 (10) | 1 | L2, L8, L9, L10, L11 |
 | credits | 21 | 1 (1) | 0 | L9 |
-| drop | 5 | 0 (0) | 0 | L1 |
+| drop | 5 | 0 (0) | 0 | **starts** |
 | end | 20 | 4 (4) | 0 | L9 |
 | multi/bb_area15 | 75 | 1 (1) | 0 | L10 |
 | multi/bb_bloodarena | 16 | 5 (5) | 109 | L3, L10 |
@@ -64,14 +65,14 @@ precreate paths (`CDestructableBrush`, `CDestructableModel::ReadProp`,
 | multi/bb_cabana | 65 | 3 (3) | 0 | L10 |
 | multi/bb_chosenarena | 123 | 2 (2) | 0 | L10 |
 | multi/bb_condemned | 177 | 4 (4) | 7 | L2, L4, L10 |
-| multi/bb_crypt | 116 | 6 (4) | 3 | L1, L10, L11 |
-| multi/bb_deathcanyon | 44 | 0 (0) | 0 | L1 |
+| multi/bb_crypt | 116 | 6 (4) | 0 | L10, L11 |
+| multi/bb_deathcanyon | 44 | 0 (0) | 0 | **starts** |
 | multi/bb_drain | 50 | 2 (1) | 0 | L10 |
 | multi/bb_fields | 97 | 8 (1) | 0 | L11 |
 | multi/bb_jgrave | 131 | 11 (4) | 8 | L2, L4, L10 |
 | multi/bb_midgard | 13 | 0 (0) | 68 | L3 |
 | multi/bb_power | 140 | 1 (1) | 0 | L10 |
-| multi/bb_rooftop | 104 | 4 (4) | 1 | L1, L10, L11 |
+| multi/bb_rooftop | 104 | 4 (4) | 0 | L10, L11 |
 | multi/ctf_cabana | 122 | 8 (4) | 0 | L10, L11 |
 | multi/ctf_deadcities | 153 | 8 (4) | 0 | L10, L11 |
 | multi/ctf_dmx | 97 | 7 (3) | 2 | L4, L10, L11 |
@@ -79,40 +80,41 @@ precreate paths (`CDestructableBrush`, `CDestructableModel::ReadProp`,
 
 Closest to starting:
 
-- **L1 only:** `08_subwayb`, `drop`, `multi/bb_deathcanyon`.
+- **L13 only:** `08_subwayb`.
 - **L3 only:** `multi/bb_midgard`.
 - **L9 only:** `credits`, `end` (the Chosen as scripted actors).
 - **L10 only:** `multi/bb_area15`, `bb_brownstar`, `bb_cabana`, `bb_chosenarena`, `bb_drain`, `bb_power`.
 - **L11 only:** `multi/bb_fields`.
-- **L1 + L7:** `02_cityhubb`. **L6 + L10:** `06_airship2`.
+- **L7 + L13:** `02_cityhubb`. **L6 + L10:** `06_airship2`.
 
 ## Batches
 
-Batches L0–L5 are fixes and policies on code that already exists; L6–L12 port
-new original code. Unported-class totals count source entries over all 44 worlds.
+L0 and L1 are done. L2–L5 are fixes and policies on code that already exists;
+L6–L13 port new original code. Unported-class totals count source entries over all 44 worlds.
 
-### L0 — Diagnostics
+### L0 — Diagnostics (done)
 
-Keep the reason of a precreate rejection in the entry detail (today the object is
-removed and only `Rejected precreate: <class>` survives). The causes exist
-already: `AI_Mgr::runtime_error`, `CDestructableModel::error`, the
-`CDestructableBrush` early returns and the `ValidateSpawnObject` result. No world
-is unblocked, but every later batch becomes measurable from the inspector.
+Classes call the bounded `ServerDE::RejectPrecreate(reason)` service before
+refusing precreate; the engine keeps the first reason of the refusal in progress
+and appends it to `Rejected precreate: <class>`. Reasons are recorded for the AI
+runtime failures, every CDestructableBrush refusal and each
+CDestructableModel property check. A refusal without a reason keeps the bare
+message; an accepted precreate with an invalid creation state says so.
 
-### L1 — Quick fixes in ported code (13 worlds)
+### L1 — Quick fixes in ported code (done)
 
-- **Sound with `InnerRadius == OuterRadius`** (17 entries: 04, 06_airship1, 21,
-  23, bb_crypt, bb_rooftop). `AudioMixer::play` requires `outer > inner`;
-  authored ambient loops use equal radii (7000/7000, 600/600, 50/50…). Confirm
-  the original attenuation for equal radii and accept it.
-- **SpawnObject allow-list** (`ServerAdapter::ValidateSpawnObject`) misses
-  classes that are already registered: `MedKitPU` (5), `FlashlightPU` /
-  `FlashLightPU` (3), `FlareGunPU` (2), `SubMachineGunPU`, `AssaultRiflePU`.
-  Affects CDestructableBrush/Model containers in 02_cityhubb, 03, 04, 05_cdm,
-  06_airship1, 07, 08_subwayb.
-- **Empty music lists** (`drop`, `multi/bb_deathcanyon`): WorldProperties declare
-  no CD track, directory or lists; "Finite playlist is empty" should mean no
-  music, not a failed level start.
+- **Sounds with `InnerRadius == OuterRadius`** (17 entries in 04, 06_airship1,
+  21, 23, bb_crypt, bb_rooftop) now play. The mixer gives full gain within the
+  inner radius and none beyond the outer one, so equal radii are a hard edge
+  without a zero division. This follows the later LithTech `CSoundInstance`
+  branch order; inner > outer and a zero outer radius still reject.
+- **Worlds authoring no music** (`drop`, `multi/bb_deathcanyon`): when every
+  WorldProperties music property is absent or empty, the catalogue is
+  `unauthored` and level requests are counted silent no-ops (inspector
+  "no authored music"), as the original ignored `PlayList` failure after a failed
+  `InitPlayLists`. An authored but invalid or missing plan still fails startup.
+- The SpawnObject allow-list part moved to **L13**: those pickups refuse string
+  creation until the original bounce is ported.
 
 ### L2 — Authored data errors: explicit omission policy (9 worlds)
 
@@ -235,6 +237,16 @@ CultistAI (6) and CivilianAI (1) fail "NPC world ground placement failed" in
 03_museum, 06_airship1 and 11_slaughter_house. Investigate the placement probe
 against those spawn positions (no relocation shortcut).
 
+### L13 — String-created pickups (7 worlds)
+
+Destructible containers whose `SpawnObject` names an already ported pickup are
+rejected: `MedKitPU` (5), `FlashlightPU`/`FlashLightPU` (3), `FlareGunPU` (2),
+`SubMachineGunPU`, `AssaultRiflePU`. `ValidateSpawnObject` does not admit them
+because `ItemPickup` and the weapon pickups refuse `PRECREATE_STRINGPROP`: the
+original string-spawn path (PickupObject.cpp, `m_bBounce` / rest-position
+spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
+03, 04, 05_cdm, 06_airship1, 07, 08_subwayb).
+
 ## Details by world
 
 ### 02_cityhubb
@@ -253,8 +265,8 @@ against those spawn positions (no relocation shortcut).
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| CDestructableBrush | SpawnObject class not accepted: MedKitPU | 1 | L1 |
-| CDestructableBrush | SpawnObject class not accepted: FlashlightPU | 1 | L1 |
+| CDestructableBrush | SpawnObject class not accepted: MedKitPU | 1 | L13 |
+| CDestructableBrush | SpawnObject class not accepted: FlashlightPU | 1 | L13 |
 
 ### 02_cityhubc
 
@@ -295,10 +307,10 @@ against those spawn positions (no relocation shortcut).
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| CDestructableBrush | SpawnObject class not accepted: MedKitPU | 1 | L1 |
 | CDestructableModel | SpawnObject class not accepted: InvulnerabilityPU | 1 | L10 |
 | CDestructableBrush | SpawnObject class not accepted: BinocularsPU | 1 | L10 |
 | CultistAI | NPC world ground placement failed | 1 | L12 |
+| CDestructableBrush | SpawnObject class not accepted: MedKitPU | 1 | L13 |
 | CDestructableBrush | Ambiguous named world model | 4 | L4 |
 | CDestructableModel | SpawnObject class not accepted: RocketAmmoPU | 1 | L6 |
 | Fanatic | authored AI weapon unavailable: SHOTGUN | 1 | L6 |
@@ -306,7 +318,7 @@ against those spawn positions (no relocation shortcut).
 
 ### 04_steamtunnels
 
-447 created instances · 55 unported entries (6 classes) · 9 failed entries
+447 created instances · 55 unported entries (6 classes) · 8 failed entries
 
 **Unported classes**
 
@@ -323,9 +335,8 @@ against those spawn positions (no relocation shortcut).
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| Sound | Invalid or over-limit sound request (InnerRadius == OuterRadius) | 1 | L1 |
-| CDestructableModel | SpawnObject class not accepted: FlareGunPU | 1 | L1 |
-| CDestructableModel | SpawnObject class not accepted: SubMachineGunPU | 1 | L1 |
+| CDestructableModel | SpawnObject class not accepted: FlareGunPU | 1 | L13 |
+| CDestructableModel | SpawnObject class not accepted: SubMachineGunPU | 1 | L13 |
 | DetailSprite | Missing, oversized or non-SPR sprite resource: sprites\bloodsplat1.dtx | 1 | L2 |
 | DetailSprite | Missing, oversized or non-SPR sprite resource: sprites\bloodsplat2.dtx | 1 | L2 |
 | DetailSprite | Missing, oversized or non-SPR sprite resource: sprites\bloodsplat3.dtx | 1 | L2 |
@@ -350,24 +361,23 @@ against those spawn positions (no relocation shortcut).
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| CDestructableModel | SpawnObject class not accepted: MedKitPU | 1 | L1 |
-| CDestructableModel | SpawnObject class not accepted: FlashlightPU | 1 | L1 |
+| CDestructableModel | SpawnObject class not accepted: MedKitPU | 1 | L13 |
+| CDestructableModel | SpawnObject class not accepted: FlashlightPU | 1 | L13 |
 | CGib | CGib: invalid property DamageTriggerMessage | 24 | L3 |
 | CDestructableModel | SpawnObject class not accepted: TeslaCannonPU | 1 | L6 |
 | Fanatic | authored AI weapon unavailable: TESLA | 1 | L6 |
 
 ### 06_airship1
 
-187 created instances · 0 unported entries (0 classes) · 11 failed entries
+187 created instances · 0 unported entries (0 classes) · 9 failed entries
 
 **Failed entries**
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| Sound | Invalid or over-limit sound request (InnerRadius == OuterRadius) | 2 | L1 |
-| CDestructableBrush | SpawnObject class not accepted: MedKitPU | 1 | L1 |
-| CDestructableBrush | SpawnObject class not accepted: FlashLightPU | 1 | L1 |
 | CultistAI | NPC world ground placement failed | 3 | L12 |
+| CDestructableBrush | SpawnObject class not accepted: MedKitPU | 1 | L13 |
+| CDestructableBrush | SpawnObject class not accepted: FlashLightPU | 1 | L13 |
 | Door | Ambiguous named world model | 2 | L4 |
 | Fanatic | authored AI weapon unavailable: SNIPE | 2 | L6 |
 
@@ -410,8 +420,8 @@ against those spawn positions (no relocation shortcut).
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| CDestructableModel | SpawnObject class not accepted: FlareGunPU | 1 | L1 |
-| CDestructableModel | SpawnObject class not accepted: AssaultRiflePU | 1 | L1 |
+| CDestructableModel | SpawnObject class not accepted: FlareGunPU | 1 | L13 |
+| CDestructableModel | SpawnObject class not accepted: AssaultRiflePU | 1 | L13 |
 | CDestructableModel | SpawnObject class not accepted: DieBugDieAmmo | 2 | L2 |
 | Sprite | Missing, oversized or non-SPR sprite resource:  | 1 | L2 |
 | CDestructableModel | SpawnObject class not accepted: ShotgunPU | 1 | L6 |
@@ -424,7 +434,7 @@ against those spawn positions (no relocation shortcut).
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| CDestructableBrush | SpawnObject class not accepted: MedKitPU | 1 | L1 |
+| CDestructableBrush | SpawnObject class not accepted: MedKitPU | 1 | L13 |
 
 ### 09_abandoned_buildings
 
@@ -510,7 +520,7 @@ against those spawn positions (no relocation shortcut).
 
 ### 21_laboratory
 
-280 created instances · 38 unported entries (9 classes) · 17 failed entries
+280 created instances · 38 unported entries (9 classes) · 9 failed entries
 
 **Unported classes**
 
@@ -530,7 +540,6 @@ against those spawn positions (no relocation shortcut).
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| Sound | Invalid or over-limit sound request (InnerRadius == OuterRadius) | 8 | L1 |
 | CDestructableBrush | Ambiguous named world model | 2 | L4 |
 | CDestructableModel | SpawnObject class not accepted: boneleech | 7 | L7 |
 
@@ -563,7 +572,7 @@ against those spawn positions (no relocation shortcut).
 
 ### 23_rooftop
 
-136 created instances · 8 unported entries (6 classes) · 2 failed entries
+136 created instances · 8 unported entries (6 classes) · 0 failed entries
 
 **Unported classes**
 
@@ -575,12 +584,6 @@ against those spawn positions (no relocation shortcut).
 | EnhancedGideon | 1 | L8 |
 | LifeLeechPU | 1 | L10 |
 | OpheliaAI | 1 | L9 |
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| Sound | Invalid or over-limit sound request (InnerRadius == OuterRadius) | 2 | L1 |
 
 ### 24_ancientcity
 
@@ -667,16 +670,6 @@ against those spawn positions (no relocation shortcut).
 | Class | Entries | Batch |
 |---|---:|---|
 | CalebAI | 1 | L9 |
-
-### drop
-
-5 created instances · 0 unported entries (0 classes) · 0 failed entries · client music refused
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| WorldProperties | No music lists authored; client music start refuses the empty playlist | – | L1 |
 
 ### end
 
@@ -848,7 +841,7 @@ against those spawn positions (no relocation shortcut).
 
 ### multi/bb_crypt
 
-116 created instances · 6 unported entries (4 classes) · 3 failed entries
+116 created instances · 6 unported entries (4 classes) · 0 failed entries
 
 **Unported classes**
 
@@ -858,22 +851,6 @@ against those spawn positions (no relocation shortcut).
 | InvulnerabilityPU | 1 | L10 |
 | ParticleSystem | 1 | L11 |
 | StealthPU | 1 | L10 |
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| Sound | Invalid or over-limit sound request (InnerRadius == OuterRadius) | 3 | L1 |
-
-### multi/bb_deathcanyon
-
-44 created instances · 0 unported entries (0 classes) · 0 failed entries · client music refused
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| WorldProperties | No music lists authored; client music start refuses the empty playlist | – | L1 |
 
 ### multi/bb_drain
 
@@ -953,7 +930,7 @@ against those spawn positions (no relocation shortcut).
 
 ### multi/bb_rooftop
 
-104 created instances · 4 unported entries (4 classes) · 1 failed entries
+104 created instances · 4 unported entries (4 classes) · 0 failed entries
 
 **Unported classes**
 
@@ -963,12 +940,6 @@ against those spawn positions (no relocation shortcut).
 | Container | 1 | L11 |
 | InvulnerabilityPU | 1 | L10 |
 | StealthPU | 1 | L10 |
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| Sound | Invalid or over-limit sound request (InnerRadius == OuterRadius) | 1 | L1 |
 
 ### multi/ctf_cabana
 

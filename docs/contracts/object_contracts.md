@@ -119,3 +119,14 @@ The [NEW_LEVEL transaction](level_change_contracts.md) extends synchronous isola
 to ownership promotion. Source and destination destructors run under their own
 adapter and original globals. Ordinary concurrent sessions remain forbidden;
 clear old ObjectIds/input at promotion and never move a GameSession.
+
+## Precreate rejection reasons
+
+A class may call the bounded `ServerDE::RejectPrecreate(reason)` before refusing
+MID_PRECREATE. Objects keeps only the first reason of the precreate in progress
+(at most 256 bytes; nested creations keep their own and restore the outer one) and
+reports `Rejected precreate: <class>: <reason>`. Calls outside precreate are
+ignored, so runtime failures sharing a helper do not leak into later creations.
+An accepted precreate with an invalid creation state reports
+`invalid creation state`. The reason is diagnostic only; it never changes which
+entries are created. `--inspect-world` logs every failed entry with its detail.

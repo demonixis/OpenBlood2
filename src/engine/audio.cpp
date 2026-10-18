@@ -246,7 +246,7 @@ namespace OpenBlood2
         if (voices_.size() >= 128 || !next_sound || next_sound == std::numeric_limits<SoundId>::max() ||
             !physics_vector(position) || !std::isfinite(request.volume) || request.volume < 0 || request.volume > 1 ||
             !std::isfinite(request.inner_radius) || !std::isfinite(request.outer_radius) || request.inner_radius < 0 ||
-            request.outer_radius <= request.inner_radius || request.outer_radius > 1e6f ||
+            request.outer_radius <= 0 || request.outer_radius < request.inner_radius || request.outer_radius > 1e6f ||
             request.resource.size() > 100 ||
             (request.space != SoundSpace::Local && request.space != SoundSpace::Ambient &&
              request.space != SoundSpace::Spatial))
@@ -327,9 +327,12 @@ namespace OpenBlood2
             {
                 const auto direction = vector_subtract(v.position, listener);
                 const auto distance = std::sqrt(vector_dot(direction, direction));
-                gain *=
-                    std::clamp((v.request.outer_radius - distance) / (v.request.outer_radius - v.request.inner_radius),
-                               0.0f, 1.0f);
+                // Full inside the inner radius, silent beyond the outer one; equal radii are a hard edge
+                // (later LithTech CSoundInstance branch order, never dividing by a zero falloff).
+                const auto& r = v.request;
+                gain *= distance <= r.inner_radius   ? 1.0f
+                        : distance >= r.outer_radius ? 0.0f
+                                                     : (r.outer_radius - distance) / (r.outer_radius - r.inner_radius);
                 if (v.request.space == SoundSpace::Spatial && distance > 1e-6f)
                     pan = std::clamp(vector_dot(direction, right) / distance, -1.0f, 1.0f);
             }

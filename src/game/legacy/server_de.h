@@ -75,6 +75,8 @@ class ServerDE : public CSBase
     virtual bool ScaleObject(HOBJECT, DVector) = 0;
     virtual PathMgr* GetPathManager() = 0;
     virtual bool ValidateSpawnObject(std::string_view) = 0;
+    // Explains a precreate refusal in the creation failure; ignored outside precreate.
+    virtual void RejectPrecreate(std::string_view reason) = 0;
     virtual void RecordSpawn(const OpenBlood2::SpawnReport&) = 0;
     virtual void RecordPickup(HOBJECT, const OpenBlood2::PickupReport&) = 0;
     virtual DRESULT WritePickupMessage(HMESSAGEWRITE, const OpenBlood2::PickupMessage&) = 0;

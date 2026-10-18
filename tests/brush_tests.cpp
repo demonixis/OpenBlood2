@@ -298,7 +298,7 @@ namespace
                         else if (why.find("container shell") != std::string::npos ||
                                  why.find("face is not on its plane") != std::string::npos)
                             kind = "shell";
-                        else if (why == "Rejected precreate: CDestructableBrush")
+                        else if (why.starts_with("Rejected precreate: CDestructableBrush"))
                         {
                             auto enabled = [&](const char* key)
                             {

@@ -32,6 +32,7 @@ class CDestructableModel : public B2BaseClass
   private:
     bool destroying_ = false;
     bool ReadProp(ObjectCreateStruct&);
+    bool Reject(const std::string& reason); // Explained precreate refusal.
     bool InitialUpdate(float);
     bool SetDimensions(DVector&, bool rotate, float shadow_limit);
     bool ChangeModel(const std::string&, const std::string&, DVector&, bool destroyed);

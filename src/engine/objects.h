@@ -252,6 +252,8 @@ namespace OpenBlood2
             return diagnostics_;
         }
         bool fail(ObjectError error, std::string detail);
+        // Reason for the precreate refusal in progress; ignored outside precreate, first reason kept.
+        void note_rejection(std::string_view reason);
 
       private:
         struct Slot
@@ -271,6 +273,8 @@ namespace OpenBlood2
         std::vector<HOBJECT> pending_;
         std::vector<std::pair<HOBJECT, HOBJECT>> links_;
         std::vector<std::string> diagnostics_;
+        std::string rejection_;
+        bool precreating_ = false;
         ObjectError error_ = ObjectError::None;
         double time_ = 0, frame_time_ = 0;
         unsigned callback_depth_ = 0;
