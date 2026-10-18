@@ -43,7 +43,7 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 | 02_cityhub | 453 | 0 (0) | 0 | **starts** |
 | 02_cityhubb | 404 | 7 (1) | 0 | L7 |
 | 02_cityhubc | 386 | 18 (2) | 2 | L2, L7, L10 |
-| 03_museum | 641 | 4 (4) | 6 | L6, L8, L10, L12 |
+| 03_museum | 651 | 0 (0) | 0 | entry validated; music (Crudux DLS bank) blocks start |
 | 04_steamtunnels | 494 | 10 (4) | 6 | L2, L5, L6, L7, L10 |
 | 05_cdm | 550 | 0 (0) | 0 | **starts** |
 | 05_cdmb | 129 | 0 (0) | 0 | **starts** |
@@ -318,27 +318,16 @@ shortcut.
 | CDestructableModel | Model clip-zero dimensions unavailable | 1 | L2 |
 
 ### 03_museum
-641 created instances · 4 unported entries (4 classes) · 6 failed entries
+651 created instances · 0 unported entries · 0 failed entries
 
-**Unported classes**
-
-| Class | Entries | Batch |
-|---|---:|---|
-| InvulnerabilityPU | 1 | L10 |
-| MadScientistAI | 1 | L8 |
-| ShotgunPU | 1 | L6 |
-| Tchernotronic | 1 | L8 |
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| CDestructableModel | SpawnObject class not accepted: InvulnerabilityPU | 1 | L10 |
-| CDestructableBrush | SpawnObject class not accepted: BinocularsPU | 1 | L10 |
-| CultistAI | NPC world ground placement failed | 1 | L12 |
-| CDestructableModel | SpawnObject class not accepted: RocketAmmoPU | 1 | L6 |
-| Fanatic | authored AI weapon unavailable: SHOTGUN | 1 | L6 |
-| Prophet | authored AI weapon unavailable: SINGULARITY | 1 | L6 |
+All classes and entries are ported (BinocularsPU, MadScientistAI, Tchernotronic,
+ShotgunPU, the Fanatic shotgun, the Prophet singularity, InvulnerabilityPU and the
+authored-overlap Cultist; the absent RocketAmmoPU spawn creates nothing, as in the
+source). World entry validates. Startup is still refused by the music check: the
+level's Crudux instrument bank is refused by the DLS decoder (program 2 has a
+664,633-frame loop in a 64,633-frame sample; music DLS contracts), so its playlist
+sections have no bank. With that check bypassed the session starts and runs its
+first update.
 
 ### 04_steamtunnels
 494 created instances · 10 unported entries (4 classes) · 6 failed entries
