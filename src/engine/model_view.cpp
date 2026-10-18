@@ -7,10 +7,11 @@ namespace OpenBlood2
     void ModelView::clear()
     {
         mesh = {};
-        mesh.materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}});
+        mesh.materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}, {}}});
         mesh.texture_bytes = 4;
         materials_.clear();
         prepared_.clear();
+        layouts_.clear();
         cached_vertices_ = 0;
         sampled_.clear();
         begin_frame();
@@ -28,6 +29,11 @@ namespace OpenBlood2
             else
                 ++it;
         }
+        for (auto it = layouts_.begin(); it != layouts_.end();)
+            it = it->second.owner.expired() ? layouts_.erase(it) : std::next(it);
+        instances.clear();
+        palette.clear();
+        deformation.clear();
         preparation = {};
         preparation.cached_assets = prepared_.size();
         preparation.cached_bytes = cached_vertices_ * sizeof(WorldVertex);
@@ -117,9 +123,23 @@ namespace OpenBlood2
         if (!visible || (require_skin && !entry.error.empty()))
             return true;
         if (!physics_vector(scale) || scale.x <= 0 || scale.y <= 0 || scale.z <= 0 || model->vertices.size() > 65536 ||
-            model->faces.size() > 200000 || model->faces.size() * 3 > 1000000 - mesh.vertices.size())
+            model->faces.size() > 200000 || (!gpu_skinning && model->faces.size() * 3 > 1000000 - mesh.vertices.size()))
         {
             return fail("Invalid model scale/geometry budget");
+        }
+        if (gpu_skinning)
+        {
+            if (!owner)
+            {
+                entry.error = "GPU skinning requires a shared immutable model";
+                return true;
+            }
+            if (!add_skinned(*model, *owner, track, pose, scale, close, alpha, material, hidden_nodes, entry, error))
+            {
+                begin_frame();
+                return false;
+            }
+            return true;
         }
         WorldDraw draw{static_cast<std::uint32_t>(mesh.ranges.size()), pose.position, pose.rotation, alpha};
         WorldViewUniform uniform;
@@ -270,5 +290,210 @@ namespace OpenBlood2
         mesh.ranges.push_back(std::move(range));
         (close ? close_draws : world_draws).push_back(draw);
         return true;
+    }
+    bool build_skinned_vertices(const Model& model, std::vector<SkinnedVertex>& out, std::string& error)
+    {
+        out.clear();
+        std::array<int, 256> slots;
+        slots.fill(-1);
+        if (model.nodes.size() > 256 || model.vertices.size() > 65536 || model.faces.size() > 200000)
+        {
+            error = "Invalid model node/geometry budget";
+            return false;
+        }
+        for (std::size_t i = 0; i < model.nodes.size(); ++i)
+        {
+            const auto index = model.nodes[i].index;
+            if (index >= slots.size() || slots[index] != -1)
+            {
+                error = "Invalid model node index";
+                return false;
+            }
+            slots[index] = static_cast<int>(i);
+        }
+        // Repeated packed indices keep file write order: the last slot wins, as on the CPU path.
+        std::vector<std::uint32_t> deform(model.vertices.size(), UINT32_MAX);
+        std::uint32_t slot = 0;
+        for (const auto& node : model.nodes)
+            for (auto vertex : node.deformed_vertices)
+            {
+                if (vertex >= model.vertices.size())
+                {
+                    error = "Invalid model deformation vertex";
+                    return false;
+                }
+                deform[vertex] = slot++;
+            }
+        out.reserve(model.faces.size() * 3);
+        for (const auto& face : model.faces)
+        {
+            std::array<std::uint8_t, 4> nodes{};
+            for (unsigned corner = 0; corner < 3; ++corner)
+            {
+                const auto vertex = face.vertices[corner];
+                if (vertex >= model.vertices.size() || slots[model.vertices[vertex].node] < 0)
+                {
+                    error = "Invalid model face node index";
+                    return false;
+                }
+                nodes[corner + 1] = static_cast<std::uint8_t>(slots[model.vertices[vertex].node]);
+            }
+            for (unsigned corner = 0; corner < 3; ++corner)
+            {
+                const auto vertex = face.vertices[corner];
+                const auto uv = face.uv[corner];
+                const auto& source = model.vertices[vertex];
+                if (!physics_vector(source.position) || !std::isfinite(uv[0]) || !std::isfinite(uv[1]) ||
+                    std::abs(uv[0]) > 1e6f || std::abs(uv[1]) > 1e6f)
+                {
+                    error = "Invalid model vertex/UV";
+                    return false;
+                }
+                nodes[0] = nodes[corner + 1];
+                out.push_back({source.position, uv, nodes, deform[vertex]});
+            }
+        }
+        return true;
+    }
+    bool ModelView::add_skinned(const Model& model, const std::shared_ptr<const Model>& owner,
+                                const AnimationTrack& track, NodePose pose, DVector scale, bool close, float alpha,
+                                std::uint32_t material, std::span<const std::uint8_t> hidden_nodes,
+                                ModelViewEntry& entry, std::string& error)
+    {
+        auto fail = [&](const char* reason)
+        {
+            error = reason;
+            return false;
+        };
+        auto layout = layouts_.find(&model);
+        if (layout != layouts_.end() &&
+            (layout->second.owner.owner_before(owner) || owner.owner_before(layout->second.owner)))
+        {
+            layouts_.erase(layout);
+            layout = layouts_.end();
+        }
+        if (layout == layouts_.end())
+        {
+            // Validated once per immutable asset; the renderer builds the same corner stream.
+            std::vector<SkinnedVertex> corners;
+            if (!build_skinned_vertices(model, corners, error))
+                return false;
+            SkinLayout next;
+            next.owner = owner;
+            std::array<int, 256> slots;
+            slots.fill(-1);
+            for (std::size_t i = 0; i < model.nodes.size(); ++i)
+                slots[model.nodes[i].index] = static_cast<int>(i);
+            next.node_bounds.resize(model.nodes.size());
+            next.bounded.assign(model.nodes.size(), false);
+            auto include = [&](std::size_t node, DVector p)
+            {
+                auto& box = next.node_bounds[node];
+                if (!next.bounded[node])
+                    box = {p, p};
+                box[0] = {std::min(box[0].x, p.x), std::min(box[0].y, p.y), std::min(box[0].z, p.z)};
+                box[1] = {std::max(box[1].x, p.x), std::max(box[1].y, p.y), std::max(box[1].z, p.z)};
+                next.bounded[node] = true;
+            };
+            next.vertex_slots.reserve(model.vertices.size());
+            for (const auto& vertex : model.vertices)
+            {
+                const auto node = static_cast<std::size_t>(slots[vertex.node]);
+                next.vertex_slots.push_back(static_cast<std::uint8_t>(node));
+                include(node, vertex.position);
+            }
+            // Packed components span 0..255 in every clip; include both extremes.
+            for (const auto& clip : model.animations)
+                for (std::size_t i = 0; i < model.nodes.size() && i < clip.nodes.size(); ++i)
+                    if (!model.nodes[i].deformed_vertices.empty())
+                    {
+                        const auto& data = clip.nodes[i];
+                        include(i, data.translation);
+                        include(i, {data.translation.x + 255 * data.scale.x, data.translation.y + 255 * data.scale.y,
+                                    data.translation.z + 255 * data.scale.z});
+                    }
+            layout = layouts_.emplace(&model, std::move(next)).first;
+        }
+        const auto& info = layout->second;
+        if (!sample_skin(model, track.animation, track.time, pose_, deformed_))
+        {
+            entry.error = "Model animation pose is unavailable";
+            return true;
+        }
+        if (pose_.size() * 2 > palette_limit - palette.size() ||
+            deformed_.size() > deformation_limit - deformation.size())
+            return fail("Model palette/deformation budget exceeded");
+        for (const auto& local : deformed_)
+            if (!physics_vector(local))
+                return fail("Invalid model vertex/UV");
+        if (!hidden_nodes.empty())
+            for (const auto& face : model.faces)
+            {
+                bool hidden = false;
+                for (auto vertex : face.vertices)
+                    hidden |= hidden_nodes[info.vertex_slots[vertex]] != 0;
+                entry.hidden_triangles += hidden;
+            }
+        entry.triangles = model.faces.size() - entry.hidden_triangles;
+        ++preparation.sampled;
+        if (!entry.triangles)
+            return true; // Nothing drawable; the entry remains inspectable, as on the CPU path.
+        SkinnedInstance instance;
+        instance.model = &model;
+        instance.owner = owner;
+        instance.material = material;
+        instance.palette = static_cast<std::uint32_t>(palette.size());
+        instance.deformation = static_cast<std::uint32_t>(deformation.size());
+        instance.scale = scale;
+        instance.color = material ? DVector{1, 1, 1} : DVector{1, 0, 1};
+        bool bounded = false;
+        for (std::size_t i = 0; i < pose_.size(); ++i)
+        {
+            const auto& node = pose_[i];
+            if (!physics_vector(node.position))
+                return fail("Invalid model vertex/UV");
+            const bool hidden = !hidden_nodes.empty() && hidden_nodes[i] != 0;
+            palette.push_back(
+                {node.rotation.m_Vec.x, node.rotation.m_Vec.y, node.rotation.m_Vec.z, node.rotation.m_Spin});
+            palette.push_back({node.position.x, node.position.y, node.position.z, hidden ? 1.f : 0.f});
+            if (!info.bounded[i])
+                continue;
+            // Conservative sphere around the posed node box, scaled into model space.
+            const auto& box = info.node_bounds[i];
+            const DVector half{(box[1].x - box[0].x) * .5f, (box[1].y - box[0].y) * .5f, (box[1].z - box[0].z) * .5f};
+            const auto center = vector_add(
+                node.position,
+                rotate_vector(DVector{box[0].x + half.x, box[0].y + half.y, box[0].z + half.z}, node.rotation));
+            const float radius = std::sqrt(half.x * half.x + half.y * half.y + half.z * half.z);
+            const DVector lo{(center.x - radius) * scale.x, (center.y - radius) * scale.y,
+                             (center.z - radius) * scale.z};
+            const DVector hi{(center.x + radius) * scale.x, (center.y + radius) * scale.y,
+                             (center.z + radius) * scale.z};
+            instance.min = bounded ? DVector{std::min(instance.min.x, lo.x), std::min(instance.min.y, lo.y),
+                                             std::min(instance.min.z, lo.z)}
+                                   : lo;
+            instance.max = bounded ? DVector{std::max(instance.max.x, hi.x), std::max(instance.max.y, hi.y),
+                                             std::max(instance.max.z, hi.z)}
+                                   : hi;
+            bounded = true;
+        }
+        for (const auto& local : deformed_)
+            deformation.push_back({local.x, local.y, local.z, 0});
+        instance.bounded = bounded && physics_vector(instance.min) && physics_vector(instance.max);
+        entry.range = static_cast<std::uint32_t>(instances.size());
+        instances.push_back(std::move(instance));
+        (close ? close_draws : world_draws).push_back({entry.range, pose.position, pose.rotation, alpha});
+        return true;
+    }
+    void ModelView::mark_translucent(std::size_t index)
+    {
+        const auto range = entries[index].range;
+        if (range == UINT32_MAX)
+            return;
+        if (gpu_skinning)
+            instances[range].translucent = true;
+        else
+            mesh.ranges[range].batches.front().translucent = true;
+        ++mesh.blended;
     }
 } // namespace OpenBlood2

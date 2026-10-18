@@ -534,6 +534,44 @@ namespace OpenBlood2
         }
         return true;
     }
+    bool sample_skin(const Model& model, std::uint32_t animation, double milliseconds, std::vector<NodePose>& nodes,
+                     std::vector<DVector>& deformed)
+    {
+        nodes.clear();
+        deformed.clear();
+        std::size_t lo, hi;
+        float t;
+        if (model.nodes.size() > 256 || !pose_interval(model, animation, milliseconds, lo, hi, t))
+            return false;
+        const auto& a = model.animations[animation];
+        nodes.resize(model.nodes.size());
+        if (!fill_pose(model, a, lo, hi, t, nodes))
+        {
+            nodes.clear();
+            return false;
+        }
+        for (std::size_t i = 0; i < model.nodes.size(); ++i)
+        {
+            const auto& list = model.nodes[i].deformed_vertices;
+            const auto& data = a.nodes[i];
+            if (!list.empty() && data.deformation.size() / 3 / list.size() <= hi)
+            {
+                nodes.clear();
+                deformed.clear();
+                return false;
+            }
+            for (std::size_t v = 0; v < list.size(); ++v)
+            {
+                auto at = (lo * list.size() + v) * 3, next = (hi * list.size() + v) * 3;
+                auto component = [&](unsigned axis)
+                { return data.deformation[at + axis] * (1 - t) + data.deformation[next + axis] * t; };
+                deformed.push_back({component(0) * data.scale.x + data.translation.x,
+                                    component(1) * data.scale.y + data.translation.y,
+                                    component(2) * data.scale.z + data.translation.z});
+            }
+        }
+        return true;
+    }
     bool advance_animation(const Model& model, AnimationTrack& track, double seconds,
                            std::vector<std::uint32_t>& events, std::string& error)
     {

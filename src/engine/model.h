@@ -75,6 +75,10 @@ namespace OpenBlood2
     // Skeleton transforms, followed by optional packed vertex deformation.
     bool sample_pose(const Model& model, std::uint32_t animation, double milliseconds, std::vector<NodePose>& out);
     bool sample_vertices(const Model& model, std::uint32_t animation, double milliseconds, std::vector<DVector>& out);
+    // GPU skinning inputs: model-order node poses and node-local packed deformation in
+    // concatenated per-node list order (repeats kept), with sample_vertices' arithmetic.
+    bool sample_skin(const Model& model, std::uint32_t animation, double milliseconds, std::vector<NodePose>& nodes,
+                     std::vector<DVector>& deformed);
     DVector rotate_vector(DRotation q, DVector v);
     DRotation compose_rotation(DRotation parent, DRotation child);
     bool sample_node_pose(const Model&, std::uint32_t animation, double milliseconds, std::size_t node, NodePose&);

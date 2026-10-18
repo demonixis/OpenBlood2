@@ -20,15 +20,18 @@ int main()
     CHECK(WorldShaderFormats == (SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_MSL));
     SDL_GPUShaderCreateInfo info{};
     for (auto formats : {SDL_GPU_SHADERFORMAT_SPIRV, SDL_GPU_SHADERFORMAT_MSL, WorldShaderFormats})
-        for (auto shader : {WorldShader::Vertex, WorldShader::OpaqueFragment, WorldShader::AlphaFragment})
+        for (auto shader :
+             {WorldShader::Vertex, WorldShader::OpaqueFragment, WorldShader::AlphaFragment, WorldShader::SkinnedVertex})
         {
+            const bool vertex = shader == WorldShader::Vertex || shader == WorldShader::SkinnedVertex;
             CHECK(world_shader_info(shader, formats, info));
             CHECK(info.code && info.code_size > 128 && info.props == 0);
-            CHECK(info.num_storage_buffers == 0 && info.num_storage_textures == 0);
-            CHECK(info.num_samplers == (shader == WorldShader::Vertex ? 0u : 1u));
+            // Only the skinned vertex stage reads storage: its node palette and packed deformation.
+            CHECK(info.num_storage_buffers == (shader == WorldShader::SkinnedVertex ? 2u : 0u) &&
+                  info.num_storage_textures == 0);
+            CHECK(info.num_samplers == (vertex ? 0u : 1u));
             CHECK(info.num_uniform_buffers == 1u);
-            CHECK(info.stage ==
-                  (shader == WorldShader::Vertex ? SDL_GPU_SHADERSTAGE_VERTEX : SDL_GPU_SHADERSTAGE_FRAGMENT));
+            CHECK(info.stage == (vertex ? SDL_GPU_SHADERSTAGE_VERTEX : SDL_GPU_SHADERSTAGE_FRAGMENT));
             if (formats & SDL_GPU_SHADERFORMAT_SPIRV)
             {
                 CHECK(info.format == SDL_GPU_SHADERFORMAT_SPIRV && std::strcmp(info.entrypoint, "main") == 0);
@@ -41,13 +44,15 @@ int main()
                 const std::string_view source(reinterpret_cast<const char*>(info.code), info.code_size);
                 CHECK(source.find("#include <metal_stdlib>") != source.npos);
                 CHECK(info.code[info.code_size] == 0); // Runtime Metal compilation also gets terminated source.
-                CHECK(source.find(shader == WorldShader::Vertex ? "vertex main0_out main0("
-                                                                : "fragment main0_out main0(") != source.npos);
+                CHECK(source.find(vertex ? "vertex main0_out main0(" : "fragment main0_out main0(") != source.npos);
                 if (info.num_uniform_buffers)
                     CHECK(source.find("[[buffer(0)]]") != source.npos);
                 if (info.num_samplers)
                     CHECK(source.find("[[texture(0)]]") != source.npos && source.find("[[sampler(0)]]") != source.npos);
-                if (shader == WorldShader::Vertex)
+                if (shader == WorldShader::SkinnedVertex)
+                    CHECK(source.find("[[buffer(1)]]") != source.npos && source.find("[[buffer(2)]]") != source.npos &&
+                          source.find("uint4 bases;") != source.npos);
+                if (vertex)
                     CHECK(source.find("u._textureOffset.xy") != source.npos);
                 else
                     CHECK(source.find("float4 positionRadius;") != source.npos &&

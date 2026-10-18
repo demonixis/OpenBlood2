@@ -15,6 +15,28 @@ namespace OpenBlood2
         std::uint64_t fragment_effect = 0;
         std::uint64_t laser_effect = 0;
     };
+    // Static corner of a GPU-skinned ABC model, one per face corner in authored order.
+    struct SkinnedVertex
+    {
+        DVector position;                    // Authored node-local position.
+        std::array<float, 2> uv{};           // Authored face-corner UV.
+        std::array<std::uint8_t, 4> nodes{}; // Vertex node slot, then the face's three corner node slots.
+        std::uint32_t deform = UINT32_MAX;   // Last packed-deformation slot writing this vertex, if any.
+    };
+    // Validates node, face, UV and deformation references and builds the static corner stream.
+    bool build_skinned_vertices(const Model&, std::vector<SkinnedVertex>&, std::string& error);
+    // One GPU-skinned instance of a shared immutable asset for the current frame.
+    struct SkinnedInstance
+    {
+        const Model* model = nullptr;
+        std::weak_ptr<const Model> owner;
+        std::uint32_t material = 0;
+        std::uint32_t palette = 0;     // First palette vec4: per node rotation, then translation/hidden.
+        std::uint32_t deformation = 0; // First deformation slot.
+        DVector scale{1, 1, 1}, color{1, 1, 1};
+        DVector min{}, max{}; // Conservative scaled model-space bounds when bounded.
+        bool bounded = false, translucent = false;
+    };
     // Presentation-only snapshot. No original object pointer survives add().
     class ModelView
     {
@@ -43,6 +65,15 @@ namespace OpenBlood2
         std::vector<WorldDraw> world_draws, close_draws;
         std::vector<ModelViewEntry> entries;
         std::uint64_t revision = 0;
+        // GPU skinning mode: visible shared assets publish node palettes and packed
+        // deformation instead of CPU-posed vertices, and draws index `instances`.
+        // Borrowed models are refused. Off by default; the CPU path is unchanged.
+        bool gpu_skinning = false;
+        std::vector<SkinnedInstance> instances;
+        std::vector<std::array<float, 4>> palette, deformation;
+        static constexpr std::size_t palette_limit = 262144, deformation_limit = 1000000;
+        // Marks an entry's drawn geometry translucent in either mode.
+        void mark_translucent(std::size_t entry);
 
       private:
         struct Prepared
@@ -62,6 +93,19 @@ namespace OpenBlood2
                       NodePose, DVector scale, bool visible, bool close, ObjectId, std::string_view label,
                       const Resources&, std::string&, std::span<const std::uint8_t> hidden_nodes, float alpha,
                       bool require_skin);
+        struct SkinLayout
+        {
+            std::weak_ptr<const Model> owner;
+            std::vector<std::uint8_t> vertex_slots;          // Node slot of each vertex.
+            std::vector<std::array<DVector, 2>> node_bounds; // Node-local vertex/deformation bounds.
+            std::vector<bool> bounded;
+        };
+        bool add_skinned(const Model&, const std::shared_ptr<const Model>&, const AnimationTrack&, NodePose,
+                         DVector scale, bool close, float alpha, std::uint32_t material,
+                         std::span<const std::uint8_t> hidden_nodes, ModelViewEntry&, std::string& error);
+        std::map<const Model*, SkinLayout> layouts_;
+        std::vector<NodePose> pose_;
+        std::vector<DVector> deformed_;
         std::map<const Model*, Prepared> prepared_;
         std::size_t cached_vertices_ = 0;
         std::map<std::string, std::uint32_t> materials_;

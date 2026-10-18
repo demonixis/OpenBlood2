@@ -1,6 +1,6 @@
 {
   "date": "2026-10-18",
-  "scope": "Presentation performance phases 0-1: scene presenter, single scene pass, batching, culling, authored DTX mips and measurement mode; no renderer or gameplay code imported",
+  "scope": "Presentation performance phases 0-2: scene presenter, single scene pass, batching, culling, authored DTX mips, GPU skinning, frame-buffer uploads and measurement mode; no renderer or gameplay code imported",
   "references": [
     {
       "source": "sources/lithtech/runtime/render_a/src/sys/d3d/drawpolygrid.cpp",
@@ -20,7 +20,7 @@
     {
       "source": "sources/lithtech/runtime/render_a/src/sys/d3d/d3dmeshrendobj_skel.cpp",
       "source_sha256": "15e1b13d6341fe17b2f628366c0032d7e70846e9e96f784a05bd7a7c1a3663b1",
-      "purpose": "Later-generation hardware bone-set skinning, recorded for the pending GPU-skinning phase; not implemented here."
+      "purpose": "Later-generation hardware bone-set skinning corroborating GPU node transforms; Blood II ABC uses one node per vertex plus CPU-sampled packed deformation, so no bone sets are imported."
     }
   ],
   "reference_revision": {
@@ -42,6 +42,13 @@
     "One scene render pass with shared depth and eagerly created shared pipelines; view models use a reserved near viewport depth slice instead of a depth clear.",
     "Conservative bounding-sphere frustum culling of bounded ranges; sky and view-model draws are never culled.",
     "Sprites/particles pre-transformed to world space and merged per consecutive texture/opacity after sorting.",
-    "Authored DTX mip levels decoded with the shared palette/masks and sampled with point mip selection."
-  ]
+    "Authored DTX mip levels decoded with the shared palette/masks and sampled with point mip selection.",
+    "GPU skinning: static per-asset corner streams, per-frame node palettes and packed deformation in storage buffers, hidden faces collapsed in the vertex shader.",
+    "Renderer uploads recorded as copy passes in the frame command buffer."
+  ],
+  "shader_tools": {
+    "glslangValidator": "16.3.0",
+    "SDL_shadercross": "1ff05bec573988a98ef9e0260b4da44f512b8367",
+    "note": "Existing SPIR-V/MSL unchanged apart from the glslang version comment."
+  }
 }

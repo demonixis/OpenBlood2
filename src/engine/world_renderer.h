@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/model_view.h"
 #include "engine/point_light.h"
 #include "engine/world_view.h"
 #include <SDL3/SDL_gpu.h>
@@ -29,8 +30,30 @@ namespace OpenBlood2
         Alpha,
         Sky,
         SkyAlpha,
+        SkinnedOpaque, // GPU-skinned ABC models (SkinnedVertex input, node palette storage).
+        SkinnedAlpha,
         Count
     };
+    // Copy pass in the frame's command buffer when one is given, so all uploads share the
+    // frame submission; otherwise in a dedicated command buffer submitted by end_upload.
+    SDL_GPUCopyPass* begin_upload(SDL_GPUDevice*, SDL_GPUCommandBuffer* frame, SDL_GPUCommandBuffer*& owned);
+    bool end_upload(SDL_GPUCopyPass*, SDL_GPUCommandBuffer* owned);
+    // Nearest-filtered sampler with point mip selection over authored DTX levels.
+    SDL_GPUSampler* create_world_sampler(SDL_GPUDevice*, bool clamp);
+    // One sampled texture per material with its authored mip chain; slot 0 is white when
+    // the list is empty, and failed or animated-sprite entries get none. Replaces textures;
+    // on failure the caller releases any partially created textures.
+    bool upload_world_textures(SDL_GPUDevice*, const std::vector<WorldMaterial>&, std::vector<SDL_GPUTexture*>&,
+                               std::string& error, SDL_GPUCommandBuffer* frame = nullptr);
+    void release_world_textures(SDL_GPUDevice*, std::vector<SDL_GPUTexture*>&);
+    // Conservative bounding-sphere test against the world_view_uniform projection.
+    struct ViewFrustum
+    {
+        DVector eye{}, right{}, up{}, forward{};
+        double aspect = 1, near = 1, far = 65536;
+    };
+    ViewFrustum view_frustum(DVector eye, DRotation view, double aspect, double near = 1, double far = 65536);
+    bool sphere_visible(const ViewFrustum&, DVector center, double radius);
     // Every world/model/sprite/sky pipeline for one color format, created together
     // so no pipeline is compiled lazily during gameplay. One set may be shared by
     // all renderers recording into the same scene pass.
@@ -87,8 +110,9 @@ namespace OpenBlood2
         ~WorldRenderer();
         WorldRenderer(const WorldRenderer&) = delete;
         WorldRenderer& operator=(const WorldRenderer&) = delete;
+        // Uploads into `frame` when given (before its render passes), else a dedicated submission.
         bool prepare(const WorldMesh&, std::uint64_t revision, SDL_GPUTextureFormat, Uint32 width, Uint32 height,
-                     std::string& error, bool dynamic = false);
+                     std::string& error, bool dynamic = false, SDL_GPUCommandBuffer* frame = nullptr);
         // Begins and ends one render pass around record(). Validation failures begin no pass.
         bool draw(SDL_GPUCommandBuffer*, SDL_GPUTexture*, const WorldMesh&, std::span<const WorldDraw>, DVector eye,
                   DRotation view, bool letterbox, std::string& error, DrawLoad = DrawLoad::Clear,
@@ -126,11 +150,11 @@ namespace OpenBlood2
         SDL_GPUBuffer* vertices_ = nullptr;
         SDL_GPUTransferBuffer* vertex_transfer_ = nullptr;
         Uint32 vertex_capacity_ = 0;
-        bool upload_vertices(const WorldMesh&, std::string&);
+        bool upload_vertices(const WorldMesh&, std::string&, SDL_GPUCommandBuffer* frame);
         SDL_GPUTexture* depth_ = nullptr;
         std::vector<SDL_GPUTexture*> textures_;
         SDL_GPUSampler* sampler_ = nullptr;
-        bool upload_materials(const WorldMesh&, std::string&);
+        bool upload_materials(const WorldMesh&, std::string&, SDL_GPUCommandBuffer* frame);
         Uint32 width_ = 0, height_ = 0;
         std::uint64_t revision_ = UINT64_MAX;
         // Checks every input and selects visible_/alpha_order_ before any pass is begun.

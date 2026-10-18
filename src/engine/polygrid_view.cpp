@@ -5,7 +5,7 @@ using namespace OpenBlood2;
 void PolyGridView::clear()
 {
     mesh = {};
-    mesh.materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}});
+    mesh.materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}, {}}});
     mesh.texture_bytes = 4;
     materials_.clear();
     begin_frame();

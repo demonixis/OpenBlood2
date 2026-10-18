@@ -58,7 +58,7 @@ int main(int argc, char** argv)
     WorldRenderer renderer(runtime.gpu);
     WorldMesh mesh;
     mesh.materials = {
-        {"pattern", "", {2, 2, 1, 0, 0, {255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 255, 255, 255, 255}}}};
+        {"pattern", "", {2, 2, 1, 0, 0, {255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 255, 255, 255, 255}, {}}}};
     mesh.ranges.push_back({0, 24, {}, "same material", {}});
     for (unsigned i = 0; i < 4; ++i)
     {

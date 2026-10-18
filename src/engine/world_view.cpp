@@ -159,7 +159,7 @@ namespace OpenBlood2
         if (world.models.empty() || world.models.size() > 4097)
             return fail("Diagnostic mesh requires a bounded primary world");
         constexpr std::size_t max_vertices = 3000000;
-        materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}});
+        materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}, {}}});
         texture_bytes = 4;
         std::map<std::string, std::uint32_t> material_ids;
         std::size_t effect_bytes = 0, frame_references = 0;

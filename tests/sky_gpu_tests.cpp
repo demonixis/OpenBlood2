@@ -55,8 +55,8 @@ int main(int argc, char** argv)
     CHECK(runtime.initialize(true, error));
     WorldRenderer renderer(runtime.gpu);
     WorldMesh mesh;
-    mesh.materials = {{"white", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}},
-                      {"half", "", {1, 1, 1, 0, 0, {255, 255, 255, 128}}}};
+    mesh.materials = {{"white", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}, {}}},
+                      {"half", "", {1, 1, 1, 0, 0, {255, 255, 255, 128}, {}}}};
     quad(mesh, .5f, 0, 1, {0, 0, 1});                      // sky near plane .01, ordinary world near plane 1
     quad(mesh, 3, 0, 6, {1, 0, 0}, true);                  // farther but later: index order, no depth rejection
     quad(mesh, 10, 0, 20, {.25f, .4f, .65f}, false, true); // portal marker must not cover the sky

@@ -609,14 +609,22 @@ namespace OpenBlood2
                     }
                     if (model_view)
                     {
-                        ImGui::Text("Model snapshot: %zu world / %zu close draws / %zu vertices / %zu skin bytes",
+                        ImGui::Text("Model snapshot: %zu world / %zu close draws / %zu skin bytes",
                                     model_view->world_draws.size(), model_view->close_draws.size(),
-                                    model_view->mesh.vertices.size(), model_view->mesh.texture_bytes);
-                        ImGui::Text("CPU preparation: %zu sampled / %zu reused / %zu uncached; %zu reused vertices",
-                                    model_view->preparation.sampled, model_view->preparation.reused,
-                                    model_view->preparation.uncached, model_view->preparation.reused_vertices);
-                        ImGui::Text("Prepared cache: %zu assets / %zu vertex bytes (weak asset ownership)",
-                                    model_view->preparation.cached_assets, model_view->preparation.cached_bytes);
+                                    model_view->mesh.texture_bytes);
+                        if (model_view->gpu_skinning)
+                            ImGui::Text("GPU skinning: %zu instances / %zu posed / %zu palette and %zu deformation "
+                                        "vec4 per frame",
+                                        model_view->instances.size(), model_view->preparation.sampled,
+                                        model_view->palette.size(), model_view->deformation.size());
+                        else
+                        {
+                            ImGui::Text("CPU preparation: %zu sampled / %zu reused / %zu uncached; %zu vertices",
+                                        model_view->preparation.sampled, model_view->preparation.reused,
+                                        model_view->preparation.uncached, model_view->mesh.vertices.size());
+                            ImGui::Text("Prepared cache: %zu assets / %zu vertex bytes (weak asset ownership)",
+                                        model_view->preparation.cached_assets, model_view->preparation.cached_bytes);
+                        }
                         ImGui::TextWrapped(
                             "Current ABC poses; first-person body/held children follow local camera visibility. "
                             "View weapons use original offsets with zero bob; no lighting, chrome or muzzle FX.");

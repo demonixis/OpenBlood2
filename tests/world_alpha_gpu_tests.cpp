@@ -58,9 +58,10 @@ int main(int argc, char** argv)
     CHECK(runtime.initialize(true, error));
     WorldRenderer renderer(runtime.gpu), overlay(runtime.gpu);
     WorldMesh mesh;
-    mesh.materials = {{"white", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}},
-                      {"red alpha", "", {2, 2, 1, 0, 0, {255, 0, 0, 0, 255, 0, 0, 128, 255, 0, 0, 255, 0, 0, 0, 255}}},
-                      {"green alpha", "", {1, 1, 1, 0, 0, {0, 255, 0, 128}}}};
+    mesh.materials = {
+        {"white", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}, {}}},
+        {"red alpha", "", {2, 2, 1, 0, 0, {255, 0, 0, 0, 255, 0, 0, 128, 255, 0, 0, 255, 0, 0, 0, 255}, {}}},
+        {"green alpha", "", {1, 1, 1, 0, 0, {0, 255, 0, 128}, {}}}};
     quad(mesh, 2, 1, 1, true); // Near alpha FIRST, far alpha LAST: renderer must sort faces.
     quad(mesh, 6, 6, 0, false, {0, 0, 1});
     quad(mesh, 3, 1.5f, 2, true);

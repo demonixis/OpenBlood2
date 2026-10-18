@@ -1514,9 +1514,9 @@ namespace
                              world_renderer.stats.frames, world_renderer.stats.triangles, world_renderer.stats.draws,
                              world_renderer.width(), world_renderer.height());
                 spdlog::info(
-                    "Model viewport: frames={}, world hidden={}, weapon hidden={}, instances={}, close={}, vertices={}",
+                    "Model viewport: frames={}, world hidden={}, weapon hidden={}, instances={}, close={}, palette={}",
                     model_frames, models_hidden, close_weapon_hidden, model_scene.world_draws.size(),
-                    model_scene.close_draws.size(), model_scene.mesh.vertices.size());
+                    model_scene.close_draws.size(), model_scene.palette.size());
                 if (!close_weapon_hidden || model_scene.world_draws.size() != 26 ||
                     model_frames != world_renderer.stats.frames)
                     return 4;

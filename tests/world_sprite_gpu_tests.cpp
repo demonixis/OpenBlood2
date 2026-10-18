@@ -62,10 +62,10 @@ int main(int argc, char** argv)
               << '\n';
     WorldRenderer renderer(runtime.gpu);
     WorldMesh mesh;
-    mesh.materials = {{"white", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}},
-                      {"red", "", {1, 1, 1, 0, 0, {255, 0, 0, 255}}},
-                      {"green", "", {1, 1, 1, 0, 0, {0, 255, 0, 255}}},
-                      {"animated.spr", "", {1, 1, 0, 0, 0, {}}, 8, {1, 2}}};
+    mesh.materials = {{"white", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}, {}}},
+                      {"red", "", {1, 1, 1, 0, 0, {255, 0, 0, 255}, {}}},
+                      {"green", "", {1, 1, 1, 0, 0, {0, 255, 0, 255}, {}}},
+                      {"animated.spr", "", {1, 1, 0, 0, 0, {}, {}}, 8, {1, 2}}};
     quad(mesh, 2, 1, 3, false);
     WorldDraw draw;
     for (unsigned cycle = 0; cycle < 2; ++cycle)

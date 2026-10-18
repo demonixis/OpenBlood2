@@ -2,6 +2,7 @@
 #include "app/model_scene.h"
 #include "app/polygrid_scene.h"
 #include "app/sprite_scene.h"
+#include "engine/model_renderer.h"
 #include "engine/world_renderer.h"
 
 namespace OpenBlood2
@@ -43,7 +44,9 @@ namespace OpenBlood2
         std::vector<WorldDraw> world_draws, sky_draws;
         DVector sky_eye{};
         WorldPipelines pipelines; // Declared before the renderers that borrow it.
-        WorldRenderer world_renderer, model_renderer, explosion_model_renderer, polygrid_renderer, sprite_renderer;
+        WorldRenderer world_renderer;
+        ModelRenderer model_renderer, explosion_model_renderer; // GPU skinning of both model views.
+        WorldRenderer polygrid_renderer, sprite_renderer;
         ModelView model_scene, explosion_model_scene;
         PolyGridView polygrid_scene;
         SpriteView sprite_scene;

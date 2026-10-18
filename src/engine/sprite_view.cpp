@@ -7,7 +7,7 @@ namespace OpenBlood2
     void SpriteView::clear()
     {
         mesh = {};
-        mesh.materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}});
+        mesh.materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}, {}}});
         mesh.texture_bytes = 4;
         materials_.clear();
         draws.clear();

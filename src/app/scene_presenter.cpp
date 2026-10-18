@@ -10,6 +10,7 @@ namespace OpenBlood2
           polygrid_renderer(device, DrawStyle::Opaque, pipelines),
           sprite_renderer(device, DrawStyle::SpriteAlpha, pipelines), device_(device)
     {
+        model_scene.gpu_skinning = explosion_model_scene.gpu_skinning = true;
     }
     ScenePresenter::~ScenePresenter()
     {
@@ -85,22 +86,22 @@ namespace OpenBlood2
         const auto time = game.server.world_time();
         const auto started = SDL_GetTicksNS();
         stats.passes = 0;
-        for (auto* renderer :
-             {&world_renderer, &model_renderer, &explosion_model_renderer, &polygrid_renderer, &sprite_renderer})
-            renderer->stats.draw_calls = renderer->stats.culled = 0;
-        // Uploads precede the scene pass; copy passes cannot run inside a render pass.
-        if (!world_renderer.prepare(world_mesh, mesh_revision, format, width, height, error))
+        for (auto* renderer : {&world_renderer.stats, &model_renderer.stats, &explosion_model_renderer.stats,
+                               &polygrid_renderer.stats, &sprite_renderer.stats})
+            renderer->draw_calls = renderer->culled = 0;
+        // All uploads are copy passes in the frame's command buffer, before the scene pass.
+        if (!world_renderer.prepare(world_mesh, mesh_revision, format, width, height, error, false, commands))
             return fail("World viewport");
-        if (!model_renderer.prepare(model_scene.mesh, model_scene.revision, format, width, height, error, true))
+        if (!model_renderer.prepare(model_scene, format, width, height, error, commands))
             return fail("Model viewport");
         if (!explosion_model_scene.world_draws.empty() &&
-            !explosion_model_renderer.prepare(explosion_model_scene.mesh, explosion_model_scene.revision, format, width,
-                                              height, error, true))
+            !explosion_model_renderer.prepare(explosion_model_scene, format, width, height, error, commands))
             return fail("Explosion model viewport");
-        if (!polygrid_renderer.prepare(polygrid_scene.mesh, polygrid_scene.revision, format, width, height, error,
-                                       true))
+        if (!polygrid_renderer.prepare(polygrid_scene.mesh, polygrid_scene.revision, format, width, height, error, true,
+                                       commands))
             return fail("PolyGrid viewport");
-        if (!sprite_renderer.prepare(sprite_scene.mesh, sprite_scene.revision, format, width, height, error, true))
+        if (!sprite_renderer.prepare(sprite_scene.mesh, sprite_scene.revision, format, width, height, error, true,
+                                     commands))
             return fail("Sprite viewport");
         if (!depth_ || depth_width_ != width || depth_height_ != height)
         {
@@ -155,19 +156,19 @@ namespace OpenBlood2
                                         sky_draws.empty() ? WorldPass::Opaque : WorldPass::OpaqueWithSky, time,
                                         flashlight))
             stage = "World viewport";
-        else if (!model_renderer.record(scene, model_scene.mesh, model_scene.world_draws, view.position, view.rotation,
-                                        error, WorldPass::Opaque, 0, flashlight))
+        else if (!model_renderer.record(scene, model_scene, model_scene.world_draws, view.position, view.rotation,
+                                        error, WorldPass::Opaque, flashlight))
             stage = "Model viewport";
         else if (world_mesh.blended &&
                  !world_renderer.record(scene, world_mesh, world_draws, view.position, view.rotation, error,
                                         WorldPass::Translucent, time, flashlight))
             stage = "Transparent world viewport";
         else if (model_scene.mesh.blended &&
-                 !model_renderer.record(scene, model_scene.mesh, model_scene.world_draws, view.position, view.rotation,
-                                        error, WorldPass::Translucent, 0, flashlight))
+                 !model_renderer.record(scene, model_scene, model_scene.world_draws, view.position, view.rotation,
+                                        error, WorldPass::Translucent, flashlight))
             stage = "Transparent model viewport";
         else if (!explosion_model_scene.world_draws.empty() &&
-                 !explosion_model_renderer.record(scene, explosion_model_scene.mesh, explosion_model_scene.world_draws,
+                 !explosion_model_renderer.record(scene, explosion_model_scene, explosion_model_scene.world_draws,
                                                   view.position, view.rotation, error))
             stage = "Explosion model viewport";
         else if (!polygrid_renderer.record(scene, polygrid_scene.mesh, polygrid_scene.draws, view.position,
@@ -177,9 +178,9 @@ namespace OpenBlood2
                                          view.rotation, error))
             stage = "Sprite viewport";
         else if (!model_scene.close_draws.empty() &&
-                 !model_renderer.record({commands, pass, false, 0, view_model_depth}, model_scene.mesh,
+                 !model_renderer.record({commands, pass, false, 0, view_model_depth}, model_scene,
                                         model_scene.close_draws, view.position, view.rotation, error, WorldPass::Opaque,
-                                        0, {}, true))
+                                        {}, true))
             stage = "Model viewport";
         SDL_EndGPURenderPass(pass);
         if (stage)

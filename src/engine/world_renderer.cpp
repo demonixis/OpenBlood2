@@ -8,25 +8,36 @@ namespace OpenBlood2
 {
     namespace
     {
-        // Conservative sphere test against the projection used by world_view_uniform.
-        bool in_frustum(const WorldRange& range, const WorldDraw& draw, DVector eye, DVector right, DVector up,
-                        DVector forward, double aspect, double near, double far)
+        bool in_frustum(const WorldRange& range, const WorldDraw& draw, const ViewFrustum& frustum)
         {
             if (!range.bounded)
                 return true;
             const DVector local{(range.min.x + range.max.x) * .5f, (range.min.y + range.max.y) * .5f,
                                 (range.min.z + range.max.z) * .5f};
             const double dx = range.max.x - range.min.x, dy = range.max.y - range.min.y, dz = range.max.z - range.min.z;
-            const double radius = .5 * std::sqrt(dx * dx + dy * dy + dz * dz);
-            const auto center = vector_add(draw.position, rotate_vector(local, draw.rotation));
-            const DVector rel = vector_subtract(center, eye);
-            auto dot = [](DVector a, DVector b) { return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z; };
-            const double x = dot(rel, right), y = dot(rel, up), z = dot(rel, forward);
-            const double side = radius * std::sqrt(2.0), vertical = radius * std::sqrt(1 + aspect * aspect);
-            return std::isfinite(radius) && z + radius >= near && z - radius <= far && z - x >= -side &&
-                   z + x >= -side && z - aspect * y >= -vertical && z + aspect * y >= -vertical;
+            return sphere_visible(frustum, vector_add(draw.position, rotate_vector(local, draw.rotation)),
+                                  .5 * std::sqrt(dx * dx + dy * dy + dz * dz));
         }
     } // namespace
+    ViewFrustum view_frustum(DVector eye, DRotation view, double aspect, double near, double far)
+    {
+        return {eye,
+                rotate_vector({1, 0, 0}, view),
+                rotate_vector({0, 1, 0}, view),
+                rotate_vector({0, 0, 1}, view),
+                aspect,
+                near,
+                far};
+    }
+    bool sphere_visible(const ViewFrustum& f, DVector center, double radius)
+    {
+        const DVector rel = vector_subtract(center, f.eye);
+        auto dot = [](DVector a, DVector b) { return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z; };
+        const double x = dot(rel, f.right), y = dot(rel, f.up), z = dot(rel, f.forward);
+        const double side = radius * std::sqrt(2.0), vertical = radius * std::sqrt(1 + f.aspect * f.aspect);
+        return std::isfinite(radius) && z + radius >= f.near && z - radius <= f.far && z - x >= -side &&
+               z + x >= -side && z - f.aspect * y >= -vertical && z + f.aspect * y >= -vertical;
+    }
     void WorldPipelines::release()
     {
         for (auto*& pipeline : pipelines_)
@@ -42,9 +53,10 @@ namespace OpenBlood2
         if (format_ == format && pipelines_[0])
             return true;
         release();
-        SDL_GPUShaderCreateInfo vertex_info{}, opaque_info{}, alpha_info{};
+        SDL_GPUShaderCreateInfo vertex_info{}, skinned_info{}, opaque_info{}, alpha_info{};
         const auto formats = SDL_GetGPUShaderFormats(device_);
         if (!world_shader_info(WorldShader::Vertex, formats, vertex_info) ||
+            !world_shader_info(WorldShader::SkinnedVertex, formats, skinned_info) ||
             !world_shader_info(WorldShader::OpaqueFragment, formats, opaque_info) ||
             !world_shader_info(WorldShader::AlphaFragment, formats, alpha_info))
         {
@@ -52,7 +64,8 @@ namespace OpenBlood2
             return false;
         }
         auto* vertex = SDL_CreateGPUShader(device_, &vertex_info);
-        auto* opaque = vertex ? SDL_CreateGPUShader(device_, &opaque_info) : nullptr;
+        auto* skinned = vertex ? SDL_CreateGPUShader(device_, &skinned_info) : nullptr;
+        auto* opaque = skinned ? SDL_CreateGPUShader(device_, &opaque_info) : nullptr;
         auto* alpha = opaque ? SDL_CreateGPUShader(device_, &alpha_info) : nullptr;
         bool success = alpha != nullptr;
         if (!success)
@@ -68,11 +81,28 @@ namespace OpenBlood2
         attributes[2].location = 2;
         attributes[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
         attributes[2].offset = offsetof(WorldVertex, uv);
+        SDL_GPUVertexBufferDescription skinned_buffer{};
+        skinned_buffer.pitch = sizeof(SkinnedVertex);
+        skinned_buffer.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
+        SDL_GPUVertexAttribute skinned_attributes[4]{};
+        skinned_attributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
+        skinned_attributes[0].offset = offsetof(SkinnedVertex, position);
+        skinned_attributes[1].location = 1;
+        skinned_attributes[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
+        skinned_attributes[1].offset = offsetof(SkinnedVertex, uv);
+        skinned_attributes[2].location = 2;
+        skinned_attributes[2].format = SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4;
+        skinned_attributes[2].offset = offsetof(SkinnedVertex, nodes);
+        skinned_attributes[3].location = 3;
+        skinned_attributes[3].format = SDL_GPU_VERTEXELEMENTFORMAT_UINT;
+        skinned_attributes[3].offset = offsetof(SkinnedVertex, deform);
         for (std::size_t i = 0; success && i < pipelines_.size(); ++i)
         {
             const auto kind = static_cast<WorldPipeline>(i);
-            const bool blend = kind == WorldPipeline::Alpha || kind == WorldPipeline::SkyAlpha;
+            const bool blend =
+                kind == WorldPipeline::Alpha || kind == WorldPipeline::SkyAlpha || kind == WorldPipeline::SkinnedAlpha;
             const bool sky = kind == WorldPipeline::Sky || kind == WorldPipeline::SkyAlpha;
+            const bool skin = kind == WorldPipeline::SkinnedOpaque || kind == WorldPipeline::SkinnedAlpha;
             SDL_GPUColorTargetDescription target{};
             target.format = format;
             if (blend)
@@ -86,9 +116,10 @@ namespace OpenBlood2
                 target.blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
             }
             SDL_GPUGraphicsPipelineCreateInfo create{};
-            create.vertex_shader = vertex;
+            create.vertex_shader = skin ? skinned : vertex;
             create.fragment_shader = blend ? alpha : opaque;
-            create.vertex_input_state = {&buffer, 1, attributes, 3};
+            create.vertex_input_state = skin ? SDL_GPUVertexInputState{&skinned_buffer, 1, skinned_attributes, 4}
+                                             : SDL_GPUVertexInputState{&buffer, 1, attributes, 3};
             create.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
             create.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
             create.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
@@ -108,7 +139,7 @@ namespace OpenBlood2
                 success = false;
             }
         }
-        for (auto* shader : {vertex, opaque, alpha})
+        for (auto* shader : {vertex, skinned, opaque, alpha})
             if (shader)
                 SDL_ReleaseGPUShader(device_, shader);
         if (!success)
@@ -137,10 +168,7 @@ namespace OpenBlood2
             SDL_ReleaseGPUTransferBuffer(device_, vertex_transfer_);
         vertex_transfer_ = nullptr;
         vertex_capacity_ = 0;
-        for (auto* texture : textures_)
-            if (texture)
-                SDL_ReleaseGPUTexture(device_, texture);
-        textures_.clear();
+        release_world_textures(device_, textures_);
         revision_ = UINT64_MAX;
         stats.triangles = stats.draws = stats.alpha_batches = stats.pan_batches = stats.alpha_pan_batches = 0;
         stats.surface_time = 0;
@@ -149,8 +177,25 @@ namespace OpenBlood2
         alpha_order_.clear();
         visible_.clear();
     }
+    SDL_GPUCopyPass* begin_upload(SDL_GPUDevice* device, SDL_GPUCommandBuffer* frame, SDL_GPUCommandBuffer*& owned)
+    {
+        owned = frame ? nullptr : SDL_AcquireGPUCommandBuffer(device);
+        auto* pass = frame || owned ? SDL_BeginGPUCopyPass(frame ? frame : owned) : nullptr;
+        if (!pass && owned)
+        {
+            SDL_CancelGPUCommandBuffer(owned);
+            owned = nullptr;
+        }
+        return pass;
+    }
+    bool end_upload(SDL_GPUCopyPass* pass, SDL_GPUCommandBuffer* owned)
+    {
+        SDL_EndGPUCopyPass(pass);
+        return !owned || SDL_SubmitGPUCommandBuffer(owned);
+    }
     bool WorldRenderer::prepare(const WorldMesh& mesh, std::uint64_t revision, SDL_GPUTextureFormat format,
-                                Uint32 width, Uint32 height, std::string& error, bool dynamic)
+                                Uint32 width, Uint32 height, std::string& error, bool dynamic,
+                                SDL_GPUCommandBuffer* frame)
     {
         error.clear();
         if (!width || !height || width > 8192 || height > 8192 || mesh.vertices.size() > 3000000)
@@ -183,11 +228,11 @@ namespace OpenBlood2
         width_ = width;
         height_ = height;
         if (revision_ == revision)
-            return !dynamic || upload_vertices(mesh, error);
+            return !dynamic || upload_vertices(mesh, error, frame);
         clear_geometry();
-        if (!upload_vertices(mesh, error))
+        if (!upload_vertices(mesh, error, frame))
             return false;
-        if (!upload_materials(mesh, error))
+        if (!upload_materials(mesh, error, frame))
         {
             clear_geometry();
             return false;
@@ -196,7 +241,7 @@ namespace OpenBlood2
         ++stats.uploads;
         return true;
     }
-    bool WorldRenderer::upload_vertices(const WorldMesh& mesh, std::string& error)
+    bool WorldRenderer::upload_vertices(const WorldMesh& mesh, std::string& error, SDL_GPUCommandBuffer* frame)
     {
         if (mesh.vertices.size() > 3000000)
         {
@@ -234,44 +279,42 @@ namespace OpenBlood2
         {
             std::memcpy(data, mesh.vertices.data(), bytes);
             SDL_UnmapGPUTransferBuffer(device_, vertex_transfer_);
-            if (auto* commands = SDL_AcquireGPUCommandBuffer(device_))
+            SDL_GPUCommandBuffer* owned = nullptr;
+            if (auto* copy = begin_upload(device_, frame, owned))
             {
-                if (auto* copy = SDL_BeginGPUCopyPass(commands))
-                {
-                    SDL_GPUTransferBufferLocation source{vertex_transfer_, 0};
-                    SDL_GPUBufferRegion target{vertices_, 0, bytes};
-                    SDL_UploadToGPUBuffer(copy, &source, &target, true);
-                    SDL_EndGPUCopyPass(copy);
-                    success = SDL_SubmitGPUCommandBuffer(commands);
-                }
-                else
-                    SDL_CancelGPUCommandBuffer(commands);
+                SDL_GPUTransferBufferLocation source{vertex_transfer_, 0};
+                SDL_GPUBufferRegion target{vertices_, 0, bytes};
+                SDL_UploadToGPUBuffer(copy, &source, &target, true);
+                success = end_upload(copy, owned);
             }
         }
         if (!success)
             error = SDL_GetError();
         return success;
     }
-    bool WorldRenderer::upload_materials(const WorldMesh& mesh, std::string& error)
+    SDL_GPUSampler* create_world_sampler(SDL_GPUDevice* device, bool clamp)
     {
-        if (!sampler_)
-        {
-            SDL_GPUSamplerCreateInfo info{};
-            info.min_filter = info.mag_filter = SDL_GPU_FILTER_NEAREST;
-            info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
-            info.max_lod = 1000; // Authored DTX levels; point sampling within each level.
-            info.address_mode_u = info.address_mode_v = info.address_mode_w =
-                style_ == DrawStyle::SpriteAlpha ? SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE
-                                                 : SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
-            sampler_ = SDL_CreateGPUSampler(device_, &info);
-            if (!sampler_)
-            {
-                error = SDL_GetError();
-                return false;
-            }
-        }
-        const Texture white{1, 1, 1, 0, 0, {255, 255, 255, 255}};
-        const auto count = std::max(std::size_t(1), mesh.materials.size());
+        SDL_GPUSamplerCreateInfo info{};
+        info.min_filter = info.mag_filter = SDL_GPU_FILTER_NEAREST;
+        info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+        info.max_lod = 1000; // Authored DTX levels; point sampling within each level.
+        info.address_mode_u = info.address_mode_v = info.address_mode_w =
+            clamp ? SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE : SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+        return SDL_CreateGPUSampler(device, &info);
+    }
+    void release_world_textures(SDL_GPUDevice* device, std::vector<SDL_GPUTexture*>& textures)
+    {
+        for (auto* texture : textures)
+            if (texture)
+                SDL_ReleaseGPUTexture(device, texture);
+        textures.clear();
+    }
+    bool upload_world_textures(SDL_GPUDevice* device, const std::vector<WorldMaterial>& materials,
+                               std::vector<SDL_GPUTexture*>& textures, std::string& error, SDL_GPUCommandBuffer* frame)
+    {
+        release_world_textures(device, textures);
+        const Texture white{1, 1, 1, 0, 0, {255, 255, 255, 255}, {}};
+        const auto count = std::max(std::size_t(1), materials.size());
         if (count > 4097)
         {
             error = "GPU texture count limit exceeded";
@@ -281,10 +324,8 @@ namespace OpenBlood2
         std::size_t bytes = 0;
         for (std::size_t i = 0; i < count; ++i)
         {
-            if (!mesh.materials.empty())
-                images[i] = mesh.materials[i].error.empty() && mesh.materials[i].frames.empty()
-                                ? &mesh.materials[i].image
-                                : nullptr;
+            if (!materials.empty())
+                images[i] = materials[i].error.empty() && materials[i].frames.empty() ? &materials[i].image : nullptr;
             if (const auto* image = images[i])
             {
                 const auto size = image->rgba.size() + image->mip_rgba.size();
@@ -305,15 +346,15 @@ namespace OpenBlood2
         }
         SDL_GPUTransferBufferCreateInfo transfer_info{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, static_cast<Uint32>(bytes),
                                                       0};
-        auto* transfer = SDL_CreateGPUTransferBuffer(device_, &transfer_info);
+        auto* transfer = SDL_CreateGPUTransferBuffer(device, &transfer_info);
         if (!transfer)
         {
             error = SDL_GetError();
             return false;
         }
-        textures_.resize(count);
+        textures.resize(count);
         bool success = false;
-        if (auto* mapped = static_cast<Uint8*>(SDL_MapGPUTransferBuffer(device_, transfer, false)))
+        if (auto* mapped = static_cast<Uint8*>(SDL_MapGPUTransferBuffer(device, transfer, false)))
         {
             std::size_t offset = 0;
             bool allocated = true;
@@ -329,8 +370,8 @@ namespace OpenBlood2
                     info.height = image->height;
                     info.layer_count_or_depth = 1;
                     info.num_levels = std::max(1u, image->mipmaps);
-                    textures_[i] = SDL_CreateGPUTexture(device_, &info);
-                    if (!textures_[i])
+                    textures[i] = SDL_CreateGPUTexture(device, &info);
+                    if (!textures[i])
                     {
                         allocated = false;
                         break;
@@ -342,11 +383,11 @@ namespace OpenBlood2
                     offset += image->mip_rgba.size();
                 }
             }
-            SDL_UnmapGPUTransferBuffer(device_, transfer);
+            SDL_UnmapGPUTransferBuffer(device, transfer);
+            SDL_GPUCommandBuffer* owned = nullptr;
             if (allocated)
-                if (auto* commands = SDL_AcquireGPUCommandBuffer(device_))
+                if (auto* copy = begin_upload(device, frame, owned))
                 {
-                    if (auto* copy = SDL_BeginGPUCopyPass(commands))
                     {
                         Uint32 offset = 0;
                         for (std::size_t i = 0; i < count; ++i)
@@ -362,7 +403,7 @@ namespace OpenBlood2
                                     source.pixels_per_row = w;
                                     source.rows_per_layer = h;
                                     SDL_GPUTextureRegion target{};
-                                    target.texture = textures_[i];
+                                    target.texture = textures[i];
                                     target.mip_level = level;
                                     target.w = w;
                                     target.h = h;
@@ -371,17 +412,27 @@ namespace OpenBlood2
                                     offset += w * h * 4;
                                 }
                         }
-                        SDL_EndGPUCopyPass(copy);
-                        success = SDL_SubmitGPUCommandBuffer(commands);
                     }
-                    else
-                        SDL_CancelGPUCommandBuffer(commands);
+                    success = end_upload(copy, owned);
                 }
         }
-        SDL_ReleaseGPUTransferBuffer(device_, transfer);
+        SDL_ReleaseGPUTransferBuffer(device, transfer);
         if (!success)
             error = SDL_GetError();
         return success;
+    }
+    bool WorldRenderer::upload_materials(const WorldMesh& mesh, std::string& error, SDL_GPUCommandBuffer* frame)
+    {
+        if (!sampler_)
+        {
+            sampler_ = create_world_sampler(device_, style_ == DrawStyle::SpriteAlpha);
+            if (!sampler_)
+            {
+                error = SDL_GetError();
+                return false;
+            }
+        }
+        return upload_world_textures(device_, mesh.materials, textures_, error, frame);
     }
     bool WorldRenderer::validate(const WorldMesh& mesh, std::span<const WorldDraw> draws, DVector eye, DRotation view,
                                  WorldPass world_pass, double surface_time, const PointLight& light, bool letterbox,
@@ -465,11 +516,10 @@ namespace OpenBlood2
             visible_.assign(draws.begin(), draws.end());
         else
         {
-            const auto right = rotate_vector({1, 0, 0}, view), up = rotate_vector({0, 1, 0}, view),
-                       forward = rotate_vector({0, 0, 1}, view);
+            const auto frustum = view_frustum(eye, view, aspect);
             for (const auto& d : draws)
             {
-                if (in_frustum(mesh.ranges[d.range], d, eye, right, up, forward, aspect, 1, 65536))
+                if (in_frustum(mesh.ranges[d.range], d, frustum))
                     visible_.push_back(d);
                 else
                     ++stats.culled;

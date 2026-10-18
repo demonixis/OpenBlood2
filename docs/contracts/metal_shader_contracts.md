@@ -96,3 +96,5 @@ iOS, D3D12, full lighting and complete M2 acceptance remain outside this change.
 On 17 October 2026 the user confirmed the updated build works on macOS. Record this
 as user-reported execution; hardware/OS/SDK and a native automated GPU test run
 remain unrecorded. Local evidence remains Linux/NVIDIA Vulkan.
+
+The [presentation performance continuation](render_performance_contracts.md) adds `skinned.vert`, the first shader reading read-only storage buffers (node palette and packed deformation, MSL `[[buffer(1)]]`/`[[buffer(2)]]`). The generator now records each shader's storage-buffer count; all eight artifacts were regenerated together with glslangValidator 16.3.0, and existing SPIR-V/MSL bytes are unchanged apart from the version comment.

@@ -1,10 +1,10 @@
-# Presentation performance (phases 0–1)
+# Presentation performance (phases 0–2)
 
 This continuation reduces CPU submission and GPU pass cost of the existing SDL_GPU
-presentation without changing simulation, original object rules or shader sources.
-It is replacement-engine work: no retail renderer parity is claimed. Remaining
-architecture work (GPU skinning, BSP/PVS world clusters, frame-command-buffer
-uploads, resource handles, HLSL shaders) is listed at the end. Reference
+presentation without changing simulation or original object rules. Phases 0–1 keep
+the shaders unchanged; phase 2 adds GPU skinning (one new vertex shader) and
+frame-command-buffer uploads. It is replacement-engine work: no retail renderer
+parity is claimed. Remaining work is listed at the end. Reference
 corroboration is recorded in the [source ledger](../implementation/sources/render_performance_sources.json).
 
 ## Scene presenter and passes
@@ -131,12 +131,70 @@ fixes the query the same way as the existing assignment fix; upstream SDL main s
 has both defects. `platform.destroyed_properties` covers the absent-ID reads.
 Linux/NVIDIA and native D3D12 were not re-run for this change.
 
+## Phase 2: GPU skinning and frame uploads
+
+The presenter's model views run in `ModelView::gpu_skinning` mode. For each shared
+immutable ABC asset, `build_skinned_vertices` validates node, face, UV and packed
+deformation references once and builds a static corner stream: authored node-local
+position, face-corner UV, the vertex's node slot plus the face's three corner slots,
+and the last packed-deformation slot writing that vertex (repeated indices keep file
+write order). `ModelRenderer` uploads that stream once per asset, keyed by pointer
+with the shared-owner check of the prepared cache, and releases it when the owner
+expires or the world revision clears. Limits: 256 assets and 2,000,000 static corners.
+
+Each frame, `sample_skin` computes the same interpolated node poses and node-local
+deformation as `sample_vertices`, without transforming vertices. The view publishes
+one palette entry per node (rotation, translation and a hidden flag) and one
+deformation entry per packed slot; limits are 262,144 palette vec4 and 1,000,000
+deformation entries per view. `skinned.vert` applies the bone transform, object
+scale and instance transform in the CPU path's order. A face with any hidden
+corner node collapses to a degenerate triangle, exactly matching the CPU face
+omission. Entry triangle/hidden counts, pose failures, missing skins and magenta
+fallback remain as before; borrowed (non-shared) models are refused in this mode
+with an inspectable error. Instance bounds are conservative spheres around posed
+node boxes that include each node's full packed-deformation range; culling,
+translucency sorting and close-view projection follow the world renderer.
+
+The CPU path, the prepared-geometry cache and `WorldRenderer` model drawing are
+unchanged and remain what standalone tests and inspection use. `gpu.model_skinning`
+renders a synthetic hierarchy with rotations, repeated packed deformation,
+non-uniform scale, an instance transform and every node-hide combination through
+both paths: all pixels are identical. `gpu.model_skinning_private` does the same for
+all 54 distinct SubwayA and CityHub assets at three clip times: 821,148 covered
+pixels, none differing.
+
+Renderer and model uploads are now copy passes recorded in the frame's command buffer
+before the scene pass (`prepare(..., frame)`), so a presented frame is one submission
+apart from the HUD's change-only texture upload. Standalone `prepare()` calls keep a
+dedicated submission.
+
+The skinned shader is the fourth bundled shader; the generator now emits each
+shader's reflected storage-buffer count and accepts read-only storage buffers. All
+eight artifacts were regenerated with glslangValidator 16.3.0 and the pinned
+SDL_shadercross: existing SPIR-V and MSL are unchanged apart from the version comment.
+
+Spatial clustering of the primary world was measured before implementation. Over a
+360-degree sweep at 3440x1440, 21% (CityHub, 18,112 triangles) and 27% (SubwayA,
+6,191 triangles) of primary-world triangles lie in the frustum. Out-of-view triangles
+cost only vertex work, which the GPU clips before rasterization, while splitting the
+world into clusters multiplies material batches and draw calls. The v56 leaf/PVS
+lists are also unverified: later LithTech only skips them while loading. Clustering
+is therefore deferred until lighting or shadow passes need per-region geometry.
+
+| CityHub, 3440x1440 | Phase 1 | Phase 2 |
+| --- | --- | --- |
+| Model CPU stage | 0.38 ms | 0.09 ms |
+| Model uploads per frame | ~3.3 MB of posed vertices | 67 KB of palettes/deformation |
+| CPU uploads + encode + submit | 0.12 ms | 0.06 ms |
+| Total serialized frame, mean / p95 | 2.03 / 3.65 ms | 1.68 / 3.37 ms |
+
+SubwayA: total 0.88 → 0.67 ms. Simulation is now the largest CPU stage (CityHub
+0.93 ms mean, 2.3 ms p95), mostly replacement collision sweeps.
+
 ## Pending phases
 
-- GPU skinning: static indexed model buffers and per-instance node palettes instead
-  of per-frame CPU vertex expansion (later LithTech uses hardware bone sets).
-- World clustering by BSP leaves/PVS from the DAT tail, with per-cluster material
-  ranges, so the primary world is culled spatially.
-- Uploads in the frame command buffer and a GPU resource registry with generational
-  handles shared by all renderers (textures are still duplicated per renderer).
+- A GPU resource registry with generational handles shared by all renderers
+  (textures are still duplicated per renderer and view).
 - HLSL shader sources compiled by SDL_shadercross to SPIR-V, MSL and DXIL.
+- Instanced model draws, spatial world clusters and PVS when lighting/shadow passes
+  need them; simulation and collision cost.

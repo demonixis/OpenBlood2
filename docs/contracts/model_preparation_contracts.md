@@ -65,3 +65,5 @@ actual reuse. Counts are not timings, FPS, or a claim that all transition stutte
 is fixed. Hidden/missing entries remain visible, with no sampling side effects.
 
 The [presentation performance continuation](render_performance_contracts.md) adds conservative frustum culling of posed model ranges, with bounds cached alongside reused geometry. Poses and skinning remain on the CPU; GPU skinning is still pending.
+
+Phase 2 of the [presentation performance work](render_performance_contracts.md) moves the application's model and explosion-model views to GPU skinning: shared assets publish node palettes and packed deformation, and a static corner stream uploads once per asset. This CPU sampler, its prepared-geometry cache and the posed-vertex path remain unchanged for standalone renderers, tests and borrowed models, and pixel comparisons show both paths identical.
