@@ -338,7 +338,8 @@ namespace OpenBlood2
         return index;
     }
     void CollisionWorld::query(std::uint32_t index, DVector from, DVector to, DVector half, CollisionHit& hit,
-                               bool& found, const PlacementAnchor* anchor, const Triangle** selected) const
+                               bool& found, const PlacementAnchor* anchor, const Triangle** selected,
+                               StartOverlap start, std::uint32_t* departed) const
     {
         const auto& n = nodes_[index];
         ++work_.node_tests;
@@ -353,8 +354,8 @@ namespace OpenBlood2
         }
         if (n.left)
         {
-            query(n.left, from, to, half, hit, found, anchor, selected);
-            query(n.right, from, to, half, hit, found, anchor, selected);
+            query(n.left, from, to, half, hit, found, anchor, selected, start, departed);
+            query(n.right, from, to, half, hit, found, anchor, selected, start, departed);
             return;
         }
         for (auto i = n.begin; i < n.end; ++i)
@@ -367,8 +368,19 @@ namespace OpenBlood2
             }
             ++work_.triangle_tests;
             CollisionHit candidate;
-            if (triangle_hit(triangles_[i].points, from, to, half, candidate, anchor) &&
-                (!found || candidate.fraction < hit.fraction ||
+            if (!triangle_hit(triangles_[i].points, from, to, half, candidate, anchor))
+                continue;
+            if (start == StartOverlap::Depart && candidate.start_solid)
+            {
+                const auto& p = triangles_[i].points;
+                const auto outward = cross(vector_subtract(p[1], p[0]), vector_subtract(p[2], p[0]));
+                if (precise_dot(outward, delta) > 0)
+                {
+                    ++*departed;
+                    continue;
+                }
+            }
+            if ((!found || candidate.fraction < hit.fraction ||
                  (candidate.fraction == hit.fraction && triangles_[i].polygon < hit.polygon)))
             {
                 hit = candidate;
@@ -380,7 +392,8 @@ namespace OpenBlood2
             }
         }
     }
-    CollisionQuery CollisionWorld::sweep(DVector from, DVector to, DVector half, CollisionHit& hit) const
+    CollisionQuery CollisionWorld::sweep(DVector from, DVector to, DVector half, CollisionHit& hit,
+                                         StartOverlap start) const
     {
         hit = {};
         if (!physics_vector(from) || !physics_vector(to) || !extents(half))
@@ -388,7 +401,9 @@ namespace OpenBlood2
         if (nodes_.empty())
             return CollisionQuery::Miss;
         bool found = false;
-        query(0, from, to, half, hit, found);
+        std::uint32_t departed = 0;
+        query(0, from, to, half, hit, found, nullptr, nullptr, start, &departed);
+        hit.departed = departed;
         return found ? CollisionQuery::Hit : CollisionQuery::Miss;
     }
     const char* body_placement_name(BodyPlacementResult result)

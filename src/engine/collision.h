@@ -14,6 +14,16 @@ namespace OpenBlood2
         bool start_solid = false;
         double penetration = 0;
         std::uint16_t texture_flags = 0;
+        // Initially overlapped faces ignored under StartOverlap::Depart.
+        std::uint32_t departed = 0;
+    };
+    // Block: any initial overlap is start_solid. Depart: an initially overlapped
+    // face does not block a displacement leaving it along its outward normal
+    // (DAT winding agrees with the plane normal). Stationary queries still block.
+    enum class StartOverlap
+    {
+        Block,
+        Depart
     };
     enum class CollisionQuery
     {
@@ -40,7 +50,8 @@ namespace OpenBlood2
             nodes_.clear();
             work_ = {};
         }
-        CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit& hit) const;
+        CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit& hit,
+                             StartOverlap start = StartOverlap::Block) const;
         BodyPlacement place_body(DVector anchor, DVector anchor_half, DVector requested, DVector half) const;
         std::size_t triangles() const
         {
@@ -75,7 +86,8 @@ namespace OpenBlood2
         mutable CollisionWork work_;
         std::uint32_t partition(std::uint32_t begin, std::uint32_t end);
         void query(std::uint32_t node, DVector from, DVector to, DVector half, CollisionHit& hit, bool& found,
-                   const PlacementAnchor* anchor = nullptr, const Triangle** selected = nullptr) const;
+                   const PlacementAnchor* anchor = nullptr, const Triangle** selected = nullptr,
+                   StartOverlap start = StartOverlap::Block, std::uint32_t* departed = nullptr) const;
     };
     DVector rotate_vector(DVector, DRotation);
     DRotation multiply_rotation(DRotation, DRotation);

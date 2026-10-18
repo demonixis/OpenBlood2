@@ -66,7 +66,7 @@ namespace OpenBlood2
         DVector position{}, velocity{}, acceleration{}, dimensions{}, ground_normal{};
         bool standing = false;
         std::uint32_t ground_surface = 0;
-        std::uint64_t stair_attempts = 0, stair_steps = 0;
+        std::uint64_t stair_attempts = 0, stair_steps = 0, start_departures = 0;
         float last_step_height = 0;
         HOBJECT ground_object = nullptr;
         std::uint32_t ground_polygon = UINT32_MAX;

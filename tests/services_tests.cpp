@@ -237,6 +237,62 @@ namespace
         CHECK(!world.build(w, error) && world.triangles() == 0);
         return true;
     }
+    WorldModel cabin_model(bool wall = false)
+    {
+        WorldModel w;
+        w.points = {{-100, 0, -100}, {100, 0, -100},  {100, 0, 100}, {-100, 0, 100}, {-100, 10, -100}, {100, 10, -100},
+                    {100, 10, 100},  {-100, 10, 100}, {0, 0, -100},  {0, 0, 100},    {0, 10, 100},     {0, 10, -100}};
+        w.surfaces.resize(1);
+        w.surfaces[0].flags = 1;
+        // DAT winding agrees with the outward plane normal: the floor faces up, the ceiling down.
+        w.polygons = {{0, {0, 3, 2, 1}}, {0, {4, 5, 6, 7}}};
+        if (wall)
+            w.polygons.push_back({0, {8, 9, 10, 11}});
+        return w;
+    }
+    bool start_departure()
+    {
+        CollisionWorld world;
+        std::string error;
+        CHECK(world.build(cabin_model(), error));
+        CollisionHit hit;
+        const DVector start{0, 9, 0}, half{1, 2, 1};
+        // A box crossing the ceiling blocks every move by default.
+        CHECK(world.sweep(start, {0, 4, 0}, half, hit) == CollisionQuery::Hit && hit.start_solid);
+        CHECK(hit.departed == 0);
+        // Leaving the overlapped ceiling along its outward normal is allowed; both triangles are counted.
+        CHECK(world.sweep(start, {0, 4, 0}, half, hit, StartOverlap::Depart) == CollisionQuery::Miss);
+        CHECK(hit.departed == 2);
+        // The floor still stops the same move.
+        CHECK(world.sweep(start, {0, -5, 0}, half, hit, StartOverlap::Depart) == CollisionQuery::Hit);
+        CHECK(!hit.start_solid && hit.normal.y == 1 && std::abs(hit.fraction - .5) < 1e-5 && hit.departed == 2);
+        // Moving deeper, sideways or not at all still fails.
+        for (auto end : {DVector{0, 12, 0}, DVector{5, 9, 0}, start})
+            CHECK(world.sweep(start, end, half, hit, StartOverlap::Depart) == CollisionQuery::Hit && hit.start_solid);
+
+        GameSession g;
+        CHECK(setup(g));
+        CHECK(g.collision.build(cabin_model(), error));
+        g.server.collision_ready = true;
+        auto h = probe(g);
+        auto* r = g.objects.get(h);
+        r->dimensions = half;
+        r->state.m_Pos = start;
+        r->state.m_Flags = FLAG_SOLID;
+        // Ordinary moves keep the explicit initial-penetration failure.
+        auto down = DVector{0, 5, 0};
+        CHECK(g.server.MoveObject(h, &down) == DE_ERROR && r->state.m_Pos.y == 9 && r->start_departures == 0);
+        // The original placement helper may leave the ceiling it starts through and rests on the floor.
+        CHECK(g.server.MoveObjectToGround(h) == DE_OK);
+        CHECK(std::abs(r->state.m_Pos.y - 2) < .01f && r->start_departures == 2 && r->grounded);
+        CHECK(g.server.MoveObject(h, &down) == DE_OK); // The policy does not outlive the placement move.
+        // A second overlapped face that the move does not leave still blocks placement.
+        CHECK(g.collision.build(cabin_model(true), error));
+        r->state.m_Pos = start;
+        r->start_departures = 0;
+        CHECK(g.server.MoveObjectToGround(h) == DE_ERROR && r->state.m_Pos.y == 9);
+        return true;
+    }
     bool collision_traversal()
     {
         WorldModel model;
@@ -498,6 +554,32 @@ namespace
         CHECK(game.objects.finish_frame() && SmellHint::m_dwNumSmells == 0);
         return true;
     }
+    // GameStartPoint 05_egress lies 112 units above the endelevator floor; the
+    // standing box crosses the car ceiling until MoveObjectToGround lowers it.
+    bool elevator_entry(const char* root, bool demo)
+    {
+        GameSession game;
+        CHECK(game.initialize());
+        Config config;
+        config.data_dir = path_from_utf8(root);
+        config.demo = demo;
+        std::string error;
+        CHECK(game.resources.mount_game(config, error));
+        CHECK(game.request_world(demo ? "Demo_02" : "05_cdmb", error));
+        if (!game.enter_player(error))
+        {
+            std::cerr << error << '\n';
+            return false;
+        }
+        const auto* player = game.objects.get(game.client_shell.player);
+        CHECK(player && player->life == Life::Alive && player->state.m_Pos.x == 0 && player->state.m_Pos.z == -1520);
+        const float feet = player->state.m_Pos.y - player->dimensions.y;
+        std::cout << (demo ? "Demo_02" : "05_CDMB") << " entry at " << player->state.m_Pos.y << ", feet " << feet
+                  << ", departed faces " << player->start_departures << '\n';
+        CHECK(player->start_departures > 0 && std::abs(feet + 5568) < 5);
+        CHECK(game.leave_player() && game.unload_world());
+        return true;
+    }
     bool private_services(const char* root)
     {
         GameSession game;
@@ -599,6 +681,8 @@ int main(int argc, char** argv)
         ok = model_callbacks();
     else if (name == "collision_queries")
         ok = collision_queries();
+    else if (name == "start_departure")
+        ok = start_departure();
     else if (name == "collision_traversal")
         ok = collision_traversal();
     else if (name == "movement_contacts")
@@ -609,6 +693,10 @@ int main(int argc, char** argv)
         ok = placement_service();
     else if (name == "original_services")
         ok = original_services();
+    else if (name == "elevator_entry" && argc == 3)
+        ok = elevator_entry(argv[2], false);
+    else if (name == "elevator_entry_demo" && argc == 3)
+        ok = elevator_entry(argv[2], true);
     else if (name == "private" && argc == 3)
         ok = private_services(argv[2]);
     callback = {};

@@ -362,7 +362,7 @@ namespace OpenBlood2
         void initialize_model_services();
         void initialize_physics_services();
         CollisionQuery sweep_scene(HOBJECT, DVector, DVector, DVector, CollisionHit&, const std::vector<ObjectId>&,
-                                   HOBJECT ignore_extra = nullptr);
+                                   HOBJECT ignore_extra = nullptr, StartOverlap start = StartOverlap::Block);
         bool affect_containers(HOBJECT, ContainerPhysics&);
         struct BodyPath
         {
@@ -388,6 +388,8 @@ namespace OpenBlood2
         void dispatch_world_body(const BodyPlan&, const std::vector<ObjectId>&);
         DRESULT move_world_body(ObjectRecord&, DVector);
         bool moving_ = false;
+        // Set only around the original MoveObjectToGround placement move.
+        bool placement_move_ = false;
         bool models_advancing_ = false, physics_advancing_ = false;
         std::vector<std::unique_ptr<StringHandle>> string_tokens_;
         std::unordered_map<HSTRING, String> strings_;

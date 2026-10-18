@@ -1,4 +1,3 @@
-#include "game/original/NewStatusBar.h"
 #include "app/inspector.h"
 #include "app/scene_presenter.h"
 #include "build_info.h"
@@ -13,6 +12,7 @@
 #include "game/original/Grenade.h"
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
+#include "game/original/NewStatusBar.h"
 #include "game/original/Projectile.h"
 #include "game/original/ProximityBomb.h"
 #include "game/original/RemoteBomb.h"
@@ -1795,6 +1795,8 @@ namespace OpenBlood2
         ImGui::Text("Stairs %llu / %llu | rise %.1f | limit %.1f", static_cast<unsigned long long>(body.stair_steps),
                     static_cast<unsigned long long>(body.stair_attempts), body.last_step_height,
                     body.dimensions.y * 0.5f);
+        ImGui::Text("Placement left %llu initially overlapped faces (MoveObjectToGround)",
+                    static_cast<unsigned long long>(body.start_departures));
         const auto* record = game.objects.get(player->m_hObject);
         ImGui::TextWrapped("Requested clip: %s", player->locomotion_requested_clip.c_str());
         ImGui::TextWrapped("Clip: %s | fallback %s", player->locomotion_clip.c_str(),

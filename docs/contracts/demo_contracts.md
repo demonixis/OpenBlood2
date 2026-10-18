@@ -71,10 +71,11 @@ Both demo worlds are DAT v56, but the world initialization gate rejects them:
   Beretta, and `_DEMO` `AddInventoryWeapon` refuses the authored `Proximity_Bombs`
   25. Fanatic Special1/Dying also needs the unported `CHowitzerShell` and the
   `OBJFX_SMOKING_2` torso smoke.
-- After world initialization, player entry at GameStartPoint `05_egress`
-  (0, -5456, -1520) starts solid against the `endelevator` world model (polygon 78)
-  and fails because the replacement `MoveObject` has no depenetration. Retail
-  `05_CDMB` fails the same way; this is engine collision work, not a class port.
+- Player entry at GameStartPoint `05_egress` (0, -5456, -1520) starts with the
+  standing box through the `endelevator` ceiling (polygon 78). The original
+  MoveObjectToGround placement now leaves that face and lands on the car floor in
+  both Demo_02 and retail `05_CDMB`; see
+  [collision traversal](collision_traversal_contracts.md).
 
 Several source `_DEMO` features are not connected:
 

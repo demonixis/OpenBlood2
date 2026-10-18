@@ -10,11 +10,12 @@ namespace OpenBlood2
 {
     CollisionQuery ServerAdapter::sweep_scene(HOBJECT ignore, DVector from, DVector to, DVector dims,
                                               CollisionHit& nearest, const std::vector<ObjectId>& ids,
-                                              HOBJECT ignore_extra)
+                                              HOBJECT ignore_extra, StartOverlap start)
     {
-        auto result = collision->sweep(from, to, dims, nearest);
+        auto result = collision->sweep(from, to, dims, nearest, start);
         if (result == CollisionQuery::Invalid)
             return result;
+        auto departed = nearest.departed;
         for (auto id : ids)
         {
             const auto* other = objects_.get(id);
@@ -22,9 +23,10 @@ namespace OpenBlood2
                 other->handle == ignore_extra || !(other->state.m_Flags & FLAG_SOLID))
                 continue;
             CollisionHit hit;
-            auto query = sweep_object(*other, from, to, dims, hit);
+            auto query = sweep_object(*other, from, to, dims, hit, start);
             if (query == CollisionQuery::Invalid)
                 return query;
+            departed += hit.departed;
             if (query == CollisionQuery::Hit && (result != CollisionQuery::Hit || hit.fraction < nearest.fraction))
             {
                 nearest = hit;
@@ -32,6 +34,7 @@ namespace OpenBlood2
                 result = query;
             }
         }
+        nearest.departed = departed;
         return result;
     }
     ResizeResult ServerAdapter::ResizeObject(HOBJECT h, DVector dimensions)
@@ -100,6 +103,7 @@ namespace OpenBlood2
         state.acceleration = r->acceleration;
         state.dimensions = r->dimensions;
         state.stair_attempts = r->stair_attempts;
+        state.start_departures = r->start_departures;
         state.stair_steps = r->stair_steps;
         state.last_step_height = r->last_step_height;
         if (!physics_vector(state.position) || !physics_vector(state.velocity) || !physics_vector(state.acceleration) ||
@@ -260,15 +264,20 @@ namespace OpenBlood2
         r->contact_object = nullptr;
         r->contact_polygon = UINT32_MAX;
         bool blocked_start = false;
+        // Replacement policy for the original placement helper only: a face the
+        // body already overlaps does not block the move leaving it (as later
+        // LithTech's one-sided world polygons). See collision_traversal_contracts.md.
+        const auto start = placement_move_ ? StartOverlap::Depart : StartOverlap::Block;
         for (unsigned iteration = 0; iteration < 4; ++iteration)
         {
             auto end = vector_add(position, remaining);
             CollisionHit nearest;
             auto query = (r->state.m_Flags & FLAG_SOLID)
-                             ? sweep_scene(h, position, end, r->dimensions, nearest, ids)
+                             ? sweep_scene(h, position, end, r->dimensions, nearest, ids, nullptr, start)
                              : ((r->state.m_Flags & FLAG_GRAVITY) && !(r->state.m_Flags & FLAG_GOTHRUWORLD)
-                                    ? collision->sweep(position, end, r->dimensions, nearest)
+                                    ? collision->sweep(position, end, r->dimensions, nearest, start)
                                     : CollisionQuery::Miss);
+            r->start_departures += nearest.departed;
             if (query == CollisionQuery::Invalid)
             {
                 moving_ = false;

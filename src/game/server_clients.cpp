@@ -260,7 +260,12 @@ namespace OpenBlood2
         if (distance > dims.y)
         {
             from.y = from.y - distance + (dims.y + 0.1f);
-            return MoveObject(h, &from);
+            // The engine (not the original game code) lets this placement move
+            // leave faces the body already overlaps; deeper overlap still fails.
+            placement_move_ = true;
+            const auto result = MoveObject(h, &from);
+            placement_move_ = false;
+            return result;
         }
         return DE_OK; // Already close enough; original helper does not move upward.
     }

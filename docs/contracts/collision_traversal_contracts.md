@@ -44,3 +44,34 @@ objects skip geometry work; visible off-screen models have no frustum rejection.
 CPU skeleton poses are also needed independently for model-node queries and
 attachments. This collision change does not claim GPU skinning, rendering culling,
 retail physics equivalence, universally smooth transitions or M2 completion.
+
+## Placement departure from initial overlap
+
+`CollisionWorld::sweep` takes a `StartOverlap` policy. `Block` (the default for
+every caller) keeps initial penetration a `start_solid` failure. `Depart` ignores
+a triangle the box already overlaps when the displacement leaves it along the
+triangle's outward normal (`normal . delta > 0`). Moving deeper, moving parallel
+to the face and stationary queries still fail. DAT winding gives that normal:
+all 338,275 polygons in the retail and demo worlds wind with their plane normal,
+and container boundaries are reoriented to it at build. A box center inside a
+closed container component stays start-solid. Ignored faces are counted in
+`CollisionHit::departed`; later hits are unaffected.
+
+Only the move issued by the original `MoveObjectToGround` placement helper uses
+`Depart`. GoToStartPoint teleports the player to `05_egress` (05_CDMB and the
+demo's Demo_02), 112 units above the `endelevator` floor, where the standing box
+crosses the car ceiling by 25 units. The source then lowers it to the floor with
+MoveObjectToGround; the replacement solver used to reject that move as initial
+penetration. The authored start, the world model and the player's position
+rules are unchanged; the body is not teleported or pushed out, it only follows
+the source's own downward move. This mirrors later LithTech's one-sided
+world-model polygons, which ignore contacts whose normal faces along the motion;
+it is replacement policy, not a verified 1998 engine trace. Ordinary
+MoveObject calls, stair probes, movers, world bodies and body placement keep
+`Block`; general depenetration remains unavailable.
+
+Movement snapshots and the Movement inspector report the faces left by
+placement moves (`start_departures`). Tests: `services.start_departure`
+(synthetic) and `services.elevator_entry` / `elevator_entry_demo` (retail
+05_CDMB and Demo_02 player entry).
+

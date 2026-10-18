@@ -10,13 +10,14 @@ namespace OpenBlood2
         return vector_add(vector_scale(vector_add(shape.min, shape.max), .5f),
                           vector_subtract(object.state.m_Pos, shape.origin));
     }
-    CollisionQuery sweep_object(const ObjectRecord& object, DVector from, DVector to, DVector half, CollisionHit& hit)
+    CollisionQuery sweep_object(const ObjectRecord& object, DVector from, DVector to, DVector half, CollisionHit& hit,
+                                StartOverlap start)
     {
         if ((!object.world_model && !object.container()) || (object.state.m_Flags & FLAG_BOXPHYSICS))
             return sweep_box(from, to, half, object_bounds_center(object), object.dimensions, hit);
         const auto& shape = *(object.world_model ? object.world_model : object.container());
         const auto offset = vector_subtract(object.state.m_Pos, shape.origin);
-        const auto result = shape.sweep(vector_subtract(from, offset), vector_subtract(to, offset), half, hit);
+        const auto result = shape.sweep(vector_subtract(from, offset), vector_subtract(to, offset), half, hit, start);
         if (result == CollisionQuery::Hit)
             hit.point = vector_add(hit.point, offset);
         return result;

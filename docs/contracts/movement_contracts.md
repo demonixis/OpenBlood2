@@ -102,7 +102,9 @@ and dispatches actual touch callbacks. The manager rereads the resolved body
 after each move. Callback removal is deferred; a removed player detaches the
 client before any later movement or weapon use. Reentrant session/unload calls
 inside contacts are rejected. Invalid geometry/penetration remains an explicit
-failure; there is no noclip or depenetration fallback.
+failure; there is no noclip or depenetration fallback. The original
+MoveObjectToGround placement move alone may leave faces it starts through; see
+[collision traversal](collision_traversal_contracts.md).
 
 ## Inspection and device boundary
 
