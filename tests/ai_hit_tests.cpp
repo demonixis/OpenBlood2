@@ -188,7 +188,13 @@ namespace
         for (const auto& n : m->nodes)
             CHECK(g.server.SetModelNodeHideStatus(h, n.name.c_str(), true) == DE_OK);
         CHECK(a->m_damage.LocalizeHit(packet, *a->AnimSound()) && a->m_damage.hit.random_fallback);
+        for (const auto& n : m->nodes)
+            CHECK(g.server.SetModelNodeHideStatus(h, n.name.c_str(), false) == DE_OK);
+        // A duplicate name resolves to the first node; an invalid pose still fails before health.
         m->nodes[1].name = "HEAD";
+        CHECK(a->m_damage.LocalizeHit(packet, *a->AnimSound()) && a->m_damage.hit.valid);
+        m->nodes[1].name = "neck";
+        g.objects.get(h)->animation.animation = 99;
         CHECK(!a->m_damage.LocalizeHit(packet, *a->AnimSound()) && !a->m_damage.hit.valid);
         const auto hp = a->m_damage.m_fHitPoints;
         CHECK(send(g, h, packet) && a->m_damage.m_fHitPoints == hp && a->m_damage.accepted_damage == 0);
@@ -206,10 +212,10 @@ namespace
         auto h = a->m_hObject;
         CHECK(g.server.QueryModelNodeTransform(h, "missing", &pos, &rot) == ServerDE::NodeQuery::Missing && pos.x == 9);
         CHECK(g.server.QueryModelNodeTransform(h, "HEAD", &pos, &rot) == ServerDE::NodeQuery::Found && pos.y == 100);
-        m->nodes[1].name = "HEAD";
+        m->nodes[1].name = "HEAD"; // Duplicate: the first node in model order (LithTech FindNode).
         pos = {9, 8, 7};
-        CHECK(g.server.QueryModelNodeTransform(h, "head", &pos, &rot) == ServerDE::NodeQuery::Unavailable &&
-              pos.x == 9);
+        CHECK(g.server.QueryModelNodeTransform(h, "head", &pos, &rot) == ServerDE::NodeQuery::Found && pos.x == 0 &&
+              pos.y == 100);
         m->nodes[1].name = "neck";
         g.objects.get(h)->animation.animation = 99;
         CHECK(!a->m_damage.LocalizeHit(shot(sender(g), 2), *a->AnimSound()));

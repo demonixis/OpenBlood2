@@ -116,7 +116,8 @@ no gameplay side effects; Release has no ImGui dependency.
 
 Synthetic tests cover mapping/fallback quirks, invalid/missing clips, forced
 restart semantics, hierarchical interpolation plus object transforms/scale,
-missing/ambiguous nodes, unchanged failure outputs, inactive and stale lifetime,
+missing nodes, first-match duplicate names ([MadScientistAI](madscientist_contracts.md)),
+unchanged failure outputs, inactive and stale lifetime,
 all original radius formulas and missing-node handling. Private checks inspect
 all clips/nodes of Caleb, male/female civilians, labtech, male/female cultists and
 Gideon, and repeat real SubwayA shell/player entry, movement and cleanup.

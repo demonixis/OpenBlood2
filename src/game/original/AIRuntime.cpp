@@ -156,6 +156,17 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         npc_weapons[0] = "SHIKARI_CLAW";
         npc_weapons[1] = "SHIKARI_SPIT";
     }
+    if (type == NPCType::MadScientist)
+    {
+        // Original MadScientistAI constructor; roll/jump keep the AI_Mgr defaults.
+        m_fHearingDist = 0;
+        m_fSeeingDist = 1000;
+        m_fRollSpeed = 2;
+        m_fJumpSpeed = 500;
+        m_dwFlags = 0;
+        npc_hp = 30;
+        npc_armor = 0;
+    }
     if (type == NPCType::Gideon)
     {
         m_fHearingDist = 0;
@@ -263,6 +274,11 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         model = "Models/Enemies/" + name + ".abc";
         skin = "Skins/Enemies/" + name + ".dtx";
     }
+    else if (npc_type == NPCType::MadScientist)
+    {
+        model = "Models/Enemies/madscientist.abc";
+        skin = "Skins/Enemies/madscientist.dtx";
+    }
     else if (npc_type == NPCType::Shikari)
     {
         model = "Models/Enemies/Shikari.abc";
@@ -326,12 +342,14 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
         return RuntimeFailure("Invalid or repeated NPC initialization");
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
-    const auto group = npc_type == NPCType::Gideon    ? 4
-                       : npc_type == NPCType::Fanatic ? 5
-                       : npc_type == NPCType::Prophet ? 6
+    const auto group = npc_type == NPCType::Gideon       ? 4
+                       : npc_type == NPCType::Fanatic    ? 5
+                       : npc_type == NPCType::Prophet    ? 6
                        : npc_type == NPCType::SoulDrudge ? 7
                        : npc_type == NPCType::Shikari    ? 8
-                                                         : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
+                       : npc_type == NPCType::MadScientist
+                           ? 9
+                           : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
     auto initialize_table = [&](unsigned slot, bool refresh, const char* root)
     {
         if (!refresh)
@@ -359,13 +377,14 @@ bool AI_Mgr::RuntimeInitialize(int reason)
             return RuntimeFailure("NPC female animation table initialization failed");
     }
     else if (!initialize_table(group, !tables[group],
-                               npc_type == NPCType::Gideon    ? "sounds/enemies/Gideon"
-                               : npc_type == NPCType::Fanatic ? "sounds/enemies/fanatic"
-                               : npc_type == NPCType::Prophet ? "sounds/enemies/Prophet"
-                               : npc_type == NPCType::SoulDrudge ? "sounds/enemies/souldrudge"
-                               : npc_type == NPCType::Shikari    ? "sounds/enemies/shikari"
-                               : male_group                   ? "sounds/enemies/m_cultist"
-                                                              : "sounds/enemies/f_cultist"))
+                               npc_type == NPCType::Gideon         ? "sounds/enemies/Gideon"
+                               : npc_type == NPCType::Fanatic      ? "sounds/enemies/fanatic"
+                               : npc_type == NPCType::Prophet      ? "sounds/enemies/Prophet"
+                               : npc_type == NPCType::SoulDrudge   ? "sounds/enemies/souldrudge"
+                               : npc_type == NPCType::Shikari      ? "sounds/enemies/shikari"
+                               : npc_type == NPCType::MadScientist ? "sounds/enemies/madscientist"
+                               : male_group                        ? "sounds/enemies/m_cultist"
+                                                                   : "sounds/enemies/f_cultist"))
         return RuntimeFailure("NPC shared animation table initialization failed");
     auto table = tables[group];
     if (!InitStatics(table) || !m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))

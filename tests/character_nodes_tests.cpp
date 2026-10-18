@@ -54,10 +54,16 @@ namespace
               before == g.objects.get(h)->hidden_nodes);
         CHECK(g.server.GetModelNodeHideStatus(h, "", &hidden) != DE_OK && hidden == 99);
         CHECK(g.server.GetModelNodeHideStatus(h, "head", nullptr) != DE_OK);
+        // LithTech Model::FindNode: a duplicate name resolves to the first node in model order.
+        std::size_t first = 0;
+        while (m->nodes[first].name != "head")
+            ++first;
+        CHECK(first < 4);
         m->nodes[4].name = "HEAD";
-        CHECK(g.server.GetModelNodeHideStatus(h, "head", &hidden) == DE_ERROR && hidden == 99);
-        CHECK(g.server.SetModelNodeHideStatus(h, "head", false) == DE_ERROR &&
-              before == g.objects.get(h)->hidden_nodes);
+        CHECK(g.server.GetModelNodeHideStatus(h, "head", &hidden) == DE_OK && hidden);
+        CHECK(g.server.SetModelNodeHideStatus(h, "head", false) == DE_OK && !g.objects.get(h)->hidden_nodes[first] &&
+              g.objects.get(h)->hidden_nodes[4] == before[4]);
+        CHECK(g.server.SetModelNodeHideStatus(h, "head", true) == DE_OK && before == g.objects.get(h)->hidden_nodes);
         m->nodes[4].name = "other";
         g.server.SetObjectState(h, OBJSTATE_INACTIVE);
         CHECK(g.server.GetModelNodeHideStatus(h, "head", &hidden) == DE_OK && hidden);
@@ -95,8 +101,8 @@ namespace
         CHECK(mask == std::vector<std::uint8_t>({0, 0, 0, 1, 1, 0, 0})); // Gap and nonstandard names preserved.
         CHECK(hide_character_node(h, 0, true, e));
         auto before = mask;
-        m->nodes[4].name = "HEAD";
-        CHECK(!reset_character_nodes(h, e) && !e.empty() && mask == before);
+        m->nodes[4].name = "HEAD"; // Duplicate: resets reach the first "head" only.
+        CHECK(reset_character_nodes(h, e) && mask[4] == before[4]);
         CHECK(!hide_character_node(h, -1, false, e) && !hide_character_node(h, 21, false, e));
         CHECK(g.objects.clear());
         return true;

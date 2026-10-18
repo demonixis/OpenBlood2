@@ -12,15 +12,12 @@ namespace OpenBlood2
                 r->model->nodes.size() > 256 ||
                 (!r->hidden_nodes.empty() && r->hidden_nodes.size() != r->model->nodes.size()))
                 return DE_INVALIDPARAMS;
-            index = r->model->nodes.size();
-            for (std::size_t i = 0; i < r->model->nodes.size(); ++i)
-                if (!CaseLess{}(name, r->model->nodes[i].name) && !CaseLess{}(r->model->nodes[i].name, name))
-                {
-                    if (index != r->model->nodes.size())
-                        return DE_ERROR;
-                    index = i;
-                }
-            return index == r->model->nodes.size() ? DE_NOTFOUND : DE_OK;
+            // LithTech Model::FindNode: the first case-insensitive match in model order
+            // (madscientist.abc names two nodes "torso").
+            for (index = 0; index < r->model->nodes.size(); ++index)
+                if (!CaseLess{}(name, r->model->nodes[index].name) && !CaseLess{}(r->model->nodes[index].name, name))
+                    return DE_OK;
+            return DE_NOTFOUND;
         }
     } // namespace
     DRESULT ServerAdapter::GetModelNodeHideStatus(HOBJECT h, const char* name, DBOOL* hidden)
@@ -144,13 +141,12 @@ namespace OpenBlood2
         if (!r || r->life != Life::Alive || !r->model || r->state.m_ObjectType != OT_MODEL || !name || !*name ||
             !position || !rotation)
             return NodeQuery::Unavailable;
-        unsigned matches = 0;
+        bool found = false;
         for (const auto& node : r->model->nodes)
-            matches += !CaseLess{}(node.name, name) && !CaseLess{}(name, node.name);
-        if (!matches)
+            found |= !CaseLess{}(node.name, name) && !CaseLess{}(name, node.name);
+        if (!found)
             return NodeQuery::Missing;
-        if (matches != 1 || !objects_.refresh_attachment(object) ||
-            !object_node_transform(*r, name, position, rotation))
+        if (!objects_.refresh_attachment(object) || !object_node_transform(*r, name, position, rotation))
             return NodeQuery::Unavailable;
         return NodeQuery::Found;
     }

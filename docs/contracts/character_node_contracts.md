@@ -21,12 +21,14 @@ extras after a numbering gap retain their state. The port selects these function
 as `hide_character_node/reset_character_nodes` without importing the unrelated
 AI_Shared class, limb spawning or FX. Lookup preflight, negative-index checks,
 a 257-extra lookup bound and explicit non-missing failures are safety adaptations.
-The decoded model limit is 256 nodes. Missing names are normal; an invalid model,
-ambiguous name or stale owner never becomes successful reset.
+The decoded model limit is 256 nodes. Missing names are normal; an invalid model
+or stale owner never becomes successful reset.
 
 The typed original-named Get/SetModelNodeHideStatus services return DE_NOTFOUND
-for missing names, DE_ERROR for ambiguous names, and DE_INVALIDPARAMS for invalid
-owners/arguments/masks. Query failure leaves output unchanged. Names match ASCII
+for missing names and DE_INVALIDPARAMS for invalid owners/arguments/masks. A duplicate
+name resolves to the first node in model order, as later LithTech `Model::FindNode`
+does ([MadScientistAI](madscientist_contracts.md): `madscientist.abc` has two `torso`
+nodes); this supersedes the earlier DE_ERROR for ambiguous names. Query failure leaves output unchanged. Names match ASCII
 case-insensitively, consistent with existing pose queries. Assignments are idempotent
 DE_OK, allowing consecutive extras to be visited even when already in the desired
 state. All nodes start visible. An empty per-object byte vector represents that

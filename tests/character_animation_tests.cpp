@@ -190,8 +190,13 @@ namespace
         CHECK(!g.server.GetModelNodeTransform(h, nullptr, &p, &q));
         CHECK(!g.server.GetModelNodeTransform(h, "hand", nullptr, &q));
         CHECK(!g.server.GetModelNodeTransform(h, "hand", &p, nullptr));
-        m->nodes[0].name = "HAND";
-        CHECK(!g.server.GetModelNodeTransform(h, "hand", &p, &q));
+        DVector root_position, hand_position;
+        DRotation root_rotation, hand_rotation;
+        CHECK(g.server.GetModelNodeTransform(h, "root", &root_position, &root_rotation));
+        CHECK(g.server.GetModelNodeTransform(h, "hand", &hand_position, &hand_rotation));
+        m->nodes[0].name = "HAND"; // Duplicate: the first node in model order (LithTech FindNode).
+        CHECK(g.server.GetModelNodeTransform(h, "hand", &p, &q) && p.x == root_position.x && p.y == root_position.y &&
+              p.z == root_position.z);
         m->nodes[0].name = "root";
         r->animation.time = std::numeric_limits<double>::infinity();
         CHECK(!g.server.GetModelNodeTransform(h, "hand", &p, &q));

@@ -106,11 +106,13 @@ class AI_Mgr : public CBaseCharacter
         Fanatic,
         Prophet,
         SoulDrudge,
-        Shikari
+        Shikari,
+        MadScientist
     };
     static void ResetRuntimeTables();
-    // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet, SoulDrudge, Shikari.
-    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 9>;
+    // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet, SoulDrudge, Shikari,
+    // MadScientist.
+    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 10>;
     // Original WeaponStrToInt prefixes; false for a matched family not integrated here.
     static bool WeaponStrToInt(std::string_view, DBYTE&);
     static void ExchangeRuntimeTables(RuntimeTables&);

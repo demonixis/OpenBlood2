@@ -206,11 +206,12 @@ remain.
 SoulDrudge + ShikariAI + BoneLeech are the minimum for the early campaign
 (02_cityhubb, 02_cityhubc, 04, 05_cdm).
 
-### L8 — Bosses and unique enemies (9 worlds)
+### L8 — Bosses and unique enemies (9 worlds; MadScientistAI done)
 
-ZealotAI (5), DeathShroud (5), MadScientistAI (3), TheHandAI (2), AncientOne (2)
+ZealotAI (5), DeathShroud (5), MadScientistAI (3, done), TheHandAI (2), AncientOne (2)
 + AncientOneTentacle (16), EnhancedGideon (2), UndeadGideon (1), Naga (1),
-Behemoth (1), Tchernotronic (1).
+Behemoth (1), Tchernotronic (1). The scientist's model has no recoil clip: wounded, it
+suspends visibly under the explicit missing-clip AI rule (madscientist contracts).
 
 ### L9 — The Chosen as NPCs (5 worlds)
 

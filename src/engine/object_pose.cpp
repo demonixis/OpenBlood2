@@ -93,14 +93,10 @@ namespace OpenBlood2
             }
             return true;
         };
-        std::size_t found = model.nodes.size();
-        for (std::size_t i = 0; i < model.nodes.size(); ++i)
-            if (equal(model.nodes[i].name, name))
-            {
-                if (found != model.nodes.size())
-                    return DFALSE; // Ambiguous names never choose an arbitrary node.
-                found = i;
-            }
+        // LithTech Model::FindNode: duplicate names resolve to the first node in model order.
+        std::size_t found = 0;
+        while (found < model.nodes.size() && !equal(model.nodes[found].name, name))
+            ++found;
         NodePose pose;
         const auto scale = record->state.m_Scale;
         if (scale.x <= 0 || scale.y <= 0 || scale.z <= 0 || !physics_vector(scale) ||

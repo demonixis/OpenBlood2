@@ -21,6 +21,7 @@
 #include "game/original/Fanatic.h"
 #include "game/original/SoulDrudge.h"
 #include "game/original/ShikariAI.h"
+#include "game/original/MadScientistAI.h"
 #include "game/original/FlareProjectile.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Gib.h"
@@ -514,6 +515,16 @@ namespace OpenBlood2
                                 {{"RandomHitPoints", 50.0f},
                                  {"AIState", std::string("IDLE"), true, 31},
                                  {"Dims", DVector{19, 30, 24}}}};
+        // Original BEGIN_CLASS(MadScientistAI). AI_Mgr::ReadProp never reads HitPoints,
+        // ArmorPoints or the digitless AIWeapon: constructor values apply.
+        const ClassInfo mad_scientist{"MadScientistAI",
+                                      &ai_manager,
+                                      construct_npc<MadScientistAI, AI_Mgr::NPCType::MadScientist>,
+                                      {{"HitPoints", 30.0f},
+                                       {"RandomHitPoints", 0.0f},
+                                       {"ArmorPoints", 0.0f},
+                                       {"AIState", std::string("IDLE"), true, 31},
+                                       {"AIWeapon", std::string("NONE"), true, 31}}};
         const ClassInfo prophet{"Prophet",
                                 &ai_manager,
                                 construct_npc<Prophet, AI_Mgr::NPCType::Prophet>,
@@ -993,6 +1004,7 @@ namespace OpenBlood2
                objects.register_class(character) && objects.register_class(ai_manager) &&
                objects.register_class(cultist) && objects.register_class(civilian) && objects.register_class(gideon) &&
                objects.register_class(fanatic) && objects.register_class(prophet) && objects.register_class(soul_drudge) && objects.register_class(shikari) &&
+               objects.register_class(mad_scientist) &&
                objects.register_class(player) &&
                objects.register_class(polygrid) && objects.register_class(volume) && objects.register_class(water) &&
                objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&

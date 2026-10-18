@@ -34,7 +34,8 @@ segment, be within their radius and be strictly closer than the previous best
 (initial distance 999). Equal distances retain the first node. The radii do not
 receive an additional object-scale factor.
 
-The typed node query distinguishes absent names from unavailable/ambiguous poses.
+The typed node query distinguishes absent names from unavailable poses; a duplicate name
+resolves to the first node in model order ([MadScientistAI](madscientist_contracts.md)).
 Missing head data fails. Missing later nodes retain the previous node transform,
 matching the source's ignored failed transform read; the missing count is visible.
 Invalid present-node poses never use that fallback. The bounded implemented path
