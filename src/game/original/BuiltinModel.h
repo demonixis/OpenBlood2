@@ -10,4 +10,14 @@ namespace OpenBlood2
       protected:
         DDWORD EngineMessageFn(DDWORD message, void* data, float reason) override;
     };
+    // AppHeaders/engineobjects.c Container / cntr_MessageFn: an OT_CONTAINER whose
+    // BSP model is its Name and whose code comes from ContainerCode (world files only).
+    class BuiltinContainer : public BaseClass
+    {
+      public:
+        D_WORD code = 0;
+
+      protected:
+        DDWORD EngineMessageFn(DDWORD message, void* data, float reason) override;
+    };
 } // namespace OpenBlood2

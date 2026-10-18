@@ -132,3 +132,15 @@ claimed, and no new dependency or ECS was introduced.
 The [original PolyGrid continuation](polygrid_contracts.md) supersedes the blanket
 liquid-surface omission for static VolumeBrush surfaces. Underwater fog, moving
 volumes, rendering parity and the actual M2 gate remain open.
+
+## Engine built-in Container
+
+`Container` is the engine class from AppHeaders/engineobjects.c (`cntr_MessageFn`):
+precreate forces OT_CONTAINER and, for world files only, reads `ContainerCode` and
+copies `Name` into the model filename, so it binds the same-named BSP (first in
+file order). Codes outside the original D_WORD range reject precreate. The object
+joins point and body container queries in container-list order with only its
+code: as the original player does for non-VolumeBrush containers, gravity and
+current are zero and Hidden is false. It occupies one of the four tracked body
+slots and, being first, can answer a point query before a later VolumeBrush.
+Retail 03_Museum (44) and 05_CDM (1, `officepool`) author code 0.

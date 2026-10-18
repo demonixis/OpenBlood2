@@ -13,6 +13,30 @@ DDWORD OpenBlood2::BuiltinModel::EngineMessageFn(DDWORD message, void* data, flo
     return bc_EngineMessageFn(this, message, data, reason);
 }
 
+DDWORD OpenBlood2::BuiltinContainer::EngineMessageFn(DDWORD message, void* data, float reason)
+{
+    if (message == MID_PRECREATE)
+    {
+        auto* state = static_cast<ObjectCreateStruct*>(data);
+        state->m_ObjectType = OT_CONTAINER;
+        if (reason == PRECREATE_WORLDFILE)
+        {
+            GenericProp prop;
+            long value = g_pServerDE->GetPropGeneric("ContainerCode", &prop) == DE_OK ? prop.m_Long : 0;
+            // The source truncates to D_WORD; an out-of-range code has no defined meaning here.
+            if (value < 0 || value > 0xFFFF)
+            {
+                g_pServerDE->RejectPrecreate("ContainerCode outside the original D_WORD range");
+                return 0;
+            }
+            code = static_cast<D_WORD>(value);
+            state->m_ContainerCode = code;
+            g_pServerDE->GetPropString("Name", state->m_Filename, MAX_CS_FILENAME_LEN);
+        }
+    }
+    return bc_EngineMessageFn(this, message, data, reason);
+}
+
 namespace
 {
     // The source casts unchecked floats to DBYTE. Out-of-range values have no

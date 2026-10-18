@@ -1,11 +1,31 @@
 #include "engine/container.h"
 #include "engine/world_model.h"
+#include "game/original/BuiltinModel.h"
 #include "game/original/PolyGrid.h"
 #include "game/original/VolumeBrush.h"
 #include "game/server_adapter.h"
 
 namespace OpenBlood2
 {
+    namespace
+    {
+        // VolumeBrush supplies its full info. The engine's built-in Container has only its
+        // code: the original player sends zero gravity/current and Hidden false for it.
+        bool container_info(const ObjectRecord& r, ContainerInfo& info)
+        {
+            if (const auto* brush = dynamic_cast<const VolumeBrush*>(r.game.get()))
+            {
+                info = brush->info;
+                return true;
+            }
+            if (const auto* container = dynamic_cast<const BuiltinContainer*>(r.game.get()))
+            {
+                info = {r.handle, static_cast<ContainerCode>(container->code), {}, 0, 0, false};
+                return true;
+            }
+            return false;
+        }
+    } // namespace
     bool ServerAdapter::GetPointContainerCode(DVector point, ContainerCode& code, bool visible_only)
     {
         trace_service("GetPointContainerCode");
@@ -17,11 +37,11 @@ namespace OpenBlood2
             const auto* r = objects_.get(id);
             if (!r || r->life != Life::Alive || !r->container() || !r->container()->contains(point))
                 continue;
-            if (const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get()))
+            if (ContainerInfo info; container_info(*r, info))
             {
                 // First overlap wins even when hidden; do not search for a later visible volume.
                 if (!visible_only || (r->user_flags & FLAG_VISIBLE))
-                    code = brush->info.code;
+                    code = info.code;
                 return true;
             }
         }
@@ -40,21 +60,21 @@ namespace OpenBlood2
             const auto* r = objects_.get(id);
             if (!r || r->life != Life::Alive || !r->container())
                 continue;
-            const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get());
-            if (!brush)
+            ContainerInfo info;
+            if (!container_info(*r, info))
                 continue;
             if (r->container()->overlaps(object_bounds_center(*body), body->dimensions))
             {
                 ++state.total;
                 if (state.count < state.body.size())
-                    state.body[state.count++] = brush->info;
+                    state.body[state.count++] = info;
             }
             // Original camera asks for one point container, then checks Hidden.
             // Stable object-slot order replaces the unavailable retail BSP ordering.
             if (!head_found && r->container()->contains(head))
             {
                 head_found = true;
-                state.head = brush->info;
+                state.head = info;
                 if (state.head.hidden)
                     state.head.code = CC_NOTHING;
             }

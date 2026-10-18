@@ -108,6 +108,10 @@ namespace OpenBlood2
             &base,
             construct<BuiltinModel>,
             {{"Filename", std::string{}}, {"Skin", std::string{}}, {"Flags", std::int32_t(FLAG_VISIBLE)}}};
+        const ClassInfo builtin_container{"Container",
+                                          &base,
+                                          construct<BuiltinContainer>,
+                                          {{"Flags", std::int32_t(FLAG_VISIBLE)}, {"ContainerCode", std::int32_t(0)}}};
         const ClassInfo builtin_sprite{"Sprite",
                                        &base,
                                        construct<BuiltinSprite>,
@@ -927,7 +931,7 @@ namespace OpenBlood2
     bool register_original_classes(Objects& objects)
     {
         return objects.register_class(base) && objects.register_class(sky_model) &&
-               objects.register_class(sky_pointer) && objects.register_class(builtin_model) &&
+               objects.register_class(sky_pointer) && objects.register_class(builtin_model) && objects.register_class(builtin_container) &&
                objects.register_class(builtin_sprite) && objects.register_class(b2base) &&
                objects.register_class(camera) && objects.register_class(client_sfx) &&
                objects.register_class(client_splat) && objects.register_class(particle_stream) &&

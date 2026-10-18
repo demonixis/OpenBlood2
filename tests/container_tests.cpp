@@ -161,6 +161,30 @@ namespace
         CHECK(!game.server.GetContainers(water, {}, state));
         return true;
     }
+    // Engine built-in Container (03_Museum, 05_CDM): code only, zero gravity/current, in list order.
+    bool builtin(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(enter(game, root));
+        auto pool = volume(game, "Container", "officepool", {-200, 0, -200}, {200, 100, 200});
+        CHECK(pool && game.objects.get(pool)->state.m_ObjectType == OT_CONTAINER);
+        CHECK(volume(game, "Water", "water", {-200, 0, -200}, {200, 100, 200}));
+        CHECK(place(game, {0, 50, 0}));
+        auto* player = game.server_shell.Player(game.local_client);
+        CHECK(player->UpdateContainerState());
+        CHECK(player->containers.count == 2 && player->containers.body[0].object == pool);
+        CHECK(player->containers.body[0].code == CC_NOTHING && player->containers.body[0].gravity == 0 &&
+              !player->containers.body[0].hidden && player->containers.body[1].code == CC_WATER);
+        // The first point container answers: the authored code-0 volume shadows the water behind it.
+        ContainerCode code = CC_WATER;
+        CHECK(game.server.GetPointContainerCode({0, 50, 0}, code) && code == CC_NOTHING);
+        auto coded = volume(game, "Container", "coded", {300, 0, 300}, {400, 100, 400},
+                            {{"ContainerCode", std::int32_t(CC_WATER)}});
+        CHECK(coded && game.server.GetPointContainerCode({350, 50, 350}, code) && code == CC_WATER);
+        CHECK(!volume(game, "Container", "bad", {500, 0, 500}, {600, 100, 600}, {{"ContainerCode", std::int32_t(-1)}}));
+        CHECK(game.objects.diagnostics().back().find("D_WORD") != std::string::npos);
+        return true;
+    }
     bool lifetime(const std::filesystem::path& root)
     {
         GameSession game;
@@ -924,6 +948,7 @@ int main(int argc, char** argv)
         {"geometry", geometry},
         {"concave", concave},
         {"membership", membership},
+        {"builtin", builtin},
         {"lifetime", lifetime},
         {"index_lifetime", index_lifetime},
         {"index_callbacks", index_callbacks},
