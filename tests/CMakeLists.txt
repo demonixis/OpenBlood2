@@ -217,6 +217,8 @@ endforeach()
 if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME locomotion.private COMMAND locomotion_tests private "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(locomotion.private PROPERTIES LABELS "headless;locomotion;private" TIMEOUT 30)
+    add_test(NAME locomotion.chosen COMMAND locomotion_tests chosen "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(locomotion.chosen PROPERTIES LABELS "headless;locomotion;private" TIMEOUT 60)
 endif()
 
 add_executable(container_tests container_tests.cpp)

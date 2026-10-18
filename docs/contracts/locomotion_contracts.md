@@ -36,9 +36,19 @@ Consequently walking/running/jumping/crouching/crawling select the corresponding
 **rifle** clips; missing knife firing clips fall back through the **two-pistol**
 column. These are original fallback rules, not guessed file aliases. The source
 macro also maps left pistol/knife strafe to `strafe_right_1pistol`; that alias is
-preserved and both requested and resolved names are visible. If the whole
-required chain is absent, the request fails with a diagnostic; clip zero is not
-silently substituted. Idle choice uses an owned seeded generator, not CRT random
+preserved and both requested and resolved names are visible.
+
+A wholly absent chain leaves the source index invalid. The installed Ishmael and
+Gabriella name their jumps `jump_rifle`/`jump_nogun`, so every `jmp_*` JUMP slot is
+invalid for them. The original `DoJumpAnim` ignores `SetAnimation`'s result.
+`SetAnimation` resets the current clip, and the engine ignores an out-of-range
+`SetModelAnimation` (later LithTech `trk_SetCurAnim` returns without changing the
+tracker). Dimensions and looping then apply to the **current** clip. The port
+reproduces that: the move state changes (jump physics is unaffected), the current
+clip restarts with the requested looping and keeps its body dimensions, and
+`locomotion_clip_retained`/`retained_clip_requests` expose it in the Movement panel.
+Clip zero is never substituted. Only a body without any valid current clip still
+fails with a diagnostic. Idle choice uses an owned seeded generator, not CRT random
 bit parity. Dual pistol body columns, injured/slow-death/death animations and
 other weapon families are outside this increment.
 
@@ -115,9 +125,11 @@ Focus loss and text editing suppress commands. Simulation also runs without ImGu
 
 Seven synthetic cases cover ascending multiple box/triangle stairs, descending,
 over-height/low-ceiling/disabled-flag/crouched/airborne rejection, clearance,
-feet/eye consistency, reduced speed/jump, clip state/looping/keys, missing chains,
+feet/eye consistency, reduced speed/jump, clip state/looping/keys, missing chains
+(current clip kept and restarted once; failure only without a valid current clip),
 exit/re-entry, Ctrl routing and speculative versus accepted touch callbacks.
 The private case verifies actual Caleb dimensions/fallback clips and world
-movement. The strengthened GPU movement smoke checks SDL walk/run/jump/crouch,
+movement. `locomotion.chosen` runs, jumps and lands as each of the four Chosen:
+Caleb/Ophelia resolve `jmp_rifle`, while Ishmael/Gabriella keep `run_rifle`. The strengthened GPU movement smoke checks SDL walk/run/jump/crouch,
 hidden stance changes, live player pose and unload/re-entry. Other-platform, XR
 and retail executable feel comparisons have not been performed.

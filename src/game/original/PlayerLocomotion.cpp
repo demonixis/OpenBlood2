@@ -128,8 +128,17 @@ bool CPlayerObj::UpdateAnim(const PlayerControls& controls)
             default:
                 break;
         }
-        if (!server->GetModelAnimationName(m_hObject, animation, name))
-            animation = UINT32_MAX;
+        // A wholly absent CheckAnims chain leaves an invalid index (installed
+        // Ishmael/Gabriella name their jumps jump_*, not the source jmp_*). The
+        // original SetAnimation still resets, the engine ignores the invalid
+        // index, and dimensions/looping then apply to the current clip.
+        const bool retained = !server->GetModelAnimationName(m_hObject, animation, name);
+        if (retained)
+        {
+            animation = server->GetModelAnimation(m_hObject);
+            if (!server->GetModelAnimationName(m_hObject, animation, name))
+                animation = UINT32_MAX;
+        }
         DVector dimensions;
         if (animation == UINT32_MAX || server->GetModelAnimUserDims(m_hObject, &dimensions, animation) != DE_OK)
         {
@@ -163,7 +172,9 @@ bool CPlayerObj::UpdateAnim(const PlayerControls& controls)
             server->SetModelLooping(m_hObject, looping);
             animation_start_ = server->GetTime();
             ++animation_changes;
+            retained_clip_requests += retained;
         }
+        locomotion_clip_retained = retained;
         move_state = state;
         locomotion_clip = std::move(name);
         crouched = duck;

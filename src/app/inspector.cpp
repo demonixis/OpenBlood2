@@ -1798,7 +1798,11 @@ namespace OpenBlood2
         const auto* record = game.objects.get(player->m_hObject);
         ImGui::TextWrapped("Requested clip: %s", player->locomotion_requested_clip.c_str());
         ImGui::TextWrapped("Clip: %s | fallback %s", player->locomotion_clip.c_str(),
-                           player->locomotion_requested_clip != player->locomotion_clip ? "yes" : "no");
+                           player->locomotion_clip_retained                               ? "current clip kept"
+                           : player->locomotion_requested_clip != player->locomotion_clip ? "yes"
+                                                                                          : "no");
+        ImGui::Text("Invalid source index requests %llu",
+                    static_cast<unsigned long long>(player->retained_clip_requests));
         if (record && record->model && record->animation.animation < record->model->animations.size())
             ImGui::Text("%.1f / %u ms | loop %s | done %s", record->animation.time,
                         record->model->animations[record->animation.animation].duration,
