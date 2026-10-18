@@ -37,6 +37,9 @@ namespace
         CHECK(parse_options(valid, options, error));
         CHECK(options.frame_limit == 12 && !options.inspector && options.check_data);
         CHECK(path_text(options.data_dir) == "a path with spaces");
+        CHECK(options.crash_capture);
+        const std::array<std::string_view, 1> no_crash{"--no-crash-capture"};
+        CHECK(parse_options(no_crash, options, error) && !options.crash_capture);
         const std::array<std::string_view, 4> log_args{"--log-dir", "logs é with spaces", "--log-level", "debug"};
         CHECK(parse_options(log_args, options, error));
         CHECK(path_text(options.log_dir) == "logs é with spaces" && options.log_level == "debug");

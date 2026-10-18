@@ -1,5 +1,7 @@
 # Implementation records
 
+- [Crash stacks and core-dump validation](../../../Documentation/Implementation/crash_capture.md)
+
 - [Diagnostic file logging validation](../../../Documentation/Implementation/logging.md)
 
 - [Gib impact audio correction](../../../Documentation/Implementation/gib_impact_audio_fix.md)

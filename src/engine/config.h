@@ -17,6 +17,7 @@ namespace OpenBlood2
         std::filesystem::path capture_file;
         std::filesystem::path log_dir;
         std::string log_level = "info";
+        bool crash_capture = true;
         std::uint32_t frame_limit = 0;
         std::string world = "01_SubwayA"; // Demo_01 with --demo unless --world is given.
         bool demo = false;                // Original two-level demo layout (B2DEMO.REZ).

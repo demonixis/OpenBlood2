@@ -13,6 +13,8 @@
 #include "cinematic_smoke.h"
 #include "engine/capture.h"
 #include "engine/config.h"
+#include "engine/crash_capture.h"
+#include "engine/logging.h"
 #include "engine/runtime.h"
 #include "game/original/AI_Mgr.h"
 #include "game/original/Door.h"
@@ -29,7 +31,6 @@
 #include "trigger_smoke.h"
 #include "world_sound_smoke.h"
 
-#include "engine/logging.h"
 #include <SDL3/SDL_main.h>
 #include <algorithm>
 #include <cmath>
@@ -1718,6 +1719,7 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --config FILE       Configuration file (default: blood2.local.ini in working directory)\n"
                      "  --log-dir DIR       Log root (default: SDL user directory / logs)\n"
                      "  --log-level LEVEL   trace, debug, info (default), warn or error\n"
+                     "  --no-crash-capture  Leave crash handling entirely to the OS/debugger\n"
                      "  --data-dir DIR      External Blood II directory; overrides BLOOD2_DATA_DIR and config\n"
                      "  --demo              The data directory is the original 1998 demo (B2Demo.rez); "
                      "first world Demo_01\n"
@@ -1856,6 +1858,8 @@ static int application_main(const OpenBlood2::Options& options)
 
 int main(int argc, char** argv)
 {
+    if (const int helper = OpenBlood2::dispatch_crash_helper(argc, argv); helper >= 0)
+        return helper;
     std::vector<std::string_view> args;
     for (int i = 1; i < argc; ++i)
         args.emplace_back(argv[i]);
@@ -1864,8 +1868,17 @@ int main(int argc, char** argv)
     const bool parsed = OpenBlood2::parse_options(args, options, error);
     OpenBlood2::LogSession logs;
     std::string log_error;
-    if (!logs.start({options.log_dir, options.log_level}, log_error))
+    const bool logging = logs.start({options.log_dir, options.log_level}, log_error);
+    if (!logging)
         spdlog::error("File logging unavailable; console remains active: {}", log_error);
+    OpenBlood2::CrashCapture crashes;
+    if (logging && options.crash_capture)
+    {
+        if (crashes.start({logs.directory()}, log_error))
+            spdlog::info("Crash capture ready: all-thread stacks and core dump in the log session directory");
+        else
+            spdlog::warn("{}", log_error);
+    }
     spdlog::info("Requested world={}; demo={}; config={}; inspector={}; view={}; bench={}; headless={}; frames={}",
                  options.world, options.demo, OpenBlood2::path_text(options.config_file),
                  bool(BLOOD2_INSPECTOR) && options.inspector, options.view_world, options.bench,
@@ -1876,6 +1889,7 @@ int main(int argc, char** argv)
     else
         result = application_main(options);
     // All application-owned SDL/GPU/audio objects have been destroyed before completion is recorded.
+    crashes.stop();
     logs.finish(result);
     return result;
 }

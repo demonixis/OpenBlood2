@@ -5,5 +5,8 @@
 /imgui.ini
 *.rez
 *.REZ
+crash.core
+crash.core.partial
+crash-executable
 
 .DS_Store

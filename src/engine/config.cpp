@@ -201,6 +201,8 @@ namespace OpenBlood2
                 options.check_data = true;
             else if (arg == "--no-inspector")
                 options.inspector = false;
+            else if (arg == "--no-crash-capture")
+                options.crash_capture = false;
             else if (arg == "--world-smoke")
                 options.world_smoke = true;
             else if (arg == "--gpu-smoke")
