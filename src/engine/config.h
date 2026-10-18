@@ -40,7 +40,8 @@ namespace OpenBlood2
         bool world_smoke = false;
         // Headless offscreen presentation measurement; never opens a window.
         bool bench = false, bench_sweep = false;
-        bool model_shadows = true; // FLAG_SHADOW model shadows (original high-detail MaxModelShadows).
+        bool model_shadows = true;   // FLAG_SHADOW model shadows (original high-detail MaxModelShadows).
+        bool pixel_lighting = false; // Model light per pixel (the frontend uses the Display setting).
         std::uint32_t bench_width = 1920, bench_height = 1080;
     };
 

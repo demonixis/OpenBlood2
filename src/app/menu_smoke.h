@@ -151,7 +151,10 @@ namespace OpenBlood2
                     key(SDL_SCANCODE_DOWN);
                     break;
                 case 15:
+                    key(SDL_SCANCODE_RETURN);
+                    break;
                 case 16:
+                    key(SDL_SCANCODE_DOWN); // Options opens on Display; Audio is next.
                     key(SDL_SCANCODE_RETURN);
                     break;
                 case 17:
@@ -162,6 +165,7 @@ namespace OpenBlood2
                     key(SDL_SCANCODE_ESCAPE);
                     break;
                 case 19:
+                    key(SDL_SCANCODE_DOWN); // Display -> Audio -> (disabled Controls) -> Mouse.
                     key(SDL_SCANCODE_DOWN);
                     break;
                 case 20:

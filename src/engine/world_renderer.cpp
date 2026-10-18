@@ -464,11 +464,12 @@ namespace OpenBlood2
                     uniform.projection[3] = -near * far / (far - near);
                 }
                 const bool illuminate = !sky && style_ == DrawStyle::Opaque && !close_view;
-                const std::array<float, 12> fragment{
-                    d.alpha,          world_saturate_scale, receive ? 1.f : 0.f, 0,
-                    light.position.x, light.position.y,     light.position.z,    illuminate ? light.radius : 0,
-                    light.color.x,    light.color.y,        light.color.z,       0};
-                SDL_PushGPUFragmentUniformData(target.commands, 0, fragment.data(), sizeof(fragment));
+                FragmentLightUniform fragment;
+                fragment.modulation = {d.alpha, world_saturate_scale, receive ? 1.f : 0.f, 0};
+                fragment.position_radius = {light.position.x, light.position.y, light.position.z,
+                                            illuminate ? light.radius : 0};
+                fragment.light_color = {light.color.x, light.color.y, light.color.z, 0};
+                SDL_PushGPUFragmentUniformData(target.commands, 0, &fragment, sizeof(fragment));
                 auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material,
                                  std::array<double, 2> rate, std::uint32_t lightmap)
                 {

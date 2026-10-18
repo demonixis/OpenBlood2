@@ -90,3 +90,5 @@ Measured on Apple M5 / Metal, CityHub at 3440x1440:
 - `ShadowZRange`/`ShadowLodOffset` are not interpreted.
 - Long shadows over ledges reach at most 96 units below the feet.
 - Dynamic lights cast no shadows.
+
+The [Display options](menu_contracts.md) map DETAIL LEVEL HIGH to these shadows (the original `MaxModelShadows 1`) and MEDIUM/LOW to none; LOW also disables lightmaps. Original corpses (`CCorpse`) carry no `FLAG_SHADOW` and cast no shadow.

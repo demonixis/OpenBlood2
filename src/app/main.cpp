@@ -362,6 +362,7 @@ namespace
         bool inspector_visible = BLOOD2_INSPECTOR && options.inspector && !options.view_world;
         OpenBlood2::ScenePresenter presenter(runtime.gpu);
         presenter.model_shadows = options.model_shadows;
+        presenter.per_pixel_lighting = options.pixel_lighting;
         const auto& world_mesh = presenter.world_mesh;
         const auto& world_renderer = presenter.world_renderer;
         const auto& model_scene = presenter.model_scene;
@@ -1732,6 +1733,7 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --bench-size WxH    Bench render size (default 1920x1080); implies --bench\n"
                      "  --bench-sweep       Bench with a presentation-only 360-degree yaw sweep\n"
                      "  --no-model-shadows  Disable FLAG_SHADOW model shadows (original low/medium detail)\n"
+                     "  --pixel-lighting    Light models per pixel (menu: Options > Display)\n"
                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled (bench: last frame)\n"
                      "  --menu-smoke        Original-menu SDL traversal, isolated preferences and pause checks\n"
                      "  --gpu-smoke         Exercise GPU presentation, inspector toggle, resize and quit\n"

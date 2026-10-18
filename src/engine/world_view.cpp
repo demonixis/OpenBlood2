@@ -167,7 +167,7 @@ namespace OpenBlood2
         }
         range.bounded = physics_vector(range.min) && physics_vector(range.max);
     }
-    bool WorldMesh::build(const World& world, std::string& error, const Resources* resources)
+    bool WorldMesh::build(const World& world, std::string& error, const Resources* resources, bool use_lightmaps)
     {
         *this = {};
         error.clear();
@@ -409,8 +409,8 @@ namespace OpenBlood2
                 const bool bright = (surface.flags & (1u << 5)) != 0;
                 std::uint32_t lightmap = 0, atlas_x = 0, atlas_y = 0;
                 std::array<double, 2> lightmap_origin_value{};
-                if (material && !bright && model.lightmaps && (surface.flags & (1u << 7)) && polygon.lightmap_width &&
-                    polygon.lightmap_height)
+                if (use_lightmaps && material && !bright && model.lightmaps && (surface.flags & (1u << 7)) &&
+                    polygon.lightmap_width && polygon.lightmap_height)
                 {
                     if (std::size_t(polygon.lightmap_offset) +
                             std::size_t(polygon.lightmap_width) * polygon.lightmap_height >

@@ -206,6 +206,8 @@ namespace OpenBlood2
                 options.bench = true;
             else if (arg == "--no-model-shadows")
                 options.model_shadows = false;
+            else if (arg == "--pixel-lighting")
+                options.pixel_lighting = true;
             else if (arg == "--bench-sweep")
                 options.bench = options.bench_sweep = true;
             else if (arg == "--bench-size")

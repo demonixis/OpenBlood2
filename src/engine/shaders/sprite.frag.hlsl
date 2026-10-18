@@ -8,7 +8,12 @@ Texture2D<float4> shadowAtlas : register(t2, space2);
 SamplerState shadowSampler : register(s2, space2);
 cbuffer Light : register(b0, space3)
 {
-    float4 modulation, positionRadius, lightColor; // modulation: alpha, lightmap scale, shadow receiver.
+    // modulation: alpha, lightmap scale, shadow receiver, per-pixel model light.
+    float4 modulation, positionRadius, lightColor;
+    // Per-pixel model light (modulation.w): ambient (w: source count), instance color (w: light
+    // scale) and three float4 per source, as the skinned vertex light.
+    float4 modelAmbient, modelColor;
+    float4 modelSources[12];
 };
 // Model shadows, pushed once per record. Per caster: tile (u0, v0, size, box top), footprint at
 // the top (min x, min z, 1/size x, 1/size z), (feet, bias, slope x, slope z): a point projects
@@ -27,6 +32,7 @@ struct Input
     float2 texCoord : TEXCOORD1;
     float3 worldPosition : TEXCOORD2;
     float2 lightmapCoord : TEXCOORD3; // Negative: no lightmap on this face.
+    float3 worldNormal : TEXCOORD4;
 };
 // Fraction of the baked light removed by model shadows on an upward-facing receiver:
 // 2x2 coverage of tile texels whose caster surface lies above this point, faded with the
@@ -62,6 +68,27 @@ float shadowAmount(float3 p)
     }
     return amount * facing * shadowInfo.y;
 }
+// The skinned vertex light term evaluated per pixel with the interpolated normal: the original
+// light term times Lambert N.L, clamped, then the instance color and light scale.
+float3 modelLight(Input input)
+{
+    float3 normal = input.worldNormal * rsqrt(max(dot(input.worldNormal, input.worldNormal), 1e-12));
+    float3 light = modelAmbient.rgb;
+    uint count = min(uint(modelAmbient.w), 4u);
+    for (uint i = 0u; i < count; ++i)
+    {
+        float3 toLight = modelSources[i * 3u].xyz - input.worldPosition;
+        float distanceToLight = max(length(toLight), 1e-4);
+        float3 direction = toLight / distanceToLight;
+        float attenuation = saturate(1.0 - distanceToLight / modelSources[i * 3u].w);
+        float coneCosine = modelSources[i * 3u + 1u].w;
+        float cone = coneCosine >= -1.0
+                         ? saturate((dot(-direction, modelSources[i * 3u + 2u].xyz) - coneCosine) / (1.0 - coneCosine))
+                         : 1.0;
+        light += modelSources[i * 3u + 1u].rgb * (attenuation * cone * max(0.0, dot(normal, direction)));
+    }
+    return modelColor.rgb * min(light, float3(1.0, 1.0, 1.0)) * modelColor.w;
+}
 // Baked light, darkened by model shadows, plus the bounded radial point light, added before the
 // albedo multiply as the original renderer adds dynamic lights to baked light. A lightmapped
 // face reads its lightmap: the sum saturates like the original framebuffer, then scales by
@@ -76,7 +103,7 @@ float3 illumination(Input input, float shadow)
     float3 baked = lightmap.SampleLevel(lightmapSampler, max(input.lightmapCoord, float2(0.0, 0.0)), 0.0).rgb;
     return input.lightmapCoord.x >= 0.0
                ? modulation.y * min(baked * (1.0 - shadow) + dynamicLight, float3(1.0, 1.0, 1.0))
-               : input.faceColor * (1.0 - shadow) + dynamicLight;
+               : (modulation.w > 0.5 ? modelLight(input) : input.faceColor) * (1.0 - shadow) + dynamicLight;
 }
 float4 main(Input input) : SV_Target0
 {

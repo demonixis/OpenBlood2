@@ -245,19 +245,18 @@ namespace OpenBlood2
                 skinned.sources[i * 3 + 2] = {source.direction.x, source.direction.y, source.direction.z, 0};
             }
             SDL_PushGPUVertexUniformData(target.commands, 0, &skinned, sizeof(skinned));
-            const std::array<float, 12> fragment{d.alpha,
-                                                 0,
-                                                 0,
-                                                 0,
-                                                 light.position.x,
-                                                 light.position.y,
-                                                 light.position.z,
-                                                 illuminate ? light.radius : 0,
-                                                 light.color.x,
-                                                 light.color.y,
-                                                 light.color.z,
-                                                 0};
-            SDL_PushGPUFragmentUniformData(target.commands, 0, fragment.data(), sizeof(fragment));
+            FragmentLightUniform fragment;
+            fragment.modulation = {d.alpha, 0, 0, per_pixel_lighting ? 1.f : 0.f};
+            fragment.position_radius = {light.position.x, light.position.y, light.position.z,
+                                        illuminate ? light.radius : 0};
+            fragment.light_color = {light.color.x, light.color.y, light.color.z, 0};
+            if (per_pixel_lighting)
+            {
+                fragment.model_ambient = skinned.ambient;
+                fragment.model_color = {skinned.color[0], skinned.color[1], skinned.color[2], skinned.scale[3]};
+                std::copy(skinned.sources.begin(), skinned.sources.end(), fragment.model_sources.begin());
+            }
+            SDL_PushGPUFragmentUniformData(target.commands, 0, &fragment, sizeof(fragment));
             if (auto* buffer = registry_->get(asset.buffer); buffer != bound_buffer)
             {
                 SDL_GPUBufferBinding binding{buffer, 0};

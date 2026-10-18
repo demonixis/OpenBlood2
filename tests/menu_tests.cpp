@@ -112,6 +112,29 @@ namespace
         for (int i = 0; i < 100; ++i)
             menu.adjust(1);
         CHECK(menu.settings.sensitivity == 1500);
+        // Display: original DETAIL LEVEL strings cycle low/medium/high; LIGHTING toggles.
+        menu.build(MenuPage::Options);
+        CHECK(menu.items[0].command == int(MENU_CMD_DISPLAY) && menu.enabled(menu.items[0]) && menu.selected == 0);
+        menu.activate();
+        CHECK(menu.page == MenuPage::Display && menu.items.size() == 2 && menu.small());
+        CHECK(menu.items[0].setting == 6 && menu.items[0].string_id == IDS_MENU_DISPLAY_DETAIL_HIGH &&
+              menu.items[1].setting == 7 && !menu.items[1].string_id);
+        menu.take_command();
+        menu.selected = 0;
+        menu.activate();
+        CHECK(menu.settings.detail == 0 && menu.items[0].string_id == IDS_MENU_DISPLAY_DETAIL_LOW &&
+              menu.take_command().action == MenuAction::Settings);
+        menu.adjust(-1);
+        CHECK(menu.settings.detail == 2 && menu.items[0].string_id == IDS_MENU_DISPLAY_DETAIL_HIGH);
+        menu.adjust(-1);
+        CHECK(menu.settings.detail == 1 && menu.items[0].string_id == IDS_MENU_DISPLAY_DETAIL_MEDIUM);
+        menu.selected = 1;
+        menu.activate();
+        CHECK(menu.settings.pixel_lighting && menu.take_command().action == MenuAction::Settings);
+        menu.adjust(1);
+        CHECK(!menu.settings.pixel_lighting);
+        menu.back();
+        CHECK(menu.page == MenuPage::Options && !strcmp(menu.title(), "options.pcx"));
         auto fit = MenuViewport::fit(1920, 1080);
         float x = 240, y = 0;
         CHECK(fit.point(x, y) && x == 0 && y == 0);

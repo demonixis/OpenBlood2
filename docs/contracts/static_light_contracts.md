@@ -113,3 +113,22 @@ The model stage now includes selection, but samples are reused (230/232).
   lights (explosions, muzzle flashes, `GlowingLight`) on models.
 - Exact original model shading (N.L, source limit, occlusion).
 - `FLAG_SHADOW` shadows are covered by the [model shadow contracts](model_shadow_contracts.md); they project along each caster's strongest source.
+
+## Per-pixel option
+
+The Display menu's `LIGHTING [PER PIXEL]` (or `--pixel-lighting`) evaluates the same model
+light per fragment. `skinned.vert` outputs the world normal (varying 4; world geometry
+outputs a constant). The full per-draw fragment uniform (`FragmentLightUniform`, 272
+bytes) carries the ambient, the instance color and scale, and the four sources. Every
+renderer pushes it whole, because Metal rejects shorter buffers; world draws leave the
+model part zero.
+
+The result clamps and scales exactly like the vertex path, so only interpolation differs.
+It costs about 0.03 ms GPU in CityHub at 3440x1440. World faces keep their baked
+lightmap or vertex light, and per-pixel dynamic lights belong to the realtime-light work.
+All eight lit-shader artifacts were regenerated.
+
+Original `CCorpse` creates bodies without `FLAG_SHADOW` and without
+`FLAG_MODELGOURAUDSHADE`. Corpses therefore cast no shadow and are lit flat (all terms at
+the center, ×1), as in the original data; per-pixel mode does not change these flags.
+

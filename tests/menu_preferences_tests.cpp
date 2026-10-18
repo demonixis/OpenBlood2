@@ -33,6 +33,33 @@ int test_menu_preferences(int argc, char** argv)
     settings.sound = true;
     CHECK(save_menu_preferences(path, settings, error));
     CHECK(load_menu_preferences(path, loaded, error) && loaded == settings);
+    // Version 2 keeps the display settings; version 1 files load with display defaults.
+    settings.detail = 1;
+    settings.pixel_lighting = true;
+    CHECK(save_menu_preferences(path, settings, error));
+    CHECK(load_menu_preferences(path, loaded, error) && loaded == settings);
+    {
+        std::ofstream out(path);
+        out << "version=1\nsound=1\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\ninvert_y=1\n";
+    }
+    CHECK(load_menu_preferences(path, loaded, error) && loaded.detail == 2 && !loaded.pixel_lighting &&
+          loaded.sensitivity == 730);
+    {
+        std::ofstream out(path);
+        out << "version=1\nsound=1\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\ninvert_y=1\n"
+               "detail=1\n";
+    }
+    CHECK(!load_menu_preferences(path, loaded, error) && !error.empty());
+    {
+        std::ofstream out(path);
+        out << "version=2\nsound=1\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\ninvert_y=1\n"
+               "detail=3\npixel_lighting=0\n";
+    }
+    CHECK(!load_menu_preferences(path, loaded, error) && !error.empty());
+    settings.detail = 2;
+    settings.pixel_lighting = false;
+    CHECK(save_menu_preferences(path, settings, error));
+    CHECK(load_menu_preferences(path, loaded, error) && loaded == settings);
     for (const auto text : {"version=1\n", "version=999\n", "version=1\nversion=1\n", "volume=5\n", "sound=nan\n"})
     {
         {

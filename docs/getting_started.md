@@ -107,7 +107,9 @@ cmake --build --preset dev --parallel
 It reports simulation, presentation and GPU completion times per frame plus draw
 call, pass, culling, lighting and shadow counters. Add `--capture FILE.png` to save the last
 measured frame. `--no-model-shadows` disables model shadows, as the original low and medium
-detail settings do, for smaller GPUs or comparisons. The inspector's 3D view shows the same counters
+detail settings do, for smaller GPUs or comparisons, and `--pixel-lighting` lights models
+per pixel. In the game, Options > Display holds the original DETAIL LEVEL and the
+per-vertex/per-pixel LIGHTING setting, saved in `preferences.cfg`. The inspector's 3D view shows the same counters
 for the last presented frame. See [presentation performance](contracts/render_performance_contracts.md).
 
 For a separate Clang sanitizer build:

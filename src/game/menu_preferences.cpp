@@ -8,12 +8,14 @@ namespace OpenBlood2
 {
     namespace
     {
-        constexpr std::array<const char*, 7> names{"version",      "sound",       "music",   "sound_volume",
-                                                   "music_volume", "sensitivity", "invert_y"};
+        // Version 1 has the first seven keys; version 2 adds the display settings.
+        constexpr std::array<const char*, 9> names{"version",     "sound",    "music",  "sound_volume",  "music_volume",
+                                                   "sensitivity", "invert_y", "detail", "pixel_lighting"};
+        constexpr std::size_t version1_keys = 7;
         bool valid(const MenuSettings& s)
         {
             return s.sound_volume >= 0 && s.sound_volume <= 50 && s.music_volume >= 0 && s.music_volume <= 50 &&
-                   s.sensitivity >= 100 && s.sensitivity <= 1500;
+                   s.sensitivity >= 100 && s.sensitivity <= 1500 && s.detail >= 0 && s.detail <= 2;
         }
     } // namespace
     bool menu_preferences_path(std::filesystem::path& output, std::string& error)
@@ -52,8 +54,8 @@ namespace OpenBlood2
             error = "Cannot open preferences";
             return false;
         }
-        std::array<int, 7> values{};
-        std::array<bool, 7> seen{};
+        std::array<int, names.size()> values{};
+        std::array<bool, names.size()> seen{};
         std::string line;
         while (std::getline(input, line))
         {
@@ -80,8 +82,12 @@ namespace OpenBlood2
             }
             seen[key] = true;
         }
-        if (input.bad() || std::find(seen.begin(), seen.end(), false) != seen.end() || values[0] != 1 ||
-            values[1] < 0 || values[1] > 1 || values[2] < 0 || values[2] > 1 || values[6] < 0 || values[6] > 1)
+        const std::size_t required = values[0] == 2 ? names.size() : version1_keys;
+        if (input.bad() || (values[0] != 1 && values[0] != 2) ||
+            std::find(seen.begin(), seen.begin() + required, false) != seen.begin() + required ||
+            std::find(seen.begin() + required, seen.end(), true) != seen.end() || values[1] < 0 || values[1] > 1 ||
+            values[2] < 0 || values[2] > 1 || values[6] < 0 || values[6] > 1 ||
+            (required == names.size() && (values[8] < 0 || values[8] > 1)))
         {
             error = "Incomplete or unsupported preferences";
             return false;
@@ -93,6 +99,11 @@ namespace OpenBlood2
         result.music_volume = values[4];
         result.sensitivity = values[5];
         result.invert_y = values[6];
+        if (required == names.size())
+        {
+            result.detail = values[7];
+            result.pixel_lighting = values[8];
+        }
         if (!valid(result))
         {
             error = "Preferences out of range";
@@ -119,13 +130,15 @@ namespace OpenBlood2
         // A unique sibling prevents partial readers and collisions between running instances.
         const auto temp =
             path.parent_path() / (path_text(path.filename()) + ".tmp-" + std::to_string(SDL_GetTicksNS()));
-        const std::array<int, 7> values{1,
-                                        settings.sound,
-                                        settings.music,
-                                        settings.sound_volume,
-                                        settings.music_volume,
-                                        settings.sensitivity,
-                                        settings.invert_y};
+        const std::array<int, names.size()> values{2,
+                                                   settings.sound,
+                                                   settings.music,
+                                                   settings.sound_volume,
+                                                   settings.music_volume,
+                                                   settings.sensitivity,
+                                                   settings.invert_y,
+                                                   settings.detail,
+                                                   settings.pixel_lighting};
         std::ofstream out(temp, std::ios::binary | std::ios::trunc);
         for (unsigned i = 0; i < values.size(); ++i)
             out << names[i] << '=' << values[i] << '\n';

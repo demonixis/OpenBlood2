@@ -132,3 +132,31 @@ log; they never capture navigation. Application request/preference errors use a
 closable modal, with focus events still delivered to input ownership. Ownership
 changes clear command levels and USE/item/jump edge latches without simulation;
 already committed weapon animation remains ordinary game state.
+
+## Display options (graphics)
+
+Options > Display is now enabled. Source `CMenuDisplay` offered renderer, resolution and
+DETAIL LEVEL. SDL owns the first two, so the page keeps the original cycling row
+`DETAIL LEVEL [LOW/MEDIUM/HIGH]` (cres.dll 516-518, setting 6). It also adds one
+replacement row styled after it, `LIGHTING [PER VERTEX/PER PIXEL]` (setting 7), which has
+no original string. Enter, left/right and the mouse cycle both rows, and Back returns to
+Options. Because Options now opens on Display, the automated traversal visits it before
+Audio and Mouse.
+
+The frontend applies the original `detail*.cfg` meaning each frame:
+
+| Detail | LightMap | MaxModelShadows |
+|---|---|---|
+| Low | 0 (vertex light) | 0 |
+| Medium | 1 | 0 |
+| High | 1 | 1 |
+
+`--no-model-shadows` still forces shadows off. Shipped `defaults.cfg` selects medium, but
+the default here is high, the original menu's initial value. The lighting row switches
+models between per-vertex and per-pixel light. Detail does not yet drive particles,
+bullet holes, mipmap offset or other `detail*.cfg` values.
+
+`preferences.cfg` version 2 adds `detail` (0-2) and `pixel_lighting` (0/1). Version 1
+files still load with display defaults, and either version rejects keys of the other.
+Writes always produce version 2.
+

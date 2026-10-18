@@ -14,6 +14,7 @@ namespace OpenBlood2
         Options,
         Audio,
         Mouse,
+        Display,
         Save,
         Load,
         Quit
@@ -42,6 +43,10 @@ namespace OpenBlood2
     {
         bool sound = true, music = true, invert_y = false;
         int sound_volume = 50, music_volume = 50, sensitivity = 150;
+        // Original Display DETAIL LEVEL (0 low, 1 medium, 2 high; detail*.cfg LightMap and
+        // MaxModelShadows) and the replacement per-pixel model lighting option.
+        int detail = 2;
+        bool pixel_lighting = false;
         bool operator==(const MenuSettings&) const = default;
     };
     struct MenuItem
@@ -50,7 +55,7 @@ namespace OpenBlood2
         int command = -1;
         bool enabled = true;
         std::string literal;
-        // Setting IDs: sound, volume, music, volume, sensitivity, invert Y.
+        // Setting IDs: sound, volume, music, volume, sensitivity, invert Y, detail, lighting.
         int setting = -1;
         HudRect rect{}, slider_rect{};
     };

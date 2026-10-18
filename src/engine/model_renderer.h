@@ -45,6 +45,8 @@ namespace OpenBlood2
         bool record_shadows(SDL_GPUCommandBuffer*, SDL_GPURenderPass*, const ModelView&, std::span<const ShadowCaster>,
                             std::string& error);
         void clear_geometry();
+        // Evaluate the model light per pixel (interpolated normals) instead of per vertex.
+        bool per_pixel_lighting = false;
         WorldViewStats stats;
         std::size_t staged_bytes = 0;   // Last prepare(): new assets, palettes and deformation.
         std::size_t asset_vertices = 0; // Static corners of the assets this renderer drew last.

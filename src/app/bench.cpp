@@ -103,6 +103,7 @@ namespace OpenBlood2
         {
             ScenePresenter presenter(device.gpu);
             presenter.model_shadows = options.model_shadows;
+            presenter.per_pixel_lighting = options.pixel_lighting;
             Capture capture;
             Series step, world, models, effects, record, gpu, total, draws, culled;
             std::size_t passes = 0, max_draws = 0;

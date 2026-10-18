@@ -78,7 +78,9 @@ namespace OpenBlood2
         // "lightmap page N"), packed texels and axes whose origin no candidate fitted.
         std::size_t lightmapped = 0, lightmap_pages = 0, lightmap_texels = 0, lightmap_unfitted = 0;
         static constexpr std::uint32_t lightmap_page_size = 1024;
-        bool build(const World&, std::string&, const Resources* = nullptr);
+        // lightmaps=false is the original "LightMap 0" (low detail): lightmapped faces keep their
+        // baked vertex light.
+        bool build(const World&, std::string&, const Resources* = nullptr, bool lightmaps = true);
     };
     bool world_material_frame(const WorldMesh&, std::uint32_t material, double time, std::uint32_t& image);
     struct WorldDraw

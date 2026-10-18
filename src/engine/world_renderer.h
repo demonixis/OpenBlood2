@@ -40,6 +40,16 @@ namespace OpenBlood2
     inline constexpr SDL_GPUTextureFormat shadow_tile_format = SDL_GPU_TEXTUREFORMAT_R32_FLOAT;
     inline constexpr float shadow_tile_clear = -1e30f;
     inline constexpr std::size_t shadow_caster_limit = 32;
+    // Fragment uniform slot 0 of both world fragment shaders (std140), pushed per draw in full:
+    // modulation (alpha, lightmap scale, shadow receiver, per-pixel model light), the radial
+    // point light, then the per-pixel model light (ambient + count, color + scale, 3 float4 per
+    // source; zero for world geometry).
+    struct FragmentLightUniform
+    {
+        std::array<float, 4> modulation{}, position_radius{}, light_color{}, model_ambient{}, model_color{};
+        std::array<std::array<float, 4>, 12> model_sources{};
+    };
+    static_assert(sizeof(FragmentLightUniform) == 272);
     // Fragment uniform slot 1 of both world fragment shaders (std140), pushed once per record.
     struct ShadowUniform
     {

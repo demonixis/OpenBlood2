@@ -69,6 +69,12 @@ namespace OpenBlood2
                 setting(IDS_MENU_AUDIO_MUSIC, 2);
                 setting(IDS_MENU_AUDIO_MUSIC_VOLUME, 3);
                 break;
+            case MenuPage::Display:
+                // Source CMenuDisplay offers renderer, resolution and DETAIL LEVEL; SDL owns the first
+                // two. The lighting row is a replacement option without an original string.
+                setting(IDS_MENU_DISPLAY_DETAIL_LOW + unsigned(std::clamp(settings.detail, 0, 2)), 6);
+                items.push_back({0, -1, true, {}, 7, {}});
+                break;
             case MenuPage::Mouse:
                 setting(IDS_MENU_MOUSE_SENSITIVITY, 4);
                 AddLargeTextItemOption(IDS_MENU_MOUSE_INPUTRATE, -1);
@@ -101,7 +107,6 @@ namespace OpenBlood2
                 case MENU_CMD_BLOODBATH:
                 case MENU_CMD_CREDITS:
                 case MENU_CMD_CUSTOM_LEVEL:
-                case MENU_CMD_DISPLAY:
                 case MENU_CMD_CUSTOMIZE_CONTROLS:
                 case MENU_CMD_JOYSTICK:
                 case MENU_CMD_KEYBOARD:
@@ -165,6 +170,7 @@ namespace OpenBlood2
                 break;
             case MenuPage::Audio:
             case MenuPage::Mouse:
+            case MenuPage::Display:
                 build(MenuPage::Options);
                 break;
             default:
@@ -248,6 +254,9 @@ namespace OpenBlood2
             case MENU_CMD_MOUSE:
                 build(MenuPage::Mouse);
                 break;
+            case MENU_CMD_DISPLAY:
+                build(MenuPage::Display);
+                break;
             case MENU_CMD_SAVE_GAME_MENU:
                 build(MenuPage::Save);
                 break;
@@ -293,6 +302,14 @@ namespace OpenBlood2
                 break;
             case 5:
                 settings.invert_y = !settings.invert_y;
+                break;
+            case 6:
+                settings.detail = (std::clamp(settings.detail, 0, 2) + (direction < 0 ? 2 : 1)) % 3;
+                items[selected].string_id = IDS_MENU_DISPLAY_DETAIL_LOW + unsigned(settings.detail);
+                items[selected].literal.clear(); // Recomposed from the new original string.
+                break;
+            case 7:
+                settings.pixel_lighting = !settings.pixel_lighting;
                 break;
             default:
                 return;
@@ -359,8 +376,8 @@ namespace OpenBlood2
     }
     bool Menu::small() const
     {
-        return page == MenuPage::Audio || page == MenuPage::Mouse || page == MenuPage::Save || page == MenuPage::Load ||
-               page == MenuPage::Quit;
+        return page == MenuPage::Audio || page == MenuPage::Mouse || page == MenuPage::Display ||
+               page == MenuPage::Save || page == MenuPage::Load || page == MenuPage::Quit;
     }
     const char* Menu::title() const
     {
@@ -369,6 +386,7 @@ namespace OpenBlood2
             case MenuPage::Options:
             case MenuPage::Audio:
             case MenuPage::Mouse:
+            case MenuPage::Display:
                 return "options.pcx";
             case MenuPage::Solo:
             case MenuPage::Character:

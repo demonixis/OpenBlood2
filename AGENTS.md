@@ -730,3 +730,5 @@ The [static light continuation](docs/contracts/static_light_contracts.md) lights
 
 The [model shadow continuation](docs/contracts/model_shadow_contracts.md) draws `FLAG_SHADOW` shadows (original high-detail `MaxModelShadows`): the nearest 16 visible casters render their heights along their strongest static light into a 512² R32F tile atlas, and world fragments remove 60 % of the baked light below them. Preserve `FLAG_REALLYCLOSE` exclusion, upward-facing receivers, darken-only results, the culling/early-outs and `--no-model-shadows`. Models do not receive; the technique and constants are replacement policy.
 
+Options > Display (see the [menu contracts](docs/contracts/menu_contracts.md)) restores the original DETAIL LEVEL row: low disables lightmaps (`LightMap 0`) and only high enables model shadows (`MaxModelShadows`). It also adds a replacement LIGHTING [PER VERTEX/PER PIXEL] row for model light. Preferences are version 2 and still read version 1. Keep every fragment uniform push full-size (Metal), the shadow/flag fidelity (corpses: no FLAG_SHADOW, flat light) and the traversal visiting Display first.
+

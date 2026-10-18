@@ -28,6 +28,10 @@ inline constexpr unsigned IDS_MENU_AUDIO_SOUND_VOLUME = 533;
 inline constexpr unsigned IDS_MENU_AUDIO_16BIT_SOUND = 534;
 inline constexpr unsigned IDS_MENU_AUDIO_MUSIC = 535;
 inline constexpr unsigned IDS_MENU_AUDIO_MUSIC_VOLUME = 536;
+// Original Display menu detail strings (Shared/ClientRes.h): DETAIL LEVEL [LOW/MEDIUM/HIGH].
+inline constexpr unsigned IDS_MENU_DISPLAY_DETAIL_LOW = 516;
+inline constexpr unsigned IDS_MENU_DISPLAY_DETAIL_MEDIUM = 517;
+inline constexpr unsigned IDS_MENU_DISPLAY_DETAIL_HIGH = 518;
 inline constexpr unsigned IDS_MENU_MOUSE_SENSITIVITY = 537;
 inline constexpr unsigned IDS_MENU_MOUSE_INPUTRATE = 538;
 inline constexpr unsigned IDS_MENU_MOUSE_INVERT_YAXIS = 539;

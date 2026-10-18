@@ -235,7 +235,7 @@ namespace OpenBlood2
             error = std::string(stage) + ": " + error;
             return false;
         };
-        rebuilt = mesh_revision != game.world_revision;
+        rebuilt = mesh_revision != game.world_revision || built_lightmaps_ != lightmaps;
         const auto model_revision = model_scene.revision, effect_revision = explosion_model_scene.revision,
                    sprite_revision = sprite_scene.revision;
         if (rebuilt)
@@ -253,8 +253,9 @@ namespace OpenBlood2
             world_mesh = {};
             world_draws.clear();
             model_lighting.clear();
-            if (!game.world_path.empty() && !world_mesh.build(game.world, error, &game.resources))
+            if (!game.world_path.empty() && !world_mesh.build(game.world, error, &game.resources, lightmaps))
                 return fail("World mesh");
+            built_lightmaps_ = lightmaps;
             if (!model_lighting.build(world_mesh, game.world, error))
                 return fail("Model lighting");
             mesh_revision = game.world_revision;
@@ -272,6 +273,7 @@ namespace OpenBlood2
         if (!model_lighting.apply(game, world_mesh, world_draws, model_scene, error))
             return fail("Model lighting");
         select_shadow_casters(game);
+        model_renderer.per_pixel_lighting = per_pixel_lighting;
         if (!update_explosion_model_scene(game, explosion_model_scene, error))
             return fail("Explosion model presentation");
         const auto models_done = SDL_GetTicksNS();

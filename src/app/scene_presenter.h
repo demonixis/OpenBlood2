@@ -59,7 +59,10 @@ namespace OpenBlood2
         ModelLighting model_lighting; // Static light objects shading model_scene instances.
         // Vertical model shadows: FLAG_SHADOW casters nearest the camera, one tile each.
         bool model_shadows = true;
-        float shadow_aspect = 16.f / 9; // Viewport aspect for caster culling; record() keeps it current.
+        // Original "LightMap" setting (off at low detail): a change rebuilds the world mesh.
+        bool lightmaps = true;
+        bool per_pixel_lighting = false; // Model light per pixel instead of per vertex.
+        float shadow_aspect = 16.f / 9;  // Viewport aspect for caster culling; record() keeps it current.
         std::vector<ModelRenderer::ShadowCaster> shadow_casters;
         ShadowUniform shadow_uniform;
         ShadowStats shadow_stats;
@@ -76,6 +79,7 @@ namespace OpenBlood2
         void select_shadow_casters(const GameSession&);
         bool record_shadow_tiles(SDL_GPUCommandBuffer*, std::string& error);
         TextureHandle shadow_atlas_, shadow_depth_;
+        bool built_lightmaps_ = true;
         TextureHandle depth_;
         Uint32 depth_width_ = 0, depth_height_ = 0;
     };

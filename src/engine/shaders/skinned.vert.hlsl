@@ -27,6 +27,7 @@ struct Output
     float2 texCoord : TEXCOORD1;
     float3 worldPosition : TEXCOORD2;
     float2 lightmapCoord : TEXCOORD3; // Models have no lightmap.
+    float3 worldNormal : TEXCOORD4;   // For per-pixel model light.
     float4 position : SV_Position;
 };
 float3 rotate(float4 q, float3 v)
@@ -73,6 +74,7 @@ Output main(Input input)
         light += sources[i * 3u + 1u].rgb * (attenuation * cone * max(0.0, dot(normal, direction)));
     }
     output.faceColor = color.xyz * min(light, float3(1.0, 1.0, 1.0)) * scale.w;
+    output.worldNormal = normal;
     output.texCoord = input.uv + textureOffset.xy;
     output.lightmapCoord = float2(-1.0, -1.0);
     return output;

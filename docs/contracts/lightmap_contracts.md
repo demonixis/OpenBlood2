@@ -130,3 +130,5 @@ Measured on Apple M5 / Metal at 3440x1440:
   - realtime lights.
 
 The [model shadow continuation](model_shadow_contracts.md) darkens the lightmap (or vertex light) of world receivers under `FLAG_SHADOW` casters before the dynamic light is added. Both fragment shaders now bind a third texture (the shadow tiles) and a second uniform buffer.
+
+DETAIL LEVEL LOW in the [Display options](menu_contracts.md) rebuilds the world mesh with lightmaps off, the original `LightMap 0`: lightmapped faces use their baked vertex light. The presenter rebuilds only when the setting changes.

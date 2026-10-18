@@ -127,6 +127,8 @@ namespace OpenBlood2
                 }
                 item.literal = label;
             }
+            if (item.setting == 7) // Replacement option, styled after the original DETAIL LEVEL row.
+                label = item.literal = menu.settings.pixel_lighting ? "LIGHTING [PER PIXEL]" : "LIGHTING [PER VERTEX]";
             const bool enabled = menu.enabled(item);
             const auto& font = menu.small()              ? small_
                                : !enabled                ? disabled_
@@ -143,7 +145,7 @@ namespace OpenBlood2
             text(*surface, font, label, 180, y);
             if (menu.small() && int(i) == menu.selected && enabled)
                 text(*surface, small_, ">", 164, y);
-            if (item.setting >= 0)
+            if (item.setting >= 0 && item.setting <= 5) // Detail/lighting rows carry their value in the label.
             {
                 const auto& settings = menu.settings;
                 const bool toggle = item.setting == 0 || item.setting == 2 || item.setting == 5;

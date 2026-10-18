@@ -221,6 +221,10 @@ namespace OpenBlood2
             }
             input.controls.mouse_sensitivity = .0025f * (settings.sensitivity / 150.f);
             input.controls.invert_y = settings.invert_y;
+            // Original detail*.cfg: LightMap 0 at low detail, MaxModelShadows 1 at high detail.
+            presenter.lightmaps = settings.detail >= 1;
+            presenter.model_shadows = options.model_shadows && settings.detail >= 2;
+            presenter.per_pixel_lighting = settings.pixel_lighting;
             menu_audio.focus(menu.active);
             for (auto cue : menu.cues)
                 menu_audio.play(cue);
