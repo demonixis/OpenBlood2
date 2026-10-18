@@ -383,7 +383,12 @@ namespace OpenBlood2
             }
         }
         if (!instruments.advance(frames, mixed))
-            return false;
+        {
+            mixed.clear();
+            output_error = instruments.last_dispatch_error.empty() ? "Invalid instrument audio step"
+                                                                   : instruments.last_dispatch_error;
+            return false; // Clock has advanced; never submit partially failed instrument output.
+        }
         if (stream_failed)
         {
             mixed.clear();

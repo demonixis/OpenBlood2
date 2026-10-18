@@ -164,6 +164,8 @@ namespace OpenBlood2
             return false;
         // An explicit diagnostic note, not a MUSIC/playlist success. It shares the real SDL stream.
         auto& sampler = g.server.audio.instruments;
+        if (sampler.queued_messages || !sampler.pending_midi().empty() || sampler.dispatch_failures)
+            return false; // The preceding world's future note must have been discarded on reload.
         std::string note_error;
         // This authored region used to refuse its paired legacy/standard pan records.
         const auto& region = bank.instruments[6].regions[4];
@@ -229,6 +231,26 @@ namespace OpenBlood2
             !sampler.voices().empty() || sampler.midi_rejected || sampler.midi_received != 86 ||
             sampler.midi_released != 2 || sampler.midi_unmatched_stops)
             return false;
+        // Explicit sample scheduling through the actual audio update, also hidden and after reload.
+        // Source band setup is real; this short test phrase is synthetic, not a MUSIC playlist.
+        const auto origin = sampler.sample_clock();
+        std::vector<DlsTimedMidi> scheduled;
+        for (const auto& m : routed->band_setup)
+            scheduled.push_back({origin, m.status, m.data1, m.data2});
+        scheduled.push_back({origin + 960, 0x84, midi_key, 100}); // Deliberately submitted before its note-on.
+        scheduled.push_back({origin + 240, 0x94, midi_key, 100});
+        scheduled.push_back({origin + 480, 0xb4, 7, 0});
+        scheduled.push_back({origin + 720, 0xb4, 7, std::uint8_t(channel.controllers.volume)});
+        if (!sampler.enqueue(routed->band_bank, scheduled, .2, note_error) || !sampler.voices().empty() ||
+            !g.server.advance_audio(.004, {}, {}) || !sampler.voices().empty() ||
+            !g.server.advance_audio(.003, {}, {}) || sampler.voices().size() != 1 || sampler.voices()[0].frames != 96 ||
+            !g.server.advance_audio(.004, {}, {}) || sampler.voices()[0].gain != 0 ||
+            !g.server.advance_audio(.004, {}, {}) || sampler.voices()[0].gain <= 0 ||
+            !g.server.advance_audio(.006, {}, {}) || !sampler.voices().empty() || !sampler.pending_midi().empty() ||
+            sampler.sample_clock() != origin + 1008 || sampler.queued_messages != 84 ||
+            sampler.dispatched_messages != 52 || sampler.dispatch_failures || sampler.queue_rejected ||
+            sampler.coalesced_messages)
+            return false;
         unsigned count = 0;
         for (const auto& e : g.entries)
             if (e.state == EntryState::WorldSound)
@@ -279,6 +301,8 @@ namespace OpenBlood2
             !command("OFF") || sound->state != SoundFX::Off || g.server.audio.get(voice) || !g.objects.remove(h))
             return false;
         g.objects.finish_frame();
-        return !g.objects.get(h) && g.server.audio.output_error.empty();
+        const DlsTimedMidi future[] = {{sampler.sample_clock() + DlsSampler::rate * 60, 0x94, midi_key, 100}};
+        return !g.objects.get(h) && g.server.audio.output_error.empty() &&
+               sampler.enqueue(routed->band_bank, future, .2, note_error) && sampler.pending_midi().size() == 1;
     }
 } // namespace OpenBlood2

@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "f7f7c5a9a5b2441be48a8862152f266b9d640edd",
+  "approach": "Independent portable scheduler, original queue/value semantics checked against installed executable; no commercial bytes imported",
+  "sources": [
+    {
+      "path": "MSynth25.dll (external original install)",
+      "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+      "rva_ranges": [
+        "0xa160..0xa1fd stable timed insertion",
+        "0xa200..0xa28d packed note insertion and inclusive extraction",
+        "0xa460..0xa482 and 0xa4b0..0xa4d2 last-due value lookup",
+        "0xa4e0..0xa52a bank latches and timestamped captured patch",
+        "0x3634..0x364e note-time patch lookup"
+      ],
+      "use": "Stable note ties, latest due control/patch and submission-time bank capture"
+    },
+    {
+      "path": "src/engine/dls_sampler.cpp, audio.cpp and ima_band.cpp",
+      "use": "Existing checked receiver, voice synthesis, sample clock and actual selected-band setup"
+    }
+  ],
+  "limitations": [
+    "Explicit unsigned sample times only; no IMA tick conversion, running section or playlist/MUSIC activation",
+    "Atomic admission does not guarantee future patch/voice availability; delivery failure is consumed and reported",
+    "65,536 pending events, existing 32 voice and 250ms PCM prefix limits; no voice stealing or unsupported controllers",
+    "Original executable probe is not a full-synth/retail PCM or native-platform test"
+  ],
+  "frozen_sources": {
+    "CMakeLists.txt": "f51ff12b0ebdae6aca93568faaac1de71c3a434ce5670da5ffaa6459fb95cb46",
+    "src/engine/dls_sampler.h": "e151896c7e7e29910df414e87945a20450d8d4fc8b35935a74a44d2b31b3ed61",
+    "src/engine/dls_sampler.cpp": "0b706b6aa124623bcbfb9707f2b20d786626db79cea11ca9019b155756d4b0a4",
+    "src/engine/dls_midi_queue.cpp": "c64f1a8eb06286ee3b98137cb919dbaad3bf561f993310e195f97917fe535a3c",
+    "src/engine/audio.cpp": "1433d402786e7fe3e0e2d5ac324bf1914cde73f9e53ac480fc1b2c6aa9c54676",
+    "src/app/inspector_world_sounds.cpp": "d7787f5823279a3cfc1c7dd4da6f225e9927981a5bec6c9a48e9627d70f2f1be",
+    "src/app/world_sound_smoke.cpp": "fae35ffe291ca84570354982c911750ac52fa1d3c000e7ab7e793323614b3b4c",
+    "tests/dls_timing_tests.cpp": "42c8289ae17c176ddb189765daf757c748c75bc78d021c557ea55750df362f1d",
+    "tests/CMakeLists.txt": "f416d19f1d466a1c29db4247c845fbd0413e3a3e4c0ab2edb1acbdc0ff188736"
+  }
+}

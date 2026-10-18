@@ -61,7 +61,8 @@ pan and original default-range pitch bend; modulation remains unavailable. Veloc
 squared gain law; stereo pan uses the DLS square-root equal-power law. Constant
 pan adds to `CC10/127` (default `64/127`), so the default is slightly right of the exact mathematical
 center. The [immediate MIDI receiver](music_midi_receiver_contracts.md) adds channel updates
-and original same-key stop/repeat selection; there is no timed MIDI queue.
+and original same-key stop/repeat selection. [Timed delivery](music_timing_contracts.md)
+adds explicit sample-boundary scheduling; original musical transport remains absent.
 The UI's additional 20% gain is an audition setting, not a game music-volume rule.
 
 ## Ownership, work bounds and inspection

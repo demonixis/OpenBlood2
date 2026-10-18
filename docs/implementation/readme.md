@@ -64,3 +64,5 @@ the original log or patch.
 - [DLS live voice controls](../../../Documentation/Implementation/m2_music_live_controls.md): actual sample-voice changes without restarting clocks; original MUSIC transport remains incomplete.
 
 - [Immediate MIDI channel delivery](../../../Documentation/Implementation/m2_music_midi_receiver.md): real voice mutation and original lifetime selection, with explicit transport limits.
+
+- [Timed MIDI delivery](../../../Documentation/Implementation/m2_music_timing.md): queued notes/controllers on the existing audio clock; IMA transport and MUSIC remain incomplete.

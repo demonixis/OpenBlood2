@@ -1374,3 +1374,7 @@ lookup tables or commercial bytes are imported. See
 ## Immediate MIDI channel receiver (2026-10-18)
 
 Independent typed integration of the installed MSynth25 note/channel selection into the existing DLS sampler. No DLL, sample bytes or disassembly imported. See [source ledger](sources/m2_music_midi_receiver_sources.json), [contracts](../contracts/music_midi_receiver_contracts.md) and [executable/behavioral evidence](../../../Documentation/Implementation/m2_music_midi_receiver.md). Replacement full-precision envelopes retain the original fast-release cap; immediate manual dispatch does not implement soundtrack transport.
+
+## Original timed MIDI queue (2026-10-18)
+
+Independent bounded scheduling using original MSynth25 insertion, due-value lookup and program bank-capture rules, checked by isolated execution. No commercial bytes imported. See [source ledger](sources/m2_music_timing_sources.json), [contracts](../contracts/music_timing_contracts.md) and [evidence](../../../Documentation/Implementation/m2_music_timing.md). Explicit sample times are a portable interface; original IMA musical time/playlist activation remains separate.

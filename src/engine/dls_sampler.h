@@ -54,7 +54,19 @@ namespace OpenBlood2
         double lfo_hz = 5, lfo_delay = .01, lfo_pitch = 0, lfo_gain = 0, envelope_pitch = 0;
         DlsEnvelope amplitude, pitch;
     };
-    // A bounded sample voice engine for diagnostic notes, not a MIDI sequencer.
+    struct DlsTimedMidi
+    {
+        std::uint64_t frame = 0; // Absolute AudioMixer sample boundary, not an IMA tick.
+        std::uint8_t status = 0, first = 0, second = 0;
+    };
+    struct DlsQueuedMidi
+    {
+        DlsTimedMidi message;
+        std::shared_ptr<const DlsBank> bank; // Only note-ons retain the immutable resource.
+        double gain = 0;
+        unsigned bank_msb = 0, bank_lsb = 0; // Program's bank captured at submission.
+    };
+    // A bounded sample voice engine; explicit sample scheduling is not a section/playlist sequencer.
     // Callers supply immutable decoded banks and note-on controller snapshots.
     class DlsSampler
     {
@@ -71,6 +83,27 @@ namespace OpenBlood2
         std::uint64_t midi_received = 0, midi_rejected = 0, midi_released = 0, midi_choked = 0;
         std::uint64_t midi_unmatched_stops = 0;
         std::string last_midi_error;
+        static constexpr std::size_t max_pending_midi = 65536;
+        // Atomic batch admission. Original bank selects are submission-time latches;
+        // programs capture those latches, controls/programs take effect at their sample boundary.
+        // Notes at equal times retain submission order and see the last due channel values.
+        bool enqueue(std::shared_ptr<const DlsBank>, std::span<const DlsTimedMidi>, double gain, std::string& error);
+        const auto& pending_midi() const
+        {
+            return pending_midi_;
+        }
+        std::uint64_t sample_clock() const
+        {
+            return sample_clock_;
+        }
+        const auto& pending_banks() const
+        {
+            return pending_banks_;
+        }
+        std::uint64_t queued_messages = 0, queue_rejected = 0, dispatched_messages = 0, coalesced_messages = 0;
+        std::uint64_t dispatch_failures = 0;
+        std::optional<std::uint64_t> failed_dispatch_frame;
+        std::string last_queue_error, last_dispatch_error; // Delivery history survives later successes.
         std::uint64_t play(std::shared_ptr<const DlsBank>, std::size_t instrument, unsigned key, unsigned velocity,
                            double gate_seconds, double gain, std::string& error, DlsControllers = {});
         std::uint64_t play_channel(std::shared_ptr<const DlsBank>, const DlsMidiChannel&, unsigned key,
@@ -91,6 +124,10 @@ namespace OpenBlood2
         std::string last_error;
 
       private:
+        void advance_voices(std::uint64_t frames, std::span<float> stereo);
+        std::uint64_t sample_clock_ = 0;
+        std::vector<DlsQueuedMidi> pending_midi_;
+        std::array<std::array<unsigned, 2>, 16> pending_banks_{};
         std::uint64_t next_id_ = 1; // Never reused, including across clear().
         std::vector<DlsVoice> voices_;
         std::array<DlsMidiChannel, 16> midi_channels_ = []

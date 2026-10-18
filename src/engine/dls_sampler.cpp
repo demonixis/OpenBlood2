@@ -442,6 +442,7 @@ namespace OpenBlood2
                 midi_channels_[slot].bank_msb = second;
             else
                 midi_channels_[slot].bank_lsb = second;
+            pending_banks_[slot][first == 0 ? 0 : 1] = second;
         }
         else
         {
@@ -490,10 +491,8 @@ namespace OpenBlood2
             }
         return false;
     }
-    bool DlsSampler::advance(std::uint64_t frames, std::span<float> stereo)
+    void DlsSampler::advance_voices(std::uint64_t frames, std::span<float> stereo)
     {
-        if (frames > rate * 60 + 1 || stereo.size() % 2 || stereo.size() / 2 > frames || stereo.size() > 24000)
-            return false;
         for (auto& v : voices_)
         {
             const auto& r = v.bank->instruments[v.instrument].regions[v.region];
@@ -544,11 +543,17 @@ namespace OpenBlood2
                           return finished(v) || (!r.settings.loop && v.cursor >= v.bank->waves[r.wave].samples.size());
                       });
         completed += before - voices_.size();
-        return true;
     }
     void DlsSampler::clear()
     {
         voices_.clear();
+        pending_midi_.clear();
+        pending_banks_ = {};
+        sample_clock_ = 0;
+        queued_messages = queue_rejected = dispatched_messages = coalesced_messages = dispatch_failures = 0;
+        failed_dispatch_frame.reset();
+        last_queue_error.clear();
+        last_dispatch_error.clear();
         midi_channels_ = {};
         midi_channels_[9].percussion = true;
         midi_received = midi_rejected = midi_released = midi_choked = midi_unmatched_stops = 0;

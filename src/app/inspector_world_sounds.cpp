@@ -138,10 +138,11 @@ namespace OpenBlood2
         if (ImGui::TreeNodeEx("DLS instruments, samples and diagnostic notes", ImGuiTreeNodeFlags_DefaultOpen))
         {
             auto& sampler = game.server.audio.instruments;
-            ImGui::TextWrapped("Audition creates a one-second note at the region midpoint, velocity 100, gain 20%%. "
-                               "This is a sample/envelope diagnostic, not original music playback. Unsupported "
-                               "connections refuse the note. Immediate MIDI/channel controls and held notes are manual "
-                               "diagnostics; timed sequence playback remains unavailable.");
+            ImGui::TextWrapped(
+                "Audition creates a one-second note at the region midpoint, velocity 100, gain 20%%. "
+                "This is a sample/envelope diagnostic, not original music playback. Unsupported "
+                "connections refuse the note. Immediate MIDI/channel controls and held notes are manual "
+                "diagnostics. Explicit sample scheduling is available; original playlists remain unavailable.");
             ImGui::Text("Voices %zu/%u | started %llu | completed %llu | refused %llu", sampler.voices().size(),
                         DlsSampler::max_voices, (unsigned long long)sampler.started,
                         (unsigned long long)sampler.completed, (unsigned long long)sampler.rejected);
@@ -157,11 +158,41 @@ namespace OpenBlood2
                         (unsigned long long)sampler.midi_choked);
             if (!sampler.last_midi_error.empty())
                 ImGui::TextWrapped("MIDI failure: %s", sampler.last_midi_error.c_str());
-            if (ImGui::TreeNode("Current MIDI channel state (no transport)"))
+            ImGui::Text("Scheduled MIDI: frame %llu | pending %zu/%zu | submitted %llu / refused batches %llu",
+                        (unsigned long long)sampler.sample_clock(), sampler.pending_midi().size(),
+                        DlsSampler::max_pending_midi, (unsigned long long)sampler.queued_messages,
+                        (unsigned long long)sampler.queue_rejected);
+            ImGui::Text("Delivered %llu | superseded controls %llu | delivery failures %llu",
+                        (unsigned long long)sampler.dispatched_messages, (unsigned long long)sampler.coalesced_messages,
+                        (unsigned long long)sampler.dispatch_failures);
+            if (!sampler.last_queue_error.empty())
+                ImGui::TextWrapped("Queue failure: %s", sampler.last_queue_error.c_str());
+            if (sampler.failed_dispatch_frame)
+                ImGui::TextWrapped("Last delivery failure at frame %llu: %s",
+                                   (unsigned long long)*sampler.failed_dispatch_frame,
+                                   sampler.last_dispatch_error.c_str());
+            if (ImGui::TreeNode("Pending sample messages (not IMA ticks)"))
+            {
+                ImGuiListClipper clipper;
+                clipper.Begin(int(sampler.pending_midi().size()));
+                while (clipper.Step())
+                    for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; ++row)
+                    {
+                        const auto& q = sampler.pending_midi()[std::size_t(row)];
+                        const auto& m = q.message;
+                        ImGui::Text("%llu | %02x %u %u | captured bank %u:%u | resource %s",
+                                    (unsigned long long)m.frame, unsigned(m.status), unsigned(m.first),
+                                    unsigned(m.second), q.bank_msb, q.bank_lsb, q.bank ? "retained" : "none");
+                    }
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNode("Current MIDI channel state"))
             {
                 for (unsigned slot = 0; slot < 16; ++slot)
                 {
                     const auto& c = sampler.midi_channels()[slot];
+                    const auto& latch = sampler.pending_banks()[slot];
+                    ImGui::Text("Submission bank latch %u: %u:%u", slot, latch[0], latch[1]);
                     ImGui::Text("%u: bank %u:%u program %u | CC7/11/10 %u/%u/%u | bend %u%s", slot, c.bank_msb,
                                 c.bank_lsb, c.program, c.controllers.volume, c.controllers.expression,
                                 c.controllers.pan, c.controllers.pitch_bend, c.percussion ? " | percussion" : "");
@@ -681,6 +712,26 @@ namespace OpenBlood2
                                             std::clamp(100U, unsigned(region.velocity_low),
                                                        unsigned(region.velocity_high)),
                                             1, .2, error);
+                                    }
+                                    if (!regions.empty() && ImGui::SmallButton("Schedule channel note (+0.5 s)"))
+                                    {
+                                        auto& receiver = game.server.audio.instruments;
+                                        const auto now = receiver.sample_clock();
+                                        std::array<DlsTimedMidi, 7> messages;
+                                        for (unsigned j = 0; j < 5; ++j)
+                                        {
+                                            const auto& m = asset.band_setup[ch * 5 + j];
+                                            messages[j] = {now, m.status, m.data1, m.data2};
+                                        }
+                                        const auto& r = regions.front();
+                                        const auto key = std::uint8_t((r.key_low + r.key_high) / 2);
+                                        messages[5] = {now + DlsSampler::rate / 2, std::uint8_t(0x90 | ((ch + 4) & 15)),
+                                                       key,
+                                                       std::uint8_t(std::clamp(100U, unsigned(r.velocity_low),
+                                                                               unsigned(r.velocity_high)))};
+                                        messages[6] = {now + DlsSampler::rate, std::uint8_t(0x80 | ((ch + 4) & 15)),
+                                                       key, 0};
+                                        receiver.enqueue(asset.band_bank, messages, .2, error);
                                     }
                                     if (!regions.empty() && ImGui::SmallButton("Hold channel note (manual MIDI)"))
                                     {

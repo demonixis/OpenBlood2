@@ -1,5 +1,8 @@
 # Immediate DLS MIDI receiver
 
+The later [timed delivery](music_timing_contracts.md) adds a queue around this receiver;
+the immediate API and its existing diagnostic behavior remain available.
+
 M2 and MUSIC remain incomplete. `DlsSampler::receive` applies explicitly delivered
 messages at the current audio sample boundary. It does not submit future grid
 messages early, run a playlist, or reinterpret IMA ticks as sample times.
