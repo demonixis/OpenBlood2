@@ -109,7 +109,7 @@ namespace
                 auto* data =
                     static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
                 CHECK(data);
-                const auto center = (height / 2 * width + width / 2) * 4;
+                const auto center = (height / 2 * width + width / 2 + 32) * 4;
                 const int expected = int(std::lround(204 * fade.Scale()));
                 for (int channel = 0; channel < 3; ++channel)
                     CHECK(std::abs(int(data[center + channel]) - expected) <= 2);

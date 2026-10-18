@@ -61,7 +61,8 @@ it tolerated truncated rows, assumed palettes and clipped overlong runs.
 
 ## GPU ownership and inspection
 
-Four composed surfaces share one 655x75 RGBA SDL_GPU atlas. Only changed snapshots
+Four composed surfaces and the [original crosshair](crosshair_contracts.md) share
+one 720x75 RGBA SDL_GPU atlas. Only changed snapshots
 or layouts upload it; both transfer and texture updates use cycling. The existing
 ImGui SDL_GPU backend draws textured quads behind the inspector and above the
 screen fade. It supplies transport only, not the original layout or typography.

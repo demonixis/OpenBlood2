@@ -916,7 +916,8 @@ namespace
             ImGui::NewFrame();
             OpenBlood2::draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
             if (!hud.draw(OpenBlood2::hud_state(game->client_shell.stats, game->client_shell.m_bInWorld,
-                                                game->client_shell.view.object != nullptr),
+                                                game->client_shell.view.object != nullptr,
+                                                game->client_shell.death_camera.active),
                           game->resources, error))
             {
                 spdlog::error("Original HUD: {}", error);

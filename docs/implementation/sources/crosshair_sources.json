@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-18",
+  "scope": "Default original crosshair; source client rules with current typed state and existing HUD GPU services.",
+  "references": [
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "purpose": "PostUpdate crosshair visibility, asset name, integer camera centering and NULL transparent color; initialization/configuration examined."
+    },
+    {
+      "source": "sources/blood2/AppHeaders/client_de.h",
+      "source_sha256": "d4bd76f15d1689a0314f832bcba0877d2bbabcdf830a8a44da9d662b4aa534e1",
+      "purpose": "Surface blit and camera rectangle API contracts."
+    },
+    {
+      "source": "sources/lithtech/runtime/client/src/sys/win/winclientde_impl.cpp",
+      "source_sha256": "36a1113bb005e741a5c167f641a898c06a6f8081751d0e5067d32d3562c31285",
+      "purpose": "Later-engine corroboration only: transparent surface blits pass color zero to pixel-format conversion."
+    }
+  ]
+}

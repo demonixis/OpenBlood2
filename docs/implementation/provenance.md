@@ -1,5 +1,14 @@
 # Source and Dependency Provenance
 
+## Original crosshair
+
+Selected `CBloodClientShell::PostUpdate` gates, bitmap path and integer centering
+now render the original default crosshair through the existing HUD surface/GPU
+owner. Black transparency remains distinct from the status bar's magenta key.
+See [contracts](../contracts/crosshair_contracts.md) and
+[source hashes](sources/crosshair_sources.json). Commercial assets remain external;
+configuration menus, cycling and zoom overrides are not imported.
+
 ## Original player statistics HUD
 
 `CNewStatusBar` supplies the actual tab geometry, resource paths, inclusion flags,

@@ -8,9 +8,9 @@ namespace OpenBlood2
     struct HudState
     {
         PlayerStats stats;
-        bool visible = false;
+        bool visible = false, crosshair_visible = false;
     };
-    HudState hud_state(const PlayerStats&, bool in_world, bool external_camera);
+    HudState hud_state(const PlayerStats&, bool in_world, bool external_camera, bool dead = false);
     class HudRenderer
     {
       public:
@@ -25,6 +25,8 @@ namespace OpenBlood2
         }
 
       private:
+        static constexpr unsigned atlas_width = 720, atlas_height = 75, crosshair_x = 656;
+        const HudSurface* crosshair_ = nullptr;
         SDL_GPUDevice* device_ = nullptr;
         SDL_GPUTexture* texture_ = nullptr;
         SDL_GPUTransferBuffer* transfer_ = nullptr;

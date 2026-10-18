@@ -2,6 +2,7 @@
 #include "app/movement_controls.h"
 #include "app/ui_runtime.h"
 #include "engine/capture.h"
+#include "game/original/ClientCrosshair.h"
 #include "game/original/Weapon.h"
 #include "player_fixture.h"
 #include <imgui.h>
@@ -96,6 +97,11 @@ namespace
         s.weapon_slot = 2;
         s.weapon_slots[2] = s.weapon;
         auto h = hud_state(s, true, false);
+        CHECK(h.crosshair_visible);
+        CHECK(!hud_state(s, false, false).crosshair_visible && !hud_state(s, true, true).crosshair_visible);
+        CHECK(!hud_state(s, true, false, true).crosshair_visible && hud_state(s, true, false, true).visible);
+        const auto rect = original_crosshair_rect({10, 20, 651, 501}, 15, 13);
+        CHECK(rect.left == 323 && rect.top == 254 && rect.right == 338 && rect.bottom == 267);
         CHECK(h.visible && h.stats == s); // Presentation owns raw values; original tab code formats them.
         CHECK(!hud_state(s, false, false).visible && !hud_state(s, true, true).visible);
         s.ammo = 1234;
@@ -320,6 +326,9 @@ namespace
         Config config;
         config.data_dir = content;
         CHECK(artwork.mount_game(config, error));
+        HudCanvas canvas(artwork);
+        const auto* crosshair = canvas.CreateSurfaceFromBitmap(original_crosshair_bitmap);
+        CHECK(crosshair && crosshair->width == 15 && crosshair->height == 13);
         CHECK(runtime.initialize(true, error));
         std::cout << "GPU device: "
                   << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu), SDL_PROP_GPU_DEVICE_NAME_STRING,
@@ -333,12 +342,12 @@ namespace
             GameSession g;
             CHECK(test_player::setup(g, root) && g.enter_player(error));
             auto* p = g.server_shell.Player(g.local_client);
-            const int width = cycle == 0 ? 1200 : cycle == 1 ? 600 : 320, height = cycle == 0 ? 780 : 400;
+            const int width = cycle == 0 ? 1200 : cycle == 1 ? 601 : 320, height = cycle == 0 ? 780 : 401;
             Capture capture;
             CHECK(capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
                                      height));
             std::vector<std::uint8_t> first;
-            for (int frame = 0; frame < 4; ++frame)
+            for (int frame = 0; frame < 8; ++frame)
             {
                 if (frame == 1)
                 {
@@ -347,16 +356,19 @@ namespace
                 }
                 if (frame == 2)
                     CHECK(g.command_weapon(0, error));
-                if (frame == 3)
+                if (frame == 6)
                     CHECK(g.leave_player());
-                if (frame < 3)
+                if (frame < 6)
                     CHECK(p->UpdateStats(true) && g.pump_player_messages(error));
                 ImGui_ImplSDLGPU3_NewFrame();
                 ImGui_ImplSDL3_NewFrame();
                 ImGui::GetIO().DisplaySize = {float(width), float(height)};
                 ImGui::GetIO().DisplayFramebufferScale = {1, 1};
                 ImGui::NewFrame();
-                CHECK(renderer.draw(hud_state(g.client_shell.stats, g.client_shell.m_bInWorld, false), artwork, error));
+                const auto display =
+                    frame == 7 ? hud_state({}, true, false)
+                               : hud_state(g.client_shell.stats, g.client_shell.m_bInWorld, frame == 4, frame == 3);
+                CHECK(renderer.draw(display, artwork, error));
                 ImGui::Render();
                 CHECK(!ImGui::GetIO().WantCaptureKeyboard && !ImGui::GetIO().WantCaptureMouse);
                 auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
@@ -364,7 +376,7 @@ namespace
                 ImGui_ImplSDLGPU3_PrepareDrawData(ImGui::GetDrawData(), commands);
                 SDL_GPUColorTargetInfo color{};
                 color.texture = capture.texture;
-                color.clear_color = {0, 0, 0, 1};
+                color.clear_color = frame == 5 ? SDL_FColor{.1f, .2f, .3f, 1} : SDL_FColor{0, 0, 0, 1};
                 color.load_op = SDL_GPU_LOADOP_CLEAR;
                 color.store_op = SDL_GPU_STOREOP_STORE;
                 auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, nullptr);
@@ -395,14 +407,33 @@ namespace
                     for (int x = 0; x < width; ++x)
                     {
                         const auto i = (y * width + x) * 4;
-                        if (pixels[i] || pixels[i + 1] || pixels[i + 2])
+                        if (pixels[i] != pixels[0] || pixels[i + 1] != pixels[1] || pixels[i + 2] != pixels[2])
                         {
                             ++lit;
                             if (y < height - 150)
                                 ++upper;
                         }
                     }
-                CHECK(!upper && (frame == 3 ? lit == 0 : lit > 1000));
+                CHECK(display.crosshair_visible ? upper > 0 : upper == 0);
+                CHECK(frame == 4 || frame == 6 ? lit == 0 : frame == 7 ? lit > 0 && lit < 1000 : lit > 1000);
+                const auto rect = original_crosshair_rect({0, 0, width, height}, crosshair->width, crosshair->height);
+                const bool bgra = SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window) ==
+                                  SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM;
+                for (unsigned y = 0; y < crosshair->height; ++y)
+                    for (unsigned x = 0; x < crosshair->width; ++x)
+                    {
+                        const auto src = (y * crosshair->width + x) * 4;
+                        const auto dst = ((rect.top + y) * width + rect.left + x) * 4;
+                        const bool black =
+                            !crosshair->rgba[src] && !crosshair->rgba[src + 1] && !crosshair->rgba[src + 2];
+                        for (unsigned c = 0; c < 3; ++c)
+                        {
+                            const int expected = !display.crosshair_visible || black
+                                                     ? pixels[c]
+                                                     : crosshair->rgba[src + (bgra ? 2 - c : c)];
+                            CHECK(std::abs(int(pixels[dst + c]) - expected) <= 1);
+                        }
+                    }
                 if (frame == 0)
                     first = pixels;
                 if (frame == 1)

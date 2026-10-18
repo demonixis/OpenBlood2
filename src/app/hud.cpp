@@ -1,14 +1,16 @@
 #include "app/hud.h"
+#include "game/original/ClientCrosshair.h"
 #include "game/original/WeaponDefs.h"
 #include <algorithm>
 #include <cmath>
 #include <imgui.h>
 namespace OpenBlood2
 {
-    HudState hud_state(const PlayerStats& s, bool in_world, bool external_camera)
+    HudState hud_state(const PlayerStats& s, bool in_world, bool external_camera, bool dead)
     {
         HudState h;
         h.stats = s;
+        h.crosshair_visible = original_crosshair_visible(in_world, external_camera, dead);
         if (!in_world || external_camera)
             return h;
         h.visible = weapon_definition(s.weapon) && std::isfinite(s.health) && std::isfinite(s.armor) &&
@@ -38,7 +40,7 @@ namespace OpenBlood2
     }
     bool HudRenderer::upload(std::string& error)
     {
-        constexpr unsigned width = 655, height = 75;
+        constexpr unsigned width = atlas_width, height = atlas_height;
         if (!texture_)
         {
             SDL_GPUTextureCreateInfo info{};
@@ -92,6 +94,22 @@ namespace OpenBlood2
                 }
             offset += surface.width;
         }
+        if (!crosshair_ || crosshair_->width > width - crosshair_x || crosshair_->height > height)
+        {
+            SDL_UnmapGPUTransferBuffer(device_, transfer_);
+            error = "Original crosshair exceeds atlas bounds";
+            return false;
+        }
+        // Unlike the status bar's magenta key, PostUpdate passes NULL (black).
+        for (unsigned y = 0; y < crosshair_->height; ++y)
+            for (unsigned x = 0; x < crosshair_->width; ++x)
+            {
+                const auto s = (y * crosshair_->width + x) * 4;
+                const auto d = (y * width + crosshair_x + x) * 4;
+                std::copy_n(crosshair_->rgba.data() + s, 4, data + d);
+                if (!data[d] && !data[d + 1] && !data[d + 2])
+                    data[d + 3] = 0;
+            }
         SDL_UnmapGPUTransferBuffer(device_, transfer_);
         auto* commands = SDL_AcquireGPUCommandBuffer(device_);
         if (!commands)
@@ -128,7 +146,7 @@ namespace OpenBlood2
     bool HudRenderer::draw(const HudState& h, const Resources& resources, std::string& error)
     {
         error.clear();
-        if (!h.visible)
+        if (!h.visible && !h.crosshair_visible)
             return true;
         const auto* viewport = ImGui::GetMainViewport();
         if (viewport->Size.x < 135 || viewport->Size.y < 100)
@@ -137,14 +155,24 @@ namespace OpenBlood2
         {
             status_ = std::make_unique<CNewStatusBar>(resources);
             resources_ = &resources;
-            uploaded_revision_ = 0;
+            uploaded_revision_ = UINT64_MAX;
+            crosshair_ = nullptr;
             if (!status_->Init())
             {
                 error = status_->canvas.error;
                 return false;
             }
         }
-        if (!status_->Update(h.stats, unsigned(viewport->Size.x), unsigned(viewport->Size.y)))
+        if (!crosshair_)
+        {
+            crosshair_ = status_->canvas.CreateSurfaceFromBitmap(original_crosshair_bitmap);
+            if (!crosshair_)
+            {
+                error = status_->canvas.error;
+                return false;
+            }
+        }
+        if (h.visible && !status_->Update(h.stats, unsigned(viewport->Size.x), unsigned(viewport->Size.y)))
         {
             error = status_->canvas.error.empty() ? "Invalid original HUD state" : status_->canvas.error;
             return false;
@@ -156,14 +184,24 @@ namespace OpenBlood2
         for (const auto* tab : status_->tabs())
         {
             const auto& s = *tab->hTab;
-            if (i != 3 || tab->value)
+            if (h.visible && (i != 3 || tab->value))
             {
                 const ImVec2 p{viewport->Pos.x + tab->locX, viewport->Pos.y + tab->locY};
                 draw->AddImage((ImTextureID)(intptr_t)texture_, p, {p.x + s.width, p.y + s.height},
-                               {float(offset) / 655.f, 0}, {float(offset + s.width) / 655.f, float(s.height) / 75.f});
+                               {float(offset) / atlas_width, 0},
+                               {float(offset + s.width) / atlas_width, float(s.height) / atlas_height});
             }
             offset += s.width;
             ++i;
+        }
+        if (h.crosshair_visible)
+        {
+            const auto rect = original_crosshair_rect({0, 0, int(viewport->Size.x), int(viewport->Size.y)},
+                                                      crosshair_->width, crosshair_->height);
+            draw->AddImage(
+                (ImTextureID)(intptr_t)texture_, {viewport->Pos.x + rect.left, viewport->Pos.y + rect.top},
+                {viewport->Pos.x + rect.right, viewport->Pos.y + rect.bottom}, {float(crosshair_x) / atlas_width, 0},
+                {float(crosshair_x + crosshair_->width) / atlas_width, float(crosshair_->height) / atlas_height});
         }
         return true;
     }

@@ -36,7 +36,7 @@ add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/ScreenFa
     src/game/registration.cpp
     src/game/server_adapter.cpp
     src/game/service_coverage.cpp)
-target_sources(blood2_game PRIVATE src/game/original/NewStatusBar.cpp src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp src/game/original/SoundFX.cpp)
+target_sources(blood2_game PRIVATE src/game/original/ClientCrosshair.cpp src/game/original/NewStatusBar.cpp src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp src/game/original/SoundFX.cpp)
 target_sources(blood2_game PRIVATE src/game/original/PlayerLanding.cpp src/game/original/PlayerDeath.cpp src/game/original/PlayerDeathCamera.cpp)
 target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/LightFX.cpp src/game/original/ClientLightFX.cpp)
 target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
