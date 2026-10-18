@@ -9,7 +9,6 @@
 #include "engine/capture.h"
 #include "game/menu_audio.h"
 #include "game/menu_preferences.h"
-#include "game/original/MenuIds.h"
 #if BLOOD2_INSPECTOR
 #include "app/inspector.h"
 #endif
@@ -51,20 +50,10 @@ namespace OpenBlood2
         if (!options.menu_smoke && (!menu_preferences_path(preferences, preference_error) ||
                                     !load_menu_preferences(preferences, menu.settings, preference_error)))
             spdlog::warn("Preferences: {}", preference_error);
+        menu.demo = config.demo;
         MenuCanvas canvas(artwork);
         if (!canvas.initialize(error))
             return failed(5);
-        // The shipped demo client (Build 108/178) predates the menu string table:
-        // its labels are compiled into cshell.dll. Never substitute invented text.
-        if (config.demo && !canvas.strings.strings.contains(IDS_MENU_MAIN_SINGLEPLAYER))
-        {
-            error = "The demo's cres.dll has no original menu strings (its labels are compiled into cshell.dll); "
-                    "the original menu is unavailable for this demo build";
-            if (!options.view_world)
-                return failed(5);
-            spdlog::warn("{}; Esc will fail instead of pausing", error);
-            error.clear();
-        }
         MenuRenderer menu_renderer(runtime.gpu);
         MenuAudio menu_audio(artwork);
         menu_audio.random_state = std::uint32_t(SDL_GetTicksNS());

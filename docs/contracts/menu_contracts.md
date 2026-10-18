@@ -160,3 +160,5 @@ bullet holes, mipmap offset or other `detail*.cfg` values.
 files still load with display defaults, and either version rejects keys of the other.
 Writes always produce version 2.
 
+
+With `--demo`, the original `_DEMO` menu variant reads its labels from the demo's own `cshell.dll` and adds the source splash screens; see [demo contracts](demo_contracts.md#demo-menu).

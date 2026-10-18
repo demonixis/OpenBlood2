@@ -90,6 +90,10 @@ namespace OpenBlood2
                             if (!e.key.repeat)
                                 menu.activate();
                             break;
+                        case SDL_SCANCODE_SPACE: // Original Splash_OnKeyDown also accepts VK_SPACE.
+                            if (!e.key.repeat)
+                                menu.dismiss_splash();
+                            break;
                         default:
                             break;
                     }

@@ -1450,7 +1450,7 @@ The original flag usage and the shipped detail configuration (`MaxModelShadows`)
 
 ## Original demo edition (2026-10-18)
 
-Selected `_DEMO` branches of original `InventoryMgr.cpp` (IsDemoWeapon, bomb construction, AddInventoryWeapon), `ItemPickups.cpp` and `PlayerObj.cpp` (COMMAND_DETONATE) are ported as a runtime edition, together with the `Demo_01` first level. The single-archive layout comes from the installed demo. The compile-time define becomes a session constant; no demo menu text is substituted. See [source ledger](sources/demo_sources.json) and [contracts](../contracts/demo_contracts.md).
+Selected `_DEMO` branches of original `InventoryMgr.cpp` (IsDemoWeapon, bomb construction, AddInventoryWeapon), `ItemPickups.cpp` and `PlayerObj.cpp` (COMMAND_DETONATE) are ported as a runtime edition, together with the `Demo_01` first level. The single-archive layout comes from the installed demo. The compile-time define becomes a session constant. The `_DEMO` menu branches (MenuMain, MenuSinglePlayer, Splash, MainMenus ambience) are ported too. Their labels are read at verified offsets from the user's demo `cshell.dll`, which is never executed; no menu text is embedded. See [source ledger](sources/demo_sources.json) and [contracts](../contracts/demo_contracts.md).
 
 ## Demo_02 world objects (2026-10-18)
 

@@ -42,17 +42,39 @@
     {
       "source": "sources/lithtech/Blood2/ClientShellDLL/MenuMain.cpp",
       "source_sha256": "91c95e3b35eb3dfafdcd278b03e70afcfa7ecda8d356fe4a11e9beb63503fdfe",
-      "purpose": "Demo main-menu splash branches (not connected) using IDS_MENU_* string ids absent from the shipped demo cres.dll."
+      "purpose": "_DEMO main menu: PRIMEGIBS label and Bloodbath/Credits/Quit splash screens (Quit exits without confirmation)."
     },
     {
       "source": "sources/lithtech/Blood2/Shared/SharedDefs.h",
       "source_sha256": "24c3d2752c18bf884afa0f376a129e68d0885b13da93410253e69db46d549423",
       "purpose": "WEAP_TESLACANNON 13 and WEAP_VOODOO 14 for IsDemoWeapon."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MenuSinglePlayer.cpp",
+      "source_sha256": "3db7492d4ffeb7547636b613dd95122c73c1b5de4557f4879209ba89c7281450",
+      "purpose": "_DEMO single player: no load/save/custom level; Chosen shows screens/modes.pcx."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/Splash.cpp",
+      "source_sha256": "cd950635ce3a6c96ece1677cdb20acb7579617d6274b5a2ad096a0379615b0ab",
+      "purpose": "Splash_SetState/Splash_OnKeyDown: full-screen PCX dismissed by ESC/SPACE/RETURN, back to GS_MENU or shutdown."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MainMenus.cpp",
+      "source_sha256": "4e52be34bfd90c547c1e9c26ab7d77711aa873b91b67bb99112621d3f0172091",
+      "purpose": "_DEMO SetFocus ambient selection 1->2, 3->4."
     }
   ],
   "adaptations": [
     "The compile-time _DEMO define is a runtime edition fixed by mount_game and carried by Resources copies.",
     "A pickup removed during its own initial update skips model placement; the source configured the doomed object, which checked transforms reject.",
-    "No demo menu text is substituted for the missing string table."
+    "No menu text is embedded: demo labels are read from the user's demo cshell.dll at verified offsets.",
+    "Splash screens keep the menu canvas aspect instead of stretching to the window."
+  ],
+  "demo_client_evidence": [
+    {
+      "file": "cshell.dll inside B2Demo.rez (719872 bytes, DEMO v1.0 (Build 108) at file offset 0x932d4)",
+      "purpose": "Data-only inspection, never executed: the 24 menu literals at .data offsets 0x94104-0x945ac each have exactly one push reference in .text, in source Build order (CMenuMain 0x100520f4.., CMenuOptions 0x10052337.., CMenuSinglePlayer 0x1005271e.., CMenuDifficulty 0x1004e4fe.., CMenuDisplay 0x1004ee68.., CMenuAudio 0x100529bb..). The splash paths screens/bloodbath.pcx, info.pcx and modes.pcx follow them."
+    }
   ]
 }
