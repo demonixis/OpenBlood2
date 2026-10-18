@@ -4,8 +4,10 @@
 independent portable reader, informed by the external original `IMUSIC25.DLL`
 loader and checked against that loader in an isolated emulator. It is **not a
 sequencer**: `MUSIC`, section transitions, personality/pitch conversion,
-live variation scheduling, humanization, applied channel routing and controllers remain unavailable. Band
-setup data is now available separately under the [band contracts](music_band_contracts.md).
+live variation scheduling, event dispatch and applied controllers remain
+unavailable. Band setup data is now available separately under the [band contracts](music_band_contracts.md).
+[Event preparation](music_event_contracts.md) supplies the post-harmonization
+arithmetic with explicit inputs; it does not resolve song pitches or play notes.
 
 ## Record boundaries and ownership
 

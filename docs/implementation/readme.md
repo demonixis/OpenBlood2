@@ -36,3 +36,5 @@ the original log or patch.
 - [IMA style meter and section timeline](../../../Documentation/Implementation/m2_music_timeline.md): original reconciliation, explicit missing style bindings and pending sequence playback.
 
 - [IMA pattern channels and variations](../../../Documentation/Implementation/m2_music_variations.md): original loader and 786 private decisions; live music remains unavailable.
+
+- [IMA note event preparation](../../../Documentation/Implementation/m2_music_events.md): original post-harmonization arithmetic and diagnostic inspection; live MUSIC remains unavailable.

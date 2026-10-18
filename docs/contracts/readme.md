@@ -180,3 +180,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [IMA style meter and section timeline](music_timeline_contracts.md): binding, signed times, mute sampling and bounded immutable ownership.
 
 - [IMA pattern channels and variations](music_variation_contracts.md): raw/effective fields, original decision rules and explicit random inputs.
+
+- [IMA note event preparation](music_event_contracts.md): signed variation, transpose, paired messages and explicit unresolved pitch context.

@@ -1,5 +1,6 @@
 #include "world_sound_smoke.h"
 #include "engine/audio_stream.h"
+#include "engine/ima_note_event.h"
 #include "engine/ima_variation.h"
 #include "game/original/SoundFX.h"
 namespace OpenBlood2
@@ -52,6 +53,21 @@ namespace OpenBlood2
                     if (!choose_ima_variations(effective, 0, current, 0xffff, 0, draws, choice, error) ||
                         choice.draws_used != 16 || choice.fallback_channels != 0)
                         return false;
+                    for (const auto& grid : pattern.grids)
+                        for (const auto& note : grid.notes)
+                        {
+                            const std::size_t count = unsigned(note.time_range != 0) +
+                                                      unsigned(note.duration_range != 0) +
+                                                      unsigned(note.velocity_range != 0);
+                            ImaNoteEvents events;
+                            // Fixed pitch/tick/transpose are explicit test inputs, not song conversion.
+                            if (!prepare_ima_note_events(note, {10000, 60, 0, {}}, std::span(draws).first(count),
+                                                         events, error) ||
+                                !events.emitted || events.draws_used != count || events.messages[0].key != 60 ||
+                                events.messages[1].time <= events.messages[0].time ||
+                                events.messages[0].velocity != events.messages[1].velocity)
+                                return false;
+                        }
                     for (std::size_t ch = 0; ch < 16; ++ch)
                         if (!effective.play_modes[ch] || choice.selected[ch] != 1 || choice.candidates[ch] != 0xffff)
                             return false;

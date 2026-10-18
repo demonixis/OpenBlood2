@@ -1,10 +1,54 @@
 #include "engine/audio_stream.h"
+#include "engine/ima_note_event.h"
 #include "engine/ima_variation.h"
 #include "inspector.h"
 #include <algorithm>
 #include <imgui.h>
 namespace OpenBlood2
 {
+    namespace
+    {
+        void draw_note_event_probe(const ImaGrid& grid)
+        {
+            if (grid.notes.empty() || !ImGui::TreeNode("Note event probe (explicit inputs; no playback)"))
+                return;
+            static int index = 0, tick = 10000, pitch = 60, transpose = 0;
+            static int random[3]{0, 0, 0};
+            ImGui::TextWrapped("This probes the step AFTER pitch conversion. Supply the resolved pitch explicitly; "
+                               "no chord interpretation, musical RNG, percussion remap or MIDI output occurs.");
+            ImGui::SliderInt("Source note", &index, 0, static_cast<int>(grid.notes.size()) - 1);
+            index = std::clamp(index, 0, static_cast<int>(grid.notes.size()) - 1);
+            ImGui::InputInt("Grid tick", &tick);
+            ImGui::SliderInt("Resolved pitch (0 suppresses)", &pitch, -32768, 32767);
+            ImGui::SliderInt("Band transpose", &transpose, -128, 127);
+            ImGui::SliderInt3("Explicit draws in consumption order", random, 0, 32767);
+            const auto& note = grid.notes[index];
+            const std::size_t count = pitch ? unsigned(note.time_range != 0) + unsigned(note.duration_range != 0) +
+                                                  unsigned(note.velocity_range != 0)
+                                            : 0;
+            std::array<std::uint16_t, 3> draws{};
+            for (unsigned i = 0; i < 3; ++i)
+                draws[i] = static_cast<std::uint16_t>(std::clamp(random[i], 0, 32767));
+            ImaNoteEvents events;
+            std::string error;
+            const ImaNoteEventContext context{tick,
+                                              static_cast<std::int16_t>(std::clamp(pitch, -32768, 32767)),
+                                              static_cast<std::int8_t>(std::clamp(transpose, -128, 127)),
+                                              {}};
+            if (!prepare_ima_note_events(note, context, std::span(draws).first(count), events, error))
+                ImGui::TextWrapped("Probe refused: %s", error.c_str());
+            else if (!events.emitted)
+                ImGui::TextUnformatted("Zero resolved pitch: no events and no draws.");
+            else
+            {
+                ImGui::Text("%u draws used; event pair prepared, not sent", events.draws_used);
+                for (const auto& event : events.messages)
+                    ImGui::Text("Tick %d | status %02x | key %u | velocity %u", event.time, event.status, event.key,
+                                event.velocity);
+            }
+            ImGui::TreePop();
+        }
+    } // namespace
     void Inspector::draw_world_sounds(GameSession& game)
     {
         const auto& music = game.music_catalog;
@@ -396,6 +440,7 @@ namespace OpenBlood2
                             if (ImGui::TreeNode("grid", "Grid %d: %zu notes / %zu opaque curves", grid.index,
                                                 grid.notes.size(), grid.curve_chunks))
                             {
+                                draw_note_event_probe(grid);
                                 ImGuiListClipper clipper;
                                 clipper.Begin(static_cast<int>(grid.notes.size()),
                                               ImGui::GetTextLineHeightWithSpacing());

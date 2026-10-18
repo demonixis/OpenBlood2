@@ -81,5 +81,6 @@ implemented by this data/algorithm work.
 
 [Original executable evidence](../../../Documentation/Implementation/m2_music_variations.md)
 covers the loader and selection block with controlled state. Full MUSIC playback,
-pattern/band choice, chord/personality pitch handling, humanization, curves and
-playlist transitions are still required. M2 remains incomplete.
+pattern/band choice, chord/personality pitch handling, live event dispatch, curves
+and playlist transitions are still required. [Event preparation](music_event_contracts.md)
+now reproduces the post-harmonization arithmetic with explicit inputs. M2 remains incomplete.

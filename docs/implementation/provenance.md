@@ -1268,3 +1268,13 @@ bytes are imported. Original Music.cpp remains unchanged; there is no live MUSIC
 success or inferred pattern/personality scheduler. See [source ledger](sources/m2_music_variations_sources.json),
 [contracts](../contracts/music_variation_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_variations.md).
+
+## IMA post-harmonization note events
+
+Independent portable paired-event preparation, checked against the external
+installed IMUSIC25 note body in isolated x86 emulation. Explicit pitch/timing,
+transpose/map and draw inputs keep this separate from missing original harmonic
+processing, scheduler and MUSIC playback. No commercial binary/source bytes
+are imported; original Music.cpp is unchanged. See [source ledger](sources/m2_music_events_sources.json),
+[contracts](../contracts/music_event_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_events.md).
