@@ -10,8 +10,9 @@ namespace OpenBlood2
     {
         // The world-owned music data exists independently of inspector visibility/reload.
         const auto& music = g.music_catalog;
-        if (!music.error.empty() || music.assets.empty() || !music.assets.front().bank ||
-            !music.assets.front().bank_error.empty())
+        if (!music.error.empty() || music.assets.empty() || music.personalities.size() != 1 ||
+            !music.personalities.front().metadata || !music.personalities.front().error.empty() ||
+            !music.assets.front().bank || !music.assets.front().bank_error.empty())
             return false;
         std::size_t pattern_notes = 0, band_count = 0, section_count = 0;
         for (const auto& asset : music.assets)
@@ -28,14 +29,28 @@ namespace OpenBlood2
             }
             if (asset.kind == MusicAssetKind::Section)
             {
-                if (!asset.timeline || !asset.timeline_error.empty() || asset.timeline->mutes.empty() ||
-                    asset.timeline->chords.size() != 1 || !asset.timeline->discarded_chords.empty() || !asset.section ||
-                    !asset.section_error.empty() || asset.section->commands.size() != 1 ||
-                    asset.section->chords.size() != 1 || asset.section->mutes.empty())
+                if (!asset.harmony || !asset.harmony_error.empty() || asset.harmony->chords.size() != 1 ||
+                    asset.harmony->base.scale_mask != 0xab5ab5 || !asset.harmony->base_flag ||
+                    asset.harmony->chords.front().harmony.enabled || !asset.timeline || !asset.timeline_error.empty() ||
+                    asset.timeline->mutes.empty() || asset.timeline->chords.size() != 1 ||
+                    !asset.timeline->discarded_chords.empty() || !asset.section || !asset.section_error.empty() ||
+                    asset.section->commands.size() != 1 || asset.section->chords.size() != 1 ||
+                    asset.section->mutes.empty())
                     return false;
                 ImaSectionTiming timing;
                 std::string error;
                 if (!ima_section_timing(*asset.section, timing, error))
+                    return false;
+                // Explicitly activate this retained chord for a diagnostic note conversion only.
+                // This runs with the UI hidden and in inspector-free builds, without choosing a live song chord.
+                auto context = asset.harmony->chords.front().harmony;
+                context.enabled = true;
+                ImaNote note;
+                note.type = 9;
+                note.music_value = 0x4000;
+                note.play_mode = 0x83;
+                ImaNotePitch pitch;
+                if (!resolve_ima_note_pitch(note, {}, context, pitch, error) || !pitch.converted)
                     return false;
                 ++section_count;
             }

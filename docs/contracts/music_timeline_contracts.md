@@ -71,7 +71,8 @@ source-indexed command/chord times, discarded beats and clipped resampled mute
 rows. Failed binding/preparation is visible separately from structural validity
 and decoding success. Style meter/grid/tempo fields are also inspectable.
 
-Effective band selection, pattern/variation choice, pitch/personality processing,
+The [harmony preparer](music_harmony_contracts.md) now consumes retained chords.
+Effective band/current-chord selection, pattern choice, personality graphs,
 curves, live sequence clocks and playlist transitions remain incomplete. `MUSIC`
 still reports unsupported; M2 is open. See [evidence](../../../Documentation/Implementation/m2_music_timeline.md),
 [sections](music_section_contracts.md), [notes](music_note_contracts.md) and

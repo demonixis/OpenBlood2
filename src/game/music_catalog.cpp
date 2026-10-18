@@ -209,5 +209,75 @@ namespace OpenBlood2
                 asset.timeline = std::move(timeline);
             }
         }
+        // Bounded installed-file profile, not the historical general UUID/resource resolver.
+        // Never turn a personality label into a directory or resolve it across music folders.
+        for (auto& asset : assets)
+        {
+            if (!asset.section)
+                continue;
+            const auto& section = *asset.section;
+            std::string label;
+            if (section.personality.find_first_of("/\\") != std::string::npos ||
+                !resource_path(section.personality, label) ||
+                std::any_of(section.personality_id.begin(), section.personality_id.end(),
+                            [](auto v) { return v != 0; }))
+            {
+                asset.harmony_error = "IMA harmony: unsupported personality label or nonzero identity";
+                continue;
+            }
+            const auto filename = label + ".per";
+            auto index = std::find_if(personalities.begin(), personalities.end(),
+                                      [&](const auto& p) { return p.filename == filename; });
+            if (index == personalities.end())
+            {
+                if (personalities.size() == 64)
+                {
+                    asset.harmony_error = "IMA harmony: personality dependency count limit";
+                    continue;
+                }
+                MusicPersonalityRecord record;
+                record.filename = filename;
+                std::filesystem::path path;
+                if (resolve(root, plan.directory + "/" + filename, path, record.error))
+                {
+                    std::error_code ec;
+                    const auto size = std::filesystem::file_size(path, ec);
+                    if (ec || size > 1024 * 1024 || size > 64 * 1024 * 1024 - reserved_bytes)
+                        record.error = "IMA personality: file size/read budget exceeded or unavailable";
+                    else
+                    {
+                        reserved_bytes += size;
+                        std::vector<std::uint8_t> bytes(static_cast<std::size_t>(size));
+                        std::ifstream stream(path, std::ios::binary);
+                        const bool read = bool(stream.read(reinterpret_cast<char*>(bytes.data()), bytes.size()));
+                        record.bytes = static_cast<std::size_t>(stream.gcount());
+                        bytes_read += record.bytes;
+                        if (!read || stream.peek() != std::char_traits<char>::eof())
+                            record.error = "IMA personality: file changed or failed during read";
+                        else
+                        {
+                            auto metadata = std::make_shared<ImaPersonality>();
+                            if (read_ima_personality(bytes, *metadata, record.error))
+                                record.metadata = std::move(metadata);
+                        }
+                    }
+                }
+                personalities.push_back(std::move(record));
+                index = personalities.end() - 1;
+            }
+            std::string decoded_name;
+            if (!index->metadata)
+                asset.harmony_error = "IMA harmony: personality metadata unavailable: " + index->error;
+            else if (!resource_path(index->metadata->name, decoded_name) || decoded_name != label)
+                asset.harmony_error = "IMA harmony: personality filename and embedded name disagree";
+            else if (!asset.timeline)
+                asset.harmony_error = "IMA harmony: reconciled timeline unavailable";
+            else
+            {
+                auto harmony = std::make_shared<ImaHarmony>();
+                if (prepare_ima_harmony(section, *asset.timeline, *index->metadata, *harmony, asset.harmony_error))
+                    asset.harmony = std::move(harmony);
+            }
+        }
     }
 } // namespace OpenBlood2

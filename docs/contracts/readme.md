@@ -184,3 +184,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [IMA note event preparation](music_event_contracts.md): signed variation, transpose, paired messages and explicit unresolved pitch context.
 
 - [IMA harmonic note conversion](music_pitch_contracts.md): effective-context mode/scale/chord arithmetic, bounded failure and diagnostic event preparation.
+
+- [IMA prepared harmony](music_harmony_contracts.md): bounded personality metadata, original chord flags and explicit live-selection limits.

@@ -242,11 +242,14 @@ namespace
         sc[43] = 3;
         sc[44] = 192;
         sc[56] = 7;
+        std::string personality_label = "Silence";
         auto complete_section = [&]
         {
             auto parts = chunk("sref", text("Shared"));
             const auto header = chunk("secn", sc);
             parts.insert(parts.end(), header.begin(), header.end());
+            const auto label = chunk("prnm", text(personality_label));
+            parts.insert(parts.end(), label.begin(), label.end());
             return container("AASE", parts);
         };
         CHECK(write(root / "Music/Test/a1.sec", complete_section()));
@@ -279,6 +282,60 @@ namespace
         CHECK(write(root / "Music/Test/a1.sec", complete_section()));
         catalog.inspect(root, props);
         CHECK(find_section()->timeline); // Explicit zero identity: exact filename profile.
+        CHECK(!find_section()->harmony && !find_section()->harmony_error.empty());
+        const auto be = [](Bytes& b, std::size_t pos, std::uint32_t v)
+        {
+            for (int i = 0; i < 4; ++i)
+                b[pos + i] = static_cast<std::uint8_t>(v >> (24 - 8 * i));
+        };
+        Bytes per(1176);
+        std::copy_n("REPs", 4, per.begin());
+        be(per, 4, per.size() - 8);
+        be(per, 8, 1164);
+        std::copy_n("Silence", 7, per.begin() + 32);
+        per[28] = 0x91;
+        CHECK(write(root / "Music/Test/SILENCE.PER", per));
+        catalog.inspect(root, props);
+        CHECK(find_section()->harmony && find_section()->harmony_error.empty() && catalog.personalities.size() == 1);
+        CHECK(find_section()->harmony->base.scale_mask == 0x91);
+        const std::weak_ptr<const ImaPersonality> old_personality = catalog.personalities.front().metadata;
+        const std::weak_ptr<const ImaHarmony> old_harmony = find_section()->harmony;
+        per[32] = 'X';
+        CHECK(write(root / "Music/Test/SILENCE.PER", per));
+        catalog.inspect(root, props);
+        CHECK(old_personality.expired() && old_harmony.expired() && !find_section()->harmony &&
+              find_section()->harmony_error.find("disagree") != std::string::npos);
+        per[32] = 'S';
+        CHECK(write(root / "Music/Test/SILENCE.PER", per));
+        sc[72] = 1;
+        CHECK(write(root / "Music/Test/a1.sec", complete_section()));
+        catalog.inspect(root, props);
+        CHECK(!find_section()->harmony && find_section()->harmony_error.find("identity") != std::string::npos);
+        sc[72] = 0;
+        for (const auto* invalid : {"../Silence", "sub/Silence", "sub\\Silence", ""})
+        {
+            personality_label = invalid;
+            CHECK(write(root / "Music/Test/a1.sec", complete_section()));
+            catalog.inspect(root, props);
+            CHECK(!find_section()->harmony && !find_section()->harmony_error.empty());
+        }
+        personality_label = "Silence";
+        CHECK(write(root / "Music/Test/a1.sec", complete_section()));
+        CHECK(write(root / "Music/Test/silence.per", per));
+        catalog.inspect(root, props);
+        CHECK(!find_section()->harmony && catalog.personalities.front().error.find("Ambiguous") != std::string::npos);
+        fs::remove(root / "Music/Test/silence.per", ec);
+        CHECK(!ec);
+        // An opaque child length escaping its envelope rejects metadata, even with valid header strings.
+        per.insert(per.end(), {'N', 'E', 'C', 's', 0, 0, 0, 1});
+        be(per, 4, per.size() - 8);
+        CHECK(write(root / "Music/Test/SILENCE.PER", per));
+        catalog.inspect(root, props);
+        CHECK(!find_section()->harmony && !catalog.personalities.front().metadata &&
+              !catalog.personalities.front().error.empty());
+        per.resize(1176);
+        be(per, 4, per.size() - 8);
+        CHECK(write(root / "Music/Test/SILENCE.PER", per));
         sc[40] = 0;
         sc[41] = 8; // 2048 measures -> 8192 mutes per section; 32768 survey limit.
         for (const auto& r : plan.requests)
@@ -360,6 +417,10 @@ namespace
             CHECK(catalog.assets.front().bank && catalog.assets.front().bank_error.empty());
             const auto& bank = *catalog.assets.front().bank;
             CHECK(bank.waves.size() == 35 && bank.instruments.size() == 14);
+            CHECK(catalog.personalities.size() == 1 && catalog.personalities.front().metadata &&
+                  catalog.personalities.front().error.empty());
+            const std::weak_ptr<const ImaPersonality> personality_lifetime = catalog.personalities.front().metadata;
+            std::weak_ptr<const ImaHarmony> harmony_lifetime;
             const std::weak_ptr<const DlsBank> bank_lifetime = catalog.assets.front().bank;
             std::weak_ptr<const ImaStyle> style_lifetime;
             const std::weak_ptr<const ImaBands> bands_lifetime = catalog.assets[1].bands;
@@ -384,6 +445,9 @@ namespace
                     CHECK(ima_section_timing(*asset.section, timing, error));
                     CHECK(asset.timeline && asset.timeline_error.empty() && !asset.timeline->mutes.empty() &&
                           asset.timeline->duration == timing.duration_ticks && asset.timeline->chords.size() == 1);
+                    CHECK(asset.harmony && asset.harmony_error.empty() && asset.harmony->chords.size() == 1 &&
+                          asset.harmony->base.scale_mask == 0xab5ab5 && !asset.harmony->chords.front().harmony.enabled);
+                    harmony_lifetime = asset.harmony;
                     timeline_lifetime = asset.timeline;
                     section_lifetime = asset.section;
                     section_index = i;
@@ -415,9 +479,13 @@ namespace
                   catalog.assets[section_index].section.get() == section_lifetime.lock().get());
             CHECK(!timeline_lifetime.expired() &&
                   catalog.assets[section_index].timeline.get() == timeline_lifetime.lock().get());
-            CHECK(game.unload_world() && game.music_catalog.assets.empty() && game.music_catalog.plan.requests.empty());
+            CHECK(!harmony_lifetime.expired() &&
+                  catalog.assets[section_index].harmony.get() == harmony_lifetime.lock().get());
+            CHECK(game.unload_world() && game.music_catalog.personalities.empty() &&
+                  game.music_catalog.assets.empty() && game.music_catalog.plan.requests.empty());
             CHECK(bank_lifetime.expired() && style_lifetime.expired() && bands_lifetime.expired() &&
-                  section_lifetime.expired() && timeline_lifetime.expired());
+                  section_lifetime.expired() && timeline_lifetime.expired() && personality_lifetime.expired() &&
+                  harmony_lifetime.expired());
             CHECK(game.objects.snapshot().empty() && !game.server.message_count() && !game.server.string_count());
         }
         return true;

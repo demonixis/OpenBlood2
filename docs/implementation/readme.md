@@ -40,3 +40,5 @@ the original log or patch.
 - [IMA note event preparation](../../../Documentation/Implementation/m2_music_events.md): original post-harmonization arithmetic and diagnostic inspection; live MUSIC remains unavailable.
 
 - [IMA harmonic note conversion](../../../Documentation/Implementation/m2_music_pitch.md): original executable comparison, explicit contexts and remaining live-music limits.
+
+- [IMA prepared harmony](../../../Documentation/Implementation/m2_music_harmony.md): original chord classification, external scale metadata and inspected bindings; MUSIC remains unavailable.

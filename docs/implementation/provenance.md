@@ -1289,3 +1289,14 @@ Nonterminating scale-only walks fail explicitly; finite long walks retain their
 original low-word result. Original Music.cpp is unchanged. See [source ledger](sources/m2_music_pitch_sources.json),
 [contracts](../contracts/music_pitch_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_pitch.md).
+
+## IMA personality metadata and prepared chords
+
+Independent portable REPs metadata and original chord preparation, checked against
+hash-pinned external IMUSIC25 routines in isolated x86 emulation. No commercial
+source/binary bytes are imported. The filename/name binding is an explicit limited
+zero-ID profile, not the historical UUID resolver. Header observations skip opaque
+graph traversal; no full personality decoder or live MUSIC is claimed. Original
+Music.cpp remains unchanged. See [source ledger](sources/m2_music_harmony_sources.json),
+[contracts](../contracts/music_harmony_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_harmony.md).

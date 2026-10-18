@@ -1,0 +1,212 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "835668e3afcc2a7ae35b0c0338241317edf9e767",
+  "status": "M2 incomplete; prepared harmony, MUSIC unsupported",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/IMUSIC25.DLL",
+      "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "rvas": [
+        "0x16654",
+        "0x18dc3",
+        "0x18f15",
+        "0x192a9",
+        "0xb5d3..0xb644",
+        "0xb79f..0xb7ca",
+        "0x93cc..0x94f6",
+        "0x962d..0x96ae",
+        "0x170e3..0x170f8"
+      ],
+      "use": "Independent portable code informed by local original disassembly and bounded isolated emulation; no imported commercial bytes"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/Music.cpp",
+      "sha256": "1024e355e8da92ba670b96fc7cec5a57f301ea45e18f0a43f910a914f6e24ee0",
+      "use": "Original asset request plan unchanged"
+    }
+  ],
+  "observations": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "rvas": [
+      "0x16654",
+      "0x18dc3",
+      "0x18f15",
+      "0x93cc..0x94f6",
+      "0x962d..0x96ae"
+    ],
+    "fixtures": [
+      {
+        "input": [
+          145,
+          0,
+          0,
+          0,
+          11229877,
+          128,
+          7,
+          0,
+          true
+        ],
+        "base_flags": 126,
+        "pitch_flags": 19,
+        "variation_flags": 12545
+      },
+      {
+        "input": [
+          137,
+          0,
+          2,
+          8,
+          2741,
+          0,
+          0,
+          0,
+          true
+        ],
+        "base_flags": 55,
+        "pitch_flags": 147,
+        "variation_flags": 10754
+      },
+      {
+        "input": [
+          145,
+          1,
+          1,
+          0,
+          2741,
+          0,
+          7,
+          1,
+          true
+        ],
+        "base_flags": 55,
+        "pitch_flags": 19,
+        "variation_flags": 16768
+      },
+      {
+        "input": [
+          4294967295,
+          0,
+          -128,
+          8,
+          2147483648,
+          255,
+          127,
+          -1,
+          true
+        ],
+        "base_flags": 17,
+        "pitch_flags": 240,
+        "variation_flags": 16641
+      },
+      {
+        "input": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          false
+        ],
+        "base_flags": 16,
+        "pitch_flags": 16,
+        "variation_flags": 9344
+      },
+      {
+        "input": [
+          3932160,
+          0,
+          0,
+          0,
+          16777215,
+          0,
+          0,
+          0,
+          false
+        ],
+        "base_flags": 120,
+        "pitch_flags": 116,
+        "variation_flags": 17409
+      }
+    ],
+    "generated": {
+      "cases": 4096,
+      "sha256": "c9429a640d80e7e0018a6f2ef4be1aa61f95d3245fc280cf1ba7a2bca14da2f5",
+      "fnv64": 12106312165928785022
+    },
+    "private": {
+      "cases": 156,
+      "sha256": "2e631dc91e08ead5586d39526db135eee7bac03944b674ff2ef50f7ffa881b9a",
+      "fnv64": 11061850450855354925
+    },
+    "headers": [
+      {
+        "path": "Music/A1/SILENCE.PER",
+        "bytes": 1294,
+        "sha256": "1f831f593d3b8b5cb726d857b7115099c003791bc5382003d8510c760694de35",
+        "name": "Silence",
+        "scale_mask": 11229877
+      },
+      {
+        "path": "Music/Bloat/SILENCE.PER",
+        "bytes": 1294,
+        "sha256": "1f831f593d3b8b5cb726d857b7115099c003791bc5382003d8510c760694de35",
+        "name": "Silence",
+        "scale_mask": 11229877
+      },
+      {
+        "path": "Music/Cabal/SILENCE.PER",
+        "bytes": 1294,
+        "sha256": "1f831f593d3b8b5cb726d857b7115099c003791bc5382003d8510c760694de35",
+        "name": "Silence",
+        "scale_mask": 11229877
+      },
+      {
+        "path": "Music/Crudux/SILENCE.PER",
+        "bytes": 1294,
+        "sha256": "1f831f593d3b8b5cb726d857b7115099c003791bc5382003d8510c760694de35",
+        "name": "Silence",
+        "scale_mask": 11229877
+      },
+      {
+        "path": "Music/Track1/SILENCE.PER",
+        "bytes": 1294,
+        "sha256": "1f831f593d3b8b5cb726d857b7115099c003791bc5382003d8510c760694de35",
+        "name": "Silence",
+        "scale_mask": 11229877
+      }
+    ],
+    "scope": "Original field extraction and retained chord arithmetic; opaque personality graph and live scheduling not executed."
+  },
+  "replacement_code": [
+    "Bounded REPs metadata reader",
+    "Exact directory/filename/name binding for zero personality identities",
+    "Pure original chord flags/classification after meter filtering",
+    "Immutable world-owned harmony and truthful inspection"
+  ],
+  "deliberate_limits": [
+    "No general UUID resolver or personality graph decoding",
+    "No current-chord selection or harmonic activation",
+    "No live scheduling, MIDI/controller application or MUSIC playback",
+    "ASCII bounded metadata labels and envelope/record budgets reject unsafe input",
+    "Header emulator skips opaque NEC/PNS graph traversal; this is not a complete personality loader comparison"
+  ],
+  "target_sha256": {
+    "CMakeLists.txt": "b55930ecb187aaebbfb4b83a35b4f707a64597d1385ba0a40ddadb938bcc9b6e",
+    "tests/CMakeLists.txt": "a3e8fe0e35662322b0230e0087d98ce2110e7bf41d5e56aff1236590a3b5cdc6",
+    "src/engine/ima_harmony.h": "763fd049f3b95dad9d747e64c244f3e353036f591b22ede41510deafcc6eb35a",
+    "src/engine/ima_harmony.cpp": "1d3a0b97ef48516930e5bd71ca164184a581ab140cbaa929a03b2bc15024e50e",
+    "src/engine/ima_note_pitch.h": "5558827e6289d013fd0075f64c0524bd8bf0b163709374cdd43ab9e8c877c7b3",
+    "src/game/music_catalog.h": "005fbeb7c49378225563979b1c393fffc0ae7e1a0892aea8f353ede065af9d1e",
+    "src/game/music_catalog.cpp": "2c63acfbd9dd2cb3039b74a3442b6ead44393e56a3f0abf449b045ba208d73ca",
+    "src/app/inspector_world_sounds.cpp": "037d45dea0d5df060454e9c932ee8e2f8e1b44ab7a7f08e05a7240260b65ac14",
+    "src/app/world_sound_smoke.cpp": "5f8f0032a016dd6a829c4446f35f8a6912618a6169739f26c2962f38f377bfd9",
+    "tests/ima_harmony_tests.cpp": "39470b4420d90aed636757974ee2da89839145cdaf5ddda8933a9b6d19d6f571",
+    "tests/music_asset_tests.cpp": "32ab26c653c6bf456e5d6cf3ddddc869b00382eec2b49cb6ec42306d1c9874ba"
+  }
+}

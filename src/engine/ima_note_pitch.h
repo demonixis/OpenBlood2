@@ -4,7 +4,7 @@
 namespace OpenBlood2
 {
     // Explicit effective runtime harmony, NOT an unprocessed authored section chord.
-    // Personality/chord reconciliation and selection belong to the future scheduler.
+    // Reconciled chord values come from ima_harmony; live selection/activation remain separate.
     struct ImaHarmonicContext
     {
         bool enabled = false;

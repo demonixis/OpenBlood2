@@ -224,8 +224,15 @@ namespace OpenBlood2
             ImGui::TextWrapped(
                 "Decoded IMA sections/bands/pattern notes and DLS sample/region data. Pattern "
                 "selection, curves, personality "
-                "records and playlist playback are not implemented. MUSIC commands "
+                "graphs and playlist playback are not implemented. MUSIC commands "
                 "still report unsupported. Explicit DLS diagnostic notes above use the existing audio output.");
+            const auto prepared =
+                std::count_if(music.assets.begin(), music.assets.end(), [](const auto& a) { return bool(a.harmony); });
+            const auto failed = std::count_if(music.assets.begin(), music.assets.end(),
+                                              [](const auto& a) { return !a.harmony_error.empty(); });
+            ImGui::Text("Harmony: %zu personality dependencies / %zu prepared sections / %zu unresolved",
+                        music.personalities.size(), static_cast<std::size_t>(prepared),
+                        static_cast<std::size_t>(failed));
             if (!music.error.empty())
                 ImGui::TextWrapped("Music inspection: %s", music.error.c_str());
             if (ImGui::TreeNode("Original request order"))
@@ -262,6 +269,8 @@ namespace OpenBlood2
                         ImGui::TextWrapped("IMA section decoding failed: %s", asset.section_error.c_str());
                     if (!asset.timeline_error.empty())
                         ImGui::TextWrapped("IMA timeline unavailable: %s", asset.timeline_error.c_str());
+                    if (!asset.harmony_error.empty())
+                        ImGui::TextWrapped("IMA harmony unavailable: %s", asset.harmony_error.c_str());
                     if (!asset.bands_error.empty())
                         ImGui::TextWrapped("IMA band decoding failed: %s", asset.bands_error.c_str());
                     if (!asset.bank_error.empty())
@@ -269,6 +278,19 @@ namespace OpenBlood2
                 }
                 ImGui::EndTable();
             }
+        }
+        if (ImGui::TreeNode("IMA personality metadata (opaque graph)"))
+        {
+            for (const auto& p : music.personalities)
+            {
+                ImGui::Text("%s | %zu bytes", p.filename.c_str(), p.bytes);
+                if (!p.error.empty())
+                    ImGui::TextWrapped("Unavailable: %s", p.error.c_str());
+                if (p.metadata)
+                    ImGui::Text("%s | scale %08x | %u header bytes | %zu opaque graph chunks", p.metadata->name.c_str(),
+                                p.metadata->scale_mask, p.metadata->header_bytes, p.metadata->opaque_chunks.size());
+            }
+            ImGui::TreePop();
         }
         if (ImGui::TreeNode("IMA sections (authored data only)"))
         {
@@ -298,6 +320,22 @@ namespace OpenBlood2
                             section.opaque_note_chunks, section.opaque_curve_chunks);
                 if (!asset.timeline_error.empty())
                     ImGui::TextWrapped("Timeline unavailable: %s", asset.timeline_error.c_str());
+                if (!asset.harmony_error.empty())
+                    ImGui::TextWrapped("Harmony unavailable: %s", asset.harmony_error.c_str());
+                if (asset.harmony && ImGui::TreeNode("Prepared harmony (no current chord selected)"))
+                {
+                    const auto& h = *asset.harmony;
+                    ImGui::Text("Base scale %08x | root %d | pitch flags %02x | base flag %d", h.base.scale_mask,
+                                h.base.scale_root, h.base.chord_flags, int(h.base_flag));
+                    for (const auto& c : h.chords)
+                        ImGui::Text("source %zu | tick %d | chord %08x / scale %08x | roots %d / %d | pitch %02x / "
+                                    "variation %04x",
+                                    c.source, c.time, c.harmony.chord_mask, c.harmony.scale_mask, c.harmony.chord_root,
+                                    c.harmony.scale_root, c.harmony.chord_flags, c.variation_flags);
+                    ImGui::TextWrapped(
+                        "Activation, current-chord choice and live sequence playback remain unavailable.");
+                    ImGui::TreePop();
+                }
                 if (asset.timeline && ImGui::TreeNode("Style-reconciled timeline (not playback)"))
                 {
                     const auto& t = *asset.timeline;

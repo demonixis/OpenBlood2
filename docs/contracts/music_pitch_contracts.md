@@ -4,8 +4,8 @@
 harmonic arithmetic before [event preparation](music_event_contracts.md). It takes
 an immutable note/pattern and **explicit effective runtime harmony**: activation,
 chord/scale masks, separate signed roots and chord flags. An authored section
-chord is not automatically that runtime context. Personality reconciliation,
-current-chord selection and live scheduling remain unavailable; MUSIC is unsupported.
+chord is not automatically that runtime context. The [harmony preparer](music_harmony_contracts.md) now derives effective masks, roots and flags.
+Current-chord selection and live scheduling remain unavailable; MUSIC is unsupported.
 
 ## Ownership and admission
 
@@ -79,6 +79,6 @@ are required in the repository. See [evidence](../../../Documentation/Implementa
 
 GPU sound checks feed converted diagnostic pitches through event preparation
 while exercising hidden stepping/reload; inspector-free builds run the same
-checks. This does not verify authored harmony, full song sequencing or listening
-parity. Pattern/band/personality selection, curves, live note ownership and
+checks. This does not verify live chord selection, full song sequencing or listening
+parity. Current-chord/pattern/band selection, personality graphs, curves, live note ownership and
 playlist/controller application remain required. M2 is incomplete.
