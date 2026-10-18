@@ -378,6 +378,7 @@ namespace
         std::uint64_t mesh_revision = UINT64_MAX;
         bool viewport_hidden = false, viewport_reloaded = false, viewport_unloaded = false;
         OpenBlood2::UiRuntime ui(runtime);
+        OpenBlood2::HudRenderer hud(runtime.gpu);
         if (!ui.initialize(error))
         {
             spdlog::error("{}", error);
@@ -914,9 +915,15 @@ namespace
 #endif
             ImGui::NewFrame();
             OpenBlood2::draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
-            OpenBlood2::draw_hud(OpenBlood2::hud_state(game->client_shell.stats, game->client_shell.m_bInWorld,
-                                                       game->client_shell.view.object != nullptr));
+            if (!hud.draw(OpenBlood2::hud_state(game->client_shell.stats, game->client_shell.m_bInWorld,
+                                                game->client_shell.view.object != nullptr),
+                          game->resources, error))
+            {
+                spdlog::error("Original HUD: {}", error);
+                return 4;
+            }
 #if BLOOD2_INSPECTOR
+            inspector.hud_status = hud.status_bar();
             const bool inspector_was_visible = inspector_visible;
             const auto coverage_before = options.gpu_smoke ? game->server.service_calls : OpenBlood2::ServiceCalls{};
             inspector.draw(config, data, inspector_visible, frames, *game, selection);

@@ -2,6 +2,7 @@
 #include "app/ui_runtime.h"
 #include "engine/capture.h"
 #include "game/original/ScreenFade.h"
+#include "game/original/WeaponDefs.h"
 #include <cmath>
 #include <filesystem>
 #include <imgui.h>
@@ -20,10 +21,14 @@ using namespace OpenBlood2;
     } while (false)
 namespace
 {
-    bool run(const std::filesystem::path& root)
+    bool run(const std::filesystem::path& root, const std::filesystem::path& content)
     {
         Runtime runtime;
         std::string error;
+        Config config;
+        config.data_dir = content;
+        Resources artwork;
+        CHECK(artwork.mount_game(config, error));
         CHECK(runtime.initialize(true, error));
         std::cout << "GPU device: "
                   << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu), SDL_PROP_GPU_DEVICE_NAME_STRING,
@@ -34,6 +39,7 @@ namespace
         {
             UiRuntime ui(runtime);
             CHECK(ui.initialize(error));
+            HudRenderer renderer(runtime.gpu);
             const Uint32 width = cycle ? 640 : 1000, height = cycle ? 400 : 680;
             Capture capture;
             CHECK(capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
@@ -62,12 +68,11 @@ namespace
                 ImGui::NewFrame();
                 CHECK(draw_screen_fade(fade.Scale(), true) == (frame == 1 || frame == 2));
                 // UI is intentionally above the scene multiplication.
-                HudState hud;
-                hud.visible = true;
-                hud.health = 100;
-                hud.armor = 20;
-                hud.weapon = "Beretta";
-                CHECK(draw_hud(hud));
+                PlayerStats stats;
+                stats.health = 100;
+                stats.armor = 20;
+                stats.weapon = WEAP_BERETTA;
+                CHECK(renderer.draw(hud_state(stats, true, false), artwork, error));
                 ImGui::SetNextWindowPos({20, 20});
                 ImGui::SetNextWindowSize({230, 70});
                 ImGui::Begin("Fade inspection", nullptr, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs);
@@ -122,7 +127,7 @@ namespace
                         }
                     }
                 SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
-                CHECK(hud_lit > width && inspector_lit > 1000); // Text area scales with viewport width.
+                CHECK(hud_lit > 1000 && inspector_lit > 1000); // Original bitmap HUD survives a black scene.
                 CHECK(capture.save(
                     (root / ("fade-" + std::to_string(cycle) + "-" + std::to_string(frame) + ".png")).c_str()));
                 std::cout << "cycle=" << cycle << " scale=" << fade.Scale() << " expected RGB=" << expected
@@ -134,5 +139,5 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
-    return argc == 2 && run(argv[1]) ? 0 : 1;
+    return argc == 3 && run(argv[1], argv[2]) ? 0 : 1;
 }

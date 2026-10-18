@@ -2,6 +2,8 @@
 
 **M2 is closed with reservation M2-GPU-001**, explicitly authorized by the user on 2026-10-18. The [acceptance and closure record](../Documentation/Implementation/m2_acceptance.md) covers the selected SubwayA-to-CityHub session. The independently reproduced NVIDIA/D-Bus GPU LeakSanitizer failure remains open as a platform qualification issue; failed tests remain failures. Do not resume or expand M2 to address it. M3 is next and awaits a separate request. Graphics optimization is assigned to another computer; preserve the stack until the user reports a push. Historical progress and omission statements below retain their original scope and do not override this decision.
 
+The [original statistics HUD](../Documentation/Implementation/original_hud.md) replaces the demo health/armor/ammo panel with selective CNewStatusBar code and external PCX/FNT artwork. Preserve source layout, owned maxima, bounded resource failures and inspector-free rendering. Other original UI screens remain separate work; this does not reopen M2 or accept M3.
+
 Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentation/Roadmap/readme.md).
 
 Documentation starts at [docs/readme.md](docs/readme.md). Keep general developer

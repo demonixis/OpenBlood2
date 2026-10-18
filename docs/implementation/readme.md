@@ -1,5 +1,7 @@
 # Implementation records
 
+- [Original statistics HUD validation](../../../Documentation/Implementation/original_hud.md)
+
 Current decision and criterion matrix: [M2 closed with reservation M2-GPU-001](../../../Documentation/Implementation/m2_acceptance.md), authorized on 2026-10-18. Functional acceptance and the unresolved external GPU sanitizer failure remain distinct. M3 is next and is not yet accepted.
 
 This directory holds work-in-progress history and source evidence. Start with the

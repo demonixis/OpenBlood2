@@ -426,6 +426,8 @@ bool CPlayerObj::UpdateStats(bool force)
 {
     UpdateDamageVoice();
     OpenBlood2::PlayerStats value{m_damage.m_fHitPoints, m_damage.m_fArmorPoints, m_InventoryMgr.GetAmmoCount(1)};
+    value.max_health = m_damage.m_fMaxHitPoints;
+    value.max_armor = m_damage.m_fMaxArmorPoints;
     // Original UpdateStats current primary/alternate ammo; never substitute the bullet pool.
     value.weapon_slot = m_InventoryMgr.m_nCurWeaponSlot;
     if (const auto* w = m_InventoryMgr.CurrentWeapon())

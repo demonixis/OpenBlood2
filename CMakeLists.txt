@@ -14,7 +14,7 @@ include(CTest)
 include(cmake/Dependencies.cmake)
 configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
 
-add_library(engine STATIC src/engine/polygrid_view.cpp src/engine/sky.cpp src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/world_shaders.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+add_library(engine STATIC src/engine/hud_surface.cpp src/engine/polygrid_view.cpp src/engine/sky.cpp src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/world_shaders.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
 target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/audio_stream.cpp src/engine/music_asset.cpp src/engine/ima_style.cpp src/engine/ima_curve.cpp src/engine/ima_curve_event.cpp src/engine/ima_variation.cpp src/engine/ima_note_event.cpp src/engine/ima_note_pitch.cpp src/engine/ima_harmony.cpp src/engine/ima_selection.cpp src/engine/ima_cursor.cpp src/engine/ima_band.cpp src/engine/ima_section.cpp src/engine/ima_clock.cpp src/engine/ima_program.cpp src/engine/ima_playlist.cpp src/engine/ima_transport.cpp src/engine/ima_timeline.cpp src/engine/dls_bank.cpp src/engine/dls_sampler.cpp src/engine/dls_midi_queue.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
 target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
 target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
@@ -36,7 +36,7 @@ add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/ScreenFa
     src/game/registration.cpp
     src/game/server_adapter.cpp
     src/game/service_coverage.cpp)
-target_sources(blood2_game PRIVATE src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp src/game/original/SoundFX.cpp)
+target_sources(blood2_game PRIVATE src/game/original/NewStatusBar.cpp src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp src/game/original/SoundFX.cpp)
 target_sources(blood2_game PRIVATE src/game/original/PlayerLanding.cpp src/game/original/PlayerDeath.cpp src/game/original/PlayerDeathCamera.cpp)
 target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/LightFX.cpp src/game/original/ClientLightFX.cpp)
 target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)

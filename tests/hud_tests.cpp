@@ -20,6 +20,69 @@ using namespace OpenBlood2;
     } while (false)
 namespace
 {
+    bool bitmaps()
+    {
+        std::vector<std::uint8_t> pcx(128, 0);
+        pcx[0] = 10;
+        pcx[1] = 5;
+        pcx[2] = 1;
+        pcx[3] = 8;
+        pcx[8] = 1;
+        pcx[65] = 1;
+        pcx[66] = 2;
+        pcx.insert(pcx.end(), {1, 2, 12});
+        pcx.resize(pcx.size() + 768);
+        const unsigned palette = 131;
+        pcx[palette + 3] = 255;
+        pcx[palette + 5] = 255;
+        pcx[palette + 7] = 200;
+        HudSurface image;
+        std::string error;
+        CHECK(read_pcx(pcx, image, error) && image.width == 2 && image.height == 1);
+        CHECK(image.rgba == std::vector<std::uint8_t>({255, 0, 255, 255, 0, 200, 0, 255}));
+        for (unsigned variant = 0; variant < 8; ++variant)
+        {
+            auto bad = pcx;
+            if (variant == 0)
+                bad.resize(127);
+            if (variant == 1)
+                bad[66] = 1;
+            if (variant == 2)
+                bad[128] = 0xc0; // zero run
+            if (variant == 3)
+                bad[128] = 0xc3; // row overrun
+            if (variant == 4)
+                bad[130] = 0; // missing palette marker
+            if (variant == 5)
+                bad[65] = 4;
+            if (variant == 6)
+                bad.erase(bad.begin() + 129); // truncated row
+            if (variant == 7)
+                bad.insert(bad.begin() + 130, 0); // unexpected image bytes
+            CHECK(!read_pcx(bad, image, error) && image.rgba.empty() && !error.empty());
+        }
+        CHECK(read_pcx(pcx, image, error));
+        HudSurface dest{2, 1, std::vector<std::uint8_t>(8, 17)};
+        hud_blit(dest, image, nullptr, 0, 0, true, hud_magenta);
+        CHECK(dest.rgba[0] == 17 && dest.rgba[5] == 200);
+        hud_blit(dest, image, nullptr, -1, 0, false, 0);
+        CHECK(dest.rgba[1] == 200); // negative destination clips without wrapping
+        HudRect oversized{0, 0, 1000, 1000};
+        hud_blit(dest, image, &oversized, 0, 0, false, 0);
+        CHECK(dest.rgba == image.rgba);
+        HudFont font;
+        std::vector<std::uint8_t> widths(190, 0);
+        widths[0] = 1;
+        widths[2 + ('0' - '!') * 2] = 2;
+        CHECK(font.read_widths(widths, image, error));
+        CHECK(font.offsets['0' - '!'] == 0 && font.widths['0' - '!'] == 2);
+        widths[2] = 3;
+        CHECK(!font.read_widths(widths, image, error) && !font.surface);
+        Resources missing;
+        CNewStatusBar bar(missing);
+        CHECK(!bar.Init() && !bar.canvas.error.empty());
+        return true;
+    }
     bool values()
     {
         PlayerStats s;
@@ -33,22 +96,16 @@ namespace
         s.weapon_slot = 2;
         s.weapon_slots[2] = s.weapon;
         auto h = hud_state(s, true, false);
-        CHECK(h.visible && h.health == 27 && h.armor == 12 && h.ammo == 123 && h.alternate_ammo == 4);
-        CHECK(h.uses_ammo && h.alternate_pool && h.slot == 2 && h.slots[2] == WEAP_ASSAULTRIFLE && !h.weapon.empty());
+        CHECK(h.visible && h.stats == s); // Presentation owns raw values; original tab code formats them.
         CHECK(!hud_state(s, false, false).visible && !hud_state(s, true, true).visible);
         s.ammo = 1234;
-        s.alternate_ammo = 1000;
-        h = hud_state(s, true, false);
-        CHECK(h.ammo == 999 && h.alternate_ammo == 999 && s.ammo == 1234);
         s.health = -20;
         s.armor = 70000;
-        s.ammo = 0;
         h = hud_state(s, true, false);
-        CHECK(h.visible && h.health == 0 && h.armor == 65535 && h.ammo == 0 && h.uses_ammo);
+        CHECK(h.visible && h.stats == s);
         s.weapon = WEAP_MELEE;
         s.ammo_type = s.alternate_ammo_type = AMMO_NONE;
-        h = hud_state(s, true, false);
-        CHECK(h.visible && !h.uses_ammo && !h.alternate_pool);
+        CHECK(hud_state(s, true, false).visible);
         s.health = std::numeric_limits<float>::quiet_NaN();
         CHECK(!hud_state(s, true, false).visible);
         CHECK(!hud_state({}, true, false).visible);
@@ -124,7 +181,8 @@ namespace
               g.client_shell.stats.weapon_slots[1] == WEAP_BERETTA);
         CHECK(g.command_weapon(0, error) && inv.m_nCurWeaponSlot == 0 && g.client_shell.weapons[0].type == WEAP_MELEE);
         CHECK(p->UpdateStats(false) && g.pump_player_messages(error));
-        CHECK(!hud_state(g.client_shell.stats, true, false).uses_ammo && g.client_shell.stats.weapon_slot == 0);
+        CHECK(hud_state(g.client_shell.stats, true, false).stats.ammo_type == AMMO_NONE &&
+              g.client_shell.stats.weapon_slot == 0);
         CHECK(!g.command_weapon(9, error) && !g.command_weapon(10, error) && inv.m_nCurWeaponSlot == 0);
         p->movement_blocked = true;
         CHECK(!g.command_weapon(1, error));
@@ -149,9 +207,10 @@ namespace
         p->m_damage.SetArmorPoints(15);
         CHECK(p->UpdateStats(false) && g.pump_player_messages(error));
         auto h = hud_state(g.client_shell.stats, true, false);
-        CHECK(h.visible && h.health == 21 && h.armor == 15 && h.ammo == 0 && h.uses_ammo && h.slot == 1);
+        CHECK(h.visible && h.stats.health == 21 && h.stats.armor == 15 && h.stats.ammo == 0 &&
+              h.stats.ammo_type == AMMO_BULLET && h.stats.weapon_slot == 1);
         auto s = g.client_shell.stats;
-        for (int variant = 0; variant < 5; ++variant)
+        for (int variant = 0; variant < 7; ++variant)
         {
             auto bad = s;
             if (variant == 0)
@@ -164,6 +223,10 @@ namespace
                 bad.ammo_type = 13;
             if (variant == 4)
                 bad.weapon_slot = 13;
+            if (variant == 5)
+                bad.max_health = std::numeric_limits<float>::infinity();
+            if (variant == 6)
+                bad.max_armor = -1;
             CHECK(g.server.SendToClient(g.local_client, bad) == DE_INVALIDPARAMS);
         }
         CHECK(g.client_shell.stats == s && g.leave_player() && !g.command_weapon(0, error));
@@ -178,6 +241,51 @@ namespace
         config.data_dir = root;
         std::string error;
         CHECK(g.initialize() && g.resources.mount_game(config, error));
+        CNewStatusBar bar(g.resources);
+        if (!bar.Init())
+            std::cerr << bar.canvas.error << '\n';
+        CHECK(bar.Init());
+        PlayerStats sample;
+        sample.weapon = WEAP_BERETTA;
+        sample.weapon_slot = 1;
+        sample.health = 100;
+        sample.ammo = 50;
+        sample.ammo_type = sample.alternate_ammo_type = AMMO_BULLET;
+        CHECK(bar.Update(sample, 640, 480) && bar.high_graphics());
+        auto tabs = bar.tabs();
+        CHECK(tabs[0]->locX == 0 && tabs[0]->locY == 425 && tabs[1]->locX == 185);
+        CHECK(tabs[2]->locX == 505 && tabs[2]->locY == 405 && tabs[3]->locX == 542 && tabs[3]->locY == 382);
+        const auto before = tabs[0]->hTab->rgba;
+        const auto rev = bar.revision;
+        CHECK(bar.Update(sample, 640, 480) && bar.revision == rev);
+        sample.max_health = 200;
+        CHECK(bar.Update(sample, 640, 480) && tabs[0]->hTab->rgba != before);
+        CHECK(bar.Update(sample, 511, 384) && !bar.high_graphics() && tabs[1]->locX == 92);
+        CHECK(bar.Update(sample, 512, 383) && !bar.high_graphics());
+        CHECK(bar.Update(sample, 512, 384) && bar.high_graphics());
+        for (auto weapon : {WEAP_MELEE, WEAP_BERETTA, WEAP_ASSAULTRIFLE, WEAP_FLAREGUN, WEAP_SUBMACHINEGUN})
+        {
+            sample.weapon = weapon;
+            CHECK(bar.Update(sample, 640, 480) && tabs[2]->hIcon);
+        }
+        sample.weapon = WEAP_ASSAULTRIFLE;
+        sample.alternate_ammo_type = AMMO_DIEBUGDIE;
+        sample.alternate_ammo = 4;
+        CHECK(bar.Update(sample, 640, 480) && tabs[3]->value == 4);
+        sample.alternate_ammo = 0;
+        CHECK(bar.Update(sample, 640, 480) && tabs[3]->value == 0);
+        sample.health = -20;
+        sample.armor = 70000;
+        sample.ammo = 1234;
+        sample.alternate_ammo = 1000;
+        CHECK(bar.Update(sample, 640, 480));
+        CHECK(tabs[0]->value == 0 && tabs[1]->value == 65535 && tabs[2]->value == 999 && tabs[3]->value == 999);
+        sample.max_health = 0;
+        sample.max_armor = 0;
+        CHECK(bar.Update(sample, 640, 480));
+        sample.weapon = WEAP_PROXIMITYBOMB;
+        sample.weapon_slot = 10;
+        CHECK(bar.Update(sample, 640, 480) && !tabs[2]->hIcon);
         for (int cycle = 0; cycle < 3; ++cycle)
         {
             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error) && g.step(.016));
@@ -196,17 +304,22 @@ namespace
             inv.SetAmmoCount(AMMO_DIEBUGDIE, 4);
             CHECK(p->UpdateStats(false) && g.pump_player_messages(error));
             auto h = hud_state(g.client_shell.stats, true, false);
-            CHECK(h.uses_ammo && h.alternate_pool && h.ammo == 31 && h.alternate_ammo == 4 && h.slot == slot);
+            CHECK(h.stats.ammo_type == AMMO_BULLET && h.stats.alternate_ammo_type == AMMO_DIEBUGDIE &&
+                  h.stats.ammo == 31 && h.stats.alternate_ammo == 4 && h.stats.weapon_slot == slot);
             CHECK(g.select_weapon(0, error) && p->UpdateStats(false) && g.pump_player_messages(error));
-            CHECK(!hud_state(g.client_shell.stats, true, false).uses_ammo);
+            CHECK(hud_state(g.client_shell.stats, true, false).stats.ammo_type == AMMO_NONE);
             CHECK(g.unload_world() && !g.client_shell.m_bInWorld && !g.server.string_count());
         }
         return true;
     }
-    bool gpu(const std::filesystem::path& root)
+    bool gpu(const std::filesystem::path& root, const std::filesystem::path& content)
     {
         Runtime runtime;
         std::string error;
+        Resources artwork;
+        Config config;
+        config.data_dir = content;
+        CHECK(artwork.mount_game(config, error));
         CHECK(runtime.initialize(true, error));
         std::cout << "GPU device: "
                   << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu), SDL_PROP_GPU_DEVICE_NAME_STRING,
@@ -216,6 +329,7 @@ namespace
         {
             UiRuntime ui(runtime);
             CHECK(ui.initialize(error));
+            HudRenderer renderer(runtime.gpu);
             GameSession g;
             CHECK(test_player::setup(g, root) && g.enter_player(error));
             auto* p = g.server_shell.Player(g.local_client);
@@ -242,7 +356,7 @@ namespace
                 ImGui::GetIO().DisplaySize = {float(width), float(height)};
                 ImGui::GetIO().DisplayFramebufferScale = {1, 1};
                 ImGui::NewFrame();
-                CHECK(draw_hud(hud_state(g.client_shell.stats, g.client_shell.m_bInWorld, false)) == (frame < 3));
+                CHECK(renderer.draw(hud_state(g.client_shell.stats, g.client_shell.m_bInWorld, false), artwork, error));
                 ImGui::Render();
                 CHECK(!ImGui::GetIO().WantCaptureKeyboard && !ImGui::GetIO().WantCaptureMouse);
                 auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
@@ -304,9 +418,11 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
-    if (argc != 3)
+    if (argc != 3 && argc != 4)
         return 2;
     const std::string mode = argv[1];
+    if (mode == "bitmaps")
+        return bitmaps() ? 0 : 1;
     if (mode == "values")
         return values() ? 0 : 1;
     if (mode == "input")
@@ -316,6 +432,6 @@ int main(int argc, char** argv)
     if (mode == "private")
         return private_data(argv[2]) ? 0 : 1;
     if (mode == "gpu")
-        return gpu(argv[2]) ? 0 : 1;
+        return argc == 4 && gpu(argv[2], argv[3]) ? 0 : 1;
     return 2;
 }

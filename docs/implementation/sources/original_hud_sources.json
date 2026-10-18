@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-18",
+  "scope": "Original statistics HUD; M2 remains closed with M2-GPU-001. Other UI components remain unported.",
+  "references": [
+    {
+      "source": "sources/blood2/ClientShellDLL/NewStatusBar.cpp",
+      "source_sha256": "c4dee3b2502db56a1a85b94a55c64fca9ddab0a1e69421858b27aeac02e324f5",
+      "purpose": "Imported statistics initialization/composition/justification and positioning; referenced draw and weapon-icon rules."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/NewStatusBar.h",
+      "source_sha256": "eccd786da2cd6ce1946ae451b14efb15b1940857393b1e9e7f1c865e6cf4d759",
+      "purpose": "StatTab fields, inclusion flags, justifications and low-resolution thresholds."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "purpose": "Statistics delivery, distinct alternate ammo and camera suppression."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "purpose": "Clamped statistics and damage maxima publication."
+    },
+    {
+      "source": "sources/blood2/Misc/CoolFont.h",
+      "source_sha256": "81982f4275f881016fd8201b54b811340d6061c203a92a2d6bcf21d4a6a960fb",
+      "purpose": "Bitmap font/cursor contract; implementation source unavailable, numeric renderer is new."
+    },
+    {
+      "source": "OpenBlood2/OpenLithTech/src/formats/pcx_parser.cpp",
+      "source_sha256": "8b83d770df8ae209e31ec15ee8886df94579974c05b4cc100a13185b9411481c",
+      "purpose": "Reviewed only; rejected due to insufficient row/palette/length validation."
+    },
+    {
+      "source": "OpenBlood2/blood2/Misc/CoolFont.cpp",
+      "source_sha256": "cb7c4e3fd457ce0493aa9975f8e39bcafd4c3739e332978a298343d66dd4913f",
+      "purpose": "Reviewed only; uses a system font and stubs width loading, not suitable for original bitmap rendering."
+    }
+  ]
+}

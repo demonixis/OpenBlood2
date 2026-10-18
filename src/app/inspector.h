@@ -8,12 +8,15 @@
 #include "engine/world_view.h"
 #include "game/server_adapter.h"
 
+class CNewStatusBar;
+
 namespace OpenBlood2
 {
 
     struct Inspector
     {
         Runtime& runtime;
+        const CNewStatusBar* hud_status = nullptr;
         const WorldMesh* world_mesh = nullptr;
         const ModelView* model_view = nullptr;
         const ModelView* explosion_model_view = nullptr;

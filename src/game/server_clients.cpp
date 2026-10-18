@@ -80,11 +80,12 @@ namespace OpenBlood2
                 else if constexpr (std::is_same_v<T, PlayerPosition>)
                     return physics_vector(value.position);
                 else if constexpr (std::is_same_v<T, PlayerStats>)
-                    return std::isfinite(value.health) && std::isfinite(value.armor) && std::isfinite(value.bullets) &&
-                           std::isfinite(value.ammo) && value.ammo >= 0 && std::isfinite(value.alternate_ammo) &&
-                           value.alternate_ammo >= 0 && value.weapon_slot < inventory_weapon_slots &&
-                           value.ammo_type < 13 && value.alternate_ammo_type < 13 &&
-                           (!value.weapon || weapon_definition(value.weapon)) &&
+                    return std::isfinite(value.max_health) && value.max_health >= 0 && std::isfinite(value.max_armor) &&
+                           value.max_armor >= 0 && std::isfinite(value.health) && std::isfinite(value.armor) &&
+                           std::isfinite(value.bullets) && std::isfinite(value.ammo) && value.ammo >= 0 &&
+                           std::isfinite(value.alternate_ammo) && value.alternate_ammo >= 0 &&
+                           value.weapon_slot < inventory_weapon_slots && value.ammo_type < 13 &&
+                           value.alternate_ammo_type < 13 && (!value.weapon || weapon_definition(value.weapon)) &&
                            std::all_of(
                                value.weapon_slots.begin(), value.weapon_slots.end(),
                                [](DBYTE type) { return !type || weapon_definition(type); });

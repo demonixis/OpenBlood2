@@ -1,3 +1,4 @@
+#include "game/original/NewStatusBar.h"
 #include "app/inspector.h"
 #include "build_info.h"
 #include "engine/audio_stream.h"
@@ -1515,14 +1516,25 @@ namespace OpenBlood2
                     hud.alternate_ammo, hud.alternate_ammo_type,
                     game.client_shell.view.object ? "yes (HUD hidden)" : "no");
         ImGui::TextUnformatted(
-            "1..9 / 0: original inventory slots. Compact HUD remains visible with inspector hidden.");
+            "1..9 / 0: original inventory slots. Original PCX stat tabs remain visible with inspector hidden.");
+        ImGui::Text("HUD maxima: health %.1f | armor %.1f", hud.max_health, hud.max_armor);
+        if (hud_status && ImGui::TreeNode("Original status bar resources"))
+        {
+            ImGui::Text("Layout %s | composition revision %llu", hud_status->high_graphics() ? "high" : "low",
+                        static_cast<unsigned long long>(hud_status->revision));
+            for (const auto& [path, surface] : hud_status->canvas.images())
+                ImGui::Text("%s: %u x %u", path.c_str(), surface.width, surface.height);
+            ImGui::TreePop();
+        }
+        else if (!hud_status)
+            ImGui::TextUnformatted("Original HUD resources await the first visible player frame.");
         const auto& boss_client = game.client_shell;
         ImGui::Text("Boss health messages %llu | raw ratio %.3f | bar %s",
                     (unsigned long long)boss_client.boss_health_messages, boss_client.boss_health.fraction,
                     boss_client.boss_health_visible ? "visible" : "hidden");
         if (boss_client.boss_health_visible)
             ImGui::ProgressBar(boss_client.boss_health.fraction, ImVec2(-1, 0), "Original boss-health state");
-        ImGui::TextUnformatted("Inspection bar; original HUD artwork is not implemented.");
+        ImGui::TextUnformatted("Inspection boss bar; the original boss/power HUD is not yet connected.");
         draw_paths(game, selection);
         if (player)
         {

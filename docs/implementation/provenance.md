@@ -1,5 +1,16 @@
 # Source and Dependency Provenance
 
+## Original player statistics HUD
+
+`CNewStatusBar` supplies the actual tab geometry, resource paths, inclusion flags,
+composition order and image justification. The new typed surface backend reads
+external PCX/FNT data and uploads composed surfaces using the existing SDL_GPU UI
+backend. Bounded parsing, numeric formatting, clipping and maxima invalidation are
+explicit adaptations. The original CoolFont implementation source is unavailable;
+the numeric bitmap backend is new. No commercial assets, dependency changes or
+prototype implementations are imported. See [contracts](../contracts/original_hud_contracts.md)
+and [source hashes](sources/original_hud_sources.json).
+
 ## Original liquid PolyGrids
 
 Selected VolumeBrush/PolyGrid/CPolyGridFX rules now create and animate independent

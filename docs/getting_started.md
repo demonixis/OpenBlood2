@@ -42,7 +42,7 @@ The authored intro restricts movement/fire for roughly twelve simulation seconds
 
 The first click that focuses/captures the window is not a shot. Text editing and
 focus loss suppress game input. Inspection can be folded with its title arrow,
-resized, hidden and reopened. The compact HUD shows health, armor, weapon and
+resized, hidden and reopened. The original PCX statistics HUD shows health, armor, the current weapon icon and
 ammunition; it hides for external-camera cinematics. Source camera/player gates
 still control whether movement, inventory actions or fire are accepted.
 

@@ -1,5 +1,9 @@
 # Compact player HUD and numeric weapon selection
 
+> Historical presentation: superseded by the [original statistics HUD](original_hud_contracts.md).
+> Numeric weapon input and typed snapshot ownership below remain applicable.
+> M2 is closed with its documented GPU reservation.
+
 This is a compact replacement presentation of original player statistics and weapon
 slots, not a port of the PCX-based `CNewStatusBar` artwork. Read the
 [source ledger](../implementation/sources/m2_hud_sources.json), [player](player_contracts.md),
