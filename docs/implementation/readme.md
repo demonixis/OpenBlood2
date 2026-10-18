@@ -23,6 +23,7 @@ This directory holds work-in-progress history and source evidence. Start with th
 | Record | Location |
 | --- | --- |
 | Imports and portability adaptations | [Provenance](provenance.md) |
+| Per-world entry gaps and implementation batches | [Level gaps](level_gaps.md) |
 | Donor selections, commits and hashes | [Source ledgers](sources/readme.md) |
 | Current M2 progress and limitations | [Workspace M2 report](../../../Documentation/Implementation/m2.md) |
 | M0 / M1 validation | [M0](../../../Documentation/Implementation/m0.md), [M1](../../../Documentation/Implementation/m1.md) |

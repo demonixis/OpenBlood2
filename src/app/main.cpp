@@ -1825,6 +1825,9 @@ static int application_main(const OpenBlood2::Options& options)
             ++counts[game.world.objects[i].class_name + " / " + OpenBlood2::entry_state_name(game.entries[i].state)];
         for (const auto& [name, count] : counts)
             spdlog::info("{}: {}", name, count);
+        for (std::size_t i = 0; i < game.entries.size(); ++i)
+            if (game.entries[i].state == OpenBlood2::EntryState::Failed)
+                spdlog::warn("Failed entry {} ({}): {}", i, game.world.objects[i].class_name, game.entries[i].detail);
         if (options.inspect_player && !game.enter_player(error))
         {
             spdlog::error("Player entry: {}", error);
