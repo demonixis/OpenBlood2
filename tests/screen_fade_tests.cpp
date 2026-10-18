@@ -67,8 +67,10 @@ namespace
         CHECK(send(g, p->m_hObject, "fadein") && g.pump_player_messages(error) && g.client_shell.fade.value == 0);
         CHECK(g.step(.1) && g.client_shell.fade.value == 10);
         CHECK(send(g, p->m_hObject, "fadeout\t") && p->ignored_triggers == 1 && p->player_trigger_error.empty());
-        CHECK(send(g, p->m_hObject, "Music LEVEL 3") && p->unsupported_triggers == 1);
-        CHECK(send(g, p->m_hObject, "   ") && p->unsupported_triggers == 1 && p->player_trigger_error.empty());
+        CHECK(send(g, p->m_hObject, "Music LEVEL 3") && p->unsupported_triggers == 0 && p->music_messages == 1);
+        CHECK(g.pump_player_messages(error) && g.client_shell.music.logical_level == 3 &&
+              g.client_shell.music.failures == 2 && !g.client_shell.music.error.empty()); // No bank in fixture.
+        CHECK(send(g, p->m_hObject, "   ") && p->unsupported_triggers == 0 && p->player_trigger_error.empty());
         CHECK(g.client_shell.fade.messages == 3 && g.server.string_count() == strings);
         p->m_bDead = true; // Source trigger dispatch is not under its pickup/dead guard.
         CHECK(send(g, p->m_hObject, "fadeout") && g.pump_player_messages(error) && g.client_shell.fade.messages == 4);

@@ -382,26 +382,14 @@ namespace OpenBlood2
                 v.done = v.cursor >= clip.frames();
             }
         }
-        std::string loop_error;
-        const bool loop_ok = frames <= UINT64_MAX - instruments.sample_clock() &&
-                             music_loop.pump(instruments, instruments.sample_clock() + frames, loop_error);
-        if (!loop_ok)
+        std::string instrument_error;
+        const bool music_was_active = music_loop.active() || music_loop.pending();
+        if (!music_loop.advance(instruments, frames, mixed, instrument_error))
         {
-            music_error = loop_error.empty() ? "IMA audio horizon overflow" : loop_error;
-            music_loop.stop(instruments);
-        }
-        const bool instrument_ok = instruments.advance(frames, mixed);
-        if (!loop_ok || !instrument_ok)
-        {
-            if (!instrument_ok && music_loop.active())
-            {
-                music_error = instruments.last_dispatch_error;
-                music_loop.stop(instruments);
-            }
+            if (music_was_active)
+                music_error = instrument_error;
             mixed.clear();
-            output_error = !loop_ok                                  ? music_error
-                           : instruments.last_dispatch_error.empty() ? "Invalid instrument audio step"
-                                                                     : instruments.last_dispatch_error;
+            output_error = instrument_error;
             return false; // Clock has advanced; never submit partially failed instrument output.
         }
         if (stream_failed)

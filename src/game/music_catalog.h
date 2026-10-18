@@ -67,10 +67,11 @@ namespace OpenBlood2
         bool play_section(std::string_view filename, DlsSampler&);
         bool play_level_once(std::uint8_t from, std::uint8_t to, DlsSampler&);
         bool play_level_loop(std::uint8_t from, std::uint8_t to, AudioMixer&);
+        bool request_level(const MusicLevelRequest&, AudioMixer&, std::string&);
         void inspect(const std::filesystem::path& root, const std::map<std::string, std::string>& properties);
 
       private:
         bool prepare_level(const MusicLevelRequest&, std::vector<std::string>&, std::vector<ImaSectionProgram>&,
-                           std::shared_ptr<const DlsBank>&);
+                           std::shared_ptr<const DlsBank>&, std::string&);
     };
 } // namespace OpenBlood2

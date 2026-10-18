@@ -1,5 +1,6 @@
 #include "game/game_settings.h"
 // Selected PlayerObj::UpdateClientPhysics and UpdateAirLevel source rules.
+#include "Music.h"
 #include "PlayerObj.h"
 #include "game/key_messages.h"
 #include <algorithm>
@@ -51,8 +52,21 @@ void CPlayerObj::ProcessTriggerMsg(HMESSAGEREAD read)
         if (trigger_sound)
             ++trigger_sound_starts;
     }
-    else if (OpenBlood2::same_name(token, "music") || OpenBlood2::same_name(token, "flaggrab") ||
-             OpenBlood2::same_name(token, "flaggive") || OpenBlood2::same_name(token, "flagdrop"))
+    else if (OpenBlood2::same_name(token, "music"))
+    {
+        OpenBlood2::MusicCommand command;
+        const auto suffix =
+            end == std::string::npos ? std::string_view{} : std::string_view(last_player_trigger).substr(end + 1);
+        if (CMusic::ParseTrigger(suffix, command, player_trigger_error))
+        {
+            if (server->SendToClient(m_hClient, command) == DE_OK)
+                ++music_messages;
+            else
+                player_trigger_error = "Music client delivery failed";
+        }
+    }
+    else if (OpenBlood2::same_name(token, "flaggrab") || OpenBlood2::same_name(token, "flaggive") ||
+             OpenBlood2::same_name(token, "flagdrop"))
     {
         ++unsupported_triggers;
         last_unsupported_player_trigger = last_player_trigger;

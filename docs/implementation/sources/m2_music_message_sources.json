@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "29dc356bac79b43963795aaec995240decea08ac",
+  "sources": [
+    {
+      "path": "sources/blood2/ObjectDLL/Music.cpp",
+      "sha256": "fad0bc80064d06a6ab4c655ae841c2a6b62fcb9cd113006b328a808ed2867a3a",
+      "use": "HandleMusicMessage, SetMusicLevel, PlayMotif, PlayBreak parsing and message fields"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
+      "use": "ProcessTriggerMsg MUSIC dispatch outside dead-player gates"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/Music.cpp",
+      "sha256": "1024e355e8da92ba670b96fc7cec5a57f301ea45e18f0a43f910a914f6e24ee0",
+      "use": "HandleMusicMessage, PlayMusicLevel, TransitionToLevel mutation order; motif/break no-op bodies; playlist initialization"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "use": "OnEnterWorld/OnExitWorld and SMSG_MUSIC dispatch; saved client level remains separately unsupported"
+    },
+    {
+      "path": "sources/blood2/AppHeaders/client_de.h",
+      "sha256": "d4bd76f15d1689a0314f832bcba0877d2bbabcdf830a8a44da9d662b4aa534e1",
+      "use": "PlayList and IMMEDIATE/NEXTSONG flags/interface"
+    }
+  ],
+  "adaptations": [
+    "Owned typed original player MUSIC delivery and client mutation-before-engine-result",
+    "Bounded atoi decimal-prefix/byte conversion and safe client name limits; source motif/break no-ops are explicit",
+    "One preflighted pending replacement; immediate or next musical section end, latest accepted request wins",
+    "Split instrument mixer at the exact deadline; cancel old events and tails without resetting time or WAV voices",
+    "Fresh/NEW_LEVEL entry SilenceList and immediate world exit; real transport and failure inspection"
+  ],
+  "limits": [
+    "20 percent gain, per-section seed 1 and fixed prepared-variation repeats remain explicit",
+    "Latest-request/tail-cut/preroll policy is replacement code, not verified retail IMUSIC activation",
+    "CD audio, enable/volume settings, saved client music state and all-bank support remain outside this increment",
+    "M2 exit criteria unchanged; real music playback does not certify the complete preservation gate"
+  ],
+  "frozen_sources": {
+    "src/app/inspector_world_sounds.cpp": "2931170689a0c88662bff688bf50d7e983a89a1b64f98f89e83666d559cf51ee",
+    "src/app/world_sound_smoke.cpp": "0d5059d0153d810e2c9e6b54ca1389c60c42a646bc1409c832fa9c4e8b6adf17",
+    "src/engine/audio.cpp": "6bf91152b2d5cd35e2200d6b5c355249d814b0b6950e5beb21b9e8fb95457517",
+    "src/engine/dls_sampler.cpp": "f6869b28c8835ba7dc02aebac0f1502236424355b8980032aaf0c9b7c6382efb",
+    "src/engine/dls_sampler.h": "e018cd092a8fcd69ab61bf3b193f11c73f5decc9500c90a01fd5b0c8ac544cdc",
+    "src/engine/ima_transport.cpp": "0b8a46813b9cdbdc9149707df28db3249f193e7f97d1fb94a50ca2814bba8d84",
+    "src/engine/ima_transport.h": "99f19f163f70900b532b9013a36b67a3d07ba862360112e04fc648b735927abd",
+    "src/game/music_catalog.cpp": "9417ee44fac6e72599242395d4c8d5faf37b950337128dde65c58e3e84777725",
+    "src/game/music_catalog.h": "3a6d7c6f220882b7e4a0dc487d2428dc58c600333078b8be737a5476b7bf24f1",
+    "src/game/original/BloodShells.cpp": "cb0da8c6db9b46acd498aa7c32c5cab9a9d1be619ce81fdbd3897405a08a9041",
+    "src/game/original/BloodShells.h": "916ad8a4e62a40e5b23cfb8189b9646aceb3ed4f06fed5793dbc4b6b91fe70f1",
+    "src/game/original/Music.cpp": "84aa52afcb53e0865c1d077acbd193d6bf36dc4469d206d30831ead1e020c5e4",
+    "src/game/original/Music.h": "9162cb37fee916d72b5dca321d1639617173d56f9a8ea73e9656a6f737088f11",
+    "src/game/original/PlayerContainers.cpp": "de04fe1a8fcee03a8ff82cd1923d85072b6eb81bd111599f630a43a619499700",
+    "src/game/original/PlayerObj.h": "3965df61e043aa0bd26e538599726ed2bbb1432546c0849d221c6304d10f630c",
+    "src/game/player_messages.h": "b4eae9ae4ae464c29308485919e45058fcca19c1a2aa3684c85d825aa53b84d9",
+    "src/game/server_adapter.h": "88f9a23ed526d2244c540518c11378f3025b602b9b18f11060f4ffdabdeb61bf",
+    "src/game/server_clients.cpp": "e862555943800c946988c0149c23ddcf57d7725a06504c64e19f47b3ff5cb583",
+    "tests/CMakeLists.txt": "d756b52be67619afc0d8bdd2b220b8d324b164e2e53e77dcc9d7ca91b316eafe",
+    "tests/ima_transport_tests.cpp": "a89a74c2d0ee40c7e8cf505f3629db24cd4b61cf1d133855d5e720cff34d375e",
+    "tests/music_message_tests.cpp": "a33535410ae342f307b45b81265aa5f7a6154bf029e733c93e034c05af886146",
+    "tests/screen_fade_tests.cpp": "168c63a31669a875cea7a0e5157845000ec867ac05722e429c8d5b8203a1dd4a",
+    "tests/train_session_tests.cpp": "b150570f55cf0e18aeeb31af213b436fe6d09b50e1050694715d765aaa0c8bd8"
+  }
+}

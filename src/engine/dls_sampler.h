@@ -119,6 +119,9 @@ namespace OpenBlood2
         // Adds to an interleaved stereo prefix. All frames advance, including unrendered ones.
         bool advance(std::uint64_t frames, std::span<float> stereo);
         // Explicit instrument-only cancellation. Preserve the shared clock, channels and failure history.
+        // Remove future events when replacing the instrument stream; keep clock/channels.
+        void discard_midi_from(std::uint64_t frame);
+        std::uint64_t cancelled_messages = 0;
         void silence();
         void clear();
         const auto& voices() const

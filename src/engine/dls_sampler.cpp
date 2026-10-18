@@ -544,6 +544,11 @@ namespace OpenBlood2
                       });
         completed += before - voices_.size();
     }
+    void DlsSampler::discard_midi_from(std::uint64_t frame)
+    {
+        cancelled_messages +=
+            std::erase_if(pending_midi_, [=](const auto& event) { return event.message.frame >= frame; });
+    }
     void DlsSampler::silence()
     {
         voices_.clear();
@@ -554,6 +559,7 @@ namespace OpenBlood2
         silence();
         pending_banks_ = {};
         sample_clock_ = 0;
+        cancelled_messages = 0;
         queued_messages = queue_rejected = dispatched_messages = coalesced_messages = dispatch_failures = 0;
         failed_dispatch_frame.reset();
         last_queue_error.clear();

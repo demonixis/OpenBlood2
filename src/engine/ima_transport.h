@@ -1,10 +1,11 @@
 #pragma once
 #include "engine/ima_playlist.h"
+#include <memory>
 
 namespace OpenBlood2
 {
     // Bounded repetition of a prepared sequence. Intro sections play once; the
-    // suffix repeats. Pattern/variation regeneration and live switches are separate.
+    // suffix repeats. Live replacement is bounded; variation regeneration is separate.
     class ImaLoopTransport
     {
       public:
@@ -13,6 +14,32 @@ namespace OpenBlood2
         // Schedule before the mixer advances through this absolute sample horizon.
         // Admission is atomic. Failure leaves this transport and the sampler intact.
         bool pump(DlsSampler&, std::uint64_t horizon, std::string& error);
+        // Replacement engine policy: latest accepted request wins; NEXTSONG
+        // commits at the next musical section end, IMMEDIATE at the current clock.
+        bool request(std::span<const ImaSectionProgram>, std::size_t loop_begin, std::shared_ptr<const DlsBank>,
+                     DlsSampler&, double gain, bool immediate, std::uint8_t level, std::string& error);
+        bool next_song(std::uint64_t now, std::uint64_t& frame, std::string& error) const;
+        bool advance(DlsSampler&, std::uint64_t frames, std::span<float> stereo, std::string& error);
+        bool pending() const
+        {
+            return replacement_ != nullptr;
+        }
+        std::uint64_t switch_frame() const
+        {
+            return replacement_ ? replacement_->origin() : 0;
+        }
+        std::uint8_t level() const
+        {
+            return level_;
+        }
+        std::uint8_t pending_level() const
+        {
+            return replacement_ ? replacement_->level_ : level_;
+        }
+        std::uint64_t switches() const
+        {
+            return switches_;
+        }
         void stop(DlsSampler&);
         bool active() const
         {
@@ -46,6 +73,12 @@ namespace OpenBlood2
         }
 
       private:
+        bool prepare(std::span<const ImaSectionProgram>, std::size_t, std::shared_ptr<const DlsBank>,
+                     std::uint64_t origin, double gain, std::string&);
+        // Exactly one pending prepared replacement; it never owns another request.
+        std::unique_ptr<ImaLoopTransport> replacement_;
+        std::uint8_t level_ = 0;
+        std::uint64_t switches_ = 0;
         ImaPlaylistProgram first_, loop_;
         ImaClock first_clock_, loop_clock_;
         std::shared_ptr<const DlsBank> bank_;

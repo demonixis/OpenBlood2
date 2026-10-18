@@ -103,6 +103,21 @@ namespace OpenBlood2
     struct PlayerDead
     {
     };
+    enum class MusicCommandType : DBYTE
+    {
+        Level,
+        Motif,
+        MotifLoop,
+        MotifStop,
+        Break
+    };
+    struct MusicCommand
+    {
+        MusicCommandType type = MusicCommandType::Level;
+        DBYTE level = 0;
+        std::string name;
+    };
+    bool valid_music_command(const MusicCommand&);
     struct ScreenFade
     {
         bool in = false;
@@ -134,5 +149,5 @@ namespace OpenBlood2
     };
     using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
                                      MissionObjectives, WorldExit, BossHealth, Conversation, InventoryAction,
-                                     ScreenFade, VoiceEvent, VoiceStop, PlayerDead>;
+                                     ScreenFade, VoiceEvent, VoiceStop, PlayerDead, MusicCommand>;
 } // namespace OpenBlood2

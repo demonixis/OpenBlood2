@@ -138,10 +138,31 @@ namespace OpenBlood2
         if (ImGui::CollapsingHeader("Music playback", ImGuiTreeNodeFlags_DefaultOpen))
         {
             auto& sampler = game.server.audio.instruments;
-            ImGui::TextWrapped(
-                "Authored music audition, gain 20%%, explicit seed 1 per section. "
-                "Prepared once, played by the shared audio clock while the inspector is hidden. "
-                "Repeats reuse the prepared variations. Game MUSIC activation and live switching remain unavailable.");
+            ImGui::TextWrapped("Authored music audition, gain 20%%, explicit seed 1 per section. "
+                               "Prepared once, played by the shared audio clock while the inspector is hidden. "
+                               "Repeats reuse prepared variations. Live original MUSIC commands share this stream; "
+                               "diagnostic auditions override it.");
+            const auto& live = game.client_shell.music;
+            const auto& current = game.server.audio.music_loop;
+            ImGui::Text(
+                "Game music: logical %u | last transport level %u (%s) | requests %llu / accepted %llu / failed %llu",
+                unsigned(live.logical_level), unsigned(current.level()), current.active() ? "active" : "stopped",
+                (unsigned long long)live.requests, (unsigned long long)live.accepted,
+                (unsigned long long)live.failures);
+            ImGui::Text(
+                "Messages %llu | source no-ops %llu | refused %llu | committed switches %llu | cancelled MIDI %llu",
+                (unsigned long long)live.received, (unsigned long long)live.source_noops,
+                (unsigned long long)live.refused, (unsigned long long)current.switches(),
+                (unsigned long long)sampler.cancelled_messages);
+            if (!music.audition_file.empty())
+                ImGui::TextWrapped("Diagnostic audition overrides the stream; the game-level counters are historical.");
+            if (current.pending())
+                ImGui::Text("Pending level %u at sample %llu", unsigned(current.pending_level()),
+                            (unsigned long long)current.switch_frame());
+            if (!live.error.empty())
+                ImGui::TextWrapped("Game music request failed: %s", live.error.c_str());
+            ImGui::TextWrapped("NEXTSONG commits at the current section end. Replacement cuts old tails. "
+                               "Cross-section variation regeneration and retail activation parity remain unverified.");
             static int from_level = 0, to_level = 3;
             ImGui::Combo("Preview from level", &from_level, "Silence\0Ambient\0Cruising\0Harddriving\0");
             ImGui::Combo("Preview requested level", &to_level, "Silence\0Ambient\0Cruising\0Harddriving\0");
@@ -186,7 +207,7 @@ namespace OpenBlood2
                                 request.loop ? "yes" : "no");
                     ImGui::TextWrapped(
                         "This audition starts on the idle clock; repeating mode skips the transition on later passes. "
-                        "Live switching and cross-section variation state are unavailable.");
+                        "This report describes the diagnostic audition; live state is shown above.");
                     ImGui::Text("Sections %zu | events %zu | global preroll %d | last tick %d", list.parts.size(),
                                 list.events.size(), list.preroll_ticks, list.last_tick);
                     if (ImGui::TreeNode("Ordered playlist sections and tempo boundaries"))
@@ -431,8 +452,7 @@ namespace OpenBlood2
             }
             ImGui::TreePop();
         }
-        if (ImGui::CollapsingHeader("Original music assets (game playlists unavailable)",
-                                    ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader("Original music assets and binding diagnostics", ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::TextWrapped("Directory: %s | %zu original requests / %zu unique assets | %zu bytes read",
                                music.plan.directory.c_str(), music.plan.requests.size(), music.assets.size(),
@@ -760,7 +780,7 @@ namespace OpenBlood2
             ImGui::TextWrapped(
                 "Style and section bands stay separate, in file order. Collection names are labels; "
                 "no bank is loaded from them. Setup messages are planned, not played. "
-                "Section band selection is prepared below; original MUSIC playback remains unavailable.");
+                "Section band selection is prepared below; live music status and failures are shown above.");
             for (const auto& asset : music.assets)
             {
                 if (asset.kind == MusicAssetKind::Instruments || !ImGui::TreeNode(asset.filename.c_str()))

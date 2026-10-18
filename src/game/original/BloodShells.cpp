@@ -216,6 +216,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
         return false;
     if (!move_mgr.Init(server_, client))
         return false;
+    music.EnterWorld(music_catalog_, audio_);
     voice_manager.Init(resources_);
     if (!restored)
         voice_manager.Reset();
@@ -262,6 +263,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
 }
 void CBloodClientShell::OnExitWorld()
 {
+    music.ExitWorld(audio_);
     voice_manager.StopAll();
     weapons = {};
     weapon_input = {};
@@ -323,6 +325,11 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     ++messages;
     if (std::holds_alternative<OpenBlood2::PlayerInitRequest>(event))
         return InitSinglePlayer(server);
+    if (const auto* value = std::get_if<OpenBlood2::MusicCommand>(&event))
+    {
+        music.HandleMusicMessage(*value, music_catalog_, audio_);
+        return true; // Delivery survives playback failure; inspect the actual music result.
+    }
     if (std::holds_alternative<OpenBlood2::VoiceStop>(event))
     {
         voice_manager.StopAll();

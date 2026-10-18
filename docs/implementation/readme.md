@@ -74,3 +74,5 @@ the original log or patch.
 - [Finite music playlists](../../../Documentation/Implementation/m2_music_playlists.md): original level decisions and one-pass transition/list audio; live MUSIC remains incomplete.
 
 - [Repeating music transport](../../../Documentation/Implementation/m2_music_transport.md): transition once, continuous prepared lists and bounded audio ownership; M2 remains incomplete.
+
+- [Live MUSIC messages](../../../Documentation/Implementation/m2_music_messages.md): original player/client requests, real immediate/next-song playback and truthful pending/failure inspection; M2 remains incomplete.

@@ -89,3 +89,5 @@ Game command delivery, logical level changes, initialized state, repeat selectio
 active-stream cancellation/transition timing, original cross-section state and
 music volume remain separate work. Unsupported game MUSIC calls stay unsupported;
 this increment does not relax the M2 exit gate.
+
+The [live MUSIC continuation](music_message_contracts.md) now connects original player/client messages and bounded immediate/next-song replacement. Earlier missing-message statements above describe the preceding increment; original variation/activation fidelity and the M2 gate remain open.

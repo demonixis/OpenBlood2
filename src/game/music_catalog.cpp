@@ -151,7 +151,7 @@ namespace OpenBlood2
         std::vector<std::string> files;
         std::vector<ImaSectionProgram> sections;
         std::shared_ptr<const DlsBank> bank;
-        if (!prepare_level(request, files, sections, bank))
+        if (!prepare_level(request, files, sections, bank, audition_error))
             return false;
         ImaPlaylistProgram next;
         if (!prepare_ima_playlist(sections, next, audition_error))
@@ -174,11 +174,12 @@ namespace OpenBlood2
         return true;
     }
     bool MusicCatalog::prepare_level(const MusicLevelRequest& request, std::vector<std::string>& files,
-                                     std::vector<ImaSectionProgram>& sections, std::shared_ptr<const DlsBank>& bank)
+                                     std::vector<ImaSectionProgram>& sections, std::shared_ptr<const DlsBank>& bank,
+                                     std::string& error)
     {
         const auto fail = [&](std::string reason)
         {
-            audition_error = std::move(reason);
+            error = std::move(reason);
             return false;
         };
         if (!request.transition.empty())
@@ -224,8 +225,8 @@ namespace OpenBlood2
             // This remains an explicit audition: reset the local seed/cursor per
             // section. Original cross-section variation/activation is separate.
             if (!prepare_ima_program(asset->section, asset->section_style, asset->timeline, asset->harmony,
-                                     *asset->selected_band, *curves, seed, 1, part, audition_error, work_remaining))
-                return fail(file + ": " + audition_error);
+                                     *asset->selected_band, *curves, seed, 1, part, error, work_remaining))
+                return fail(file + ": " + error);
             work_remaining -= part.work_units;
             if (part.events.size() > DlsSampler::max_pending_midi - messages)
                 return fail("Finite playlist combined message budget exceeded");
@@ -253,7 +254,8 @@ namespace OpenBlood2
         std::vector<ImaSectionProgram> sections;
         std::shared_ptr<const DlsBank> bank;
         ImaPlaylistProgram report;
-        if (!prepare_level(request, files, sections, bank) || !prepare_ima_playlist(sections, report, audition_error) ||
+        if (!prepare_level(request, files, sections, bank, audition_error) ||
+            !prepare_ima_playlist(sections, report, audition_error) ||
             !audio.music_loop.start(sections, request.transition.empty() ? 0 : 1, bank, audio.instruments, .2,
                                     audition_error))
             return false;
@@ -267,6 +269,29 @@ namespace OpenBlood2
         // The first pass boundary is inspectable; there is no finite completion deadline.
         audio.music_loop.sample(audio.music_loop.first_end_tick(), audition_end, audition_error);
         audition_failures = audio.instruments.dispatch_failures;
+        audition_stopped = false;
+        return true;
+    }
+    bool MusicCatalog::request_level(const MusicLevelRequest& request, AudioMixer& audio, std::string& error)
+    {
+        std::vector<std::string> files;
+        std::vector<ImaSectionProgram> sections;
+        std::shared_ptr<const DlsBank> bank;
+        if (!prepare_level(request, files, sections, bank, error))
+        {
+            return false;
+        }
+        if (!audio.music_loop.request(sections, request.transition.empty() ? 0 : 1, bank, audio.instruments, .2,
+                                      request.immediate, request.to, error))
+            return false;
+        audio.music_error.clear();
+        // A live request supersedes the diagnostic report, including while queued.
+        audition = {};
+        audition_file.clear();
+        audition_error.clear();
+        playlist_audition = {};
+        playlist_files.clear();
+        playlist_request.reset();
         audition_stopped = false;
         return true;
     }

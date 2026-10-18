@@ -1,8 +1,11 @@
 // Original Blood II ClientShellDLL/Music.cpp:24-37,111-199.
 // Request order preserved; DLL calls replaced with an explicitly read-only plan.
 #include "Music.h"
+#include "engine/audio.h"
 #include "engine/model_commands.h"
 #include "engine/resources.h"
+#include "game/key_messages.h"
+#include "game/music_catalog.h"
 #include <array>
 
 bool CMusic::SelectLevel(std::uint8_t from, std::uint8_t to, OpenBlood2::MusicLevelRequest& out)
@@ -100,4 +103,134 @@ bool CMusic::BuildAssetPlan(const std::map<std::string, std::string>& properties
     }
     out = std::move(next);
     return true;
+}
+
+// ObjectDLL/Music.cpp HandleMusicMessage: literal-space tokens, atoi-style
+// byte conversion, case-insensitive commands. Reject undefined overflow safely.
+bool CMusic::ParseTrigger(std::string_view text, OpenBlood2::MusicCommand& out, std::string& error)
+{
+    using namespace OpenBlood2;
+    out = {};
+    error.clear();
+    if (text.size() > 500 || text.find('\0') != text.npos)
+    {
+        error = "Music trigger length/NUL limit";
+        return false;
+    }
+    auto token = [&]()
+    {
+        const auto begin = text.find_first_not_of(' ');
+        if (begin == text.npos)
+        {
+            text = {};
+            return std::string_view{};
+        }
+        text.remove_prefix(begin);
+        auto end = text.find(' ');
+        const auto word = text.substr(0, end);
+        text = end == text.npos ? std::string_view{} : text.substr(end + 1);
+        return word;
+    };
+    const auto command = token();
+    auto value = token();
+    if (same_name(command, "level"))
+    {
+        // atoi accepts leading C whitespace/sign, a decimal prefix, or no digits (0).
+        while (!value.empty() && (value.front() == '\t' || value.front() == '\n' || value.front() == '\r' ||
+                                  value.front() == '\v' || value.front() == '\f'))
+            value.remove_prefix(1);
+        bool negative = !value.empty() && value.front() == '-';
+        if (!value.empty() && (value.front() == '-' || value.front() == '+'))
+            value.remove_prefix(1);
+        std::uint64_t number = 0;
+        for (const char c : value)
+        {
+            if (c < '0' || c > '9')
+                break;
+            number = number * 10 + unsigned(c - '0');
+            if (number > std::uint64_t(INT32_MAX) + negative)
+            {
+                error = "Music LEVEL exceeds defined original atoi range";
+                return false;
+            }
+        }
+        out.level = std::uint8_t(negative ? -std::int64_t(number) : std::int64_t(number));
+        return true;
+    }
+    if (same_name(command, "motif"))
+        out.type = MusicCommandType::Motif;
+    else if (same_name(command, "break"))
+        out.type = MusicCommandType::Break;
+    else
+    {
+        error = "Unknown or absent original music subcommand";
+        return false;
+    }
+    out.name = value;
+    if (!valid_music_command(out))
+    {
+        error = "Music name missing or exceeds safe original client buffer";
+        out = {};
+        return false;
+    }
+    return true;
+}
+
+namespace OpenBlood2
+{
+    bool valid_music_command(const MusicCommand& command)
+    {
+        if (command.type == MusicCommandType::Level)
+            return command.name.empty(); // All byte levels are delivered; the client decides validity.
+        return command.type <= MusicCommandType::Break && !command.name.empty() && command.name.size() < 50 &&
+               command.name.find('\0') == command.name.npos;
+    }
+} // namespace OpenBlood2
+
+bool CMusic::PlayMusicLevel(std::uint8_t level, OpenBlood2::MusicCatalog& catalog, OpenBlood2::AudioMixer& audio)
+{
+    error.clear();
+    OpenBlood2::MusicLevelRequest request;
+    if (!SelectLevel(logical_level, level, request))
+    {
+        ++refused;
+        return false;
+    }
+    // Original TransitionToLevel assigns before the fallible PlayList call.
+    // The same-silence direct PlayList branch leaves the identical value intact.
+    logical_level = level;
+    ++requests;
+    if (!catalog.request_level(request, audio, error))
+    {
+        ++failures;
+        return false;
+    }
+    ++accepted; // Admission only; receiver errors and audible level are separate.
+    return true;
+}
+void CMusic::HandleMusicMessage(const OpenBlood2::MusicCommand& command, OpenBlood2::MusicCatalog& catalog,
+                                OpenBlood2::AudioMixer& audio)
+{
+    ++received;
+    last_command = command;
+    error.clear();
+    if (!OpenBlood2::valid_music_command(command))
+    {
+        error = "Invalid typed music command";
+        ++failures;
+    }
+    else if (command.type == OpenBlood2::MusicCommandType::Level)
+        PlayMusicLevel(command.level, catalog, audio);
+    else
+        ++source_noops; // Original PlayMotif/StopMotif/PlayBreak contain no engine call.
+}
+void CMusic::EnterWorld(OpenBlood2::MusicCatalog& catalog, OpenBlood2::AudioMixer& audio)
+{
+    *this = {};
+    PlayMusicLevel(0, catalog, audio); // Original fresh-world SilenceList request.
+}
+void CMusic::ExitWorld(OpenBlood2::AudioMixer& audio)
+{
+    audio.music_loop.stop(audio.instruments);
+    *this = {};
 }

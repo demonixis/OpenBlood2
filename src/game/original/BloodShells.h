@@ -1,6 +1,7 @@
 #pragma once
 #include "CommLink.h"
 #include "MoveMgr.h"
+#include "Music.h"
 #include "PathMgr.h"
 #include "PlayerDeathCamera.h"
 #include "PlayerObj.h"
@@ -70,8 +71,9 @@ class CBloodServerShell
 class CBloodClientShell
 {
   public:
-    explicit CBloodClientShell(ServerDE& server, const OpenBlood2::Resources& resources)
-        : voice_manager(server), resources_(resources), server_(server)
+    explicit CBloodClientShell(ServerDE& server, const OpenBlood2::Resources& resources,
+                               OpenBlood2::MusicCatalog& catalog, OpenBlood2::AudioMixer& audio)
+        : voice_manager(server), resources_(resources), server_(server), music_catalog_(catalog), audio_(audio)
     {
     }
     bool StartNewWorld(const char*, OpenBlood2::WorldMessage&);
@@ -93,6 +95,7 @@ class CBloodClientShell
     std::string item_audio_error;
     CScreenFade fade;
     CVoiceMgr voice_manager;
+    CMusic music;
     CMoveMgr move_mgr;
     OpenBlood2::MovementInput movement_input;
     bool SyncWeapons(OpenBlood2::ModelStore&, OpenBlood2::Resources&, CBloodServerShell&, std::string&);
@@ -135,4 +138,6 @@ class CBloodClientShell
     const OpenBlood2::Resources& resources_;
     HCLIENT client_ = nullptr;
     ServerDE& server_;
+    OpenBlood2::MusicCatalog& music_catalog_;
+    OpenBlood2::AudioMixer& audio_;
 };

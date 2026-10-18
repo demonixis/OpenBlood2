@@ -88,3 +88,5 @@ The [combat voice continuation](combat_voice_contracts.md) connects original pai
 The [single-player death continuation](player_death_contracts.md) supersedes the missing selected Caleb death/corpse/gib and client death-camera paths above. Active powers, multiplayer death and whole-world/dead-player restoration remain unavailable. M2 is still incomplete.
 
 The [jump/landing audio continuation](movement_audio_contracts.md) connects the original MoveMgr Jump caller. Idle, taunt and other unimplemented callers are not implied by this addition; M2 remains open.
+
+The [live MUSIC continuation](music_message_contracts.md) now connects original player/client messages and bounded immediate/next-song replacement. Earlier missing-message statements above describe the preceding increment; original variation/activation fidelity and the M2 gate remain open.

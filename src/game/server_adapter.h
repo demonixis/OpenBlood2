@@ -410,10 +410,10 @@ namespace OpenBlood2
         Objects objects;
         ServerAdapter server{objects};
         CBloodServerShell server_shell{server};
-        CBloodClientShell client_shell{server, resources};
+        MusicCatalog music_catalog;
+        CBloodClientShell client_shell{server, resources, music_catalog, server.audio};
         HCLIENT local_client = nullptr;
         World world;
-        MusicCatalog music_catalog; // Read-only asset evidence; no music playback success is implied.
         std::vector<WorldEntry> entries;
         std::vector<ResourceUse> resource_uses;
         std::vector<std::string> trace;

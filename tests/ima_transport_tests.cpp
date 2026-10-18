@@ -154,6 +154,119 @@ namespace
                   << " / peak queue " << peak_queue << '\n';
         return true;
     }
+    bool switching()
+    {
+        std::string error;
+        const auto parts = sections();
+        AudioMixer whole, split;
+        whole.inspect_pcm = split.inspect_pcm = true;
+        auto b = bank();
+        for (auto* audio : {&whole, &split})
+            CHECK(audio->music_loop.request(parts, 1, b, audio->instruments, .2, true, 1, error));
+        std::uint64_t first_end;
+        CHECK(whole.music_loop.next_song(0, first_end, error));
+        ImaPlaylistProgram reference;
+        CHECK(prepare_ima_playlist(parts, reference, error));
+        std::uint64_t expected;
+        CHECK(whole.music_loop.sample(reference.parts[0].start_tick + parts[0].duration_ticks, expected, error));
+        CHECK(first_end == expected);
+        // Ask during the introduction. Latest accepted request replaces the pending one.
+        const auto other = std::array{section(101, 7, 250, 65, 173, 45000)};
+        for (auto* audio : {&whole, &split})
+        {
+            CHECK(audio->advance(.01, {}, {}));
+            CHECK(audio->music_loop.request(other, 0, b, audio->instruments, .2, false, 2, error));
+            CHECK(audio->music_loop.pending() && audio->music_loop.switch_frame() == first_end);
+            CHECK(audio->music_loop.request(other, 0, b, audio->instruments, .2, false, 3, error));
+            CHECK(!audio->music_loop.request(other, 1, b, audio->instruments, .2, true, 0, error));
+            CHECK(audio->music_loop.pending_level() == 3 && audio->music_loop.level() == 1);
+        }
+        // Exact PCM must not depend on whether a mixer block crosses the switch.
+        std::uint64_t nonzero = 0;
+        const auto end = first_end + 24000;
+        while (whole.instruments.sample_clock() < end)
+        {
+            const auto frames = unsigned(std::min<std::uint64_t>(5001, end - whole.instruments.sample_clock()));
+            CHECK(whole.advance(double(frames) / 48000, {}, {}));
+            std::vector<float> fragments;
+            for (unsigned pos = 0; pos < frames;)
+            {
+                const auto n = std::min(17u, frames - pos);
+                CHECK(split.advance(double(n) / 48000, {}, {}));
+                fragments.insert(fragments.end(), split.mixed.begin(), split.mixed.end());
+                pos += n;
+            }
+            CHECK(whole.mixed == fragments);
+            for (float v : fragments)
+                nonzero += v != 0;
+        }
+        CHECK(nonzero && whole.music_loop.level() == 3 && !whole.music_loop.pending() &&
+              whole.music_loop.switches() == 2 && whole.instruments.cancelled_messages);
+        CHECK(whole.music_loop.origin() == first_end && !whole.instruments.dispatch_failures);
+        // Query exact boundaries and very late repeats against an unrolled clock.
+        std::vector<ImaSectionProgram> unrolled(40, other[0]);
+        CHECK(prepare_ima_playlist(unrolled, reference, error));
+        ImaClock clock;
+        CHECK(clock.prepare(reference.tempos, first_end, error));
+        std::uint64_t previous = first_end;
+        for (const auto& part : reference.parts)
+        {
+            CHECK(clock.sample(part.start_tick + part.duration, expected, error));
+            std::uint64_t next;
+            CHECK(whole.music_loop.next_song(previous, next, error) && next == expected);
+            CHECK(whole.music_loop.next_song(expected - 1, next, error) && next == expected);
+            previous = expected;
+        }
+        // Pending bank ownership ends on supersession, stop and clear.
+        auto pending_bank = bank();
+        std::weak_ptr<const DlsBank> weak = pending_bank;
+        CHECK(whole.music_loop.request(parts, 1, pending_bank, whole.instruments, .2, false, 2, error));
+        pending_bank.reset();
+        CHECK(!weak.expired());
+        const auto now = whole.instruments.sample_clock();
+        CHECK(whole.music_loop.request(other, 0, b, whole.instruments, .2, true, 1, error));
+        CHECK(weak.expired() && whole.music_loop.origin() == now && whole.music_loop.switches() == 3);
+        CHECK(!whole.music_loop.pending());
+        CHECK(whole.music_loop.request(other, 0, b, whole.instruments, .2, false, 2, error));
+        whole.music_loop.stop(whole.instruments);
+        CHECK(!whole.music_loop.pending() && whole.instruments.sample_clock() == now);
+        CHECK(whole.advance(0, {}, {}));
+        // Large headless step crosses the same boundary and reaches the same clock.
+        AudioMixer stalled;
+        CHECK(stalled.music_loop.request(parts, 1, b, stalled.instruments, .2, true, 1, error));
+        CHECK(stalled.music_loop.request(other, 0, b, stalled.instruments, .2, false, 2, error));
+        CHECK(stalled.advance(10, {}, {}) && stalled.instruments.sample_clock() == 480000 &&
+              stalled.music_loop.level() == 2 && !stalled.music_loop.pending());
+        AudioMixer exact;
+        CHECK(exact.music_loop.request(parts, 1, b, exact.instruments, .2, true, 1, error));
+        CHECK(exact.music_loop.request(other, 0, b, exact.instruments, .2, false, 2, error));
+        CHECK(exact.advance(double(first_end - 1) / 48000, {}, {}) && exact.music_loop.level() == 1 &&
+              exact.music_loop.pending());
+        CHECK(exact.advance(1.0 / 48000, {}, {}) && exact.music_loop.level() == 2 && !exact.music_loop.pending());
+        CHECK(!exact.instruments.voices().empty());
+        for (const auto& voice : exact.instruments.voices())
+            CHECK(voice.key == 65);
+        // Receiver failure at a committed replacement stops both streams, advances
+        // the complete block once, and remains inspectable on subsequent steps.
+        AudioMixer failed;
+        CHECK(failed.music_loop.request(parts, 1, b, failed.instruments, .2, true, 1, error));
+        auto missing = bank();
+        missing->instruments.front().program = 10;
+        CHECK(failed.music_loop.request(other, 0, missing, failed.instruments, .2, false, 2, error));
+        CHECK(!failed.advance(1, {}, {}) && failed.instruments.sample_clock() == 48000 && !failed.music_loop.active() &&
+              !failed.music_loop.pending() && !failed.music_error.empty());
+        CHECK(failed.advance(.1, {}, {}) && !failed.music_error.empty());
+        AudioMixer bypassed;
+        CHECK(bypassed.music_loop.request(parts, 1, b, bypassed.instruments, .2, true, 1, error));
+        CHECK(bypassed.music_loop.request(other, 0, b, bypassed.instruments, .2, false, 2, error));
+        CHECK(bypassed.instruments.advance(first_end + 1, {}));
+        CHECK(!bypassed.advance(.01, {}, {}) && !bypassed.music_loop.pending() &&
+              bypassed.music_error.find("bypassed") != std::string::npos);
+        std::cout << "Live replacement: exact boundary " << first_end << "; nonzero PCM " << nonzero
+                  << "; 40 next-song boundaries; cancellation and stalled audio verified\n";
+        return true;
+    }
+
     bool limits()
     {
         std::string error;
@@ -291,7 +404,8 @@ int main(int argc, char** argv)
     if (argc < 2)
         return 2;
     std::string_view mode = argv[1];
-    bool ok = mode == "timing"                 ? timing()
+    bool ok = mode == "switching"              ? switching()
+              : mode == "timing"               ? timing()
               : mode == "playback"             ? playback()
               : mode == "limits"               ? limits()
               : mode == "lifetime"             ? lifetime()

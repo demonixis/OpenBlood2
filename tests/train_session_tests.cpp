@@ -309,7 +309,10 @@ namespace
         for (const auto& slot : trigger->slots)
             CHECK(slot.sent == 1);
         CHECK(g.client_shell.weapons.front().fire_keys > 0 && p->fade_messages == 1);
-        CHECK(p->unsupported_triggers == 1 && p->last_unsupported_player_trigger == "MUSIC LEVEL 3");
+        CHECK(p->unsupported_triggers == 0 && p->music_messages == 1 && g.client_shell.music.received == 1 &&
+              g.client_shell.music.logical_level == 3 && g.client_shell.music.failures == 0 &&
+              g.server.audio.music_loop.active() && g.server.audio.music_loop.level() == 3 &&
+              g.server.audio.music_error.empty());
         CHECK(p->m_damage.apply_damage_physics && p->m_damage.last_impulse_ok);
         // The 30 Hz driver takes enemy hits; the 60 Hz route can finish unhurt.
         if (hz == 30)

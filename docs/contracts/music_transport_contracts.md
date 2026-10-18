@@ -86,3 +86,5 @@ long headless continuation and catalogue destruction. NVIDIA checks exercise the
 ordinary mixer with the inspector hidden and after world reload, leaving active
 music for teardown. These checks do not establish the remaining original live
 switch/variation semantics or native Metal playback.
+
+The [live MUSIC continuation](music_message_contracts.md) now connects original player/client messages and bounded immediate/next-song replacement. Earlier missing-message statements above describe the preceding increment; original variation/activation fidelity and the M2 gate remain open.

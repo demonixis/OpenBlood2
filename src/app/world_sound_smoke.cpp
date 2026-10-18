@@ -6,21 +6,47 @@
 #include "engine/ima_selection.h"
 #include "engine/ima_variation.h"
 #include "game/original/SoundFX.h"
+#include <source_location>
+#include <spdlog/spdlog.h>
 namespace OpenBlood2
 {
     bool check_world_sound_smoke(GameSession& g)
     {
+        const auto fail = [&](std::source_location where = std::source_location::current())
+        {
+            spdlog::error("World sound smoke failed at {}:{}", where.file_name(), where.line());
+            spdlog::error("Music state: inworld={} active={} pending={} level={} switches={} logical={} accepted={} "
+                          "received={} failures={} client-error={} audio-error={} queued={}",
+                          g.client_shell.m_bInWorld, g.server.audio.music_loop.active(),
+                          g.server.audio.music_loop.pending(), unsigned(g.server.audio.music_loop.level()),
+                          g.server.audio.music_loop.switches(), unsigned(g.client_shell.music.logical_level),
+                          g.client_shell.music.accepted, g.client_shell.music.received, g.client_shell.music.failures,
+                          g.client_shell.music.error, g.server.audio.music_error,
+                          g.server.audio.instruments.queued_messages);
+            return false;
+        };
         // The world-owned music data exists independently of inspector visibility/reload.
         auto& music = g.music_catalog;
-        if (g.server.audio.music_loop.active() || g.server.audio.music_loop.template_events() ||
-            !g.server.audio.music_error.empty())
-            return false;
+        // World entry starts SilenceList; the authored startup trigger has already
+        // requested level 3 by this frame. Both requests must reach real playback.
+        if (!g.client_shell.m_bInWorld || !g.server_shell.Player(g.local_client) ||
+            !g.server.audio.music_loop.active() || g.server.audio.music_loop.pending() ||
+            g.server.audio.music_loop.level() != 3 || g.server.audio.music_loop.switches() != 2 ||
+            g.client_shell.music.logical_level != 3 || g.client_shell.music.accepted != 2 ||
+            g.client_shell.music.received != 1 || g.client_shell.music.failures || !g.server.audio.music_error.empty())
+            return fail();
         if (!music.audition_file.empty() || !music.audition.events.empty() || music.playlist_request ||
             !music.playlist_files.empty() || !music.playlist_audition.events.empty() || !music.error.empty() ||
             music.assets.empty() || music.personalities.size() != 1 || !music.personalities.front().metadata ||
             !music.personalities.front().error.empty() || !music.assets.front().bank ||
             !music.assets.front().bank_error.empty())
-            return false;
+            return fail();
+        // Explicitly suspend the live list for the existing diagnostic auditions.
+        const auto initial_clock = g.server.audio.instruments.sample_clock();
+        g.server.audio.music_loop.stop(g.server.audio.instruments);
+        if (g.server.audio.instruments.sample_clock() != initial_clock ||
+            !g.server.audio.instruments.pending_midi().empty())
+            return fail();
         std::size_t pattern_notes = 0, band_count = 0, section_count = 0, curves = 0, curve_points = 0,
                     curve_events = 0;
         for (const auto& asset : music.assets)
@@ -28,11 +54,11 @@ namespace OpenBlood2
             if (asset.kind != MusicAssetKind::Instruments)
             {
                 if (!asset.bands || !asset.bands_error.empty() || asset.bands->bands.size() != 1)
-                    return false;
+                    return fail();
                 std::array<ImaMidiSetup, 80> setup;
                 std::string error;
                 if (!ima_band_setup(asset.bands->bands.front(), setup, error) || setup[25].status != 0xb9)
-                    return false;
+                    return fail();
                 ++band_count;
             }
             if (asset.kind == MusicAssetKind::Section)
@@ -48,11 +74,11 @@ namespace OpenBlood2
                     !asset.timeline->discarded_chords.empty() || !asset.section || !asset.section_error.empty() ||
                     asset.section->commands.size() != 1 || asset.section->chords.size() != 1 ||
                     asset.section->mutes.empty())
-                    return false;
+                    return fail();
                 ImaSectionTiming timing;
                 std::string error;
                 if (!asset.section_style || !ima_section_timing(*asset.section, timing, error))
-                    return false;
+                    return fail();
                 for (auto tick : {0, int(asset.timeline->ticks_per_measure), asset.timeline->duration - 1})
                 {
                     ImaSectionSelection selected;
@@ -60,14 +86,14 @@ namespace OpenBlood2
                     if (!select_ima_section(*asset.section, *asset.timeline, tick, selected, error) ||
                         !select_ima_pattern(*asset.section_style, selected.request, pattern, error) ||
                         !pattern.pattern || selected.chord != 0 || !selected.mute)
-                        return false;
+                        return fail();
                     const auto channels = prepare_ima_pattern_channels(asset.section_style->patterns[*pattern.pattern]);
                     ImaVariationChoice variation;
                     std::array<std::uint16_t, 16> current{}, draws{};
                     if (!choose_ima_variations(channels, asset.harmony->chords[selected.chord].variation_flags, current,
                                                0xffff, 0, draws, variation, error) ||
                         variation.draws_used != 16)
-                        return false;
+                        return fail();
                 }
                 // Explicitly activate this retained chord for a diagnostic note conversion only.
                 // This runs with the UI hidden and in inspector-free builds, without choosing a live song chord.
@@ -79,11 +105,11 @@ namespace OpenBlood2
                 note.play_mode = 0x83;
                 ImaNotePitch pitch;
                 if (!resolve_ima_note_pitch(note, {}, context, pitch, error) || !pitch.converted)
-                    return false;
+                    return fail();
                 ImaCursorSeed seed;
                 seed.random_channels = 0xffff;
                 if (!music.cursor.start(asset.section, asset.section_style, asset.timeline, asset.harmony, seed, error))
-                    return false;
+                    return fail();
                 music.cursor_file = asset.filename;
                 for (unsigned step = 0; step < 8 && music.cursor.active(); ++step)
                 {
@@ -93,7 +119,7 @@ namespace OpenBlood2
                         !music.cursor.last_step() ||
                         music.cursor.last_notes()->rows.size() != music.cursor.last_step()->admitted ||
                         music.cursor.last_step()->interval <= 0 || music.cursor.state().steps != step + 1)
-                        return false;
+                        return fail();
                     const auto& notes = *music.cursor.last_notes();
                     if (!notes.curves_prepared || notes.opaque_curve_chunks ||
                         notes.dispatch.size() !=
@@ -101,7 +127,7 @@ namespace OpenBlood2
                         music.cursor.active_notes().size() + notes.note_offs.size() !=
                             active_before + notes.rows.size() - notes.suppressed ||
                         notes.shortened > active_before)
-                        return false;
+                        return fail();
                 }
                 music.cursor_file = asset.filename;
                 // Retained by the catalogue until actual world unload/reload, even with UI hidden.
@@ -111,7 +137,7 @@ namespace OpenBlood2
             {
                 if (!asset.style || !asset.style_error.empty() || !asset.curves || !asset.curves_error.empty() ||
                     asset.curves->chunks != asset.style->curve_chunks)
-                    return false;
+                    return fail();
                 curves += asset.curves->curves.size();
                 curve_points += asset.curves->points;
                 for (const auto& curve : asset.curves->curves)
@@ -119,7 +145,7 @@ namespace OpenBlood2
                     std::vector<ImaTimedMidiMessage> messages;
                     std::string error;
                     if (!prepare_ima_curve_events(curve, 10000, messages, error))
-                        return false;
+                        return fail();
                     curve_events += messages.size();
                 }
                 pattern_notes += asset.style->notes;
@@ -132,14 +158,14 @@ namespace OpenBlood2
                     // Explicit diagnostic decision, independent of UI and game RNG.
                     if (!choose_ima_variations(effective, 0, current, 0xffff, 0, draws, choice, error) ||
                         choice.draws_used != 16 || choice.fallback_channels != 0)
-                        return false;
+                        return fail();
                     for (const auto& grid : pattern.grids)
                         for (const auto& note : grid.notes)
                         {
                             // Explicit synthetic runtime harmony; not the authored song's resolved chord.
                             ImaNotePitch pitch;
                             if (!resolve_ima_note_pitch(note, pattern, {true, 0x91, 0xab5, 0, 0, 0}, pitch, error))
-                                return false;
+                                return fail();
                             const std::size_t count = pitch.pitch ? unsigned(note.time_range != 0) +
                                                                         unsigned(note.duration_range != 0) +
                                                                         unsigned(note.velocity_range != 0)
@@ -148,29 +174,34 @@ namespace OpenBlood2
                             if (!prepare_ima_note_events(note, {10000, pitch.pitch, 0, {}},
                                                          std::span(draws).first(count), events, error) ||
                                 events.emitted != (pitch.pitch != 0) || events.draws_used != count)
-                                return false;
+                                return fail();
                             if (events.emitted && (events.messages[1].time <= events.messages[0].time ||
                                                    events.messages[0].key < 1 || events.messages[0].key > 127 ||
                                                    events.messages[0].velocity != events.messages[1].velocity))
-                                return false;
+                                return fail();
                         }
                     for (std::size_t ch = 0; ch < 16; ++ch)
                         if (!effective.play_modes[ch] || choice.selected[ch] != 1 || choice.candidates[ch] != 0xffff)
-                            return false;
+                            return fail();
                 }
             }
         }
         if (pattern_notes != 3049 || band_count != 44 || !section_count || curves != 2 || curve_points != 2 ||
             curve_events != 206)
-            return false;
+            return fail();
         const auto& bank = *music.assets.front().bank;
         if (bank.instruments.size() != 14 || bank.waves.size() != 35 || bank.decoded_bytes != 913403 * sizeof(float) ||
             !bank.waves[8].settings || bank.waves[8].settings->loop_in_bounds)
-            return false;
+            return fail();
         // An explicit diagnostic note, not a MUSIC/playlist success. It shares the real SDL stream.
         auto& sampler = g.server.audio.instruments;
-        if (sampler.queued_messages || !sampler.pending_midi().empty() || sampler.dispatch_failures)
-            return false; // The preceding world's future note must have been discarded on reload.
+        if (sampler.queued_messages != 4358 || sampler.sample_clock() >= DlsSampler::rate || !sampler.started ||
+            !sampler.pending_midi().empty() || sampler.dispatch_failures)
+            return fail(); // Exactly fresh SilenceList + authored Harddriving admission; no old-world note.
+        const auto startup_midi = sampler.midi_received, startup_queued = sampler.queued_messages,
+                   startup_dispatched = sampler.dispatched_messages, startup_controls = sampler.controls_updated,
+                   startup_choked = sampler.midi_choked, startup_released = sampler.midi_released,
+                   startup_unmatched = sampler.midi_unmatched_stops, startup_coalesced = sampler.coalesced_messages;
         std::string note_error;
         // This authored region used to refuse its paired legacy/standard pan records.
         const auto& region = bank.instruments[6].regions[4];
@@ -178,7 +209,7 @@ namespace OpenBlood2
             sampler.play(music.assets.front().bank, 6, (region.key_low + region.key_high) / 2, 100, 1, .2, note_error);
         if (!note || !note_error.empty() || !sampler.voices().back().legacy_pan || sampler.voices().back().pan != 6 ||
             sampler.voices().back().pan_destination != 4)
-            return false;
+            return fail();
         const MusicAssetRecord* routed = nullptr;
         for (const auto& asset : music.assets)
             if (asset.kind == MusicAssetKind::Section && asset.band_bank)
@@ -187,21 +218,21 @@ namespace OpenBlood2
                 break;
             }
         if (!routed || routed->band_bank != music.assets.front().bank || !routed->band_bank_error.empty())
-            return false;
+            return fail();
         const auto& channel = routed->band_channels[0];
         std::optional<std::size_t> instrument;
         if (!find_dls_instrument(*routed->band_bank, channel, 128, instrument, note_error))
-            return false;
+            return fail();
         const auto& routed_region = routed->band_bank->instruments[*instrument].regions.front();
         const auto routed_note = sampler.play_channel(
             routed->band_bank, channel, (routed_region.key_low + routed_region.key_high) / 2, 100, 1, .2, note_error);
         if (!routed_note || sampler.voices().back().controllers != channel.controllers ||
             !sampler.voices().back().channel)
-            return false;
+            return fail();
         const auto before_note = g.server.audio.submitted_frames;
         if (!g.server.advance_audio(.02, {}, {}) || sampler.voices().size() != 2 || sampler.voices()[0].frames != 960 ||
             sampler.voices()[1].frames != 960 || g.server.audio.submitted_frames <= before_note)
-            return false;
+            return fail();
         auto controls = channel.controllers;
         if (!apply_dls_controller(controls, 0xb4, 7, 0, note_error) ||
             !apply_dls_controller(controls, 0xb4, 10, 127, note_error) ||
@@ -210,15 +241,16 @@ namespace OpenBlood2
             sampler.voices().size() != 2 || sampler.voices()[1].frames != 1440 || sampler.voices()[1].gain != 0 ||
             sampler.voices()[1].controllers != controls ||
             sampler.voices()[1].channel->controllers != channel.controllers ||
-            !sampler.set_controllers(routed_note, channel.controllers, note_error) || sampler.controls_updated != 2 ||
-            sampler.controls_rejected || !sampler.release(note) || !sampler.release(routed_note))
-            return false;
+            !sampler.set_controllers(routed_note, channel.controllers, note_error) ||
+            sampler.controls_updated - startup_controls != 2 || sampler.controls_rejected || !sampler.release(note) ||
+            !sampler.release(routed_note))
+            return fail();
         if (!g.server.advance_audio(4, {}, {}) || !sampler.voices().empty() || sampler.completed == 0)
-            return false;
+            return fail();
         // Immediate MIDI diagnostic: actual selected band setup, held notes, channel controls and note-off.
         for (const auto& m : routed->band_setup)
             if (!sampler.receive({}, m.status, m.data1, m.data2, .2, note_error))
-                return false;
+                return fail();
         const auto midi_key = std::uint8_t((routed_region.key_low + routed_region.key_high) / 2);
         // This actual Cabal region explicitly allows same-key overlap; verify its authored rule.
         if (routed_region.options != 1 || !sampler.receive(routed->band_bank, 0x94, midi_key, 100, .2, note_error) ||
@@ -226,29 +258,30 @@ namespace OpenBlood2
             sampler.voices()[0].midi_channel != 4 || !sampler.receive({}, 0xb4, 7, 0, .2, note_error) ||
             sampler.voices()[0].gain != 0 ||
             !sampler.receive({}, 0xb4, 7, std::uint8_t(channel.controllers.volume), .2, note_error))
-            return false;
+            return fail();
         const auto older_note = sampler.voices()[0].id;
-        if (!sampler.receive(routed->band_bank, 0x94, midi_key, 100, .2, note_error) || sampler.midi_choked != 0 ||
-            !g.server.advance_audio(.02, {}, {}) || sampler.voices().size() != 2 ||
-            !sampler.receive({}, 0x84, midi_key, 100, .2, note_error) || !g.server.advance_audio(.001, {}, {}) ||
-            sampler.voices().size() != 1 || sampler.voices()[0].id != older_note ||
-            !sampler.receive({}, 0x84, midi_key, 100, .2, note_error) || !g.server.advance_audio(4, {}, {}) ||
-            !sampler.voices().empty() || sampler.midi_rejected || sampler.midi_received != 86 ||
-            sampler.midi_released != 2 || sampler.midi_unmatched_stops)
-            return false;
+        if (!sampler.receive(routed->band_bank, 0x94, midi_key, 100, .2, note_error) ||
+            sampler.midi_choked != startup_choked || !g.server.advance_audio(.02, {}, {}) ||
+            sampler.voices().size() != 2 || !sampler.receive({}, 0x84, midi_key, 100, .2, note_error) ||
+            !g.server.advance_audio(.001, {}, {}) || sampler.voices().size() != 1 ||
+            sampler.voices()[0].id != older_note || !sampler.receive({}, 0x84, midi_key, 100, .2, note_error) ||
+            !g.server.advance_audio(4, {}, {}) || !sampler.voices().empty() || sampler.midi_rejected ||
+            sampler.midi_received - startup_midi != 86 || sampler.midi_released - startup_released != 2 ||
+            sampler.midi_unmatched_stops != startup_unmatched)
+            return fail();
         // Original tempo conversion reaches actual audio output, also hidden and after reload.
         // Source band/tempo are real; this short phrase is synthetic, not a MUSIC playlist.
         const auto origin = sampler.sample_clock();
         if (!routed->section)
-            return false;
+            return fail();
         const ImaTempo tempo{0, routed->section->tempo, routed->section->tempo_fraction};
         ImaClock clock;
         std::array<std::uint64_t, 4> boundaries;
         if (!clock.prepare(std::span(&tempo, 1), origin, note_error))
-            return false;
+            return fail();
         for (unsigned i = 0; i < 4; ++i)
             if (!clock.sample(2 * (i + 1), boundaries[i], note_error))
-                return false;
+                return fail();
         std::vector<ImaTimedMidiMessage> scheduled;
         for (const auto& m : routed->band_setup)
             scheduled.push_back({0, m.status, m.data1, m.data2});
@@ -263,68 +296,68 @@ namespace OpenBlood2
             sampler.voices().size() != 1 || sampler.voices()[0].frames != 1 || !advance_to(boundaries[1]) ||
             sampler.voices()[0].gain != 0 || !advance_to(boundaries[2]) || sampler.voices()[0].gain <= 0 ||
             !advance_to(boundaries[3] + 48) || !sampler.voices().empty() || !sampler.pending_midi().empty() ||
-            sampler.sample_clock() != boundaries[3] + 48 || sampler.queued_messages != 84 ||
-            sampler.dispatched_messages != 52 || sampler.dispatch_failures || sampler.queue_rejected ||
-            sampler.coalesced_messages)
-            return false;
+            sampler.sample_clock() != boundaries[3] + 48 || sampler.queued_messages - startup_queued != 84 ||
+            sampler.dispatched_messages - startup_dispatched != 52 || sampler.dispatch_failures ||
+            sampler.queue_rejected || sampler.coalesced_messages != startup_coalesced)
+            return fail();
         // Whole authored section, through the ordinary mixer clock; no inspector-driven stepping.
         const auto started_before = sampler.started;
         if (!music.play_section("a2.sec", sampler) || music.audition.notes == 0)
-            return false;
+            return fail();
         while (sampler.sample_clock() <= music.audition_end + DlsSampler::rate * 4)
             if (!g.server.advance_audio(.02, {}, {}))
-                return false;
+                return fail();
         for (const auto& v : sampler.voices())
             if (v.gate == UINT64_MAX || v.amplitude.release > 20)
-                return false;
+                return fail();
         if (!g.server.advance_audio(21, {}, {}) || !sampler.pending_midi().empty() || !sampler.voices().empty() ||
             sampler.dispatch_failures || sampler.started <= started_before)
-            return false;
+            return fail();
         // Cancellation drops future notes without rewinding the shared audio clock.
         if (!music.play_section("a2.sec", sampler) || !g.server.advance_audio(.02, {}, {}))
-            return false;
+            return fail();
         const auto cancel_frame = sampler.sample_clock();
         sampler.silence();
         music.audition_stopped = true;
         if (!sampler.pending_midi().empty() || !sampler.voices().empty() || sampler.sample_clock() != cancel_frame)
-            return false;
+            return fail();
         // Original level request -> authored transition and ordered playlist, one finite pass.
         // Runtime selection/repeats are deliberately not claimed by this audition.
         const auto playlist_started = sampler.started;
         if (!music.play_level_once(0, 3, sampler) || !music.playlist_request ||
             music.playlist_files.front() != "sth.sec" || music.playlist_files.size() < 2)
-            return false;
+            return fail();
         std::uint64_t playlist_notes = 0;
         for (const auto& part : music.playlist_audition.parts)
             playlist_notes += part.notes;
         while (sampler.sample_clock() <= music.audition_end + DlsSampler::rate * 4)
             if (!g.server.advance_audio(.02, {}, {}))
-                return false;
+                return fail();
         for (const auto& voice : sampler.voices())
             if (voice.gate == UINT64_MAX || voice.amplitude.release > 20)
-                return false;
+                return fail();
         if (!g.server.advance_audio(21, {}, {}) || !sampler.pending_midi().empty() || !sampler.voices().empty() ||
             sampler.dispatch_failures || sampler.started - playlist_started != playlist_notes)
-            return false;
+            return fail();
         // Transition once, then three playlist passes on the normal audio clock.
         // Repeats retain prepared variations; live MUSIC switching is not claimed.
         if (!music.play_level_loop(0, 3, g.server.audio))
-            return false;
+            return fail();
         auto& loop = g.server.audio.music_loop;
         std::uint64_t loop_end;
         if (!loop.sample(loop.first_end_tick() + 2 * loop.loop_ticks(), loop_end, note_error))
-            return false;
+            return fail();
         while (sampler.sample_clock() < loop_end)
             if (!g.server.advance_audio(
                     double(std::min<std::uint64_t>(960, loop_end - sampler.sample_clock())) / DlsSampler::rate, {}, {}))
-                return false;
+                return fail();
         if (!loop.active() || loop.passes_submitted() < 3 || sampler.dispatch_failures ||
             !g.server.audio.music_error.empty())
-            return false;
+            return fail();
         const auto stop_frame = sampler.sample_clock();
         loop.stop(sampler);
         if (!sampler.voices().empty() || !sampler.pending_midi().empty() || sampler.sample_clock() != stop_frame)
-            return false;
+            return fail();
         unsigned count = 0;
         for (const auto& e : g.entries)
             if (e.state == EntryState::WorldSound)
@@ -333,12 +366,12 @@ namespace OpenBlood2
                 if (!v || !v->world_owned || !v->request.loop || v->done || v->cursor <= 0 ||
                     v->clip->frames() != 198623 || v->clip->rate != 22050 || g.objects.get(v->owner) ||
                     v->request.space != SoundSpace::Ambient)
-                    return false;
+                    return fail();
                 ++count;
             }
         if (count != 4 || !g.server.audio.has_output() || !g.server.audio.submitted_frames ||
             !g.server.audio.output_error.empty())
-            return false;
+            return fail();
         // Labelled SoundFX probe with an actual decoded SubwayA asset; runs while UI is hidden and after reload.
         std::string resource;
         for (const auto& entry : g.entries)
@@ -354,7 +387,7 @@ namespace OpenBlood2
                                    {"FileStream", true}});
         auto* sound = dynamic_cast<SoundFX*>(g.server.HandleToObject(h));
         if (!sound)
-            return false;
+            return fail();
         auto command = [&](const char* text)
         {
             auto str = g.server.CreateString(text);
@@ -365,7 +398,7 @@ namespace OpenBlood2
             return ok;
         };
         if (!command("ON") || !sound->sound || sound->state != SoundFX::On)
-            return false;
+            return fail();
         const auto voice = sound->sound;
         const auto submitted = g.server.audio.submitted_frames;
         if (!g.server.advance_audio(.02, {}, {}) || g.server.audio.submitted_frames <= submitted ||
@@ -373,11 +406,36 @@ namespace OpenBlood2
             !g.server.audio.get(voice)->request.loop || !g.server.audio.get(voice)->clip->stream ||
             !g.server.audio.get(voice)->clip->stream->refills || !g.server.audio.get(voice)->clip->samples.empty() ||
             !command("OFF") || sound->state != SoundFX::Off || g.server.audio.get(voice) || !g.objects.remove(h))
-            return false;
+            return fail();
         g.objects.finish_frame();
-        // Leave both a running repeat and a future note for world-unload ownership checks.
-        if (!music.play_level_loop(0, 3, g.server.audio))
-            return false;
+        // Exercise actual player trigger -> owned client message -> live transport,
+        // independently of drawing, both hidden and after reload.
+        if (!g.client_shell.m_bInWorld || !g.server_shell.Player(g.local_client))
+            return fail();
+        auto music_command = [&](const char* text)
+        {
+            auto str = g.server.CreateString(text);
+            auto msg = g.server.StartMessageToObject(nullptr, g.client_shell.player, 1000);
+            const bool ok =
+                msg && g.server.WriteToMessageHString(msg, str) == DE_OK && g.server.EndMessage(msg) == DE_OK;
+            g.server.FreeString(str);
+            return ok && g.pump_player_messages(note_error);
+        };
+        if (!music_command("MUSIC LEVEL 0") || !music_command("MUSIC LEVEL 3") || loop.level() != 3 || loop.pending() ||
+            !g.server.advance_audio(.1, {}, {}) || !music_command("MUSIC LEVEL 1") || !loop.pending())
+            return fail();
+        const auto boundary = loop.switch_frame();
+        while (sampler.sample_clock() < boundary)
+            if (!g.server.advance_audio(double(std::min<std::uint64_t>(960, boundary - sampler.sample_clock())) / 48000,
+                                        {}, {}))
+                return fail();
+        if (loop.level() != 1 || loop.pending() || !g.client_shell.music.error.empty() ||
+            !music_command("MUSIC LEVEL 3") || !loop.pending() || g.client_shell.music.received != 5)
+            return fail();
+        spdlog::info("Live MUSIC: received={}, logical={}, playing={}, pending={}, boundary={}, switches={}",
+                     g.client_shell.music.received, unsigned(g.client_shell.music.logical_level),
+                     unsigned(loop.level()), loop.pending(), loop.switch_frame(), loop.switches());
+        // Leave a live stream, pending replacement and future note for unload checks.
         const auto pending = sampler.pending_midi().size();
         const DlsTimedMidi future[] = {{sampler.sample_clock() + DlsSampler::rate * 60, 0x94, midi_key, 100}};
         return !g.objects.get(h) && g.server.audio.output_error.empty() &&
