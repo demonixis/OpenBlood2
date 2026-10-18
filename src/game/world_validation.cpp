@@ -48,11 +48,23 @@ namespace OpenBlood2
         WorldMesh mesh;
         if (!mesh.build(game.world, error, &game.resources))
             return false;
+        // Container BSP faces are never drawn (volumes, conveyors, liquids): their textures
+        // cannot block presentation. Any other model may be drawn now or later (debris).
+        std::vector<bool> container_only(game.world.models.size(), false), world_bound(game.world.models.size(), false);
+        for (auto id : game.objects.snapshot())
+            if (const auto* r = game.objects.get(id); r && r->world_model_index < game.world.models.size())
+                (r->container() ? container_only : world_bound)[r->world_model_index] = true;
+        std::set<std::string> drawn;
+        for (std::size_t i = 0; i < game.world.models.size(); ++i)
+            if (i == 0 || !container_only[i] || world_bound[i])
+                for (const auto& path : game.world.models[i].textures)
+                    if (std::string key; resource_path(path, key))
+                        drawn.insert(key);
         std::set<std::string> checked;
         std::size_t bytes = mesh.texture_bytes;
         for (const auto& material : mesh.materials)
         {
-            if (!material.error.empty())
+            if (!material.error.empty() && drawn.contains(material.path))
             {
                 error = "World texture " + material.path + ": " + material.error;
                 return false;

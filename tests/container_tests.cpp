@@ -2,6 +2,7 @@
 #include "engine/container.h"
 #include "game/original/VolumeBrush.h"
 #include "game/original/trigger_helpers.h"
+#include "game/world_validation.h"
 #include "player_fixture.h"
 #include <algorithm>
 #include <cmath>
@@ -183,6 +184,27 @@ namespace
         CHECK(coded && game.server.GetPointContainerCode({350, 50, 350}, code) && code == CC_WATER);
         CHECK(!volume(game, "Container", "bad", {500, 0, 500}, {600, 100, 600}, {{"ContainerCode", std::int32_t(-1)}}));
         CHECK(game.objects.diagnostics().back().find("D_WORD") != std::string::npos);
+        // Container BSP faces are never drawn: a missing texture there cannot block
+        // presentation (05_CDM conveyors use "default"); the same texture on any other
+        // model still does.
+        auto missing = [](WorldModel& model)
+        {
+            model.textures = {"absent_texture.dtx"};
+            for (auto& surface : model.surfaces)
+                surface.texture = 0;
+        };
+        for (auto& model : game.world.models)
+            if (model.name == "coded") // Model 0 is always the drawn main world.
+                missing(model);
+        WorldValidation report;
+        std::string error;
+        // World textures are checked first; the fixture's fake player skin fails later.
+        check_world_presentation(game, report, error);
+        CHECK(error.find("absent_texture") == std::string::npos);
+        auto drawn = test_brush::box("unbound", {700, 0, 700}, {800, 100, 800});
+        missing(drawn);
+        game.world.models.push_back(drawn);
+        CHECK(!check_world_presentation(game, report, error) && error.find("absent_texture") != std::string::npos);
         return true;
     }
     bool lifetime(const std::filesystem::path& root)

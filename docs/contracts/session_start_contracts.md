@@ -70,3 +70,12 @@ A successful check does not certify later combat, the complete campaign, native
 Metal execution, autosave or all M2 acceptance evidence.
 
 See [implementation and validation](../../../Documentation/Implementation/m2_session_start.md).
+
+## Container textures
+
+Startup presentation preflight checks the textures of every model that can be
+drawn: the main world, models bound to world-model objects and unbound models
+(runtime debris may draw them later). Models bound only to containers (Container,
+VolumeBrush: conveyors, liquids, ladders…) are never drawn, so a missing texture
+there no longer blocks startup. Retail 05_CDM's conveyors use the editor texture
+`default`, which no archive provides.
