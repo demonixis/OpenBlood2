@@ -21,6 +21,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Original music asset inspection](music_asset_contracts.md)
 
 - [Collision traversal and post-transition work](collision_traversal_contracts.md)
+- [Allowed contact overlap in MoveObject](contact_overlap_contracts.md)
 - [Compound DAT shell validation](compound_shell_contracts.md)
 - [Transient object-message lifetime](message_lifetime_contracts.md)
 - [M2 Model and Collision Services](model_and_collision_contracts.md)

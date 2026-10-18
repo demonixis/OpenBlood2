@@ -124,8 +124,8 @@ namespace OpenBlood2
         DVector color{}; // Original model additive-light RGB; shading is not implemented yet.
         float alpha = 1;
         DVector dimensions{};
-        std::uint64_t stair_attempts = 0, stair_steps = 0;
-        float last_step_height = 0;
+        std::uint64_t stair_attempts = 0, stair_steps = 0, overlap_contacts = 0;
+        float last_step_height = 0, last_overlap_depth = 0;
         DVector velocity{}, acceleration{}, contact_normal{};
         std::uint32_t contact_polygon = UINT32_MAX;
         HOBJECT contact_object = nullptr;

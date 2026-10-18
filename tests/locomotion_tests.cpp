@@ -5,6 +5,7 @@
 #include <cmath>
 #include <functional>
 #include <limits>
+#include <random>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
     do                                                                                                                 \
@@ -416,9 +417,81 @@ namespace
         }
         return true;
     }
+    // Seeded random roaming in CityHub at ~100 Hz: walk/run/strafe/jump/crouch,
+    // turning and firing. Float-rounded crease/wedge contacts must not stop play.
+    bool roam_cityhub(const std::filesystem::path& root, unsigned seed, DBYTE character, double seconds)
+    {
+        GameSession game;
+        CHECK(game.initialize());
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(game.resources.mount_game(config, error));
+        CHECK(select_character(character, game.client_shell.entry_profile));
+        CHECK(game.request_world("02_CityHub", error) && game.enter_player(error));
+        auto& c = game.client_shell;
+        std::mt19937 random(seed);
+        std::uniform_real_distribution<float> unit(0, 1);
+        double time = 0, next = 0;
+        float yaw_speed = 0;
+        DVector last{};
+        while (time < seconds)
+        {
+            if (time >= next)
+            {
+                next = time + 0.1 + unit(random) * 0.8;
+                auto& m = c.movement_input;
+                m = {};
+                m.forward = unit(random) < .6f;
+                m.backward = !m.forward && unit(random) < .3f;
+                m.left = unit(random) < .2f;
+                m.right = !m.left && unit(random) < .2f;
+                m.run = unit(random) < .6f;
+                m.jump = unit(random) < .25f;
+                m.crouch = unit(random) < .1f;
+                c.weapon_input = {};
+                c.weapon_input.primary = unit(random) < .15f;
+                yaw_speed = (unit(random) - .5f) * 6;
+            }
+            c.rotation.yaw += yaw_speed * 0.01f;
+            const double delta = 0.0095 + unit(random) * 0.001;
+            if (auto* r = game.objects.get(c.player))
+                last = r->state.m_Pos;
+            if (!game.step(delta))
+            {
+                std::cerr << "seed " << seed << " character " << int(character) << " failed at t=" << time
+                          << " last=" << last.x << ',' << last.y << ',' << last.z << '\n';
+                for (auto& d : game.objects.diagnostics())
+                    std::cerr << "  " << d << '\n';
+                for (auto& t : game.trace)
+                    std::cerr << "  " << t << '\n';
+                return false;
+            }
+            time += delta;
+            CHECK(game.local_client);
+        }
+        if (auto* r = game.objects.get(c.player))
+            std::cout << "seed " << seed << " character " << int(character) << " at " << r->state.m_Pos.x << ','
+                      << r->state.m_Pos.y << ',' << r->state.m_Pos.z << ", overlap contacts " << r->overlap_contacts
+                      << ", last depth " << r->last_overlap_depth << '\n';
+        return true;
+    }
+    bool cityhub_roam(const std::filesystem::path& root)
+    {
+        // Each pair stopped with a start penetration before the overlap tolerance.
+        for (const auto& [seed, character] : {std::pair{1u, 0}, {4u, 0}, {1u, 1}, {3u, 3}})
+            CHECK(roam_cityhub(root, seed, DBYTE(character), 30));
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
+    // Reproduction hook: locomotion_tests roam DATA SEED CHARACTER SECONDS.
+    if (argc == 6 && std::string_view(argv[1]) == "roam")
+        return roam_cityhub(path_from_utf8(argv[2]), unsigned(std::stoul(argv[3])), DBYTE(std::stoul(argv[4])),
+                            std::stod(argv[5]))
+                   ? 0
+                   : 1;
     if (argc != 3)
         return 2;
     const std::string_view name = argv[1];
@@ -432,6 +505,7 @@ int main(int argc, char** argv)
                     : name == "contacts"     ? contacts(root)
                     : name == "private"      ? private_world(root)
                     : name == "chosen"       ? private_chosen(root)
+                    : name == "cityhub_roam" ? cityhub_roam(root)
                                              : false;
     return ok ? 0 : 1;
 }

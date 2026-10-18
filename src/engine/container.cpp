@@ -276,9 +276,10 @@ namespace OpenBlood2
         }
         return std::abs(angle) > 2 * std::numbers::pi;
     }
-    CollisionQuery ContainerShape::sweep(DVector from, DVector to, DVector half, CollisionHit& hit) const
+    CollisionQuery ContainerShape::sweep(DVector from, DVector to, DVector half, CollisionHit& hit,
+                                         double allowed_penetration) const
     {
-        auto result = boundary_.sweep(from, to, half, hit);
+        auto result = boundary_.sweep(from, to, half, hit, allowed_penetration);
         if (result != CollisionQuery::Invalid && contains(from))
         {
             hit = {};

@@ -12,6 +12,9 @@ namespace OpenBlood2
         std::uint32_t polygon = UINT32_MAX;
         HOBJECT object = nullptr;
         bool start_solid = false;
+        // A start overlap within the caller's allowed penetration, reported as a
+        // fraction-zero contact because the motion would go deeper.
+        bool allowed_overlap = false;
         double penetration = 0;
         std::uint16_t texture_flags = 0;
     };
@@ -40,7 +43,10 @@ namespace OpenBlood2
             nodes_.clear();
             work_ = {};
         }
-        CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit& hit) const;
+        // allowed_penetration > 0 tolerates a start overlap up to that depth:
+        // motion leaving or parallel to it is free, deeper motion stops at zero.
+        CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit& hit,
+                             double allowed_penetration = 0) const;
         BodyPlacement place_body(DVector anchor, DVector anchor_half, DVector requested, DVector half) const;
         std::size_t triangles() const
         {
@@ -75,14 +81,15 @@ namespace OpenBlood2
         mutable CollisionWork work_;
         std::uint32_t partition(std::uint32_t begin, std::uint32_t end);
         void query(std::uint32_t node, DVector from, DVector to, DVector half, CollisionHit& hit, bool& found,
-                   const PlacementAnchor* anchor = nullptr, const Triangle** selected = nullptr) const;
+                   const PlacementAnchor* anchor = nullptr, const Triangle** selected = nullptr,
+                   double allowed_penetration = 0) const;
     };
     DVector rotate_vector(DVector, DRotation);
     DRotation multiply_rotation(DRotation, DRotation);
     DRotation inverse_rotation(DRotation);
     bool physics_vector(DVector v);
     CollisionQuery sweep_box(DVector from, DVector to, DVector half, DVector center, DVector other_half,
-                             CollisionHit& hit);
+                             CollisionHit& hit, double allowed_penetration = 0);
     DVector vector_add(DVector a, DVector b);
     DVector vector_subtract(DVector a, DVector b);
     DVector vector_scale(DVector a, float scale);

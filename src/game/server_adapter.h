@@ -362,7 +362,7 @@ namespace OpenBlood2
         void initialize_model_services();
         void initialize_physics_services();
         CollisionQuery sweep_scene(HOBJECT, DVector, DVector, DVector, CollisionHit&, const std::vector<ObjectId>&,
-                                   HOBJECT ignore_extra = nullptr);
+                                   HOBJECT ignore_extra = nullptr, double allowed_penetration = 0);
         bool affect_containers(HOBJECT, ContainerPhysics&);
         struct BodyPath
         {

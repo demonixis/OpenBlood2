@@ -1795,6 +1795,8 @@ namespace OpenBlood2
         ImGui::Text("Stairs %llu / %llu | rise %.1f | limit %.1f", static_cast<unsigned long long>(body.stair_steps),
                     static_cast<unsigned long long>(body.stair_attempts), body.last_step_height,
                     body.dimensions.y * 0.5f);
+        ImGui::Text("Allowed-overlap contacts %llu | last depth %.6f",
+                    static_cast<unsigned long long>(body.overlap_contacts), body.last_overlap_depth);
         const auto* record = game.objects.get(player->m_hObject);
         ImGui::TextWrapped("Requested clip: %s", player->locomotion_requested_clip.c_str());
         ImGui::TextWrapped("Clip: %s | fallback %s", player->locomotion_clip.c_str(),

@@ -331,6 +331,96 @@ namespace
         CHECK(!game.server.collision_ready);
         return true;
     }
+    // Float-rounded contacts can leave a body a few ulps inside an adjacent
+    // face. MoveObject tolerates such overlaps without ever moving deeper;
+    // default sweeps and deeper overlaps keep their start-solid semantics.
+    bool contact_overlap()
+    {
+        CollisionWorld world;
+        std::string error;
+        CHECK(world.build(floor_model(), error));
+        CollisionHit hit;
+        const DVector half{1, 2, 1}, inside{0, 2 - 1e-4f, 0};
+        CHECK(world.sweep(inside, {20, inside.y, 0}, half, hit) == CollisionQuery::Hit && hit.start_solid);
+        CHECK(world.sweep(inside, {20, inside.y, 0}, half, hit, .01) == CollisionQuery::Miss);
+        CHECK(world.sweep(inside, {0, 5, 0}, half, hit, .01) == CollisionQuery::Miss);
+        CHECK(world.sweep(inside, inside, half, hit, .01) == CollisionQuery::Miss);
+        CHECK(world.sweep(inside, {5, 0, 0}, half, hit, .01) == CollisionQuery::Hit);
+        CHECK(hit.allowed_overlap && !hit.start_solid && hit.fraction == 0 && hit.normal.y == 1);
+        CHECK(std::abs(hit.penetration - 1e-4) < 1e-5 && hit.polygon == 0);
+        CHECK(world.sweep({0, 1.95f, 0}, {20, 1.95f, 0}, half, hit, .01) == CollisionQuery::Hit && hit.start_solid);
+        CHECK(sweep_box({1.9999f, 0, 0}, {5, 0, 0}, half, {}, half, hit, .01) == CollisionQuery::Miss);
+        CHECK(sweep_box({1.9999f, 0, 0}, {-5, 0, 0}, half, {}, half, hit, .01) == CollisionQuery::Hit);
+        CHECK(hit.allowed_overlap && hit.fraction == 0 && hit.normal.x == 1);
+        CHECK(sweep_box({1.9999f, 0, 0}, {-5, 0, 0}, half, {}, half, hit) == CollisionQuery::Hit && hit.start_solid);
+
+        GameSession game;
+        CHECK(setup(game));
+        // CityHub-like converging corner: wall A faces -Z and wall B faces
+        // (-1, 0, 2)/sqrt(5); the box fits exactly at x=1108, z=2484.
+        WorldModel w;
+        w.surfaces.resize(1);
+        w.surfaces[0].flags = 1;
+        w.points = {{900, 0, 2300},  {1400, 0, 2300}, {1400, 0, 2600},   {900, 0, 2600},
+                    {1000, 0, 2496}, {1300, 0, 2496}, {1300, 200, 2496}, {1000, 200, 2496},
+                    {1000, 0, 2412}, {1168, 0, 2496}, {1168, 200, 2496}, {1000, 200, 2412}};
+        w.polygons = {{0, {0, 1, 2, 3}}, {0, {4, 5, 6, 7}}, {0, {8, 9, 10, 11}}};
+        CHECK(game.collision.build(w, error));
+        game.server.collision_ready = true;
+        auto h = probe(game);
+        auto* r = game.objects.get(h);
+        r->dimensions = {12, 42, 12};
+        r->state.m_Pos = {1050, 42.001f, 2470};
+        r->state.m_Flags = FLAG_SOLID;
+        std::mt19937 random(7);
+        std::uniform_real_distribution<float> unit(-1, 1);
+        for (int i = 0; i < 2000; ++i)
+        {
+            auto destination = vector_add(r->state.m_Pos, {2.8f + unit(random), -.07f, unit(random) * 2});
+            CHECK(game.server.MoveObject(h, &destination) == DE_OK);
+            // Never deeper than the tolerance.
+            CHECK(game.collision.sweep(r->state.m_Pos, r->state.m_Pos, r->dimensions, hit) == CollisionQuery::Miss ||
+                  hit.penetration <= .01);
+        }
+        CHECK(r->state.m_Pos.x > 1100 && r->state.m_Pos.x < 1108.01f);
+        // A body slightly inside the floor slides freely and is lifted by a
+        // downward move; the contact is inspectable.
+        game.collision.clear();
+        CHECK(game.collision.build(floor_model(), error));
+        r->dimensions = half;
+        r->state.m_Pos = inside;
+        const auto contacts = r->overlap_contacts;
+        auto destination = DVector{10, inside.y, 0};
+        CHECK(game.server.MoveObject(h, &destination) == DE_OK);
+        CHECK(r->state.m_Pos.x == 10 && r->state.m_Pos.y == inside.y && r->overlap_contacts == contacts);
+        // The whole tolerated overlap is lifted, not only the usual 0.001.
+        r->state.m_Pos.y = 2 - .005f;
+        destination = {12, 1, 0};
+        CHECK(game.server.MoveObject(h, &destination) == DE_OK);
+        CHECK(r->state.m_Pos.y > 2 && r->state.m_Pos.y < 2.002f && r->overlap_contacts == contacts + 1);
+        CHECK(std::abs(r->last_overlap_depth - .005f) < 1e-5f && r->contact_normal.y == 1);
+        // Real penetration still fails visibly and names its contact.
+        r->state.m_Pos = {0, 1.5f, 0};
+        destination = {5, 1.5f, 0};
+        CHECK(game.server.MoveObject(h, &destination) == DE_ERROR);
+        CHECK(!game.objects.diagnostics().empty() &&
+              game.objects.diagnostics().back().find("world polygon 0, depth 0.5") != std::string::npos);
+        // A tolerated overlap (floor, polygon 0) loses the equal-time tie and
+        // cannot mask a deep wall overlap (polygon 1).
+        auto walled = floor_model();
+        walled.points.insert(walled.points.end(), {{.5f, 0, -100}, {.5f, 100, -100}, {.5f, 100, 100}, {.5f, 0, 100}});
+        walled.polygons.push_back({0, {4, 5, 6, 7}});
+        game.collision.clear();
+        CHECK(game.collision.build(walled, error));
+        CHECK(game.collision.sweep(inside, {0, 1, 0}, half, hit, .01) == CollisionQuery::Hit);
+        CHECK(hit.start_solid && hit.polygon == 1);
+        r->state.m_Pos = inside;
+        destination = {0, 1, 0};
+        CHECK(game.server.MoveObject(h, &destination) == DE_ERROR);
+        CHECK(game.objects.diagnostics().back().find("world polygon 1, depth 0.5") != std::string::npos);
+        game.unload_world();
+        return true;
+    }
     WorldModel placement_corner(bool cage = false)
     {
         auto w = floor_model();
@@ -603,6 +693,8 @@ int main(int argc, char** argv)
         ok = collision_traversal();
     else if (name == "movement_contacts")
         ok = movement_contacts();
+    else if (name == "contact_overlap")
+        ok = contact_overlap();
     else if (name == "placement_queries")
         ok = placement_queries();
     else if (name == "placement_service")

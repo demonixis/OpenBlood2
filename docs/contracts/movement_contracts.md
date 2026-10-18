@@ -102,7 +102,9 @@ and dispatches actual touch callbacks. The manager rereads the resolved body
 after each move. Callback removal is deferred; a removed player detaches the
 client before any later movement or weapon use. Reentrant session/unload calls
 inside contacts are rejected. Invalid geometry/penetration remains an explicit
-failure; there is no noclip or depenetration fallback.
+failure; there is no noclip or depenetration fallback. Overlaps of at most 0.01
+units left by float-rounded crease/wedge contacts are tolerated without moving
+deeper; see [contact overlap contracts](contact_overlap_contracts.md).
 
 ## Inspection and device boundary
 

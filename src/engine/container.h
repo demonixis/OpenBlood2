@@ -12,7 +12,8 @@ namespace OpenBlood2
         bool transform(DRotation, DVector destination);
         bool contains(DVector point) const;
         bool overlaps(DVector center, DVector half) const;
-        CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit&) const;
+        CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit&,
+                             double allowed_penetration = 0) const;
         DVector min{}, max{}, origin{};
         bool convex = false;
         std::size_t closed_components = 0, shared_edges = 0;

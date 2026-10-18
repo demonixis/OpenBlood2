@@ -574,6 +574,8 @@ The [authored particle-stream continuation](../Documentation/Implementation/m2_p
 
 The [original sky continuation](../Documentation/Implementation/m2_sky.md) integrates built-in DemoSkyWorldModel/SkyPointer with checked sky slots, first-update lookup, camera parallax and actual SDL_GPU world-model backgrounds. Read [sky contracts](docs/contracts/sky_contracts.md). Preserve deferred pointer removal, empty-list release, index order, unchanged simulation/collision and explicit unsupported types/duplicate slots. The projection/depth reference is later LithTech, not verified retail parity. CityHub has 448 created / 31 sounds / 541 editor-only / five unsupported / one failed entry. M2 and CityHub NEW_LEVEL remain incomplete.
 
+The [contact overlap policy](docs/contracts/contact_overlap_contracts.md) lets `MoveObject` tolerate start overlaps of at most 0.01 units left by float-rounded crease/wedge contacts: leaving, sliding and static queries are free, deeper motion stops at fraction zero. Keep it opt-in (other sweeps retain start-solid), never move deeper, count acted contacts, and keep deeper penetration an explicit failure that names its contact. It is replacement physics corroborated by later LithTech's 0.001 plane tolerance, not depenetration.
+
 Interactive input/simulation frames are capped at 100 ms by `app_frame_delta`; discarded wall time is inspectable. Resource preparation and diagnostic capture are paused tool work. Keep direct diagnostic stepping and core physics safety bounds unchanged; this is a frontend catch-up policy, not a retail timing claim.
 
 

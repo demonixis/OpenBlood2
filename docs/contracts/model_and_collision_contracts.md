@@ -104,7 +104,9 @@ four contacts, removes inward velocity and records the last normal, source
 polygon/object and grounded flag. Touch-notify objects receive typed original
 callbacks along the travelled path, including nonsolid triggers. Callback-driven
 removal is deferred. An unloaded world, unsupported moving world-model type,
-recursive move, invalid destination or initial penetration fails explicitly.
+recursive move, invalid destination or initial penetration fails explicitly
+(overlaps of at most 0.01 units are now tolerated; see
+[contact overlap contracts](contact_overlap_contracts.md)).
 `TeleportObject` intentionally bypasses collision and resets contact state.
 
 Velocity/acceleration accessors and global force are real storage/services.
