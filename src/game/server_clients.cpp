@@ -95,7 +95,7 @@ namespace OpenBlood2
                     return value.character >= 0 && value.character < 4 && value.event >= 0 &&
                            value.event < (value.group ? 12 : 9);
                 else if constexpr (std::is_same_v<T, InventoryAction>)
-                    return value.type == 1 || value.type == 2;
+                    return value.type == 1 || value.type == 2 || value.type == 5;
                 else if constexpr (std::is_same_v<T, BossHealth>)
                     return std::isfinite(value.fraction);
                 else if constexpr (std::is_same_v<T, WorldExit>)

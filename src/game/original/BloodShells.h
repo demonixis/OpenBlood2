@@ -89,6 +89,15 @@ class CBloodClientShell
     bool medkit_down = false, medkit_was_down = false;
     bool flashlight_down = false, flashlight_was_down = false;
     CFlashlightFX flashlight;
+    bool binoculars_down = false, binoculars_was_down = false;
+    // Original SMSG_ZOOMVIEW/INVITEMACTION client state and UpdateCamera FOV (radians; 0 before entry).
+    bool UpdateZoom(double seconds);
+    float ViewFovX() const; // Effective first-person horizontal FOV for presentation.
+    bool m_bZoomView = false, m_bBinocularsActive = false;
+    bool m_bShowCrosshair = true, m_bCrosshairOriginallyOn = true;
+    DBYTE m_nCrosshair = 1, m_nCrosshairOriginalNum = 1;
+    float m_fovX = 0;
+    std::uint64_t zoom_messages = 0;
     bool proximity_down = false, proximity_was_down = false;
     bool remote_down = false, remote_was_down = false, detonate_down = false, detonate_was_down = false;
     std::uint64_t item_actions = 0, item_sounds = 0;

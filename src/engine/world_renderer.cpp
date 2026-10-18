@@ -457,6 +457,11 @@ namespace OpenBlood2
                 if (!r.count)
                     return;
                 world_view_uniform(eye, view, aspect, d, uniform);
+                if (!close_view)
+                {
+                    uniform.projection[0] *= target.view_scale;
+                    uniform.projection[1] *= target.view_scale;
+                }
                 if (sky || close_view)
                 {
                     constexpr float near = .01f, far = 65536;

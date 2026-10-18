@@ -20,7 +20,9 @@ statistics tabs. Inspector visibility does not affect either. Source seeing-eye,
 orb, scoreboard and level-change third-person modes do not exist in the supported
 single-player profile and are not claimed by this port. Zoom overrides, crosshair
 cycling/toggle commands and importing/persisting user CFG preferences remain absent;
-this continuation enables the original default image.
+this continuation enables the original default image. The [binoculars](binoculars_contracts.md)
+supersede the zoom-override omission: SMSG_ZOOMVIEW now selects crosshair98 and restores the
+saved image.
 
 The original crosshair blit passes NULL for its transparent color: exact black,
 not the magenta key used by `CNewStatusBar`. Later LithTech's transparent-color
@@ -31,8 +33,8 @@ That is reconstruction evidence, not an original-executable parity claim.
 The existing bounded PCX service loads/caches the external image alongside other
 HUD resources. Its path/dimensions appear in the resource inspector, which also
 reports current crosshair visibility. Missing/invalid images fail explicitly.
-The combined atlas is now 720x75; the crosshair begins at x=656, separated from the
+The combined atlas is now 768x75; the crosshair begins at x=656, separated from the
 655-pixel statistics strip by a transparent pixel. Images exceeding the remaining
-64x75 slot fail; larger modded crosshairs are not supported. GPU cycling, resource
+112x75 slot fail; larger modded crosshairs are not supported. GPU cycling, resource
 replacement and teardown use the existing HUD owner. No new device, renderer,
 dependency pin, shader or gameplay mutation is introduced.

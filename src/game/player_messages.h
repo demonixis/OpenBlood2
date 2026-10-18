@@ -34,6 +34,12 @@ namespace OpenBlood2
         DBYTE type = 1;
         bool active = false;
     };
+    // Original SMSG_ZOOMVIEW: zoom flag and crosshair override (0 keeps the current one).
+    struct ZoomView
+    {
+        bool on = false;
+        DBYTE type = 0;
+    };
     struct PlayerUse
     {
         PlayerRotation rotation;
@@ -150,5 +156,5 @@ namespace OpenBlood2
     };
     using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
                                      MissionObjectives, WorldExit, BossHealth, Conversation, InventoryAction,
-                                     ScreenFade, VoiceEvent, VoiceStop, PlayerDead, MusicCommand>;
+                                     ScreenFade, VoiceEvent, VoiceStop, PlayerDead, MusicCommand, ZoomView>;
 } // namespace OpenBlood2

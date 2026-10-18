@@ -33,7 +33,7 @@ namespace OpenBlood2
         bool focused = false, enabled = true, use_suppressed = false;
         bool flashlight_suppressed = false;
         bool medkit_suppressed = false, proximity_suppressed = false, remote_suppressed = false,
-             detonate_suppressed = false;
+             detonate_suppressed = false, binoculars_suppressed = false;
         bool mouse_requested = false, mouse_captured = false;
         std::array<bool, 2> mouse_buttons{}, fire_suppressed{};
         float mouse_x = 0, mouse_y = 0;
@@ -60,7 +60,8 @@ namespace OpenBlood2
             pending_weapon_slot = -1;
             keys = {};
             flashlight_suppressed = false;
-            use_suppressed = medkit_suppressed = proximity_suppressed = remote_suppressed = detonate_suppressed = false;
+            use_suppressed = medkit_suppressed = proximity_suppressed = remote_suppressed = detonate_suppressed =
+                binoculars_suppressed = false;
             release_mouse();
             if (play)
                 request_play();
@@ -114,6 +115,7 @@ namespace OpenBlood2
                 case SDL_SCANCODE_P:
                 case SDL_SCANCODE_L:
                 case SDL_SCANCODE_H:
+                case SDL_SCANCODE_Z:
                 case SDL_SCANCODE_E:
                 case SDL_SCANCODE_SPACE:
                 case SDL_SCANCODE_LEFT:
@@ -161,7 +163,7 @@ namespace OpenBlood2
                 const int code = event.key.scancode;
                 if ((code == SDL_SCANCODE_L || code == SDL_SCANCODE_R || code == SDL_SCANCODE_B ||
                      code == SDL_SCANCODE_P || code == SDL_SCANCODE_H || code == SDL_SCANCODE_E ||
-                     code == SDL_SCANCODE_F || code == SDL_SCANCODE_G) &&
+                     code == SDL_SCANCODE_F || code == SDL_SCANCODE_G || code == SDL_SCANCODE_Z) &&
                     event.type == SDL_EVENT_KEY_DOWN && event.key.repeat && !keys[static_cast<unsigned>(code)])
                     return; // A held key after focus loss is not a fresh USE press.
                 if (code > SDL_SCANCODE_UNKNOWN && code < SDL_SCANCODE_COUNT)
@@ -240,6 +242,17 @@ namespace OpenBlood2
             }
             return keys[SDL_SCANCODE_L] && !flashlight_suppressed;
         }
+        bool sample_binoculars(bool text_editing)
+        {
+            if (!keys[SDL_SCANCODE_Z])
+                binoculars_suppressed = false;
+            if (!focused || !enabled || text_editing)
+            {
+                binoculars_suppressed = keys[SDL_SCANCODE_Z];
+                return false;
+            }
+            return keys[SDL_SCANCODE_Z] && !binoculars_suppressed;
+        }
         bool sample_medkit(bool text_editing)
         {
             if (!keys[SDL_SCANCODE_H])
@@ -278,7 +291,8 @@ namespace OpenBlood2
             }
             return {result[0], result[1]};
         }
-        void look(PlayerRotation& rotation, double seconds, bool text_editing)
+        // zoomed: original CBloodClientShell quarters mouse offsets while m_bZoomView (keys unchanged).
+        void look(PlayerRotation& rotation, double seconds, bool text_editing, bool zoomed = false)
         {
             const float dx = std::exchange(mouse_x, 0), dy = std::exchange(mouse_y, 0);
             if (!focused || !enabled || text_editing)
@@ -287,8 +301,9 @@ namespace OpenBlood2
             // Device mapping policy: radians per relative mouse unit, independent of frame duration.
             if (mouse_captured)
             {
-                rotation.yaw = std::remainder(rotation.yaw + dx * mouse_sensitivity, 6.28318530718f);
-                rotation.pitch += dy * mouse_sensitivity * (invert_y ? -1.f : 1.f);
+                const float scale = zoomed ? mouse_sensitivity / 4 : mouse_sensitivity;
+                rotation.yaw = std::remainder(rotation.yaw + dx * scale, 6.28318530718f);
+                rotation.pitch += dy * scale * (invert_y ? -1.f : 1.f);
             }
             rotation.yaw += (int(keys[SDL_SCANCODE_RIGHT]) - int(keys[SDL_SCANCODE_LEFT])) * 2 * dt;
             rotation.pitch = std::clamp(

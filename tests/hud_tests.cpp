@@ -100,6 +100,9 @@ namespace
         CHECK(h.crosshair_visible);
         CHECK(!hud_state(s, false, false).crosshair_visible && !hud_state(s, true, true).crosshair_visible);
         CHECK(!hud_state(s, true, false, true).crosshair_visible && hud_state(s, true, false, true).visible);
+        // Client m_bShowCrosshair/m_nCrosshair: zoom overrides with its cursor type.
+        CHECK(!hud_state(s, true, false, false, false).crosshair_visible && h.crosshair == 1);
+        CHECK(hud_state(s, true, false, false, true, 98).crosshair == 98);
         const auto rect = original_crosshair_rect({10, 20, 651, 501}, 15, 13);
         CHECK(rect.left == 323 && rect.top == 254 && rect.right == 338 && rect.bottom == 267);
         CHECK(h.visible && h.stats == s); // Presentation owns raw values; original tab code formats them.

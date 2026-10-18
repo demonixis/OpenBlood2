@@ -2,7 +2,9 @@
 // original call ordering is retained; source-level adaptations replace raw
 // client data / packet reads with checked handles and owned typed values.
 #include "BloodShells.h"
+#include "ClientCrosshair.h"
 #include "game/game_settings.h"
+#include <algorithm>
 #include <cmath>
 
 void CBloodServerShell::PreStartWorld()
@@ -247,6 +249,13 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     medkit_down = medkit_was_down = false;
     flashlight_down = flashlight_was_down = false;
     flashlight = {};
+    binoculars_down = binoculars_was_down = false;
+    // StartNewWorld/OnEnterWorld: zoom off, original crosshair and default FOV.
+    m_bZoomView = m_bBinocularsActive = false;
+    m_bShowCrosshair = m_bCrosshairOriginallyOn;
+    m_nCrosshair = m_nCrosshairOriginalNum;
+    m_fovX = OpenBlood2::original_fov_normal;
+    zoom_messages = 0;
     proximity_down = proximity_was_down = false;
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     item_actions = item_sounds = item_voice = 0;
@@ -295,6 +304,13 @@ void CBloodClientShell::OnExitWorld()
     medkit_down = medkit_was_down = false;
     flashlight_down = flashlight_was_down = false;
     flashlight = {};
+    binoculars_down = binoculars_was_down = false;
+    // StartNewWorld/OnEnterWorld: zoom off, original crosshair and default FOV.
+    m_bZoomView = m_bBinocularsActive = false;
+    m_bShowCrosshair = m_bCrosshairOriginallyOn;
+    m_nCrosshair = m_nCrosshairOriginalNum;
+    m_fovX = OpenBlood2::original_fov_normal;
+    zoom_messages = 0;
     proximity_down = proximity_was_down = false;
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     item_actions = item_sounds = item_voice = 0;
@@ -354,13 +370,38 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         fade.Begin(value->in);
         return true;
     }
+    if (const auto* value = std::get_if<OpenBlood2::ZoomView>(&event))
+    {
+        ++zoom_messages;
+        m_bZoomView = value->on;
+        if (m_bZoomView)
+        {
+            m_bCrosshairOriginallyOn = m_bShowCrosshair;
+            m_nCrosshairOriginalNum = m_nCrosshair;
+            if (value->type)
+            {
+                m_bShowCrosshair = true;
+                m_nCrosshair = value->type;
+            }
+        }
+        else
+        {
+            m_bShowCrosshair = m_bCrosshairOriginallyOn;
+            m_nCrosshair = m_nCrosshairOriginalNum;
+        }
+        return true;
+    }
     if (const auto* value = std::get_if<OpenBlood2::InventoryAction>(&event))
     {
-        if (value->type != 1 && value->type != 2)
+        if (value->type != 1 && value->type != 2 && value->type != 5)
             return false;
         ++item_actions;
+        if (value->type == 5)
+            m_bBinocularsActive = value->active;
         OpenBlood2::SoundRequest request;
-        request.resource = value->type == 1 ? "sounds/powerups/medikit.wav" : "sounds/powerups/flashlight.wav";
+        request.resource = value->type == 1   ? "sounds/powerups/medikit.wav"
+                           : value->type == 2 ? "sounds/powerups/flashlight.wav"
+                                              : "sounds/powerups/binoculars.wav";
         request.space = OpenBlood2::SoundSpace::Local;
         request.priority = 4; // SOUNDPRIORITY_PLAYER_LOW.
         request.reverb_requested = false;
@@ -551,6 +592,10 @@ bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
     proximity_was_down = proximity_down;
     if (proximity_pressed)
         server.OnMessage(client_, OpenBlood2::PlayerItemCommand{7});
+    const bool binoculars_pressed = binoculars_down && !binoculars_was_down;
+    binoculars_was_down = binoculars_down;
+    if (binoculars_pressed)
+        server.OnMessage(client_, OpenBlood2::PlayerItemCommand{5});
     const bool item_pressed = medkit_down && !medkit_was_down;
     medkit_was_down = medkit_down;
     if (item_pressed)
@@ -569,11 +614,38 @@ bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server, double seconds,
     if (const auto* owner = server.Player(client_); owner && owner->camera_movement_blocked)
         input.primary = input.alternate = false;
     for (auto& weapon : weapons)
+    {
+        weapon.binoculars_active = m_bBinocularsActive;
         if (!weapon.Update(server_, server, client_, input, camera_position, forward, seconds, error))
             return false;
+    }
     return true;
 }
 
+bool CBloodClientShell::UpdateZoom(double seconds)
+{
+    // Original UpdateCamera first-person branch: 8 rad/s toward 12.5 or default 90 degrees.
+    // External cameras keep the current value; this port has no seeing-eye/orb views.
+    if (view.object || !std::isfinite(seconds) || seconds < 0)
+        return true;
+    if (!m_fovX)
+        m_fovX = OpenBlood2::original_fov_normal;
+    const float speed = 8 * static_cast<float>(std::min(seconds, 60.0));
+    if (m_bZoomView && m_fovX > OpenBlood2::original_fov_zoomed)
+        m_fovX = std::max(m_fovX - speed, OpenBlood2::original_fov_zoomed);
+    else if (!m_bZoomView && m_fovX < OpenBlood2::original_fov_normal)
+        m_fovX = std::min(m_fovX + speed, OpenBlood2::original_fov_normal);
+    else if (!m_bZoomView && m_fovX > OpenBlood2::original_fov_normal)
+        m_fovX = std::max(m_fovX - speed, OpenBlood2::original_fov_normal);
+    return true;
+}
+float CBloodClientShell::ViewFovX() const
+{
+    // Letterbox cameras use the default FOV; other views use the current value.
+    if ((view.object && view.settings.type == 1) || !m_fovX)
+        return OpenBlood2::original_fov_normal;
+    return m_fovX;
+}
 bool CBloodClientShell::UpdateCameraSelection()
 {
     auto* owner = dynamic_cast<CPlayerObj*>(server_.HandleToObject(player));

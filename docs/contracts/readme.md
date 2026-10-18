@@ -118,6 +118,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Original energy projectile boundary](energy_projectile_contracts.md)
 - [Original Flare Gun and projectile family](flare_contracts.md)
 - [Original flashlight and bounded point illumination](flashlight_contracts.md)
+- [Original binoculars and camera zoom](binoculars_contracts.md)
 - [Original Ingram Mac-10](mac10_contracts.md)
 - [Original MedKit pickup and inventory action](medkit_contracts.md)
 - [Original Naga eye weapon and red laser beam](naga_weapon_contracts.md)

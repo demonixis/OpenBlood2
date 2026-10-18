@@ -666,6 +666,7 @@ namespace OpenBlood2
         const ClassInfo proximity_pickup{"ProximitiesPU", &item_weapon, construct<ProximitiesPU>, {}};
         const ClassInfo flashlight_pickup{"FlashlightPU", &charged_pickup, construct<FlashlightPU>, {}};
         const ClassInfo medkit_pickup{"MedKitPU", &charged_pickup, construct<MedKitPU>, {}};
+        const ClassInfo binoculars_pickup{"BinocularsPU", &charged_pickup, construct<BinocularsPU>, {}};
         const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}};
         const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
         const ClassInfo assault_pickup{"AssaultRiflePU", &weapon_pickup, construct<AssaultRiflePU>, {}};
@@ -1001,6 +1002,7 @@ namespace OpenBlood2
                objects.register_class(item_weapon) && objects.register_class(proximity_pickup) &&
                objects.register_class(remote_pickup) && objects.register_class(charged_pickup) &&
                objects.register_class(medkit_pickup) && objects.register_class(flashlight_pickup) &&
+               objects.register_class(binoculars_pickup) &&
                objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
                objects.register_class(assault_pickup) && objects.register_class(flare_pickup) &&
                objects.register_class(tesla_pickup) &&

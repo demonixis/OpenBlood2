@@ -20,6 +20,7 @@ namespace OpenBlood2
         std::vector<KeyItem> keys;
         std::optional<DBYTE> medkit_charge;
         std::optional<FlashlightState> flashlight;
+        bool binoculars = false; // Owned item; InvItem::Load always clears its active flag.
         DBYTE strength = 1, magic = 1, current_slot = 0;
         bool infinite_ammo = false;
         float damage_multiplier = 1;

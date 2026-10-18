@@ -57,6 +57,18 @@ namespace OpenBlood2
             }
             else
                 ImGui::TextUnformatted("Flashlight: not collected (L after collection)");
+            if (const auto& item = player->m_InventoryMgr.binoculars)
+            {
+                ImGui::Text("Binoculars (Z): active %d | server zoom %d type %u | client active %d", item->active,
+                            player->m_bZoomView, unsigned(player->m_nZoomType), game.client_shell.m_bBinocularsActive);
+                ImGui::Text("Actions %llu | zoom sent %llu / coalesced %llu / failed %llu",
+                            (unsigned long long)item->actions, (unsigned long long)player->zoom_messages,
+                            (unsigned long long)player->zoom_messages_coalesced,
+                            (unsigned long long)player->zoom_message_failures);
+                ImGui::TextWrapped("Resource 304 / binoculars.pcx HUD unavailable. Item: %s", item->error.c_str());
+            }
+            else
+                ImGui::TextUnformatted("Binoculars: not collected (Z after collection)");
             if (const auto& item = player->m_InventoryMgr.medkit)
             {
                 ImGui::Text("Medkit: %u / 100 charges", item->count);

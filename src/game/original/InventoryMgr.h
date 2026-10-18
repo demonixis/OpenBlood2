@@ -35,6 +35,7 @@ class CInventoryMgr : public Aggregate
     void RemoveDeathItems();
     std::optional<CInvMedkit> medkit;
     std::unique_ptr<CInvFlashlight> flashlight;
+    std::optional<CInvBinoculars> binoculars;
     InventoryResult AddKey(const OpenBlood2::KeyItem&);
     InventoryResult QueryKey(std::string_view);
     std::vector<OpenBlood2::KeyItem> keys;

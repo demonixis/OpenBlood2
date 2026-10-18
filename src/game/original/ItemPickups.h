@@ -25,6 +25,11 @@ class MedKitPU : public ItemPickupCharged
   public:
     MedKitPU();
 };
+class BinocularsPU : public ItemPickupCharged
+{
+  public:
+    BinocularsPU();
+};
 
 class ItemPickupWeapon : public ItemPickup
 {

@@ -222,6 +222,15 @@ class CPlayerObj : public CBaseCharacter
     DBYTE m_nCharacter = 0, m_nSkin = 0;
     DBYTE m_nAttribStrength = 1, m_nAttribSpeed = 1, m_nAttribResistance = 1, m_nAttribMagic = 1;
     DBOOL m_bFirstUpdate = DTRUE, m_bDead = DFALSE;
+    // Original SetZoomMode overloads: every call sends SMSG_ZOOMVIEW, even unchanged.
+    void SetZoomMode(bool zoom, DBYTE type = 0);
+    bool GetZoomMode() const
+    {
+        return m_bZoomView;
+    }
+    bool m_bZoomView = false;
+    DBYTE m_nZoomType = 0, m_CurGun = 0; // m_CurGun: last current weapon type seen by Update.
+    std::uint64_t zoom_messages = 0, zoom_message_failures = 0, zoom_messages_coalesced = 0;
 
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
@@ -237,4 +246,5 @@ class CPlayerObj : public CBaseCharacter
     HCLIENT m_hClient = nullptr;
     HSTRING m_hstrTrigger = nullptr, m_hstrPlayerName = nullptr;
     HOBJECT initial_smell_ = nullptr;
+    bool zoom_sent_ = false; // Last delivered SMSG_ZOOMVIEW state; the client starts unzoomed.
 };

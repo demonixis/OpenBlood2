@@ -9,8 +9,10 @@ namespace OpenBlood2
     {
         PlayerStats stats;
         bool visible = false, crosshair_visible = false;
+        DBYTE crosshair = 1; // Original m_nCrosshair (zoom overrides it with 98/99).
     };
-    HudState hud_state(const PlayerStats&, bool in_world, bool external_camera, bool dead = false);
+    HudState hud_state(const PlayerStats&, bool in_world, bool external_camera, bool dead = false,
+                       bool show_crosshair = true, DBYTE crosshair = 1);
     class HudRenderer
     {
       public:
@@ -25,8 +27,10 @@ namespace OpenBlood2
         }
 
       private:
-        static constexpr unsigned atlas_width = 720, atlas_height = 75, crosshair_x = 656;
+        // The crosshair slot fits the widest original zoom cursor (crosshair98, 97x41).
+        static constexpr unsigned atlas_width = 768, atlas_height = 75, crosshair_x = 656;
         const HudSurface* crosshair_ = nullptr;
+        DBYTE crosshair_number_ = 0;
         SDL_GPUDevice* device_ = nullptr;
         SDL_GPUTexture* texture_ = nullptr;
         SDL_GPUTransferBuffer* transfer_ = nullptr;

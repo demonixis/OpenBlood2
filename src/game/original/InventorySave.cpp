@@ -91,6 +91,7 @@ bool CInventoryMgr::Save(OpenBlood2::InventoryState& output, std::string& error)
         state.medkit_charge = medkit->count;
     if (flashlight)
         state.flashlight = OpenBlood2::FlashlightState{flashlight->count, flashlight->remaining};
+    state.binoculars = binoculars.has_value();
     state.current_slot = m_nCurWeaponSlot;
     state.damage_multiplier = damage_multiplier;
     if (!valid(state, error))
@@ -165,6 +166,8 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
         }
         // Original InvItem::Load clears active for both load modes; new child stays hidden.
     }
+    if (state.binoculars)
+        staged.binoculars.emplace(m_hOwner); // Inactive; player Load separately clears zoom.
     // Commit only after every fallible service. Old child removal is deferred;
     // transferred weapons must point at this aggregate, never the local stage.
     m_Weapons.swap(staged.m_Weapons);
@@ -173,6 +176,7 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
     keys.swap(staged.keys);
     medkit.swap(staged.medkit);
     flashlight.swap(staged.flashlight);
+    binoculars.swap(staged.binoculars);
     m_fAmmo = staged.m_fAmmo;
     m_nAttribStrength = staged.m_nAttribStrength;
     m_nAttribMagic = staged.m_nAttribMagic;

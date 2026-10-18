@@ -6,11 +6,13 @@
 #include <imgui.h>
 namespace OpenBlood2
 {
-    HudState hud_state(const PlayerStats& s, bool in_world, bool external_camera, bool dead)
+    HudState hud_state(const PlayerStats& s, bool in_world, bool external_camera, bool dead, bool show_crosshair,
+                       DBYTE crosshair)
     {
         HudState h;
         h.stats = s;
-        h.crosshair_visible = original_crosshair_visible(in_world, external_camera, dead);
+        h.crosshair = crosshair;
+        h.crosshair_visible = show_crosshair && original_crosshair_visible(in_world, external_camera, dead);
         if (!in_world || external_camera)
             return h;
         h.visible = weapon_definition(s.weapon) && std::isfinite(s.health) && std::isfinite(s.armor) &&
@@ -163,9 +165,12 @@ namespace OpenBlood2
                 return false;
             }
         }
-        if (!crosshair_)
+        if (!crosshair_ || crosshair_number_ != h.crosshair)
         {
-            crosshair_ = status_->canvas.CreateSurfaceFromBitmap(original_crosshair_bitmap);
+            // Original PostUpdate reloads the bitmap whenever m_nCrosshair changes.
+            crosshair_ = status_->canvas.CreateSurfaceFromBitmap(original_crosshair_path(h.crosshair).c_str());
+            crosshair_number_ = h.crosshair;
+            uploaded_revision_ = UINT64_MAX;
             if (!crosshair_)
             {
                 error = status_->canvas.error;

@@ -231,6 +231,11 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
 }
 InventoryResult CInventoryMgr::ChangeWeaponSlot(DBYTE slot)
 {
+    // Original: any in-range request from a client inventory ends zoom first,
+    // even when the slot is empty or current; active binoculars stay flagged.
+    if (m_hClient && slot < inventory_weapon_slots)
+        if (auto* player = dynamic_cast<CPlayerObj*>(BaseClass::GetServerDE()->HandleToObject(m_hOwner)))
+            player->SetZoomMode(false);
     auto* weapon = GetWeapon(slot);
     if (!weapon)
         return InventoryResult::NotAvailable;
@@ -395,8 +400,16 @@ InventoryResult CInventoryMgr::DropCurrentWeapon()
 // Selected original AddItem/SetActiveItem branches; other items remain unsupported.
 InventoryResult CInventoryMgr::AddItem(DBYTE type, DBYTE value)
 {
-    if ((type != 1 && type != 2) || !BaseClass::GetServerDE()->IsObjectAlive(m_hOwner))
+    if ((type != 1 && type != 2 && type != 5) || !BaseClass::GetServerDE()->IsObjectAlive(m_hOwner))
         return InventoryResult::Invalid;
+    if (type == 5)
+    {
+        if (binoculars)
+            return InventoryResult::AlreadyHave; // Base CInvItem::AddItem refuses more.
+        binoculars.emplace(m_hOwner);
+        ++revision;
+        return InventoryResult::Ok;
+    }
     if (type == 2)
     {
         if (!flashlight)
@@ -424,6 +437,13 @@ InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
         ++revision;
         return InventoryResult::Ok;
     }
+    if (type == 5)
+    {
+        if (!binoculars || !binoculars->ActivateItem())
+            return InventoryResult::NotAvailable;
+        ++revision;
+        return InventoryResult::Ok;
+    }
     if (type != 1 || !medkit)
         return InventoryResult::NotAvailable;
     const auto before = medkit->count;
@@ -444,6 +464,9 @@ void CInventoryMgr::RemoveDeathItems()
     if (flashlight && flashlight->active)
         flashlight->SetActive(false); // Original active-item removal sends its off action.
     flashlight.reset();
+    if (binoculars && binoculars->active)
+        binoculars->Deactivate(); // RemoveItem's SetActiveItem toggle: action, then zoom off.
+    binoculars.reset();
     if (!keys.empty())
         keys.erase(keys.begin()); // One item of this type, not the entire key inventory.
     ++revision;

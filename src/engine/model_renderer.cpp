@@ -225,6 +225,11 @@ namespace OpenBlood2
                 continue;
             SkinnedUniform skinned;
             world_view_uniform(eye, view_rotation, aspect, d, skinned.view);
+            if (!close_view)
+            {
+                skinned.view.projection[0] *= target.view_scale;
+                skinned.view.projection[1] *= target.view_scale;
+            }
             if (close_view)
             {
                 constexpr float near = .01f, far = 65536;

@@ -49,3 +49,53 @@ int CInvMedkit::Activate()
     activation_result = static_cast<int>(requested_gain); // Preserve fractional-zero and negative nonzero returns.
     return activation_result;
 }
+
+// GameInvItems.cpp CInvBinoculars and InvItem.cpp SendActionMessage.
+void CInvBinoculars::SendActionMessage()
+{
+    auto* player = dynamic_cast<CPlayerObj*>(BaseClass::GetServerDE()->HandleToObject(owner_));
+    if (!player)
+        return;
+    if (BaseClass::GetServerDE()->SendToClient(player->GetClient(), OpenBlood2::InventoryAction{5, active}) == DE_OK)
+        ++actions;
+    else
+        error = "Binoculars action could not reach its client";
+}
+int CInvBinoculars::Activate()
+{
+    error.clear();
+    auto* server = BaseClass::GetServerDE();
+    auto* player = server->IsObjectAlive(owner_) ? dynamic_cast<CPlayerObj*>(server->HandleToObject(owner_)) : nullptr;
+    if (player)
+    {
+        // Already zoomed by something else (the sniper alt-fire in the source): ignore.
+        if (player->GetZoomMode())
+            return 0;
+        active = true;
+        SendActionMessage();
+        player->SetZoomMode(true, 98); // Original cursor type 98.
+    }
+    else
+        active = true;
+    return active;
+}
+int CInvBinoculars::Deactivate()
+{
+    error.clear();
+    auto* server = BaseClass::GetServerDE();
+    auto* player = server->IsObjectAlive(owner_) ? dynamic_cast<CPlayerObj*>(server->HandleToObject(owner_)) : nullptr;
+    active = false;
+    if (player)
+    {
+        SendActionMessage();
+        player->SetZoomMode(false);
+    }
+    return active;
+}
+bool CInvBinoculars::ActivateItem()
+{
+    if (!active)
+        return Activate() != 0;
+    Deactivate(); // Source ignores the deactivation result and reports success.
+    return true;
+}

@@ -1,4 +1,5 @@
 #include "app/scene_presenter.h"
+#include "game/original/ClientCrosshair.h"
 #include <SDL3/SDL_timer.h>
 #include <algorithm>
 
@@ -369,6 +370,7 @@ namespace OpenBlood2
         }
         ++stats.passes;
         WorldRecordTarget scene{commands, pass, letterbox, view_model_depth, 1};
+        scene.view_scale = original_fov_scale(game.client_shell.ViewFovX());
         if (!shadow_casters.empty())
         {
             scene.shadow_atlas = registry.get(shadow_atlas_);

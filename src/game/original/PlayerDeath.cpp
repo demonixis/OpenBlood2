@@ -38,8 +38,8 @@ void CPlayerObj::HandleDeath()
         death_error = "Multiplayer and active unported timed-power death are unavailable";
         return;
     }
-    // DoDeath: these supported players have no zoom, slow-death, parasitic
-    // attachment or flag to reset. ResetPowerups ends Willpower and invisibility.
+    // DoDeath: these supported players have no slow-death, parasitic attachment
+    // or flag to reset. ResetPowerups ends Willpower and invisibility.
     m_bDead = DTRUE;
     ResetPowerups();
     ++deaths;
@@ -50,6 +50,8 @@ void CPlayerObj::HandleDeath()
         ++death_messages;
     else
         death_error = "Original SMSG_DEAD delivery failed";
+    if (m_bZoomView)
+        SetZoomMode(false); // Original weapon-zoom reset after SMSG_DEAD.
     if (m_hCurSound)
     {
         s->KillSound(m_hCurSound);

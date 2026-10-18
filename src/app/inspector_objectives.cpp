@@ -215,6 +215,7 @@ namespace OpenBlood2
                     if (inventory.flashlight)
                         ImGui::Text("Saved flashlight: %u / %.3f seconds; restores inactive",
                                     inventory.flashlight->count, inventory.flashlight->remaining);
+                    ImGui::Text("Saved binoculars: %s", inventory.binoculars ? "present; restores inactive" : "absent");
                     for (const auto& key : inventory.keys)
                         ImGui::Text("Key %s: %u uses", key.name.c_str(), key.uses);
                     ImGui::TreePop();

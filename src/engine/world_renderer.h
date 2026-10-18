@@ -108,6 +108,9 @@ namespace OpenBlood2
         SDL_GPURenderPass* pass = nullptr;
         bool letterbox = false;
         float min_depth = 0, max_depth = 1;
+        // Camera zoom: 1/tan(fovX/2) over the 90-degree default. View models keep 1; culling
+        // stays at 90 degrees, which contains every narrower zoomed view.
+        float view_scale = 1;
         // Vertical model shadow tiles and their uniform; receivers ignore them when null.
         SDL_GPUTexture* shadow_atlas = nullptr;
         const ShadowUniform* shadows = nullptr;

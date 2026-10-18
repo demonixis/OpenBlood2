@@ -218,9 +218,10 @@ CalebAI (4), OpheliaAI (3), IshmaelAI (2), GabriellaAI (2), and the Revenant
 variants OpheliaREV, IshmaelREV, GabriellaREV (1 each). Unblocks `credits` and
 `end` alone; also needed by 23, 24b, 25.
 
-### L10 — Power-ups and inventory items (StealthPU done)
+### L10 — Power-ups and inventory items (StealthPU, InvulnerabilityPU, BinocularsPU done)
 
-StealthPU and the player invisibility power are ported (timed-power contracts);
+StealthPU, InvulnerabilityPU (invisibility and Willpower powers; timed-power
+contracts) and BinocularsPU with camera zoom (binoculars contracts) are ported;
 the other powers remain and still refuse death/capture while active.
 
 | Class | Entries | Worlds |
@@ -232,7 +233,7 @@ the other powers remain and still refuse death/capture while active.
 | NightGogglesPU | 8 | 6 |
 | TimeBombPU | 28 | 5 |
 | RevenantPU | 3 | 2 |
-| BinocularsPU | 3 | 2 |
+| BinocularsPU (done) | 3 | 2 |
 | VoodooDollPU, LifeLeechPU, BugSprayPU | 2 each | 2 each |
 
 Also SpawnObject `LifeEssencePU` (2). The timed powers need the timer

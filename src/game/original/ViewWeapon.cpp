@@ -120,6 +120,11 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
         const bool alternate = state == WS_ALT_FIRING || state == WS_STOP_ALT_FIRING;
         if (player->m_InventoryMgr.CurrentWeapon(left) != weapon)
             return true;
+        if (binoculars_active)
+        {
+            ++binocular_refusals; // Original Fire returns before its seed draw.
+            return true;
+        }
         next_seed_ = static_cast<DBYTE>(2 + random_() % 254);
         auto result =
             server.OnMessage(client, WeaponFire{position, direction, next_seed_, type, alternate, left, bomb_speed});

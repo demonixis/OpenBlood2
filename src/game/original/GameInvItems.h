@@ -25,3 +25,20 @@ class CInvMedkit
   private:
     HOBJECT owner_ = nullptr; // Checked non-owning identity; never serialized.
 };
+
+// Selected original CInvBinoculars. Zoom is player state; the item owns no child.
+class CInvBinoculars
+{
+  public:
+    explicit CInvBinoculars(HOBJECT owner) : owner_(owner) {}
+    int Activate();
+    int Deactivate();
+    bool ActivateItem(); // Original CInvItem::ActivateItem toggle.
+    bool active = false;
+    std::uint64_t actions = 0;
+    std::string error;
+
+  private:
+    void SendActionMessage();
+    HOBJECT owner_ = nullptr; // Checked non-owning identity; never serialized.
+};

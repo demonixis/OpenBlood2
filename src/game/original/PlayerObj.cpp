@@ -413,7 +413,35 @@ DBOOL CPlayerObj::Update(DVector*)
         if (m_InventoryMgr.ChangeWeaponSlot(1) == InventoryResult::NotAvailable)
             m_InventoryMgr.ChangeWeaponSlot(0);
     }
+    // Original current-gun tracking: a weapon change toggles active binoculars off.
+    const auto* weapon = m_InventoryMgr.CurrentWeapon();
+    if (const DBYTE gun = weapon ? weapon->data.m_nType : 0; gun != m_CurGun)
+    {
+        m_CurGun = gun;
+        if (m_InventoryMgr.binoculars && m_InventoryMgr.binoculars->active)
+            m_InventoryMgr.SetActiveItem(5);
+    }
     return DTRUE;
+}
+void CPlayerObj::SetZoomMode(bool zoom, DBYTE type)
+{
+    m_bZoomView = zoom;
+    m_nZoomType = type;
+    // The source sends every call, and a dead player's per-update ChangeWeaponSlot
+    // repeats SetZoomMode(FALSE). Repeated "off" only restores the already-restored
+    // client crosshair, so consecutive offs are coalesced to keep the bounded queue free.
+    if (!zoom && !zoom_sent_)
+    {
+        ++zoom_messages_coalesced;
+        return;
+    }
+    if (GetServerDE()->SendToClient(m_hClient, OpenBlood2::ZoomView{zoom, type}) == DE_OK)
+    {
+        ++zoom_messages;
+        zoom_sent_ = zoom;
+    }
+    else
+        ++zoom_message_failures; // Lost presentation never reverts server zoom state.
 }
 bool CPlayerObj::InitializeClientState()
 {

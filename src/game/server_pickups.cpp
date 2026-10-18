@@ -29,11 +29,11 @@ namespace OpenBlood2
         bool supported = false;
         // Fanatic/Prophet: original Spawner requests (fanatic_prophet_contracts.md). Item and weapon
         // leaves bounce on string creation; SniperRiflePU's weapon is not integrated.
-        for (auto name : {"BulletAmmoPU",  "ShellAmmoPU",     "BMGAmmoPU",      "FlareAmmoPU",  "DieBugDieAmmoPU",
-                          "HowitzerAmmoPU", "FuelAmmoPU",      "BatteryAmmoPU",  "HealthPU",     "MegaHealthPU",
-                          "WardPU",         "NecroWardPU",     "InvulnerabilityPU", "MedKitPU",       "FlashlightPU", "ProximitiesPU",
-                          "RemotesPU",      "BerettaPU",       "SubMachineGunPU", "FlareGunPU",  "AssaultRiflePU", "TeslaCannonPU",
-                          "Fanatic",        "Prophet"})
+        for (auto name : {"BulletAmmoPU",   "ShellAmmoPU",    "BMGAmmoPU",         "FlareAmmoPU", "DieBugDieAmmoPU",
+                          "HowitzerAmmoPU", "FuelAmmoPU",     "BatteryAmmoPU",     "HealthPU",    "MegaHealthPU",
+                          "WardPU",         "NecroWardPU",    "InvulnerabilityPU", "MedKitPU",    "FlashlightPU",
+                          "BinocularsPU",   "ProximitiesPU",  "RemotesPU",         "BerettaPU",   "SubMachineGunPU",
+                          "FlareGunPU",     "AssaultRiflePU", "TeslaCannonPU",     "Fanatic",     "Prophet"})
             supported |= same_name(type, name);
         Properties parsed;
         return supported && objects_.parse_properties(objects_.find_class(type), props, parsed);
@@ -86,8 +86,8 @@ namespace OpenBlood2
             (value.kind == PickupKind::Weapon && !WeaponPickupClass(value.type)) || !std::isfinite(value.amount) ||
             value.amount < 0 || value.amount > 1e6f ||
             (value.kind == PickupKind::Item &&
-             ((value.type != 1 && value.type != 2 && value.type != 7 && value.type != 8) || value.amount > 255 ||
-              std::floor(value.amount) != value.amount)))
+             ((value.type != 1 && value.type != 2 && value.type != 5 && value.type != 7 && value.type != 8) ||
+              value.amount > 255 || std::floor(value.amount) != value.amount)))
         {
             m->bad = true;
             return DE_INVALIDPARAMS;

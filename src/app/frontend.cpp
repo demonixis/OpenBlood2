@@ -309,13 +309,14 @@ namespace OpenBlood2
                 shell.use_down = input.controls.sample_use(false);
                 shell.medkit_down = input.controls.sample_medkit(false);
                 shell.flashlight_down = input.controls.sample_flashlight(false);
+                shell.binoculars_down = input.controls.sample_binoculars(false);
                 shell.proximity_down = input.controls.sample_proximity(false);
                 shell.remote_down = input.controls.sample_remote(false);
                 shell.detonate_down = input.controls.sample_detonate(false);
                 if (const int slot = input.controls.sample_weapon_slot(false); slot >= 0)
                     if (!game->command_weapon(DBYTE(slot), error))
                         spdlog::info("Weapon selection: {}", error);
-                input.controls.look(shell.rotation, delta, false);
+                input.controls.look(shell.rotation, delta, false, shell.m_bZoomView);
             }
             if (!menu.active && !paused_at_start)
             {
@@ -367,7 +368,7 @@ namespace OpenBlood2
                 draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
                 const auto& client = game->client_shell;
                 if (!hud.draw(hud_state(client.stats, client.m_bInWorld, client.view.object != nullptr,
-                                        client.death_camera.active),
+                                        client.death_camera.active, client.m_bShowCrosshair, client.m_nCrosshair),
                               game->resources, error))
                     return failed(4);
             }

@@ -231,7 +231,8 @@ bool CPlayerObj::RestoreModelState(std::string& error)
         return fail("Saved player velocity reset failed");
     restore_model_loaded = true;
     restore_model_error.clear();
-    // Source resets zoom next; zoom is not implemented. No Respawn, teleport,
+    m_bZoomView = DFALSE;
+    // Source Load resets zoom without a message (the client starts unzoomed). No Respawn, teleport,
     // dimension/animation-clock reconstruction, scheduling or client association.
     return true;
 }

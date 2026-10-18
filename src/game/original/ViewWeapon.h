@@ -30,7 +30,8 @@ class CViewWeapon
     WeaponState state = WS_HOLSTERED;
     std::string last_key, pending_sound;
     bool sound_indexed = false; // Request only; audio output is not ported.
-    std::uint64_t fire_keys = 0, shots = 0;
+    std::uint64_t fire_keys = 0, shots = 0, binocular_refusals = 0;
+    bool binoculars_active = false; // Client m_bBinocularsActive, set by the shell before Update.
     float bomb_start = 0, bomb_held = 0, bomb_speed = 1000;
     FireResult last_result = FireResult::Invalid;
 

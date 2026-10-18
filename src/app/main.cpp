@@ -666,6 +666,7 @@ namespace
                 game->client_shell.weapon_input = {};
             game->client_shell.use_down = controls.sample_use(text_editing);
             game->client_shell.flashlight_down = controls.sample_flashlight(text_editing);
+            game->client_shell.binoculars_down = controls.sample_binoculars(text_editing);
             game->client_shell.medkit_down = controls.sample_medkit(text_editing);
             game->client_shell.proximity_down = controls.sample_proximity(text_editing);
             game->client_shell.remote_down = controls.sample_remote(text_editing);
@@ -687,7 +688,7 @@ namespace
             movement.crouch |= keyboard.crouch;
             if (!controls.focused && !smoke)
                 movement = {};
-            controls.look(game->client_shell.rotation, delta, text_editing);
+            controls.look(game->client_shell.rotation, delta, text_editing, game->client_shell.m_bZoomView);
             if (options.movement_smoke)
             {
                 if (frames == 45 || frames == 100 || frames == 170 || frames == 185)
@@ -882,7 +883,8 @@ namespace
             OpenBlood2::draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
             if (!hud.draw(OpenBlood2::hud_state(game->client_shell.stats, game->client_shell.m_bInWorld,
                                                 game->client_shell.view.object != nullptr,
-                                                game->client_shell.death_camera.active),
+                                                game->client_shell.death_camera.active,
+                                                game->client_shell.m_bShowCrosshair, game->client_shell.m_nCrosshair),
                           game->resources, error))
             {
                 spdlog::error("Original HUD: {}", error);

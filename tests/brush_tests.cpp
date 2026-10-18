@@ -1,8 +1,8 @@
 #include "brush_fixture.h"
 #include "engine/container.h"
 #include "game/original/RotatingBrush.h"
-#include "game/original/spawn_object.h"
 #include "game/original/Trigger.h"
+#include "game/original/spawn_object.h"
 #include "player_fixture.h"
 #include <functional>
 #include <numbers>
@@ -404,13 +404,14 @@ namespace
             std::cout << name << "=" << n << '\n';
         CHECK(unreadable == 1 && counts["RotatingBrush"].created == 136 && counts["RotatingBrush"].rejected == 0 &&
               counts["RotatingBrush"].moved == 136 && counts["RotatingBrush"].filtered == 0 &&
-              counts["CDestructableBrush"].created == 2391 && counts["CDestructableBrush"].rejected == 64 &&
+              counts["CDestructableBrush"].created == 2392 && counts["CDestructableBrush"].rejected == 63 &&
               counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 50 &&
-              counts["CDestructableBrush"].detonated == 50 && counts["CDestructableBrush"].spawned == 68 &&
+              counts["CDestructableBrush"].detonated == 50 && counts["CDestructableBrush"].spawned == 69 &&
               counts["CDestructableBrush"].compound == 3);
         CHECK(failures["CDestructableBrush/shell"] == 2 && !failures.contains("CDestructableBrush/schema") &&
               !failures.contains("CDestructableBrush/ambiguous") && failures["CDestructableBrush/missing"] == 32 &&
-              failures["CDestructableBrush/polygon dynamics"] == 28 && failures["CDestructableBrush/spawn"] == 2 && counts["CDestructableBrush"].absent_spawns == 1 && !failures.contains("RotatingBrush/ambiguous"));
+              failures["CDestructableBrush/polygon dynamics"] == 28 && failures["CDestructableBrush/spawn"] == 1 &&
+              counts["CDestructableBrush"].absent_spawns == 1 && !failures.contains("RotatingBrush/ambiguous"));
         CHECK(g.request_world("01_SubwayA", error));
         std::map<EntryState, unsigned> entries;
         for (const auto& e : g.entries)

@@ -41,3 +41,11 @@ FlashlightPU::FlashlightPU()
     display_name = "Flashlight";
     resource_id = 301;
 }
+
+BinocularsPU::BinocularsPU()
+{
+    value = {OpenBlood2::PickupKind::Item, 5, 1};
+    file = "Binoculars_pu";
+    display_name = "Binoculars";
+    resource_id = 304;
+}

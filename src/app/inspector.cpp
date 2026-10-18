@@ -1639,10 +1639,14 @@ namespace OpenBlood2
                     game.client_shell.view.object ? "yes (HUD hidden)" : "no");
         ImGui::TextUnformatted(
             "1..9 / 0: original inventory slots. Original PCX stat tabs remain visible with inspector hidden.");
-        ImGui::Text("Original crosshair 01: %s", game.client_shell.m_bInWorld && !game.client_shell.view.object &&
-                                                         !game.client_shell.death_camera.active
-                                                     ? "visible"
-                                                     : "hidden");
+        const auto& shell = game.client_shell;
+        ImGui::Text("Original crosshair %02u: %s", unsigned(shell.m_nCrosshair),
+                    shell.m_bShowCrosshair && shell.m_bInWorld && !shell.view.object && !shell.death_camera.active
+                        ? "visible"
+                        : "hidden");
+        ImGui::Text("Zoom %s | FOV %.2f deg (presented %.2f) | messages %llu", shell.m_bZoomView ? "on" : "off",
+                    shell.m_fovX * 57.29578f, shell.ViewFovX() * 57.29578f,
+                    static_cast<unsigned long long>(shell.zoom_messages));
         ImGui::Text("HUD maxima: health %.1f | armor %.1f", hud.max_health, hud.max_armor);
         if (hud_status && ImGui::TreeNode("Original status bar resources"))
         {
