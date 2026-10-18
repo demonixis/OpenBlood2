@@ -21,7 +21,7 @@ namespace
     // COMBAT/FLAYER/ROCK/NIGHTMARE_FIREBALL branches are absent: the patched retail
     // object.lto contains no FLAYER literal (only BLOOD2NM does).
     constexpr WeaponPrefix weapon_prefixes[]{{"BERET", WEAP_BERETTA, true},
-                                             {"SHOTG", 0, false}, // "SHOTGU" compared on 5 bytes.
+                                             {"SHOTG", WEAP_SHOTGUN, true}, // "SHOTGU" compared on 5 bytes.
                                              {"SNIPE", 0, false},
                                              {"ASSAULTR", WEAP_ASSAULTRIFLE, true},
                                              {"SUBMA", WEAP_SUBMACHINEGUN, true},

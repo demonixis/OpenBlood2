@@ -392,7 +392,7 @@ bool collect(const std::filesystem::path& root)
     CHECK(p && p->value.amount == 0 && g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player) &&
           !p->picked_up);
     auto message = g.server.StartMessageToObject(g.server.HandleToObject(h), g.client_shell.player, add_weapon_message);
-    CHECK(message && g.server.WritePickupMessage(message, {PickupKind::Weapon, 4, 12}) == DE_INVALIDPARAMS);
+    CHECK(message && g.server.WritePickupMessage(message, {PickupKind::Weapon, 6, 12}) == DE_INVALIDPARAMS);
     g.server.EndMessage(message);
     CHECK(g.server.pickup_reports.size() == 2 && !g.server.message_count());
     CHECK(g.unload_world() && !g.server.string_count());

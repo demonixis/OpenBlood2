@@ -824,7 +824,7 @@ namespace
     {
         GameSession g;
         CHECK(setup(g, root));
-        for (auto props : {Properties{{"AIWeapon1", std::string("SHOTGUN")}}, Properties{{"RobeSkin", true}},
+        for (auto props : {Properties{{"AIWeapon1", std::string("HOWITZER")}}, Properties{{"RobeSkin", true}},
                            Properties{{"RandomHitPoints", -1.f}}})
         {
             CHECK(!npc(g, "CultistAI", props));

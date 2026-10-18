@@ -15,6 +15,13 @@ SubMachineGunPU::SubMachineGunPU()
     display_name = "Sub-machine Gun";
     resource_id = IDS_WEAPON_MAC10;
 }
+ShotgunPU::ShotgunPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_SHOTGUN, 8};
+    file = "Shotgun_pu";
+    display_name = "Sawed-off Shotgun";
+    resource_id = IDS_WEAPON_SHOTGUN;
+}
 TeslaCannonPU::TeslaCannonPU()
 {
     value = {OpenBlood2::PickupKind::Weapon, WEAP_TESLACANNON, 40};
@@ -57,6 +64,8 @@ const char* WeaponPickupClass(DDWORD type)
             return "FlareGunPU";
         case WEAP_TESLACANNON:
             return "TeslaCannonPU";
+        case WEAP_SHOTGUN:
+            return "ShotgunPU";
         case WEAP_SNIPERRIFLE:
             return "SniperRiflePU";
         default:

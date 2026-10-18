@@ -85,7 +85,7 @@ class CWeapon
     virtual void BeginFire(bool /*alternate*/) {}
     virtual const char* FireSound(bool alternate) const;
     virtual FireResult FireProjectile();
-    HOBJECT projectile = nullptr; // Checked independent runtime child, never owning.
+    HOBJECT projectile = nullptr;               // Checked independent runtime child, never owning.
     const char* alt_projectile_class = nullptr; // Source m_szAltProjectileClass override.
     std::string projectile_error;
     virtual FireResult FireVector();
@@ -101,6 +101,7 @@ class CWeapon
     float m_fLastShotTime = 0;
     bool m_bLastFireAlt = false;
     std::uint64_t shots = 0;
+    DDWORD last_pellets = 0; // Vectors of the last accepted fire (shotgun: 16); last_shot is the final one.
     WeaponShot last_shot;
 };
 // Original visual ray and ordinary damage ray deliberately have different filters.
@@ -156,6 +157,13 @@ class CBeretta final : public CWeapon
 {
   public:
     CBeretta() : CWeapon(WEAP_BERETTA) {}
+};
+// Original CShotgun::Fire only selects shell ejection (a client effect not ported) before
+// CWeapon::Fire, whose FireSpread casts its sixteen vectors.
+class CShotgun final : public CWeapon
+{
+  public:
+    CShotgun() : CWeapon(WEAP_SHOTGUN) {}
 };
 class CAssaultRifle final : public CWeapon
 {

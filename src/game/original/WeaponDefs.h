@@ -2,12 +2,13 @@
 #include "basedefs_de.h"
 // Selected original definitions; complete source fields, base-game weapon numbering.
 inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_FLAREGUN = 3, WEAP_ASSAULTRIFLE = 9,
-                       WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38, WEAP_ZEALOT_ENERGYBLAST = 27, WEAP_SHIKARI_CLAW = 18, WEAP_SHIKARI_SPIT = 19,
-                       WEAP_SOUL_CROWBAR = 20,
-                       WEAP_SOUL_AXE = 21, WEAP_SOUL_PIPE = 22, WEAP_SOUL_HOOK = 23,
-                       WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42, WEAP_PROXIMITYBOMB = 49, WEAP_REMOTEBOMB = 50;
+                       WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38, WEAP_ZEALOT_ENERGYBLAST = 27, WEAP_SHIKARI_CLAW = 18,
+                       WEAP_SHIKARI_SPIT = 19, WEAP_SOUL_CROWBAR = 20, WEAP_SOUL_AXE = 21, WEAP_SOUL_PIPE = 22,
+                       WEAP_SOUL_HOOK = 23, WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42, WEAP_PROXIMITYBOMB = 49,
+                       WEAP_REMOTEBOMB = 50;
 inline constexpr DBYTE WEAP_TESLACANNON = 13, WEAP_VOODOO = 14; // Voodoo: referenced by IsDemoWeapon only.
-inline constexpr DBYTE WEAP_SNIPERRIFLE = 5;                    // Pickup offer only; the weapon is not integrated.
+inline constexpr DBYTE WEAP_SHOTGUN = 4;
+inline constexpr DBYTE WEAP_SNIPERRIFLE = 5; // Pickup offer only; the weapon is not integrated.
 inline constexpr DBYTE AMMO_PROXIMITYBOMB = 10, AMMO_REMOTEBOMB = 11;
 inline constexpr bool inventory_bomb(DBYTE type)
 {
@@ -24,7 +25,8 @@ inline constexpr DBYTE TYPE_RIFLE = 0, TYPE_AUTORIFLE = 1, TYPE_PISTOL = 2, TYPE
                        AMMO_NONE = 0, AMMO_BULLET = 1, AMMO_SHELL = 2, AMMO_BMG = 3, AMMO_FLARE = 4, AMMO_DIEBUGDIE = 5,
                        AMMO_BATTERY = 8;
 inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_MAC10 = 354, IDS_WEAPON_FLAREGUN = 355,
-                     IDS_WEAPON_KNIFE = 366, IDS_WEAPON_M16 = 353, IDS_WEAPON_SNIPER = 352, IDS_WEAPON_TESLA = 364;
+                     IDS_WEAPON_KNIFE = 366, IDS_WEAPON_M16 = 353, IDS_WEAPON_SNIPER = 352, IDS_WEAPON_TESLA = 364,
+                     IDS_WEAPON_SHOTGUN = 351;
 // Weapon spread structure
 typedef struct Spread_t
 {

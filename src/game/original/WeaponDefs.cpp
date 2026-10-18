@@ -241,6 +241,65 @@ namespace
             "interface\\statusbar\\weapons\\flaregun.pcx",   // Icon for status bar
             "interface\\statusbar\\weapons\\flaregun_h.pcx", // Highlighted icon for status bar
         },
+        // Shotgun
+        {
+            "Models\\Weapons\\Shotgun_pv.abc",              // Model
+            "Models\\Weapons\\Shotgun_pv.abc",              // Model
+            "Skins\\Weapons\\C_Shot_pv_t.dtx",              // Skin
+            "Models\\Powerups\\Shotgun_pu.abc",             // 3rd person model
+            "Skins\\Powerups\\Shotgun_pu.dtx",              // 3rd person skin
+            WEAP_SHOTGUN,                                   // Type
+            TYPE_PISTOL,                                    // Fire type
+            AMMO_SHELL,                                     // Ammo type
+            1,                                              // Ammo Use
+            2,                                              // Alt Ammo Use
+            4.0f,                                           // Min Damage
+            6.0f,                                           // Max Damage
+            8.0f,                                           // Min Alt damage
+            12.0f,                                          // Max Alt damage
+            0.5f,                                           // Reload time
+            1.0f,                                           // Alt reload time
+            {200.0f, 100.0f},                               // Spread
+            {200.0f, 100.0f},                               // Alt Spread
+            0.0f,                                           // Projectile Velocity
+            0.0f,                                           // Alt Projectile Velocity
+            3500.0f,                                        // Range
+            3500.0f,                                        // Alt Range
+            16,                                             // Shots per fire
+            16,                                             // Alt Shots per fire
+            3,                                              // Strength or Magic required
+            4,                                              // Two-handed Strength or Magic required
+            0,                                              // Damage Radius (projectiles)
+            0,                                              // Alt Damage Radius (projectiles)
+            DFALSE,                                         // Alt fire zoom
+            DFALSE,                                         // Semi-auto
+            "Sounds\\Weapons\\shotgun\\fire.wav",           // Fire sound
+            "Sounds\\Weapons\\shotgun\\alt.wav",            // Alt Fire sound
+            "",                                             // Empty weapon sound
+            "",                                             // Alt Empty weapon sound
+            NULL,                                           // Projectile class
+            NULL,                                           // Alt Projectile class
+            125,                                            // Muzzle Flash radius
+            {1.0f, 0.68f, 0.35f},                           // Muzzle Flash color
+            "Sawed-off Shotgun",                            // Name
+            IDS_WEAPON_SHOTGUN,                             // Name ID (resource)
+            "Sprites\\shotgun1.spr",                        // flash sprite name
+            "Sprites\\shotgun2.spr",                        // alt flash Sprite name
+            0.05f,                                          // Flash duration
+            0.19f,                                          // Flash scale
+            {0.0f, 0.0f, 0.0f},                             // 3rd person gun offset
+            {0.5f, -0.5f, 0.9f},                            // Gun Offset
+            {0.08f, 0.5f, 2.0f},                            // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                          // Recoil
+            {5.0f, -5.0f, 30.0f},                           // Flash position
+            0.625f,                                         // Eject interval
+            2.5f,                                           // View kick
+            DFALSE,                                         // View kick is Cumulative
+            DFALSE,                                         // Animation looping
+            DFALSE,                                         // Alt anim looping
+            "interface\\statusbar\\weapons\\shotgun.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\shotgun_h.pcx", // Highlighted icon for status bar
+        },
         // Tesla Cannon
         {
             "Models\\Weapons\\TeslaRod_pv.abc",          // Model

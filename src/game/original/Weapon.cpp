@@ -4,6 +4,7 @@
 #include "engine/collision.h"
 #include <cmath>
 #include <random>
+#include <vector>
 
 using namespace OpenBlood2;
 float CWeapon::CheckAmmo(bool alternate) const
@@ -66,12 +67,29 @@ FireResult CWeapon::Fire(const WeaponFire& request)
         last_shot.result = FireResult::Dry;
         return last_shot.result;
     }
+    // Original FireSpread: every vector of one fire shares the damage draw. Shells cost
+    // the ammo use once per fire; other ammo costs one use per vector, reduced to what
+    // is available. All selected single-vector definitions keep their former behavior.
+    DDWORD vectors = request.alternate ? data.m_dwAltShotsPerFire : data.m_dwShotsPerFire;
+    if (!vectors || vectors > 64)
+        return last_shot.result = FireResult::Invalid;
+    float cost = static_cast<float>(use);
+    if (GetAmmoType(request.alternate) != AMMO_SHELL)
+    {
+        if (static_cast<float>(vectors * use) > ammo)
+            vectors = static_cast<DDWORD>(static_cast<int>(ammo) / use);
+        cost = static_cast<float>(vectors * use);
+    }
     const auto spread = request.alternate ? data.m_AltSpread : data.m_Spread;
-    auto direction = vector_add(forward, vector_scale(right, sample(-spread.h, spread.h) / 2000));
-    direction = vector_add(direction, vector_scale(up, sample(-spread.v, spread.v) / 2000));
-    direction = vector_scale(direction, 1 / std::sqrt(vector_dot(direction, direction)));
+    std::vector<DVector> directions(vectors);
+    for (auto& direction : directions)
+    {
+        direction = vector_add(forward, vector_scale(right, sample(-spread.h, spread.h) / 2000));
+        direction = vector_add(direction, vector_scale(up, sample(-spread.v, spread.v) / 2000));
+        direction = vector_scale(direction, 1 / std::sqrt(vector_dot(direction, direction)));
+    }
     const auto range = request.alternate ? data.m_fAltRange : data.m_fRange;
-    const auto trace = [&]()
+    const auto trace = [&](DVector direction)
     {
         auto aim_direction = direction;
         if (inventory_bomb(data.m_nType) && request.alternate)
@@ -142,13 +160,28 @@ FireResult CWeapon::Fire(const WeaponFire& request)
         }
         return true;
     };
-    if (!trace())
+    // No-consumption collision preflight of every vector.
+    const auto base = last_shot;
+    std::vector<WeaponShot> traced(vectors, base);
+    const auto trace_all = [&]()
+    {
+        for (unsigned i = 0; i < vectors; ++i)
+        {
+            last_shot = base;
+            if (!trace(directions[i]))
+                return false;
+            traced[i] = last_shot;
+        }
+        return true;
+    };
+    if (!trace_all())
         return last_shot.result;
-    // Selected definitions emit one shot; alternate Flare Gun consumes eight rounds.
-    m_pInventoryMgr->SetAmmoCount(GetAmmoType(request.alternate), ammo - use);
+    // Alternate Flare Gun consumes eight rounds; shotgun shells one or two per fire.
+    m_pInventoryMgr->SetAmmoCount(GetAmmoType(request.alternate), ammo - cost);
     m_fLastShotTime = server->GetTime();
     m_bLastFireAlt = request.alternate;
     ++shots;
+    last_pellets = vectors;
     last_shot.result = FireResult::Fired;
     PlayFireSound(request.alternate, request.position);
     if (!server->IsObjectAlive(m_hOwner))
@@ -158,10 +191,21 @@ FireResult CWeapon::Fire(const WeaponFire& request)
         last_shot.collision = SegmentResult::Unavailable;
         return last_shot.result; // Accepted shot; a hearing callback removed its owner before impact.
     }
-    // Keep the existing no-consumption collision preflight. After actual hearing
-    // callbacks, resolve the final ray again rather than damage a stale/moved target.
-    if (fire_sound_alert.eligible && !trace())
+    // After actual hearing callbacks, resolve the final rays again rather than damage
+    // a stale/moved target.
+    if (fire_sound_alert.eligible && !trace_all())
         return last_shot.result;
-    return (request.alternate ? data.m_szAltProjectileClass : data.m_szProjectileClass) ? FireProjectile()
-                                                                                        : FireVector();
+    const bool projectile = request.alternate ? data.m_szAltProjectileClass : data.m_szProjectileClass;
+    auto result = FireResult::Fired;
+    for (unsigned i = 0; i < vectors; ++i)
+    {
+        last_shot = traced[i];
+        last_shot.result = FireResult::Fired;
+        const auto vector_result = projectile ? FireProjectile() : FireVector();
+        if (vector_result != FireResult::Fired)
+            result = vector_result;
+        if (last_shot.interrupted || !server->IsObjectAlive(m_hOwner))
+            break; // A damage/impact callback removed the shooter: no further vectors.
+    }
+    return result;
 }
