@@ -23,6 +23,11 @@ class StealthPU : public EnhancementBase
   public:
     StealthPU();
 };
+class InvulnerabilityPU : public EnhancementBase
+{
+  public:
+    InvulnerabilityPU();
+};
 class HealthPU : public HealthBase
 {
   public:

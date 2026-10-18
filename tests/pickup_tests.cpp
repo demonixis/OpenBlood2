@@ -481,10 +481,10 @@ namespace
               counts["AssaultRiflePU"] == 5 && counts["MedKitPU"] == 22 && counts["ProximitiesPU"] == 161 &&
               counts["RemotesPU"] == 107 && counts["FlashlightPU"] == 10 && counts["SniperRiflePU"] == 4);
         CHECK(failures.empty()); // Retired TypeAction rows are created.
-        // 1764 includes the four SniperRiflePU offers (their weapon is not integrated) and 14 StealthPU.
-        // 68 container spawns include the bouncing item/weapon leaves.
-        CHECK(counts["StealthPU"] == 14);
-        CHECK(worlds == 57 && created == 1764 && missing == 0 && rejected == 0 && spawns == 68);
+        // 1777 includes the four SniperRiflePU offers (their weapon is not integrated), 14 StealthPU
+        // and 13 InvulnerabilityPU. 69 container spawns include the bouncing item/weapon leaves.
+        CHECK(counts["StealthPU"] == 14 && counts["InvulnerabilityPU"] == 13);
+        CHECK(worlds == 57 && created == 1777 && missing == 0 && rejected == 0 && spawns == 69);
         return true;
     }
 } // namespace

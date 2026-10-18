@@ -1,10 +1,25 @@
-# Original timed powers (Stealth)
+# Original timed powers (Willpower, Stealth)
 
 Selected original `PowerupPickups.cpp` StealthPU and `CPlayerObj`
 AddPowerup/CheckPowerups/ResetPowerups/Start/EndPowerupSound
-(PlayerObj.cpp:3670–4046). Only Stealth (POWERUP_STEALTH, PU_INVISIBLE) is
-collected and timed; Willpower, Anger, Revenant, incorporeal and silence remain
-unported and keep refusing death, capture and restore.
+(PlayerObj.cpp:3670–4046). Willpower (POWERUP_INVULNERABILITY, PU_INVULNERABLE)
+and Stealth (POWERUP_STEALTH, PU_INVISIBLE) are collected and timed; Anger,
+Revenant, incorporeal and silence remain unported and keep refusing death, capture
+and restore.
+
+## Willpower
+
+InvulnerabilityPU (EnhancementBase, model `Invulnerability_pu`, resource 313,
+30 seconds; 13 retail instances, and a 03_Museum container spawn) sets
+`m_fNighInvulnerableTime = now + value`, the CDestructable nigh invulnerability
+(non-Death character damage × 0.05), activates PU_INVULNERABLE, pushes its sound
+(loop `invulnerabilityloop1.wav`) and sets USRFLG_WILLPOWERGLOW (1 << 9).
+CheckPowerups tests it before invisibility: on expiry it clears the flag, the
+nigh invulnerability and the glow, ends the sound and plays the VME_POWERUP voice
+group (single player); IDS_GENERAL_WILLPOWER_EXP is not delivered (counted).
+ResetPowerups (death) clears it first. Capture drops the power, but the source
+CDestructable Save keeps `m_bNighInvulnerable`, so a transferred player stays
+nigh invulnerable with no timer — a source behavior kept as such.
 
 ## Pickup
 

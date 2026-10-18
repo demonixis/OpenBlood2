@@ -38,3 +38,10 @@ StealthPU::StealthPU()
     display_name = "Stealth";
     resource_id = 314; // IDS_POWERUP_STEALTH; default powerup4.wav pickup sound.
 }
+InvulnerabilityPU::InvulnerabilityPU()
+{
+    value = {OpenBlood2::PickupKind::Powerup, 5, 30}; // POWERUP_INVULNERABILITY, 30 seconds.
+    file = "Invulnerability_pu";
+    display_name = "Willpower";
+    resource_id = 313; // IDS_POWERUP_WILLPOWER; default powerup4.wav pickup sound.
+}

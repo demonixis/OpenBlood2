@@ -55,10 +55,11 @@ namespace
             error = "Player fields require a live initialized owner outside damage callbacks";
             return false;
         }
-        // The source Save writes no power state or timer: invisibility is simply dropped
-        // (the engine snapshot keeps its translucent color). Other powers stay refused.
+        // The source Save writes no power state or timer: invisibility and Willpower are
+        // dropped (the engine keeps the translucent color, CDestructable keeps the nigh
+        // invulnerability). Other powers stay refused.
         for (int i = 0; i < PU_MAXTYPES; ++i)
-            if (player.m_bPowerupActivated[i] && i != PU_INVISIBLE)
+            if (player.m_bPowerupActivated[i] && i != PU_INVISIBLE && i != PU_INVULNERABLE)
             {
                 error = "Active unported player powers require unported saved expiration timers";
                 return false;

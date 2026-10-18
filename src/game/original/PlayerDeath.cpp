@@ -31,7 +31,7 @@ void CPlayerObj::HandleDeath()
     }
     bool unported_power = false;
     for (int i = 0; i < PU_MAXTYPES; ++i)
-        unported_power |= m_bPowerupActivated[i] && i != PU_INVISIBLE;
+        unported_power |= m_bPowerupActivated[i] && i != PU_INVISIBLE && i != PU_INVULNERABLE;
     if (s->GetVarValueFloat(s->GetGameConVar("GAME_GAMETYPE")) != 0 || !OpenBlood2::character_profile(m_nCharacter) ||
         unported_power)
     {
@@ -39,7 +39,7 @@ void CPlayerObj::HandleDeath()
         return;
     }
     // DoDeath: these supported players have no zoom, slow-death, parasitic
-    // attachment or flag to reset. ResetPowerups ends invisibility.
+    // attachment or flag to reset. ResetPowerups ends Willpower and invisibility.
     m_bDead = DTRUE;
     ResetPowerups();
     ++deaths;

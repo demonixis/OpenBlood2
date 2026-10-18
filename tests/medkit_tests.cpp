@@ -386,6 +386,42 @@ namespace
         CHECK(!p.AddPowerup(7, 30)); // Other powers stay unported.
         return true;
     }
+    // Original InvulnerabilityPU: Willpower nigh invulnerability, glow flag, expiry voice.
+    bool willpower(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(setup(g, root));
+        auto& p = player(g);
+        auto pickup = g.objects.create(g.objects.find_class("InvulnerabilityPU"), {}, Creation::World,
+                                       {{"Pos", DVector{300, 100, 300}}});
+        auto* item = pickup ? dynamic_cast<InvulnerabilityPU*>(g.objects.get(pickup)->game.get()) : nullptr;
+        CHECK(item && item->value.type == 5 && item->value.amount == 30 && item->resource_id == 313 &&
+              item->file == "Invulnerability_pu" && g.server.ValidateSpawnObject("InvulnerabilityPU"));
+        auto m = g.server.StartMessageToObject(item, p.m_hObject, add_powerup_message);
+        CHECK(m && g.server.WritePickupMessage(m, item->value) == DE_OK && g.server.EndMessage(m) == DE_OK);
+        const float start = g.objects.time();
+        CHECK(p.IsPowerupActive(PU_INVULNERABLE) && p.m_damage.m_bNighInvulnerable);
+        CHECK(g.server.GetObjectUserFlags(p.m_hObject) & (1u << 9));
+        CHECK(std::abs(p.m_fNighInvulnerableTime - (start + 30)) < 1e-4f);
+        // Character damage is scaled by 0.05 while nigh invulnerable.
+        const float before = p.m_damage.m_fHitPoints;
+        auto d = g.server.StartMessageToObject(item, p.m_hObject, damage_message);
+        CHECK(d && g.server.WriteDamage(d, {{0, 0, 1}, {}, 40, DamageType::Normal, pickup}) == DE_OK &&
+              g.server.EndMessage(d) == DE_OK);
+        CHECK(before - p.m_damage.m_fHitPoints <= 2.001f);
+        while (g.objects.time() < start + 31)
+            CHECK(g.step(.1));
+        CHECK(!p.IsPowerupActive(PU_INVULNERABLE) && !p.m_damage.m_bNighInvulnerable &&
+              !(g.server.GetObjectUserFlags(p.m_hObject) & (1u << 9)) && p.powerup_expiries == 1);
+        // Capture drops the power; the source CDestructable Save keeps nigh invulnerability.
+        CHECK(p.AddPowerup(5, 30));
+        PlayerRestoreState s;
+        std::string e;
+        CHECK(g.capture_player(s, e) && s.damage.nigh_invulnerable);
+        p.ResetPowerups();
+        CHECK(!p.IsPowerupActive(PU_INVULNERABLE) && !p.m_damage.m_bNighInvulnerable);
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
@@ -394,7 +430,7 @@ int main(int argc, char** argv)
     const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests = {
         {"rules", rules},     {"pickup", pickup},     {"commands", commands}, {"transport", transport},
         {"restore", restore}, {"lifetime", lifetime}, {"input", input},       {"private", private_game},
-        {"stealth", stealth}};
+        {"stealth", stealth},     {"willpower", willpower}};
     auto it = tests.find(argv[1]);
     return it != tests.end() && it->second(argv[2]) ? 0 : 1;
 }

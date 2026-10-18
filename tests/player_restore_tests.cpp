@@ -114,9 +114,9 @@ namespace
             auto* p = g.server_shell.Player(g.local_client);
             PlayerRestoreState untouched;
             untouched.world = "unchanged";
-            p->m_bPowerupActivated[0] = true;
+            p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = true;
             CHECK(!g.capture_player(untouched, e) && untouched.world == "unchanged");
-            p->m_bPowerupActivated[0] = false;
+            p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = false;
             p->door_push_pending = true;
             CHECK(!g.capture_player(untouched, e));
             p->door_push_pending = false;

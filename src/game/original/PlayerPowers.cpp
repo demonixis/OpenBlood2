@@ -1,11 +1,13 @@
 // Selected original CPlayerObj AddPowerup/CheckPowerups/ResetPowerups and the
-// powerup sound stack (PlayerObj.cpp:3670-4046), Stealth only. See powerup_contracts.md.
+// powerup sound stack (PlayerObj.cpp:3670-4046), Willpower and Stealth. See
+// powerup_contracts.md.
 #include "PlayerObj.h"
 #include <cmath>
 using namespace OpenBlood2;
 namespace
 {
     constexpr float alpha_normal = 1, alpha_invisible = .08f;
+    constexpr DDWORD willpower_glow = 1u << 9; // USRFLG_WILLPOWERGLOW
     constexpr const char* start_sound = "sounds\\powerups\\specialpowerupstart1.wav";
     constexpr const char* end_sound = "sounds\\powerups\\specialpowerupend1.wav";
     // Indexed by PowerupType; the source's second entry is the Stealth loop.
@@ -31,8 +33,18 @@ namespace
 bool CPlayerObj::AddPowerup(DBYTE type, float value)
 {
     auto* s = GetServerDE();
-    if (type != 6 /* POWERUP_STEALTH */ || !std::isfinite(value))
+    if ((type != 5 /* POWERUP_INVULNERABILITY */ && type != 6 /* POWERUP_STEALTH */) || !std::isfinite(value))
         return false;
+    if (type == 5)
+    {
+        m_fNighInvulnerableTime = s->GetTime() + value;
+        m_damage.m_bNighInvulnerable = true;
+        m_bPowerupActivated[PU_INVULNERABLE] = true;
+        ++powerup_pickups;
+        StartPowerupSound(PU_INVULNERABLE);
+        s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) | willpower_glow);
+        return true;
+    }
     m_fInvisibleTime = s->GetTime() + value;
     s->SetObjectColor(m_hObject, {}, alpha_invisible);
     s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) & ~FLAG_SHADOW);
@@ -45,6 +57,17 @@ bool CPlayerObj::CheckPowerups()
 {
     auto* s = GetServerDE();
     float time = s->GetTime();
+    // Nigh invulnerability (Willpower) precedes invisibility in the source.
+    if (m_bPowerupActivated[PU_INVULNERABLE] && time > m_fNighInvulnerableTime)
+    {
+        m_bPowerupActivated[PU_INVULNERABLE] = false;
+        m_damage.m_bNighInvulnerable = false;
+        ++powerup_expiries;
+        ++powerup_console_unavailable; // IDS_GENERAL_WILLPOWER_EXP console text is not delivered.
+        EndPowerupSound(PU_INVULNERABLE);
+        PlayVoiceGroupEventOnClient(6 /* VME_POWERUP */, true);
+        s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) & ~willpower_glow);
+    }
     if (m_bPowerupActivated[PU_INVISIBLE])
     {
         bool visible = false;
@@ -113,6 +136,13 @@ bool CPlayerObj::CheckPowerups()
 void CPlayerObj::ResetPowerups()
 {
     auto* s = GetServerDE();
+    if (m_bPowerupActivated[PU_INVULNERABLE])
+    {
+        m_bPowerupActivated[PU_INVULNERABLE] = false;
+        m_damage.m_bNighInvulnerable = false;
+        EndPowerupSound(PU_INVULNERABLE);
+        s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) & ~willpower_glow);
+    }
     if (m_bPowerupActivated[PU_INVISIBLE])
     {
         m_bPowerupActivated[PU_INVISIBLE] = false;

@@ -179,9 +179,9 @@ namespace
         CHECK(!p->RestoreModelState(e) && !p->restore_model_loaded && r->velocity.y == 2);
         p->SetClient(nullptr);
         CHECK(g.server.disconnect_client(client));
-        p->m_bPowerupActivated[0] = true;
+        p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = true;
         CHECK(!p->RestoreModelState(e));
-        p->m_bPowerupActivated[0] = false;
+        p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = false;
         // Model failure is reported, not converted to a completed tail.
         r->animation.animation = UINT32_MAX;
         CHECK(!p->RestoreModelState(e) && !p->restore_model_error.empty() && r->velocity.y == 2);

@@ -679,6 +679,7 @@ namespace OpenBlood2
         const ClassInfo armor_base{"ArmorBase", &powerup_pickup, construct<ArmorBase>, {}};
         const ClassInfo enhancement_base{"EnhancementBase", &powerup_pickup, construct<EnhancementBase>, {}};
         const ClassInfo stealth_pickup{"StealthPU", &enhancement_base, construct<StealthPU>, {}};
+        const ClassInfo willpower_pickup{"InvulnerabilityPU", &enhancement_base, construct<InvulnerabilityPU>, {}};
         const ClassInfo bullet_ammo{"BulletAmmoPU", &ammo_pickup, construct<BulletAmmoPU>, {}};
         const ClassInfo shell_ammo{"ShellAmmoPU", &ammo_pickup, construct<ShellAmmoPU>, {}};
         const ClassInfo bmg_ammo{"BMGAmmoPU", &ammo_pickup, construct<BMGAmmoPU>, {}};
@@ -1012,6 +1013,7 @@ namespace OpenBlood2
                objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
                objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
                objects.register_class(enhancement_base) && objects.register_class(stealth_pickup) &&
+               objects.register_class(willpower_pickup) &&
                objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
                objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
                objects.register_class(conversation_trigger) && objects.register_class(big_trigger) &&

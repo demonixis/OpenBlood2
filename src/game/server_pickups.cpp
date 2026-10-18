@@ -31,7 +31,7 @@ namespace OpenBlood2
         // leaves bounce on string creation; SniperRiflePU's weapon is not integrated.
         for (auto name : {"BulletAmmoPU",  "ShellAmmoPU",     "BMGAmmoPU",      "FlareAmmoPU",  "DieBugDieAmmoPU",
                           "HowitzerAmmoPU", "FuelAmmoPU",      "BatteryAmmoPU",  "HealthPU",     "MegaHealthPU",
-                          "WardPU",         "NecroWardPU",     "MedKitPU",       "FlashlightPU", "ProximitiesPU",
+                          "WardPU",         "NecroWardPU",     "InvulnerabilityPU", "MedKitPU",       "FlashlightPU", "ProximitiesPU",
                           "RemotesPU",      "BerettaPU",       "SubMachineGunPU", "FlareGunPU",  "AssaultRiflePU", "TeslaCannonPU",
                           "Fanatic",        "Prophet"})
             supported |= same_name(type, name);
