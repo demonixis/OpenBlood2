@@ -110,19 +110,10 @@ namespace OpenBlood2
             const auto* r = store.get(id);
             if (!r || r->life != Life::Alive || !(r->state.m_Flags & FLAG_VISIBLE))
                 continue;
-            std::size_t match = 0;
-            for (std::size_t i = 1; i < mesh.ranges.size(); ++i)
-                if (!CaseLess{}(mesh.ranges[i].name, r->state.m_Filename) &&
-                    !CaseLess{}(r->state.m_Filename, mesh.ranges[i].name))
-                {
-                    if (match)
-                    {
-                        e = "Ambiguous sky world model";
-                        draws.clear();
-                        return false;
-                    }
-                    match = i;
-                }
+            std::size_t match = r->world_model_index; // Bound at creation (first in file order).
+            if (match >= mesh.ranges.size() || CaseLess{}(mesh.ranges[match].name, r->state.m_Filename) ||
+                CaseLess{}(r->state.m_Filename, mesh.ranges[match].name))
+                match = 0;
             WorldViewUniform uniform;
             if (!r->world_model || !match ||
                 !world_view_uniform({}, {}, 1, {unsigned(match), r->state.m_Pos, r->state.m_Rotation}, uniform))

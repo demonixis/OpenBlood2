@@ -591,15 +591,15 @@ namespace
             CHECK(!probe(s) && s.objects.error() == ObjectError::MissingWorldModel && initial == 0);
             CHECK(s.objects.get(rejected)->life == Life::Pending);
             CHECK(s.objects.finish_frame() && !s.objects.get(rejected));
-            // A bound but invalid shape, or ambiguous case-insensitive matches,
-            // is not the original missing-name case and cannot become an omission.
+            // A bound but invalid shape is not the original missing-name case and cannot
+            // become an omission. Duplicate case-insensitive names bind the first model.
             s.world.models[0].name = "absent";
             CHECK(!probe(s) && s.objects.error() == ObjectError::Unsupported && initial == 0);
             CHECK(s.objects.finish_frame());
             s.world.models.push_back(s.world.models[0]);
             s.world.models[1].name = "ABSENT";
             CHECK(!probe(s) && s.objects.error() == ObjectError::Unsupported && initial == 0);
-            CHECK(s.objects.diagnostics().back().find("Ambiguous") != std::string::npos);
+            CHECK(s.objects.diagnostics().back().find("Ambiguous") == std::string::npos);
             CHECK(s.objects.finish_frame());
             s.world.models.resize(1);
             s.world.models[0].name = "existing";

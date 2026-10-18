@@ -603,20 +603,11 @@ namespace OpenBlood2
             }
             if (r->state.m_ObjectType != OT_WORLDMODEL)
                 continue;
-            std::size_t match = 0;
-            for (std::size_t i = 1; i < mesh.ranges.size(); ++i)
-                if (!CaseLess{}(mesh.ranges[i].name, r->state.m_Filename) &&
-                    !CaseLess{}(r->state.m_Filename, mesh.ranges[i].name))
-                {
-                    if (match)
-                    {
-                        error = "Ambiguous diagnostic world model";
-                        draws.clear();
-                        return false;
-                    }
-                    match = i;
-                }
-            if (!match || !r->world_model)
+            // One range per world model in file order: draw the model creation bound.
+            const std::size_t match = r->world_model_index;
+            if (!match || match >= mesh.ranges.size() || !r->world_model ||
+                CaseLess{}(mesh.ranges[match].name, r->state.m_Filename) ||
+                CaseLess{}(r->state.m_Filename, mesh.ranges[match].name))
             {
                 error = "Missing diagnostic world model binding";
                 draws.clear();

@@ -397,17 +397,19 @@ namespace OpenBlood2
         {
             const WorldModel* model = nullptr;
             std::string error;
+            // Duplicate names bind the first model in file order (later LithTech FindWorldModel,
+            // case-insensitive); the others stay unbound. Keep the candidate count inspectable.
             if (world)
-                for (const auto& candidate : world->models)
-                    if (!CaseLess{}(candidate.name, state.m_Filename) && !CaseLess{}(state.m_Filename, candidate.name))
+                for (std::size_t i = 0; i < world->models.size(); ++i)
+                    if (const auto& candidate = world->models[i]; !CaseLess{}(candidate.name, state.m_Filename) &&
+                                                                  !CaseLess{}(state.m_Filename, candidate.name))
                     {
-                        if (model)
+                        if (!model)
                         {
-                            error = state.m_ObjectType == OT_CONTAINER ? "Ambiguous named container model"
-                                                                       : "Ambiguous named world model";
-                            break;
+                            model = &candidate;
+                            object->world_model_index = static_cast<std::uint32_t>(i);
                         }
-                        model = &candidate;
+                        ++object->world_model_candidates;
                     }
             auto shape = std::make_shared<ContainerShape>();
             if (!model || !error.empty() || !shape->build(*model, state.m_Rotation, error))
@@ -415,8 +417,8 @@ namespace OpenBlood2
                 contexts_.pop_back();
                 remove(handle);
                 // The original engine rejects this object before initial update. Its
-                // world-file loader continues after a missing named BSP; ambiguity,
-                // invalid shapes and an unattached world remain hard failures here.
+                // world-file loader continues after a missing named BSP; invalid shapes
+                // and an unattached world remain hard failures here.
                 const bool absent = world && !world->models.empty() && state.m_Filename[0] && !model && error.empty();
                 fail(absent ? ObjectError::MissingWorldModel : ObjectError::Unsupported,
                      std::string(state.m_Name) + ": " +

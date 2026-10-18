@@ -156,6 +156,9 @@ namespace OpenBlood2
         std::uint32_t rotation_steps = 0;
         // state.Pos is the current translation pivot.
         std::shared_ptr<const ContainerShape> world_model;
+        // Bound BSP (world/container models): the first of `world_model_candidates`
+        // same-named models in file order, as later LithTech FindWorldModel returns.
+        std::uint32_t world_model_index = UINT32_MAX, world_model_candidates = 0;
         std::uint64_t mover_moves = 0, mover_blocks = 0, mover_pushes = 0, mover_riders = 0;
         HOBJECT mover_blocker = nullptr;
         AnimationTrack animation;

@@ -824,8 +824,13 @@ namespace OpenBlood2
                                         object->color.x, object->color.y, object->color.z, object->alpha);
                         if (const auto* shape =
                                 object->world_model ? object->world_model.get() : object->container().get())
+                        {
                             ImGui::Text("Geometry: %zu closed components | %zu shared edges | %zu triangles",
                                         shape->closed_components, shape->shared_edges, shape->triangles.size());
+                            ImGui::Text("BSP model #%u of %u same-named%s", object->world_model_index,
+                                        object->world_model_candidates,
+                                        object->world_model_candidates > 1 ? " (first in file order bound)" : "");
+                        }
                         if (const auto* sound = dynamic_cast<const SoundFX*>(object->game.get()))
                         {
                             ImGui::SeparatorText("Original SoundFX");

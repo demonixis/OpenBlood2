@@ -53,8 +53,9 @@ next update; it does not report arrival, reverse itself or invent crushing damag
 
 ## Named geometry and typed services
 
-OT_WORLDMODEL=2 binds exactly one case-insensitive named DAT model after precreate.
-Missing/ambiguous names and invalid closed shells fail explicitly, using the
+OT_WORLDMODEL=2 binds one case-insensitive named DAT model after precreate (the
+first in file order when names repeat; see the [duplicate-name rule](object_contracts.md#duplicate-bsp-names)).
+Missing names and invalid closed shells fail explicitly, using the
 same checked base-ring/topology reader as containers. A separate immutable
 `world_model` record retains that shell; containers keep their static contract.
 

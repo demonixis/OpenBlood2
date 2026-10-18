@@ -88,9 +88,10 @@ still the actual closed shell. Changes are independent of Dear ImGui.
 The supplied base/multiplayer archives create and remove 103 additional volume
 instances: 38 Conveyor, 47 Damage, 18 FreeFall. Four entries in
 `worlds/14_subwayc.dat` (two Damage, two Conveyor) bind the ambiguous name
-`noname`; `worlds/20_powerstation.dat` Damage `kkk` has no model. These five
-entries remain explicit failures. `worlds/16_bridge.dat` remains unreadable at
-the previously recorded typed property. No arbitrary model selection is added.
+`noname`; `worlds/20_powerstation.dat` Damage `kkk` has no model. The four
+`noname` entries now bind the first model in file order ([duplicate-name rule](object_contracts.md#duplicate-bsp-names), 40
+Conveyor / 49 Damage created); the missing model remains an explicit failure. `worlds/16_bridge.dat` remains unreadable at
+the previously recorded typed property. The binding is deterministic and inspected, not arbitrary.
 
 SubwayA now has 23 created / 372 preprocessor-only / 185 unported source entries.
 CityHub has 11 supported volume instances, including its six conveyor escalators.

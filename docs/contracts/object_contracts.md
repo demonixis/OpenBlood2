@@ -143,3 +143,17 @@ and never read; a value of another type still rejects. This is a named retiremen
 not a rule that ignores unknown names: undeclared properties keep rejecting
 creation so incomplete class schemas stay visible (the original CGib, for
 example, reads a real Init* schema that is now declared and ported).
+
+## Duplicate BSP names
+
+Retail worlds reuse names for several BSP models (`Door1`, `window3`, `noname`,
+`blame33`…). Later LithTech `IWorldSharedBSP::FindWorldModel` walks the models in
+file order with a case-insensitive compare and returns the first match. Creation
+now does the same for OT_WORLDMODEL and OT_CONTAINER: it binds the first match and
+stores `world_model_index` plus the number of same-named candidates on the
+record (inspector: "BSP model #i of n same-named"). Later candidates stay unbound
+and, like any unbound model, are neither drawn nor collided. World and sky
+drawing reuse the stored index instead of a second name search; a record whose
+index does not name its range fails drawing. This is later-engine evidence, not
+a verified 1998 trace. It cleared 28 retail failures across 11 worlds. Missing
+names, open/non-manifold shells and off-plane faces keep failing.

@@ -14,7 +14,9 @@ per-world counts in the contracts are historical.
 Update after L0/L1 (same data, `--start-game`): `drop` and `multi/bb_deathcanyon`
 now start; 17 equal-radius Sounds now play (434 → 417 failed entries over all
 worlds); every precreate rejection names its cause. After L13 `08_subwayb`
-also starts; after L3, 147 entries still fail. The tables below are regenerated from
+also starts; after L3, 147 entries still fail, and after L4 115. Of the seven
+worlds that pass entry validation, six start with `--start-game`; `bb_midgard`
+fails its first update (L14). The tables below are regenerated from
 the latest run.
 
 ## How to refresh
@@ -29,8 +31,8 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 
 ## Status by world
 
-`starts` means the world passes entry validation (01_SubwayA, 02_CityHub,
-05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon). Batches are defined in the next section.
+`starts` means the world passes entry validation and `--start-game` (01_SubwayA,
+02_CityHub, 05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon). Batches are defined in the next section.
 
 | World | Created | Unported (classes) | Failed | Batches needed |
 |---|---:|---:|---:|---|
@@ -38,19 +40,19 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 | 02_cityhub | 453 | 0 (0) | 0 | **starts** |
 | 02_cityhubb | 392 | 19 (3) | 0 | L7 |
 | 02_cityhubc | 370 | 34 (4) | 2 | L2, L7, L10 |
-| 03_museum | 555 | 86 (6) | 10 | L4, L6, L8, L10, L11, L12 |
+| 03_museum | 559 | 86 (6) | 6 | L6, L8, L10, L11, L12 |
 | 04_steamtunnels | 449 | 55 (6) | 6 | L2, L5, L6, L7, L10 |
 | 05_cdm | 534 | 14 (5) | 2 | L6, L7, L10, L11 |
 | 05_cdmb | 129 | 0 (0) | 0 | **starts** |
-| 06_airship1 | 189 | 0 (0) | 7 | L4, L6, L12 |
+| 06_airship1 | 191 | 0 (0) | 5 | L6, L12 |
 | 06_airship2 | 243 | 2 (2) | 17 | L6, L10 |
 | 07_cathedral | 207 | 18 (9) | 4 | L2, L6, L7, L8, L10, L11 |
 | 08_subwayb | 175 | 0 (0) | 0 | **starts** |
 | 09_abandoned_buildings | 641 | 38 (11) | 32 | L2, L4, L5, L6, L7, L8, L10, L11 |
 | 10_sewagetreatmentplant | 99 | 25 (5) | 1 | L6, L7, L11 |
-| 11_slaughter_house | 465 | 26 (8) | 16 | L4, L6, L7, L8, L10, L12 |
-| 21_laboratory | 280 | 38 (9) | 9 | L4, L6, L7, L8, L11 |
-| 22_office | 482 | 6 (3) | 17 | L2, L4, L6, L7, L8, L10 |
+| 11_slaughter_house | 467 | 26 (8) | 14 | L6, L7, L8, L10, L12 |
+| 21_laboratory | 282 | 38 (9) | 7 | L6, L7, L8, L11 |
+| 22_office | 490 | 6 (3) | 9 | L2, L6, L7, L8, L10 |
 | 23_rooftop | 136 | 8 (6) | 0 | L8, L9, L10, L11 |
 | 24_ancientcity | 255 | 57 (9) | 1 | L6, L7, L8, L10 |
 | 24b_arena | 152 | 18 (11) | 0 | L7, L9, L10, L11 |
@@ -61,27 +63,27 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 | multi/bb_area15 | 75 | 1 (1) | 0 | L10 |
 | multi/bb_bloodarena | 125 | 5 (5) | 0 | L10 |
 | multi/bb_bloodkeep | 81 | 2 (2) | 1 | L2, L10 |
-| multi/bb_bodies | 64 | 2 (2) | 2 | L4, L10 |
+| multi/bb_bodies | 66 | 2 (2) | 0 | L10 |
 | multi/bb_brownstar | 132 | 2 (2) | 0 | L10 |
 | multi/bb_cabana | 65 | 3 (3) | 0 | L10 |
 | multi/bb_chosenarena | 123 | 2 (2) | 0 | L10 |
-| multi/bb_condemned | 177 | 4 (4) | 7 | L2, L4, L10 |
+| multi/bb_condemned | 181 | 4 (4) | 3 | L2, L4, L10 |
 | multi/bb_crypt | 116 | 6 (4) | 0 | L10, L11 |
 | multi/bb_deathcanyon | 44 | 0 (0) | 0 | **starts** |
 | multi/bb_drain | 50 | 2 (1) | 0 | L10 |
 | multi/bb_fields | 97 | 8 (1) | 0 | L11 |
-| multi/bb_jgrave | 131 | 11 (4) | 8 | L2, L4, L10 |
-| multi/bb_midgard | 79 | 0 (0) | 2 | L4 |
+| multi/bb_jgrave | 135 | 11 (4) | 4 | L2, L10 |
+| multi/bb_midgard | 81 | 0 (0) | 0 | L14 |
 | multi/bb_power | 140 | 1 (1) | 0 | L10 |
 | multi/bb_rooftop | 104 | 4 (4) | 0 | L10, L11 |
 | multi/ctf_cabana | 122 | 8 (4) | 0 | L10, L11 |
 | multi/ctf_deadcities | 153 | 8 (4) | 0 | L10, L11 |
-| multi/ctf_dmx | 97 | 7 (3) | 2 | L4, L10, L11 |
+| multi/ctf_dmx | 99 | 7 (3) | 0 | L10, L11 |
 | multi/ctf_jam | 219 | 21 (7) | 0 | L10, L11 |
 
 Closest to starting:
 
-- **L4 only:** `multi/bb_midgard`.
+- **L14 only:** `multi/bb_midgard` (passes entry validation, fails first update).
 - **L9 only:** `credits`, `end` (the Chosen as scripted actors).
 - **L10 only:** `multi/bb_bloodarena`, `multi/bb_area15`, `bb_brownstar`, `bb_cabana`, `bb_chosenarena`, `bb_drain`, `bb_power`.
 - **L11 only:** `multi/bb_fields`.
@@ -89,7 +91,7 @@ Closest to starting:
 
 ## Batches
 
-L0, L1, L3 and L13 are done. L2, L4 and L5 are fixes and policies on code that already exists;
+L0, L1, L3 and L13 are done, L4 partly. L2, the rest of L4, L5 and L14 are fixes and policies on code that already exists;
 L6–L12 port new original code. Unported-class totals count source entries over all 44 worlds.
 
 ### L0 — Diagnostics (done)
@@ -150,15 +152,17 @@ whether each kind is omitted visibly or keeps the world blocked:
 Accepting these rows surfaced two more ambiguous world-model names (bb_bodies
 `window3`, bb_midgard `rotate01`), now listed under L4.
 
-### L4 — World-model name resolution and shells (9 worlds)
+### L4 — World-model name resolution and shells (duplicate names done)
 
-- **Ambiguous named world models** (28 entries): Door, CDestructableBrush,
-  RotatingDoor and Ladder (container) whose name matches several BSP models
-  (03, 06_airship1, 11, 21, 22, bb_condemned, bb_jgrave, ctf_dmx). Establish the
-  original engine's choice for duplicate names (first match?) and replace the
-  refusal by that rule.
-- **Open/non-manifold door shell** `Buildings` (bb_condemned) and **container
-  face not on its plane** `helloyou1` (09): compound-shell/plane tolerance cases.
+- **Duplicate BSP names** (done): creation binds the first same-named model in
+  file order, as later LithTech `FindWorldModel` does; drawing reuses that
+  binding and later candidates stay unbound (object contracts). This cleared
+  every ambiguous failure, including the two surfaced by L3.
+- **Still open — open/non-manifold door shell** `Buildings` (bb_condemned): one
+  component has 4 unpaired edges. **Off-plane container face** `helloyou3` (09):
+  a quad deviates 0.985 units from its plane (tolerance 0.1), a real warp rather
+  than rounding. Both need a collision policy for shells the replacement solver
+  cannot represent today; the original BSP collision never required closure.
 
 ### L5 — Polygon dynamics (2 worlds)
 
@@ -253,6 +257,14 @@ source spring is never reached. The allow-list admits the ported item and weapon
 pickups; 02_cityhubb, 03, 04, 05_cdm, 06_airship1, 07 and 08_subwayb lost those
 failures.
 
+### L14 — Runtime start placement (1 world)
+
+`multi/bb_midgard` passes entry validation now, but its first update fails:
+`NecroWardPU0` lies 1.29 units inside world polygon 449 after its initial ground
+placement, beyond the 0.01-unit contact overlap tolerance. Investigate the
+pickup's MoveObjectToGround result against that slope; no depenetration
+shortcut.
+
 ## Details by world
 
 ### 02_cityhubb
@@ -286,7 +298,7 @@ failures.
 | CDestructableModel | Model clip-zero dimensions unavailable | 1 | L2 |
 
 ### 03_museum
-555 created instances · 86 unported entries (6 classes) · 10 failed entries
+559 created instances · 86 unported entries (6 classes) · 6 failed entries
 
 **Unported classes**
 
@@ -306,7 +318,6 @@ failures.
 | CDestructableModel | SpawnObject class not accepted: InvulnerabilityPU | 1 | L10 |
 | CDestructableBrush | SpawnObject class not accepted: BinocularsPU | 1 | L10 |
 | CultistAI | NPC world ground placement failed | 1 | L12 |
-| CDestructableBrush | Ambiguous named world model | 4 | L4 |
 | CDestructableModel | SpawnObject class not accepted: RocketAmmoPU | 1 | L6 |
 | Fanatic | authored AI weapon unavailable: SHOTGUN | 1 | L6 |
 | Prophet | authored AI weapon unavailable: SINGULARITY | 1 | L6 |
@@ -356,14 +367,13 @@ failures.
 | Fanatic | authored AI weapon unavailable: TESLA | 1 | L6 |
 
 ### 06_airship1
-189 created instances · 0 unported entries (0 classes) · 7 failed entries
+191 created instances · 0 unported entries (0 classes) · 5 failed entries
 
 **Failed entries**
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
 | CultistAI | NPC world ground placement failed | 3 | L12 |
-| Door | Ambiguous named world model | 2 | L4 |
 | Fanatic | authored AI weapon unavailable: SNIPE | 2 | L6 |
 
 ### 06_airship2
@@ -455,7 +465,7 @@ failures.
 | Fanatic | authored AI weapon unavailable: HOWITZ | 1 | L6 |
 
 ### 11_slaughter_house
-465 created instances · 26 unported entries (8 classes) · 16 failed entries
+467 created instances · 26 unported entries (8 classes) · 14 failed entries
 
 **Unported classes**
 
@@ -478,7 +488,6 @@ failures.
 | CDestructableBrush | SpawnObject class not accepted: InvulnerabilityPU | 1 | L10 |
 | CultistAI | NPC world ground placement failed | 2 | L12 |
 | CivilianAI | NPC world ground placement failed | 1 | L12 |
-| CDestructableBrush | Ambiguous named world model | 2 | L4 |
 | CDestructableModel | SpawnObject class not accepted: HowitzerPU | 1 | L6 |
 | CDestructableModel | SpawnObject class not accepted: ShotgunPU | 1 | L6 |
 | Prophet | authored AI weapon unavailable: NAPALMCANNON | 1 | L6 |
@@ -486,7 +495,7 @@ failures.
 | CDestructableModel | SpawnObject class not accepted: BoneLeech | 5 | L7 |
 
 ### 21_laboratory
-280 created instances · 38 unported entries (9 classes) · 9 failed entries
+282 created instances · 38 unported entries (9 classes) · 7 failed entries
 
 **Unported classes**
 
@@ -506,11 +515,10 @@ failures.
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| CDestructableBrush | Ambiguous named world model | 2 | L4 |
 | CDestructableModel | SpawnObject class not accepted: boneleech | 7 | L7 |
 
 ### 22_office
-482 created instances · 6 unported entries (3 classes) · 17 failed entries
+490 created instances · 6 unported entries (3 classes) · 9 failed entries
 
 **Unported classes**
 
@@ -526,9 +534,6 @@ failures.
 |---|---|---:|---|
 | CDestructableBrush | SpawnObject class not accepted: TheAngerPU | 1 | L10 |
 | CDestructableModel | Model clip-zero dimensions unavailable: Model resource not mounted: modelsworldobjects\urinal2.abc | 1 | L2 |
-| CDestructableBrush | Ambiguous named world model | 6 | L4 |
-| RotatingDoor | Ambiguous named world model | 1 | L4 |
-| Door | Ambiguous named world model | 1 | L4 |
 | Fanatic | authored AI weapon unavailable: TESLACANNON | 3 | L6 |
 | CDestructableBrush | SpawnObject class not accepted: RocketAmmoPU | 1 | L6 |
 | Fanatic | authored AI weapon unavailable: SNIPERRIFLE | 1 | L6 |
@@ -675,7 +680,7 @@ failures.
 | Sound | Missing or oversized sound resource | 1 | L2 |
 
 ### multi/bb_bodies
-64 created instances · 2 unported entries (2 classes) · 2 failed entries
+66 created instances · 2 unported entries (2 classes) · 0 failed entries
 
 **Unported classes**
 
@@ -683,12 +688,6 @@ failures.
 |---|---:|---|
 | AngerPU | 1 | L10 |
 | InvulnerabilityPU | 1 | L10 |
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| Door | Ambiguous named world model | 2 | L4 |
 
 ### multi/bb_brownstar
 132 created instances · 2 unported entries (2 classes) · 0 failed entries
@@ -722,7 +721,7 @@ failures.
 | InvulnerabilityPU | 1 | L10 |
 
 ### multi/bb_condemned
-177 created instances · 4 unported entries (4 classes) · 7 failed entries
+181 created instances · 4 unported entries (4 classes) · 3 failed entries
 
 **Unported classes**
 
@@ -738,8 +737,6 @@ failures.
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
 | Sound | Missing or oversized sound resource | 2 | L2 |
-| Door | Ambiguous named world model | 2 | L4 |
-| Ladder | Ambiguous named container model | 2 | L4 |
 | Door | Open or non-manifold container shell: 4 edges / balance 0 in component 3 | 1 | L4 |
 
 ### multi/bb_crypt
@@ -773,7 +770,7 @@ failures.
 | Minefield | 8 | L11 |
 
 ### multi/bb_jgrave
-131 created instances · 11 unported entries (4 classes) · 8 failed entries
+135 created instances · 11 unported entries (4 classes) · 4 failed entries
 
 **Unported classes**
 
@@ -789,16 +786,6 @@ failures.
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
 | Sound | Invalid sound resource path | 4 | L2 |
-| Door | Ambiguous named world model | 4 | L4 |
-
-### multi/bb_midgard
-79 created instances · 0 unported entries (0 classes) · 2 failed entries
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| RotatingBrush | Ambiguous named world model | 2 | L4 |
 
 ### multi/bb_power
 140 created instances · 1 unported entries (1 classes) · 0 failed entries
@@ -846,7 +833,7 @@ failures.
 | TheEyePU | 2 | L10 |
 
 ### multi/ctf_dmx
-97 created instances · 7 unported entries (3 classes) · 2 failed entries
+99 created instances · 7 unported entries (3 classes) · 0 failed entries
 
 **Unported classes**
 
@@ -855,12 +842,6 @@ failures.
 | TimeBombPU | 4 | L10 |
 | FlagStand | 2 | L11 |
 | AngerPU | 1 | L10 |
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| CDestructableBrush | Ambiguous named world model | 2 | L4 |
 
 ### multi/ctf_jam
 219 created instances · 21 unported entries (7 classes) · 0 failed entries
@@ -876,3 +857,10 @@ failures.
 | FlagStand | 2 | L11 |
 | NightGogglesPU | 2 | L10 |
 | InvulnerabilityPU | 1 | L10 |
+
+### multi/bb_midgard
+
+Passes entry validation but `--start-game` fails on the first update:
+`NecroWardPU0` starts 1.29 units inside world polygon 449 (MoveObject refuses
+start penetration deeper than 0.01; depenetration is not implemented). Batch L14.
+

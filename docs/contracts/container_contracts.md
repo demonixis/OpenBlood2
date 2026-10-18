@@ -73,8 +73,8 @@ membership for air, rather than a second independent integration clock.
 ## Geometry and typed queries
 
 `ObjectRecord` owns an immutable shared `ContainerShape`; no pointer into a
-replaceable World survives creation. Creation requires one unambiguous named
-model. A missing/open/invalid shape produces a diagnostic and deferred cleanup,
+replaceable World survives creation. Creation binds the first same-named model in
+file order ([duplicate-name rule](object_contracts.md#duplicate-bsp-names)). A missing/open/invalid shape produces a diagnostic and deferred cleanup,
 not a fake box volume. Removal makes it invisible to queries immediately;
 world unload destroys original objects before their services and resources.
 Teleport, rotation, resize, dimension, velocity/acceleration changes and

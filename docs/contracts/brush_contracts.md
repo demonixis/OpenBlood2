@@ -129,6 +129,7 @@ The source surface fallback through debris materials and decals remain pending.
 Pushable/gravity brushes, Exploding=true and nonempty SpawnObject reject creation
 because their missing branches affect gameplay. Save/restore creation rejects.
 No missing/ambiguous model is replaced by arbitrary geometry.
+Duplicate names now bind the first model in file order ([duplicate-name rule](object_contracts.md#duplicate-bsp-names)).
 
 ## Inspection
 

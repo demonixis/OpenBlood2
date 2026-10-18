@@ -117,6 +117,7 @@ namespace
         r->state.m_Pos = {30, 40, 50};
         r->state.m_Rotation = rotation_from_euler({0, 1, 0});
         r->world_model = std::make_shared<ContainerShape>();
+        r->world_model_index = 1; // Bound by creation in file order; drawing reuses it.
         r->state.m_Flags |= FLAG_VISIBLE;
         r->activity = OBJSTATE_INACTIVE;
         std::vector<WorldDraw> draws;
@@ -130,9 +131,12 @@ namespace
         CHECK(draws.size() == 1 && stats.hidden == 1 && mesh.effects.size() == 2);
         CHECK(world_alpha_order(mesh, draws, {}, {}, order, error) && order.empty());
         r->state.m_Flags |= FLAG_VISIBLE;
+        // A later same-named model stays unbound: drawing reuses the creation binding.
         mesh.ranges.push_back(mesh.ranges[1]);
-        CHECK(!world_draws(mesh, g.objects, draws, stats, error));
-        CHECK(draws.empty());
+        CHECK(world_draws(mesh, g.objects, draws, stats, error) && draws.size() == 2 && stats.unbound == 1);
+        r->world_model_index = 0; // A lost binding is never repaired by a name search.
+        CHECK(!world_draws(mesh, g.objects, draws, stats, error) && draws.empty());
+        r->world_model_index = 1;
         mesh.ranges.pop_back();
         CHECK(g.objects.remove(h));
         CHECK(world_draws(mesh, g.objects, draws, stats, error));

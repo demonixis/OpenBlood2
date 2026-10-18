@@ -61,6 +61,7 @@ historical TypeAction schemas, 19 ambiguous names, 12 missing models and one
 unresolved shell (`worlds/multi/bb_condemned.dat`, `Buildings`). The latter has four
 uses in a single connected component, so balanced winding is insufficient.
 The later [object contracts](object_contracts.md#retired-world-properties) supersede TypeAction rejection: the retired flag is accepted and never read.
+Duplicate names now bind the first model in file order ([duplicate-name rule](object_contracts.md#duplicate-bsp-names)).
 
 The brush catalog additionally recovers three `startfences` instances across the
 CityHub variants: 2,298 CDestructableBrush instances create, 157 reject, and all

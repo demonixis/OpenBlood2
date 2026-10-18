@@ -41,8 +41,8 @@ No class/name/world exception or general 'ignore errors' policy is introduced.
 Ambiguous names, invalid/unsupported geometry, absent world context, invalid
 properties, rejected precreate, missing models/images/audio, unknown classes and
 unavailable required services retain their existing failures. The original later
-engine takes the first ambiguous match; this project deliberately retains its
-stricter ambiguity rejection. Binary/parser corruption still rejects preparation.
+engine takes the first ambiguous match. This project first kept a stricter
+rejection; the later [duplicate-name rule](object_contracts.md#duplicate-bsp-names) supersedes it and binds that first match. Binary/parser corruption still rejects preparation.
 
 ## Animated world materials revealed by destination preflight
 
