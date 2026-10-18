@@ -255,7 +255,7 @@ namespace
         for (auto n : {-1, 1025})
             CHECK(!make(g, {{"RepeatY", std::int32_t(n)}}));
         CHECK(!make(g, {{"RepeatX", std::int32_t(33)}, {"RepeatY", std::int32_t(33)}}));
-        CHECK(!make(g, {{"TypeAction", true}}));
+        CHECK(!make(g, {{"Bogus", true}})); // Undeclared names still reject (TypeAction is a retired flag).
         CHECK(!g.objects.create(g.objects.find_class("DetailSprite"), {}, Creation::Restore));
         CHECK(g.objects.finish_frame() && g.objects.snapshot().empty());
         auto failed = make(g, {{"FlushWithWorld", true},
@@ -346,8 +346,8 @@ namespace
         std::cout << "worlds=" << worlds << " sources=" << count << " manifests=" << loaded << " missing=" << missing
                   << " invalid=" << invalid << " rejected=" << rejected << " flush=" << flush << " repeat=" << repeat
                   << '\n';
-        CHECK(worlds == 57 && count == 124 && missing == 4 && invalid == 0 && rejected == 5 && loaded == 120 &&
-              flush == 2 && repeat == 0);
+        CHECK(worlds == 57 && count == 124 && missing == 4 && invalid == 0 && rejected == 4 && loaded == 120 &&
+              flush == 3 && repeat == 0);
         return true;
     }
     bool subway(const std::filesystem::path& root)

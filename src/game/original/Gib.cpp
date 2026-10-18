@@ -4,6 +4,7 @@
 #include "ParticleExplosionFX.h"
 #include "engine/collision.h"
 #include "game/game_settings.h"
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <numbers>
@@ -127,8 +128,16 @@ DDWORD CGib::EngineMessageFn(DDWORD msg, void* data, DFLOAT reason)
     {
         auto ret = B2BaseClass::EngineMessageFn(msg, data, reason);
         auto* state = static_cast<ObjectCreateStruct*>(data);
-        if (!ret || !state || reason != PRECREATE_NORMAL || !state->m_Filename[0])
+        if (!ret || !state || (reason != PRECREATE_NORMAL && reason != PRECREATE_WORLDFILE))
             return 0;
+        if (reason == PRECREATE_WORLDFILE && !ReadProp(*state))
+            return 0;
+        if (!state->m_Filename[0])
+        {
+            s->RejectPrecreate("CGib without a model filename");
+            return 0;
+        }
+        // PostPropRead (GIB type 0) replaces InitFlags and the authored HitPoints/ObjectMass.
         state->m_Flags = FLAG_VISIBLE | FLAG_RAYHIT | FLAG_GRAVITY | FLAG_TOUCH_NOTIFY;
         state->m_ObjectType = OT_MODEL;
         return ret;
@@ -141,8 +150,31 @@ DDWORD CGib::EngineMessageFn(DDWORD msg, void* data, DFLOAT reason)
         damage.SetArmorPoints(0);
         damage.m_fMass = 3;
         damage.apply_damage_physics = true;
+        if (world_file && !init_anim.empty())
+        {
+            const auto animation = s->GetAnimIndex(m_hObject, init_anim.c_str());
+            if (animation == UINT32_MAX)
+                error = "CGib InitAnim not found: " + init_anim;
+            else
+                s->SetModelAnimation(m_hObject, animation);
+        }
         s->SetModelLooping(m_hObject, false);
-        s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) | (100u << 24));
+        DVector dims;
+        if (world_file && kickable)
+        {
+            // Original kickable gibs use a cube of the largest current-clip extent.
+            if (s->GetModelAnimUserDims(m_hObject, &dims, s->GetModelAnimation(m_hObject)) != DE_OK)
+                initialized = false;
+            else
+            {
+                const float side = std::max({dims.x, dims.y, dims.z});
+                dims = {side, side, side};
+                initialized = initialized && s->SetObjectDims(m_hObject, &dims) == DE_OK;
+            }
+            if (!initialized && error.empty())
+                error = "CGib kickable dimensions unavailable";
+        }
+        s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) | (surface << 24));
         if (GetGameType() != GAMETYPE_SINGLE)
             remove_time = s->GetTime() + 29.9f;
         s->SetNextUpdate(m_hObject, .1f);
@@ -152,6 +184,32 @@ DDWORD CGib::EngineMessageFn(DDWORD msg, void* data, DFLOAT reason)
     else if (msg == MID_TOUCHNOTIFY)
         Touch(static_cast<HOBJECT>(data));
     return B2BaseClass::EngineMessageFn(msg, data, reason);
+}
+bool CGib::ReadProp(ObjectCreateStruct& state)
+{
+    auto* s = GetServerDE();
+    world_file = true;
+    GenericProp prop;
+    if (s->GetPropGeneric("Kickable", &prop) == DE_OK)
+        kickable = prop.m_Bool != 0;
+    auto text = [&](const char* key, char* out, std::size_t size)
+    {
+        if (s->GetPropGeneric(key, &prop) != DE_OK || !prop.m_String[0])
+            return false;
+        if (std::strlen(prop.m_String) >= size)
+        {
+            s->RejectPrecreate(std::string(key) + " exceeds the original buffer");
+            return false;
+        }
+        std::strcpy(out, prop.m_String);
+        return true;
+    };
+    if (text("InitFilename", state.m_Filename, sizeof(state.m_Filename)))
+        surface = SURFTYPE_PLASTIC;
+    text("InitSkin", state.m_SkinName, sizeof(state.m_SkinName));
+    if (s->GetPropGeneric("InitAnim", &prop) == DE_OK)
+        init_anim = prop.m_String;
+    return true;
 }
 bool CGib::Update()
 {
@@ -175,7 +233,7 @@ bool CGib::Update()
     }
     if (s->GetObjectPos(m_hObject, &last_position) != DE_OK)
         return false;
-    if (add_blood_spurt)
+    if (add_blood_spurt && surface == SURFTYPE_FLESH)
     {
         OpenBlood2::BloodSpurtSettings spurt;
         spurt.position = last_position;
@@ -221,13 +279,24 @@ bool CGib::Update()
 }
 void CGib::BounceSound()
 {
-    int variant;
     auto* s = GetServerDE();
-    if (!s->RandomInt(1, 3, variant))
-        return;
     SoundRequest request;
     request.speaker = m_hObject;
-    request.resource = "sounds/gibs/flesh/gib_impact" + std::to_string(variant) + ".wav";
+    if (surface == SURFTYPE_PLASTIC)
+        request.resource = "sounds/bounce/pylon.wav"; // No random draw on this branch.
+    else if (surface == SURFTYPE_FLESH)
+    {
+        int variant;
+        if (!s->RandomInt(1, 3, variant))
+            return;
+        request.resource = "sounds/gibs/flesh/gib_impact" + std::to_string(variant) + ".wav";
+    }
+    else
+    {
+        // The source plays an uninitialized buffer for other surfaces; play nothing.
+        sound_error = "No original bounce sound for this surface";
+        return;
+    }
     request.outer_radius = 1000;
     request.inner_radius = 100;
     s->PlayCharacterSound(m_hObject, request, false, sound_error);

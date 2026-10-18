@@ -144,3 +144,19 @@ cleanup. Inspection never advances simulation.
 Continuation: [original corpse blood pools](blood_splat_contracts.md) supersedes the pool omission for corpse ground hits. Blood-spurt particles, gib impact callers, shared SFX eviction and other required services remain incomplete. The M2 exit gate is unchanged.
 
 The [blood-spurt continuation](blood_spurt_contracts.md) extends the selected original weapon/fragment/limb callers and impact splats. Earlier blanket omissions are historical; separate flesh sparks, generic debris and M2 remain incomplete.
+
+## World-file CGib
+
+Retail 05_CDM (24) and 09_Abandoned_Buildings (3) place CGib objects. The class now
+declares the original BEGIN_CLASS schema (destructable aggregate, InitFilename,
+InitSkin, InitFlags, InitAnim, HitPoints, ObjectMass, Kickable) and ports ReadProp
+for PRECREATE_WORLDFILE only: InitFilename/InitSkin select the model and make the
+surface SURFTYPE_PLASTIC; InitAnim picks the initial clip; Kickable is kept.
+PostPropRead for GIB type 0 then replaces InitFlags with VISIBLE|RAYHIT|GRAVITY|
+TOUCH_NOTIFY and the authored HitPoints/ObjectMass with 10/3, so those authored
+values are read but have no effect, as in the source. Kickable world gibs get a
+cube of the largest current-clip extent. Plastic bounces play
+`sounds\bounce\pylon.wav` without a random draw and never publish blood spurts;
+other surfaces play nothing (the source uses an uninitialized buffer). Death keeps
+the limb rule: the original child gibs are GIB_SMALL and remove themselves on
+their first update, so none are invented. A missing model rejects precreate.

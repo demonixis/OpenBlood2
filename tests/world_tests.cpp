@@ -171,7 +171,7 @@ namespace
             w.append(object("DetailSprite", {string_prop("Filename", "missing.spr")}));
             w.append(object("DetailSprite", {string_prop("Filename", "bad.spr")}));
             w.append(object("DetailSprite", {string_prop("Filename", "valid.spr"), prop("DifficultyMed", 5, no)}));
-            w.append(object("DetailSprite", {string_prop("Filename", "valid.spr"), prop("TypeAction", 5, yes)}));
+            w.append(object("DetailSprite", {string_prop("Filename", "valid.spr"), prop("Bogus", 5, yes)}));
             w.append(object("DetailSprite", {string_prop("Filename", "frame-missing.spr")}));
         }
         else if (sounds)
@@ -613,7 +613,7 @@ namespace
             for (auto i : {1u, 2u, 4u, 5u})
                 CHECK(game.entries[i].state == EntryState::Failed && !game.entries[i].object &&
                       !game.entries[i].detail.empty());
-            CHECK(game.entries[4].detail.find("TypeAction") != std::string::npos);
+            CHECK(game.entries[4].detail.find("Bogus") != std::string::npos);
             CHECK(game.entries[5].detail.find("frame resource") != std::string::npos);
             CHECK(game.step(.02) && r->sprite_track.milliseconds == 20);
             CHECK(game.unload_world() && weak.expired());

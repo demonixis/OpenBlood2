@@ -296,6 +296,49 @@ namespace
         }
         return true;
     }
+    // Authored world-file CGib (05_CDM, 09_Abandoned_Buildings): original ReadProp/PostPropRead.
+    bool world_gibs(const char* root)
+    {
+        GameSession g;
+        CHECK(g.initialize());
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(g.resources.mount_game(config, error));
+        unsigned total = 0;
+        for (const char* world : {"05_CDM", "09_Abandoned_Buildings"})
+        {
+            CHECK(g.request_world(world, error));
+            unsigned gibs = 0;
+            for (std::size_t i = 0; i < g.entries.size(); ++i)
+            {
+                if (g.world.objects[i].class_name != "CGib")
+                    continue;
+                CHECK(g.entries[i].state == EntryState::Created);
+                const auto* r = g.objects.get(g.entries[i].object);
+                auto* gib = r ? dynamic_cast<CGib*>(r->game.get()) : nullptr;
+                CHECK(gib && gib->world_file && gib->initialized && gib->error.empty());
+                CHECK(gib->surface == SURFTYPE_PLASTIC && (g.server.GetObjectUserFlags(r->handle) >> 24) == 90);
+                // PostPropRead replaces the authored HitPoints/ObjectMass and InitFlags.
+                CHECK(gib->damage.m_fHitPoints == 10 && gib->damage.m_fMass == 3);
+                CHECK((g.server.GetObjectFlags(r->handle) & (FLAG_VISIBLE | FLAG_RAYHIT | FLAG_GRAVITY |
+                                                            FLAG_TOUCH_NOTIFY)) ==
+                      (FLAG_VISIBLE | FLAG_RAYHIT | FLAG_GRAVITY | FLAG_TOUCH_NOTIFY));
+                DVector dims;
+                CHECK(g.server.GetObjectDims(r->handle, &dims) == DE_OK);
+                if (gib->kickable)
+                    CHECK(dims.x == dims.y && dims.y == dims.z && dims.x > 0);
+                ++gibs;
+            }
+            for (int frame = 0; frame < 30; ++frame)
+                CHECK(g.step(1.0 / 30));
+            std::cout << world << " world gibs=" << gibs << "\n";
+            total += gibs;
+            CHECK(g.unload_world());
+        }
+        CHECK(total == 27);
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
@@ -314,5 +357,7 @@ int main(int argc, char** argv)
         return particles(argv[2]) ? 0 : 1;
     if (mode == "lifetime")
         return lifetime(argv[2]) ? 0 : 1;
+    if (mode == "world_gibs")
+        return world_gibs(argv[2]) ? 0 : 1;
     return 2;
 }

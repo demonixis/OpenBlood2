@@ -371,9 +371,10 @@ namespace
         }
         std::cout << "Door catalog: created=" << created << ", rejected=" << rejected << ", unreadable=" << skipped
                   << ", SelfTrigger=" << self_triggers << ", polygon=" << polygon << "\n";
-        CHECK(created == 619 && rejected == 79 && skipped == 1 && self_triggers == 149 && polygon == 114 &&
+        CHECK(created == 664 && rejected == 34 && skipped == 1 && self_triggers == 158 && polygon == 127 &&
               compound == 14);
-        CHECK(failures["schema"] == 47 && failures["ambiguous"] == 19 && failures["missing"] == 12 &&
+        // Retired TypeAction rows are created; two more ambiguous names surface (multiplayer maps).
+        CHECK(!failures.contains("schema") && failures["ambiguous"] == 21 && failures["missing"] == 12 &&
               failures["shell"] == 1);
         return true;
     }

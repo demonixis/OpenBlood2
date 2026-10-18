@@ -83,7 +83,11 @@ namespace OpenBlood2
                               {"Solid", false, false},
                               {"Gravity", false, false},
                               {"TouchNotify", false, false},
-                              {"Rayhit", false, false}}};
+                              {"Rayhit", false, false},
+                              // Retired editor flag on older DAT rows (BB_BloodArena, BB_Bodies,
+                              // BB_Midgard). No original class declares or reads it: B2BaseClass reads
+                              // TypeActionMode. Like the engine prop list, keep it unread, never defaulted.
+                              {"TypeAction", false, false}}};
         const ClassInfo sky_model{"DemoSkyWorldModel",
                                   &base,
                                   construct<DemoSkyWorldModel>,
@@ -140,7 +144,24 @@ namespace OpenBlood2
                 {"TypeCoop", true},
                 {"DifficultyInsane", true, false} // Read by original code, absent from its class registration.
             }};
-        const ClassInfo gib{"CGib", &b2base, construct<CGib>, {}};
+        // Original BEGIN_CLASS(CGib): destructable aggregate plus world-file Init props.
+        const ClassInfo gib{"CGib",
+                            &b2base,
+                            construct<CGib>,
+                            {{"DamageTriggerTarget", std::string{}},
+                             {"DamageTriggerMessage", std::string{}},
+                             {"DeathTriggerTarget", std::string{}},
+                             {"DeathTriggerMessage", std::string{}},
+                             {"TriggerDestroyOnly", false},
+                             {"SpawnObject", std::string{}, true, MAX_GP_STRING_LEN},
+                             {"SpawnObjectVel", DVector{}},
+                             {"InitFilename", std::string{}},
+                             {"InitSkin", std::string{}},
+                             {"InitFlags", std::int32_t(FLAG_VISIBLE | FLAG_RAYHIT | FLAG_GRAVITY | FLAG_SHADOW)},
+                             {"InitAnim", std::string{}},
+                             {"HitPoints", 20.0f},
+                             {"ObjectMass", 10.0f},
+                             {"Kickable", true}}};
         const ClassInfo corpse{"CCorpse", &b2base, construct<CCorpse>, {}};
         const ClassInfo camera_object{"CameraObj",
                                       &b2base,
@@ -169,7 +190,8 @@ namespace OpenBlood2
         const ClassInfo spawner{"Spawner",
                                 &b2base,
                                 construct<Spawner>,
-                                {{"SpawnObject", std::string{}},
+                                // Original GenericProp/szSpawn buffers: MAX_GP_STRING_LEN.
+                                {{"SpawnObject", std::string{}, true, MAX_GP_STRING_LEN},
                                  {"MinVelocity", DVector{0, 500, 0}},
                                  {"MaxVelocity", DVector{0, 500, 0}},
                                  {"Sound", std::string{}},
@@ -295,8 +317,9 @@ namespace OpenBlood2
                                                                      {"SpawnObjectVel", DVector{}}};
                                          for (auto name : {"RampUpSound", "RampDownSound", "DamageTriggerTarget",
                                                            "DamageTriggerMessage", "DeathTriggerTarget",
-                                                           "DeathTriggerMessage", "SpawnObject"})
+                                                           "DeathTriggerMessage"})
                                              p.push_back({name, std::string{}});
+                                         p.push_back({"SpawnObject", std::string{}, true, MAX_GP_STRING_LEN});
                                          for (auto name : {"CastShadowsFlag", "SolidLightFlag", "OnlyLightWorldFlag",
                                                            "DontLightBackfacingFlag", "FogLightFlag"})
                                              p.push_back({name, false});
@@ -398,7 +421,7 @@ namespace OpenBlood2
                                                                    {"DeathTriggerTarget", std::string{}},
                                                                    {"DeathTriggerMessage", std::string{}},
                                                                    {"TriggerDestroyOnly", false},
-                                                                   {"SpawnObject", std::string{}},
+                                                                   {"SpawnObject", std::string{}, true, MAX_GP_STRING_LEN},
                                                                    {"SpawnObjectVel", DVector{}},
                                                                    {"CanDamage", true}};
                                        for (const auto* name :
@@ -770,8 +793,9 @@ namespace OpenBlood2
                                             {"ExplodeDamage", 100.0f},
                                             {"DamageRadius", 200.0f}};
                 for (auto name : {"DamageTriggerTarget", "DamageTriggerMessage", "DeathTriggerTarget",
-                                  "DeathTriggerMessage", "SpawnObject", "CustomTexture", "CustomSound", "CustomModel"})
+                                  "DeathTriggerMessage", "CustomTexture", "CustomSound", "CustomModel"})
                     p.push_back({name, std::string{}});
+                p.push_back({"SpawnObject", std::string{}, true, MAX_GP_STRING_LEN});
                 for (auto name : {"Stone", "Metal", "Wood", "Energy", "Glass", "Terrain", "Plastic", "Flesh", "Liquid",
                                   "Exploding", "Custom"})
                     p.push_back({name, false});
@@ -810,8 +834,9 @@ namespace OpenBlood2
                 for (auto name :
                      {"InitFilename", "InitSkin", "DamageFilename", "DamageSkin", "DestroyFilename", "DestroySkin",
                       "SlidingSound", "DamageTriggerTarget", "DamageTriggerMessage", "DeathTriggerTarget",
-                      "DeathTriggerMessage", "SpawnObject", "CustomTexture", "CustomSound", "CustomModel"})
+                      "DeathTriggerMessage", "CustomTexture", "CustomSound", "CustomModel"})
                     p.push_back({name, std::string{}});
+                p.push_back({"SpawnObject", std::string{}, true, MAX_GP_STRING_LEN});
                 for (auto name : {"Stone", "Metal", "Wood", "Energy", "Glass", "Terrain", "Plastic", "Flesh", "Liquid",
                                   "Exploding", "Custom"})
                     p.push_back({name, false});

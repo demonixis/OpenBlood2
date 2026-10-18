@@ -13,7 +13,7 @@ M2 remains incomplete.
 resource 301, Flashlight_pu model/skin and inventory1.wav pickup request. The
 existing checked touch/acknowledgement path rejects dead players and full charge,
 and defers removal. Only authored single-player creation is supported; historical
-TypeAction remains unavailable. The later [pickup contracts](pickup_contracts.md) supersede the string-creation refusal: string-created item/weapon pickups follow the original bouncing SpawnItem.
+TypeAction is accepted as a retired, unread flag ([object contracts](object_contracts.md#retired-world-properties)). The later [pickup contracts](pickup_contracts.md) supersede the string-creation refusal: string-created item/weapon pickups follow the original bouncing SpawnItem.
 
 `CInvFlashlight` starts at 100 displayed charges and 120 seconds. Recharge ignores
 the incoming quantity and requires the rounded count to be below 100. Activation

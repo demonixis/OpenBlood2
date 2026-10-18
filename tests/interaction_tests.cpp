@@ -417,7 +417,7 @@ namespace
                   << " unreadable=" << skipped << " children=" << children << " moved=" << moved << "\n";
         for (const auto& [kind, count] : failures)
             std::cout << kind << "=" << count << "\n";
-        CHECK(created == 223 && rejected == 12 && filtered == 0 && skipped == 1 && children == 155 && moved == 215);
+        CHECK(created == 227 && rejected == 8 && filtered == 0 && skipped == 1 && children == 159 && moved == 219);
         return true;
     }
 } // namespace

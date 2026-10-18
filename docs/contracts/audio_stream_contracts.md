@@ -77,8 +77,9 @@ retained, unused historical metadata. No guessed voice category, priority mappin
 or audio behavior is attached to it. Nonzero values reject precreate; wrong types
 and unrelated unknown properties remain schema failures. This bounded compatibility
 choice follows the available original code, not a claim about the older binary's
-meaning. The three TypeAction SoundFX entries still reject; no speculative alias
-to TypeActionMode is introduced. Properties remain visible in the inspector.
+meaning. No alias to TypeActionMode is introduced; the three TypeAction SoundFX
+entries are now created under the retired-property rule of the
+[object contracts](object_contracts.md#retired-world-properties). Properties remain visible in the inspector.
 
 ## Verification scope
 

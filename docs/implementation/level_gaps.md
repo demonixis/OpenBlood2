@@ -14,7 +14,7 @@ per-world counts in the contracts are historical.
 Update after L0/L1 (same data, `--start-game`): `drop` and `multi/bb_deathcanyon`
 now start; 17 equal-radius Sounds now play (434 → 417 failed entries over all
 worlds); every precreate rejection names its cause. After L13 `08_subwayb`
-also starts and 405 entries still fail. The tables below are regenerated from
+also starts; after L3, 147 entries still fail. The tables below are regenerated from
 the latest run.
 
 ## How to refresh
@@ -40,28 +40,28 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 | 02_cityhubc | 370 | 34 (4) | 2 | L2, L7, L10 |
 | 03_museum | 555 | 86 (6) | 10 | L4, L6, L8, L10, L11, L12 |
 | 04_steamtunnels | 449 | 55 (6) | 6 | L2, L5, L6, L7, L10 |
-| 05_cdm | 510 | 14 (5) | 26 | L3, L6, L7, L10, L11 |
+| 05_cdm | 534 | 14 (5) | 2 | L6, L7, L10, L11 |
 | 05_cdmb | 129 | 0 (0) | 0 | **starts** |
 | 06_airship1 | 189 | 0 (0) | 7 | L4, L6, L12 |
 | 06_airship2 | 243 | 2 (2) | 17 | L6, L10 |
 | 07_cathedral | 207 | 18 (9) | 4 | L2, L6, L7, L8, L10, L11 |
 | 08_subwayb | 175 | 0 (0) | 0 | **starts** |
-| 09_abandoned_buildings | 638 | 38 (11) | 35 | L2, L3, L4, L5, L6, L7, L8, L10, L11 |
+| 09_abandoned_buildings | 641 | 38 (11) | 32 | L2, L4, L5, L6, L7, L8, L10, L11 |
 | 10_sewagetreatmentplant | 99 | 25 (5) | 1 | L6, L7, L11 |
 | 11_slaughter_house | 465 | 26 (8) | 16 | L4, L6, L7, L8, L10, L12 |
 | 21_laboratory | 280 | 38 (9) | 9 | L4, L6, L7, L8, L11 |
 | 22_office | 482 | 6 (3) | 17 | L2, L4, L6, L7, L8, L10 |
 | 23_rooftop | 136 | 8 (6) | 0 | L8, L9, L10, L11 |
-| 24_ancientcity | 254 | 57 (9) | 2 | L3, L6, L7, L8, L10 |
-| 24b_arena | 149 | 18 (11) | 3 | L3, L7, L9, L10, L11 |
+| 24_ancientcity | 255 | 57 (9) | 1 | L6, L7, L8, L10 |
+| 24b_arena | 152 | 18 (11) | 0 | L7, L9, L10, L11 |
 | 25_ancientone | 123 | 30 (10) | 1 | L2, L8, L9, L10, L11 |
 | credits | 21 | 1 (1) | 0 | L9 |
 | drop | 5 | 0 (0) | 0 | **starts** |
 | end | 20 | 4 (4) | 0 | L9 |
 | multi/bb_area15 | 75 | 1 (1) | 0 | L10 |
-| multi/bb_bloodarena | 16 | 5 (5) | 109 | L3, L10 |
+| multi/bb_bloodarena | 125 | 5 (5) | 0 | L10 |
 | multi/bb_bloodkeep | 81 | 2 (2) | 1 | L2, L10 |
-| multi/bb_bodies | 12 | 2 (2) | 54 | L3, L10 |
+| multi/bb_bodies | 64 | 2 (2) | 2 | L4, L10 |
 | multi/bb_brownstar | 132 | 2 (2) | 0 | L10 |
 | multi/bb_cabana | 65 | 3 (3) | 0 | L10 |
 | multi/bb_chosenarena | 123 | 2 (2) | 0 | L10 |
@@ -71,7 +71,7 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 | multi/bb_drain | 50 | 2 (1) | 0 | L10 |
 | multi/bb_fields | 97 | 8 (1) | 0 | L11 |
 | multi/bb_jgrave | 131 | 11 (4) | 8 | L2, L4, L10 |
-| multi/bb_midgard | 13 | 0 (0) | 68 | L3 |
+| multi/bb_midgard | 79 | 0 (0) | 2 | L4 |
 | multi/bb_power | 140 | 1 (1) | 0 | L10 |
 | multi/bb_rooftop | 104 | 4 (4) | 0 | L10, L11 |
 | multi/ctf_cabana | 122 | 8 (4) | 0 | L10, L11 |
@@ -81,15 +81,15 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 
 Closest to starting:
 
-- **L3 only:** `multi/bb_midgard`.
+- **L4 only:** `multi/bb_midgard`.
 - **L9 only:** `credits`, `end` (the Chosen as scripted actors).
-- **L10 only:** `multi/bb_area15`, `bb_brownstar`, `bb_cabana`, `bb_chosenarena`, `bb_drain`, `bb_power`.
+- **L10 only:** `multi/bb_bloodarena`, `multi/bb_area15`, `bb_brownstar`, `bb_cabana`, `bb_chosenarena`, `bb_drain`, `bb_power`.
 - **L11 only:** `multi/bb_fields`.
 - **L7 only:** `02_cityhubb`. **L6 + L10:** `06_airship2`.
 
 ## Batches
 
-L0, L1 and L13 are done. L2–L5 are fixes and policies on code that already exists;
+L0, L1, L3 and L13 are done. L2, L4 and L5 are fixes and policies on code that already exists;
 L6–L12 port new original code. Unported-class totals count source entries over all 44 worlds.
 
 ### L0 — Diagnostics (done)
@@ -132,20 +132,23 @@ whether each kind is omitted visibly or keeps the world blocked:
   (07); a CDestructableModel with empty `InitFilename` (02_cityhubc,
   "clip-zero dimensions unavailable").
 
-### L3 — Legacy property schemas (7 worlds)
+### L3 — Legacy property schemas (done)
 
-- **`TypeAction`** instead of `TypeActionMode` (231 entries, only
-  `multi/bb_bloodarena`, `bb_bodies`, `bb_midgard`): Door, Ladder, RotatingBrush,
-  BigTrigger, Water, WorldProperties and all pickups. The contracts forbid a
-  speculative alias; establish what the original does with an unknown world
-  property (most likely ignored by `GetProp*`) and apply that rule generally.
-- **CGib placed in world files** (27 entries, 05_cdm 24, 09 3): `CGib` is
-  registered without properties, but the DAT rows carry the CDestructable schema
-  (`DamageTriggerMessage`, `InitFilename`, `Kickable`, `ObjectMass`…). Port the
-  world-file CGib properties.
-- **Spawner `SpawnObject` rejected by the schema** (4 entries, 24_ancientcity,
-  24b_arena): probably an over-length spawn string with properties; confirm and
-  raise the bound to the original's.
+- **`TypeAction`** (231 entries, `multi/bb_bloodarena`, `bb_bodies`, `bb_midgard`,
+  plus three SoundFX): no original class declares or reads it, and LithTech's
+  `GetPropGeneric` never looks at a name nobody asks for. BaseClass now declares it
+  as a retired, non-defaulted bool: kept, never read, wrong types still reject.
+  Undeclared names keep rejecting so incomplete schemas stay visible.
+- **World-file CGib** (27 entries, 05_cdm 24, 09 3): the original BEGIN_CLASS
+  schema and ReadProp are ported (plastic surface, InitAnim, kickable cube, pylon
+  bounce sound, PostPropRead overrides; see the death-effect contracts).
+- **Spawner `SpawnObject`** (4 entries, 24_ancientcity, 24b_arena): the original
+  bound is MAX_GP_STRING_LEN (200 bytes), not 100; the 112–141-byte requests are
+  accepted. They name unported classes (UndeadGideon, the Revenant Chosen,
+  SoulDrudge), which still fail when triggered (L7–L9).
+
+Accepting these rows surfaced two more ambiguous world-model names (bb_bodies
+`window3`, bb_midgard `rotate01`), now listed under L4.
 
 ### L4 — World-model name resolution and shells (9 worlds)
 
@@ -333,7 +336,7 @@ failures.
 | Fanatic | authored AI weapon unavailable: SHOTGU | 1 | L6 |
 
 ### 05_cdm
-510 created instances · 14 unported entries (5 classes) · 26 failed entries
+534 created instances · 14 unported entries (5 classes) · 2 failed entries
 
 **Unported classes**
 
@@ -349,7 +352,6 @@ failures.
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| CGib | CGib: invalid property DamageTriggerMessage | 24 | L3 |
 | CDestructableModel | SpawnObject class not accepted: TeslaCannonPU | 1 | L6 |
 | Fanatic | authored AI weapon unavailable: TESLA | 1 | L6 |
 
@@ -406,7 +408,7 @@ failures.
 | CDestructableModel | SpawnObject class not accepted: ShotgunPU | 1 | L6 |
 
 ### 09_abandoned_buildings
-638 created instances · 38 unported entries (11 classes) · 35 failed entries
+641 created instances · 38 unported entries (11 classes) · 32 failed entries
 
 **Unported classes**
 
@@ -429,7 +431,6 @@ failures.
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
 | Sound | Missing or oversized sound resource | 4 | L2 |
-| CGib | CGib: invalid property DamageTriggerMessage | 3 | L3 |
 | CDestructableBrush | Container face is not on its plane | 1 | L4 |
 | CDestructableBrush | Gravity without BoxPhysics (polygon dynamics) | 26 | L5 |
 | Prophet | authored AI weapon unavailable: SINGULARITY | 1 | L6 |
@@ -549,7 +550,7 @@ failures.
 | OpheliaAI | 1 | L9 |
 
 ### 24_ancientcity
-254 created instances · 57 unported entries (9 classes) · 2 failed entries
+255 created instances · 57 unported entries (9 classes) · 1 failed entries
 
 **Unported classes**
 
@@ -569,11 +570,10 @@ failures.
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| Spawner | Spawner: invalid property SpawnObject | 1 | L3 |
 | Fanatic | authored AI weapon unavailable: SHOTGUN | 1 | L6 |
 
 ### 24b_arena
-149 created instances · 18 unported entries (11 classes) · 3 failed entries
+152 created instances · 18 unported entries (11 classes) · 0 failed entries
 
 **Unported classes**
 
@@ -590,12 +590,6 @@ failures.
 | SoulDrudge | 1 | L7 |
 | StealthPU | 1 | L10 |
 | VoodooDollPU | 1 | L10 |
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| Spawner | Spawner: invalid property SpawnObject | 3 | L3 |
 
 ### 25_ancientone
 123 created instances · 30 unported entries (10 classes) · 1 failed entries
@@ -652,7 +646,7 @@ failures.
 | StealthPU | 1 | L10 |
 
 ### multi/bb_bloodarena
-16 created instances · 5 unported entries (5 classes) · 109 failed entries
+125 created instances · 5 unported entries (5 classes) · 0 failed entries
 
 **Unported classes**
 
@@ -663,30 +657,6 @@ failures.
 | InvulnerabilityPU | 1 | L10 |
 | StealthPU | 1 | L10 |
 | TheEyePU | 1 | L10 |
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| Door | Door: invalid property TypeAction | 24 | L3 |
-| Ladder | Ladder: invalid property TypeAction | 14 | L3 |
-| BulletAmmoPU | BulletAmmoPU: invalid property TypeAction | 12 | L3 |
-| ProximitiesPU | ProximitiesPU: invalid property TypeAction | 8 | L3 |
-| RotatingBrush | RotatingBrush: invalid property TypeAction | 8 | L3 |
-| HealthPU | HealthPU: invalid property TypeAction | 7 | L3 |
-| ShellAmmoPU | ShellAmmoPU: invalid property TypeAction | 6 | L3 |
-| WardPU | WardPU: invalid property TypeAction | 4 | L3 |
-| FuelAmmoPU | FuelAmmoPU: invalid property TypeAction | 4 | L3 |
-| HowitzerAmmoPU | HowitzerAmmoPU: invalid property TypeAction | 4 | L3 |
-| DieBugDieAmmoPU | DieBugDieAmmoPU: invalid property TypeAction | 4 | L3 |
-| BatteryAmmoPU | BatteryAmmoPU: invalid property TypeAction | 4 | L3 |
-| RemotesPU | RemotesPU: invalid property TypeAction | 2 | L3 |
-| FlareAmmoPU | FlareAmmoPU: invalid property TypeAction | 2 | L3 |
-| BMGAmmoPU | BMGAmmoPU: invalid property TypeAction | 2 | L3 |
-| WorldProperties | WorldProperties: invalid property TypeAction | 1 | L3 |
-| MegaHealthPU | MegaHealthPU: invalid property TypeAction | 1 | L3 |
-| NecroWardPU | NecroWardPU: invalid property TypeAction | 1 | L3 |
-| MedKitPU | MedKitPU: invalid property TypeAction | 1 | L3 |
 
 ### multi/bb_bloodkeep
 81 created instances · 2 unported entries (2 classes) · 1 failed entries
@@ -705,7 +675,7 @@ failures.
 | Sound | Missing or oversized sound resource | 1 | L2 |
 
 ### multi/bb_bodies
-12 created instances · 2 unported entries (2 classes) · 54 failed entries
+64 created instances · 2 unported entries (2 classes) · 2 failed entries
 
 **Unported classes**
 
@@ -718,24 +688,7 @@ failures.
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| Door | Door: invalid property TypeAction | 8 | L3 |
-| RotatingBrush | RotatingBrush: invalid property TypeAction | 8 | L3 |
-| ShellAmmoPU | ShellAmmoPU: invalid property TypeAction | 6 | L3 |
-| BulletAmmoPU | BulletAmmoPU: invalid property TypeAction | 4 | L3 |
-| HealthPU | HealthPU: invalid property TypeAction | 4 | L3 |
-| BatteryAmmoPU | BatteryAmmoPU: invalid property TypeAction | 3 | L3 |
-| FlareAmmoPU | FlareAmmoPU: invalid property TypeAction | 3 | L3 |
-| FuelAmmoPU | FuelAmmoPU: invalid property TypeAction | 3 | L3 |
-| ProximitiesPU | ProximitiesPU: invalid property TypeAction | 3 | L3 |
-| Water | Water: invalid property TypeAction | 2 | L3 |
-| DieBugDieAmmoPU | DieBugDieAmmoPU: invalid property TypeAction | 2 | L3 |
-| HowitzerAmmoPU | HowitzerAmmoPU: invalid property TypeAction | 2 | L3 |
-| WorldProperties | WorldProperties: invalid property TypeAction | 1 | L3 |
-| BMGAmmoPU | BMGAmmoPU: invalid property TypeAction | 1 | L3 |
-| MegaHealthPU | MegaHealthPU: invalid property TypeAction | 1 | L3 |
-| NecroWardPU | NecroWardPU: invalid property TypeAction | 1 | L3 |
-| WardPU | WardPU: invalid property TypeAction | 1 | L3 |
-| Ladder | Ladder: invalid property TypeAction | 1 | L3 |
+| Door | Ambiguous named world model | 2 | L4 |
 
 ### multi/bb_brownstar
 132 created instances · 2 unported entries (2 classes) · 0 failed entries
@@ -839,29 +792,13 @@ failures.
 | Door | Ambiguous named world model | 4 | L4 |
 
 ### multi/bb_midgard
-13 created instances · 0 unported entries (0 classes) · 68 failed entries
+79 created instances · 0 unported entries (0 classes) · 2 failed entries
 
 **Failed entries**
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| Door | Door: invalid property TypeAction | 12 | L3 |
-| HealthPU | HealthPU: invalid property TypeAction | 10 | L3 |
-| RotatingBrush | RotatingBrush: invalid property TypeAction | 9 | L3 |
-| BulletAmmoPU | BulletAmmoPU: invalid property TypeAction | 6 | L3 |
-| FlareAmmoPU | FlareAmmoPU: invalid property TypeAction | 5 | L3 |
-| BigTrigger | BigTrigger: invalid property TypeAction | 4 | L3 |
-| ProximitiesPU | ProximitiesPU: invalid property TypeAction | 4 | L3 |
-| ShellAmmoPU | ShellAmmoPU: invalid property TypeAction | 4 | L3 |
-| FuelAmmoPU | FuelAmmoPU: invalid property TypeAction | 3 | L3 |
-| BatteryAmmoPU | BatteryAmmoPU: invalid property TypeAction | 2 | L3 |
-| DieBugDieAmmoPU | DieBugDieAmmoPU: invalid property TypeAction | 2 | L3 |
-| HowitzerAmmoPU | HowitzerAmmoPU: invalid property TypeAction | 2 | L3 |
-| WorldProperties | WorldProperties: invalid property TypeAction | 1 | L3 |
-| BMGAmmoPU | BMGAmmoPU: invalid property TypeAction | 1 | L3 |
-| MedKitPU | MedKitPU: invalid property TypeAction | 1 | L3 |
-| MegaHealthPU | MegaHealthPU: invalid property TypeAction | 1 | L3 |
-| NecroWardPU | NecroWardPU: invalid property TypeAction | 1 | L3 |
+| RotatingBrush | Ambiguous named world model | 2 | L4 |
 
 ### multi/bb_power
 140 created instances · 1 unported entries (1 classes) · 0 failed entries

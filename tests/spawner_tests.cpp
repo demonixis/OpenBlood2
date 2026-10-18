@@ -97,6 +97,16 @@ namespace
         CHECK(!make(g, {{"SoundRadius", -5.0f}}));
         CHECK(!make(g, {{"Bogus", true}}));
         CHECK(!make(g, {}, Creation::Restore));
+        // Original GenericProp/szSpawn hold MAX_GP_STRING_LEN (200) bytes; 24_AncientCity authors 141.
+        const std::string padded = "HealthPU Name " + std::string(80, 'x') + ";PickupTriggerTarget " +
+                                   std::string(40, 'y');
+        CHECK(padded.size() > 140 && make(g, {{"SpawnObject", padded}}) && g.server.ValidateSpawnObject(padded));
+        CHECK(!make(g, {{"SpawnObject", padded + ";PickupTriggerMessage " + std::string(40, 'z')}}));
+        // Retired editor flag on older DAT rows: accepted on every class, never read or defaulted.
+        auto legacy = make(g, {{"TypeAction", true}});
+        CHECK(legacy && g.objects.get(legacy)->properties.contains("TypeAction"));
+        CHECK(!g.objects.get(make(g))->properties.contains("TypeAction"));
+        CHECK(!make(g, {{"TypeAction", 1.0f}})); // Known names keep their type.
         return true;
     }
     bool commands(const std::filesystem::path& root)

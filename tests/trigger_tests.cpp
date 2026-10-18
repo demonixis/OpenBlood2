@@ -524,11 +524,10 @@ namespace
                       << " filtered\n";
         for (const auto& [reason, count] : failures)
             std::cout << count << " rejected: " << reason << '\n';
-        CHECK(worlds == 57 && unreadable == 1 && found["Trigger"] == 603 && created["Trigger"] == 599 &&
-              found["BigTrigger"] == 89 && created["BigTrigger"] == 84 && created["ToggleTrigger"] == 3 &&
+        CHECK(worlds == 57 && unreadable == 1 && found["Trigger"] == 603 && created["Trigger"] == 601 &&
+              found["BigTrigger"] == 89 && created["BigTrigger"] == 88 && created["ToggleTrigger"] == 3 &&
               created["KeyPickup"] == 13 && filtered["Trigger"] == 2 && filtered["BigTrigger"] == 1);
-        CHECK(failures.size() == 2 && failures["Trigger: invalid property TypeAction"] == 2 &&
-              failures["BigTrigger: invalid property TypeAction"] == 4);
+        CHECK(failures.empty()); // Retired TypeAction rows are created.
         CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
         return true;
     }

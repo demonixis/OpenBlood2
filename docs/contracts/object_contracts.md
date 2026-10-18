@@ -130,3 +130,16 @@ ignored, so runtime failures sharing a helper do not leak into later creations.
 An accepted precreate with an invalid creation state reports
 `invalid creation state`. The reason is diagnostic only; it never changes which
 entries are created. `--inspect-world` logs every failed entry with its detail.
+
+## Retired world properties
+
+LithTech's `GetPropGeneric` looks a name up in the property list read from the
+world file; a property no class asks for is simply never read. Older retail DAT
+rows (BB_BloodArena, BB_Bodies, BB_Midgard and three SoundFX) still carry the
+editor flag `TypeAction`, which appears nowhere in the original source:
+B2BaseClass reads `TypeActionMode`. BaseClass therefore declares `TypeAction` as a
+non-defaulted bool. It is kept on objects that author it, never added to others
+and never read; a value of another type still rejects. This is a named retirement,
+not a rule that ignores unknown names: undeclared properties keep rejecting
+creation so incomplete class schemas stay visible (the original CGib, for
+example, reads a real Init* schema that is now declared and ported).

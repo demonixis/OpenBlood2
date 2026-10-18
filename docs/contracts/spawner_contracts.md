@@ -72,3 +72,9 @@ supported spawn classes. Tests:
 and `spawner.private` (05_CDMB).
 The rift FX, save/restore and retail velocity-random parity remain unavailable.
 See the [source ledger](../implementation/sources/cdmb_world_sources.json).
+
+SpawnObject strings follow the original MAX_GP_STRING_LEN (200 bytes) of
+GenericProp and the `szSpawn` buffer, for Spawner and the destructable aggregate.
+24_AncientCity and 24B_Arena author 112–141-byte requests; their Spawners are now
+created. Requests naming unported classes (UndeadGideon, the Revenant Chosen)
+still fail when triggered.

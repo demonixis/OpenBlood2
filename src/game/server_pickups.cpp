@@ -7,7 +7,8 @@ namespace OpenBlood2
     {
         type.clear();
         props.clear();
-        if (input.empty() || input.size() > 100 || input.find('\0') != input.npos)
+        // Original Spawner copies the request into a MAX_GP_STRING_LEN buffer.
+        if (input.empty() || input.size() > MAX_GP_STRING_LEN || input.find('\0') != input.npos)
             return false;
         auto first = input.find_first_not_of(' ');
         if (first == input.npos)

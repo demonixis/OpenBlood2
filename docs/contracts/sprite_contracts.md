@@ -88,6 +88,7 @@ TypeAction schema rejection. The two accepted flush placements hit real Temple
 entrance geometry. No catalog entry repeats; synthetic tests cover that branch.
 The known 16_bridge.dat structural rejection remains unchanged. No commercial
 resource bytes are copied into the repository.
+The later [object contracts](object_contracts.md#retired-world-properties) supersede TypeAction rejection: the retired flag is accepted and never read.
 
 The [sprite presentation continuation](sprite_view_contracts.md) now draws supported
 original sprites with actual DTX alpha and shared world/model depth, before view

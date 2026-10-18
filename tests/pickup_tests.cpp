@@ -470,11 +470,10 @@ namespace
         CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2 &&
               counts["AssaultRiflePU"] == 5 && counts["MedKitPU"] == 22 && counts["ProximitiesPU"] == 161 &&
               counts["RemotesPU"] == 107 && counts["FlashlightPU"] == 10 && counts["SniperRiflePU"] == 4);
-        CHECK(failures["ProximitiesPU: invalid property TypeAction"] == 28);
-        CHECK(failures["RemotesPU: invalid property TypeAction"] == 14);
-        // 1530 includes the four SniperRiflePU offers (their weapon is not integrated).
+        CHECK(failures.empty()); // Retired TypeAction rows are created.
+        // 1750 includes the four SniperRiflePU offers (their weapon is not integrated).
         // 68 container spawns include the bouncing item/weapon leaves.
-        CHECK(worlds == 57 && created == 1530 && missing == 0 && rejected == 220 && spawns == 68);
+        CHECK(worlds == 57 && created == 1750 && missing == 0 && rejected == 0 && spawns == 68);
         return true;
     }
 } // namespace

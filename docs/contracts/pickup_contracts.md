@@ -93,7 +93,7 @@ the item pickups MedKitPU, FlashlightPU, ProximitiesPU and RemotesPU and the
 weapon pickups BerettaPU, SubMachineGunPU, FlareGunPU and AssaultRiflePU are
 admitted (SniperRiflePU's weapon is not integrated); the Spawner class and
 arbitrary object spawning are not imported.
-The request is bounded to 100 bytes and validated against the existing typed
+The request is bounded to the original 200-byte MAX_GP_STRING_LEN buffer and validated against the existing typed
 property grammar before brush creation. Unknown classes/properties, repeated
 properties and malformed strings reject creation. Spawn velocity must fit the
 engine's finite vector bounds (absolute components at most 10000000).
@@ -134,7 +134,7 @@ multiplayer scaling/respawn, bouncing/rotating pickup FX, localized HUD strings,
 audio, AI pickup seeking, save/restore or a full original session. It does not
 make ammo-consuming weapons beyond the current Beretta/knife subset available.
 ManaAmmoPU is commented out in the source; RocketAmmoPU is not guessed as an alias.
-Legacy TypeAction schemas, missing/ambiguous world models and polygon dynamics
+Missing/ambiguous world models and polygon dynamics
 remain explicit failures. Rendering, retail-executable comparisons, additional
 platforms and XR validation remain pending. M2's exit gate is unchanged.
 

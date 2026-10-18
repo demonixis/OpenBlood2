@@ -302,8 +302,9 @@ namespace
                   << " rejected=" << rejected << " starts=" << attempts << " failures=" << failures
                   << " references=" << references << " unreadable=" << missing << " city=" << city
                   << " VoiceType=" << voice_schema << " TypeAction=" << action_schema << '\n';
-        CHECK(worlds == 57 && entries == 124 && rejected == 3 && created == 121 && attempts == 100 && failures == 0 &&
-              references == 124 && missing == 1 && voice_schema == 0 && action_schema == 3 && city == 5 &&
+        // The three retired TypeAction rows are created; they authored no playback start.
+        CHECK(worlds == 57 && entries == 124 && rejected == 0 && created == 124 && attempts == 100 && failures == 0 &&
+              references == 124 && missing == 1 && voice_schema == 0 && action_schema == 0 && city == 5 &&
               !g.server.string_count());
         return true;
     }
