@@ -1714,6 +1714,8 @@ foreach(case rules pickup commands transport restore lifetime input stealth)
     add_test(NAME medkit.${case} COMMAND medkit_tests ${case} "${CMAKE_CURRENT_BINARY_DIR}/medkit-fixtures/${case}")
     set_tests_properties(medkit.${case} PROPERTIES LABELS "headless;medkit" TIMEOUT 30)
 endforeach()
+# Simulates the full 30 s invisibility; sanitizer builds need more wall time.
+set_tests_properties(medkit.stealth PROPERTIES TIMEOUT 180)
 if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME medkit.private COMMAND medkit_tests private "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(medkit.private PROPERTIES LABELS "headless;private;medkit" TIMEOUT 180)

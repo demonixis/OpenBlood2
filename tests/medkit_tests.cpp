@@ -353,19 +353,21 @@ namespace
         CHECK(std::abs(r->alpha - .08f) < 1e-6f && !(r->state.m_Flags & FLAG_SHADOW));
         CHECK(p.m_nPowerupSoundStackPos == 1 && p.m_ePowerupSoundStack[0] == PU_INVISIBLE);
         CHECK(std::abs(p.m_fInvisibleTime - (start + 30)) < 1e-4f);
-        // Still invisible 20 s later; the last five seconds blink.
-        for (int i = 0; i < 200; ++i)
+        // Still invisible 24 s later; the last five seconds blink.
+        while (g.objects.time() < start + 24)
             CHECK(g.step(.1));
         CHECK(p.IsPowerupActive(PU_INVISIBLE) && std::abs(r->alpha - .08f) < 1e-6f);
         bool shown = false, hidden = false;
-        for (int i = 0; i < 90; ++i)
+        while (g.objects.time() < start + 26)
+            CHECK(g.step(.1));
+        for (int i = 0; i < 60; ++i)
         {
             CHECK(g.step(.05));
             shown |= r->alpha == 1;
             hidden |= std::abs(r->alpha - .08f) < 1e-6f;
         }
         CHECK(shown && hidden && p.IsPowerupActive(PU_INVISIBLE));
-        for (int i = 0; i < 20; ++i)
+        while (g.objects.time() < start + 31)
             CHECK(g.step(.1));
         CHECK(!p.IsPowerupActive(PU_INVISIBLE) && p.powerup_expiries == 1 && r->alpha == 1 &&
               (r->state.m_Flags & FLAG_SHADOW) && p.powerup_console_unavailable == 1 && !p.m_nPowerupSoundStackPos);

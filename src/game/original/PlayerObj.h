@@ -69,7 +69,7 @@ class CPlayerObj : public CBaseCharacter
     std::array<PowerupType, 15> m_ePowerupSoundStack{PU_NONE}; // Source PU_MAXSTACK.
     int m_nPowerupSoundStackPos = 0;
     OpenBlood2::SoundId m_hPowerupStartSound = 0, m_hPowerupEndSound = 0, m_hPowerupLoopSound = 0;
-    std::uint64_t powerup_pickups = 0, powerup_expiries = 0, powerup_console_unavailable = 0;
+    std::uint64_t powerup_pickups = 0, powerup_expiries = 0, powerup_console_unavailable = 0, powerup_loop_failures = 0;
     std::string powerup_error;
     bool AddPowerup(DBYTE type, float value);
     bool CheckPowerups();

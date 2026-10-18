@@ -30,7 +30,9 @@ The source stack (15 entries) records each activation. A retained start sound
 (`specialpowerupstart1.wav`, 1000 radius, player-low) plays if none is retained;
 when it finishes, or when nothing plays while the stack is non-empty, the top
 active power's loop (`revenantloop1b.wav` for Stealth, player-medium) starts,
-popping inactive or silent entries. Ending a power pops it only if it is on top,
+popping inactive or silent entries. The source spins forever when that loop fails
+to start; here a failed start leaves the loop and retries on the next update
+(counted as a loop failure). Ending a power pops it only if it is on top,
 kills the loop and plays the retained end sound. The player destructor kills all
 three handles.
 

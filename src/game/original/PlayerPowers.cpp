@@ -101,7 +101,8 @@ bool CPlayerObj::CheckPowerups()
                 }
                 m_hPowerupLoopSound = play(m_hObject, looping_sounds[power], 5 /* PLAYER_MEDIUM */, true,
                                            powerup_error);
-                if (m_hPowerupLoopSound)
+                // The source loops forever when this play fails; stop and retry next update instead.
+                if (m_hPowerupLoopSound || ++powerup_loop_failures)
                     break;
             }
             else
