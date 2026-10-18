@@ -39,12 +39,32 @@ foreach(case IN ITEMS arguments precedence relative_paths invalid_config content
     set_tests_properties(config.${case} PROPERTIES LABELS "headless;config")
 endforeach()
 
+add_executable(logging_tests logging_tests.cpp)
+target_link_libraries(logging_tests PRIVATE engine spdlog::spdlog)
+blood2_project_options(logging_tests)
+set(logging_cases basic level rotation failure write_failure retention threads abrupt)
+if(UNIX)
+    list(APPEND logging_cases crash)
+endif()
+foreach(case IN LISTS logging_cases)
+    add_test(NAME logging.${case} COMMAND "${CMAKE_COMMAND}"
+        "-DTEST=$<TARGET_FILE:logging_tests>" "-DCASE=${case}"
+        "-DROOT=${CMAKE_CURRENT_BINARY_DIR}/log-fixtures/${case}"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/logging_test.cmake")
+    set_tests_properties(logging.${case} PROPERTIES LABELS "headless;logging" TIMEOUT 20)
+endforeach()
+
 set(fixture "${CMAKE_CURRENT_BINARY_DIR}/fixtures/Blood II")
 file(MAKE_DIRECTORY "${fixture}")
 # Only metadata is checked in M0. This is not a REZ archive and must never be
 # used as a parser acceptance fixture.
 file(WRITE "${fixture}/BLOOD2.REZ" "Synthetic M0 metadata fixture; not a REZ archive.\n")
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/empty.ini" "# Deliberately empty test configuration\n")
+add_test(NAME logging.cli COMMAND "${CMAKE_COMMAND}"
+    "-DAPP=$<TARGET_FILE:blood2_app>" "-DROOT=${CMAKE_CURRENT_BINARY_DIR}/log-cli-fixtures"
+    "-DDATA_DIR=${fixture}" "-DCONFIG=${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/logging_cli_test.cmake")
+set_tests_properties(logging.cli PROPERTIES LABELS "headless;logging;cli" TIMEOUT 60)
 foreach(case IN ITEMS help unknown missing_data missing_config metadata)
     add_test(NAME cli.${case} COMMAND "${CMAKE_COMMAND}"
         "-DAPP=$<TARGET_FILE:blood2_app>" "-DCASE=${case}" "-DDATA_DIR=${fixture}"
@@ -1890,6 +1910,14 @@ if(BLOOD2_GPU_TESTS)
         set_tests_properties(gpu.blood_splat_private PROPERTIES LABELS "gpu;private;blood_splats" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
     endif()
 endif()
+
+add_executable(flesh_gib_collision_tests flesh_gib_collision_tests.cpp)
+target_link_libraries(flesh_gib_collision_tests PRIVATE blood2_game)
+blood2_project_options(flesh_gib_collision_tests)
+foreach(case IN ITEMS query fragments ceiling particles)
+    add_test(NAME flesh_gib_collision.${case} COMMAND flesh_gib_collision_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/flesh-gib-collision-${case}")
+    set_tests_properties(flesh_gib_collision.${case} PROPERTIES LABELS "headless;death_effects;blood_spurts;audio" TIMEOUT 30)
+endforeach()
 
 add_executable(blood_spurt_tests blood_spurt_tests.cpp ../src/app/sprite_scene.cpp)
 target_link_libraries(blood_spurt_tests PRIVATE blood2_game)

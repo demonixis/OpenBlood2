@@ -3,6 +3,9 @@
 namespace OpenBlood2::build
 {
     inline constexpr const char* version = "@PROJECT_VERSION@";
+    inline constexpr const char* revision = "@BLOOD2_BUILD_REVISION@";
+    inline constexpr const char* configuration = "@CMAKE_BUILD_TYPE@";
+    inline constexpr const char* compiler = "@CMAKE_CXX_COMPILER_ID@ @CMAKE_CXX_COMPILER_VERSION@";
     inline constexpr const char* sdl_revision = "@BLOOD2_SDL_REVISION@";
     inline constexpr const char* imgui_revision = "@BLOOD2_IMGUI_REVISION@";
     inline constexpr const char* spdlog_revision = "@BLOOD2_SPDLOG_REVISION@";

@@ -72,8 +72,10 @@ namespace OpenBlood2
             spdlog::warn("Game audio output: {}", error);
         if (options.view_world)
         {
+            spdlog::info("Loading world: {} (direct entry)", options.world);
             if (!game->request_world(options.world, error) || !game->run_world(error))
                 return failed(6);
+            spdlog::info("World ready: {}", game->world_path);
         }
         else
             menu.open(false);
@@ -176,12 +178,18 @@ namespace OpenBlood2
                 break;
             if (command.action == MenuAction::NewGame)
             {
+                spdlog::info("New game requested: world=01_SubwayA; character={}; difficulty={}",
+                             command.story ? 0 : int(command.character), int(command.difficulty));
                 // Execute the owned profile request outside SDL event dispatch.
                 if (!GameSession::start_new_game(game, "01_SubwayA", DBYTE(command.difficulty),
                                                  DBYTE(command.story ? 0 : command.character), error))
+                {
                     menu.error = error;
+                    spdlog::error("New game failed: {}", error);
+                }
                 else
                 {
+                    spdlog::info("World ready: {}", game->world_path);
                     menu.error.clear();
                     menu.close();
                     selection.id = {};
@@ -197,7 +205,10 @@ namespace OpenBlood2
             {
                 stored_settings = menu.settings;
                 if (!options.menu_smoke && !save_menu_preferences(preferences, menu.settings, error))
+                {
                     menu.error = error;
+                    spdlog::error("Save preferences failed: {}", error);
+                }
             }
             const auto& settings = menu.settings;
             const float sound_gain = settings.sound ? settings.sound_volume / 50.f : 0;
@@ -281,12 +292,22 @@ namespace OpenBlood2
             {
                 if (!step_app_session(*game, delta))
                 {
+                    spdlog::error("Simulation failed: world={}, frame={}, delta={}, time={}", game->world_path, frames,
+                                  delta, game->objects.time());
+                    for (const auto& diagnostic : game->objects.diagnostics())
+                        spdlog::error("Object: {}", diagnostic);
+                    for (const auto& diagnostic : game->trace)
+                        spdlog::error("Session: {}", diagnostic);
+                    if (!game->server.particle_streams.update_error.empty())
+                        spdlog::error("Particle streams: {}", game->server.particle_streams.update_error);
                     error = "Simulation step failed";
                     return failed(4);
                 }
                 const auto change = GameSession::process_level_change(game, error);
                 if (change == LevelChangeResult::Committed)
                 {
+                    spdlog::info("NEW_LEVEL committed: {} -> {} / start {}", game->level_change.source_world,
+                                 game->world_path, game->level_change.selected_start);
                     selection.id = {};
                     controlled = {};
                     input.reset(menu, true);

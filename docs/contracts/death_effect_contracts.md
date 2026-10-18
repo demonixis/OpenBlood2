@@ -121,7 +121,11 @@ ranges. SIZE_SMALL is unused in this selected CGibFX source body.
 InitMovingObject zeroes the earlier HALFGRAVITY/STICKY flags: use .5 of original
 client gravity (-1000 normal / -500 liquid), position-before-gravity integration,
 .35/.20 reflection damping, floor bounce count and spin changes. Container sampling
-is at creation, as in the source. Collision uses the existing primary-world ray.
+is at creation, as in the source. Collision uses a finite primary-world segment
+from the current position to the next position, excluding ordinary objects and
+moving world models. `CastWorldRay` takes a direction and extends beyond the
+frame's motion; it must not be used for these moving fragments. See the
+[impact audio correction](../../../Documentation/Implementation/gib_impact_audio_fix.md).
 A resting model remains until unload; general SFX-list eviction/fade and retail
 outside-world classification are not reproduced. Capacity is 256 models and 64
 retained reports, with conservative space reserved for doubled requests. Exhaustion

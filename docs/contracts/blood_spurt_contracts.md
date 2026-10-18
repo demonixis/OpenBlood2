@@ -63,7 +63,7 @@ damage-test order are preserved, not global/retail random ordering. Regression t
 retain their existing authored combat and corpse-clearance assertions.
 
 The engine keeps portable per-component random streams, explicit values instead
-of packets/client handles, discrete primary-world ray collision and existing
+of packets/client handles, finite primary-world segment collision and existing
 SDL_GPU billboard rasterization. These are documented adaptations, not retail
 bitwise parity. Textures are indexed at publication and decoded by presentation;
 missing/corrupt decode remains visible. No shader/dependency changes are required.
@@ -75,6 +75,12 @@ GetPointStatus outside-world classification, shared original SFX-list eviction,
 full save/restore and broader M2 acceptance remain open. Arterial spurt calls
 commented out in original corpse/player/living-AI code stay disabled. This
 continuation does not enable living-NPC limb loss or add collision to cosmetic FX.
+
+The [impact audio correction](../../../Documentation/Implementation/gib_impact_audio_fix.md)
+uses `IntersectWorldSegment(position, next)` for emitter movement. The current
+frame's endpoints bound the query: a distant surface must not stop emission or
+produce an impact sound/splat before the emitter reaches it. `CastWorldRay` remains
+a direction-based query for original sprite placement.
 
 The [original impact sparks](spark_contracts.md) continuation supersedes the flesh/metal spark omission only. Underwater bubbles, generic recipes and remaining M2 services stay unavailable.
 

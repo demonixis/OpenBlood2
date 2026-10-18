@@ -163,8 +163,9 @@ namespace OpenBlood2
             g.velocity.y -= float(dt) * (g.liquid ? 250.f : 500.f);
             SegmentHit hit;
             const auto delta = vector_subtract(next, g.position);
-            const auto result =
-                vector_dot(delta, delta) < 1e-12f ? SegmentResult::Miss : server.CastWorldRay(g.position, next, hit);
+            const auto result = vector_dot(delta, delta) < 1e-12f
+                                    ? SegmentResult::Miss
+                                    : server.IntersectWorldSegment(g.position, next, hit);
             if (result != SegmentResult::Hit && result != SegmentResult::Miss)
             {
                 g.error = "Flesh-gib world collision unavailable";

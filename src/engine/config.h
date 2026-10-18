@@ -15,6 +15,8 @@ namespace OpenBlood2
         std::filesystem::path config_file = "blood2.local.ini";
         std::filesystem::path data_dir;
         std::filesystem::path capture_file;
+        std::filesystem::path log_dir;
+        std::string log_level = "info";
         std::uint32_t frame_limit = 0;
         std::string world = "01_SubwayA";
         bool inspect_world = false;

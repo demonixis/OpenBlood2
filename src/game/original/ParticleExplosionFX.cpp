@@ -103,7 +103,8 @@ bool CParticleExplosionFX::Update(double now, double dt, ServerDE& server, std::
     velocity.y -= float(dt) * (liquid ? 100.f : 200.f);
     SegmentHit hit;
     const auto travel = vector_subtract(next, position);
-    auto result = vector_dot(travel, travel) < 1e-12f ? SegmentResult::Miss : server.CastWorldRay(position, next, hit);
+    auto result = vector_dot(travel, travel) < 1e-12f ? SegmentResult::Miss
+                                                    : server.IntersectWorldSegment(position, next, hit);
     if (result != SegmentResult::Miss && result != SegmentResult::Hit)
     {
         error = "Blood-spurt world collision unavailable";

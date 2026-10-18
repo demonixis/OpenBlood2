@@ -55,6 +55,17 @@ namespace OpenBlood2
             return SegmentResult::Unavailable;
         if (bound != SegmentResult::Hit)
             return bound;
+        return IntersectWorldSegment(from, to, out);
+    }
+    SegmentResult ServerAdapter::IntersectWorldSegment(DVector from, DVector to, SegmentHit& out)
+    {
+        trace_service("IntersectWorldSegment");
+        out = {};
+        const auto delta = vector_subtract(to, from);
+        if (!physics_vector(from) || !physics_vector(to) || vector_dot(delta, delta) < 1e-12f)
+            return SegmentResult::Invalid;
+        if (!collision || !collision_ready)
+            return SegmentResult::Unavailable;
         CollisionHit hit;
         const auto result = collision->sweep(from, to, {}, hit);
         if (result == CollisionQuery::Invalid)

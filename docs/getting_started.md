@@ -32,6 +32,10 @@ The authored intro restricts movement/fire for roughly twelve simulation seconds
 
 ## Controls
 
+Every launch writes [diagnostic log files](logging.md) under SDL's user directory.
+Use `--log-dir DIR --log-level debug` for a reproduction; retain the whole session
+directory after a problem. File logging also works without the development inspector.
+
 | Action | Binding |
 | --- | --- |
 | Move | Physical WASD / ZQSD positions |

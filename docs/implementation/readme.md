@@ -1,5 +1,9 @@
 # Implementation records
 
+- [Diagnostic file logging validation](../../../Documentation/Implementation/logging.md)
+
+- [Gib impact audio correction](../../../Documentation/Implementation/gib_impact_audio_fix.md)
+
 - [Original menu validation](../../../Documentation/Implementation/original_menus.md)
 
 - [Original crosshair validation](../../../Documentation/Implementation/crosshair.md)

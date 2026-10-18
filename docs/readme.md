@@ -8,6 +8,7 @@ The complete game and later milestones are not yet supported.
 | Guide | Contents |
 | --- | --- |
 | [Getting started](getting_started.md) | Build, external game data, controls, platforms and test commands |
+| [Diagnostic logs](logging.md) | File locations, rotation, interrupted sessions and crash-analysis limits |
 | [Architecture](architecture.md) | Code layout, target responsibilities and service boundaries |
 | [Contributing](contributing.md) | Original-source workflow, conventions and verification |
 | [Service contracts](contracts/readme.md) | Subsystem rules, ownership and explicit limitations |

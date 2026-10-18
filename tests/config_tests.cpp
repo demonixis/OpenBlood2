@@ -37,6 +37,24 @@ namespace
         CHECK(parse_options(valid, options, error));
         CHECK(options.frame_limit == 12 && !options.inspector && options.check_data);
         CHECK(path_text(options.data_dir) == "a path with spaces");
+        const std::array<std::string_view, 4> log_args{"--log-dir", "logs é with spaces", "--log-level", "debug"};
+        CHECK(parse_options(log_args, options, error));
+        CHECK(path_text(options.log_dir) == "logs é with spaces" && options.log_level == "debug");
+        for (const auto level : {"trace", "debug", "info", "warn", "error"})
+        {
+            const std::array<std::string_view, 2> args{"--log-level", level};
+            CHECK(parse_options(args, options, error) && options.log_level == level);
+        }
+        for (const auto level : {"", "verbose", "off", "INFO"})
+        {
+            const std::array<std::string_view, 2> args{"--log-level", level};
+            CHECK(!parse_options(args, options, error));
+        }
+        for (const auto name : {"--log-dir", "--log-level"})
+        {
+            const std::array<std::string_view, 1> args{name};
+            CHECK(!parse_options(args, options, error));
+        }
         for (const auto value : {"-1", "0", "12x", "1000001", "999999999999999999999"})
         {
             const std::array<std::string_view, 2> args{"--frames", value};
