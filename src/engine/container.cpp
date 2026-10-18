@@ -243,6 +243,9 @@ namespace OpenBlood2
             closed_components += root(i) == i;
         for (auto& surface : mesh.surfaces)
             surface.flags |= 1;
+        // Faces were rewound to the rotated plane normals above; keep planes consistent.
+        for (auto& plane : mesh.planes)
+            plane.normal = rotate(plane.normal, rotation);
         if (!boundary_.build(mesh, error))
         {
             *this = {};

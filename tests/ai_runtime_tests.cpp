@@ -825,11 +825,17 @@ namespace
         GameSession g;
         CHECK(setup(g, root));
         for (auto props : {Properties{{"AIWeapon1", std::string("SHOTGUN")}}, Properties{{"RobeSkin", true}},
-                           Properties{{"Proximity_Bombs", 1.f}}, Properties{{"RandomHitPoints", -1.f}}})
+                           Properties{{"RandomHitPoints", -1.f}}})
         {
             CHECK(!npc(g, "CultistAI", props));
             CHECK(g.objects.finish_frame() && g.objects.snapshot().empty());
         }
+        // Retail AddInventoryWeapon(INV_PROXIMITY, n) stores an unused slot-10 inventory weapon.
+        auto* bomber = npc(g, "CultistAI", {{"Proximity_Bombs", 3.f}});
+        CHECK(bomber && bomber->RuntimeReady() && bomber->m_InventoryMgr.GetWeapon(10) &&
+              bomber->m_InventoryMgr.GetAmmoCount(AMMO_PROXIMITYBOMB) == 3 &&
+              bomber->m_InventoryMgr.CurrentWeapon() != bomber->m_InventoryMgr.GetWeapon(10));
+        CHECK(g.objects.remove(bomber->m_hObject) && g.objects.finish_frame() && g.objects.snapshot().empty());
         CHECK(!npc(g, "CivilianAI", {}, Creation::Restore) && g.objects.finish_frame() && g.objects.snapshot().empty());
         CHECK(AI_Mgr::m_dwNumCabal == 0 && g.server.string_count() == 0 && g.server.message_count() == 0);
         return true;

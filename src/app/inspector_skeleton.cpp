@@ -1,8 +1,10 @@
 #include "game/original/AI_Mgr.h"
 #include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
+#include "game/original/Fanatic.h"
 #include "game/original/Gib.h"
 #include "game/original/Gideon.h"
+#include "game/original/Prophet.h"
 #include "game/original/SmellHint.h"
 #include "inspector.h"
 #include <algorithm>
@@ -561,6 +563,33 @@ namespace OpenBlood2
             }
             if (!ai.fire_error.empty())
                 ImGui::TextWrapped("Failed: %s", ai.fire_error.c_str());
+        }
+        if ((dynamic_cast<const Fanatic*>(target_ai) || dynamic_cast<const Prophet*>(target_ai)) &&
+            ImGui::CollapsingHeader("Original Fanatic/Prophet actions", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const auto& cabal = *target_ai;
+            ImGui::Text("Attack updates %llu | distance %.2f | height %.2f | dodge flags 0x%x | roll command %d",
+                        (unsigned long long)cabal.crouch_attack_updates, cabal.crouch_attack_distance,
+                        cabal.crouch_attack_height, unsigned(cabal.m_nDodgeFlags), cabal.locomotion_command);
+            ImGui::Text("FindHealth calls %llu (no powerup list: always escapes)",
+                        (unsigned long long)cabal.health_searches);
+            if (const auto* f = dynamic_cast<const Fanatic*>(target_ai))
+            {
+                ImGui::Text("Kamikaze starts %llu | lit at %.3f | detonations %llu",
+                            (unsigned long long)f->kamikaze_starts, f->m_fStartTime,
+                            (unsigned long long)f->detonations);
+                ImGui::Text("Smoke source %s | attachment %u | published %llu (effect %llu)",
+                            f->m_hSmokeSource ? "present" : "none", unsigned(f->m_hAttach),
+                            (unsigned long long)f->smoke_publications, (unsigned long long)f->smoke_effect);
+                if (!f->kamikaze_error.empty())
+                    ImGui::TextWrapped("%s", f->kamikaze_error.c_str());
+                if (!f->gib_error.empty())
+                    ImGui::TextWrapped("Gibs: %s", f->gib_error.c_str());
+            }
+            if (const auto* p = dynamic_cast<const Prophet*>(target_ai))
+                ImGui::Text("Melee swings %llu (clip %d) | alternate fire choices %llu",
+                            (unsigned long long)p->melee_swings, p->melee_roll,
+                            (unsigned long long)p->alternate_choices);
         }
         if (const auto* boss = dynamic_cast<const Gideon*>(target_ai);
             boss && ImGui::CollapsingHeader("Original Gideon combat actions", ImGuiTreeNodeFlags_DefaultOpen))

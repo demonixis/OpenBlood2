@@ -263,11 +263,13 @@ namespace
         // Leaving the overlapped ceiling along its outward normal is allowed; both triangles are counted.
         CHECK(world.sweep(start, {0, 4, 0}, half, hit, StartOverlap::Depart) == CollisionQuery::Miss);
         CHECK(hit.departed == 2);
+        // Sliding parallel to it goes no deeper and is allowed too.
+        CHECK(world.sweep(start, {5, 9, 0}, half, hit, StartOverlap::Depart) == CollisionQuery::Miss);
         // The floor still stops the same move.
         CHECK(world.sweep(start, {0, -5, 0}, half, hit, StartOverlap::Depart) == CollisionQuery::Hit);
         CHECK(!hit.start_solid && hit.normal.y == 1 && std::abs(hit.fraction - .5) < 1e-5 && hit.departed == 2);
-        // Moving deeper, sideways or not at all still fails.
-        for (auto end : {DVector{0, 12, 0}, DVector{5, 9, 0}, start})
+        // Moving deeper or not at all still fails.
+        for (auto end : {DVector{0, 12, 0}, DVector{3, 10, 0}, start})
             CHECK(world.sweep(start, end, half, hit, StartOverlap::Depart) == CollisionQuery::Hit && hit.start_solid);
 
         GameSession g;
@@ -279,18 +281,23 @@ namespace
         r->dimensions = half;
         r->state.m_Pos = start;
         r->state.m_Flags = FLAG_SOLID;
-        // Ordinary moves keep the explicit initial-penetration failure.
-        auto down = DVector{0, 5, 0};
-        CHECK(g.server.MoveObject(h, &down) == DE_ERROR && r->state.m_Pos.y == 9 && r->start_departures == 0);
-        // The original placement helper may leave the ceiling it starts through and rests on the floor.
+        // MoveObject keeps the explicit failure for deeper moves without moving the body.
+        auto up = DVector{0, 12, 0};
+        CHECK(g.server.MoveObject(h, &up) == DE_ERROR && r->state.m_Pos.y == 9 && r->start_departures == 0);
+        // The original placement helper (and any move) may leave the ceiling it starts through.
         CHECK(g.server.MoveObjectToGround(h) == DE_OK);
         CHECK(std::abs(r->state.m_Pos.y - 2) < .01f && r->start_departures == 2 && r->grounded);
-        CHECK(g.server.MoveObject(h, &down) == DE_OK); // The policy does not outlive the placement move.
-        // A second overlapped face that the move does not leave still blocks placement.
+        // A box resting through a wall can still settle and slide along it.
         CHECK(g.collision.build(cabin_model(true), error));
-        r->state.m_Pos = start;
+        r->state.m_Pos = {0.5f, 5, 0};
         r->start_departures = 0;
-        CHECK(g.server.MoveObjectToGround(h) == DE_ERROR && r->state.m_Pos.y == 9);
+        auto down = DVector{0.5f, 1, 0};
+        CHECK(g.server.MoveObject(h, &down) == DE_OK && std::abs(r->state.m_Pos.y - 2) < .01f);
+        auto along = DVector{0.5f, 2.001f, 30};
+        CHECK(g.server.MoveObject(h, &along) == DE_OK && r->state.m_Pos.z > 29.9f && r->start_departures >= 2);
+        // Moving further into the wall's solid (+x) side is still refused.
+        auto into = DVector{3, 2.001f, 30};
+        CHECK(g.server.MoveObject(h, &into) == DE_ERROR && r->state.m_Pos.x == .5f);
         return true;
     }
     bool collision_traversal()

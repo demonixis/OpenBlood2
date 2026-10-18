@@ -95,6 +95,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Original AI state decisions and stationary actions](ai_state_contracts.md)
 - [Original explicit AI targets and facing](ai_target_contracts.md)
 - [Original AI trigger commands and hearing](ai_trigger_contracts.md)
+- [Original Fanatic, Prophet and howitzer shell](fanatic_prophet_contracts.md)
 - [Original Gideon attack, dodge and recoil sequencing](gideon_attack_contracts.md)
 - [Original Gideon combat actions](gideon_combat_contracts.md)
 - [Original Gideon initialization and boss-health delivery](gideon_runtime_contracts.md)

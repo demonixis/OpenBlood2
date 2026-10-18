@@ -57,25 +57,23 @@ only warns, and its Esc pause menu would then fail.
 
 Both demo worlds are DAT v56, but the world initialization gate rejects them:
 
-- `Demo_01` ("Center for Di…"): 66 unsupported classes (Fanatic ×31, Spawner ×20,
-  TripLaser ×7, SoulDrudge ×4, Container, ShikariAI, StealthPU, VoodooDollPU) and
-  27 failed entries. CGib rejects its `DamageTriggerMessage` property, three
-  CDestructableModels fail, and the first update rejects HealthPU0 overlapping
-  geometry.
-- `Demo_02` ("Movin' On Up", the demo cut of retail `05_CDMB`): the engine
-  [Sprite ×28 and FastApproxArea](builtin_sprite_contracts.md) and the two
-  [Spawners](spawner_contracts.md) now initialize. Five unsupported classes remain:
-  Fanatic ×4 and Prophet. Porting them must follow two executable facts: the
-  demo (and retail base) `object.lto` has no `_ADD_ON` COMBAT branch in
-  `WeaponStrToInt`, so the authored `COMBAT` weapons resolve to the source default
-  Beretta, and `_DEMO` `AddInventoryWeapon` refuses the authored `Proximity_Bombs`
-  25. Fanatic Special1/Dying also needs the unported `CHowitzerShell` and the
-  `OBJFX_SMOKING_2` torso smoke.
+`Demo_02` ("Movin' On Up", the demo cut of retail `05_CDMB`) now passes
+`--start-game --demo --world Demo_02`, as does retail `--start-game --world 05_CDMB`:
+
+- The engine [Sprite ×28 and FastApproxArea](builtin_sprite_contracts.md), the two
+  [Spawners](spawner_contracts.md) and the [Fanatic ×4 and Prophet](fanatic_prophet_contracts.md)
+  initialize. The authored `COMBAT` weapons resolve to the original WeaponStrToInt
+  default Beretta (no `_ADD_ON` branch in the demo or patched retail `object.lto`), and
+  `_DEMO` `AddInventoryWeapon` refuses the authored `Proximity_Bombs` 25.
 - Player entry at GameStartPoint `05_egress` (0, -5456, -1520) starts with the
-  standing box through the `endelevator` ceiling (polygon 78). The original
-  MoveObjectToGround placement now leaves that face and lands on the car floor in
-  both Demo_02 and retail `05_CDMB`; see
-  [collision traversal](collision_traversal_contracts.md).
+  standing box through the `endelevator` ceiling (polygon 78). MoveObject now leaves
+  faces it does not go deeper into, so the original MoveObjectToGround lands the
+  player on the car floor; see [collision traversal](collision_traversal_contracts.md).
+
+`Demo_01` ("Center for Di…") is still rejected: 15 unsupported classes (TripLaser ×7,
+SoulDrudge ×4, Container, ShikariAI, StealthPU, VoodooDollPU) and 28 failed entries
+(24 CGib reject their `DamageTriggerMessage` property, three CDestructableModels fail,
+and one Fanatic is authored with the non-integrated `TESLA` weapon).
 
 Several source `_DEMO` features are not connected:
 
@@ -89,5 +87,7 @@ Several source `_DEMO` features are not connected:
 Tests: `config.demo` covers parsing, smoke rejection, edition inspection and
 mismatch hints. `world.resource_mount` covers edition-exclusive mounting.
 `remote.demo` covers weapon/bomb/detonate rules and pickup removal on a labelled
-synthetic index. `builtin_sprite.demo` and `spawner.demo` load the real Demo_02
-when `BLOOD2_DEMO_DATA_DIR` is set; no test plays the real demo worlds.
+synthetic index. `builtin_sprite.demo`, `spawner.demo`, `services.elevator_entry_demo`
+and `fanatic_prophet.catalog_demo`/`world_demo` load the real demo when
+`BLOOD2_DEMO_DATA_DIR` is set; `world_demo` runs the startup check. No test plays
+through the demo worlds.

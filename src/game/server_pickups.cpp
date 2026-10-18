@@ -26,9 +26,10 @@ namespace OpenBlood2
         if (!split_spawn(input, type, props))
             return false;
         bool supported = false;
+        // Fanatic/Prophet: original Spawner requests (fanatic_prophet_contracts.md).
         for (auto name :
              {"BulletAmmoPU", "ShellAmmoPU", "BMGAmmoPU", "FlareAmmoPU", "DieBugDieAmmoPU", "HowitzerAmmoPU",
-              "FuelAmmoPU", "BatteryAmmoPU", "HealthPU", "MegaHealthPU", "WardPU", "NecroWardPU"})
+              "FuelAmmoPU", "BatteryAmmoPU", "HealthPU", "MegaHealthPU", "WardPU", "NecroWardPU", "Fanatic", "Prophet"})
             supported |= same_name(type, name);
         Properties parsed;
         return supported && objects_.parse_properties(objects_.find_class(type), props, parsed);

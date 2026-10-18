@@ -45,7 +45,7 @@ An empty spawn string makes no attempt, no sound and no report. Otherwise the
 velocity is drawn x, y, z in that order as `min + (max - min) * unit`, the linear
 interval formula already used for reversed endpoints in the
 [AI runtime](ai_runtime_contracts.md). The existing helper validates the class
-and the property string (the supported spawn-class list is unchanged), creates
+and the property string (pickups plus Fanatic and Prophet), creates
 the object at the chosen pose and applies the velocity. Children are independent:
 removing the spawner never removes them.
 
@@ -65,8 +65,9 @@ trigger/attempt/success/failure/rift counters, the last child token and voice.
 ## Evidence and limits
 
 Demo_02 and retail 05_CDMB each have two Spawners (`spawn1`, `spawn2`) spawning
-`Fanatic` at (0,500,0), count -1, inactive. Both now create. Until Fanatic is a
-supported spawn class their triggers report a failed spawn. Tests:
+`Fanatic` at (0,500,0), count -1, inactive. Both create, and a trigger now creates a
+ready [Fanatic](fanatic_prophet_contracts.md): `Fanatic` and `Prophet` joined the
+supported spawn classes. Tests:
 `spawner.properties`, `commands`, `respawn`, `spawn` (synthetic pickups and WAV),
 `spawner.private` (05_CDMB) and `spawner.demo` (Demo_02).
 The rift FX, save/restore and retail velocity-random parity remain unavailable.

@@ -18,8 +18,9 @@ namespace OpenBlood2
         std::uint32_t departed = 0;
     };
     // Block: any initial overlap is start_solid. Depart: an initially overlapped
-    // face does not block a displacement leaving it along its outward normal
-    // (DAT winding agrees with the plane normal). Stationary queries still block.
+    // face does not block a nonzero displacement that does not go deeper into it
+    // (outward normal . delta >= 0; DAT winding agrees with the plane normal).
+    // Zero-length queries and deeper moves still block.
     enum class StartOverlap
     {
         Block,

@@ -32,5 +32,12 @@ class FlareGunPU : public WeaponPickup
   public:
     FlareGunPU();
 };
+// The sniper rifle weapon is not integrated: the player inventory refuses the
+// offer and the pickup stays in the world (see fanatic_prophet_contracts.md).
+class SniperRiflePU : public WeaponPickup
+{
+  public:
+    SniperRiflePU();
+};
 const char* WeaponPickupClass(DDWORD type);
 HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector, DRotation, bool include_ammo);

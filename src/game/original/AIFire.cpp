@@ -305,3 +305,60 @@ bool AI_Mgr::MC_Fire_Stand()
     }
     return true;
 }
+// Original AI_Mgr::MC_Fire_Crouch: no-weapon fallback is the pistol clip, the
+// clip result is ignored, and completion also stops velocity.
+bool AI_Mgr::MC_Fire_Crouch()
+{
+    state_error.clear();
+    auto* server = GetServerDE();
+    if (!server || !server->IsObjectAlive(m_hObject))
+        return StateFailure("AI fire command requires a live owner");
+    if (!m_bAnimating || m_nCurMetacmd != 11)
+    {
+        auto* weapon = m_InventoryMgr.CurrentWeapon();
+        const auto type = weapon ? weapon->data.m_nFireType : TYPE_PISTOL;
+        if (!m_pAnim_Sound || type >= std::size(m_pAnim_Sound->m_nAnim_FIRE_CROUCH))
+            return StateFailure("AI crouching-fire animation table unavailable");
+        if (weapon)
+            m_fAttackLoadTime = weapon->data.m_fReloadTime;
+        m_fLoadTimeStart = m_fTimeStart = 0;
+        // A blocked resize keeps the clip (ai_animation_clearance_contracts.md);
+        // missing clips or services stay failures.
+        if (!SetAnimation(m_pAnim_Sound->m_nAnim_FIRE_CROUCH[type]))
+            return false;
+        server->SetModelLooping(m_hObject, DFALSE);
+        m_bAnimating = true;
+        m_nCurMetacmd = 11;
+        server->SetNextUpdate(m_hObject, .1f);
+        return true;
+    }
+    if (!std::isfinite(m_fLoadTimeStart) || !std::isfinite(m_fAttackLoadTime) || m_fAttackLoadTime < 0)
+        return StateFailure("AI fire cadence invalid");
+    std::string animation;
+    if (!server->GetModelAnimationName(m_hObject, server->GetModelAnimation(m_hObject), animation))
+        return StateFailure("AI crouching-fire playback unavailable");
+    const bool done = (server->GetModelPlaybackState(m_hObject) & MS_PLAYDONE) != 0;
+    if (Metacmd > std::numeric_limits<int>::max() - 2)
+        return StateFailure("AI Metacmd overflow");
+    if (server->GetTime() > m_fLoadTimeStart + m_fAttackLoadTime)
+    {
+        if (Fire())
+            m_fLoadTimeStart = server->GetTime();
+        else if (fire_result == FireResult::Blocked || !m_InventoryMgr.CurrentWeapon())
+        {
+            m_bAnimating = false;
+            ++Metacmd;
+        }
+        else
+            return StateFailure("AI fire command required shot service failed");
+    }
+    if (done)
+    {
+        if (!StopVelocity())
+            return false;
+        m_bAnimating = false;
+        ++Metacmd;
+        ++animation_finishes;
+    }
+    return true;
+}

@@ -4,6 +4,9 @@ Continuation: [original collection audio](pickup_audio_contracts.md) supersedes 
 collection-sound omission for supported pickups and keys. Trigger activation
 sounds, character quips and other missing services remain separate.
 
+> `SniperRiflePU` is registered as an original offer whose weapon is not integrated:
+> the inventory refuses it and it stays in the world ([contracts](fanatic_prophet_contracts.md)).
+
 > Extended by [NPC weapon-drop contracts](weapon_drop_contracts.md): the selected
 > Cabal drop, independent falling hand and Beretta collection now work. Corpse/gib
 > and remaining death services still fail explicitly; M2 is incomplete.

@@ -106,4 +106,5 @@ Automatic NEW_LEVEL, complete boss encounter/death behavior, required remaining 
 services still block M2. This isolation is new engine adaptation, not recovered
 retail transition code or proof of retail behavior equivalence.
 
-The fifth-table extension is documented in [Gideon runtime contracts](gideon_runtime_contracts.md).
+The fifth-table extension is documented in [Gideon runtime contracts](gideon_runtime_contracts.md);
+the Fanatic and Prophet tables make seven owners ([contracts](fanatic_prophet_contracts.md)).

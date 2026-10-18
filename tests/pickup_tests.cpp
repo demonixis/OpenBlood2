@@ -453,10 +453,11 @@ namespace
         }
         CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2 &&
               counts["AssaultRiflePU"] == 5 && counts["MedKitPU"] == 22 && counts["ProximitiesPU"] == 161 &&
-              counts["RemotesPU"] == 107 && counts["FlashlightPU"] == 10);
+              counts["RemotesPU"] == 107 && counts["FlashlightPU"] == 10 && counts["SniperRiflePU"] == 4);
         CHECK(failures["ProximitiesPU: invalid property TypeAction"] == 28);
         CHECK(failures["RemotesPU: invalid property TypeAction"] == 14);
-        CHECK(worlds == 57 && created == 1526 && missing == 0 && rejected == 220 && spawns == 60);
+        // 1530 includes the four SniperRiflePU offers (their weapon is not integrated).
+        CHECK(worlds == 57 && created == 1530 && missing == 0 && rejected == 220 && spawns == 60);
         return true;
     }
 } // namespace

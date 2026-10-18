@@ -264,10 +264,10 @@ namespace OpenBlood2
         r->contact_object = nullptr;
         r->contact_polygon = UINT32_MAX;
         bool blocked_start = false;
-        // Replacement policy for the original placement helper only: a face the
-        // body already overlaps does not block the move leaving it (as later
-        // LithTech's one-sided world polygons). See collision_traversal_contracts.md.
-        const auto start = placement_move_ ? StartOverlap::Depart : StartOverlap::Block;
+        // Replacement policy: a face the body already overlaps does not block a move
+        // that does not go deeper into it (later LithTech's one-sided world polygons
+        // ignore contacts facing along the motion). See collision_traversal_contracts.md.
+        const auto start = StartOverlap::Depart;
         for (unsigned iteration = 0; iteration < 4; ++iteration)
         {
             auto end = vector_add(position, remaining);

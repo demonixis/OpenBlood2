@@ -177,21 +177,31 @@ bool AI_Mgr::StartBurnDeath()
 }
 bool AI_Mgr::CreateDeathGibs()
 {
-    using namespace OpenBlood2;
-    auto* s = GetServerDE();
     gib_error.clear();
-    auto direction = m_damage.last_damage.direction;
-    direction.y += 2;
-    const float length = std::sqrt(vector_dot(direction, direction));
-    // CreateGibs negates, then SetupClientGibFX negates its IN/OUT argument again.
-    direction = length > 0 ? vector_scale(direction, (50 + 2 * m_damage.m_fLastDamageAmount) / length) : DVector{};
-    const float scale = m_fAIMass > 0 && m_fAIMass < 250 ? m_fAIMass / 250 : 1;
     if (!std::isfinite(m_damage.m_fMass) || m_damage.m_fMass < 0 || m_damage.m_fMass > 2048)
     {
         gib_error = "AI gib mass exceeds bounded fragment request";
         return false;
     }
-    const unsigned count = static_cast<unsigned>(m_damage.m_fMass) / 32;
+    // Source ((int)GetMass()) >> 5 gibs, launched from the last damage.
+    return CreateGibs(m_damage.last_damage.direction, static_cast<unsigned>(m_damage.m_fMass) / 32,
+                      m_damage.m_fLastDamageAmount);
+}
+bool AI_Mgr::CreateGibs(DVector direction, unsigned count, float damage)
+{
+    using namespace OpenBlood2;
+    auto* s = GetServerDE();
+    gib_error.clear();
+    if (!physics_vector(direction) || !std::isfinite(damage) || count > 64)
+    {
+        gib_error = "AI gib direction, damage or count is outside the bounded request";
+        return false;
+    }
+    direction.y += 2;
+    const float length = std::sqrt(vector_dot(direction, direction));
+    // CreateGibs negates, then SetupClientGibFX negates its IN/OUT argument again.
+    direction = length > 0 ? vector_scale(direction, (50 + 2 * damage) / length) : DVector{};
+    const float scale = m_fAIMass > 0 && m_fAIMass < 250 ? m_fAIMass / 250 : 1;
     const auto event = s->PublishFleshGibs(m_hObject, m_MoveObj.GetPos(), direction, m_vDims, scale, count, gib_error);
     gib_events += event != 0;
     if (m_bCabal)

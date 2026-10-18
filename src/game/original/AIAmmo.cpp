@@ -130,3 +130,24 @@ bool AI_Mgr::AmmoStep()
             return true;
     }
 }
+// Original AI_Mgr.cpp:6180-6262. FindObjectInRadius scans only the exit, smell,
+// ammo and actor lists; HealthPU (HealthBase/PowerupPickup) matches none, so the
+// search always yields no object and the state escapes on its first command.
+bool AI_Mgr::AI_STATE_FindHealth()
+{
+    ++health_searches;
+    if (Metacmd > 1)
+    {
+        const int stim = ComputeStimuli();
+        if (stim < 0)
+            return StateFailure(perception_error.c_str());
+        if (stim == 3)
+            return SetNewState(StateSearchSmell);
+        if (stim > 0)
+            return ComputeState(stim);
+    }
+    if (Metacmd == 1)
+        return SetNewState(StateEscapeRun);
+    // The path commands need a found pickup, which the original lists never provide.
+    return StateFailure("FindHealth path commands require a health candidate list");
+}

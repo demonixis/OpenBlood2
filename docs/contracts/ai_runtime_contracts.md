@@ -1,5 +1,11 @@
 # Original Cultist/Civilian initialization and AI_Update
 
+> Extended by [Fanatic/Prophet contracts](fanatic_prophet_contracts.md): two more
+> registered classes and shared tables (seven owners), the original WeaponStrToInt
+> Beretta default for names without a compiled branch (e.g. COMBAT), retail slot-10
+> proximity inventory weapons and FindHealth. Earlier unknown-weapon-name and
+> proximity rejections are superseded for those cases.
+
 > The [animation-clearance correction](ai_animation_clearance_contracts.md) supersedes
 > earlier blocked-resize failures/CrawlUnder fallback claims: original SetAnimation
 > continues a valid clip while physical bounds stay unchanged on collision refusal.

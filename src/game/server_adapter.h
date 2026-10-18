@@ -388,8 +388,6 @@ namespace OpenBlood2
         void dispatch_world_body(const BodyPlan&, const std::vector<ObjectId>&);
         DRESULT move_world_body(ObjectRecord&, DVector);
         bool moving_ = false;
-        // Set only around the original MoveObjectToGround placement move.
-        bool placement_move_ = false;
         bool models_advancing_ = false, physics_advancing_ = false;
         std::vector<std::unique_ptr<StringHandle>> string_tokens_;
         std::unordered_map<HSTRING, String> strings_;

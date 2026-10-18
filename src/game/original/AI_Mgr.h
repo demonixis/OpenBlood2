@@ -102,10 +102,15 @@ class AI_Mgr : public CBaseCharacter
         Diagnostic,
         Cultist,
         Civilian,
-        Gideon
+        Gideon,
+        Fanatic,
+        Prophet
     };
     static void ResetRuntimeTables();
-    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 5>;
+    // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet.
+    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 7>;
+    // Original WeaponStrToInt prefixes; false for a matched family not integrated here.
+    static bool WeaponStrToInt(std::string_view, DBYTE&);
     static void ExchangeRuntimeTables(RuntimeTables&);
     void ConfigureRuntime(NPCType); // Original constructor defaults, selected by production factories only.
     bool AI_Update();
@@ -212,6 +217,8 @@ class AI_Mgr : public CBaseCharacter
     bool AI_STATE_SearchVisualTarget();
     bool AI_STATE_SearchSmellTarget();
     bool AI_STATE_FindAmmo();
+    bool AI_STATE_FindHealth();
+    std::uint64_t health_searches = 0;
     void ReceiveAmmo(HOBJECT, HMESSAGEREAD);
     std::uint64_t ammo_searches = 0, ammo_collections = 0, ammo_refusals = 0, ammo_target_losses = 0;
     DBYTE searched_ammo = 0;
@@ -243,6 +250,8 @@ class AI_Mgr : public CBaseCharacter
     int CalculateDodge(DVector);
     bool MC_Roll_Left();
     bool MC_Roll_Right();
+    bool MC_Roll_Forward(bool loop = false);
+    bool MC_Roll_Backward();
     int m_nDodgeFlags = 0;
     std::uint64_t dodge_updates = 0, dodge_queries = 0;
     virtual bool AI_STATE_AttackClose();
@@ -263,13 +272,18 @@ class AI_Mgr : public CBaseCharacter
     std::uint64_t locomotion_calls = 0, locomotion_failures = 0;
     int locomotion_command = 0;
     std::string locomotion_error;
+    // Shared Fanatic/Prophet AttackClose/AttackFar/Dodge bodies (inspection values).
+    float crouch_attack_distance = 0, crouch_attack_height = 0;
+    std::uint64_t crouch_attack_updates = 0;
     bool HandleDamage();
     bool MC_Recoil();
     bool MC_Dead();
-    bool AI_STATE_Dying();
+    virtual bool AI_STATE_Dying();
     bool CreateCorpse();
     bool StartBurnDeath();
     bool CreateDeathGibs();
+    // Original AI_Mgr::CreateGibs(direction, count, DAMAGE_TYPE, damage).
+    bool CreateGibs(DVector direction, unsigned count, float damage);
     float m_fAIMass = 250; // Original AI_DEFAULT_MASS, distinct from aggregate overrides.
     HOBJECT fire_source = nullptr;
     std::uint64_t gib_events = 0, limbs_created = 0, big_gib_voice_requests = 0;
@@ -290,6 +304,7 @@ class AI_Mgr : public CBaseCharacter
     bool MC_Idle();
     bool MC_BestWeapon();
     virtual bool MC_Fire_Stand();
+    bool MC_Fire_Crouch();
     bool CheckClearShot(DVector origin, DVector& direction, bool alternate = false);
     virtual bool Fire(bool alternate = false); // Source acceptance includes dry attempts; inspect fire_result.
     virtual bool MC_Extra(std::string_view);
@@ -507,6 +522,8 @@ class AI_Mgr : public CBaseCharacter
     bool TriggerFailure(const char*);
     bool StateFailure(const char*);
     bool AnimationCommand(DDWORD clip, int command);
+    bool CrouchAttack(bool far, bool close_height_fires);
+    bool RollDodge();
     bool EscapeRun(bool civilian);
     bool EscapeHide();
     bool OnStringKey(ArgList*) override;
@@ -520,7 +537,7 @@ class AI_Mgr : public CBaseCharacter
     bool locomotion_busy = false;
     bool LocomotionReady();
     bool TauntMovement(unsigned slot, int command);
-    bool RollMovement(bool right);
+    bool RollMovement(int command, bool loop = false);
     bool LocomotionFailure(std::string_view);
     bool Locomotion(bool run, bool fire, bool crawl = false);
     bool navigation_busy = false;

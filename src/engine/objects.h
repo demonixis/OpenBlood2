@@ -125,7 +125,7 @@ namespace OpenBlood2
         float alpha = 1;
         DVector dimensions{};
         std::uint64_t stair_attempts = 0, stair_steps = 0;
-        // Overlapped faces left by original MoveObjectToGround placement moves.
+        // Initially overlapped faces a MoveObject did not go deeper into.
         std::uint64_t start_departures = 0;
         float last_step_height = 0;
         DVector velocity{}, acceleration{}, contact_normal{};

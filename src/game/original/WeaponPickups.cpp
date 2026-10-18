@@ -29,6 +29,13 @@ FlareGunPU::FlareGunPU()
     display_name = "Flare Pistol";
     resource_id = IDS_WEAPON_FLAREGUN;
 }
+SniperRiflePU::SniperRiflePU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_SNIPERRIFLE, 10};
+    file = "Sniperrifle_pu";
+    display_name = "Sniper Rifle";
+    resource_id = IDS_WEAPON_SNIPER;
+}
 const char* WeaponPickupClass(DDWORD type)
 {
     switch (type)
@@ -41,6 +48,8 @@ const char* WeaponPickupClass(DDWORD type)
             return "AssaultRiflePU";
         case WEAP_FLAREGUN:
             return "FlareGunPU";
+        case WEAP_SNIPERRIFLE:
+            return "SniperRiflePU";
         default:
             return nullptr;
     }

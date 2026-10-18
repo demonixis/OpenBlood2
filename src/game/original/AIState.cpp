@@ -291,6 +291,8 @@ bool AI_Mgr::DispatchState()
             return AI_STATE_SearchVisualTarget();
         case StateFindAmmo:
             return AI_STATE_FindAmmo();
+        case StateFindHealth:
+            return AI_STATE_FindHealth();
         case StateSearchSmell:
             return AI_STATE_SearchSmellTarget();
         default:

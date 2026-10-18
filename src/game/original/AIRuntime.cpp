@@ -1,5 +1,6 @@
 // Selected original AI_Mgr construction/ReadProp/InitialUpdate/AI_Update and
-// CultistAI/CivilianAI construction/model/table initialization. See ai_runtime_contracts.md.
+// CultistAI/CivilianAI/Fanatic/Prophet construction/model/table initialization.
+// See ai_runtime_contracts.md and fanatic_prophet_contracts.md.
 #include "AI_Mgr.h"
 #include "CameraObj.h"
 #include "CivilianAI.h"
@@ -10,33 +11,77 @@ using namespace OpenBlood2;
 namespace
 {
     AI_Mgr::RuntimeTables tables; // Reset after world objects are destroyed.
-    bool weapon(std::string_view name, DBYTE& id)
+    struct WeaponPrefix
     {
-        if (name.starts_with("NONE"))
-            id = 0;
-        else if (name.starts_with("BERET"))
-            id = WEAP_BERETTA;
-        else if (name.starts_with("ENERGY_BLAST"))
-            id = WEAP_ZEALOT_ENERGYBLAST;
-        else if (name.starts_with("GIDEON_SHIELD"))
-            id = WEAP_GIDEON_SHIELD;
-        else if (name.starts_with("GIDEON_WIND"))
-            id = WEAP_GIDEON_WIND;
-        else if (name.starts_with("NAGA_BLAST"))
-            id = WEAP_NAGA_EYEBEAM;
-        else if (name.starts_with("SUBMA"))
-            id = WEAP_SUBMACHINEGUN;
-        else if (name.starts_with("ASSAULTR"))
-            id = WEAP_ASSAULTRIFLE;
-        else if (name.starts_with("FLARE"))
-            id = WEAP_FLAREGUN;
-        else if (name.starts_with("MELEE"))
-            id = WEAP_MELEE;
-        else
-            return false; // Other source weapon families are not implemented; never substitute Beretta.
-        return true;
-    }
+        std::string_view prefix; // Compared bytes: the source _mbsncmp length.
+        DBYTE id;                // 0 for a family not integrated here (except NONE).
+        bool supported;
+    };
+    // Original AI_Mgr::WeaponStrToInt order (AI_Mgr.cpp:377-663). The _ADD_ON
+    // COMBAT/FLAYER/ROCK/NIGHTMARE_FIREBALL branches are absent: the shipped demo
+    // and patched retail object.lto contain no FLAYER literal (only BLOOD2NM does).
+    constexpr WeaponPrefix weapon_prefixes[]{{"BERET", WEAP_BERETTA, true},
+                                             {"SHOTG", 0, false}, // "SHOTGU" compared on 5 bytes.
+                                             {"SNIPE", 0, false},
+                                             {"ASSAULTR", WEAP_ASSAULTRIFLE, true},
+                                             {"SUBMA", WEAP_SUBMACHINEGUN, true},
+                                             {"FLARE", WEAP_FLAREGUN, true},
+                                             {"HOWITZ", 0, false},
+                                             {"FLAME", 0, false},
+                                             {"NAPALM", 0, false},
+                                             {"MINIG", 0, false},
+                                             {"VOODO", 0, false},
+                                             {"ORB", 0, false},
+                                             {"LASER", 0, false},
+                                             {"LIFEL", 0, false},
+                                             {"TESLA", 0, false},
+                                             {"MELEE", WEAP_MELEE, true},
+                                             {"SINGULAR", 0, false},
+                                             {"NONE", 0, true},
+                                             {"PROX_BOMB", 0, false},
+                                             {"SHIKARI_CLAW", 0, false},
+                                             {"SHIKARI_SPIT", 0, false},
+                                             {"SOUL_CROWBAR", 0, false},
+                                             {"SOUL_AXE", 0, false},
+                                             {"SOUL_PIPE", 0, false},
+                                             {"SOUL_HOOK", 0, false},
+                                             {"BEHEMOTH_CLAW", 0, false},
+                                             {"HEAL", 0, false},
+                                             {"SHIELD", 0, false},
+                                             {"ENERGY_BLAST", WEAP_ZEALOT_ENERGYBLAST, true},
+                                             {"GROUND_FIRE", 0, false},
+                                             {"SHOCKWAVE", 0, false},
+                                             {"FIREBALL", 0, false},
+                                             {"LIGHTNING", 0, false},
+                                             {"HAND_SQUEEZE", 0, false},
+                                             {"THIEF_SUCK", 0, false},
+                                             {"BONELEECH_SUCK", 0, false},
+                                             {"NIGHTMARE_BITE", 0, false},
+                                             {"BEHEMOTH_SHOCKWAVE", 0, false},
+                                             {"DEATHSHROUD_ZAP", 0, false},
+                                             {"NAGA_BLAST", WEAP_NAGA_EYEBEAM, true},
+                                             {"NAGA_SPIKE", 0, false},
+                                             {"NAGA_DEBRIS", 0, false},
+                                             {"GIDEON_SHIELD", WEAP_GIDEON_SHIELD, true},
+                                             {"GIDEON_WIND", WEAP_GIDEON_WIND, true},
+                                             {"GIDEON_GOO", 0, false},
+                                             {"GIDEON_VOMIT", 0, false},
+                                             {"GIDEON_SPEAR", 0, false},
+                                             {"ANCIENTONE_BEAM", 0, false},
+                                             {"ANCIENTONE_TENTACLE", 0, false},
+                                             {"SKULL", 0, false}};
 } // namespace
+bool AI_Mgr::WeaponStrToInt(std::string_view name, DBYTE& id)
+{
+    for (const auto& entry : weapon_prefixes)
+        if (name.starts_with(entry.prefix))
+        {
+            id = entry.id;
+            return entry.supported; // Never substitute Beretta for a matched, missing family.
+        }
+    id = WEAP_BERETTA; // Source default for a name matching no compiled branch (e.g. COMBAT).
+    return true;
+}
 void AI_Mgr::ExchangeRuntimeTables(AI_Mgr::RuntimeTables& other)
 {
     tables.swap(other);
@@ -61,6 +106,23 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
     npc_ammo[2] = type == NPCType::Cultist ? 60 : 0;
     npc_ammo[5] = type == NPCType::Cultist ? 20 : 0;
     npc_ammo[6] = type == NPCType::Civilian ? 100 : 0;
+    if (type == NPCType::Fanatic || type == NPCType::Prophet)
+    {
+        // Original Fanatic/Prophet constructors (shared AI_Mgr defaults otherwise).
+        const bool fanatic = type == NPCType::Fanatic;
+        m_fHearingDist = m_fSeeingDist = 1500;
+        m_fRollSpeed = 105;
+        m_fJumpSpeed = 400;
+        m_dwFlags = 0x0f; // FLAG_CRAWL | FLAG_JUMP | FLAG_LIMP | FLAG_DODGE.
+        npc_hp = fanatic ? 50 : 200;
+        npc_armor = fanatic ? 0 : 100;
+        npc_weapons = fanatic
+                          ? std::array<std::string, 5>{"BERETTA", "COMBAT", "ASSAULTRIFLE", "NONE", "NONE"}
+                          : std::array<std::string, 5>{"BERETTA", "COMBAT", "ASSAULTRIFLE", "COMBAT", "ASSAULTRIFLE"};
+        // Bullets, BMG, shells, grenades, rockets, flares, charges, cells, fuel, prox.
+        npc_ammo = fanatic ? std::array<float, 10>{300, 50, 50, 50, 25, 40, 120, 200, 100, 0}
+                           : std::array<float, 10>{750, 0, 150, 50, 100, 100, 400, 600, 200, 0};
+    }
     if (type == NPCType::Gideon)
     {
         m_fHearingDist = 0;
@@ -115,7 +177,7 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         text("TriggerRelayTarget", trigger_relay_target);
     }
     // Source subclass booleans are read only for world-file creation.
-    if (reason == PRECREATE_WORLDFILE && npc_type != NPCType::Gideon)
+    if (reason == PRECREATE_WORLDFILE && (npc_type == NPCType::Cultist || npc_type == NPCType::Civilian))
     {
         auto flag = [&](const char* key, bool& out)
         {
@@ -141,12 +203,10 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
     for (float value : npc_ammo)
         if (!std::isfinite(value) || value < 0 || value > 1e6f)
             return RuntimeFailure("Invalid NPC ammunition");
-    if (npc_ammo[9] != 0)
-        return RuntimeFailure("NPC proximity inventory weapons are not integrated");
     for (const auto& name : npc_weapons)
     {
         DBYTE id;
-        if (!weapon(name, id))
+        if (!WeaponStrToInt(name, id))
             return RuntimeFailure("NPC authored weapon unavailable: " + name);
     }
     int initial;
@@ -158,6 +218,13 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
     {
         model = "Models/Enemies/gideon.abc";
         skin = "Skins/Enemies/gideon.dtx";
+    }
+    else if (npc_type == NPCType::Fanatic || npc_type == NPCType::Prophet)
+    {
+        // Original PostPropRead: fixed model and skin for every non-savegame precreate.
+        const std::string name = npc_type == NPCType::Fanatic ? "Fanatic" : "Prophet";
+        model = "Models/Enemies/" + name + ".abc";
+        skin = "Skins/Enemies/" + name + ".dtx";
     }
     else if (npc_type == NPCType::Cultist)
     {
@@ -208,7 +275,10 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
         return RuntimeFailure("Invalid or repeated NPC initialization");
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
-    const auto group = npc_type == NPCType::Gideon ? 4 : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
+    const auto group = npc_type == NPCType::Gideon    ? 4
+                       : npc_type == NPCType::Fanatic ? 5
+                       : npc_type == NPCType::Prophet ? 6
+                                                      : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
     auto initialize_table = [&](unsigned slot, bool refresh, const char* root)
     {
         if (!refresh)
@@ -236,9 +306,11 @@ bool AI_Mgr::RuntimeInitialize(int reason)
             return RuntimeFailure("NPC female animation table initialization failed");
     }
     else if (!initialize_table(group, !tables[group],
-                               npc_type == NPCType::Gideon ? "sounds/enemies/Gideon"
-                               : male_group                ? "sounds/enemies/m_cultist"
-                                                           : "sounds/enemies/f_cultist"))
+                               npc_type == NPCType::Gideon    ? "sounds/enemies/Gideon"
+                               : npc_type == NPCType::Fanatic ? "sounds/enemies/fanatic"
+                               : npc_type == NPCType::Prophet ? "sounds/enemies/Prophet"
+                               : male_group                   ? "sounds/enemies/m_cultist"
+                                                              : "sounds/enemies/f_cultist"))
         return RuntimeFailure("NPC shared animation table initialization failed");
     auto table = tables[group];
     if (!InitStatics(table) || !m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
@@ -250,7 +322,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     for (const auto& name : npc_weapons)
     {
         DBYTE id;
-        if (!weapon(name, id))
+        if (!WeaponStrToInt(name, id))
             return RuntimeFailure("NPC weapon unavailable");
         if (id && std::find(obtained.begin(), obtained.end(), id) == obtained.end())
         {
@@ -260,7 +332,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         }
     }
     DBYTE first;
-    weapon(npc_weapons[0], first);
+    WeaponStrToInt(npc_weapons[0], first);
     if (first)
     {
         const auto result = m_InventoryMgr.ChangeWeapon(first);
@@ -272,8 +344,20 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         if (m_InventoryMgr.AddAmmo(ammo[i], npc_ammo[i]) == InventoryResult::Invalid)
             return RuntimeFailure("NPC ammunition initialization failed");
     m_InventoryMgr.AddAmmo(9, 200);
+    // Source AddInventoryWeapon(INV_PROXIMITY, (int)m_fProxBombs). _DEMO refuses it;
+    // retail stores a slot-10 inventory weapon the AI never selects (FindBestWeapon
+    // scans slots 0..9 and MC_LayProximity has no caller). The source also makes the
+    // call with a zero count; that empty weapon is omitted here.
+    if (npc_ammo[9] != 0)
+    {
+        const auto result = m_InventoryMgr.AddInventoryWeapon(7, static_cast<DBYTE>(static_cast<int>(npc_ammo[9])));
+        if (result != InventoryResult::Ok && result != InventoryResult::NotAvailable)
+            return RuntimeFailure("NPC proximity inventory initialization failed");
+    }
     const float difficulty = GetGameDifficulty() == 0 ? .25f : GetGameDifficulty() == 2 ? 1.5f : 1;
-    m_InventoryMgr.damage_multiplier = (npc_type == NPCType::Cultist ? .5f : 1) * difficulty;
+    // Cultist, Fanatic and Prophet InitialUpdate add a 0.5 multiplier before the base difficulty.
+    const bool halved = npc_type == NPCType::Cultist || npc_type == NPCType::Fanatic || npc_type == NPCType::Prophet;
+    m_InventoryMgr.damage_multiplier = (halved ? .5f : 1) * difficulty;
     float unit;
     if (!s->RandomFloat(0, 1, unit))
         return RuntimeFailure("NPC health RNG failed");

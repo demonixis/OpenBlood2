@@ -299,6 +299,11 @@ namespace OpenBlood2
                     cross(vector_subtract(t.points[1], t.points[0]), vector_subtract(t.points[2], t.points[0]));
                 if (vector_dot(normal, normal) < 1e-12f)
                     continue;
+                // Wind toward the polygon's plane normal (its empty side) when it has one.
+                // Retail DAT already does; the two-sided SAT is unaffected by the order.
+                const auto plane = model.surfaces[polygon.surface].plane;
+                if (plane < model.planes.size() && vector_dot(normal, model.planes[plane].normal) < 0)
+                    std::swap(t.points[1], t.points[2]);
                 t.min = minv(t.points[0], minv(t.points[1], t.points[2]));
                 t.max = maxv(t.points[0], maxv(t.points[1], t.points[2]));
                 triangles_.push_back(t);
@@ -370,11 +375,11 @@ namespace OpenBlood2
             CollisionHit candidate;
             if (!triangle_hit(triangles_[i].points, from, to, half, candidate, anchor))
                 continue;
-            if (start == StartOverlap::Depart && candidate.start_solid)
+            if (start == StartOverlap::Depart && candidate.start_solid && precise_dot(delta, delta) > 0)
             {
                 const auto& p = triangles_[i].points;
                 const auto outward = cross(vector_subtract(p[1], p[0]), vector_subtract(p[2], p[0]));
-                if (precise_dot(outward, delta) > 0)
+                if (precise_dot(outward, delta) >= 0)
                 {
                     ++*departed;
                     continue;

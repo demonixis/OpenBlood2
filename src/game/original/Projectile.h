@@ -71,3 +71,27 @@ class CBehemothShockwaveProjectile final : public CProjectile
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
 };
+
+// Original GameProjectiles.cpp CHowitzerShell: one update casts 3000 units along
+// the shell's forward vector (past its shooter), explodes at the hit and is removed.
+class CHowitzerShell final : public CProjectile
+{
+  public:
+    CHowitzerShell() : CProjectile(OT_NORMAL)
+    {
+        m_fLifeTime = 5;
+    }
+    DVector ray_from{}, ray_to{};
+    OpenBlood2::SegmentResult ray_result = OpenBlood2::SegmentResult::Unavailable;
+    OpenBlood2::SegmentHit ray_hit;
+    bool skipped_shooter = false, direct_hit = false;
+    std::uint64_t orphaned = 0; // Shooter already pending removal at the shell's update.
+    OpenBlood2::SceneExplosionReport effect;
+    bool AdvanceFlight(double) override
+    {
+        return !failed;
+    } // Hitscan: the source never flies the shell.
+  protected:
+    bool Update() override;
+    void AddExplosion(DVector, DVector) override;
+};

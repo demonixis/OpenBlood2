@@ -18,6 +18,7 @@
 #include "game/original/Door.h"
 #include "game/original/ExitHint.h"
 #include "game/original/ExitTrigger.h"
+#include "game/original/Fanatic.h"
 #include "game/original/FlareProjectile.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Gib.h"
@@ -33,6 +34,7 @@
 #include "game/original/PolyGrid.h"
 #include "game/original/PowerupPickups.h"
 #include "game/original/Projectile.h"
+#include "game/original/Prophet.h"
 #include "game/original/ProximityBomb.h"
 #include "game/original/RandomSoundFX.h"
 #include "game/original/RemoteBomb.h"
@@ -119,6 +121,7 @@ namespace OpenBlood2
         const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {}};
         const ClassInfo flare_burst{"CFlareBurstProjectile", &base, construct<CFlareBurstProjectile>, {}};
         const ClassInfo energy_projectile{"CEnergyBlastProjectile", &base, construct<CEnergyBlastProjectile>, {}};
+        const ClassInfo howitzer_shell{"CHowitzerShell", &base, construct<CHowitzerShell>, {}};
         const ClassInfo hand_model{"CHandWeaponModel", &base, construct<CHandWeaponModel>, {}};
         const ClassInfo b2base{
             "B2BaseClass",
@@ -429,6 +432,45 @@ namespace OpenBlood2
                                   {"Scared", false},
                                   {"Dims", DVector{21, 37, 21}},
                                   {"SororitySkin", false}}};
+        const ClassInfo fanatic{"Fanatic",
+                                &ai_manager,
+                                construct_npc<Fanatic, AI_Mgr::NPCType::Fanatic>,
+                                {{"RandomHitPoints", 0.0f},
+                                 {"AIState", std::string("IDLE"), true, 31},
+                                 {"AIWeapon1", std::string("BERETTA"), true, 31},
+                                 {"AIWeapon2", std::string("COMBAT"), true, 31},
+                                 {"AIWeapon3", std::string("ASSAULTRIFLE"), true, 31},
+                                 {"Bullets", 300.0f},
+                                 {"BMG", 150.0f},
+                                 {"Shells", 50.0f},
+                                 {"Grenades", 50.0f},
+                                 {"Rockets", 25.0f},
+                                 {"Flares", 40.0f},
+                                 {"Cells", 200.0f},
+                                 {"Charges", 120.0f},
+                                 {"Fuel", 100.0f},
+                                 {"Proximity_Bombs", 25.0f},
+                                 {"Dims", DVector{21, 38, 19}}}};
+        const ClassInfo prophet{"Prophet",
+                                &ai_manager,
+                                construct_npc<Prophet, AI_Mgr::NPCType::Prophet>,
+                                {{"RandomHitPoints", 0.0f},
+                                 {"AIState", std::string("IDLE"), true, 31},
+                                 {"AIWeapon1", std::string("BERETTA"), true, 31},
+                                 {"AIWeapon2", std::string("COMBAT"), true, 31},
+                                 {"AIWeapon3", std::string("ASSAULTRIFLE"), true, 31},
+                                 {"AIWeapon4", std::string("COMBAT"), true, 31},
+                                 {"AIWeapon5", std::string("ASSAULTRIFLE"), true, 31},
+                                 {"Bullets", 750.0f},
+                                 {"BMG", 150.0f},
+                                 {"Shells", 150.0f},
+                                 {"Grenades", 50.0f},
+                                 {"Rockets", 100.0f},
+                                 {"Flares", 100.0f},
+                                 {"Cells", 600.0f},
+                                 {"Charges", 400.0f},
+                                 {"Fuel", 200.0f},
+                                 {"Dims", DVector{19, 43, 15}}}};
         const ClassInfo gideon{
             "Gideon",
             &ai_manager,
@@ -566,6 +608,7 @@ namespace OpenBlood2
         const ClassInfo assault_pickup{"AssaultRiflePU", &weapon_pickup, construct<AssaultRiflePU>, {}};
         const ClassInfo flare_pickup{"FlareGunPU", &weapon_pickup, construct<FlareGunPU>, {}};
         const ClassInfo mac10_pickup{"SubMachineGunPU", &weapon_pickup, construct<SubMachineGunPU>, {}};
+        const ClassInfo sniper_pickup{"SniperRiflePU", &weapon_pickup, construct<SniperRiflePU>, {}};
         const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}};
         const ClassInfo powerup_pickup{"PowerupPickup", &pickup, construct<PowerupPickup>, {}};
         const ClassInfo health_base{"HealthBase", &powerup_pickup, construct<HealthBase>, {}};
@@ -879,17 +922,18 @@ namespace OpenBlood2
                objects.register_class(smell) && objects.register_class(exit_hint) &&
                objects.register_class(character) && objects.register_class(ai_manager) &&
                objects.register_class(cultist) && objects.register_class(civilian) && objects.register_class(gideon) &&
-               objects.register_class(player) && objects.register_class(polygrid) && objects.register_class(volume) &&
-               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
-               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
-               objects.register_class(freefall) && objects.register_class(trigger) &&
-               objects.register_class(key_pickup) && objects.register_class(pickup) &&
-               objects.register_class(item_pickup) && objects.register_class(item_weapon) &&
-               objects.register_class(proximity_pickup) && objects.register_class(remote_pickup) &&
-               objects.register_class(charged_pickup) && objects.register_class(medkit_pickup) &&
-               objects.register_class(flashlight_pickup) && objects.register_class(weapon_pickup) &&
-               objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
-               objects.register_class(flare_pickup) && objects.register_class(mac10_pickup) &&
+               objects.register_class(fanatic) && objects.register_class(prophet) && objects.register_class(player) &&
+               objects.register_class(polygrid) && objects.register_class(volume) && objects.register_class(water) &&
+               objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
+               objects.register_class(conveyor) && objects.register_class(damage) && objects.register_class(freefall) &&
+               objects.register_class(trigger) && objects.register_class(key_pickup) &&
+               objects.register_class(pickup) && objects.register_class(item_pickup) &&
+               objects.register_class(item_weapon) && objects.register_class(proximity_pickup) &&
+               objects.register_class(remote_pickup) && objects.register_class(charged_pickup) &&
+               objects.register_class(medkit_pickup) && objects.register_class(flashlight_pickup) &&
+               objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
+               objects.register_class(assault_pickup) && objects.register_class(flare_pickup) &&
+               objects.register_class(mac10_pickup) && objects.register_class(sniper_pickup) &&
                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
                objects.register_class(health_base) && objects.register_class(armor_base) &&
                objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
@@ -908,7 +952,7 @@ namespace OpenBlood2
                objects.register_class(remote) && objects.register_class(grenade) &&
                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
                objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
-               objects.register_class(shockwave_projectile);
+               objects.register_class(howitzer_shell) && objects.register_class(shockwave_projectile);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

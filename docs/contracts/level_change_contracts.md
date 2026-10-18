@@ -25,7 +25,7 @@ owning session. Inspector commands use the same queue as original exit messages.
    replace it), and check world-revision exhaustion.
 2. Suspend the source original globals using the same boundary as
    [destination rehearsal](destination_trial_contracts.md): seven fixed-address
-   intrusive heads/counts, active camera, five class/gender AI table owners and the
+   intrusive heads/counts, active camera, seven class/gender AI table owners (Fanatic/Prophet added; see [contracts](fanatic_prophet_contracts.md)) and the
    server binding. The source runtime and all its object addresses remain alive.
 3. Allocate a separate session at a stable address and copy only the mounted resource
    index. Run normal DAT/collision/schema loading and original initialization.
