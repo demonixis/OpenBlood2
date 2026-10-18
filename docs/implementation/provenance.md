@@ -1442,3 +1442,8 @@ The DAT v56 lightmap block, axes, extents and origin rule are reverse-engineered
 ## Static light objects and model lighting (2026-10-18)
 
 The original light term is established by fitting light objects against retail baked vertex colors; later LithTech model-light ranking and Saturate shading are consulted. No code is imported. Lambert shading, the source limit and occlusion are replacement policies. See [source ledger](sources/static_light_sources.json) and [contracts](../contracts/static_light_contracts.md).
+
+## FLAG_SHADOW model shadows (2026-10-18)
+
+The original flag usage and the shipped detail configuration (`MaxModelShadows`) select casters and the default; later LithTech's projected silhouette technique is consulted. No code is imported. Tile shadows along the strongest static light are a replacement policy. See [source ledger](sources/model_shadow_sources.json) and [contracts](../contracts/model_shadow_contracts.md).
+

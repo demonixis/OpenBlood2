@@ -53,12 +53,13 @@ namespace OpenBlood2
         if (format_ == format && pipelines_[0])
             return true;
         release();
-        SDL_GPUShaderCreateInfo vertex_info{}, skinned_info{}, opaque_info{}, alpha_info{};
+        SDL_GPUShaderCreateInfo vertex_info{}, skinned_info{}, opaque_info{}, alpha_info{}, shadow_info{};
         const auto formats = SDL_GetGPUShaderFormats(device_);
         if (!world_shader_info(WorldShader::Vertex, formats, vertex_info) ||
             !world_shader_info(WorldShader::SkinnedVertex, formats, skinned_info) ||
             !world_shader_info(WorldShader::OpaqueFragment, formats, opaque_info) ||
-            !world_shader_info(WorldShader::AlphaFragment, formats, alpha_info))
+            !world_shader_info(WorldShader::AlphaFragment, formats, alpha_info) ||
+            !world_shader_info(WorldShader::ShadowFragment, formats, shadow_info))
         {
             error = "No bundled world shader for this GPU backend (SPIR-V or MSL required)";
             return false;
@@ -67,7 +68,8 @@ namespace OpenBlood2
         auto* skinned = vertex ? SDL_CreateGPUShader(device_, &skinned_info) : nullptr;
         auto* opaque = skinned ? SDL_CreateGPUShader(device_, &opaque_info) : nullptr;
         auto* alpha = opaque ? SDL_CreateGPUShader(device_, &alpha_info) : nullptr;
-        bool success = alpha != nullptr;
+        auto* shadow = alpha ? SDL_CreateGPUShader(device_, &shadow_info) : nullptr;
+        bool success = shadow != nullptr;
         if (!success)
             error = SDL_GetError();
         SDL_GPUVertexBufferDescription buffer{};
@@ -108,9 +110,10 @@ namespace OpenBlood2
             const bool blend =
                 kind == WorldPipeline::Alpha || kind == WorldPipeline::SkyAlpha || kind == WorldPipeline::SkinnedAlpha;
             const bool sky = kind == WorldPipeline::Sky || kind == WorldPipeline::SkyAlpha;
-            const bool skin = kind == WorldPipeline::SkinnedOpaque || kind == WorldPipeline::SkinnedAlpha;
+            const bool caster = kind == WorldPipeline::ShadowCaster;
+            const bool skin = kind == WorldPipeline::SkinnedOpaque || kind == WorldPipeline::SkinnedAlpha || caster;
             SDL_GPUColorTargetDescription target{};
-            target.format = format;
+            target.format = caster ? shadow_tile_format : format;
             if (blend)
             {
                 target.blend_state.enable_blend = true;
@@ -123,7 +126,7 @@ namespace OpenBlood2
             }
             SDL_GPUGraphicsPipelineCreateInfo create{};
             create.vertex_shader = skin ? skinned : vertex;
-            create.fragment_shader = blend ? alpha : opaque;
+            create.fragment_shader = caster ? shadow : blend ? alpha : opaque;
             create.vertex_input_state = skin ? SDL_GPUVertexInputState{&skinned_buffer, 1, skinned_attributes, 5}
                                              : SDL_GPUVertexInputState{&buffer, 1, attributes, 4};
             create.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
@@ -145,7 +148,7 @@ namespace OpenBlood2
                 success = false;
             }
         }
-        for (auto* shader : {vertex, skinned, opaque, alpha})
+        for (auto* shader : {vertex, skinned, opaque, alpha, shadow})
             if (shader)
                 SDL_ReleaseGPUShader(device_, shader);
         if (!success)
@@ -221,7 +224,8 @@ namespace OpenBlood2
             textures_ = std::move(handles);
             texture_paths_ = std::move(paths);
             if (!(sampler_ = registry_->sampler(style_ == DrawStyle::SpriteAlpha, error)) ||
-                !(lightmap_sampler_ = registry_->lightmap_sampler(error)) || !upload_vertices(mesh, error) ||
+                !(lightmap_sampler_ = registry_->lightmap_sampler(error)) ||
+                !(shadow_sampler_ = registry_->sampler(true, error)) || !upload_vertices(mesh, error) ||
                 !registry_->refresh_textures(mesh.materials, textures_, texture_paths_, error) || !textures_[0] ||
                 !registry_->get(textures_[0]))
             {
@@ -429,6 +433,10 @@ namespace OpenBlood2
         {
             SDL_GPUBufferBinding binding{vertices, 0};
             SDL_BindGPUVertexBuffers(target.pass, 0, &binding, 1);
+            static const ShadowUniform no_shadows{};
+            SDL_PushGPUFragmentUniformData(target.commands, 1, target.shadows ? target.shadows : &no_shadows,
+                                           sizeof(ShadowUniform));
+            const bool receive = receive_shadows && target.shadows && !sky && !close_view;
             // Redundant state is skipped within this record; another renderer may have
             // pushed uniforms or bound samplers in between, so nothing is assumed on entry.
             SDL_GPUTexture *bound_texture = nullptr, *bound_lightmap = nullptr;
@@ -456,18 +464,10 @@ namespace OpenBlood2
                     uniform.projection[3] = -near * far / (far - near);
                 }
                 const bool illuminate = !sky && style_ == DrawStyle::Opaque && !close_view;
-                const std::array<float, 12> fragment{d.alpha,
-                                                     world_saturate_scale,
-                                                     0,
-                                                     0,
-                                                     light.position.x,
-                                                     light.position.y,
-                                                     light.position.z,
-                                                     illuminate ? light.radius : 0,
-                                                     light.color.x,
-                                                     light.color.y,
-                                                     light.color.z,
-                                                     0};
+                const std::array<float, 12> fragment{
+                    d.alpha,          world_saturate_scale, receive ? 1.f : 0.f, 0,
+                    light.position.x, light.position.y,     light.position.z,    illuminate ? light.radius : 0,
+                    light.color.x,    light.color.y,        light.color.z,       0};
                 SDL_PushGPUFragmentUniformData(target.commands, 0, fragment.data(), sizeof(fragment));
                 auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material,
                                  std::array<double, 2> rate, std::uint32_t lightmap)
@@ -487,9 +487,12 @@ namespace OpenBlood2
                     auto* lightmap_texture = registry_->get(textures_[lightmap]);
                     if (image_texture != bound_texture || lightmap_texture != bound_lightmap)
                     {
+                        // Slot 2: the shadow tiles, or white when there are none (never read then).
+                        auto* shadow_texture = target.shadow_atlas ? target.shadow_atlas : registry_->get(textures_[0]);
                         const SDL_GPUTextureSamplerBinding textures[]{{image_texture, sampler_},
-                                                                      {lightmap_texture, lightmap_sampler_}};
-                        SDL_BindGPUFragmentSamplers(target.pass, 0, textures, 2);
+                                                                      {lightmap_texture, lightmap_sampler_},
+                                                                      {shadow_texture, shadow_sampler_}};
+                        SDL_BindGPUFragmentSamplers(target.pass, 0, textures, 3);
                         bound_texture = image_texture;
                         bound_lightmap = lightmap_texture;
                     }

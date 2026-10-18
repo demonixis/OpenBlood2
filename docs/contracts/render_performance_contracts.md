@@ -246,3 +246,5 @@ set 1 vertex uniforms, set 2 fragment textures/samplers and set 3 fragment unifo
 The [baked lighting continuation](baked_lighting_contracts.md) adds model light sampling to the models stage. Samples are cached per object, so CityHub's frame time and model stage are within measurement noise. `--bench --capture FILE.png` saves the last measured frame.
 
 The [lightmap continuation](lightmap_contracts.md) splits opaque batches by lightmap page (CityHub: 238 → 296 draw calls) and adds one bilinear texture read per world pixel. CityHub at 3440x1440 measures 1.74 ms per frame (GPU 0.58 ms).
+
+The [model shadow continuation](model_shadow_contracts.md) adds an optional render pass before the scene pass for the shadow tile atlas; scenes without visible casters keep one pass. CityHub at 3440x1440 measures 0.79 ms GPU with 5 casters, against 0.61 ms without shadows.

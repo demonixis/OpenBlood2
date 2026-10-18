@@ -554,6 +554,14 @@ namespace OpenBlood2
                             ImGui::TextWrapped("Original light term per static light; Lambert N.L, source limit and "
                                                "occlusion are replacement policy, not retail parity.");
                         }
+                        if (model_shadows)
+                        {
+                            const auto& m = *model_shadows;
+                            ImGui::Text("Model shadows: %zu FLAG_SHADOW candidates, %zu drawn (%zu beyond limit, %zu "
+                                        "distant, %zu outside view, %zu unbounded)%s",
+                                        m.candidates, m.casters, m.beyond_limit, m.distant, m.outside, m.unbounded,
+                                        m.available ? "" : " | atlas unavailable or not yet created");
+                        }
                         ImGui::Text("Alpha: %zu prepared faces / %zu submitted batches / %llu passes",
                                     world_mesh->blended, world_render->alpha_batches,
                                     (unsigned long long)world_render->alpha_frames);

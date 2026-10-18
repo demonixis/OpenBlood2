@@ -112,4 +112,4 @@ The model stage now includes selection, but samples are reused (230/232).
 - `ModelDirAdd`, `GlobalDirLight`/`ObjectLight` sun cases beyond point lights, and dynamic
   lights (explosions, muzzle flashes, `GlowingLight`) on models.
 - Exact original model shading (N.L, source limit, occlusion).
-- `FLAG_SHADOW` model shadows (next continuation).
+- `FLAG_SHADOW` shadows are covered by the [model shadow contracts](model_shadow_contracts.md); they project along each caster's strongest source.

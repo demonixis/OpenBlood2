@@ -128,3 +128,5 @@ Measured on Apple M5 / Metal at 3440x1440:
   - static-light model lighting with normals;
   - model shadows (`detailhi.cfg` enables `MaxModelShadows 1`, `ShadowZRange 17`, `ShadowLodOffset 100`);
   - realtime lights.
+
+The [model shadow continuation](model_shadow_contracts.md) darkens the lightmap (or vertex light) of world receivers under `FLAG_SHADOW` casters before the dynamic light is added. Both fragment shaders now bind a third texture (the shadow tiles) and a second uniform buffer.

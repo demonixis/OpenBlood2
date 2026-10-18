@@ -728,3 +728,5 @@ The [lightmap continuation](docs/contracts/lightmap_contracts.md) decodes the or
 
 The [static light continuation](docs/contracts/static_light_contracts.md) lights GPU-skinned models from Light/DirLight/ObjectLight objects using the verified original term `color * (1 - d/R) * linear cone` (no N.L, no occlusion in the baked data). The four strongest unoccluded lights shade per vertex with N.L, doubled like lightmaps; the rest join `AmbientLight + ModelAdd + object color`. Preserve flat/NOLIGHT/FX handling, fully bright defaults and sample reuse. Lambert, the source limit and occlusion are replacement policies.
 
+The [model shadow continuation](docs/contracts/model_shadow_contracts.md) draws `FLAG_SHADOW` shadows (original high-detail `MaxModelShadows`): the nearest 16 visible casters render their heights along their strongest static light into a 512² R32F tile atlas, and world fragments remove 60 % of the baked light below them. Preserve `FLAG_REALLYCLOSE` exclusion, upward-facing receivers, darken-only results, the culling/early-outs and `--no-model-shadows`. Models do not receive; the technique and constants are replacement policy.
+

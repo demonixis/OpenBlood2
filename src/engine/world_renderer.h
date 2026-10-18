@@ -33,7 +33,23 @@ namespace OpenBlood2
         SkyAlpha,
         SkinnedOpaque, // GPU-skinned ABC models (SkinnedVertex input, node palette storage).
         SkinnedAlpha,
+        ShadowCaster, // Skinned caster heights into a shadow_tile_format tile (depth-tested).
         Count
+    };
+    // Vertical model shadow tiles store caster world heights; uncovered texels keep the clear value.
+    inline constexpr SDL_GPUTextureFormat shadow_tile_format = SDL_GPU_TEXTUREFORMAT_R32_FLOAT;
+    inline constexpr float shadow_tile_clear = -1e30f;
+    inline constexpr std::size_t shadow_caster_limit = 32;
+    // Fragment uniform slot 1 of both world fragment shaders (std140), pushed once per record.
+    struct ShadowUniform
+    {
+        std::array<float, 4> info{}; // Caster count, strength, fade range below the feet, atlas texel.
+        std::array<float, 4> eye{};
+        std::array<float, 4> bounds{}; // Union of caster boxes: min x, min z, max x, max z.
+        std::array<float, 4> height{}; // Union top.
+        // Per caster: tile (u0, v0, size, top), footprint at the top (min x, min z, 1/size x, 1/size z),
+        // (feet, bias, slope x, slope z).
+        std::array<std::array<float, 4>, 3 * shadow_caster_limit> casters{};
     };
     // Conservative bounding-sphere test against the world_view_uniform projection.
     struct ViewFrustum
@@ -82,6 +98,9 @@ namespace OpenBlood2
         SDL_GPURenderPass* pass = nullptr;
         bool letterbox = false;
         float min_depth = 0, max_depth = 1;
+        // Vertical model shadow tiles and their uniform; receivers ignore them when null.
+        SDL_GPUTexture* shadow_atlas = nullptr;
+        const ShadowUniform* shadows = nullptr;
     };
     class WorldRenderer
     {
@@ -124,6 +143,7 @@ namespace OpenBlood2
         }
         void clear_geometry();
         WorldViewStats stats;
+        bool receive_shadows = false; // Opaque/translucent world passes read the shadow tiles.
         Uint32 width() const
         {
             return width_;
@@ -147,7 +167,7 @@ namespace OpenBlood2
         TextureHandle depth_;
         std::vector<TextureHandle> textures_;
         std::vector<std::string> texture_paths_;
-        SDL_GPUSampler *sampler_ = nullptr, *lightmap_sampler_ = nullptr; // Owned by the registry.
+        SDL_GPUSampler *sampler_ = nullptr, *lightmap_sampler_ = nullptr, *shadow_sampler_ = nullptr; // Registry-owned.
         Uint32 width_ = 0, height_ = 0;
         std::uint64_t revision_ = UINT64_MAX;
         // Checks every input and selects visible_/alpha_order_ before any pass is begun.

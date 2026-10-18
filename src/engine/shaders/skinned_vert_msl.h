@@ -51,50 +51,50 @@ struct main0_in
 vertex main0_out main0(main0_in in [[stage_in]], constant type_View& View [[buffer(0)]], const device type_StructuredBuffer_v4float& palette [[buffer(1)]], const device type_StructuredBuffer_v4float& deformation [[buffer(2)]])
 {
     main0_out out = {};
-    uint _82 = View.bases.x + (in.in_var_TEXCOORD2.x * 2u);
-    float3 _99;
+    uint _83 = View.bases.x + (in.in_var_TEXCOORD2.x * 2u);
+    float3 _100;
     if (in.in_var_TEXCOORD3 == 4294967295u)
     {
-        _99 = in.in_var_TEXCOORD0;
+        _100 = in.in_var_TEXCOORD0;
     }
     else
     {
-        _99 = deformation._m0[View.bases.y + in.in_var_TEXCOORD3].xyz;
+        _100 = deformation._m0[View.bases.y + in.in_var_TEXCOORD3].xyz;
     }
-    float3 _112 = (palette._m0[_82 + 1u].xyz + (_99 + (cross(palette._m0[_82].xyz, cross(palette._m0[_82].xyz, _99) + (_99 * palette._m0[_82].w)) * 2.0))) * View.scale.xyz;
-    float3 _126 = (_112 + (cross(View.quaternion.xyz, cross(View.quaternion.xyz, _112) + (_112 * View.quaternion.w)) * 2.0)) + View.translation.xyz;
-    float3 _130 = _126 - View.eye.xyz;
-    float _134 = dot(_130, View.forward.xyz);
-    float3 _187 = in.in_var_TEXCOORD4 + (cross(palette._m0[_82].xyz, cross(palette._m0[_82].xyz, in.in_var_TEXCOORD4) + (in.in_var_TEXCOORD4 * palette._m0[_82].w)) * 2.0);
-    float3 _193 = _187 + (cross(View.quaternion.xyz, cross(View.quaternion.xyz, _187) + (_187 * View.quaternion.w)) * 2.0);
-    float3 _197 = _193 * rsqrt(precise::max(dot(_193, _193), 9.9999999600419720025001879548654e-13));
-    uint _204 = min(uint(View.ambient.w), 4u);
-    float3 _206;
-    _206 = View.ambient.xyz;
-    float3 _207;
-    for (uint _209 = 0u; _209 < _204; _206 = _207, _209++)
+    float3 _113 = (palette._m0[_83 + 1u].xyz + (_100 + (cross(palette._m0[_83].xyz, cross(palette._m0[_83].xyz, _100) + (_100 * palette._m0[_83].w)) * 2.0))) * View.scale.xyz;
+    float3 _127 = (_113 + (cross(View.quaternion.xyz, cross(View.quaternion.xyz, _113) + (_113 * View.quaternion.w)) * 2.0)) + View.translation.xyz;
+    float3 _131 = _127 - View.eye.xyz;
+    float _135 = dot(_131, View.forward.xyz);
+    float3 _192 = in.in_var_TEXCOORD4 + (cross(palette._m0[_83].xyz, cross(palette._m0[_83].xyz, in.in_var_TEXCOORD4) + (in.in_var_TEXCOORD4 * palette._m0[_83].w)) * 2.0);
+    float3 _198 = _192 + (cross(View.quaternion.xyz, cross(View.quaternion.xyz, _192) + (_192 * View.quaternion.w)) * 2.0);
+    float3 _202 = _198 * rsqrt(precise::max(dot(_198, _198), 9.9999999600419720025001879548654e-13));
+    uint _209 = min(uint(View.ambient.w), 4u);
+    float3 _211;
+    _211 = View.ambient.xyz;
+    float3 _212;
+    for (uint _214 = 0u; _214 < _209; _211 = _212, _214++)
     {
-        uint _214 = _209 * 3u;
-        float3 _218 = View.sources[_214].xyz - _126;
-        float _220 = precise::max(length(_218), 9.9999997473787516355514526367188e-05);
-        float3 _222 = _218 / float3(_220);
-        uint _228 = _214 + 1u;
-        float _245;
-        if (View.sources[_228].w >= (-1.0))
+        uint _219 = _214 * 3u;
+        float3 _223 = View.sources[_219].xyz - _127;
+        float _225 = precise::max(length(_223), 9.9999997473787516355514526367188e-05);
+        float3 _227 = _223 / float3(_225);
+        uint _233 = _219 + 1u;
+        float _250;
+        if (View.sources[_233].w >= (-1.0))
         {
-            _245 = fast::clamp((dot(-_222, View.sources[_214 + 2u].xyz) - View.sources[_228].w) / (1.0 - View.sources[_228].w), 0.0, 1.0);
+            _250 = fast::clamp((dot(-_227, View.sources[_219 + 2u].xyz) - View.sources[_233].w) / (1.0 - View.sources[_233].w), 0.0, 1.0);
         }
         else
         {
-            _245 = 1.0;
+            _250 = 1.0;
         }
-        _207 = _206 + (View.sources[_228].xyz * ((fast::clamp(1.0 - (_220 / View.sources[_214].w), 0.0, 1.0) * _245) * precise::max(0.0, dot(_197, _222))));
+        _212 = _211 + (View.sources[_233].xyz * ((fast::clamp(1.0 - (_225 / View.sources[_219].w), 0.0, 1.0) * _250) * precise::max(0.0, dot(_202, _227))));
     }
-    out.out_var_TEXCOORD0 = (View.color.xyz * precise::min(_206, float3(1.0))) * View.scale.w;
+    out.out_var_TEXCOORD0 = (View.color.xyz * precise::min(_211, float3(1.0))) * View.scale.w;
     out.out_var_TEXCOORD1 = in.in_var_TEXCOORD1 + View._textureOffset.xy;
-    out.out_var_TEXCOORD2 = _126;
+    out.out_var_TEXCOORD2 = _127;
     out.out_var_TEXCOORD3 = float2(-1.0);
-    out.gl_Position = select(float4(dot(_130, View.right.xyz) * View.projection.x, dot(_130, View.up.xyz) * View.projection.y, (_134 * View.projection.z) + View.projection.w, _134), float4(0.0), bool4(((((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.y * 2u)) + 1u])[3] + ((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.z * 2u)) + 1u])[3]) + ((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.w * 2u)) + 1u])[3]) > 0.0));
+    out.gl_Position = select(float4(dot(_131, View.right.xyz) * View.projection.x, dot(_131, View.up.xyz) * View.projection.y, (_135 * View.projection.z) + View.projection.w, (View.forward.w > 0.5) ? 1.0 : _135), float4(0.0), bool4(((((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.y * 2u)) + 1u])[3] + ((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.z * 2u)) + 1u])[3]) + ((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.w * 2u)) + 1u])[3]) > 0.0));
     return out;
 }
 

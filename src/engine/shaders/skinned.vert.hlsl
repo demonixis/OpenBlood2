@@ -44,8 +44,9 @@ Output main(Input input)
     float3 world = rotate(quaternion, model) + translation.xyz;
     float3 relative = world - eye.xyz;
     float z = dot(relative, forward.xyz);
+    // forward.w > 0.5 selects an orthographic projection (vertical model shadow tiles).
     output.position = float4(dot(relative, right.xyz) * projection.x, dot(relative, up.xyz) * projection.y,
-                             z * projection.z + projection.w, z);
+                             z * projection.z + projection.w, forward.w > 0.5 ? 1.0 : z);
     // A face with any hidden corner node is omitted: every corner collapses identically.
     if (palette[base + input.nodes.y * 2u + 1u].w + palette[base + input.nodes.z * 2u + 1u].w +
             palette[base + input.nodes.w * 2u + 1u].w >

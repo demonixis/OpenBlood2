@@ -26,6 +26,24 @@ namespace OpenBlood2
         bool record(const WorldRecordTarget&, const ModelView&, std::span<const WorldDraw>, DVector eye, DRotation view,
                     std::string& error, WorldPass = WorldPass::Opaque, const PointLight& light = {},
                     bool close_view = false);
+        // One shadow tile: the caster instance, its pose, the tile viewport in pixels, its world
+        // box (y from the feet to the top), the slopes projecting a point along the light onto
+        // the box top (x' = x + slope.x * (y - top)) and the projected footprint at that top.
+        struct ShadowCaster
+        {
+            std::uint32_t instance = 0;
+            DVector position{};
+            DRotation rotation{{0, 0, 0}, 1};
+            std::array<float, 4> viewport{};
+            DVector min{}, max{};
+            std::array<float, 2> slope{};
+            std::array<float, 4> footprint{}; // Min x, min z, max x, max z.
+        };
+        // Records caster heights with an orthographic projection along the light (vertical when
+        // the slopes are zero) into the current shadow tile pass (shadow_tile_format color and a
+        // depth target). Requires a prepare() for this view.
+        bool record_shadows(SDL_GPUCommandBuffer*, SDL_GPURenderPass*, const ModelView&, std::span<const ShadowCaster>,
+                            std::string& error);
         void clear_geometry();
         WorldViewStats stats;
         std::size_t staged_bytes = 0;   // Last prepare(): new assets, palettes and deformation.
@@ -45,7 +63,7 @@ namespace OpenBlood2
         BufferHandle palette_, deformation_;
         std::vector<TextureHandle> textures_;
         std::vector<std::string> texture_paths_;
-        SDL_GPUSampler *sampler_ = nullptr, *lightmap_sampler_ = nullptr; // Owned by the registry.
+        SDL_GPUSampler *sampler_ = nullptr, *lightmap_sampler_ = nullptr, *shadow_sampler_ = nullptr; // Registry-owned.
         std::uint64_t revision_ = UINT64_MAX;
         Uint32 width_ = 0, height_ = 0;
         std::vector<Visible> visible_;

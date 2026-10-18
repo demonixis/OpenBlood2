@@ -10,7 +10,8 @@ namespace OpenBlood2
         Vertex,
         OpaqueFragment,
         AlphaFragment,
-        SkinnedVertex // Rigid ABC node palette and packed deformation from storage buffers.
+        SkinnedVertex, // Rigid ABC node palette and packed deformation from storage buffers.
+        ShadowFragment // Caster height for vertical model shadow tiles.
     };
     // Static owned bytecode/source and reflected resource counts. No device or
     // filesystem needed; MSL's generated entry point differs from SPIR-V's.

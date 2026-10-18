@@ -12,7 +12,7 @@ file(MAKE_DIRECTORY "${OUTPUT_DIR}")
 # Temporary binaries/metadata never become distributable game assets.
 set(work "${OUTPUT_DIR}/.generation")
 file(MAKE_DIRECTORY "${work}")
-foreach(shader world_vert skinned_vert world_frag sprite_frag)
+foreach(shader world_vert skinned_vert world_frag sprite_frag shadow_frag)
     string(REPLACE "_" "." filename "${shader}")
     set(source "${shader_dir}/${filename}.hlsl")
     if(shader MATCHES "_vert$")

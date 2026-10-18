@@ -1,4 +1,6 @@
 #include "engine/world_shaders.h"
+#include "engine/shaders/shadow_frag.h"
+#include "engine/shaders/shadow_frag_msl.h"
 #include "engine/shaders/skinned_vert.h"
 #include "engine/shaders/skinned_vert_msl.h"
 #include "engine/shaders/sprite_frag.h"
@@ -46,6 +48,15 @@ namespace OpenBlood2
                 info.num_uniform_buffers = world_frag_uniforms;
                 info.num_samplers = world_frag_samplers;
                 info.num_storage_buffers = world_frag_storage_buffers;
+                break;
+            case WorldShader::ShadowFragment:
+                info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+                info.code = spirv ? reinterpret_cast<const Uint8*>(shadow_frag)
+                                  : reinterpret_cast<const Uint8*>(shadow_frag_msl);
+                info.code_size = spirv ? sizeof(shadow_frag) : sizeof(shadow_frag_msl) - 1;
+                info.num_uniform_buffers = shadow_frag_uniforms;
+                info.num_samplers = shadow_frag_samplers;
+                info.num_storage_buffers = shadow_frag_storage_buffers;
                 break;
             case WorldShader::AlphaFragment:
                 info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;

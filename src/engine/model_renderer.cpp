@@ -60,6 +60,7 @@ namespace OpenBlood2
         {
             if (!(sampler_ = registry_->sampler(style_ == DrawStyle::SpriteAlpha, error)) ||
                 !(lightmap_sampler_ = registry_->lightmap_sampler(error)) ||
+                !(shadow_sampler_ = registry_->sampler(true, error)) ||
                 !registry_->refresh_textures(view.mesh.materials, textures_, texture_paths_, error))
             {
                 revision_ = UINT64_MAX;
@@ -209,6 +210,8 @@ namespace OpenBlood2
                                                                      : WorldPipeline::SkinnedOpaque));
         SDL_GPUBuffer* storage[] = {registry_->get(palette_), registry_->get(deformation_)};
         SDL_BindGPUVertexStorageBuffers(target.pass, 0, storage, 2);
+        static const ShadowUniform no_shadows{}; // Models receive no model shadows.
+        SDL_PushGPUFragmentUniformData(target.commands, 1, &no_shadows, sizeof(no_shadows));
         const bool illuminate = style_ == DrawStyle::Opaque && !close_view;
         const SDL_GPUBuffer* bound_buffer = nullptr;
         const SDL_GPUTexture* bound_texture = nullptr;
@@ -264,9 +267,10 @@ namespace OpenBlood2
             if (auto* skin = registry_->get(textures_[instance.material]); skin != bound_texture)
             {
                 // Models have no lightmap; slot 1 holds white to keep the binding valid.
-                const SDL_GPUTextureSamplerBinding textures[]{{skin, sampler_},
-                                                              {registry_->get(textures_[0]), lightmap_sampler_}};
-                SDL_BindGPUFragmentSamplers(target.pass, 0, textures, 2);
+                auto* white = registry_->get(textures_[0]);
+                const SDL_GPUTextureSamplerBinding textures[]{
+                    {skin, sampler_}, {white, lightmap_sampler_}, {white, shadow_sampler_}};
+                SDL_BindGPUFragmentSamplers(target.pass, 0, textures, 3);
                 bound_texture = skin;
             }
             SDL_DrawGPUPrimitives(target.pass, asset.count, 1, 0, 0);
@@ -283,6 +287,67 @@ namespace OpenBlood2
             ++stats.frames;
             stats.draws = visible_.size();
             stats.triangles = triangles;
+        }
+        return true;
+    }
+    bool ModelRenderer::record_shadows(SDL_GPUCommandBuffer* commands, SDL_GPURenderPass* pass, const ModelView& view,
+                                       std::span<const ShadowCaster> casters, std::string& error)
+    {
+        error.clear();
+        auto* pipeline = pipelines_->get(WorldPipeline::ShadowCaster);
+        if (!pipeline || instance_assets_.size() != view.instances.size())
+        {
+            error = "Model shadow renderer not prepared";
+            return false;
+        }
+        for (const auto& caster : casters)
+            if (caster.instance >= view.instances.size() || !physics_vector(caster.min) ||
+                !physics_vector(caster.max) || !(caster.max.y > caster.min.y) ||
+                !(caster.footprint[2] > caster.footprint[0]) || !(caster.footprint[3] > caster.footprint[1]) ||
+                !std::isfinite(caster.slope[0]) || !std::isfinite(caster.slope[1]))
+            {
+                error = "Invalid model shadow caster";
+                return false;
+            }
+        SDL_BindGPUGraphicsPipeline(pass, pipeline);
+        SDL_GPUBuffer* storage[] = {registry_->get(palette_), registry_->get(deformation_)};
+        SDL_BindGPUVertexStorageBuffers(pass, 0, storage, 2);
+        const SDL_GPUBuffer* bound_buffer = nullptr;
+        for (const auto& caster : casters)
+        {
+            const auto& instance = view.instances[caster.instance];
+            const auto& asset = instance_assets_[caster.instance];
+            if (!asset.count)
+                continue;
+            const SDL_GPUViewport viewport{
+                caster.viewport[0], caster.viewport[1], caster.viewport[2], caster.viewport[3], 0, 1};
+            SDL_SetGPUViewport(pass, &viewport);
+            // Orthographic along the light: x/z sheared onto the box top, z up the tile, depth from
+            // the box top down.
+            SkinnedUniform skinned;
+            const auto& f = caster.footprint;
+            const float hx = (f[2] - f[0]) / 2, hz = (f[3] - f[1]) / 2;
+            skinned.view.eye = {f[0] + hx, caster.max.y, f[1] + hz, 0};
+            skinned.view.right = {1, caster.slope[0], 0, 0};
+            skinned.view.up = {0, caster.slope[1], 1, 0};
+            skinned.view.forward = {0, -1, 0, 1};
+            skinned.view.projection = {1 / hx, 1 / hz, 1 / (caster.max.y - caster.min.y), 0};
+            skinned.view.position = {caster.position.x, caster.position.y, caster.position.z, 0};
+            skinned.view.quaternion = {caster.rotation.m_Vec.x, caster.rotation.m_Vec.y, caster.rotation.m_Vec.z,
+                                       caster.rotation.m_Spin};
+            skinned.scale = {instance.scale.x, instance.scale.y, instance.scale.z, 1};
+            skinned.color = {1, 1, 1, 1};
+            skinned.bases = {instance.palette, instance.deformation, 0, 0};
+            skinned.ambient = {1, 1, 1, 0};
+            SDL_PushGPUVertexUniformData(commands, 0, &skinned, sizeof(skinned));
+            if (auto* buffer = registry_->get(asset.buffer); buffer != bound_buffer)
+            {
+                SDL_GPUBufferBinding binding{buffer, 0};
+                SDL_BindGPUVertexBuffers(pass, 0, &binding, 1);
+                bound_buffer = buffer;
+            }
+            SDL_DrawGPUPrimitives(pass, asset.count, 1, 0, 0);
+            ++stats.draw_calls;
         }
         return true;
     }

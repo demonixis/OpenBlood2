@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-18",
+  "scope": "FLAG_SHADOW model shadows: caster selection, light-direction shadow tiles and world receivers; no game or renderer code imported",
+  "retail_evidence": [
+    {
+      "file": "detailhi.cfg (installed Blood II)",
+      "sha256": "e4170df11ccfc96426120e9f29dc1fd2b22d92bcb2d7d028474750be11b6cf78",
+      "purpose": "High detail sets MaxModelShadows 1, ShadowZRange 17 and ShadowLodOffset 100."
+    },
+    {
+      "file": "detailmd.cfg (installed Blood II)",
+      "sha256": "e8780418828805d601460dc3be8b1dc080d8bc6c179c7c849d3626261ba6b00b",
+      "purpose": "Medium detail sets MaxModelShadows 0."
+    },
+    {
+      "file": "detaillo.cfg (installed Blood II)",
+      "sha256": "717fdd3e6e13789cb268f7f08550ae613b7f06c371aa7584414f5b3aae4e365a",
+      "purpose": "Low detail sets MaxModelShadows 0."
+    },
+    {
+      "file": "d3d.ren (installed Blood II renderer)",
+      "sha256": "7aae288739ea01d20697ef81b3aba0b496a40764b4b49276bcbdb693320d9510",
+      "purpose": "Strings only: MaxModelShadows, ShadowZRange, ShadowLodOffset, ShadowLight."
+    }
+  ],
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/AppHeaders/basetypes_de.h",
+      "source_sha256": "9447597d4d3d893572d0e74929352e9ffd742a7520aaf2d3f3c37ff4598fe4cb",
+      "purpose": "FLAG_SHADOW (does this model cast shadows) and FLAG_REALLYCLOSE (view models)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "93056622f9f083f11447a471ecae6f115b7dc3937daf7d251d2396724f3d2003",
+      "purpose": "Players set FLAG_SHADOW and clear it while stealthed or invisible."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/AI_Mgr.cpp",
+      "source_sha256": "7275c3a4f9374926e0a5e7cce4d533ae59ea558027bda1448b223a283e66fb09",
+      "purpose": "AI set FLAG_SHADOW."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/DestructableModel.cpp",
+      "source_sha256": "a725d5d5d84f539de382f73ea266b0ab92380eb4911fa2188c997322e69efd86",
+      "purpose": "Destructible models set FLAG_SHADOW and clear it for small models whose shadow shows through."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PickupObject.cpp",
+      "source_sha256": "7f75a9fcbc23aabe64cb1ce21f02d63cce2b38110e5d98c8a60e94f0a4ebb43c",
+      "purpose": "Pickups clear FLAG_SHADOW."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/drawmodelshadows.cpp",
+      "source_sha256": "7b42b52eef9b80c0e8efd7563730cf92739b6e03cc11675466e7337b0560b915",
+      "purpose": "Legacy (uncompiled) projected shadow setup with a straight-down light direction and a frustum around the model."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/rendershadowlist.cpp",
+      "source_sha256": "967ed7678da1e85fa972e676e23ab7c7a6ec35b510744cb368f5ae8b834ced72",
+      "purpose": "Later-generation silhouette render-to-texture projected onto world geometry along the strongest shadow-casting light, with distance fade and really-close exclusion."
+    }
+  ],
+  "reference_revision": {
+    "repository": "https://github.com/jsj2008/lithtech",
+    "revision": "0eab18289bed72879eddb648d3311075b108cf46"
+  },
+  "adaptations": [
+    "Caster heights in an R32_FLOAT tile atlas are evaluated by the world fragment shaders instead of re-drawing receiving polygons.",
+    "Light direction from the strongest static source with a 40-degree minimum elevation, 60% strength, 96-unit fade, 2x2 coverage, 16 nearest visible casters within 2048 units are replacement policies.",
+    "ShadowZRange and ShadowLodOffset values are recorded but not interpreted."
+  ]
+}

@@ -8,6 +8,12 @@
 
 namespace OpenBlood2
 {
+    // Vertical FLAG_SHADOW model shadows of the last update(). Inspection/measurement only.
+    struct ShadowStats
+    {
+        bool available = false; // Atlas formats supported by the device.
+        std::size_t candidates = 0, casters = 0, beyond_limit = 0, distant = 0, unbounded = 0, outside = 0;
+    };
     // Counters of the most recently recorded frame. Inspection/measurement only.
     struct PresentationStats
     {
@@ -50,12 +56,26 @@ namespace OpenBlood2
         ModelRenderer model_renderer, explosion_model_renderer; // GPU skinning of both model views.
         WorldRenderer polygrid_renderer, sprite_renderer;
         ModelView model_scene, explosion_model_scene;
-        ModelLighting model_lighting; // Baked world light read by model_scene instances.
+        ModelLighting model_lighting; // Static light objects shading model_scene instances.
+        // Vertical model shadows: FLAG_SHADOW casters nearest the camera, one tile each.
+        bool model_shadows = true;
+        float shadow_aspect = 16.f / 9; // Viewport aspect for caster culling; record() keeps it current.
+        std::vector<ModelRenderer::ShadowCaster> shadow_casters;
+        ShadowUniform shadow_uniform;
+        ShadowStats shadow_stats;
+        static constexpr Uint32 shadow_atlas_size = 512, shadow_tile = 128;
+        // Replacement policy: footprint margin, distance limit, strength (fraction of the baked
+        // light removed), fade range below the feet and height bias, in world units.
+        static constexpr float shadow_margin = 8, shadow_distance = 2048, shadow_strength = .6f, shadow_fade = 96,
+                               shadow_bias = 2, shadow_elevation = 40; // Minimum light elevation, degrees.
         PolyGridView polygrid_scene;
         SpriteView sprite_scene;
         PresentationStats stats;
 
       private:
+        void select_shadow_casters(const GameSession&);
+        bool record_shadow_tiles(SDL_GPUCommandBuffer*, std::string& error);
+        TextureHandle shadow_atlas_, shadow_depth_;
         TextureHandle depth_;
         Uint32 depth_width_ = 0, depth_height_ = 0;
     };

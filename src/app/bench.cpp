@@ -102,6 +102,7 @@ namespace OpenBlood2
         }
         {
             ScenePresenter presenter(device.gpu);
+            presenter.model_shadows = options.model_shadows;
             Capture capture;
             Series step, world, models, effects, record, gpu, total, draws, culled;
             std::size_t passes = 0, max_draws = 0;
@@ -212,6 +213,11 @@ namespace OpenBlood2
                          mesh.lit, mesh.fullbright, lighting.lights.lights, lighting.models, lighting.sampled,
                          lighting.reused, lighting.flat, lighting.unlit, lighting.sources, lighting.occluded,
                          lighting.model_add.x, lighting.model_add.y, lighting.model_add.z);
+            const auto& shadows = presenter.shadow_stats;
+            spdlog::info("Model shadows: {} FLAG_SHADOW candidates, {} drawn ({} beyond limit, {} distant, {} outside "
+                         "view, {} unbounded), atlas {}",
+                         shadows.candidates, shadows.casters, shadows.beyond_limit, shadows.distant, shadows.outside,
+                         shadows.unbounded, shadows.available ? "available" : "unavailable/disabled");
             if (!options.capture_file.empty())
             {
                 if (!capture.save(path_text(options.capture_file).c_str()))

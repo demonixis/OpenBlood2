@@ -20,18 +20,21 @@ int main()
     CHECK(WorldShaderFormats == (SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_MSL));
     SDL_GPUShaderCreateInfo info{};
     for (auto formats : {SDL_GPU_SHADERFORMAT_SPIRV, SDL_GPU_SHADERFORMAT_MSL, WorldShaderFormats})
-        for (auto shader :
-             {WorldShader::Vertex, WorldShader::OpaqueFragment, WorldShader::AlphaFragment, WorldShader::SkinnedVertex})
+        for (auto shader : {WorldShader::Vertex, WorldShader::OpaqueFragment, WorldShader::AlphaFragment,
+                            WorldShader::SkinnedVertex, WorldShader::ShadowFragment})
         {
             const bool vertex = shader == WorldShader::Vertex || shader == WorldShader::SkinnedVertex;
+            const bool caster = shader == WorldShader::ShadowFragment;
             CHECK(world_shader_info(shader, formats, info));
             CHECK(info.code && info.code_size > 128 && info.props == 0);
             // Only the skinned vertex stage reads storage: its node palette and packed deformation.
             CHECK(info.num_storage_buffers == (shader == WorldShader::SkinnedVertex ? 2u : 0u) &&
                   info.num_storage_textures == 0);
-            // Fragments sample the albedo (slot 0) and the lightmap page (slot 1).
-            CHECK(info.num_samplers == (vertex ? 0u : 2u));
-            CHECK(info.num_uniform_buffers == 1u);
+            // Fragments sample the albedo (slot 0), the lightmap page (slot 1) and the model shadow
+            // tiles (slot 2), with per-draw light and per-record shadow uniforms; the shadow tile
+            // fragment only writes the caster height.
+            CHECK(info.num_samplers == (vertex || caster ? 0u : 3u));
+            CHECK(info.num_uniform_buffers == (vertex ? 1u : caster ? 0u : 2u));
             CHECK(info.stage == (vertex ? SDL_GPU_SHADERSTAGE_VERTEX : SDL_GPU_SHADERSTAGE_FRAGMENT));
             if (formats & SDL_GPU_SHADERFORMAT_SPIRV)
             {
@@ -49,8 +52,11 @@ int main()
                 if (info.num_uniform_buffers)
                     CHECK(source.find("[[buffer(0)]]") != source.npos);
                 if (info.num_samplers)
-                    CHECK(source.find("[[texture(0)]]") != source.npos && source.find("[[sampler(0)]]") != source.npos &&
-                          source.find("[[texture(1)]]") != source.npos && source.find("[[sampler(1)]]") != source.npos);
+                    CHECK(
+                        source.find("[[texture(0)]]") != source.npos && source.find("[[sampler(0)]]") != source.npos &&
+                        source.find("[[texture(1)]]") != source.npos && source.find("[[sampler(1)]]") != source.npos &&
+                        source.find("[[texture(2)]]") != source.npos && source.find("[[sampler(2)]]") != source.npos &&
+                        source.find("[[buffer(1)]]") != source.npos);
                 if (shader == WorldShader::SkinnedVertex)
                     CHECK(source.find("[[buffer(1)]]") != source.npos && source.find("[[buffer(2)]]") != source.npos &&
                           source.find("uint4 bases;") != source.npos);
@@ -59,6 +65,8 @@ int main()
                     CHECK(source.find("View._textureOffset.xy") != source.npos &&
                           source.find("[[user(locn2)]]") != source.npos &&
                           source.find("[[user(locn3)]]") != source.npos);
+                else if (caster)
+                    CHECK(source.find("in_var_TEXCOORD2 [[user(locn2)]]") != source.npos);
                 else
                     CHECK(source.find("float4 positionRadius;") != source.npos &&
                           source.find("float4 lightColor;") != source.npos &&

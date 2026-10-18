@@ -86,6 +86,7 @@ namespace OpenBlood2
         input.reset(menu, game->client_shell.m_bInWorld);
         ObjectSelection selection;
         ScenePresenter presenter(runtime.gpu);
+        presenter.model_shadows = options.model_shadows;
         HudRenderer hud(runtime.gpu);
 #if BLOOD2_INSPECTOR
         Inspector inspector(runtime);
@@ -98,6 +99,9 @@ namespace OpenBlood2
         inspector.sprite_render = &presenter.sprite_renderer.stats;
         inspector.world_render = &presenter.world_renderer.stats;
         inspector.presentation = &presenter.stats;
+        inspector.gpu_resources = &presenter.registry.stats;
+        inspector.model_lighting = &presenter.model_lighting.stats;
+        inspector.model_shadows = &presenter.shadow_stats;
 #else
         (void)data;
 #endif
