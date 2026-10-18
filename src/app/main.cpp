@@ -559,6 +559,21 @@ namespace
             discarded_wall_time += wall_delta - delta;
             limited_frames += wall_delta > delta;
             previous_tick = tick;
+#if BLOOD2_INSPECTOR
+            if (auto level = std::exchange(inspector.start_level_request, {}); !level.empty())
+            {
+                if (!OpenBlood2::GameSession::start_new_game(game_owner, level, DBYTE(inspector.start_level_difficulty),
+                                                             0, error))
+                    inspector.world_error = error;
+                else
+                {
+                    inspector.world_error.clear();
+                    selection.id = {};
+                    inspector.forget_world();
+                }
+                game = game_owner.get();
+            }
+#endif
             game->client_shell.movement_input = {};
             game->client_shell.weapon_input = {};
             bool text_editing = false;

@@ -203,6 +203,29 @@ namespace OpenBlood2
                 }
                 previous = SDL_GetTicksNS();
             }
+#if BLOOD2_INSPECTOR
+            if (auto level = std::exchange(inspector.start_level_request, {}); !level.empty())
+            {
+                spdlog::info("Inspector level requested: world={}; difficulty={}", level,
+                             inspector.start_level_difficulty);
+                if (!GameSession::start_new_game(game, level, DBYTE(inspector.start_level_difficulty), 0, error))
+                {
+                    inspector.world_error = error;
+                    spdlog::error("Inspector level failed: {}", error);
+                }
+                else
+                {
+                    spdlog::info("World ready: {}", game->world_path);
+                    inspector.world_error.clear();
+                    menu.close();
+                    selection.id = {};
+                    controlled = {};
+                    inspector.forget_world();
+                    input.reset(menu, true);
+                }
+                previous = SDL_GetTicksNS();
+            }
+#endif
             if (stored_settings != menu.settings)
             {
                 stored_settings = menu.settings;

@@ -24,6 +24,7 @@
 #include "game/original/WorldModelDebris.h"
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
@@ -33,6 +34,59 @@
 namespace OpenBlood2
 {
 
+    void Inspector::draw_levels(GameSession& game)
+    {
+        ImGui::TextWrapped("Every world in the mounted archives. Play starts a new game there with Caleb, like the "
+                           "menu's New Game; Inspect loads it without a player (leave the player first).");
+        constexpr const char* difficulties[]{"Easy", "Medium", "Hard"};
+        ImGui::SetNextItemWidth(120);
+        ImGui::Combo("Difficulty", &start_level_difficulty, difficulties, 3);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(200);
+        ImGui::InputText("Filter", level_filter, sizeof(level_filter));
+        ImGui::Text("Current: %s", game.world_path.empty() ? "none" : game.world_path.c_str());
+        if (!world_error.empty())
+            ImGui::TextWrapped("Last error: %s", world_error.c_str());
+        std::string filter(level_filter);
+        std::transform(filter.begin(), filter.end(), filter.begin(),
+                       [](unsigned char c) { return char(std::tolower(c)); });
+        if (!ImGui::BeginTable("Levels", 3, ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, 0)))
+            return;
+        ImGui::TableSetupColumn("World");
+        ImGui::TableSetupColumn("Play", ImGuiTableColumnFlags_WidthFixed, 45);
+        ImGui::TableSetupColumn("Inspect", ImGuiTableColumnFlags_WidthFixed, 60);
+        ImGui::TableHeadersRow();
+        for (const auto& [path, resource] : game.resources.index())
+        {
+            (void)resource;
+            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
+                continue;
+            const auto name = path.substr(7, path.size() - 11);
+            if (!filter.empty() && name.find(filter) == std::string::npos)
+                continue;
+            ImGui::PushID(path.c_str());
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            const bool current = game.world_path == path;
+            if (current)
+                ImGui::TextColored(ImVec4(.4f, 1, .4f, 1), "%s", name.c_str());
+            else
+                ImGui::TextUnformatted(name.c_str());
+            ImGui::TableNextColumn();
+            if (ImGui::SmallButton("Play"))
+                start_level_request = name;
+            ImGui::TableNextColumn();
+            ImGui::BeginDisabled(game.local_client);
+            if (ImGui::SmallButton("Inspect"))
+            {
+                SAFE_STRCPY(keep_world_name, name.c_str());
+                keep_world_request = true;
+            }
+            ImGui::EndDisabled();
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
     void Inspector::forget_world()
     {
         skeleton_selection = trigger_selection = trigger_request = scene_explosion_selection =
@@ -460,6 +514,11 @@ namespace OpenBlood2
             ImGui::Separator();
             if (ImGui::BeginTabBar("Inspection"))
             {
+                if (ImGui::BeginTabItem("Levels"))
+                {
+                    draw_levels(game);
+                    ImGui::EndTabItem();
+                }
                 if (ImGui::BeginTabItem("3D view"))
                 {
                     ImGui::TextWrapped(

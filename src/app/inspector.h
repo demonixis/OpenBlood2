@@ -120,6 +120,11 @@ namespace OpenBlood2
         ObjectId remove_request{};
         std::string spawn_request;
         std::string world_error, reload_world_name = "01_SubwayA";
+        // Levels tab: the owning loop starts a fresh new game on this world (Caleb).
+        std::string start_level_request;
+        int start_level_difficulty = 1;
+        char level_filter[100]{};
+        void draw_levels(GameSession&);
         bool reload_request = false, unload_request = false, run_request = false;
         int source_selection = 0, model_selection = 0;
         char world_filter[100]{}, resource_filter[128]{};
