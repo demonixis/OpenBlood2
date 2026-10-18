@@ -65,6 +65,26 @@ add_test(NAME logging.cli COMMAND "${CMAKE_COMMAND}"
     "-DDATA_DIR=${fixture}" "-DCONFIG=${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
     -P "${CMAKE_CURRENT_SOURCE_DIR}/logging_cli_test.cmake")
 set_tests_properties(logging.cli PROPERTIES LABELS "headless;logging;cli" TIMEOUT 60)
+add_executable(crash_capture_tests crash_capture_tests.cpp)
+target_link_libraries(crash_capture_tests PRIVATE engine spdlog::spdlog)
+blood2_project_options(crash_capture_tests)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT BLOOD2_SANITIZERS)
+    target_compile_options(crash_capture_tests PRIVATE -fno-optimize-sibling-calls)
+    find_program(BLOOD2_TEST_GDB NAMES gdb)
+    set(crash_cases missing existing child_reaper)
+    if(BLOOD2_TEST_GDB)
+        list(APPEND crash_cases lifecycle debugger segv thread abort overflow dead_helper collector_loss timeout dump_failure size_limit)
+    endif()
+else()
+    set(crash_cases unavailable)
+endif()
+foreach(case IN LISTS crash_cases)
+    add_test(NAME crash.${case} COMMAND "${CMAKE_COMMAND}"
+        "-DTEST=$<TARGET_FILE:crash_capture_tests>" "-DCASE=${case}" "-DGDB=${BLOOD2_TEST_GDB}"
+        "-DROOT=${CMAKE_CURRENT_BINARY_DIR}/crash-fixtures/${case} with spaces"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/crash_capture_test.cmake")
+    set_tests_properties(crash.${case} PROPERTIES LABELS "headless;crash" TIMEOUT 60 ENVIRONMENT "LC_ALL=C")
+endforeach()
 foreach(case IN ITEMS help unknown missing_data missing_config metadata)
     add_test(NAME cli.${case} COMMAND "${CMAKE_COMMAND}"
         "-DAPP=$<TARGET_FILE:blood2_app>" "-DCASE=${case}" "-DDATA_DIR=${fixture}"

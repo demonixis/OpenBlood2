@@ -32,8 +32,10 @@ foreach(case IN ITEMS metadata invalid missing_data)
     endif()
 endforeach()
 # Simultaneous launches share a root but never a session/file (execute_process pipelines run concurrently).
-execute_process(COMMAND "${APP}" --log-dir "${ROOT}/concurrent" --help
-    COMMAND "${APP}" --log-dir "${ROOT}/concurrent" --help
+execute_process(COMMAND "${APP}" --log-dir "${ROOT}/concurrent" --log-level error
+        --config "${CONFIG}" --data-dir "${DATA_DIR}" --check-data
+    COMMAND "${APP}" --log-dir "${ROOT}/concurrent" --log-level error
+        --config "${CONFIG}" --data-dir "${DATA_DIR}" --check-data
     RESULTS_VARIABLE results OUTPUT_VARIABLE output ERROR_VARIABLE errors TIMEOUT 10)
 if(NOT results STREQUAL "0;0")
     message(FATAL_ERROR "Concurrent launches failed: ${results}\n${errors}")
@@ -48,6 +50,17 @@ foreach(session IN LISTS sessions)
         message(FATAL_ERROR "Concurrent session did not finish: ${session}")
     endif()
 endforeach()
+execute_process(COMMAND "${APP}" --log-dir "${ROOT}/disabled" --no-crash-capture --help
+    RESULT_VARIABLE result OUTPUT_QUIET ERROR_VARIABLE errors TIMEOUT 10)
+file(GLOB sessions "${ROOT}/disabled/session-*")
+list(LENGTH sessions count)
+if(NOT "${result}" STREQUAL "0" OR NOT count EQUAL 1)
+    message(FATAL_ERROR "Disabled crash capture launch failed: ${result}\n${errors}")
+endif()
+list(GET sessions 0 session)
+if(EXISTS "${session}/crash-context.txt" OR EXISTS "${session}/crash-capture.txt")
+    message(FATAL_ERROR "--no-crash-capture must leave native crash handling alone")
+endif()
 file(WRITE "${ROOT}/blocker" "not a directory")
 execute_process(COMMAND "${APP}" --log-dir "${ROOT}/blocker" --config "${CONFIG}"
     --data-dir "${DATA_DIR}" --check-data RESULT_VARIABLE result

@@ -69,19 +69,21 @@ every message. Failed file output never produces a successful completion marker.
 The logger outlives application resource teardown and restores the previous SDL
 callback and default logger when destroyed.
 
-## Crash-analysis boundary
+## Crash stacks and dumps
 
-These logs preserve the last completed writes, not a stack trace or memory dump.
-No signal handler, exception handler or crash-recovery logic is installed. This
-avoids calling allocators, SDL, mutexes or spdlog from a fatal signal handler and
-leaves operating-system crash dumps, debuggers and sanitizers in control.
+On Linux, an independent [crash collector](crash_capture.md) now uses GDB to save
+all-thread stacks, an ELF core and a matching executable in the log session.
+The startup log reports whether it is armed or unavailable. `--no-crash-capture`
+disables it; debugger/sanitizer handling takes priority. Other platforms retain
+log files but do not yet have a native dump backend. The logger itself is never
+called from a fatal-signal handler, and no crash recovery is attempted.
 
 `fflush` drains process buffers to the operating system; it is not `fsync` and does
 not guarantee survival of power loss, storage failure, or a crash during a write.
-Raw stderr, third-party output bypassing SDL/spdlog, sanitizer reports and native
-crash backtraces are not redirected into `blood2.log`. Capture them separately when
+Raw stderr, third-party output bypassing SDL/spdlog and sanitizer reports are not
+redirected into `blood2.log`. Capture them separately when
 needed, for example by adding `2>diagnostic-stderr.txt` to the launch command, or
-by running under a debugger. Native dump/backtrace collection remains separate work.
+by running under a debugger. Crash artifacts use their own files alongside the log.
 
 The build identity is captured at CMake configure time; reconfigure after changing
 revisions if an exact reproduction label is needed. This is new engine diagnostic

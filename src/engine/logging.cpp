@@ -160,7 +160,8 @@ namespace OpenBlood2
             for (std::size_t i = 0; i + keep < completed.size(); ++i)
             {
                 // Never recurse: unrelated files and unfinished/active sessions are preserved.
-                for (const auto* name : {"blood2.log", "blood2.1.log", "blood2.2.log", "session.txt", "finished.txt"})
+                for (const auto* name : {"blood2.log", "blood2.1.log", "blood2.2.log", "session.txt", "finished.txt",
+                                         "crash-context.txt", "crash-capture.txt"})
                 {
                     fs::remove(completed[i] / name, ec);
                     if (ec)

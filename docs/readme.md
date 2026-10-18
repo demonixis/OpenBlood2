@@ -9,6 +9,7 @@ The complete game and later milestones are not yet supported.
 | --- | --- |
 | [Getting started](getting_started.md) | Build, external game data, controls, platforms and test commands |
 | [Diagnostic logs](logging.md) | File locations, rotation, interrupted sessions and crash-analysis limits |
+| [Crash capture](crash_capture.md) | Linux all-thread stacks, ELF cores, matching binaries and failure limits |
 | [Architecture](architecture.md) | Code layout, target responsibilities and service boundaries |
 | [Contributing](contributing.md) | Original-source workflow, conventions and verification |
 | [Service contracts](contracts/readme.md) | Subsystem rules, ownership and explicit limitations |
