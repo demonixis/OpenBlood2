@@ -68,6 +68,7 @@ namespace OpenBlood2
         state_ = {};
         state_.channels = seed;
         last_.reset();
+        notes_.reset();
         return true;
     }
     bool ImaSectionCursor::step(std::span<const std::uint16_t> draws, std::string& error)
@@ -159,6 +160,71 @@ namespace OpenBlood2
             next.grid = 0;
         state_ = next;
         last_ = report;
+        notes_.reset();
+        return true;
+    }
+    bool ImaSectionCursor::step_notes(std::span<const std::uint16_t> draws, std::int32_t grid_time, const ImaBand& band,
+                                      std::span<const std::uint8_t> percussion_map, std::string& error)
+    {
+        error.clear();
+        if (!percussion_map.empty() && percussion_map.size() != 128)
+        {
+            error = "IMA cursor notes: require an absent or 128-entry percussion map";
+            return false;
+        }
+        // Advance a candidate without copying potentially large prior note inspection.
+        ImaSectionCursor next;
+        next.section_ = section_;
+        next.style_ = style_;
+        next.timeline_ = timeline_;
+        next.harmony_ = harmony_;
+        next.state_ = state_;
+        if (!next.step(draws, error))
+            return false;
+        const auto& report = *next.last_;
+        ImaCursorNotes notes;
+        notes.grid_time = grid_time;
+        auto used = report.draws_used;
+        if (report.grid)
+        {
+            const auto& pattern = style_->patterns[*report.pattern.pattern];
+            const auto& grid = pattern.grids[*report.grid];
+            notes.opaque_curve_chunks = grid.curve_chunks;
+            auto context = harmony_->chords[report.section.chord].harmony;
+            // IMUSIC25 normal modes 2/3 set the local conversion mode to 2 (RVA 16b38).
+            context.enabled = true;
+            notes.rows.reserve(report.admitted);
+            for (std::size_t i = 0; i < grid.notes.size(); ++i)
+            {
+                const auto& note = grid.notes[i];
+                if ((report.section.mute_mask & (1u << note.channel)) ||
+                    !(next.state_.channels.variations[note.channel] & note.variations))
+                    continue;
+                ImaCursorNote row;
+                row.row = i;
+                if (!resolve_ima_note_pitch(note, pattern, context, row.pitch, error))
+                    return false;
+                const std::size_t count = row.pitch.pitch
+                                              ? unsigned(note.time_range != 0) + unsigned(note.duration_range != 0) +
+                                                    unsigned(note.velocity_range != 0)
+                                              : 0;
+                if (draws.size() - used < count)
+                {
+                    error = "IMA cursor notes: insufficient explicit note draws";
+                    return false;
+                }
+                if (!prepare_ima_note_events(
+                        note, {grid_time, row.pitch.pitch, band.channels[note.channel].transpose, percussion_map},
+                        draws.subspan(used, count), row.events, error))
+                    return false;
+                used += count;
+                notes.suppressed += !row.events.emitted;
+                notes.rows.push_back(row);
+            }
+        }
+        notes.draws_used = used - report.draws_used;
+        next.notes_ = std::move(notes);
+        *this = std::move(next);
         return true;
     }
     void ImaSectionCursor::stop()

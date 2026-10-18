@@ -279,12 +279,19 @@ namespace OpenBlood2
             if (ImGui::TreeNode("Grid cursor (manual steps; no playback)"))
             {
                 ImGui::TextWrapped("Start from an IMA section below. Explicit zero seed/draws, all channels random. "
-                                   "No wall clock, MIDI, curves, active notes, repeats or playlist transitions.");
+                                   "Note preparation uses normal-mode harmony and the selected band. No wall clock, "
+                                   "MIDI submission, curves, active notes or playlists.");
                 ImGui::Text("Section: %s", music.cursor_file.c_str());
                 if (ImGui::Button("Step grid"))
                 {
                     const std::array<std::uint16_t, 16> draws{};
                     music.cursor.step(draws, music.cursor_error);
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Step and prepare notes"))
+                {
+                    const std::array<std::uint16_t, 4096> draws{};
+                    music.step_cursor_notes(draws);
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("Stop cursor"))
@@ -313,6 +320,31 @@ namespace OpenBlood2
                                 last->admitted, last->muted, last->excluded_variation, last->section.mute_mask);
                     for (unsigned i = 0; i < 16; ++i)
                         ImGui::Text("Channel %u variation %04x", i, state.channels.variations[i]);
+                }
+                if (const auto& notes = music.cursor.last_notes())
+                {
+                    ImGui::Text("Prepared clock %d | rows %zu / suppressed %zu | note draws %zu", notes->grid_time,
+                                notes->rows.size(), notes->suppressed, notes->draws_used);
+                    ImGui::Text("Opaque grid curves: %zu (not prepared)", notes->opaque_curve_chunks);
+                    ImGui::TextUnformatted("Paired note-on/off values only; no queued or audible sequence.");
+                    if (ImGui::TreeNode("Prepared note events"))
+                    {
+                        ImGuiListClipper clipper;
+                        clipper.Begin(static_cast<int>(notes->rows.size()));
+                        while (clipper.Step())
+                            for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
+                            {
+                                const auto& row = notes->rows[i];
+                                const auto& on = row.events.messages[0];
+                                const auto& off = row.events.messages[1];
+                                ImGui::Text(
+                                    "row %zu | pitch %d mode %u converted %d | %s | MIDI %u key %u vel %u | %d..%d",
+                                    row.row, row.pitch.pitch, row.pitch.mode, row.pitch.converted,
+                                    row.events.emitted ? "prepared" : "suppressed", on.status & 15u, on.key,
+                                    on.velocity, on.time, off.time);
+                            }
+                        ImGui::TreePop();
+                    }
                 }
                 if (!music.cursor_error.empty())
                     ImGui::TextWrapped("Cursor refused: %s", music.cursor_error.c_str());

@@ -24,6 +24,8 @@ namespace
         std::shared_ptr<ImaTimeline> timeline = std::make_shared<ImaTimeline>();
         std::shared_ptr<ImaHarmony> harmony = std::make_shared<ImaHarmony>();
         ImaCursorSeed seed;
+        ImaBand band;
+        std::vector<std::uint8_t> percussion_map;
         bool prepare(std::string& error)
         {
             ImaPersonality personality;
@@ -44,7 +46,7 @@ namespace
             c.value[i] = std::uint8_t(flags >> (i * 8));
         f.section->commands.push_back(c);
     }
-    Fixture fixture(unsigned index = 0)
+    Fixture fixture(unsigned index = 0, bool notes = false)
     {
         Fixture f;
         f.section->measures = 4;
@@ -77,15 +79,51 @@ namespace
                     pattern.variation_flags[ch][v] = std::uint16_t(index * 977 + ch * 13 + v * 3881);
             f.style->patterns.push_back(std::move(pattern));
         }
+        if (notes)
+        {
+            for (unsigned ch = 0; ch < 16; ++ch)
+                f.band.channels[ch].transpose = std::int8_t(int((index + ch) % 25) - 12);
+            if (index % 2)
+            {
+                f.percussion_map.resize(128);
+                for (unsigned i = 0; i < 128; ++i)
+                    f.percussion_map[i] = std::uint8_t((i + index) % 128);
+            }
+            for (auto& p : f.style->patterns)
+            {
+                p.pitch_range_channels = std::uint16_t(index * 997);
+                for (unsigned ch = 0; ch < 16; ++ch)
+                {
+                    p.upper_pitch[ch] = 84;
+                    p.lower_pitch[ch] = 36;
+                    p.play_modes[ch] = std::uint8_t(ch % 7);
+                }
+                for (auto& g : p.grids)
+                    for (auto& n : g.notes)
+                    {
+                        n.type = index % 2 ? 8 : 9;
+                        n.music_value = std::uint16_t(0x4000 | (n.channel % 3) * 0x100);
+                        n.midi_note = std::uint8_t(n.channel % 7 ? 48 + n.channel : 0);
+                        n.play_mode = std::uint8_t((index + n.channel) % 7 | (index % 3 ? 0x80 : 0));
+                        n.pitch_modifier = std::uint8_t(n.channel % 4 * 16);
+                        n.velocity = std::uint8_t(80 + index % 64);
+                        n.duration = std::int16_t(200 - index * 2);
+                        n.time_offset = std::int16_t(int(index % 31) - 15);
+                        n.time_range = std::uint8_t(index % 2 ? 255 : 0);
+                        n.duration_range = std::uint8_t(index % 3 ? 7 : 0);
+                        n.velocity_range = std::uint8_t(index % 5 ? 128 : 0);
+                    }
+            }
+        }
         f.seed.random_channels = 0x5555;
         f.seed.cycle_channels = 0xaaaa;
         f.seed.variations.fill(1);
         return f;
     }
-    std::array<std::uint16_t, 16> draws(std::uint64_t step)
+    std::array<std::uint16_t, 4096> draws(std::uint64_t step)
     {
-        std::array<std::uint16_t, 16> out;
-        for (unsigned i = 0; i < 16; ++i)
+        std::array<std::uint16_t, 4096> out;
+        for (unsigned i = 0; i < out.size(); ++i)
             out[i] = std::uint16_t((step * 313 + i * 997 + 32760) & 32767);
         return out;
     }
@@ -183,6 +221,90 @@ namespace
         CHECK(retained.expired());
         return true;
     }
+    bool notes_behavior()
+    {
+        std::string error;
+        auto f = fixture(0, true);
+        f.style->patterns.resize(1);
+        auto& p = f.style->patterns.front();
+        ImaNote n;
+        n.type = 9;
+        n.midi_note = 60;
+        n.velocity = 80;
+        n.duration = 12;
+        n.variations = 0xffff;
+        n.time_offset = -3;
+        n.time_range = 3;
+        n.duration_range = 5;
+        n.velocity_range = 7;
+        auto muted = n;
+        muted.channel = 1;
+        muted.type = 255;
+        auto excluded = n;
+        excluded.channel = 2;
+        excluded.type = 255;
+        excluded.variations = 0;
+        auto zero = n;
+        zero.midi_note = 0;
+        auto drum = n;
+        drum.channel = 5;
+        drum.type = 8;
+        drum.midi_note = 40;
+        drum.time_offset = 0;
+        drum.duration = 10;
+        drum.time_range = drum.duration_range = drum.velocity_range = 0;
+        p.grids[0].notes = {n, muted, excluded, zero, drum};
+        p.grids[1].notes = p.grids[0].notes;
+        p.grids[1].notes.back().type = 14; // Unsupported after earlier rows prepared.
+        f.section->mutes = {{0, 2, 0}};
+        f.seed.random_channels = 1;
+        f.seed.cycle_channels = 0;
+        f.seed.variations.fill(0xffff);
+        f.band.channels[0].transpose = 2;
+        f.band.channels[5].transpose = -12;
+        f.percussion_map.resize(128);
+        for (unsigned i = 0; i < 128; ++i)
+            f.percussion_map[i] = std::uint8_t(i);
+        f.percussion_map[40] = 45;
+        CHECK(f.prepare(error));
+        ImaSectionCursor c;
+        CHECK(f.start(c, error));
+        const std::array<std::uint16_t, 5> pool{5, 2, 4, 6, 32768};
+        const auto initial = c.state();
+        CHECK(!c.step_notes(std::span(pool).first(3), -5, f.band, f.percussion_map, error));
+        CHECK(c.state() == initial && !c.last_notes() && !c.last_step());
+        auto invalid = pool;
+        invalid[2] = 32768;
+        CHECK(!c.step_notes(invalid, -5, f.band, f.percussion_map, error) && c.state() == initial);
+        CHECK(!c.step_notes(pool, -5, f.band, std::span(f.percussion_map).first(127), error));
+        CHECK(!c.step_notes(pool, 2147483647, f.band, f.percussion_map, error) && c.state() == initial);
+        CHECK(c.step_notes(pool, -5, f.band, f.percussion_map, error));
+        const auto& report = *c.last_step();
+        const auto& notes = *c.last_notes();
+        CHECK(report.admitted == 3 && report.muted == 1 && report.excluded_variation == 1 && report.draws_used == 1);
+        CHECK(notes.grid_time == -5 && notes.draws_used == 3 && notes.suppressed == 1 && notes.rows.size() == 3);
+        CHECK(notes.rows[0].row == 0 && notes.rows[1].row == 3 && notes.rows[2].row == 4);
+        CHECK((notes.rows[0].events.messages[0] == ImaTimedMidiMessage{-7, 0x94, 62, 83}));
+        CHECK((notes.rows[0].events.messages[1] == ImaTimedMidiMessage{7, 0x84, 62, 83}));
+        CHECK(!notes.rows[1].events.emitted && !notes.rows[1].events.draws_used);
+        CHECK((notes.rows[2].events.messages[0] == ImaTimedMidiMessage{-5, 0x99, 33, 80}));
+        const auto previous = c.state();
+        CHECK(!c.step_notes(pool, 192, f.band, f.percussion_map, error) && c.state() == previous);
+        CHECK(c.last_step()->tick == 0 && c.last_notes()->grid_time == -5 && c.last_notes()->rows.size() == 3);
+        // Retain resources while the caller disappears, but keep prepared values independent of the band/map.
+        const auto copied = *c.last_notes();
+        std::weak_ptr<const ImaStyle> retained = f.style;
+        f = {};
+        CHECK(!retained.expired() && copied.rows[2].events.messages[0].key == 33);
+        CHECK(c.step({}, error) && !c.last_notes()); // Admission-only steps clear old note inspection.
+        c.stop();
+        CHECK(retained.expired() && !c.last_notes() && copied.rows[0].events.messages[0].key == 62);
+        MusicCatalog catalog;
+        CHECK(!catalog.step_cursor_notes(pool) && !catalog.cursor_error.empty());
+        catalog.inspect({}, {});
+        CHECK(catalog.cursor_error.empty() && !catalog.cursor.last_notes());
+        return true;
+    }
     void word(std::vector<std::uint8_t>& out, std::uint32_t value)
     {
         for (int i = 0; i < 4; ++i)
@@ -220,7 +342,7 @@ namespace
             word(out, v);
         return out;
     }
-    void export_fixture(std::ostream& output, const Fixture& f)
+    void export_fixture(std::ostream& output, const Fixture& f, bool notes)
     {
         std::vector<std::uint8_t> b;
         auto add = [&](auto v) { word(b, static_cast<std::uint32_t>(v)); };
@@ -233,6 +355,16 @@ namespace
         add(f.seed.previous_root);
         for (auto v : f.seed.variations)
             add(v);
+        if (notes)
+        {
+            add(f.harmony->base.chord_mask);
+            add(f.harmony->base.chord_root);
+            for (const auto& c : f.band.channels)
+                add(c.transpose);
+            add(f.percussion_map.size());
+            for (auto v : f.percussion_map)
+                add(v);
+        }
         add(f.timeline->commands.size());
         for (auto c : f.timeline->commands)
         {
@@ -248,6 +380,11 @@ namespace
             add(c.time);
             add(c.harmony.chord_mask);
             add(c.harmony.chord_root);
+            if (notes)
+            {
+                add(c.harmony.scale_mask);
+                add(c.harmony.chord_flags);
+            }
             add(c.variation_flags);
             add(f.section->chords[c.source].measure);
             add(f.section->chords[c.source].beat);
@@ -268,6 +405,16 @@ namespace
             for (const auto& row : prepare_ima_pattern_channels(p).variation_flags)
                 for (auto v : row)
                     add(v);
+            if (notes)
+            {
+                add(p.pitch_range_channels);
+                for (unsigned ch = 0; ch < 16; ++ch)
+                {
+                    add(p.upper_pitch[ch]);
+                    add(p.lower_pitch[ch]);
+                    add(prepare_ima_pattern_channels(p).play_modes[ch]);
+                }
+            }
             add(p.grids.size());
             for (const auto& g : p.grids)
             {
@@ -276,22 +423,62 @@ namespace
                 {
                     add(n.channel);
                     add(n.variations);
+                    if (notes)
+                    {
+                        add(n.type);
+                        add(n.time_offset);
+                        add(n.pitch_modifier);
+                        add(n.byte7);
+                        add(n.midi_note);
+                        add(n.velocity);
+                        add(n.music_value);
+                        add(n.duration);
+                        add(n.time_range);
+                        add(n.duration_range);
+                        add(n.velocity_range);
+                        add(n.play_mode);
+                    }
                 }
             }
         }
         output.write(reinterpret_cast<const char*>(b.data()), b.size());
     }
-    bool walk(const Fixture& f, std::uint64_t& hash, std::size_t& steps, std::ostream* output, std::string& error)
+    bool walk(const Fixture& f, std::uint64_t& hash, std::size_t& steps, std::ostream* output, std::string& error,
+              bool notes = false)
     {
         ImaSectionCursor c;
         CHECK(f.start(c, error));
         if (output)
-            export_fixture(*output, f);
+            export_fixture(*output, f, notes);
         std::vector<std::uint8_t> records;
         while (c.active())
         {
-            CHECK(c.state().steps < 65536 && c.step(draws(c.state().steps), error));
+            CHECK(c.state().steps < 65536);
+            const auto pool = draws(c.state().steps);
+            CHECK(notes ? c.step_notes(pool, c.state().tick + 7001, f.band, f.percussion_map, error)
+                        : c.step(pool, error));
             auto b = trace(c);
+            if (notes)
+            {
+                const auto& n = *c.last_notes();
+                CHECK(n.rows.size() == c.last_step()->admitted);
+                word(b, std::uint32_t(n.draws_used));
+                word(b, std::uint32_t(n.suppressed));
+                word(b, std::uint32_t(n.rows.size()));
+                for (const auto& row : n.rows)
+                {
+                    word(b, std::uint32_t(row.row));
+                    word(b, std::uint32_t(row.pitch.pitch));
+                    word(b, row.events.emitted);
+                    for (auto m : row.events.messages)
+                    {
+                        word(b, std::uint32_t(m.time));
+                        word(b, m.status);
+                        word(b, m.key);
+                        word(b, m.velocity);
+                    }
+                }
+            }
             for (auto x : b)
             {
                 hash ^= x;
@@ -310,14 +497,14 @@ namespace
         }
         return true;
     }
-    bool generated(std::ostream* output = nullptr)
+    bool generated(std::ostream* output = nullptr, bool notes = false)
     {
         std::string error;
         std::uint64_t hash = 14695981039346656037ull;
         std::size_t steps = 0;
         for (unsigned i = 0; i < 128; ++i)
         {
-            auto f = fixture(i);
+            auto f = fixture(i, notes);
             f.section->measures = std::int16_t(2 + i % 7);
             command(f, 768, 0x220);
             command(f, 768, 0x200);
@@ -341,10 +528,10 @@ namespace
                 f.style->patterns[0].timing[0] = i % 10 == 0 ? 130 : 128;
             if (i % 7 == 0)
                 f.style->patterns[2].grids.clear();
-            CHECK(f.prepare(error) && walk(f, hash, steps, output, error));
+            CHECK(f.prepare(error) && walk(f, hash, steps, output, error, notes));
         }
         std::cout << "Generated cursor steps " << steps << "; FNV64 " << hash << '\n';
-        CHECK(steps == 2799 && hash == 10075978454587385952ull);
+        CHECK(steps == 2799 && hash == (notes ? 937667046537544111ull : 10075978454587385952ull));
         return true;
     }
     std::vector<std::uint8_t> read(const std::filesystem::path& path)
@@ -358,7 +545,7 @@ namespace
             c = char(std::tolower(static_cast<unsigned char>(c)));
         return s;
     }
-    bool private_data(const std::filesystem::path& root, std::ostream* output = nullptr)
+    bool private_data(const std::filesystem::path& root, std::ostream* output = nullptr, bool notes = false)
     {
         std::string error;
         std::vector<std::filesystem::path> files;
@@ -383,17 +570,27 @@ namespace
                 continue;
             }
             CHECK(read_ima_style(read(style), *f.style, error) && f.style->identifier == f.section->style_id);
+            if (notes)
+            {
+                ImaBands section_bands, style_bands;
+                std::optional<ImaBandChoice> choice;
+                CHECK(read_ima_bands(read(path), MusicAssetKind::Section, section_bands, error));
+                CHECK(read_ima_bands(read(style), MusicAssetKind::Style, style_bands, error));
+                CHECK(select_ima_band(section_bands, &style_bands, choice, error));
+                f.band = (choice->scope == ImaBandScope::Section ? section_bands : style_bands).bands[choice->index];
+            }
             f.seed.random_channels = 0xffff;
             ImaPersonality personality;
             CHECK(read_ima_personality(read(path.parent_path() / "SILENCE.PER"), personality, error));
             CHECK(prepare_ima_timeline(*f.section, *f.style, *f.timeline, error) &&
                   prepare_ima_harmony(*f.section, *f.timeline, personality, *f.harmony, error) &&
-                  walk(f, hash, steps, output, error));
+                  walk(f, hash, steps, output, error, notes));
             ++bound;
         }
         std::cout << "Private cursor steps " << steps << "; bound/missing " << bound << '/' << missing << "; FNV64 "
                   << hash << '\n';
-        CHECK(bound == 132 && missing == 24 && steps == 8174 && hash == 14793402716944126194ull);
+        CHECK(bound == 132 && missing == 24 && steps == 8174 &&
+              hash == (notes ? 5880823308775508798ull : 14793402716944126194ull));
         return true;
     }
 } // namespace
@@ -402,12 +599,19 @@ int main(int argc, char** argv)
     if (argc < 2)
         return 2;
     std::string_view mode = argv[1];
-    if (mode == "export" && argc == 4)
+    if ((mode == "export" || mode == "notes_export") && argc == 4)
     {
         // Optional transient emulator input: contains external data, never commit this output.
         std::ofstream out(argv[2], std::ios::binary);
-        return out && generated(&out) && private_data(argv[3], &out) && out.good() ? 0 : 1;
+        const bool notes = mode == "notes_export";
+        return out && generated(&out, notes) && private_data(argv[3], &out, notes) && out.good() ? 0 : 1;
     }
+    if (mode == "notes_behavior")
+        return notes_behavior() ? 0 : 1;
+    if (mode == "notes_generated")
+        return generated(nullptr, true) ? 0 : 1;
+    if (mode == "notes_private" && argc == 3)
+        return private_data(argv[2], nullptr, true) ? 0 : 1;
     return (mode == "behavior"               ? behavior()
             : mode == "bounds_lifetime"      ? bounds_lifetime()
             : mode == "generated"            ? generated()

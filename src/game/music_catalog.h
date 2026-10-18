@@ -51,6 +51,7 @@ namespace OpenBlood2
         std::vector<MusicPersonalityRecord> personalities; // Dependencies, separate from original playlist requests.
         std::string error;
         std::size_t bytes_read = 0;
+        bool step_cursor_notes(std::span<const std::uint16_t> draws);
         void inspect(const std::filesystem::path& root, const std::map<std::string, std::string>& properties);
     };
 } // namespace OpenBlood2

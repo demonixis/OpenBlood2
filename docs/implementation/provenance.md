@@ -1315,3 +1315,12 @@ setup arithmetic remains separate from MIDI delivery. See the
 ## Original music instrument routing
 
 Independent typed DLS patch/key lookup follows read-only inspection and bounded execution of installed MSynth25 locale conversion and resident lookup/fallback. Existing verified IMA setup supplies MIDI channel snapshots. The sampler uses its existing DLS gain/pan law with actual note-on CC7/CC11/CC10 values. No commercial code, samples, binary ABI or new dependency is imported. See [source ledger](sources/m2_music_routing_sources.json), [contracts](../contracts/music_routing_contracts.md) and [evidence](../../../Documentation/Implementation/m2_music_routing.md).
+
+## Connected IMA grid note preparation
+
+Typed composition of the existing cursor, pitch and note-event adapters follows
+read-only analysis and isolated execution of the installed IMUSIC25 normal-mode
+tick. No commercial code, samples, executable bytes or binary ABI structures are
+imported. See [source ledger](sources/m2_music_grid_notes_sources.json),
+[contracts](../contracts/music_grid_note_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_grid_notes.md).

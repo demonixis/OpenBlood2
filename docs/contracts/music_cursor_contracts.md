@@ -83,3 +83,8 @@ MIDI emission and playlist side effects. Those paths are explicitly **not** cove
 by the equivalence claim. No full scheduler, seeking, tempo clock, band selection,
 curves, note lifetime, playlist transitions or successful MUSIC call is supplied.
 The actual M2 gate remains open.
+
+The [connected note operation](music_grid_note_contracts.md) additionally prepares
+normal-mode harmonic/event values atomically. Admission-only `step` remains
+available and clears previous note inspection. This supersedes the earlier blanket
+absence of prepared events only; audio transport and MUSIC remain unavailable.

@@ -77,10 +77,13 @@ namespace OpenBlood2
                 seed.random_channels = 0xffff;
                 if (!music.cursor.start(asset.section, asset.section_style, asset.timeline, asset.harmony, seed, error))
                     return false;
+                music.cursor_file = asset.filename;
                 for (unsigned step = 0; step < 8 && music.cursor.active(); ++step)
                 {
-                    const std::array<std::uint16_t, 16> cursor_draws{};
-                    if (!music.cursor.step(cursor_draws, error) || !music.cursor.last_step() ||
+                    const std::array<std::uint16_t, 4096> cursor_draws{};
+                    if (!music.step_cursor_notes(cursor_draws) || !music.cursor.last_notes() ||
+                        !music.cursor.last_step() ||
+                        music.cursor.last_notes()->rows.size() != music.cursor.last_step()->admitted ||
                         music.cursor.last_step()->interval <= 0 || music.cursor.state().steps != step + 1)
                         return false;
                 }

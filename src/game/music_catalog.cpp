@@ -74,6 +74,14 @@ namespace OpenBlood2
             return true;
         }
     } // namespace
+    bool MusicCatalog::step_cursor_notes(std::span<const std::uint16_t> draws)
+    {
+        for (const auto& asset : assets)
+            if (asset.filename == cursor_file && asset.selected_band)
+                return cursor.step_notes(draws, cursor.state().tick, *asset.selected_band, {}, cursor_error);
+        cursor_error = "IMA cursor notes: no selected band for this section";
+        return false;
+    }
     void MusicCatalog::inspect(const std::filesystem::path& root, const std::map<std::string, std::string>& properties)
     {
         *this = {};

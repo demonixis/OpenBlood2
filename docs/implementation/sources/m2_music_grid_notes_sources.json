@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "7431f3a33f094059a59f8f93fcda11ed9a5ab2c3",
+  "status": "M2 incomplete; connected normal-mode grid note preparation, no live MUSIC",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/IMUSIC25.DLL",
+      "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "image_base": "0x35440000",
+      "rvas": {
+        "normal_tick": "0x16908",
+        "normal_mode_activation": "0x16b38",
+        "effective_scale": "0x170e3..0x170f8",
+        "admission_pitch_events": "0x17103..0x17595",
+        "paired_off_registration": "0x17544..0x17592"
+      },
+      "use": "Read-only inspection and isolated instruction execution of normal section cursor and admitted note preparation. MIDI sink, allocation/registration, unrelated notifications and transport intercepted; active-note list discarded after paired value observation."
+    },
+    {
+      "source": "Existing ima_cursor, ima_harmony, ima_note_pitch, ima_note_event and ima_band adapters",
+      "use": "Compose previously verified typed helpers without altering their individual arithmetic or immutable resource ownership"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/Music.cpp",
+      "use": "Preserved original client plan/commands; MUSIC service remains explicitly unsupported"
+    }
+  ],
+  "replacement_code": [
+    "src/engine/ima_cursor.cpp: atomic candidate step with normal-mode harmonic activation and ordered note draw prefix",
+    "src/game/music_catalog.cpp: selected-band diagnostic preparation at explicit section ticks",
+    "src/app/inspector_world_sounds.cpp: clipped owned note pair inspection and opaque curve count"
+  ],
+  "deliberate_limits": [
+    "Only admitted pattern note types 8 and 9; unsupported admitted types fail rather than silently disappear",
+    "Supplied output tick is separate from section position; no wall time or implicit RNG",
+    "Caller-selected band and optional 128-byte percussion map; no new dynamic band/map resolver",
+    "Paired event values in source order, not a sorted live MIDI queue; no later chord-dependent active-note shortening or note-off delivery",
+    "Section event/curve records and grid curves remain unprepared and visible; no MUSIC success or M2 closure",
+    "Original probe intercepts external side effects and allocation/registration and discards active notes after preparation; not a full tick/audio comparison",
+    "No executable bytes, sample data, disassembly or runtime/build dependency imported"
+  ],
+  "original_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "rva": "0x16908",
+    "generated": {
+      "sections": 128,
+      "steps": 2799,
+      "admitted_notes": 6779,
+      "emitted_pairs": 6686,
+      "note_draws": 12179,
+      "sha256": "b578076f070506c957fd9ca9806c5587274794292381806cc668ed2c51082079",
+      "fnv64": 937667046537544111
+    },
+    "private": {
+      "sections": 132,
+      "steps": 8174,
+      "admitted_notes": 6290,
+      "emitted_pairs": 6290,
+      "note_draws": 12580,
+      "sha256": "8acaa1db032da34dd2a43eebabba07e722760883ae85cadfda0f551103ed6226",
+      "fnv64": 5880823308775508798
+    },
+    "scope": "Original normal-mode grid/chord/mute/pattern/variation decisions, admitted note pitch and paired event values. Prepared inputs come from previously verified readers/helpers. Section event list and active notes empty; notifications, metronome, MIDI sink, note allocation/registration, playlist lookahead/repeats/transitions intercepted. Active notes discarded after pair observation: no later reharmonization/note-off dispatch claim. This is not a full tick/audio equivalence claim."
+  },
+  "target_sha256": {
+    "src/engine/ima_cursor.h": "1fd121921103adc50125974b17980f5c424686d13dd2913cdbf3a259fa3b1567",
+    "src/engine/ima_cursor.cpp": "c00ea89861dadab7410b13ab98a58127a3c165ba760078d104d7ae0f9a1f1363",
+    "src/game/music_catalog.h": "d8f70265b417f3ed54560bf16cd2e016b83ba2bcada02298d797f4e3f24e857d",
+    "src/game/music_catalog.cpp": "5179997136fdf36878e89f32d4eccd39401143d531813448402f300c750a3d5a",
+    "src/app/inspector_world_sounds.cpp": "1ba3446018cac2e0165a11d7d17e961a4b2c963d9872a9f0e4bb029ecad5676a",
+    "src/app/world_sound_smoke.cpp": "148bbff47702e333c2fdc903fb59273908ed5b4133d92302ee1fa402d2d1863e",
+    "tests/ima_cursor_tests.cpp": "b09de5b0bc4d2bac72efbd1a44ea1aa4334959663e1701d8bd221e697f44dfdd",
+    "tests/CMakeLists.txt": "a32d3bc86aaa8a286e713ec5adf4a9fdc784ce1f70e6d1f2c3137c09f09314be"
+  }
+}

@@ -1,5 +1,7 @@
 #pragma once
+#include "engine/ima_band.h"
 #include "engine/ima_harmony.h"
+#include "engine/ima_note_event.h"
 #include "engine/ima_selection.h"
 #include "engine/ima_variation.h"
 #include <memory>
@@ -35,6 +37,18 @@ namespace OpenBlood2
         bool command_restart = false, pattern_selected = false, chord_changed = false, variations_changed = false;
         std::size_t draws_used = 0, admitted = 0, muted = 0, excluded_variation = 0;
     };
+    struct ImaCursorNote
+    {
+        std::size_t row = 0; // Index in the selected grid, including filtered rows.
+        ImaNotePitch pitch;
+        ImaNoteEvents events;
+    };
+    struct ImaCursorNotes
+    {
+        std::int32_t grid_time = 0; // Caller-supplied output clock, independent of section tick.
+        std::size_t draws_used = 0, suppressed = 0, opaque_curve_chunks = 0;
+        std::vector<ImaCursorNote> rows; // Admitted rows in source order; paired events are not sorted.
+    };
     // Explicit single-section traversal of original normal-mode grid rules, NOT an audio player.
     // Immutable bindings are retained until stop/replacement. No callbacks, I/O or implicit RNG.
     class ImaSectionCursor
@@ -45,6 +59,11 @@ namespace OpenBlood2
                    std::string& error);
         // Consume only the required prefix of the caller's draw pool. Failure leaves the cursor unchanged.
         bool step(std::span<const std::uint16_t> draws, std::string& error);
+        // Normal-mode harmonic activation, selected-band transpose, then note event preparation.
+        // One draw prefix: variations first, then admitted nonzero notes in source order.
+        // Band/map are borrowed for this call. Failure preserves state AND prior inspection.
+        bool step_notes(std::span<const std::uint16_t> draws, std::int32_t grid_time, const ImaBand&,
+                        std::span<const std::uint8_t> percussion_map, std::string& error);
         void stop();
         bool active() const
         {
@@ -58,6 +77,10 @@ namespace OpenBlood2
         {
             return last_;
         }
+        const std::optional<ImaCursorNotes>& last_notes() const
+        {
+            return notes_;
+        }
 
       private:
         std::shared_ptr<const ImaSection> section_;
@@ -66,5 +89,6 @@ namespace OpenBlood2
         std::shared_ptr<const ImaHarmony> harmony_;
         ImaCursorState state_;
         std::optional<ImaCursorStep> last_;
+        std::optional<ImaCursorNotes> notes_;
     };
 } // namespace OpenBlood2
