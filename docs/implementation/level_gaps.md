@@ -259,11 +259,13 @@ contracts). The remaining classes stay open.
 | RotatingModel | 1 | 1 |
 | ParticleSystem | 1 | 1 |
 
-### L12 — NPC ground placement (3 worlds)
+### L12 — NPC ground placement (2 worlds; 03_museum done)
 
 CultistAI (6) and CivilianAI (1) fail "NPC world ground placement failed" in
-03_museum, 06_airship1 and 11_slaughter_house. Investigate the placement probe
-against those spawn positions (no relocation shortcut).
+03_museum, 06_airship1 and 11_slaughter_house. 03_museum's Cultist was authored
+2.86 units into a wall and is now resolved by the bounded authored placement
+nudge (contact overlap contracts); the 06_airship1 and 11_slaughter_house cases
+fail for other reasons and remain to investigate (no relocation shortcut).
 
 ### L13 — String-created pickups (done)
 

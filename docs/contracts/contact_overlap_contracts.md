@@ -65,3 +65,22 @@ simulated minutes, all four Chosen) completed without failure. It recorded 20,89
 acted contacts, and a per-step static check never found an overlap deeper than
 0.002 units. This is randomized coverage of reachable CityHub areas, not a
 guarantee for every geometry, and it is not a retail feel comparison.
+
+## Authored placement nudge
+
+`MoveObjectToGround` keeps every existing path, including lowering a body out of a
+ceiling it starts through. Only when a solid box's descent itself starts blocked (a
+wall or floor it overlaps more than the 0.01 tolerance, under `StartOverlap::Leave`) does
+it first nudge the box out of the primary world: a zero-length sweep reports the
+overlapped face's separating normal and depth, the box moves by depth + 0.001, at most
+four corrections, and never further in total than its smaller horizontal half extent.
+The nudge is committed (teleport, no contacts) only if the final box is clear; otherwise
+nothing moves and the following MoveObject still names the overlap. Objects other than
+the primary world are not nudged. The record keeps `placement_nudge`/`placement_nudges`,
+shown in the NPC runtime panel.
+
+03_Museum's Cultist "pud" is authored 2.86 units into a wall; the original one-sided BSP
+planes let it settle, while this sweep cannot start inside a solid body. A thin polygon
+separates towards its nearer side. This is a bounded replacement placement policy, not
+depenetration during simulation: later moves keep the rules above. Other 06_Airship1 and
+11_Slaughter_House placement failures have different causes and remain open.

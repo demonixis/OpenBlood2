@@ -304,6 +304,21 @@ namespace
         // Moving further into the wall's solid (+x) side is still refused.
         auto into = DVector{3, 2.001f, 30};
         CHECK(g.server.MoveObject(h, &into) == DE_ERROR && r->state.m_Pos.x == .5f);
+        // An authored solid body 1.5 units through the wall's front face (03_Museum's Cultist
+        // "pud"): the placement helper nudges it out along the face normal, then lowers it.
+        r->state.m_Flags = FLAG_SOLID;
+        r->dimensions = {2, 2, 2};
+        r->state.m_Pos = {.5f, 5, 0};
+        CHECK(g.server.MoveObjectToGround(h) == DE_OK && r->placement_nudges == 1);
+        CHECK(std::abs(r->placement_nudge.x - 1.501f) < .001f && std::abs(r->state.m_Pos.x - 2.001f) < .001f &&
+              std::abs(r->state.m_Pos.y - 2) < .01f);
+        // Deeper than the smaller horizontal half extent: nothing moves, the overlap stays explicit.
+        // The polygon separates towards its nearer side; a narrow body (half z 0.25) needing
+        // 1 unit along x exceeds its smaller half extent.
+        r->dimensions = {2, 2, .25f};
+        r->state.m_Pos = {-1, 5, 0};
+        CHECK(g.server.MoveObjectToGround(h) == DE_ERROR && r->placement_nudges == 1 && r->state.m_Pos.x == -1 &&
+              r->state.m_Pos.y == 5);
         return true;
     }
     bool collision_traversal()

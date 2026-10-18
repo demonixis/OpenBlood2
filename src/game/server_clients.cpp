@@ -226,6 +226,49 @@ namespace OpenBlood2
         // Original ObjectUtilities::MoveObjectToGround: downward ray, animation-0
         // user dimensions for characters, then collision-aware MoveObject. The
         // otherwise unbounded CastRay is limited to the supported coordinate range.
+        // Replacement policy for authored overlaps: a solid box may start inside primary-world
+        // faces (03_Museum's Cultist "pud" sits 2.86 units into a wall). The original one-sided
+        // BSP planes let such a body settle; this sweep cannot start inside it. Nudge the box
+        // out along the overlapped faces' normals: at most four corrections, never further
+        // than its smaller horizontal half extent, and only to a position whose box is clear.
+        // Otherwise nothing moves and the MoveObject below reports the overlap explicitly.
+        CollisionHit descent;
+        const auto below = DVector{r->state.m_Pos.x, r->state.m_Pos.y - 1, r->state.m_Pos.z};
+        // Only when the descent itself starts blocked: overlaps it leaves (a ceiling) keep the
+        // ordinary path, which lowers the body out of them.
+        if ((r->state.m_Flags & FLAG_SOLID) && physics_vector(r->dimensions) &&
+            collision->sweep(r->state.m_Pos, below, r->dimensions, descent, 0.01, StartOverlap::Leave) ==
+                CollisionQuery::Hit &&
+            descent.start_solid)
+        {
+            const auto half = r->dimensions;
+            const double limit = std::min(half.x, half.z);
+            auto position = r->state.m_Pos;
+            double distance = 0;
+            bool clear = false;
+            for (unsigned i = 0; i <= 4; ++i)
+            {
+                CollisionHit overlap;
+                const auto query = collision->sweep(position, position, half, overlap);
+                if (query == CollisionQuery::Invalid)
+                    return DE_ERROR;
+                clear = query == CollisionQuery::Miss || !overlap.start_solid;
+                if (clear || i == 4 || !physics_vector(overlap.normal) || !std::isfinite(overlap.penetration))
+                    break;
+                const double step = overlap.penetration + .001;
+                distance += step;
+                if (distance > limit)
+                    break;
+                position = vector_add(position, vector_scale(overlap.normal, static_cast<float>(step)));
+            }
+            if (clear && distance > 0 && distance <= limit)
+            {
+                r->placement_nudge = vector_subtract(position, r->state.m_Pos);
+                ++r->placement_nudges;
+                if (TeleportObject(h, &position) != DE_OK)
+                    return DE_ERROR;
+            }
+        }
         auto from = r->state.m_Pos;
         auto to = from;
         to.y = -10000000.0f;

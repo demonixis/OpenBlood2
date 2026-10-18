@@ -241,6 +241,9 @@ namespace OpenBlood2
                         a.m_damage.m_bNighInvulnerable);
             ImGui::TextWrapped("Activation uses replacement center-ray visibility, not retail PVS. Remaining states "
                                "may fail explicitly.");
+            if (const auto* body = game.objects.get(a.m_hObject); body && body->placement_nudges)
+                ImGui::Text("Authored overlap nudge %.3f %.3f %.3f (replacement placement)", body->placement_nudge.x,
+                            body->placement_nudge.y, body->placement_nudge.z);
             if (!a.runtime_error.empty())
                 ImGui::TextWrapped("Failure: %s", a.runtime_error.c_str());
         }
