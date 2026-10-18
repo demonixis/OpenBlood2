@@ -70,6 +70,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Original pushable brushes and bounded box physics](pushable_contracts.md)
 - [Conveyor, Damage and FreeFall boundary](specialized_volume_contracts.md)
 - [Original triggers, door SelfTrigger and keys](trigger_contracts.md)
+- [Original TripLaser](trip_laser_contracts.md)
 - [Original Spawner](spawner_contracts.md)
 - [Original world-model debris](world_debris_contracts.md)
 - [Keyframed translating world models](worldpath_contracts.md)

@@ -45,6 +45,7 @@
 #include "game/original/Sound.h"
 #include "game/original/SoundFX.h"
 #include "game/original/Spawner.h"
+#include "game/original/TripLaser.h"
 #include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
 #include "game/original/WeaponPickups.h"
@@ -191,6 +192,20 @@ namespace OpenBlood2
                                        {"RepeatY", std::int32_t(1)},
                                        {"SpacingX", 0.0f},
                                        {"SpacingY", 0.0f}}};
+        const ClassInfo trip_laser{"TripLaser",
+                                   &b2base,
+                                   construct<TripLaser>,
+                                   {{"Filename", std::string("Models\\default.abc")},
+                                    {"Skin", std::string("Skins\\ammo\\beamred.dtx")},
+                                    {"Dims", DVector{1, 20, 1}},
+                                    {"Color", DVector{255, 0, 0}},
+                                    {"Alpha", .5f},
+                                    {"StartOn", false},
+                                    {"TouchTriggerTarget", std::string{}},
+                                    {"TouchTriggerMessage", std::string{}},
+                                    {"Sound", std::string{}},
+                                    {"TouchSound", std::string{}},
+                                    {"Damage", 10.0f}}};
         const ClassInfo spawner{"Spawner",
                                 &b2base,
                                 construct<Spawner>,
@@ -945,7 +960,7 @@ namespace OpenBlood2
                objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
                objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
                objects.register_class(sound_fx) && objects.register_class(detail_sprite) &&
-               objects.register_class(spawner) && objects.register_class(sound) && objects.register_class(keyframer) &&
+               objects.register_class(spawner) && objects.register_class(trip_laser) && objects.register_class(sound) && objects.register_class(keyframer) &&
                objects.register_class(key) && objects.register_class(start) && objects.register_class(game_start) &&
                objects.register_class(path) && objects.register_class(world_properties) &&
                objects.register_class(smell) && objects.register_class(exit_hint) &&
