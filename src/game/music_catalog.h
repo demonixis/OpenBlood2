@@ -6,6 +6,7 @@
 #include "engine/ima_cursor.h"
 #include "engine/ima_curve.h"
 #include "engine/ima_harmony.h"
+#include "engine/ima_program.h"
 #include "engine/ima_section.h"
 #include "engine/ima_style.h"
 #include "engine/ima_timeline.h"
@@ -49,11 +50,16 @@ namespace OpenBlood2
         MusicAssetPlan plan;
         ImaSectionCursor cursor; // Explicit inspection traversal; reset with the world catalogue.
         std::string cursor_file, cursor_error;
+        ImaSectionProgram audition;
+        std::string audition_file, audition_error;
+        std::uint64_t audition_origin = 0, audition_end = 0, audition_failures = 0;
+        bool audition_stopped = false;
         std::vector<MusicAssetRecord> assets;
         std::vector<MusicPersonalityRecord> personalities; // Dependencies, separate from original playlist requests.
         std::string error;
         std::size_t bytes_read = 0;
         bool step_cursor_notes(std::span<const std::uint16_t> draws);
+        bool play_section(std::string_view filename, DlsSampler&);
         void inspect(const std::filesystem::path& root, const std::map<std::string, std::string>& properties);
     };
 } // namespace OpenBlood2

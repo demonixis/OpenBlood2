@@ -204,3 +204,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Timed MIDI delivery](music_timing_contracts.md): sample-boundary dispatch, original queue order, bank capture and checked world lifetime.
 
 - [IMA runtime clock](music_clock_contracts.md): original tempo boundaries and tick-to-sample queue conversion.
+
+- [Finite IMA section playback](music_program_contracts.md): complete authored audition, terminal-note deadlines, explicit preparation policies and audio lifetime.

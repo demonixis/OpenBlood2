@@ -544,17 +544,21 @@ namespace OpenBlood2
                       });
         completed += before - voices_.size();
     }
-    void DlsSampler::clear()
+    void DlsSampler::silence()
     {
         voices_.clear();
         pending_midi_.clear();
+    }
+    void DlsSampler::clear()
+    {
+        silence();
         pending_banks_ = {};
         sample_clock_ = 0;
         queued_messages = queue_rejected = dispatched_messages = coalesced_messages = dispatch_failures = 0;
         failed_dispatch_frame.reset();
         last_queue_error.clear();
         last_dispatch_error.clear();
-        midi_channels_ = {};
+        midi_channels_.fill(DlsMidiChannel{});
         midi_channels_[9].percussion = true;
         midi_received = midi_rejected = midi_released = midi_choked = midi_unmatched_stops = 0;
         last_midi_error.clear();

@@ -118,6 +118,8 @@ namespace OpenBlood2
         bool release(std::uint64_t id);
         // Adds to an interleaved stereo prefix. All frames advance, including unrendered ones.
         bool advance(std::uint64_t frames, std::span<float> stereo);
+        // Explicit instrument-only cancellation. Preserve the shared clock, channels and failure history.
+        void silence();
         void clear();
         const auto& voices() const
         {
@@ -138,6 +140,9 @@ namespace OpenBlood2
         std::array<DlsMidiChannel, 16> midi_channels_ = []
         {
             std::array<DlsMidiChannel, 16> channels{};
+            // Explicitly initialize every slot: GCC 16 -O3 can zero the tail of
+            // this nested aggregate after the percussion-slot write (isolated repro in evidence).
+            channels.fill(DlsMidiChannel{});
             channels[9].percussion = true;
             return channels;
         }();

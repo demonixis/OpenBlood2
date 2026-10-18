@@ -135,6 +135,40 @@ namespace OpenBlood2
     void Inspector::draw_world_sounds(GameSession& game)
     {
         auto& music = game.music_catalog;
+        if (ImGui::CollapsingHeader("Single-section music playback", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            auto& sampler = game.server.audio.instruments;
+            ImGui::TextWrapped("Finite original-section audition, gain 20%%, explicit seed 1. "
+                               "Prepared once, played by the shared audio clock while the inspector is hidden. "
+                               "Game MUSIC playlists/transitions are still unavailable.");
+            if (ImGui::Button("Stop all instrument audio"))
+            {
+                sampler.silence();
+                music.audition_stopped = true;
+            }
+            if (!music.audition_error.empty())
+                ImGui::TextWrapped("Section refused: %s", music.audition_error.c_str());
+            if (!music.audition_file.empty())
+            {
+                const auto& p = music.audition;
+                ImGui::Text("%s | %s", music.audition_file.c_str(),
+                            music.audition_stopped ? "cancelled"
+                            : sampler.dispatch_failures > music.audition_failures
+                                ? "delivery failed (see audio diagnostics)"
+                            : sampler.sample_clock() < music.audition_end ? "scheduled / playing"
+                            : !sampler.voices().empty()                   ? "release tails / other instrument voices"
+                                                                          : "sequence elapsed");
+                ImGui::Text("Grids %llu | notes %llu | curve messages %llu | terminal stops %llu | events %zu",
+                            (unsigned long long)p.grids, (unsigned long long)p.notes,
+                            (unsigned long long)p.curve_messages, (unsigned long long)p.terminal_notes,
+                            p.events.size());
+                ImGui::Text("Preroll %d ticks | last tick %d | draws %llu | pending MIDI %zu", p.preroll_ticks,
+                            p.last_tick, (unsigned long long)p.draws, sampler.pending_midi().size());
+                ImGui::Text("Audio frame %llu | start %llu / last event or section end %llu",
+                            (unsigned long long)sampler.sample_clock(), (unsigned long long)music.audition_origin,
+                            (unsigned long long)music.audition_end);
+            }
+        }
         if (ImGui::TreeNodeEx("DLS instruments, samples and diagnostic notes", ImGuiTreeNodeFlags_DefaultOpen))
         {
             auto& sampler = game.server.audio.instruments;
@@ -351,17 +385,16 @@ namespace OpenBlood2
             }
             ImGui::TreePop();
         }
-        if (ImGui::CollapsingHeader("Original music assets (sequence playback unavailable)",
+        if (ImGui::CollapsingHeader("Original music assets (game playlists unavailable)",
                                     ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::TextWrapped("Directory: %s | %zu original requests / %zu unique assets | %zu bytes read",
                                music.plan.directory.c_str(), music.plan.requests.size(), music.assets.size(),
                                music.bytes_read);
             ImGui::TextWrapped(
-                "Decoded IMA sections/bands/pattern notes and DLS sample/region data. Live pattern "
-                "activation, personality "
-                "graphs and playlist playback are not implemented. MUSIC commands "
-                "still report unsupported. Explicit DLS diagnostic notes above use the existing audio output.");
+                "Decoded IMA sections/bands/pattern notes and DLS sample/region data. Finite section playback is "
+                "available below. Personality graphs and game playlist activation remain incomplete; MUSIC "
+                "commands still report unsupported.");
             if (ImGui::TreeNode("Grid cursor (manual steps; no playback)"))
             {
                 ImGui::TextWrapped("Start from an IMA section below. Explicit zero seed/draws, all channels random. "
@@ -540,10 +573,11 @@ namespace OpenBlood2
             }
             ImGui::TreePop();
         }
-        if (ImGui::TreeNode("IMA sections (authored data only)"))
+        if (ImGui::TreeNode("IMA sections and finite playback"))
         {
-            ImGui::TextWrapped("Authored records and the style-reconciled timeline are separate. Mutes are sampled "
-                               "at each effective beat; chords are not final pitches. No sequence is scheduled.");
+            ImGui::TextWrapped(
+                "Authored records and the style-reconciled timeline are separate. Mutes are sampled "
+                "at each effective beat; chords are not final pitches. Playback is an explicit finite audition.");
             for (const auto& asset : music.assets)
             {
                 if (!asset.section || !ImGui::TreeNode(asset.filename.c_str()))
@@ -581,6 +615,8 @@ namespace OpenBlood2
                 if (!asset.harmony_error.empty())
                     ImGui::TextWrapped("Harmony unavailable: %s", asset.harmony_error.c_str());
                 draw_section_selection(asset);
+                if (ImGui::Button("Play this section once (20% gain)"))
+                    music.play_section(asset.filename, game.server.audio.instruments);
                 if (ImGui::Button("Start grid cursor probe"))
                 {
                     ImaCursorSeed seed;

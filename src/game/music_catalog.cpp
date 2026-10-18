@@ -93,6 +93,44 @@ namespace OpenBlood2
         cursor_error = "IMA cursor dispatch: no selected band/exact style binding for this section";
         return false;
     }
+    bool MusicCatalog::play_section(std::string_view filename, DlsSampler& sampler)
+    {
+        audition_error.clear();
+        if (!sampler.voices().empty() || !sampler.pending_midi().empty())
+        {
+            audition_error = "Stop existing instrument audio before starting a section";
+            return false;
+        }
+        for (const auto& asset : assets)
+            if (asset.filename == filename && asset.section && asset.section_style && asset.selected_band &&
+                asset.band_setup_ready && asset.band_bank)
+                for (const auto& style : assets)
+                    if (style.style == asset.section_style && style.curves)
+                    {
+                        ImaSectionProgram next;
+                        ImaCursorSeed seed;
+                        seed.random_channels = 0xffff; // Explicit audition policy; playlist initialization is separate.
+                        if (!prepare_ima_program(asset.section, asset.section_style, asset.timeline, asset.harmony,
+                                                 *asset.selected_band, *style.curves, seed, 1, next, audition_error))
+                            return false;
+                        ImaClock clock;
+                        std::uint64_t end;
+                        const auto origin = sampler.sample_clock();
+                        if (!clock.prepare(std::span(&next.tempo, 1), origin, audition_error) ||
+                            !clock.sample(next.last_tick, end, audition_error) ||
+                            !sampler.enqueue_ima(asset.band_bank, clock, next.events, .2, audition_error))
+                            return false;
+                        audition = std::move(next);
+                        audition_file = asset.filename;
+                        audition_origin = origin;
+                        audition_end = end;
+                        audition_failures = sampler.dispatch_failures;
+                        audition_stopped = false;
+                        return true;
+                    }
+        audition_error = "Section lacks a complete immutable section/style/harmony/curve/band/bank binding";
+        return false;
+    }
     void MusicCatalog::inspect(const std::filesystem::path& root, const std::map<std::string, std::string>& properties)
     {
         *this = {};

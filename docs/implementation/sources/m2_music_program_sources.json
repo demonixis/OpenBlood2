@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "457b0c5369ed25ca1e9baa6e1f37c44d175b792a",
+  "approach": "Finite original-section preparation composes existing verified cursor/clock/sampler; no original binary is imported or executed natively",
+  "sources": [
+    {
+      "path": "IMUSIC25.DLL (external original install)",
+      "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "rva_ranges": [
+        "0x17996..0x179c2 finite termination drains active list without reordering/retiming",
+        "0x4e49..0x4f0f note-off construction preserves stored event timestamp"
+      ],
+      "use": "Isolated original execution with synthetic active lists and intercepted sink/free"
+    },
+    {
+      "path": "src/engine/ima_cursor.cpp, ima_clock.cpp, dls_midi_queue.cpp, dls_sampler.cpp",
+      "use": "Existing verified pattern/harmonic/event rules, bounded sample conversion, stable queue and real replacement synthesis"
+    }
+  ],
+  "adaptations": [
+    "Finite synchronous compilation; at most 65536 grid steps/messages including setup, a conservative 16-million combined record/draw budget, and up to 4096 draws per grid",
+    "Explicit isolated deterministic seed 1, random mask 0xffff, no percussion remap, 20% audition gain",
+    "Shift the finite output epoch by any negative earliest event before tick conversion; original OS lookahead/playlist epoch not reconstructed",
+    "Developer stop cancels all instruments without rewinding the shared clock or stopping world WAV voices",
+    "Explicit fill of all 16 MIDI channels on construction/reset: standalone installed GCC 16.2.1 -O3 reproduction otherwise zeroes slots 9..15"
+  ],
+  "limits": [
+    "No playlist, repeat, transition quantization, global seed/history, cross-section state or required MUSIC implementation",
+    "Section-level opaque notes/curves refuse preparation; future synthesis failures remain visible; original PCM/listening parity not claimed"
+  ],
+  "frozen_sources": {
+    "CMakeLists.txt": "63205bcde2046620d65d62af6f6a7babed6700f40d6aff61621dd431ca9001f9",
+    "src/engine/ima_program.h": "40cf5061a293dd2e991015b7ba1d049c3b10066c54f9b9537dc963d5c77313df",
+    "src/engine/ima_program.cpp": "926047ee7b72af9624eb57855edda1d93f8bd3dc390b3d874b285bb6cefbd892",
+    "src/engine/dls_sampler.h": "c806d77817f3200979e4a54ec9254e62330632e80c6822c1fabe8c26943bce78",
+    "src/engine/dls_sampler.cpp": "56aa384cefbb5776faf1878e5bf0298257e4e1f6fb5a4b02c6ca586fd8dc2c84",
+    "src/game/music_catalog.h": "8302a83d0a6c70278962bcef5675374e2b86fa03883eb43cb841cf7c8767d196",
+    "src/game/music_catalog.cpp": "5585eb1c4e3c37bed8c22603d03a8c974f3a514f9e062845c41bd34628c56436",
+    "src/app/inspector_world_sounds.cpp": "86c798c021e10d39af3308474cdb82a6b6e3f978f9085abef68fff77b0415919",
+    "src/app/world_sound_smoke.cpp": "f28c3d112e75ddd13ef6e7658eb9077e5e53cca0b13f9db3d9576abe3171a2b3",
+    "tests/ima_program_tests.cpp": "bf4c2210a5fe91025cb84fc85dbf6010f3206dc87f5f9a039f35495951845537",
+    "tests/CMakeLists.txt": "ffe5edad66052bf7019702bb54a049971b7fa9e718283d62af75d595593da470"
+  }
+}

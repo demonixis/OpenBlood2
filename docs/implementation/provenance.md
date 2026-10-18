@@ -1382,3 +1382,7 @@ Independent bounded scheduling using original MSynth25 insertion, due-value look
 ## Original IMA runtime tempo clock (2026-10-18)
 
 Independent bounded value arithmetic and queue integration derived from read-only IMRT25 routine execution. No commercial bytes imported. See [source ledger](sources/m2_music_clock_sources.json), [contracts](../contracts/music_clock_contracts.md) and [evidence](../../../Documentation/Implementation/m2_music_clock.md). Native timer behavior and selectable old sample rates are replaced by the existing 48 kHz audio clock.
+
+## Finite original IMA section playback (2026-10-18)
+
+Existing verified readers/cursor/clock/receiver compose a bounded single-section audition. Original finite-termination note flushing is independently checked through isolated IMUSIC25 execution. Explicit draw seed, preparatory output epoch and developer cancellation are documented replacement policies. No commercial bytes imported. See [source ledger](sources/m2_music_program_sources.json), [contracts](../contracts/music_program_contracts.md) and [evidence](../../../Documentation/Implementation/m2_music_program.md).

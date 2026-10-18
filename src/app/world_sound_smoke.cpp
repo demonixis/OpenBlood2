@@ -12,9 +12,10 @@ namespace OpenBlood2
     {
         // The world-owned music data exists independently of inspector visibility/reload.
         auto& music = g.music_catalog;
-        if (!music.error.empty() || music.assets.empty() || music.personalities.size() != 1 ||
-            !music.personalities.front().metadata || !music.personalities.front().error.empty() ||
-            !music.assets.front().bank || !music.assets.front().bank_error.empty())
+        if (!music.audition_file.empty() || !music.audition.events.empty() || !music.error.empty() ||
+            music.assets.empty() || music.personalities.size() != 1 || !music.personalities.front().metadata ||
+            !music.personalities.front().error.empty() || !music.assets.front().bank ||
+            !music.assets.front().bank_error.empty())
             return false;
         std::size_t pattern_notes = 0, band_count = 0, section_count = 0, curves = 0, curve_points = 0,
                     curve_events = 0;
@@ -261,6 +262,27 @@ namespace OpenBlood2
             sampler.sample_clock() != boundaries[3] + 48 || sampler.queued_messages != 84 ||
             sampler.dispatched_messages != 52 || sampler.dispatch_failures || sampler.queue_rejected ||
             sampler.coalesced_messages)
+            return false;
+        // Whole authored section, through the ordinary mixer clock; no inspector-driven stepping.
+        const auto started_before = sampler.started;
+        if (!music.play_section("a2.sec", sampler) || music.audition.notes == 0)
+            return false;
+        while (sampler.sample_clock() <= music.audition_end + DlsSampler::rate * 4)
+            if (!g.server.advance_audio(.02, {}, {}))
+                return false;
+        for (const auto& v : sampler.voices())
+            if (v.gate == UINT64_MAX || v.amplitude.release > 20)
+                return false;
+        if (!g.server.advance_audio(21, {}, {}) || !sampler.pending_midi().empty() || !sampler.voices().empty() ||
+            sampler.dispatch_failures || sampler.started <= started_before)
+            return false;
+        // Cancellation drops future notes without rewinding the shared audio clock.
+        if (!music.play_section("a2.sec", sampler) || !g.server.advance_audio(.02, {}, {}))
+            return false;
+        const auto cancel_frame = sampler.sample_clock();
+        sampler.silence();
+        music.audition_stopped = true;
+        if (!sampler.pending_midi().empty() || !sampler.voices().empty() || sampler.sample_clock() != cancel_frame)
             return false;
         unsigned count = 0;
         for (const auto& e : g.entries)
