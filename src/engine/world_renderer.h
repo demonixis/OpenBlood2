@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/gpu_registry.h"
 #include "engine/model_view.h"
 #include "engine/point_light.h"
 #include "engine/world_view.h"
@@ -34,18 +35,6 @@ namespace OpenBlood2
         SkinnedAlpha,
         Count
     };
-    // Copy pass in the frame's command buffer when one is given, so all uploads share the
-    // frame submission; otherwise in a dedicated command buffer submitted by end_upload.
-    SDL_GPUCopyPass* begin_upload(SDL_GPUDevice*, SDL_GPUCommandBuffer* frame, SDL_GPUCommandBuffer*& owned);
-    bool end_upload(SDL_GPUCopyPass*, SDL_GPUCommandBuffer* owned);
-    // Nearest-filtered sampler with point mip selection over authored DTX levels.
-    SDL_GPUSampler* create_world_sampler(SDL_GPUDevice*, bool clamp);
-    // One sampled texture per material with its authored mip chain; slot 0 is white when
-    // the list is empty, and failed or animated-sprite entries get none. Replaces textures;
-    // on failure the caller releases any partially created textures.
-    bool upload_world_textures(SDL_GPUDevice*, const std::vector<WorldMaterial>&, std::vector<SDL_GPUTexture*>&,
-                               std::string& error, SDL_GPUCommandBuffer* frame = nullptr);
-    void release_world_textures(SDL_GPUDevice*, std::vector<SDL_GPUTexture*>&);
     // Conservative bounding-sphere test against the world_view_uniform projection.
     struct ViewFrustum
     {
@@ -97,20 +86,25 @@ namespace OpenBlood2
     class WorldRenderer
     {
       public:
-        // Standalone renderer: owns its pipelines and a depth target sized by prepare().
+        // Standalone renderer: owns its pipelines, GPU registry and a depth target sized by
+        // prepare(), and flushes its uploads in prepare().
         explicit WorldRenderer(SDL_GPUDevice* device, DrawStyle style = DrawStyle::Opaque)
-            : device_(device), style_(style), own_pipelines_(device), pipelines_(&own_pipelines_)
+            : style_(style), own_pipelines_(device), pipelines_(&own_pipelines_), own_registry_(device),
+              registry_(&own_registry_)
         {
         }
-        // Scene renderer: records into externally owned passes/targets with shared pipelines.
-        WorldRenderer(SDL_GPUDevice* device, DrawStyle style, WorldPipelines& shared)
-            : device_(device), style_(style), own_pipelines_(device), pipelines_(&shared), external_targets_(true)
+        // Scene renderer: records into externally owned passes/targets with shared pipelines
+        // and registry; the registry's owner flushes the staged uploads.
+        WorldRenderer(DrawStyle style, WorldPipelines& pipelines, GpuRegistry& registry)
+            : style_(style), own_pipelines_(registry.device()), pipelines_(&pipelines),
+              own_registry_(registry.device()), registry_(&registry), external_targets_(true)
         {
         }
         ~WorldRenderer();
         WorldRenderer(const WorldRenderer&) = delete;
         WorldRenderer& operator=(const WorldRenderer&) = delete;
-        // Uploads into `frame` when given (before its render passes), else a dedicated submission.
+        // Stages geometry/material uploads in the registry. An owned registry is flushed into
+        // `frame` when given (before its render passes), else in a dedicated submission.
         bool prepare(const WorldMesh&, std::uint64_t revision, SDL_GPUTextureFormat, Uint32 width, Uint32 height,
                      std::string& error, bool dynamic = false, SDL_GPUCommandBuffer* frame = nullptr);
         // Begins and ends one render pass around record(). Validation failures begin no pass.
@@ -126,7 +120,7 @@ namespace OpenBlood2
                     const PointLight& light = {}, bool close_view = false);
         SDL_GPUTexture* depth_target() const
         {
-            return depth_;
+            return registry_->get(depth_);
         }
         void clear_geometry();
         WorldViewStats stats;
@@ -140,21 +134,20 @@ namespace OpenBlood2
         }
 
       private:
-        SDL_GPUDevice* device_ = nullptr;
         DrawStyle style_;
         WorldPipelines own_pipelines_;
         WorldPipelines* pipelines_ = nullptr;
+        GpuRegistry own_registry_;
+        GpuRegistry* registry_ = nullptr;
         bool external_targets_ = false;
         std::vector<WorldAlphaBatch> alpha_order_;
         std::vector<WorldDraw> visible_;
-        SDL_GPUBuffer* vertices_ = nullptr;
-        SDL_GPUTransferBuffer* vertex_transfer_ = nullptr;
-        Uint32 vertex_capacity_ = 0;
-        bool upload_vertices(const WorldMesh&, std::string&, SDL_GPUCommandBuffer* frame);
-        SDL_GPUTexture* depth_ = nullptr;
-        std::vector<SDL_GPUTexture*> textures_;
-        SDL_GPUSampler* sampler_ = nullptr;
-        bool upload_materials(const WorldMesh&, std::string&, SDL_GPUCommandBuffer* frame);
+        BufferHandle vertices_;
+        bool upload_vertices(const WorldMesh&, std::string&);
+        TextureHandle depth_;
+        std::vector<TextureHandle> textures_;
+        std::vector<std::string> texture_paths_;
+        SDL_GPUSampler* sampler_ = nullptr; // Owned by the registry.
         Uint32 width_ = 0, height_ = 0;
         std::uint64_t revision_ = UINT64_MAX;
         // Checks every input and selects visible_/alpha_order_ before any pass is begun.

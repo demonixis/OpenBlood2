@@ -1,4 +1,4 @@
-# Presentation performance (phases 0–2)
+# Presentation performance (phases 0–3)
 
 This continuation reduces CPU submission and GPU pass cost of the existing SDL_GPU
 presentation without changing simulation or original object rules. Phases 0–1 keep
@@ -191,10 +191,43 @@ is therefore deferred until lighting or shadow passes need per-region geometry.
 SubwayA: total 0.88 → 0.67 ms. Simulation is now the largest CPU stage (CityHub
 0.93 ms mean, 2.3 ms p95), mostly replacement collision sweeps.
 
+## Phase 3: GPU resource registry
+
+`GpuRegistry` (`src/engine/gpu_registry.*`) is the single owner of presentation
+textures, buffers and samplers. Renderers hold `TextureHandle`/`BufferHandle`
+values: index plus generation, with index 0 null. Releasing a slot or clearing a
+world's textures changes its generation, so a stale handle resolves to nullptr
+instead of a recycled object. SDL still performs deferred GPU destruction.
+
+Material textures are content-addressed: the key is the resource path plus a hash
+of dimensions and every decoded level, so equal resources are uploaded once and
+shared by the world, model, explosion, PolyGrid and sprite renderers, while a
+different payload under the same name stays distinct. Failed and animated-sprite
+entries still have no texture, and an empty list still gets white.
+`refresh_textures` keeps the handles of an unchanged, still valid material prefix
+(views only append materials until `clear()`), so a new effect texture uploads
+only itself instead of the renderer's whole material set. Two shared samplers
+(repeat, clamp) replace one sampler per renderer.
+
+Uploads are staged on the CPU and recorded at `flush()` as one copy pass in the
+frame's command buffer. The presenter owns one registry, flushes it once after all
+renderers are prepared and clears its material textures at each world revision.
+Standalone renderers (tests, tools) own a private registry and flush it inside
+`prepare()`, keeping their previous behavior. Static skinned corner streams are
+shared by key and owner identity across both model renderers and released when the
+owning ABC asset expires; presenter depth is an explicit registry target.
+Inspection and `--bench` report textures, bytes, shared hits, buffers, shared assets
+and staged bytes. The HUD and capture keep their own small GPU objects.
+
+`gpu.registry` checks stale handles after release, world clears and slot reuse,
+content sharing and same-name payload separation, null/white material rules,
+invalid payloads, incremental tail acquisition, buffer growth, staging bounds,
+owner-scoped shared assets and target survival. CityHub registers 276 textures
+(23 MB with mips, 3 cross-view hits), 52 shared assets and 57 buffers; frame time
+is unchanged (1.65 ms mean at 3440x1440).
+
 ## Pending phases
 
-- A GPU resource registry with generational handles shared by all renderers
-  (textures are still duplicated per renderer and view).
 - HLSL shader sources compiled by SDL_shadercross to SPIR-V, MSL and DXIL.
 - Instanced model draws, spatial world clusters and PVS when lighting/shadow passes
   need them; simulation and collision cost.

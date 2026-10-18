@@ -4,22 +4,22 @@
 namespace OpenBlood2
 {
     // GPU-skinned presentation of a ModelView in gpu_skinning mode. Each shared immutable
-    // asset's static corner stream uploads once; a frame uploads only node palettes and
-    // packed deformation, in one copy submission. Records into externally owned passes.
+    // asset's static corner stream uploads once into the registry and is shared by every
+    // ModelRenderer using it; a frame stages only node palettes and packed deformation.
+    // The registry's owner flushes staged uploads. Records into externally owned passes.
     class ModelRenderer
     {
       public:
-        ModelRenderer(SDL_GPUDevice* device, DrawStyle style, WorldPipelines& pipelines)
-            : device_(device), style_(style), pipelines_(&pipelines)
+        ModelRenderer(DrawStyle style, WorldPipelines& pipelines, GpuRegistry& registry)
+            : style_(style), pipelines_(&pipelines), registry_(&registry)
         {
         }
         ~ModelRenderer();
         ModelRenderer(const ModelRenderer&) = delete;
         ModelRenderer& operator=(const ModelRenderer&) = delete;
-        // Uploads new assets, skins on a view revision change, and this frame's palette/deformation.
-        // Uploads into `frame` when given (before its render passes), else a dedicated submission.
-        bool prepare(const ModelView&, SDL_GPUTextureFormat, Uint32 width, Uint32 height, std::string& error,
-                     SDL_GPUCommandBuffer* frame = nullptr);
+        // Stages new assets, skins appended since the last view revision, and this frame's
+        // palette/deformation. Nothing reaches the GPU until the registry is flushed.
+        bool prepare(const ModelView&, SDL_GPUTextureFormat, Uint32 width, Uint32 height, std::string& error);
         // Opaque records non-translucent instances (all of them for SpriteAlpha); Translucent
         // records translucent instances far-to-near. Bounded instances outside the frustum
         // are skipped unless close_view. Validation precedes any encoding.
@@ -28,43 +28,24 @@ namespace OpenBlood2
                     bool close_view = false);
         void clear_geometry();
         WorldViewStats stats;
-        std::size_t assets() const
-        {
-            return assets_.size();
-        }
-        std::size_t asset_vertices() const
-        {
-            return asset_vertices_;
-        }
-        std::size_t uploaded_bytes = 0; // Last prepare(): new assets, palettes and deformation.
-        static constexpr std::size_t asset_limit = 256, asset_vertex_limit = 2000000;
+        std::size_t staged_bytes = 0;   // Last prepare(): new assets, palettes and deformation.
+        std::size_t asset_vertices = 0; // Static corners of the assets this renderer drew last.
+        static constexpr std::size_t asset_limit = 512, asset_vertex_limit = 2000000;
 
       private:
-        struct Asset
-        {
-            std::weak_ptr<const Model> owner;
-            SDL_GPUBuffer* buffer = nullptr;
-            std::uint32_t vertices = 0;
-        };
         struct Visible
         {
             std::size_t draw = 0;
             double depth = 0;
         };
-        bool reserve(SDL_GPUBuffer*& buffer, Uint32& capacity, Uint32 bytes, std::string& error);
-        void release_asset(Asset&);
-        SDL_GPUDevice* device_ = nullptr;
         DrawStyle style_;
         WorldPipelines* pipelines_ = nullptr;
-        std::map<const Model*, Asset> assets_;
-        std::size_t asset_vertices_ = 0;
-        std::vector<std::vector<SkinnedVertex>> pending_;
-        SDL_GPUBuffer *palette_ = nullptr, *deformation_ = nullptr;
-        Uint32 palette_capacity_ = 0, deformation_capacity_ = 0;
-        SDL_GPUTransferBuffer* transfer_ = nullptr;
-        Uint32 transfer_capacity_ = 0;
-        std::vector<SDL_GPUTexture*> textures_;
-        SDL_GPUSampler* sampler_ = nullptr;
+        GpuRegistry* registry_ = nullptr;
+        std::vector<GpuRegistry::Shared> instance_assets_; // Per view instance, by value.
+        BufferHandle palette_, deformation_;
+        std::vector<TextureHandle> textures_;
+        std::vector<std::string> texture_paths_;
+        SDL_GPUSampler* sampler_ = nullptr; // Owned by the registry.
         std::uint64_t revision_ = UINT64_MAX;
         Uint32 width_ = 0, height_ = 0;
         std::vector<Visible> visible_;

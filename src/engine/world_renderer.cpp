@@ -154,21 +154,15 @@ namespace OpenBlood2
     WorldRenderer::~WorldRenderer()
     {
         clear_geometry();
-        if (sampler_)
-            SDL_ReleaseGPUSampler(device_, sampler_);
-        if (depth_)
-            SDL_ReleaseGPUTexture(device_, depth_);
+        registry_->release(depth_);
     }
     void WorldRenderer::clear_geometry()
     {
-        if (vertices_)
-            SDL_ReleaseGPUBuffer(device_, vertices_);
-        vertices_ = nullptr;
-        if (vertex_transfer_)
-            SDL_ReleaseGPUTransferBuffer(device_, vertex_transfer_);
-        vertex_transfer_ = nullptr;
-        vertex_capacity_ = 0;
-        release_world_textures(device_, textures_);
+        registry_->release(vertices_);
+        textures_.clear();
+        texture_paths_.clear();
+        if (registry_ == &own_registry_)
+            own_registry_.clear_textures();
         revision_ = UINT64_MAX;
         stats.triangles = stats.draws = stats.alpha_batches = stats.pan_batches = stats.alpha_pan_batches = 0;
         stats.surface_time = 0;
@@ -176,22 +170,6 @@ namespace OpenBlood2
         stats.culled = 0;
         alpha_order_.clear();
         visible_.clear();
-    }
-    SDL_GPUCopyPass* begin_upload(SDL_GPUDevice* device, SDL_GPUCommandBuffer* frame, SDL_GPUCommandBuffer*& owned)
-    {
-        owned = frame ? nullptr : SDL_AcquireGPUCommandBuffer(device);
-        auto* pass = frame || owned ? SDL_BeginGPUCopyPass(frame ? frame : owned) : nullptr;
-        if (!pass && owned)
-        {
-            SDL_CancelGPUCommandBuffer(owned);
-            owned = nullptr;
-        }
-        return pass;
-    }
-    bool end_upload(SDL_GPUCopyPass* pass, SDL_GPUCommandBuffer* owned)
-    {
-        SDL_EndGPUCopyPass(pass);
-        return !owned || SDL_SubmitGPUCommandBuffer(owned);
     }
     bool WorldRenderer::prepare(const WorldMesh& mesh, std::uint64_t revision, SDL_GPUTextureFormat format,
                                 Uint32 width, Uint32 height, std::string& error, bool dynamic,
@@ -205,7 +183,7 @@ namespace OpenBlood2
         }
         if (!pipelines_->prepare(format, error))
             return false;
-        if (!external_targets_ && (!depth_ || width_ != width || height_ != height))
+        if (!external_targets_ && (!registry_->get(depth_) || width_ != width || height_ != height))
         {
             SDL_GPUTextureCreateInfo info{};
             info.type = SDL_GPU_TEXTURETYPE_2D;
@@ -215,33 +193,43 @@ namespace OpenBlood2
             info.height = height;
             info.layer_count_or_depth = 1;
             info.num_levels = 1;
-            auto* next = SDL_CreateGPUTexture(device_, &info);
+            const auto next = registry_->create_texture(info, error);
             if (!next)
-            {
-                error = SDL_GetError();
                 return false;
-            }
-            if (depth_)
-                SDL_ReleaseGPUTexture(device_, depth_);
+            registry_->release(depth_);
             depth_ = next;
         }
         width_ = width;
         height_ = height;
         if (revision_ == revision)
-            return !dynamic || upload_vertices(mesh, error, frame);
-        clear_geometry();
-        if (!upload_vertices(mesh, error, frame))
-            return false;
-        if (!upload_materials(mesh, error, frame))
         {
-            clear_geometry();
-            return false;
+            if (dynamic && !upload_vertices(mesh, error))
+                return false;
         }
-        revision_ = revision;
-        ++stats.uploads;
-        return true;
+        else
+        {
+            // Keep the material handles so an appended material list only acquires its tail.
+            auto handles = std::move(textures_);
+            auto paths = std::move(texture_paths_);
+            clear_geometry();
+            textures_ = std::move(handles);
+            texture_paths_ = std::move(paths);
+            if (!(sampler_ = registry_->sampler(style_ == DrawStyle::SpriteAlpha, error)) ||
+                !upload_vertices(mesh, error) ||
+                !registry_->refresh_textures(mesh.materials, textures_, texture_paths_, error) || !textures_[0] ||
+                !registry_->get(textures_[0]))
+            {
+                if (error.empty())
+                    error = "Missing diagnostic GPU texture";
+                clear_geometry();
+                return false;
+            }
+            revision_ = revision;
+            ++stats.uploads;
+        }
+        return registry_ != &own_registry_ || own_registry_.flush(frame, error);
     }
-    bool WorldRenderer::upload_vertices(const WorldMesh& mesh, std::string& error, SDL_GPUCommandBuffer* frame)
+    bool WorldRenderer::upload_vertices(const WorldMesh& mesh, std::string& error)
     {
         if (mesh.vertices.size() > 3000000)
         {
@@ -249,190 +237,8 @@ namespace OpenBlood2
             return false;
         }
         const auto bytes = static_cast<Uint32>(mesh.vertices.size() * sizeof(WorldVertex));
-        if (!bytes)
-            return true;
-        if (bytes > vertex_capacity_)
-        {
-            SDL_GPUBufferCreateInfo info{SDL_GPU_BUFFERUSAGE_VERTEX, bytes, 0};
-            auto* next = SDL_CreateGPUBuffer(device_, &info);
-            SDL_GPUTransferBufferCreateInfo transfer_info{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, bytes, 0};
-            auto* transfer = SDL_CreateGPUTransferBuffer(device_, &transfer_info);
-            if (!next || !transfer)
-            {
-                if (next)
-                    SDL_ReleaseGPUBuffer(device_, next);
-                if (transfer)
-                    SDL_ReleaseGPUTransferBuffer(device_, transfer);
-                error = SDL_GetError();
-                return false;
-            }
-            if (vertices_)
-                SDL_ReleaseGPUBuffer(device_, vertices_);
-            if (vertex_transfer_)
-                SDL_ReleaseGPUTransferBuffer(device_, vertex_transfer_);
-            vertices_ = next;
-            vertex_transfer_ = transfer;
-            vertex_capacity_ = bytes;
-        }
-        bool success = false;
-        if (auto* data = SDL_MapGPUTransferBuffer(device_, vertex_transfer_, true))
-        {
-            std::memcpy(data, mesh.vertices.data(), bytes);
-            SDL_UnmapGPUTransferBuffer(device_, vertex_transfer_);
-            SDL_GPUCommandBuffer* owned = nullptr;
-            if (auto* copy = begin_upload(device_, frame, owned))
-            {
-                SDL_GPUTransferBufferLocation source{vertex_transfer_, 0};
-                SDL_GPUBufferRegion target{vertices_, 0, bytes};
-                SDL_UploadToGPUBuffer(copy, &source, &target, true);
-                success = end_upload(copy, owned);
-            }
-        }
-        if (!success)
-            error = SDL_GetError();
-        return success;
-    }
-    SDL_GPUSampler* create_world_sampler(SDL_GPUDevice* device, bool clamp)
-    {
-        SDL_GPUSamplerCreateInfo info{};
-        info.min_filter = info.mag_filter = SDL_GPU_FILTER_NEAREST;
-        info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
-        info.max_lod = 1000; // Authored DTX levels; point sampling within each level.
-        info.address_mode_u = info.address_mode_v = info.address_mode_w =
-            clamp ? SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE : SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
-        return SDL_CreateGPUSampler(device, &info);
-    }
-    void release_world_textures(SDL_GPUDevice* device, std::vector<SDL_GPUTexture*>& textures)
-    {
-        for (auto* texture : textures)
-            if (texture)
-                SDL_ReleaseGPUTexture(device, texture);
-        textures.clear();
-    }
-    bool upload_world_textures(SDL_GPUDevice* device, const std::vector<WorldMaterial>& materials,
-                               std::vector<SDL_GPUTexture*>& textures, std::string& error, SDL_GPUCommandBuffer* frame)
-    {
-        release_world_textures(device, textures);
-        const Texture white{1, 1, 1, 0, 0, {255, 255, 255, 255}, {}};
-        const auto count = std::max(std::size_t(1), materials.size());
-        if (count > 4097)
-        {
-            error = "GPU texture count limit exceeded";
-            return false;
-        }
-        std::vector<const Texture*> images(count, &white);
-        std::size_t bytes = 0;
-        for (std::size_t i = 0; i < count; ++i)
-        {
-            if (!materials.empty())
-                images[i] = materials[i].error.empty() && materials[i].frames.empty() ? &materials[i].image : nullptr;
-            if (const auto* image = images[i])
-            {
-                const auto size = image->rgba.size() + image->mip_rgba.size();
-                if (!image->width || !image->height || image->width > 1024 || image->height > 1024 ||
-                    image->mipmaps > 11 || image->rgba.size() != std::size_t(image->width) * image->height * 4 ||
-                    image->mip_rgba.size() != texture_mip_bytes(*image) || size > 128 * 1024 * 1024 - bytes)
-                {
-                    error = "Invalid GPU texture dimensions/payload/budget";
-                    return false;
-                }
-                bytes += size;
-            }
-        }
-        if (!images[0])
-        {
-            error = "Missing diagnostic GPU texture";
-            return false;
-        }
-        SDL_GPUTransferBufferCreateInfo transfer_info{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, static_cast<Uint32>(bytes),
-                                                      0};
-        auto* transfer = SDL_CreateGPUTransferBuffer(device, &transfer_info);
-        if (!transfer)
-        {
-            error = SDL_GetError();
-            return false;
-        }
-        textures.resize(count);
-        bool success = false;
-        if (auto* mapped = static_cast<Uint8*>(SDL_MapGPUTransferBuffer(device, transfer, false)))
-        {
-            std::size_t offset = 0;
-            bool allocated = true;
-            for (std::size_t i = 0; i < count; ++i)
-            {
-                if (const auto* image = images[i])
-                {
-                    SDL_GPUTextureCreateInfo info{};
-                    info.type = SDL_GPU_TEXTURETYPE_2D;
-                    info.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
-                    info.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
-                    info.width = image->width;
-                    info.height = image->height;
-                    info.layer_count_or_depth = 1;
-                    info.num_levels = std::max(1u, image->mipmaps);
-                    textures[i] = SDL_CreateGPUTexture(device, &info);
-                    if (!textures[i])
-                    {
-                        allocated = false;
-                        break;
-                    }
-                    std::memcpy(mapped + offset, image->rgba.data(), image->rgba.size());
-                    offset += image->rgba.size();
-                    if (!image->mip_rgba.empty())
-                        std::memcpy(mapped + offset, image->mip_rgba.data(), image->mip_rgba.size());
-                    offset += image->mip_rgba.size();
-                }
-            }
-            SDL_UnmapGPUTransferBuffer(device, transfer);
-            SDL_GPUCommandBuffer* owned = nullptr;
-            if (allocated)
-                if (auto* copy = begin_upload(device, frame, owned))
-                {
-                    {
-                        Uint32 offset = 0;
-                        for (std::size_t i = 0; i < count; ++i)
-                        {
-                            if (const auto* image = images[i])
-                                for (Uint32 level = 0, w = image->width, h = image->height;
-                                     level < std::max(1u, image->mipmaps);
-                                     ++level, w = std::max(1u, w / 2), h = std::max(1u, h / 2))
-                                {
-                                    SDL_GPUTextureTransferInfo source{};
-                                    source.transfer_buffer = transfer;
-                                    source.offset = offset;
-                                    source.pixels_per_row = w;
-                                    source.rows_per_layer = h;
-                                    SDL_GPUTextureRegion target{};
-                                    target.texture = textures[i];
-                                    target.mip_level = level;
-                                    target.w = w;
-                                    target.h = h;
-                                    target.d = 1;
-                                    SDL_UploadToGPUTexture(copy, &source, &target, false);
-                                    offset += w * h * 4;
-                                }
-                        }
-                    }
-                    success = end_upload(copy, owned);
-                }
-        }
-        SDL_ReleaseGPUTransferBuffer(device, transfer);
-        if (!success)
-            error = SDL_GetError();
-        return success;
-    }
-    bool WorldRenderer::upload_materials(const WorldMesh& mesh, std::string& error, SDL_GPUCommandBuffer* frame)
-    {
-        if (!sampler_)
-        {
-            sampler_ = create_world_sampler(device_, style_ == DrawStyle::SpriteAlpha);
-            if (!sampler_)
-            {
-                error = SDL_GetError();
-                return false;
-            }
-        }
-        return upload_world_textures(device_, mesh.materials, textures_, error, frame);
+        return !bytes || (registry_->reserve(vertices_, SDL_GPU_BUFFERUSAGE_VERTEX, bytes, error) &&
+                          registry_->stage(vertices_, mesh.vertices.data(), bytes, true, error));
     }
     bool WorldRenderer::validate(const WorldMesh& mesh, std::span<const WorldDraw> draws, DVector eye, DRotation view,
                                  WorldPass world_pass, double surface_time, const PointLight& light, bool letterbox,
@@ -447,8 +253,8 @@ namespace OpenBlood2
             error = "Invalid point light";
             return false;
         }
-        if (!pipelines_->get(WorldPipeline::Opaque) || (!external_targets_ && !depth_) ||
-            (!vertices_ && !mesh.vertices.empty()))
+        if (!pipelines_->get(WorldPipeline::Opaque) || (!external_targets_ && !registry_->get(depth_)) ||
+            (!registry_->get(vertices_) && !mesh.vertices.empty()))
         {
             error = "Diagnostic renderer not prepared";
             return false;
@@ -492,15 +298,15 @@ namespace OpenBlood2
             {
                 std::uint32_t image = 0;
                 if (!world_material_frame(mesh, b.material, surface_time, image) || image >= textures_.size() ||
-                    !textures_[image] || b.first < r.first || b.first > std::size_t(r.first) + r.count ||
-                    b.count > std::size_t(r.first) + r.count - b.first ||
+                    !registry_->get(textures_[image]) || b.first < r.first ||
+                    b.first > std::size_t(r.first) + r.count || b.count > std::size_t(r.first) + r.count - b.first ||
                     !world_texture_offset(b.uv_rate, surface_time, texture_offset))
                 {
                     error = "Invalid diagnostic GPU material batch";
                     return false;
                 }
             }
-            if (r.count && (textures_.empty() || !textures_[0]))
+            if (r.count && (textures_.empty() || !registry_->get(textures_[0])))
             {
                 error = "GPU materials not prepared";
                 return false;
@@ -564,7 +370,7 @@ namespace OpenBlood2
             error = "Transparent world pass requires loaded opaque depth";
             return false;
         }
-        if (!shared_depth && !depth_)
+        if (!shared_depth && !registry_->get(depth_))
         {
             error = "Diagnostic renderer not prepared";
             return false;
@@ -578,7 +384,7 @@ namespace OpenBlood2
         color.load_op = load == DrawLoad::Clear ? SDL_GPU_LOADOP_CLEAR : SDL_GPU_LOADOP_LOAD;
         color.store_op = SDL_GPU_STOREOP_STORE;
         SDL_GPUDepthStencilTargetInfo depth{};
-        depth.texture = shared_depth ? shared_depth : depth_;
+        depth.texture = shared_depth ? shared_depth : registry_->get(depth_);
         depth.clear_depth = 1;
         depth.load_op = load == DrawLoad::Load ? SDL_GPU_LOADOP_LOAD : SDL_GPU_LOADOP_CLEAR;
         depth.store_op = SDL_GPU_STOREOP_STORE;
@@ -612,9 +418,9 @@ namespace OpenBlood2
             sky ? WorldPipeline::Sky
                 : (translucent || style_ == DrawStyle::SpriteAlpha ? WorldPipeline::Alpha : WorldPipeline::Opaque));
         SDL_BindGPUGraphicsPipeline(target.pass, bound);
-        if (vertices_)
+        if (auto* vertices = registry_->get(vertices_))
         {
-            SDL_GPUBufferBinding binding{vertices_, 0};
+            SDL_GPUBufferBinding binding{vertices, 0};
             SDL_BindGPUVertexBuffers(target.pass, 0, &binding, 1);
             // Redundant state is skipped within this record; another renderer may have
             // pushed uniforms or bound samplers in between, so nothing is assumed on entry.
@@ -669,11 +475,11 @@ namespace OpenBlood2
                     pan_batches += rate[0] != 0 || rate[1] != 0;
                     std::uint32_t image = material;
                     world_material_frame(mesh, material, surface_time, image); // Validated before recording.
-                    if (textures_[image] != bound_texture)
+                    if (auto* image_texture = registry_->get(textures_[image]); image_texture != bound_texture)
                     {
-                        SDL_GPUTextureSamplerBinding texture{textures_[image], sampler_};
+                        SDL_GPUTextureSamplerBinding texture{image_texture, sampler_};
                         SDL_BindGPUFragmentSamplers(target.pass, 0, &texture, 1);
-                        bound_texture = textures_[image];
+                        bound_texture = image_texture;
                     }
                     SDL_DrawGPUPrimitives(target.pass, count, 1, first, 0);
                     ++stats.draw_calls;

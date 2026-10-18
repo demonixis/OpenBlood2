@@ -389,6 +389,7 @@ namespace
         inspector.sprite_render = &sprite_renderer.stats;
         inspector.world_render = &world_renderer.stats;
         inspector.presentation = &presenter.stats;
+        inspector.gpu_resources = &presenter.registry.stats;
         if (options.keepalive_smoke)
             SAFE_STRCPY(inspector.keep_start_name, "01_egressa");
         inspector.select_services = options.gpu_smoke;

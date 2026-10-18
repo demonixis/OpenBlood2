@@ -514,6 +514,13 @@ namespace OpenBlood2
                                         presentation->world_ns / 1e6, presentation->models_ns / 1e6,
                                         presentation->effects_ns / 1e6, presentation->record_ns / 1e6);
                         }
+                        if (gpu_resources)
+                            ImGui::Text("GPU registry: %zu textures (%zu bytes, %llu shared hits) / %zu buffers (%zu "
+                                        "bytes) / %zu shared assets | %zu bytes staged last frame",
+                                        gpu_resources->textures, gpu_resources->texture_bytes,
+                                        (unsigned long long)gpu_resources->texture_hits, gpu_resources->buffers,
+                                        gpu_resources->buffer_bytes, gpu_resources->shared,
+                                        gpu_resources->staged_bytes);
                         ImGui::Text("Prepared: %zu triangles / %zu instances / %zu hidden instances",
                                     world_render->triangles, world_render->draws, world_render->hidden);
                         ImGui::Text("Unbound models: %zu / excluded containers: %zu", world_render->unbound,

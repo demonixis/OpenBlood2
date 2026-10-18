@@ -177,14 +177,20 @@ namespace OpenBlood2
             row("total serialized frame", total);
             spdlog::info(
                 "Counters: {:.0f} draw calls mean ({} max), {:.0f} culled draw records mean, {} render passes, "
-                "{} world draws, {} skinned model instances, {} skinned asset vertices, {} model upload bytes/frame, "
+                "{} world draws, {} skinned model instances, {} skinned instance corners, {} staged upload "
+                "bytes/frame, "
                 "{} sprite draws, {} PolyGrid surfaces, {} world triangles",
                 draws.mean(), max_draws, culled.mean(), passes, presenter.world_draws.size(),
                 presenter.model_scene.instances.size() + presenter.explosion_model_scene.instances.size(),
-                presenter.model_renderer.asset_vertices() + presenter.explosion_model_renderer.asset_vertices(),
-                presenter.model_renderer.uploaded_bytes + presenter.explosion_model_renderer.uploaded_bytes,
-                presenter.sprite_scene.draws.size(), presenter.polygrid_scene.draws.size(),
-                presenter.world_renderer.stats.triangles);
+                presenter.model_renderer.asset_vertices + presenter.explosion_model_renderer.asset_vertices,
+                presenter.registry.stats.staged_bytes, presenter.sprite_scene.draws.size(),
+                presenter.polygrid_scene.draws.size(), presenter.world_renderer.stats.triangles);
+            const auto& resources = presenter.registry.stats;
+            spdlog::info("GPU registry: {} textures ({} bytes, {} uploads, {} shared hits), {} targets, {} buffers ({} "
+                         "bytes), {} shared assets, {} flushes",
+                         resources.textures, resources.texture_bytes, resources.texture_uploads, resources.texture_hits,
+                         resources.targets, resources.buffers, resources.buffer_bytes, resources.shared,
+                         resources.flushes);
         }
         game->unload_world();
         return 0;

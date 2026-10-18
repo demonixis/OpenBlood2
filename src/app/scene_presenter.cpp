@@ -4,18 +4,17 @@
 namespace OpenBlood2
 {
     ScenePresenter::ScenePresenter(SDL_GPUDevice* device)
-        : pipelines(device), world_renderer(device, DrawStyle::Opaque, pipelines),
-          model_renderer(device, DrawStyle::Opaque, pipelines),
-          explosion_model_renderer(device, DrawStyle::SpriteAlpha, pipelines),
-          polygrid_renderer(device, DrawStyle::Opaque, pipelines),
-          sprite_renderer(device, DrawStyle::SpriteAlpha, pipelines), device_(device)
+        : registry(device), pipelines(device), world_renderer(DrawStyle::Opaque, pipelines, registry),
+          model_renderer(DrawStyle::Opaque, pipelines, registry),
+          explosion_model_renderer(DrawStyle::SpriteAlpha, pipelines, registry),
+          polygrid_renderer(DrawStyle::Opaque, pipelines, registry),
+          sprite_renderer(DrawStyle::SpriteAlpha, pipelines, registry)
     {
         model_scene.gpu_skinning = explosion_model_scene.gpu_skinning = true;
     }
     ScenePresenter::~ScenePresenter()
     {
-        if (depth_)
-            SDL_ReleaseGPUTexture(device_, depth_);
+        registry.release(depth_);
     }
     bool ScenePresenter::update(GameSession& game, std::string& error)
     {
@@ -39,6 +38,7 @@ namespace OpenBlood2
             polygrid_renderer.clear_geometry();
             sprite_scene.clear();
             sprite_renderer.clear_geometry();
+            registry.clear_textures(); // Material textures belong to one world revision.
             world_mesh = {};
             world_draws.clear();
             if (!game.world_path.empty() && !world_mesh.build(game.world, error, &game.resources))
@@ -89,21 +89,23 @@ namespace OpenBlood2
         for (auto* renderer : {&world_renderer.stats, &model_renderer.stats, &explosion_model_renderer.stats,
                                &polygrid_renderer.stats, &sprite_renderer.stats})
             renderer->draw_calls = renderer->culled = 0;
-        // All uploads are copy passes in the frame's command buffer, before the scene pass.
-        if (!world_renderer.prepare(world_mesh, mesh_revision, format, width, height, error, false, commands))
+        // Renderers stage uploads in the shared registry; one copy pass in the frame's
+        // command buffer records them all before the scene pass.
+        if (!world_renderer.prepare(world_mesh, mesh_revision, format, width, height, error))
             return fail("World viewport");
-        if (!model_renderer.prepare(model_scene, format, width, height, error, commands))
+        if (!model_renderer.prepare(model_scene, format, width, height, error))
             return fail("Model viewport");
         if (!explosion_model_scene.world_draws.empty() &&
-            !explosion_model_renderer.prepare(explosion_model_scene, format, width, height, error, commands))
+            !explosion_model_renderer.prepare(explosion_model_scene, format, width, height, error))
             return fail("Explosion model viewport");
-        if (!polygrid_renderer.prepare(polygrid_scene.mesh, polygrid_scene.revision, format, width, height, error, true,
-                                       commands))
+        if (!polygrid_renderer.prepare(polygrid_scene.mesh, polygrid_scene.revision, format, width, height, error,
+                                       true))
             return fail("PolyGrid viewport");
-        if (!sprite_renderer.prepare(sprite_scene.mesh, sprite_scene.revision, format, width, height, error, true,
-                                     commands))
+        if (!sprite_renderer.prepare(sprite_scene.mesh, sprite_scene.revision, format, width, height, error, true))
             return fail("Sprite viewport");
-        if (!depth_ || depth_width_ != width || depth_height_ != height)
+        if (!registry.flush(commands, error))
+            return fail("GPU uploads");
+        if (!registry.get(depth_) || depth_width_ != width || depth_height_ != height)
         {
             SDL_GPUTextureCreateInfo info{};
             info.type = SDL_GPU_TEXTURETYPE_2D;
@@ -113,14 +115,10 @@ namespace OpenBlood2
             info.height = height;
             info.layer_count_or_depth = 1;
             info.num_levels = 1;
-            auto* next = SDL_CreateGPUTexture(device_, &info);
+            const auto next = registry.create_texture(info, error);
             if (!next)
-            {
-                error = SDL_GetError();
                 return fail("World viewport");
-            }
-            if (depth_)
-                SDL_ReleaseGPUTexture(device_, depth_);
+            registry.release(depth_);
             depth_ = next;
             depth_width_ = width;
             depth_height_ = height;
@@ -131,7 +129,7 @@ namespace OpenBlood2
         color.load_op = SDL_GPU_LOADOP_CLEAR;
         color.store_op = SDL_GPU_STOREOP_STORE;
         SDL_GPUDepthStencilTargetInfo depth{};
-        depth.texture = depth_;
+        depth.texture = registry.get(depth_);
         depth.clear_depth = 1;
         depth.load_op = SDL_GPU_LOADOP_CLEAR;
         depth.store_op = SDL_GPU_STOREOP_DONT_CARE; // Nothing reads scene depth after this pass.

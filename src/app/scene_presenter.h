@@ -43,6 +43,7 @@ namespace OpenBlood2
         std::uint64_t mesh_revision = UINT64_MAX;
         std::vector<WorldDraw> world_draws, sky_draws;
         DVector sky_eye{};
+        GpuRegistry registry;     // Owns every presentation GPU resource; declared before its users.
         WorldPipelines pipelines; // Declared before the renderers that borrow it.
         WorldRenderer world_renderer;
         ModelRenderer model_renderer, explosion_model_renderer; // GPU skinning of both model views.
@@ -53,8 +54,7 @@ namespace OpenBlood2
         PresentationStats stats;
 
       private:
-        SDL_GPUDevice* device_ = nullptr;
-        SDL_GPUTexture* depth_ = nullptr;
+        TextureHandle depth_;
         Uint32 depth_width_ = 0, depth_height_ = 0;
     };
 } // namespace OpenBlood2

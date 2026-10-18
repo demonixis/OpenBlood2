@@ -20,55 +20,25 @@ namespace OpenBlood2
     ModelRenderer::~ModelRenderer()
     {
         clear_geometry();
-        for (auto* buffer : {palette_, deformation_})
-            if (buffer)
-                SDL_ReleaseGPUBuffer(device_, buffer);
-        if (transfer_)
-            SDL_ReleaseGPUTransferBuffer(device_, transfer_);
-        if (sampler_)
-            SDL_ReleaseGPUSampler(device_, sampler_);
-    }
-    void ModelRenderer::release_asset(Asset& asset)
-    {
-        if (asset.buffer)
-            SDL_ReleaseGPUBuffer(device_, asset.buffer);
-        asset_vertices_ -= asset.vertices;
-        asset = {};
+        registry_->release(palette_);
+        registry_->release(deformation_);
     }
     void ModelRenderer::clear_geometry()
     {
-        for (auto& [model, asset] : assets_)
-            release_asset(asset);
-        assets_.clear();
-        asset_vertices_ = 0;
-        release_world_textures(device_, textures_);
+        // Shared assets stay in the registry until their owners expire.
+        instance_assets_.clear();
+        textures_.clear();
+        texture_paths_.clear();
         revision_ = UINT64_MAX;
         visible_.clear();
         stats.triangles = stats.draws = stats.alpha_batches = 0;
     }
-    bool ModelRenderer::reserve(SDL_GPUBuffer*& buffer, Uint32& capacity, Uint32 bytes, std::string& error)
-    {
-        if (bytes <= capacity && buffer)
-            return true;
-        const Uint32 size = std::max<Uint32>(bytes, capacity + capacity / 2);
-        SDL_GPUBufferCreateInfo info{SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, size, 0};
-        auto* next = SDL_CreateGPUBuffer(device_, &info);
-        if (!next)
-        {
-            error = SDL_GetError();
-            return false;
-        }
-        if (buffer)
-            SDL_ReleaseGPUBuffer(device_, buffer);
-        buffer = next;
-        capacity = size;
-        return true;
-    }
     bool ModelRenderer::prepare(const ModelView& view, SDL_GPUTextureFormat format, Uint32 width, Uint32 height,
-                                std::string& error, SDL_GPUCommandBuffer* frame)
+                                std::string& error)
     {
         error.clear();
-        uploaded_bytes = 0;
+        staged_bytes = 0;
+        instance_assets_.clear();
         if (!width || !height || width > 8192 || height > 8192)
         {
             error = "Diagnostic GPU dimensions/geometry exceed limits";
@@ -83,165 +53,69 @@ namespace OpenBlood2
             return false;
         width_ = width;
         height_ = height;
-        for (auto it = assets_.begin(); it != assets_.end();)
-        {
-            if (it->second.owner.expired())
-            {
-                release_asset(it->second);
-                it = assets_.erase(it);
-            }
-            else
-                ++it;
-        }
         if (revision_ != view.revision)
         {
-            if (!sampler_ && !(sampler_ = create_world_sampler(device_, style_ == DrawStyle::SpriteAlpha)))
+            if (!(sampler_ = registry_->sampler(style_ == DrawStyle::SpriteAlpha, error)) ||
+                !registry_->refresh_textures(view.mesh.materials, textures_, texture_paths_, error))
             {
-                error = SDL_GetError();
-                return false;
-            }
-            if (!upload_world_textures(device_, view.mesh.materials, textures_, error, frame))
-            {
-                release_world_textures(device_, textures_);
                 revision_ = UINT64_MAX;
                 return false;
             }
             revision_ = view.revision;
             ++stats.uploads;
         }
-        // New immutable assets: the same validated corner stream ModelView checked.
-        struct Copy
-        {
-            SDL_GPUBuffer* buffer;
-            const void* data;
-            Uint32 bytes;
-            bool cycle;
-        };
-        std::vector<Copy> copies;
-        std::vector<const Model*> created;
-        pending_.clear();
-        // A failed preparation must not leave a created but never uploaded asset behind.
-        auto fail = [&]()
-        {
-            for (const auto* model : created)
-                if (auto found = assets_.find(model); found != assets_.end())
-                {
-                    release_asset(found->second);
-                    assets_.erase(found);
-                }
-            pending_.clear();
-            return false;
-        };
+        // Each asset's static corner stream is the same validated stream ModelView checked.
+        asset_vertices = 0;
+        instance_assets_.reserve(view.instances.size());
         for (const auto& instance : view.instances)
         {
-            auto found = assets_.find(instance.model);
-            if (found != assets_.end() && !found->second.owner.owner_before(instance.owner) &&
-                !instance.owner.owner_before(found->second.owner))
-                continue;
-            if (found != assets_.end())
+            const std::weak_ptr<const void> owner = instance.owner;
+            const auto* asset = registry_->shared(instance.model, owner);
+            if (!asset)
             {
-                release_asset(found->second);
-                assets_.erase(found);
-            }
-            const auto owner = instance.owner.lock();
-            if (!owner || owner.get() != instance.model)
-            {
-                error = "Skinned model asset expired before upload";
-                return fail();
-            }
-            std::vector<SkinnedVertex> corners;
-            if (!build_skinned_vertices(*instance.model, corners, error))
-                return fail();
-            if (assets_.size() >= asset_limit || corners.size() > asset_vertex_limit - asset_vertices_)
-            {
-                error = "GPU skinned asset budget exceeded";
-                return fail();
-            }
-            Asset asset;
-            asset.owner = instance.owner;
-            asset.vertices = static_cast<std::uint32_t>(corners.size());
-            if (!corners.empty())
-            {
-                const auto bytes = static_cast<Uint32>(corners.size() * sizeof(SkinnedVertex));
-                SDL_GPUBufferCreateInfo info{SDL_GPU_BUFFERUSAGE_VERTEX, bytes, 0};
-                asset.buffer = SDL_CreateGPUBuffer(device_, &info);
-                if (!asset.buffer)
+                const auto alive = instance.owner.lock();
+                if (!alive || alive.get() != instance.model)
                 {
-                    error = SDL_GetError();
-                    return fail();
+                    error = "Skinned model asset expired before upload";
+                    return false;
                 }
-                pending_.push_back(std::move(corners));
-                copies.push_back({asset.buffer, pending_.back().data(), bytes, false});
+                std::vector<SkinnedVertex> corners;
+                if (!build_skinned_vertices(*instance.model, corners, error))
+                    return false;
+                if (registry_->stats.shared >= asset_limit || corners.size() > asset_vertex_limit)
+                {
+                    error = "GPU skinned asset budget exceeded";
+                    return false;
+                }
+                GpuRegistry::Shared entry{{}, static_cast<std::uint32_t>(corners.size())};
+                if (!corners.empty())
+                {
+                    const auto bytes = static_cast<Uint32>(corners.size() * sizeof(SkinnedVertex));
+                    entry.buffer = registry_->create_buffer(SDL_GPU_BUFFERUSAGE_VERTEX, bytes, error);
+                    if (!entry.buffer || !registry_->stage(entry.buffer, corners.data(), bytes, false, error))
+                    {
+                        registry_->release(entry.buffer);
+                        return false;
+                    }
+                    staged_bytes += bytes;
+                }
+                asset = registry_->share(instance.model, owner, entry);
             }
-            asset_vertices_ += asset.vertices;
-            assets_.emplace(instance.model, std::move(asset));
-            created.push_back(instance.model);
+            instance_assets_.push_back(*asset);
+            asset_vertices += asset->count;
         }
         // Storage buffers always exist so the vertex stage binding is never empty.
+        static const std::array<float, 4> zero{};
         const auto palette_bytes = static_cast<Uint32>(std::max<std::size_t>(1, view.palette.size()) * 16);
         const auto deformation_bytes = static_cast<Uint32>(std::max<std::size_t>(1, view.deformation.size()) * 16);
-        static const std::array<float, 4> zero{};
-        if (!reserve(palette_, palette_capacity_, palette_bytes, error) ||
-            !reserve(deformation_, deformation_capacity_, deformation_bytes, error))
-            return fail();
-        copies.push_back(
-            {palette_, view.palette.empty() ? zero.data() : view.palette.data()->data(), palette_bytes, true});
-        copies.push_back({deformation_, view.deformation.empty() ? zero.data() : view.deformation.data()->data(),
-                          deformation_bytes, true});
-        Uint32 total = 0;
-        for (const auto& copy : copies)
-            total += copy.bytes;
-        if (total > transfer_capacity_)
-        {
-            SDL_GPUTransferBufferCreateInfo info{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-                                                 std::max<Uint32>(total, transfer_capacity_ + transfer_capacity_ / 2),
-                                                 0};
-            auto* next = SDL_CreateGPUTransferBuffer(device_, &info);
-            if (!next)
-            {
-                error = SDL_GetError();
-                return fail();
-            }
-            if (transfer_)
-                SDL_ReleaseGPUTransferBuffer(device_, transfer_);
-            transfer_ = next;
-            transfer_capacity_ = info.size;
-        }
-        auto* mapped = static_cast<Uint8*>(SDL_MapGPUTransferBuffer(device_, transfer_, true));
-        if (!mapped)
-        {
-            error = SDL_GetError();
-            return fail();
-        }
-        Uint32 offset = 0;
-        for (const auto& copy : copies)
-        {
-            std::memcpy(mapped + offset, copy.data, copy.bytes);
-            offset += copy.bytes;
-        }
-        SDL_UnmapGPUTransferBuffer(device_, transfer_);
-        SDL_GPUCommandBuffer* owned = nullptr;
-        auto* pass = begin_upload(device_, frame, owned);
-        if (!pass)
-        {
-            error = SDL_GetError();
-            return fail();
-        }
-        offset = 0;
-        for (const auto& copy : copies)
-        {
-            SDL_GPUTransferBufferLocation source{transfer_, offset};
-            SDL_GPUBufferRegion target{copy.buffer, 0, copy.bytes};
-            SDL_UploadToGPUBuffer(pass, &source, &target, copy.cycle);
-            offset += copy.bytes;
-        }
-        if (!end_upload(pass, owned))
-        {
-            error = SDL_GetError();
-            return fail();
-        }
-        uploaded_bytes = total;
-        pending_.clear();
+        if (!registry_->reserve(palette_, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, palette_bytes, error) ||
+            !registry_->reserve(deformation_, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, deformation_bytes, error) ||
+            !registry_->stage(palette_, view.palette.empty() ? zero.data() : view.palette.data()->data(), palette_bytes,
+                              true, error) ||
+            !registry_->stage(deformation_, view.deformation.empty() ? zero.data() : view.deformation.data()->data(),
+                              deformation_bytes, true, error))
+            return false;
+        staged_bytes += palette_bytes + deformation_bytes;
         return true;
     }
     bool ModelRenderer::record(const WorldRecordTarget& target, const ModelView& view, std::span<const WorldDraw> draws,
@@ -269,8 +143,9 @@ namespace OpenBlood2
             error = "Model renderer supports opaque and translucent model passes only";
             return false;
         }
-        if (!pipelines_->get(WorldPipeline::SkinnedOpaque) || !palette_ || !deformation_ ||
-            revision_ != view.revision || textures_.empty() || !textures_[0])
+        if (!pipelines_->get(WorldPipeline::SkinnedOpaque) || !registry_->get(palette_) ||
+            !registry_->get(deformation_) || revision_ != view.revision || textures_.empty() ||
+            !registry_->get(textures_[0]) || instance_assets_.size() != view.instances.size())
         {
             error = "Diagnostic renderer not prepared";
             return false;
@@ -293,8 +168,8 @@ namespace OpenBlood2
                 return false;
             }
             const auto& instance = view.instances[d.range];
-            const auto asset = assets_.find(instance.model);
-            if (asset == assets_.end() || instance.material >= textures_.size() || !textures_[instance.material] ||
+            if ((instance_assets_[d.range].count && !registry_->get(instance_assets_[d.range].buffer)) ||
+                instance.material >= textures_.size() || !registry_->get(textures_[instance.material]) ||
                 instance.palette + instance.model->nodes.size() * 2 > view.palette.size() ||
                 instance.deformation > view.deformation.size())
             {
@@ -328,7 +203,7 @@ namespace OpenBlood2
         SDL_BindGPUGraphicsPipeline(target.pass, pipelines_->get(translucent || style_ == DrawStyle::SpriteAlpha
                                                                      ? WorldPipeline::SkinnedAlpha
                                                                      : WorldPipeline::SkinnedOpaque));
-        SDL_GPUBuffer* storage[] = {palette_, deformation_};
+        SDL_GPUBuffer* storage[] = {registry_->get(palette_), registry_->get(deformation_)};
         SDL_BindGPUVertexStorageBuffers(target.pass, 0, storage, 2);
         const bool illuminate = style_ == DrawStyle::Opaque && !close_view;
         const SDL_GPUBuffer* bound_buffer = nullptr;
@@ -338,8 +213,8 @@ namespace OpenBlood2
         {
             const auto& d = draws[entry.draw];
             const auto& instance = view.instances[d.range];
-            const auto& asset = assets_.at(instance.model);
-            if (!asset.vertices)
+            const auto& asset = instance_assets_[d.range];
+            if (!asset.count)
                 continue;
             SkinnedUniform skinned;
             world_view_uniform(eye, view_rotation, aspect, d, skinned.view);
@@ -366,21 +241,21 @@ namespace OpenBlood2
                                                  light.color.z,
                                                  0};
             SDL_PushGPUFragmentUniformData(target.commands, 0, fragment.data(), sizeof(fragment));
-            if (asset.buffer != bound_buffer)
+            if (auto* buffer = registry_->get(asset.buffer); buffer != bound_buffer)
             {
-                SDL_GPUBufferBinding binding{asset.buffer, 0};
+                SDL_GPUBufferBinding binding{buffer, 0};
                 SDL_BindGPUVertexBuffers(target.pass, 0, &binding, 1);
-                bound_buffer = asset.buffer;
+                bound_buffer = buffer;
             }
-            if (textures_[instance.material] != bound_texture)
+            if (auto* skin = registry_->get(textures_[instance.material]); skin != bound_texture)
             {
-                SDL_GPUTextureSamplerBinding texture{textures_[instance.material], sampler_};
+                SDL_GPUTextureSamplerBinding texture{skin, sampler_};
                 SDL_BindGPUFragmentSamplers(target.pass, 0, &texture, 1);
-                bound_texture = textures_[instance.material];
+                bound_texture = skin;
             }
-            SDL_DrawGPUPrimitives(target.pass, asset.vertices, 1, 0, 0);
+            SDL_DrawGPUPrimitives(target.pass, asset.count, 1, 0, 0);
             ++stats.draw_calls;
-            triangles += asset.vertices / 3;
+            triangles += asset.count / 3;
         }
         if (translucent)
         {

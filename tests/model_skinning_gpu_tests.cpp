@@ -53,9 +53,9 @@ namespace
         return true;
     }
     // Renders both paths for the same draws and camera and compares the results.
-    bool compare(Runtime& runtime, WorldRenderer& cpu_renderer, ModelRenderer& gpu_renderer, const ModelView& cpu,
-                 const ModelView& gpu, std::size_t entry, DVector eye, DRotation view, Comparison& result,
-                 std::string& error, const char* save = nullptr)
+    bool compare(Runtime& runtime, WorldRenderer& cpu_renderer, ModelRenderer& gpu_renderer, GpuRegistry& registry,
+                 const ModelView& cpu, const ModelView& gpu, std::size_t entry, DVector eye, DRotation view,
+                 Comparison& result, std::string& error, const char* save = nullptr)
     {
         result = {};
         const auto& a = cpu.entries[entry];
@@ -73,7 +73,7 @@ namespace
         if (!first.initialize(runtime.gpu, format, width, height) ||
             !second.initialize(runtime.gpu, format, width, height) ||
             !cpu_renderer.prepare(cpu.mesh, cpu.revision, format, width, height, error, true) ||
-            !gpu_renderer.prepare(gpu, format, width, height, error))
+            !gpu_renderer.prepare(gpu, format, width, height, error) || !registry.flush(nullptr, error))
             return false;
         std::vector<Uint8> cpu_pixels, gpu_pixels;
         auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
@@ -144,8 +144,9 @@ int main(int argc, char** argv)
     std::string error;
     CHECK(runtime.initialize(true, error));
     WorldPipelines pipelines(runtime.gpu);
+    GpuRegistry registry(runtime.gpu);
     WorldRenderer cpu_renderer(runtime.gpu);
-    ModelRenderer gpu_renderer(runtime.gpu, DrawStyle::Opaque, pipelines);
+    ModelRenderer gpu_renderer(DrawStyle::Opaque, pipelines, registry);
     Resources resources;
     // Synthetic hierarchy: rotated parent, translated child with packed deformation,
     // non-uniform scale, an instance transform and every hidden-node combination.
@@ -217,7 +218,7 @@ int main(int argc, char** argv)
                       gpu.entries[0].hidden_triangles == cpu.entries[0].hidden_triangles);
                 CHECK(gpu.deformation.size() == 3 && gpu.palette.size() == 4);
                 Comparison c;
-                CHECK(compare(runtime, cpu_renderer, gpu_renderer, cpu, gpu, 0, {}, {}, c, error));
+                CHECK(compare(runtime, cpu_renderer, gpu_renderer, registry, cpu, gpu, 0, {}, {}, c, error));
                 std::cout << "Synthetic mask " << mask << " time " << time << ": " << c.filled_cpu << "/"
                           << c.filled_gpu << " filled, " << c.differing << " differing, max delta " << c.max_delta
                           << '\n';
@@ -267,7 +268,7 @@ int main(int argc, char** argv)
                                                 clip.max.z * r->state.m_Scale.z});
                     Comparison c;
                     const auto path = std::string(argv[1]) + "-" + std::to_string(compared) + ".png";
-                    CHECK(compare(runtime, cpu_renderer, gpu_renderer, cpu, gpu, i, eye, {}, c, error,
+                    CHECK(compare(runtime, cpu_renderer, gpu_renderer, registry, cpu, gpu, i, eye, {}, c, error,
                                   fraction == .37 ? path.c_str() : nullptr));
                     if (!equivalent(c))
                         std::cerr << "Mismatch " << world << " " << probe.entries[i].label << " t=" << r->animation.time
