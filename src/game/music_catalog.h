@@ -16,6 +16,7 @@
 
 namespace OpenBlood2
 {
+    class AudioMixer;
     struct MusicAssetRecord
     {
         std::string filename, error, style_reference, bank_error, style_error, bands_error, section_error,
@@ -65,6 +66,11 @@ namespace OpenBlood2
         bool step_cursor_notes(std::span<const std::uint16_t> draws);
         bool play_section(std::string_view filename, DlsSampler&);
         bool play_level_once(std::uint8_t from, std::uint8_t to, DlsSampler&);
+        bool play_level_loop(std::uint8_t from, std::uint8_t to, AudioMixer&);
         void inspect(const std::filesystem::path& root, const std::map<std::string, std::string>& properties);
+
+      private:
+        bool prepare_level(const MusicLevelRequest&, std::vector<std::string>&, std::vector<ImaSectionProgram>&,
+                           std::shared_ptr<const DlsBank>&);
     };
 } // namespace OpenBlood2

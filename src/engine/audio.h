@@ -1,6 +1,7 @@
 #pragma once
 #include "basedefs_de.h"
 #include "engine/dls_sampler.h"
+#include "engine/ima_transport.h"
 #include "engine/resources.h"
 #include <SDL3/SDL_audio.h>
 #include <memory>
@@ -90,8 +91,10 @@ namespace OpenBlood2
         }
         bool advance(double, DVector listener, DRotation rotation);
         void clear();
-        DlsSampler instruments;   // World-owned diagnostic notes share the sound output/clock.
-        bool inspect_pcm = false; // Headless simulation can advance exact sample cursors without rendering blocks.
+        DlsSampler instruments;      // World-owned diagnostic notes share the sound output/clock.
+        ImaLoopTransport music_loop; // Prepared-sequence repeat transport, independent of inspection.
+        std::string music_error;     // Durable transport/delivery failure; reset with the world or a new start.
+        bool inspect_pcm = false;    // Headless simulation can advance exact sample cursors without rendering blocks.
         std::vector<float> mixed;
         std::uint64_t mixed_frames = 0, submitted_frames = 0, dropped_frames = 0;
         float peak = 0;

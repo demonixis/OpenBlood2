@@ -29,7 +29,10 @@ namespace OpenBlood2
         // changes retain submission order, with the last one active at that boundary.
         // Failure preserves this map. Unsupported signed times/overflow fail explicitly.
         bool prepare(std::span<const ImaTempo>, std::uint64_t origin_frame, std::string& error);
-        bool sample(std::int32_t tick, std::uint64_t& frame, std::string& error) const;
+        bool sample(std::int32_t tick, std::uint64_t& frame, std::string& error,
+                    std::uint64_t retained_time100ns = 0) const;
+        // Truncated time at a new tempo boundary, before millisecond event rounding.
+        bool time_at(std::int32_t tick, std::uint64_t& time100ns, std::string& error) const;
         const auto& boundaries() const
         {
             return boundaries_;

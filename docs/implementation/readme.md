@@ -72,3 +72,5 @@ the original log or patch.
 - [Finite IMA section playback](../../../Documentation/Implementation/m2_music_program.md): original terminal-note flushing and complete authored audio; playlists/MUSIC remain incomplete.
 
 - [Finite music playlists](../../../Documentation/Implementation/m2_music_playlists.md): original level decisions and one-pass transition/list audio; live MUSIC remains incomplete.
+
+- [Repeating music transport](../../../Documentation/Implementation/m2_music_transport.md): transition once, continuous prepared lists and bounded audio ownership; M2 remains incomplete.

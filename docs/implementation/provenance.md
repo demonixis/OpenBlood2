@@ -1390,3 +1390,5 @@ Existing verified readers/cursor/clock/receiver compose a bounded single-section
 ## Original music level selection and finite playlists (2026-10-18)
 
 The original ClientShellDLL/Music.cpp request matrix is adapted into a pure selector and compared against compiled unchanged original methods. Finite composition uses documented client_de.h ordering and existing verified clock/section services; seed resets, global preroll and one-pass playback are explicit replacement policies. See [source ledger](sources/m2_music_playlist_sources.json), [contracts](../contracts/music_playlist_contracts.md) and [evidence](../../../Documentation/Implementation/m2_music_playlists.md).
+
+- [Repeating IMA transport](sources/m2_music_transport_sources.json): original PlayList ordering/loop contract, replacement bounded scheduler and existing original clock arithmetic; live MUSIC and variation state remain open.

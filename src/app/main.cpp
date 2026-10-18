@@ -538,7 +538,10 @@ namespace
                 break;
             // The populated viewport now deforms/renders fifteen NPCs and ten held weapons.
             // Keep the same frame/event assertions; allow Debug CPU rendering more wall time.
-            if (smoke && SDL_GetTicks() - started > (extended_smoke ? 45000u : 15000u))
+            // The sound scenario additionally synthesizes complete authored sections
+            // and three playlist passes before testing hidden/reloaded ownership.
+            const auto smoke_budget = options.world_sounds_smoke ? 60000u : extended_smoke ? 45000u : 15000u;
+            if (smoke && SDL_GetTicks() - started > smoke_budget)
             {
                 spdlog::error("GPU smoke timed out before completing its frames/events");
                 return 4;

@@ -1,4 +1,5 @@
 #include "game/music_catalog.h"
+#include "engine/audio.h"
 #include "engine/resources.h"
 #include <algorithm>
 #include <fstream>
@@ -148,6 +149,38 @@ namespace OpenBlood2
         if (!sampler.voices().empty() || !sampler.pending_midi().empty())
             return fail("Stop existing instrument audio before starting a finite playlist");
         std::vector<std::string> files;
+        std::vector<ImaSectionProgram> sections;
+        std::shared_ptr<const DlsBank> bank;
+        if (!prepare_level(request, files, sections, bank))
+            return false;
+        ImaPlaylistProgram next;
+        if (!prepare_ima_playlist(sections, next, audition_error))
+            return false;
+        ImaClock clock;
+        const auto origin = sampler.sample_clock();
+        std::uint64_t end;
+        if (!clock.prepare(next.tempos, origin, audition_error) || !clock.sample(next.last_tick, end, audition_error) ||
+            !sampler.enqueue_ima(bank, clock, next.events, .2, audition_error))
+            return false;
+        playlist_audition = std::move(next);
+        playlist_files = std::move(files);
+        playlist_request = request;
+        audition = {};
+        audition_file = request.playlist;
+        audition_origin = origin;
+        audition_end = end;
+        audition_failures = sampler.dispatch_failures;
+        audition_stopped = false;
+        return true;
+    }
+    bool MusicCatalog::prepare_level(const MusicLevelRequest& request, std::vector<std::string>& files,
+                                     std::vector<ImaSectionProgram>& sections, std::shared_ptr<const DlsBank>& bank)
+    {
+        const auto fail = [&](std::string reason)
+        {
+            audition_error = std::move(reason);
+            return false;
+        };
         if (!request.transition.empty())
             files.emplace_back(request.transition);
         const auto first_list_entry = files.size();
@@ -156,8 +189,6 @@ namespace OpenBlood2
                 files.push_back(entry.filename); // Preserve authored order and duplicates.
         if (files.size() == first_list_entry || files.size() > 64)
             return fail("Finite playlist is empty or exceeds 64 transition/list sections");
-        std::vector<ImaSectionProgram> sections;
-        std::shared_ptr<const DlsBank> bank;
         std::size_t work_remaining = 16000000, messages = 0;
         for (const auto& file : files)
         {
@@ -201,23 +232,41 @@ namespace OpenBlood2
             messages += part.events.size();
             sections.push_back(std::move(part));
         }
-        ImaPlaylistProgram next;
-        if (!prepare_ima_playlist(sections, next, audition_error))
+        return true;
+    }
+    bool MusicCatalog::play_level_loop(std::uint8_t from, std::uint8_t to, AudioMixer& audio)
+    {
+        audition_error.clear();
+        MusicLevelRequest request;
+        if (!CMusic::SelectLevel(from, to, request))
+        {
+            audition_error = "Original PlayMusicLevel makes no request for this level pair";
             return false;
-        ImaClock clock;
-        const auto origin = sampler.sample_clock();
-        std::uint64_t end;
-        if (!clock.prepare(next.tempos, origin, audition_error) || !clock.sample(next.last_tick, end, audition_error) ||
-            !sampler.enqueue_ima(bank, clock, next.events, .2, audition_error))
+        }
+        if (audio.music_loop.active() || !audio.instruments.pending_midi().empty() ||
+            !audio.instruments.voices().empty())
+        {
+            audition_error = "Stop existing instrument audio before starting a repeating playlist";
             return false;
-        playlist_audition = std::move(next);
+        }
+        std::vector<std::string> files;
+        std::vector<ImaSectionProgram> sections;
+        std::shared_ptr<const DlsBank> bank;
+        ImaPlaylistProgram report;
+        if (!prepare_level(request, files, sections, bank) || !prepare_ima_playlist(sections, report, audition_error) ||
+            !audio.music_loop.start(sections, request.transition.empty() ? 0 : 1, bank, audio.instruments, .2,
+                                    audition_error))
+            return false;
+        audio.music_error.clear();
+        playlist_audition = std::move(report);
         playlist_files = std::move(files);
         playlist_request = request;
         audition = {};
         audition_file = request.playlist;
-        audition_origin = origin;
-        audition_end = end;
-        audition_failures = sampler.dispatch_failures;
+        audition_origin = audio.instruments.sample_clock();
+        // The first pass boundary is inspectable; there is no finite completion deadline.
+        audio.music_loop.sample(audio.music_loop.first_end_tick(), audition_end, audition_error);
+        audition_failures = audio.instruments.dispatch_failures;
         audition_stopped = false;
         return true;
     }

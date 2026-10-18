@@ -208,3 +208,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Finite IMA section playback](music_program_contracts.md): complete authored audition, terminal-note deadlines, explicit preparation policies and audio lifetime.
 
 - [Finite music playlists](music_playlist_contracts.md): original level choices, ordered one-pass playback and shared tempo/lifetime limits.
+
+- [Repeating music transport](music_transport_contracts.md): bounded continuous audio, fractional clocks, cancellation and remaining live-MUSIC limits.

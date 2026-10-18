@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "a6ca134dd0e2e0e1849f4d2e99ea780db43fdd1b",
+  "sources": [
+    {
+      "path": "sources/blood2/AppHeaders/client_de.h",
+      "sha256": "d4bd76f15d1689a0314f832bcba0877d2bbabcdf830a8a44da9d662b4aa534e1",
+      "use": "PlayList contract: introduction before ordered songs, repeat the list"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/Music.cpp",
+      "sha256": "1024e355e8da92ba670b96fc7cec5a57f301ea45e18f0a43f910a914f6e24ee0",
+      "use": "Existing original level/list selection; no live game-level mutation imported in this increment"
+    }
+  ],
+  "adaptations": [
+    "Bounded two-template repeat transport; prefix once, repeating suffix in source order",
+    "Retained 100ns tempo-boundary carry and original millisecond rounding; no accumulating map",
+    "Pump before audio horizon, atomic bounded MIDI admission; stop on mixer/receiver failure",
+    "Explicit per-section seed 1, prepared-variation repetition and 20 percent audition gain",
+    "AudioMixer-owned immutable bank; stop/reset independent of inspector"
+  ],
+  "limits": [
+    "No live MUSIC message acceptance or NEXTSONG request replacement",
+    "Original cross-section state and regenerated variations remain unavailable; no retail listening/PCM parity claim",
+    "Bank/resource refusals and M2 gate remain unchanged"
+  ],
+  "frozen_sources": {
+    "CMakeLists.txt": "52b08ec36acf68ca8ef004a44a6d72e3e2f015b616158a2e36652c86e1ade612",
+    "src/app/inspector_world_sounds.cpp": "ccee96887cd2eaaf76068e3605a1cee1c755cd76ee783cefc6e964bacf2f49cf",
+    "src/app/main.cpp": "f71d2439b52840b3aa82aa9fd46857b87fc34b176a5a618a7f631aa5ffcfe88b",
+    "src/app/world_sound_smoke.cpp": "efb89c3dc8572fdd4fdc0ea18ffdc5bbcaf248947973fe2a0551f99756cbee61",
+    "src/engine/audio.cpp": "8e212bc82c7e384942d90e9985e76d0400c2621953bf930513224d3718ad972d",
+    "src/engine/audio.h": "d6f0f10845e80442b13c932cf6a323bd09c3c72acf30d6109e4253b0eb35f476",
+    "src/engine/ima_clock.cpp": "9314ae53a1890c7bfae05b92cfcf1dcae51e727e60ce1a095ff4b932ed38faca",
+    "src/engine/ima_clock.h": "ee13890fc485ab459a9da755bf7cd58dd78cefb2799498800f62d7b3c8b7fe41",
+    "src/engine/ima_transport.cpp": "3121724e76bfc7f3474dff8a2167882e0fae5b69727c0165bb398a5ce5379fcc",
+    "src/engine/ima_transport.h": "e0d9f9e94559302522012bf2d567e0116bbdffceaefdf8223c02bbe12b120280",
+    "src/game/music_catalog.cpp": "30ba3c17d0c99fa0151e4d6018f8334802548a8daf2516ec7c3c79ca22297211",
+    "src/game/music_catalog.h": "7498d4849f3f99ad32a4a27461bcdfc0cd455b2aca5924274d84dff253167f2c",
+    "tests/CMakeLists.txt": "77b6db53f368d51bd9014abf21cae756780aaa2ca13605b63049c9238ec5ccb1",
+    "tests/ima_transport_tests.cpp": "8c2bffa520d9420e3137f7d47a97e0de3e22c7be9dc2056ae4cbd95a1352cd3d"
+  }
+}

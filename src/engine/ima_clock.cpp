@@ -46,7 +46,23 @@ namespace OpenBlood2
         origin_ = origin;
         return true;
     }
-    bool ImaClock::sample(std::int32_t tick, std::uint64_t& frame, std::string& error) const
+    bool ImaClock::time_at(std::int32_t tick, std::uint64_t& time, std::string& error) const
+    {
+        time = 0;
+        error.clear();
+        if (boundaries_.empty() || tick < 0)
+        {
+            error = "IMA clock is unprepared or the boundary has a negative tick";
+            return false;
+        }
+        const auto next = std::upper_bound(boundaries_.begin(), boundaries_.end(), tick,
+                                           [](auto t, const auto& b) { return t < b.authored.tick; });
+        const auto& b = *(next - 1);
+        time = b.time100ns + std::uint64_t(tick - b.authored.tick) * 50000000 / b.tempo16;
+        return true;
+    }
+    bool ImaClock::sample(std::int32_t tick, std::uint64_t& frame, std::string& error,
+                          std::uint64_t retained_time100ns) const
     {
         frame = 0;
         error.clear();
@@ -59,9 +75,15 @@ namespace OpenBlood2
                                            [](auto time, const auto& b) { return time < b.authored.tick; });
         const auto& boundary = *(next - 1);
         const auto delta = std::uint64_t(tick - boundary.authored.tick);
+        if (retained_time100ns > std::numeric_limits<std::uint64_t>::max() - boundary.time100ns)
+        {
+            error = "IMA retained clock time overflow";
+            return false;
+        }
         // Original MulDiv rounds to nearest, with positive halves upward. Preserve
         // millisecond quantization before adapting the old output rate to 48 kHz.
-        const auto milliseconds = boundary.time100ns / 10000 + (delta * 5000 + boundary.tempo16 / 2) / boundary.tempo16;
+        const auto milliseconds = (retained_time100ns + boundary.time100ns) / 10000 +
+                                  (delta * 5000 + boundary.tempo16 / 2) / boundary.tempo16;
         if (milliseconds > std::uint64_t(std::numeric_limits<std::int32_t>::max()) ||
             milliseconds > (std::numeric_limits<std::uint64_t>::max() - origin_) / 48)
         {

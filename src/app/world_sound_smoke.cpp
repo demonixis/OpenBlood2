@@ -12,6 +12,9 @@ namespace OpenBlood2
     {
         // The world-owned music data exists independently of inspector visibility/reload.
         auto& music = g.music_catalog;
+        if (g.server.audio.music_loop.active() || g.server.audio.music_loop.template_events() ||
+            !g.server.audio.music_error.empty())
+            return false;
         if (!music.audition_file.empty() || !music.audition.events.empty() || music.playlist_request ||
             !music.playlist_files.empty() || !music.playlist_audition.events.empty() || !music.error.empty() ||
             music.assets.empty() || music.personalities.size() != 1 || !music.personalities.front().metadata ||
@@ -303,6 +306,25 @@ namespace OpenBlood2
         if (!g.server.advance_audio(21, {}, {}) || !sampler.pending_midi().empty() || !sampler.voices().empty() ||
             sampler.dispatch_failures || sampler.started - playlist_started != playlist_notes)
             return false;
+        // Transition once, then three playlist passes on the normal audio clock.
+        // Repeats retain prepared variations; live MUSIC switching is not claimed.
+        if (!music.play_level_loop(0, 3, g.server.audio))
+            return false;
+        auto& loop = g.server.audio.music_loop;
+        std::uint64_t loop_end;
+        if (!loop.sample(loop.first_end_tick() + 2 * loop.loop_ticks(), loop_end, note_error))
+            return false;
+        while (sampler.sample_clock() < loop_end)
+            if (!g.server.advance_audio(
+                    double(std::min<std::uint64_t>(960, loop_end - sampler.sample_clock())) / DlsSampler::rate, {}, {}))
+                return false;
+        if (!loop.active() || loop.passes_submitted() < 3 || sampler.dispatch_failures ||
+            !g.server.audio.music_error.empty())
+            return false;
+        const auto stop_frame = sampler.sample_clock();
+        loop.stop(sampler);
+        if (!sampler.voices().empty() || !sampler.pending_midi().empty() || sampler.sample_clock() != stop_frame)
+            return false;
         unsigned count = 0;
         for (const auto& e : g.entries)
             if (e.state == EntryState::WorldSound)
@@ -353,8 +375,13 @@ namespace OpenBlood2
             !command("OFF") || sound->state != SoundFX::Off || g.server.audio.get(voice) || !g.objects.remove(h))
             return false;
         g.objects.finish_frame();
+        // Leave both a running repeat and a future note for world-unload ownership checks.
+        if (!music.play_level_loop(0, 3, g.server.audio))
+            return false;
+        const auto pending = sampler.pending_midi().size();
         const DlsTimedMidi future[] = {{sampler.sample_clock() + DlsSampler::rate * 60, 0x94, midi_key, 100}};
         return !g.objects.get(h) && g.server.audio.output_error.empty() &&
-               sampler.enqueue(routed->band_bank, future, .2, note_error) && sampler.pending_midi().size() == 1;
+               sampler.enqueue(routed->band_bank, future, .2, note_error) &&
+               sampler.pending_midi().size() == pending + 1;
     }
 } // namespace OpenBlood2

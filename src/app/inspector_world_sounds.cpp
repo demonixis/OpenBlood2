@@ -135,21 +135,33 @@ namespace OpenBlood2
     void Inspector::draw_world_sounds(GameSession& game)
     {
         auto& music = game.music_catalog;
-        if (ImGui::CollapsingHeader("Finite music playback", ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader("Music playback", ImGuiTreeNodeFlags_DefaultOpen))
         {
             auto& sampler = game.server.audio.instruments;
             ImGui::TextWrapped(
-                "Finite authored music audition, gain 20%%, explicit seed 1 per section. "
+                "Authored music audition, gain 20%%, explicit seed 1 per section. "
                 "Prepared once, played by the shared audio clock while the inspector is hidden. "
-                "Game MUSIC activation, repeating lists and live transition boundaries remain unavailable.");
+                "Repeats reuse the prepared variations. Game MUSIC activation and live switching remain unavailable.");
             static int from_level = 0, to_level = 3;
             ImGui::Combo("Preview from level", &from_level, "Silence\0Ambient\0Cruising\0Harddriving\0");
             ImGui::Combo("Preview requested level", &to_level, "Silence\0Ambient\0Cruising\0Harddriving\0");
+            ImGui::BeginDisabled(game.server.audio.music_loop.active());
             if (ImGui::Button("Audition transition + playlist once (20% gain)"))
                 music.play_level_once(std::uint8_t(from_level), std::uint8_t(to_level), sampler);
+            if (ImGui::Button("Audition transition once + repeating playlist (20% gain)"))
+                music.play_level_loop(std::uint8_t(from_level), std::uint8_t(to_level), game.server.audio);
+            ImGui::EndDisabled();
+            const auto& transport = game.server.audio.music_loop;
+            if (transport.passes_submitted())
+                ImGui::Text(
+                    "Repeat transport %s | passes submitted %llu | next admission frame %llu | template events %zu",
+                    transport.active() ? "running" : "stopped", (unsigned long long)transport.passes_submitted(),
+                    (unsigned long long)transport.next_submission(), transport.template_events());
+            if (!game.server.audio.music_error.empty())
+                ImGui::TextWrapped("Repeat transport failed: %s", game.server.audio.music_error.c_str());
             if (ImGui::Button("Stop all instrument audio"))
             {
-                sampler.silence();
+                game.server.audio.music_loop.stop(sampler);
                 music.audition_stopped = true;
             }
             if (!music.audition_error.empty())
@@ -158,7 +170,8 @@ namespace OpenBlood2
             {
                 const auto& p = music.audition;
                 ImGui::Text("%s | %s", music.audition_file.c_str(),
-                            music.audition_stopped ? "cancelled"
+                            transport.active()       ? "repeating prepared playlist"
+                            : music.audition_stopped ? "cancelled"
                             : sampler.dispatch_failures > music.audition_failures
                                 ? "delivery failed (see audio diagnostics)"
                             : sampler.sample_clock() < music.audition_end ? "scheduled / playing"
@@ -171,8 +184,9 @@ namespace OpenBlood2
                     ImGui::Text("Original request: %u -> %u | %s | loop requested %s", unsigned(request.from),
                                 unsigned(request.to), request.immediate ? "IMMEDIATE" : "NEXTSONG",
                                 request.loop ? "yes" : "no");
-                    ImGui::TextWrapped("This audition starts on the idle clock and plays one pass; it does not execute "
-                                       "the original live-switch or repeat request.");
+                    ImGui::TextWrapped(
+                        "This audition starts on the idle clock; repeating mode skips the transition on later passes. "
+                        "Live switching and cross-section variation state are unavailable.");
                     ImGui::Text("Sections %zu | events %zu | global preroll %d | last tick %d", list.parts.size(),
                                 list.events.size(), list.preroll_ticks, list.last_tick);
                     if (ImGui::TreeNode("Ordered playlist sections and tempo boundaries"))
@@ -648,7 +662,12 @@ namespace OpenBlood2
                     ImGui::TextWrapped("Harmony unavailable: %s", asset.harmony_error.c_str());
                 draw_section_selection(asset);
                 if (ImGui::Button("Play this section once (20% gain)"))
-                    music.play_section(asset.filename, game.server.audio.instruments);
+                {
+                    if (!game.server.audio.music_loop.active())
+                        music.play_section(asset.filename, game.server.audio.instruments);
+                    else
+                        music.audition_error = "Stop repeating music before starting a finite section";
+                }
                 if (ImGui::Button("Start grid cursor probe"))
                 {
                     ImaCursorSeed seed;
