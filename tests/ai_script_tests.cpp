@@ -248,8 +248,9 @@ namespace
         CHECK(a->AI_STATE_Script(g.server_shell.paths) && a->GetTarget() == h && a->m_nState == AI_Mgr::StateAttackFar);
         CHECK(a->script_outcome == AI_Mgr::ScriptOutcome::StateChanged && a->ScriptCommands().size() == 1);
         CHECK(a->AI_STATE_Script(g.server_shell.paths) && a->script_selections == 1);
-        CHECK(a->PrepareScript("SCRIPT; TARGET absent") && !a->AI_STATE_Script(g.server_shell.paths) &&
-              a->GetTarget() == h);
+        // Source SetTargetCmd: an unmatched name keeps the target and still enters AttackFar.
+        CHECK(a->PrepareScript("SCRIPT; TARGET absent") && a->AI_STATE_Script(g.server_shell.paths) &&
+              a->GetTarget() == h && a->m_nState == AI_Mgr::StateAttackFar && a->target_misses == 1);
         CHECK(a->PrepareScript("SCRIPT; SETSTATE PASSIVE; WAIT 0") && a->AI_STATE_Script(g.server_shell.paths));
         CHECK(a->m_nState == AI_Mgr::StatePassive && a->ScriptCommands().size() == 1);
         CHECK(a->PrepareScript("SCRIPT 2; WAIT 50"));

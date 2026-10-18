@@ -608,4 +608,35 @@ namespace OpenBlood2
         server.trace_enabled = was_tracing;
         return ok;
     }
+    std::vector<std::string> GameSession::step_errors()
+    {
+        std::vector<std::string> out;
+        const auto add = [&out](std::string_view label, const std::string& error)
+        {
+            if (!error.empty())
+                out.push_back(std::string(label) + ": " + error);
+        };
+        add("Audio output", server.audio.output_error);
+        add("Music", server.audio.music_error);
+        add("Explosion sprites", server.explosion_sprites.update_error);
+        add("Blood splats", server.blood_splats.update_error);
+        add("Weapon sprites", server.weapon_sprites.update_error);
+        add("Explosion models", server.explosion_models.update_error);
+        add("Laser beams", server.laser_beams.update_error);
+        add("Explosion lights", server.explosion_lights.update_error);
+        add("Explosion rings", server.explosion_rings.update_error);
+        add("Explosion flames", server.explosion_flames.update_error);
+        add("Flesh gibs", server.flesh_gibs.update_error);
+        add("Sparks", server.sparks.update_error);
+        add("Blood spurts", server.blood_spurts.update_error);
+        add("Explosion fragments", server.explosion_fragments.update_error);
+        add("Object particles", server.object_particles.update_error);
+        add("Particle streams", server.particle_streams.update_error);
+        add("PolyGrids", server.polygrids.update_error);
+        add("Flashlight effect", client_shell.flashlight.error);
+        if (const auto* player = server_shell.Player(local_client))
+            if (const auto* item = player->m_InventoryMgr.flashlight.get(); item && !item->update_ok)
+                add("Flashlight item", item->error.empty() ? std::string("update failed") : item->error);
+        return out;
+    }
 } // namespace OpenBlood2

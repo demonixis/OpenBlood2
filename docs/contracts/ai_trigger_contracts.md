@@ -32,8 +32,9 @@ execute an earlier prefix. Numeric conversions are strict instead of unchecked
 atoi/atof. This is a safety adaptation, not a claim of complete SDK Parse parity.
 
 SETSTATE uses the existing original prefix-to-state mapping and transition rules.
-TARGET selects/faces the named object and then selects AttackFar. A failed lookup
-retains the previous target; no invented attack action executes. PLAYANIMATION
+TARGET selects/faces the named object and then selects AttackFar. An unmatched
+name is the source no-op: it retains the previous target and AttackFar is still
+selected; failed services reject and no invented attack action executes. PLAYANIMATION
 resolves a named clip, selects it through the checked size/animation service and
 disables looping. Validation happens before changing looping, unlike the original
 unchecked call order. PLAYSOUND starts a real attached spatial one-shot WAV with

@@ -473,6 +473,9 @@ namespace OpenBlood2
         bool pump_player_messages(std::string& error);
         bool unload_world();
         bool step(double seconds);
+        // Labelled durable subsystem errors for logging a failed step; many
+        // update paths report through these fields, not object diagnostics.
+        std::vector<std::string> step_errors();
         bool initialize()
         {
             objects.models = &models;

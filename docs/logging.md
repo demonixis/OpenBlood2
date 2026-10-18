@@ -57,6 +57,12 @@ recursive deletion. Incomplete sessions are deliberately retained and must be
 removed manually after investigation; total disk usage is therefore not globally
 bounded. Concurrent launches create directories atomically and never share files.
 
+A failed simulation step logs the world, frame, delta and clock, the object
+diagnostics, the session trace, then every labelled durable subsystem error from
+`GameSession::step_errors` (audio, each client FX store, flashlight). Many update
+paths report only through these fields; an empty list means the failure came from
+a path without a durable message.
+
 A directory/open/write/rotation failure is reported to the console. The application
 continues with console logging; a failed file sink is disabled, without retrying on
 every message. Failed file output never produces a successful completion marker.

@@ -66,8 +66,9 @@ Missing WAVs fail; the existing mixer owns decoding/playback and unload cleanup.
 SETSTATE and TARGET retain their original state transitions (TARGET chooses
 AttackFar). The remaining commands stay stored, but the next caller observes the
 changed state and does not execute them. State selection does not execute an
-unported attack/search action. Target lookup failure remains explicit, retaining
-the prior target rather than continuing as if acquisition succeeded.
+unported attack/search action. As in the source SetTargetCmd, an unmatched name
+retains the prior target and still selects AttackFar (SubwayA's `Target cat` can
+name an already killed civilian). Invalid names and failed services stay explicit.
 
 Exhausting a list clears flags and calls the subclass ComputeState once. An explicit
 or unknown DONE instruction calls it twice: once in UpdateScriptCommand, then again

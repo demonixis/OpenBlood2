@@ -22,6 +22,7 @@ namespace OpenBlood2
         std::vector<CExplosionSpriteFX> active;
         std::vector<ExplosionSpriteReport> reports;
         std::uint64_t started = 0, expired = 0, failed = 0;
+        std::string update_error;
 
       private:
         std::uint64_t next_id_ = 1, next_event_ = 1;

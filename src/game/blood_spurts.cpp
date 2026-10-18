@@ -15,6 +15,7 @@ namespace OpenBlood2
             if (r.id == fx.event)
             {
                 r.emitted = fx.emitted;
+                r.capacity_skips = fx.capacity_skips;
                 r.impacts = fx.impacts;
                 r.splat_event = fx.splat_event;
                 r.error = fx.error;

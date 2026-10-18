@@ -208,12 +208,44 @@ namespace
         std::minstd_rand rng(1);
         CParticleExplosionFX fx;
         CHECK(fx.CreateObject(s, g.resources, g.server, 0, rng, error));
-        CHECK(!fx.Update(0, 0, g.server, rng, 11) && !fx.error.empty() && fx.particles.empty());
+        // A burst beyond the shared budget is skipped whole; it is not an update failure.
+        CHECK(fx.Update(0, 0, g.server, rng, 11) && fx.error.empty() && fx.particles.empty());
+        CHECK(fx.emitting && fx.emitted == 0 && fx.capacity_skips == 1);
         Resources missing;
         BloodSpurts effects;
         CHECK(effects.publish(s, "missing", false, missing, g.server, 0, error) && !error.empty() &&
               effects.active.empty());
         CHECK(g.unload_world() && g.server.blood_spurts.reports.empty() && g.server.blood_splats.reports.empty());
+        return true;
+    }
+    // The source emits one burst per update, so a long flight at a high refresh
+    // rate exceeds the 2048-drop system budget. That must skip bursts without
+    // failing the session step or evicting drops (2 s at 240 Hz = 480 bursts).
+    bool high_rate(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(setup(g, root));
+        std::string error;
+        BloodSpurtSettings s;
+        s.position = {0, 1000, 0}; // Falls 400 units in its 2 s life: no floor impact.
+        s.lifetime = 2;
+        CHECK(g.server.PublishClientBloodSpurt(s, "high rate", true, error) && error.empty());
+        auto& effects = g.server.blood_spurts;
+        float last_y = effects.active.front().position.y;
+        for (int tick = 1; tick <= 480; ++tick)
+        {
+            CHECK(effects.advance(tick / 240., g.server) && effects.update_error.empty());
+            const auto& fx = effects.active.front();
+            CHECK(fx.particles.size() <= 2048 && fx.emitting && fx.impacts == 0 && fx.position.y <= last_y);
+            last_y = fx.position.y;
+        }
+        const auto& fx = effects.active.front();
+        CHECK(fx.position.y < 700 && fx.emitted == 2040 && fx.particles.size() == 2040 && fx.capacity_skips == 311);
+        CHECK(effects.advance(2.01, g.server) && effects.active.empty() && effects.expired == 1 && !effects.failed);
+        const auto& report = effects.reports.back();
+        CHECK(report.ended && report.error.empty() && report.emitted == 2040 && report.capacity_skips == 311);
+        std::cout << "High-rate spurt: " << report.emitted << " drops, " << report.capacity_skips
+                  << " skipped bursts, no failure\n";
         return true;
     }
     bool private_world(const char* root)
@@ -347,6 +379,7 @@ int main(int argc, char** argv)
             : mode == "impact"        ? impact(argv[2])
             : mode == "weapon"        ? weapon(argv[2])
             : mode == "failures"      ? failures(argv[2])
+            : mode == "high_rate"     ? high_rate(argv[2])
                                       : mode == "private" && private_world(argv[2]))
                ? 0
                : 1;

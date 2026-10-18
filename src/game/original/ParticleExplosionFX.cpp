@@ -71,30 +71,34 @@ bool CParticleExplosionFX::Update(double now, double dt, ServerDE& server, std::
         return false;
     if (!emitting)
         return true;
+    // The source emits one burst per update with no engine cap, so drop counts
+    // grow with frame rate: 120+ Hz exceeds this replacement budget during a
+    // long flight. Skip the whole burst (no eviction, no RNG draws); the emitter
+    // still moves, impacts and fades. Cosmetic budgets never stop the session.
     if (particles.size() + 12 > 2048 || available < 12)
+        ++capacity_skips;
+    else
     {
-        error = "Blood-spurt particle capacity exhausted";
-        return false;
-    }
-    // Original six samples, two drops each, BEFORE the emitter's current movement.
-    const auto delta = vector_scale(vector_subtract(position, previous), 1.f / 6);
-    auto point = vector_subtract(previous, settings.position);
-    const float life_step = float(now - last_emission) / 6;
-    for (int step = 0; step < 6; ++step)
-    {
-        for (int j = 0; j < 2; ++j)
+        // Original six samples, two drops each, BEFORE the emitter's current movement.
+        const auto delta = vector_scale(vector_subtract(position, previous), 1.f / 6);
+        auto point = vector_subtract(previous, settings.position);
+        const float life_step = float(now - last_emission) / 6;
+        for (int step = 0; step < 6; ++step)
         {
-            Particle p;
-            p.velocity = {draw(rng, 0, 0), draw(rng, -10, -5), draw(rng, 0, 0)};
-            p.position = vector_add(point, {draw(rng, -.5f, .5f), draw(rng, -.5f, .5f), draw(rng, -.5f, .5f)});
-            const float gray = draw(rng, 128, 128) / 255.f;
-            p.color = {gray, gray, gray};
-            p.lifetime = 10 + step * life_step;
-            particles.push_back(p);
+            for (int j = 0; j < 2; ++j)
+            {
+                Particle p;
+                p.velocity = {draw(rng, 0, 0), draw(rng, -10, -5), draw(rng, 0, 0)};
+                p.position = vector_add(point, {draw(rng, -.5f, .5f), draw(rng, -.5f, .5f), draw(rng, -.5f, .5f)});
+                const float gray = draw(rng, 128, 128) / 255.f;
+                p.color = {gray, gray, gray};
+                p.lifetime = 10 + step * life_step;
+                particles.push_back(p);
+            }
+            point = vector_add(point, delta);
         }
-        point = vector_add(point, delta);
+        emitted += 12;
     }
-    emitted += 12;
     last_emission = now;
     if (vector_dot(velocity, velocity) < .01f)
         velocity = {};

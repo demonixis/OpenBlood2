@@ -51,9 +51,14 @@ alpha, texture failures and history; weapons/limbs/fragments expose originating 
 
 Limits: 128 systems, 2048 particles/system, 16384 total, 64 retained reports,
 source labels100 bytes, textures1..3 (zero requests client selection), finite
-physics vectors, lifetime (0,10], fade [0,lifetime), update delta [0,1]. Capacity
-failure is explicit, never silent eviction. A whole 12-drop burst is checked before
-insertion. Existing particles use the shared checked integrator. The .001-second
+physics vectors, lifetime (0,10], fade [0,lifetime), update delta [0,1]. System
+and publication capacity failures are explicit, never silent eviction. The source
+emits one burst per update without an engine cap, so drop counts scale with frame
+rate: a long flight above ~100 Hz exceeds 2048. A whole 12-drop burst is checked
+before insertion; one that does not fit the system or shared budget is skipped
+without RNG draws and counted as a budget skip (emitter and report inspection).
+The emitter still moves, impacts and fades, and the session step does not fail.
+Existing particles use the shared checked integrator. The .001-second
 schedule avoids a second update in the same publication frame.
 
 The original selection happens on the server; this integration deliberately uses

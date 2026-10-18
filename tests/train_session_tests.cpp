@@ -443,9 +443,10 @@ namespace
         const auto knife_shots = p->m_InventoryMgr.GetWeapon(0)->shots;
         // Source frame histories leave different dropped pickups on this fixed
         // route. Require real dry-ammo knife firing at 30 Hz and ammunition
-        // collection at 60 Hz, without diagnostic ammo/stat grants.
+        // collection at 60 Hz, without diagnostic ammo/stat grants. 120 Hz guards
+        // high-refresh per-update emission (blood spurts); its pickups are not fixed.
         CHECK(damaged.size() >= 4 && dead.size() >= 4 && health_pickup);
-        CHECK(hz == 30 ? knife_shots > 0 : ammo_pickup);
+        CHECK(hz == 30 ? knife_shots > 0 : hz == 120 || ammo_pickup);
         CHECK(trigger->activations == 1 && trigger->last_sender == p->m_hObject && black);
         for (const auto& slot : trigger->slots)
             CHECK(slot.sent == 1);
@@ -511,7 +512,8 @@ int main(int argc, char** argv)
 {
     if (argc == 2 && std::string_view(argv[1]) == "audit")
         return audit_rejections() ? 0 : 1;
-    if (argc < 3 || argc > 4 || (std::string_view(argv[2]) != "30" && std::string_view(argv[2]) != "60"))
+    const std::string_view rate = argc >= 3 ? argv[2] : "";
+    if (argc < 3 || argc > 4 || (rate != "30" && rate != "60" && rate != "120"))
         return 2;
-    return traverse(argv[1], std::string_view(argv[2]) == "30" ? 30 : 60, argc == 4 ? argv[3] : "") ? 0 : 1;
+    return traverse(argv[1], rate == "30" ? 30 : rate == "60" ? 60 : 120, argc == 4 ? argv[3] : "") ? 0 : 1;
 }

@@ -126,6 +126,7 @@ namespace OpenBlood2
                           else
                           {
                               ++failed;
+                              update_error = fx.error;
                               valid = false;
                           }
                           return true;
@@ -136,6 +137,7 @@ namespace OpenBlood2
     {
         active.clear();
         reports.clear();
+        update_error.clear();
         started = expired = failed = 0;
         // IDs are not reused, including across world unload.
     }

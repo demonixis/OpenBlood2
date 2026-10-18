@@ -256,8 +256,9 @@ namespace OpenBlood2
             {
                 ImGui::Text("Emitter %.2f %.2f %.2f | velocity %.2f %.2f %.2f", fx.position.x, fx.position.y,
                             fx.position.z, fx.velocity.x, fx.velocity.y, fx.velocity.z);
-                ImGui::Text("Emitting %d / liquid %d | drops %zu | alpha %.3f | updates %llu", fx.emitting, fx.liquid,
-                            fx.particles.size(), fx.alpha, (unsigned long long)fx.updates);
+                ImGui::Text("Emitting %d / liquid %d | drops %zu | alpha %.3f | updates %llu | budget skips %llu",
+                            fx.emitting, fx.liquid, fx.particles.size(), fx.alpha, (unsigned long long)fx.updates,
+                            (unsigned long long)fx.capacity_skips);
                 ImGui::Text("Impact splat event %llu | lifetime %.2f / fade %.2f", (unsigned long long)fx.splat_event,
                             fx.settings.lifetime, fx.settings.fade_time);
                 ImGui::TextWrapped("Impact sound: %s", fx.sound_resource.c_str());
@@ -275,12 +276,12 @@ namespace OpenBlood2
         }
         for (const auto& r : effects.reports)
         {
-            ImGui::TextWrapped("Event %llu %s -> #%llu | immediate %d / ended %d | drops %llu / impacts %llu / "
-                               "splat %llu | %s %s %s",
+            ImGui::TextWrapped("Event %llu %s -> #%llu | immediate %d / ended %d | drops %llu / budget skips %llu / "
+                               "impacts %llu / splat %llu | %s %s %s",
                                (unsigned long long)r.id, r.source.c_str(), (unsigned long long)r.effect, r.immediate,
-                               r.ended, (unsigned long long)r.emitted, (unsigned long long)r.impacts,
-                               (unsigned long long)r.splat_event, r.error.c_str(), r.splat_error.c_str(),
-                               r.sound_error.c_str());
+                               r.ended, (unsigned long long)r.emitted, (unsigned long long)r.capacity_skips,
+                               (unsigned long long)r.impacts, (unsigned long long)r.splat_event, r.error.c_str(),
+                               r.splat_error.c_str(), r.sound_error.c_str());
             ImGui::TextWrapped("Impact sound: %s", r.sound_resource.c_str());
         }
     }

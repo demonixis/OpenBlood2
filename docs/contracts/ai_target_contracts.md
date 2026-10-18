@@ -24,8 +24,11 @@ GetTarget returns an identity, not a borrowed C++ object pointer.
 SetTarget searches an exact, case-sensitive name and takes the first returned
 match. The current engine's list prepends matches from slot enumeration, including
 hidden/inactive live objects; it excludes pending removals. Its tie order is not
-claimed equivalent to retail engine enumeration. An empty result retains the
-old target and returns an explicit failure. The copied name is limited to the
+claimed equivalent to retail engine enumeration. An empty result is the source's
+silent return: it retains the old target, counts an unmatched name (inspected
+beside failures) and succeeds, so authored TARGET commands still select AttackFar
+and its null-target guard. A named actor may already be dead or removed; this is
+not a service failure. An unavailable list service still fails. The copied name is limited to the
 engine's 100-byte object name boundary; empty, oversized and embedded-NUL names
 reject. Lists are always relinquished, including failures after selection.
 

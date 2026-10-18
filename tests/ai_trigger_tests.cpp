@@ -121,7 +121,9 @@ namespace
         CHECK(a->trigger_commands == 1); // Source command early return.
         CHECK(a->HandleTrigger(h, "TARGET \"target with spaces\"; SETSTATE IDLE"));
         CHECK(a->GetTarget() == h && a->m_nState == AI_Mgr::StateAttackFar && a->Metacmd == 1);
-        CHECK(!a->HandleTrigger(h, "TARGET absent") && a->GetTarget() == h);
+        a->Metacmd = 3; // An unmatched name is the source no-op; SetNewState still runs.
+        CHECK(a->HandleTrigger(h, "TARGET absent") && a->GetTarget() == h && a->Metacmd == 1);
+        CHECK(a->m_nState == AI_Mgr::StateAttackFar && a->target_misses == 1);
         const auto state = a->m_nState;
         CHECK(!a->HandleTrigger(h, "SCRIPT INTERRUPTABLE; WAIT 1;") && a->m_nState == state);
         CHECK(!a->HandleTrigger(h, "SETSTATE IDLE; \"unterminated") && a->m_nState == state);

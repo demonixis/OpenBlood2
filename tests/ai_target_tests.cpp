@@ -67,8 +67,11 @@ namespace
         CHECK(ai->SetTarget("target") && ai->target_changes == 1 && ai->face_commands == 2);
         ai->target_name = "prefix_target";
         CHECK(ai->SetTarget(std::string_view(ai->target_name).substr(7)) && ai->GetTarget() == second);
-        CHECK(!ai->SetTarget("Target") && ai->GetTarget() == second && ai->Metacmd == 1);
-        CHECK(g.server.list_count() == 0 && ai->target_error.find("No matching") != std::string::npos);
+        // Source no-op: no match keeps the previous target and is not a failure.
+        const auto failures = ai->target_failures;
+        CHECK(ai->SetTarget("Target") && ai->GetTarget() == second && ai->Metacmd == 1);
+        CHECK(g.server.list_count() == 0 && ai->target_misses == 1 && ai->target_failures == failures &&
+              ai->target_error.empty() && ai->target_name == "Target");
         CHECK(g.objects.remove(second));
         CHECK(ai->SetTarget("target") && ai->GetTarget() == first && ai->target_changes == 2);
         CHECK(g.objects.finish_frame() && ai->GetTarget() == first && ai->target_link_breaks == 0);

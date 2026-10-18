@@ -736,8 +736,8 @@ namespace
                     spdlog::error("Object: {}", diagnostic);
                 for (const auto& diagnostic : game->trace)
                     spdlog::error("Session: {}", diagnostic);
-                if (!game->server.particle_streams.update_error.empty())
-                    spdlog::error("Particle streams: {}", game->server.particle_streams.update_error);
+                for (const auto& diagnostic : game->step_errors())
+                    spdlog::error("{}", diagnostic);
                 return 4;
             }
             const auto change = OpenBlood2::GameSession::process_level_change(game_owner, error);

@@ -687,9 +687,9 @@ namespace OpenBlood2
                         target_ai->target_position_valid ? "sampled" : "unavailable");
             ImGui::Text("Metacmd %d | turns %llu | last local yaw %.4f rad", target_ai->Metacmd,
                         (unsigned long long)target_ai->face_commands, target_ai->face_yaw_delta);
-            ImGui::Text("Target changes %llu | broken links %llu | failures %llu",
+            ImGui::Text("Target changes %llu | broken links %llu | unmatched names %llu | failures %llu",
                         (unsigned long long)target_ai->target_changes,
-                        (unsigned long long)target_ai->target_link_breaks,
+                        (unsigned long long)target_ai->target_link_breaks, (unsigned long long)target_ai->target_misses,
                         (unsigned long long)target_ai->target_failures);
             if (!target_ai->target_error.empty())
                 ImGui::TextWrapped("%s", target_ai->target_error.c_str());

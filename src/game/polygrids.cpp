@@ -48,6 +48,7 @@ bool PolyGrids::advance(double now, ServerDE& server)
                           ok = false;
                           if (fx.error.empty())
                               fx.error = "PolyGrid position unavailable";
+                          update_error = fx.error;
                       }
                       else
                           ++expired;
@@ -65,6 +66,7 @@ void PolyGrids::clear()
 {
     active.clear();
     reports.clear();
+    update_error.clear();
     phases = {0, 1, 4, 3};
     started = expired = failed = 0;
 }

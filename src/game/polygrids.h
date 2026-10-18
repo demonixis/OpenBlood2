@@ -24,6 +24,7 @@ namespace OpenBlood2
         std::vector<PolyGridReport> reports;
         std::array<float, 4> phases{0, 1, 4, 3};
         std::uint64_t started = 0, expired = 0, failed = 0;
+        std::string update_error;
 
       private:
         std::uint64_t next_id_ = 1;

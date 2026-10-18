@@ -62,7 +62,13 @@ bool AI_Mgr::SetTarget(std::string_view name)
     // Copy the checked identity; never keep a list or raw game-object pointer.
     server->RelinquishList(list);
     if (!target)
-        return TargetFailure("No matching named target; previous target retained");
+    {
+        // Source SetTarget is void and returns silently, so the authored TARGET
+        // command still enters AttackFar (its null-target guard). A named target
+        // may already be dead/removed; this is not a service failure.
+        ++target_misses;
+        return true;
+    }
     if (!SetNewTarget(target) || !RefreshTargetPosition() || !MC_FaceTarget())
         return false;
     --Metacmd; // SetTarget cancels MC_FaceTarget's original command increment.

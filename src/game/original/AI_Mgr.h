@@ -486,7 +486,7 @@ class AI_Mgr : public CBaseCharacter
     bool MC_FacePos(DVector);
     DVector m_vTargetPos{};
     int Metacmd = 1;
-    std::uint64_t target_changes = 0, target_link_breaks = 0, target_failures = 0, face_commands = 0;
+    std::uint64_t target_changes = 0, target_link_breaks = 0, target_failures = 0, target_misses = 0, face_commands = 0;
     std::string target_name, target_error;
     DVector face_position{};
     float face_yaw_delta = 0;
