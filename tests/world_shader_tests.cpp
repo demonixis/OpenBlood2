@@ -52,12 +52,14 @@ int main()
                 if (shader == WorldShader::SkinnedVertex)
                     CHECK(source.find("[[buffer(1)]]") != source.npos && source.find("[[buffer(2)]]") != source.npos &&
                           source.find("uint4 bases;") != source.npos);
+                // HLSL cbuffer members keep their names; varyings are matched by location.
                 if (vertex)
-                    CHECK(source.find("u._textureOffset.xy") != source.npos);
+                    CHECK(source.find("View._textureOffset.xy") != source.npos &&
+                          source.find("[[user(locn2)]]") != source.npos);
                 else
                     CHECK(source.find("float4 positionRadius;") != source.npos &&
                           source.find("float4 lightColor;") != source.npos &&
-                          source.find("float3 worldPosition") != source.npos);
+                          source.find("float3 in_var_TEXCOORD2 [[user(locn2)]]") != source.npos);
             }
             const auto* owned = info.code;
             SDL_GPUShaderCreateInfo repeated{};

@@ -26,7 +26,16 @@ FetchContent_MakeAvailable(spirvcross)
 # Upstream's non-vendored find guard uses this spelling, while its link target
 # uses spirv-cross-c. Both refer to the same pinned build; no system fallback.
 add_library(spirv_cross_c ALIAS spirv-cross-c)
-set(SDLSHADERCROSS_DXC OFF CACHE BOOL "" FORCE)
+# HLSL sources compile through DXC: an installed dxcompiler (for example the Vulkan
+# SDK's) with dxcapi.h. DXC is loaded by shadercross, never linked into the game.
+set(SDLSHADERCROSS_DXC ON CACHE BOOL "" FORCE)
+find_library(BLOOD2_DXCOMPILER dxcompiler REQUIRED)
+# shadercross only needs DXIL's signing library to install it. macOS DXC packages ship
+# none; DXIL output there would be unsigned, so no DXIL artifact is generated.
+find_library(BLOOD2_DXIL dxil)
+if(NOT BLOOD2_DXIL)
+    set(DirectXShaderCompiler_dxil_LIBRARY "${BLOOD2_DXCOMPILER}" CACHE FILEPATH "" FORCE)
+endif()
 set(SDLSHADERCROSS_SHARED OFF CACHE BOOL "" FORCE)
 set(SDLSHADERCROSS_STATIC ON CACHE BOOL "" FORCE)
 set(SDLSHADERCROSS_SPIRVCROSS_SHARED OFF CACHE BOOL "" FORCE)

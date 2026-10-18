@@ -25,8 +25,8 @@ texture offset. Its uniform buffer is slot 0 and vertex attributes are 0/1/2.
 Both fragments sample texture/sampler 0 and use uniform buffer 0. The flashlight
 continuation expands that fragment buffer to three float4 fields (48 bytes):
 modulation, world position/radius and RGB light color. Both stages pass the
-current posed world position for the bounded radial illumination. Storage buffers/textures are unused. Keep reflection and all
-packaged artifacts synchronized when GLSL changes. Source texture coordinates,
+current posed world position for the bounded radial illumination. Storage textures are unused; only the skinned vertex shader reads storage buffers. Keep reflection and all
+packaged artifacts synchronized when HLSL changes. Source texture coordinates,
 SDL GPU depth/orientation conventions, current transforms, alpha policy and
 world-clock panning are identical inputs on both paths; add no backend-only
 axis flip or second animation clock.
@@ -45,25 +45,29 @@ archives. [Provenance](../implementation/sources/m2_metal_sources.json) records 
 SDL/ImGui/spdlog pins are unchanged; shader tools reuse the already-built SDL.
 No reference repository or commercial resource is a shader input.
 
-Current GLSL sources remain the source of truth. glslangValidator 16.2.0 creates
-Vulkan 1.0 SPIR-V, then SDL_shadercross emits MSL 1.2 and reflection metadata.
-Retaining these small existing GLSL shaders avoids an unrelated HLSL rewrite.
-Future shader-language changes must preserve the same tested binding contract.
-The generator rejects unsupported storage resources or an unexpected entry name.
-Six headers are checked in, so normal builds require neither generation tools nor
-network access beyond ordinary configured dependency fetching.
+HLSL sources (`src/engine/shaders/*.hlsl`) are the single source of truth; the
+earlier GLSL sources are removed. They follow SDL_GPU's HLSL register conventions:
+vertex storage buffers `t#, space0` and uniforms `b#, space1`; fragment textures and
+samplers `t#/s#, space2` and uniforms `b#, space3`; vertex inputs and varyings use
+`TEXCOORD` semantics in declaration order. The pinned SDL_shadercross, built with DXC
+(an installed `dxcompiler` with `dxcapi.h`, such as the Vulkan SDK's), compiles each
+source to Vulkan SPIR-V, MSL 1.2 and reflection metadata; CMake turns the SPIR-V
+module into a word array. The generator rejects storage textures, read-write
+storage or an unexpected entry name. Eight headers are checked in, so normal builds
+require neither generation tools nor network access beyond ordinary dependency
+fetching. DXIL is not generated: on hosts without DXC's signing library (macOS) it
+would be unsigned, and D3D12 stays unadvertised until signed artifacts are tested.
 
-From Blood2, with glslangValidator available and SDL already built:
+From Blood2, with DXC installed and SDL already built:
 
 ```sh
 cmake -S tools/shaders -B build/shader-tools -G Ninja \
-  -DCMAKE_BUILD_TYPE=Release -DSDL3_DIR="$PWD/build/debug/_deps/sdl3-build"
+  -DCMAKE_BUILD_TYPE=Release -DSDL3_DIR="$PWD/build/dev/_deps/sdl3-build"
 cmake --build build/shader-tools -j3 --target regenerate
 ```
 
-The optional toolchain uses no DXC and links no shader compiler into the game.
-Its standalone CMake project is not part of ordinary application configuration.
-To compare regeneration without overwriting checked headers:
+DXC is used only by this optional tool project; no shader compiler is linked into
+the game. To compare regeneration without overwriting checked headers:
 
 ```sh
 cmake -DSHADERCROSS="$PWD/build/shader-tools/_deps/shadercross-build/shadercross" \
@@ -75,7 +79,7 @@ cmake -DSHADERCROSS="$PWD/build/shader-tools/_deps/shadercross-build/shadercross
 
 Headless tests exercise both packaged formats, stages, generated entry names,
 resource bindings, static storage, uniform size and unsupported-format failures.
-Byte-for-byte regeneration checks all six artifacts. These checks cannot validate
+Byte-for-byte regeneration checks all eight artifacts. These checks cannot validate
 Apple's Metal compiler or driver. NVIDIA Vulkan readback covers actual world/model
 occlusion, alpha, sprites, panning, viewport reload and device lifetime.
 
@@ -98,3 +102,5 @@ as user-reported execution; hardware/OS/SDK and a native automated GPU test run
 remain unrecorded. Local evidence remains Linux/NVIDIA Vulkan.
 
 The [presentation performance continuation](render_performance_contracts.md) adds `skinned.vert`, the first shader reading read-only storage buffers (node palette and packed deformation, MSL `[[buffer(1)]]`/`[[buffer(2)]]`). The generator now records each shader's storage-buffer count; all eight artifacts were regenerated together with glslangValidator 16.3.0, and existing SPIR-V/MSL bytes are unchanged apart from the version comment.
+
+The [presentation performance continuation](render_performance_contracts.md) moves the four shaders to HLSL compiled by SDL_shadercross with DXC (Vulkan SDK 1.4.350, dxcompiler 1.9.0.5347). Bindings, vertex attribute locations, varying locations and uniform layouts are unchanged; standalone renderer readbacks and application captures are compared against the GLSL-generated artifacts in that contract.

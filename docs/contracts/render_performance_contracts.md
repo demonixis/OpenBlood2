@@ -1,4 +1,4 @@
-# Presentation performance (phases 0–3)
+# Presentation performance (phases 0–4)
 
 This continuation reduces CPU submission and GPU pass cost of the existing SDL_GPU
 presentation without changing simulation or original object rules. Phases 0–1 keep
@@ -226,8 +226,19 @@ owner-scoped shared assets and target survival. CityHub registers 276 textures
 (23 MB with mips, 3 cross-view hits), 52 shared assets and 57 buffers; frame time
 is unchanged (1.65 ms mean at 3440x1440).
 
+## Phase 4: HLSL shader sources
+
+The four shaders (`world.vert`, `skinned.vert`, `world.frag`, `sprite.frag`) are now
+HLSL, the single source compiled by the pinned SDL_shadercross with DXC into the
+checked-in SPIR-V and MSL; see the [shader contracts](metal_shader_contracts.md).
+They use SDL_GPU's register spaces, so the same sources can later emit DXIL for
+D3D12 on a host with DXC's signing library; no DXIL is generated or advertised yet.
+Math, operation order, uniform layouts, attribute and varying locations and resource
+bindings are unchanged from the GLSL versions; reflection confirms set 0 storage,
+set 1 vertex uniforms, set 2 fragment textures/samplers and set 3 fragment uniforms.
+
 ## Pending phases
 
-- HLSL shader sources compiled by SDL_shadercross to SPIR-V, MSL and DXIL.
+- DXIL artifacts and a D3D12 path, once they can be signed and tested on Windows.
 - Instanced model draws, spatial world clusters and PVS when lighting/shadow passes
   need them; simulation and collision cost.
