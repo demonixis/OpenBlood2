@@ -26,6 +26,8 @@ struct type_View
     float4 scale;
     float4 color;
     uint4 bases;
+    float4 ambient;
+    float4 sources[12];
 };
 
 struct main0_out
@@ -43,30 +45,56 @@ struct main0_in
     float2 in_var_TEXCOORD1 [[attribute(1)]];
     uint4 in_var_TEXCOORD2 [[attribute(2)]];
     uint in_var_TEXCOORD3 [[attribute(3)]];
+    float3 in_var_TEXCOORD4 [[attribute(4)]];
 };
 
 vertex main0_out main0(main0_in in [[stage_in]], constant type_View& View [[buffer(0)]], const device type_StructuredBuffer_v4float& palette [[buffer(1)]], const device type_StructuredBuffer_v4float& deformation [[buffer(2)]])
 {
     main0_out out = {};
-    uint _69 = View.bases.x + (in.in_var_TEXCOORD2.x * 2u);
-    float3 _86;
+    uint _82 = View.bases.x + (in.in_var_TEXCOORD2.x * 2u);
+    float3 _99;
     if (in.in_var_TEXCOORD3 == 4294967295u)
     {
-        _86 = in.in_var_TEXCOORD0;
+        _99 = in.in_var_TEXCOORD0;
     }
     else
     {
-        _86 = deformation._m0[View.bases.y + in.in_var_TEXCOORD3].xyz;
+        _99 = deformation._m0[View.bases.y + in.in_var_TEXCOORD3].xyz;
     }
-    float3 _99 = (palette._m0[_69 + 1u].xyz + (_86 + (cross(palette._m0[_69].xyz, cross(palette._m0[_69].xyz, _86) + (_86 * palette._m0[_69].w)) * 2.0))) * View.scale.xyz;
-    float3 _113 = (_99 + (cross(View.quaternion.xyz, cross(View.quaternion.xyz, _99) + (_99 * View.quaternion.w)) * 2.0)) + View.translation.xyz;
-    float3 _117 = _113 - View.eye.xyz;
-    float _121 = dot(_117, View.forward.xyz);
-    out.out_var_TEXCOORD0 = View.color.xyz;
+    float3 _112 = (palette._m0[_82 + 1u].xyz + (_99 + (cross(palette._m0[_82].xyz, cross(palette._m0[_82].xyz, _99) + (_99 * palette._m0[_82].w)) * 2.0))) * View.scale.xyz;
+    float3 _126 = (_112 + (cross(View.quaternion.xyz, cross(View.quaternion.xyz, _112) + (_112 * View.quaternion.w)) * 2.0)) + View.translation.xyz;
+    float3 _130 = _126 - View.eye.xyz;
+    float _134 = dot(_130, View.forward.xyz);
+    float3 _187 = in.in_var_TEXCOORD4 + (cross(palette._m0[_82].xyz, cross(palette._m0[_82].xyz, in.in_var_TEXCOORD4) + (in.in_var_TEXCOORD4 * palette._m0[_82].w)) * 2.0);
+    float3 _193 = _187 + (cross(View.quaternion.xyz, cross(View.quaternion.xyz, _187) + (_187 * View.quaternion.w)) * 2.0);
+    float3 _197 = _193 * rsqrt(precise::max(dot(_193, _193), 9.9999999600419720025001879548654e-13));
+    uint _204 = min(uint(View.ambient.w), 4u);
+    float3 _206;
+    _206 = View.ambient.xyz;
+    float3 _207;
+    for (uint _209 = 0u; _209 < _204; _206 = _207, _209++)
+    {
+        uint _214 = _209 * 3u;
+        float3 _218 = View.sources[_214].xyz - _126;
+        float _220 = precise::max(length(_218), 9.9999997473787516355514526367188e-05);
+        float3 _222 = _218 / float3(_220);
+        uint _228 = _214 + 1u;
+        float _245;
+        if (View.sources[_228].w >= (-1.0))
+        {
+            _245 = fast::clamp((dot(-_222, View.sources[_214 + 2u].xyz) - View.sources[_228].w) / (1.0 - View.sources[_228].w), 0.0, 1.0);
+        }
+        else
+        {
+            _245 = 1.0;
+        }
+        _207 = _206 + (View.sources[_228].xyz * ((fast::clamp(1.0 - (_220 / View.sources[_214].w), 0.0, 1.0) * _245) * precise::max(0.0, dot(_197, _222))));
+    }
+    out.out_var_TEXCOORD0 = (View.color.xyz * precise::min(_206, float3(1.0))) * View.scale.w;
     out.out_var_TEXCOORD1 = in.in_var_TEXCOORD1 + View._textureOffset.xy;
-    out.out_var_TEXCOORD2 = _113;
+    out.out_var_TEXCOORD2 = _126;
     out.out_var_TEXCOORD3 = float2(-1.0);
-    out.gl_Position = select(float4(dot(_117, View.right.xyz) * View.projection.x, dot(_117, View.up.xyz) * View.projection.y, (_121 * View.projection.z) + View.projection.w, _121), float4(0.0), bool4(((((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.y * 2u)) + 1u])[3] + ((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.z * 2u)) + 1u])[3]) + ((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.w * 2u)) + 1u])[3]) > 0.0));
+    out.gl_Position = select(float4(dot(_130, View.right.xyz) * View.projection.x, dot(_130, View.up.xyz) * View.projection.y, (_134 * View.projection.z) + View.projection.w, _134), float4(0.0), bool4(((((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.y * 2u)) + 1u])[3] + ((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.z * 2u)) + 1u])[3]) + ((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.w * 2u)) + 1u])[3]) > 0.0));
     return out;
 }
 

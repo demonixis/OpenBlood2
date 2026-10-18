@@ -1438,3 +1438,7 @@ DAT v56 per-vertex RGB is read as baked light (world ambient included), as estab
 ## Original DAT lightmaps (2026-10-18)
 
 The DAT v56 lightmap block, axes, extents and origin rule are reverse-engineered from the 58 retail worlds and corroborated by later LithTech preprocessor and renderer code. Composition follows the shipped `defaults.cfg` Saturate default and the strings in the installed renderer; no code is imported or executed. Atlas packing and bilinear sampling are replacement policies. See [source ledger](sources/lightmap_sources.json) and [contracts](../contracts/lightmap_contracts.md).
+
+## Static light objects and model lighting (2026-10-18)
+
+The original light term is established by fitting light objects against retail baked vertex colors; later LithTech model-light ranking and Saturate shading are consulted. No code is imported. Lambert shading, the source limit and occlusion are replacement policies. See [source ledger](sources/static_light_sources.json) and [contracts](../contracts/static_light_contracts.md).

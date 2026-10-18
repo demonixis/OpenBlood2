@@ -350,7 +350,7 @@ namespace OpenBlood2
                     return false;
                 }
                 nodes[0] = nodes[corner + 1];
-                out.push_back({source.position, uv, nodes, deform[vertex]});
+                out.push_back({source.position, uv, nodes, deform[vertex], source.normal});
             }
         }
         return true;
@@ -489,13 +489,13 @@ namespace OpenBlood2
         (close ? close_draws : world_draws).push_back({entry.range, pose.position, pose.rotation, alpha});
         return true;
     }
-    bool ModelView::set_light(std::size_t index, DVector light)
+    bool ModelView::set_light(std::size_t index, const ModelLight& light)
     {
         if (!gpu_skinning || index >= entries.size() || entries[index].range >= instances.size())
             return false;
         auto& instance = instances[entries[index].range];
         if (instance.material)
-            instance.color = light;
+            instance.light = light;
         return true;
     }
     void ModelView::mark_translucent(std::size_t index)

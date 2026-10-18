@@ -15,9 +15,10 @@ namespace OpenBlood2
         // Lightmap page coordinates; negative when the face uses its vertex light instead.
         std::array<float, 2> lightmap{-1, -1};
     };
-    // Shipped Blood II defaults.cfg sets "Saturate" 1: lightmapped faces draw texture * 2 * light
-    // (later LithTech's MODULATE2X/SRCCOLOR blend); Gouraud faces stay texture * light.
-    constexpr float world_lightmap_scale = 2;
+    // Shipped Blood II defaults.cfg sets "Saturate" 1 (later LithTech: MODULATE2X/SRCCOLOR). Light
+    // terms that include N.L (lightmaps, Gouraud-shaded models) are doubled; the preprocessor's
+    // vertex light omits N.L and stays texture * light.
+    constexpr float world_saturate_scale = 2;
     // Lightmap texel origin along one axis (dot with the surface lightmap axis): the
     // polygon minimum snapped to the 20-unit grid. Points exactly on a grid line snap to
     // either neighbor depending on preprocessor float noise, so the stored texel count picks

@@ -67,39 +67,65 @@ namespace OpenBlood2
     void ModelLighting::clear()
     {
         shade_.clear();
+        lights_.clear();
         samples_.clear();
         next_.clear();
         poses_.clear();
         ambient_ = {};
-        floor_ = 0;
         stats = {};
     }
     bool ModelLighting::build(const WorldMesh& mesh, const World& world, std::string& error)
     {
         clear();
-        if (!shade_.build(mesh, error))
+        if (!shade_.build(mesh, error) || !world_static_lights(world, lights_, stats.lights, error))
+        {
+            clear();
             return false;
+        }
         DVector ambient{};
         world_info_ambient(world.info, ambient); // Absent or malformed: no ambient.
         stats.world_ambient = ambient;
         ambient_ = vector_scale(ambient, 1.f / 255);
-        floor_ = world.min.y - 1;
         poses_.resize(mesh.ranges.size());
         return true;
     }
     void ModelLighting::sample(DVector center, std::span<const WorldDraw> draws, Sample& out)
     {
-        out.center = center;
-        const DVector bottom{center.x, std::min(center.y, floor_), center.z};
-        float fraction = 1;
-        if (!shade_.trace(center, bottom, draws, out.light, fraction))
+        out = {};
+        out.center = out.min = out.max = center;
+        ranked_.clear();
+        for (std::size_t i = 0; i < lights_.size(); ++i)
         {
-            out.light = ambient_;
-            ++stats.ambient;
+            const auto& light = lights_[i];
+            const auto value = static_light_at(light, center);
+            const float strength = std::max({value.x, value.y, value.z});
+            if (strength <= 0)
+                continue;
+            out.min = {std::min(out.min.x, light.position.x), std::min(out.min.y, light.position.y),
+                       std::min(out.min.z, light.position.z)};
+            out.max = {std::max(out.max.x, light.position.x), std::max(out.max.y, light.position.y),
+                       std::max(out.max.z, light.position.z)};
+            if (light.clip && shade_.blocked(center, light.position, draws))
+            {
+                ++stats.occluded;
+                continue;
+            }
+            ranked_.push_back({strength, i, value});
         }
-        const float hit = center.y + (bottom.y - center.y) * fraction;
-        out.min = {center.x, hit, center.z};
-        out.max = center;
+        // Strongest first; ties keep authored order.
+        std::stable_sort(ranked_.begin(), ranked_.end(),
+                         [](const Ranked& a, const Ranked& b) { return a.strength > b.strength; });
+        for (std::size_t k = 0; k < ranked_.size(); ++k)
+        {
+            if (k < ModelLight::source_limit)
+            {
+                const auto& light = lights_[ranked_[k].light];
+                out.light.sources[k] = {light.position, light.color, light.direction, light.radius, light.cos_half};
+                out.light.count = static_cast<std::uint32_t>(k + 1);
+            }
+            else
+                out.remainder = vector_add(out.remainder, ranked_[k].value);
+        }
         ++stats.sampled;
     }
     bool ModelLighting::apply(const GameSession& game, const WorldMesh& mesh, std::span<const WorldDraw> draws,
@@ -107,7 +133,7 @@ namespace OpenBlood2
     {
         error.clear();
         const auto shade = shade_.stats;
-        stats.models = stats.sampled = stats.reused = stats.ambient = stats.unlit = 0;
+        stats.models = stats.sampled = stats.reused = stats.unlit = stats.flat = stats.sources = stats.occluded = 0;
         stats.model_add = {console_channel(game, "ModelAddR"), console_channel(game, "ModelAddG"),
                            console_channel(game, "ModelAddB")};
         stats.model_dir_add = {console_channel(game, "ModelDirAddR"), console_channel(game, "ModelDirAddG"),
@@ -179,7 +205,9 @@ namespace OpenBlood2
             if (record && (record->state.m_Flags & FLAG_NOLIGHT))
             {
                 ++stats.unlit;
-                scene.set_light(i, clamp_light(record->color));
+                ModelLight unlit;
+                unlit.ambient = clamp_light(record->color);
+                scene.set_light(i, unlit);
                 continue;
             }
             const auto center = entry.close ? view.position : instance.center;
@@ -210,14 +238,34 @@ namespace OpenBlood2
                 sample(center, draws, current);
             if (entry.object)
                 next_[key] = current;
-            auto light = vector_add(current.light, add);
+            auto light = current.light;
+            light.ambient = vector_add(vector_add(ambient_, add), current.remainder);
             if (record)
-                light = vector_add(light, record->color);
-            scene.set_light(i, clamp_light(light));
+                light.ambient = vector_add(light.ambient, record->color);
+            // Without Gouraud model shading every source joins the ambient at the center. View
+            // models have no object record and are shaded.
+            const bool gouraud = !record || (record->state.m_Flags & FLAG_MODELGOURAUDSHADE);
+            if (!gouraud)
+            {
+                ++stats.flat;
+                for (std::uint32_t k = 0; k < light.count; ++k)
+                {
+                    const auto& source = light.sources[k];
+                    StaticLight flat{source.position, source.color, source.radius, source.direction, source.cos_half};
+                    light.ambient = vector_add(light.ambient, static_light_at(flat, center));
+                }
+                light.count = 0;
+            }
+            stats.sources += light.count;
+            light.ambient = clamp_light(light.ambient);
+            if (gouraud)
+                light.scale = world_saturate_scale; // N.L shading, as lightmaps.
+            scene.set_light(i, light);
         }
         samples_.swap(next_);
         stats.shade = shade_.stats;
         stats.shade.traces -= shade.traces;
+        stats.shade.blocked -= shade.blocked;
         stats.shade.hits -= shade.hits;
         stats.shade.node_tests -= shade.node_tests;
         stats.shade.triangle_tests -= shade.triangle_tests;

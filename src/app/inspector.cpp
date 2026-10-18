@@ -535,22 +535,24 @@ namespace OpenBlood2
                                     "(Saturate)",
                                     world_mesh->lightmap_pages, WorldMesh::lightmap_page_size,
                                     world_mesh->lightmap_texels, world_mesh->lightmap_unfitted,
-                                    double(world_lightmap_scale));
+                                    double(world_saturate_scale));
                         if (model_lighting)
                         {
                             const auto& l = *model_lighting;
-                            ImGui::Text("Model light: %zu models (%zu sampled, %zu reused, %zu ambient fallback, %zu "
-                                        "FLAG_NOLIGHT) | %llu traces, %llu node / %llu triangle tests",
-                                        l.models, l.sampled, l.reused, l.ambient, l.unlit,
-                                        (unsigned long long)l.shade.traces, (unsigned long long)l.shade.node_tests,
-                                        (unsigned long long)l.shade.triangle_tests);
+                            ImGui::Text("Model light: %zu models (%zu sampled, %zu reused, %zu flat, %zu "
+                                        "FLAG_NOLIGHT), %zu directional sources, %zu occluded lights",
+                                        l.models, l.sampled, l.reused, l.flat, l.unlit, l.sources, l.occluded);
+                            ImGui::Text("Static lights: %zu (%zu without LightObjects, %zu invalid, %zu OuterColor) | "
+                                        "%llu occlusion traces, %llu blocked",
+                                        l.lights.lights, l.lights.without_objects, l.lights.invalid, l.lights.outer,
+                                        (unsigned long long)l.shade.traces, (unsigned long long)l.shade.blocked);
                             ImGui::Text("AmbientLight %.0f %.0f %.0f | ModelAdd %.0f %.0f %.0f | ModelDirAdd %.0f %.0f "
-                                        "%.0f (not applied: needs model normals)",
+                                        "%.0f (read, not applied)",
                                         l.world_ambient.x, l.world_ambient.y, l.world_ambient.z, l.model_add.x,
                                         l.model_add.y, l.model_add.z, l.model_dir_add.x, l.model_dir_add.y,
                                         l.model_dir_add.z);
-                            ImGui::TextWrapped("Replacement model light: baked world light below each model, no "
-                                               "static/dynamic light objects, normals or shadows; not retail parity.");
+                            ImGui::TextWrapped("Original light term per static light; Lambert N.L, source limit and "
+                                               "occlusion are replacement policy, not retail parity.");
                         }
                         ImGui::Text("Alpha: %zu prepared faces / %zu submitted batches / %llu passes",
                                     world_mesh->blended, world_render->alpha_batches,

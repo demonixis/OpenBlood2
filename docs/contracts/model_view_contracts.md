@@ -117,3 +117,5 @@ The [Gideon fade/teleport continuation](gideon_teleport_contracts.md) adds the o
 The [presentation performance continuation](render_performance_contracts.md) renders application models with GPU skinning (`ModelView::gpu_skinning`, `ModelRenderer`). Poses, deformation arithmetic, basis conversion, hidden-face omission, skins, magenta fallback and inspection entries are unchanged; close-view models use a reserved near depth slice of the single scene pass instead of a cleared depth target.
 
 The [baked lighting continuation](baked_lighting_contracts.md) sets GPU-skinned instance face colors from the baked world light below each model (`ModelView::set_light`, `SkinnedInstance::center`). Unresolved-material markers keep magenta. The CPU model path stays unlit.
+
+The [static light continuation](static_light_contracts.md) replaces `set_light(DVector)` with `set_light(ModelLight)` (ambient, scale and up to four sources) and adds authored normals to `SkinnedVertex`. Default instances stay fully bright, so CPU/GPU skinning equivalence is unchanged.

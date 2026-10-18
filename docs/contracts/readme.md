@@ -161,6 +161,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Presentation performance: single scene pass, batching, culling and mips](render_performance_contracts.md)
 - [Baked world lighting and replacement model light](baked_lighting_contracts.md)
 - [Original DAT lightmaps](lightmap_contracts.md)
+- [Static light objects and model lighting](static_light_contracts.md)
 - [Prepared ABC geometry and CPU sampling](model_preparation_contracts.md)
 - [Animated model presentation](model_view_contracts.md)
 - [Current budget continuation](object_particle_contracts.md)

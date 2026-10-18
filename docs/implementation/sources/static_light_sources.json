@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-18",
+  "scope": "Static light objects (Light/DirLight/ObjectLight), the original vertex light term, and replacement per-vertex model shading; no game or renderer code imported",
+  "retail_evidence": [
+    {
+      "file": "retail worlds/*.dat",
+      "purpose": "The light term color*(1-d/R)*linear cone, without N.L or occlusion, reproduces baked vertex colors within 3: SubwayA 100%, Steam Tunnels 99%, Train Station 99.8%, CityHub 95.5%. Lightmap texels measure 1.0-1.4x the same term with N.L."
+    }
+  ],
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/AppHeaders/engineobjects.c",
+      "source_sha256": "70730e7e8aa704de5c6ddfa40194227832260812f951a49fd76e7735b530f75f",
+      "purpose": "Light/DirLight/ObjectLight/GlobalDirLight properties and CF_NORUNTIME; ObjectLight lights only objects, GlobalDirLight only the world."
+    },
+    {
+      "source": "sources/lithtech/Blood2/AppHeaders/basetypes_de.h",
+      "source_sha256": "9447597d4d3d893572d0e74929352e9ffd742a7520aaf2d3f3c37ff4598fe4cb",
+      "purpose": "FLAG_MODELGOURAUDSHADE (Gouraud model shading) and FLAG_NOLIGHT (object color only) definitions."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/relevantlightlist.cpp",
+      "source_sha256": "c994a58b7b8bb73a7e2dbd6d588721e98acedbbde77a2c604a7b3a0793c58372",
+      "purpose": "Later-generation ranking: strongest lights at the object center become device lights, the rest join the ambient."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/renderlight.cpp",
+      "source_sha256": "e54e453151b6df2e764ad5a4fc35efcca163ff313690e23c52b898499f0e248a",
+      "purpose": "Later-generation spot evaluation and model light sampling, consulted for the selection policy."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/d3d_rendershader_gouraud.cpp",
+      "source_sha256": "e03219fdb04660c46df27308e4688c14694750fe21f048332aa5dceabbf4757f",
+      "purpose": "Saturate applies MODULATE2X to Gouraud shading in later LithTech, supporting the doubling of N.L model light."
+    }
+  ],
+  "reference_revision": {
+    "repository": "https://github.com/jsj2008/lithtech",
+    "revision": "0eab18289bed72879eddb648d3311075b108cf46"
+  },
+  "adaptations": [
+    "Lambert N.L per model vertex, the four-source limit and ClipLight occlusion at the model center are replacement policies.",
+    "N.L model light is doubled like lightmaps; flat and unlit models are not."
+  ]
+}

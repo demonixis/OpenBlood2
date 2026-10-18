@@ -6,7 +6,7 @@ namespace OpenBlood2
     struct WorldShadeStats
     {
         std::size_t triangles = 0, nodes = 0;
-        std::uint64_t traces = 0, hits = 0, node_tests = 0, triangle_tests = 0;
+        std::uint64_t traces = 0, hits = 0, node_tests = 0, triangle_tests = 0, blocked = 0;
     };
     // Baked light of the textured opaque faces of every world range, for reading the light
     // around a point: the face's lightmap (scaled like the renderer) or its vertex light.
@@ -21,6 +21,8 @@ namespace OpenBlood2
         // Interpolated face light at the nearest face (either side) crossed by the segment
         // from `from` to `to` among the given range draws. False when nothing is crossed.
         bool trace(DVector from, DVector to, std::span<const WorldDraw>, DVector& light, float& fraction);
+        // True when any indexed face crosses the open segment (ends excluded by a small margin).
+        bool blocked(DVector from, DVector to, std::span<const WorldDraw>);
         WorldShadeStats stats;
         static constexpr std::size_t triangle_limit = 1000000;
 

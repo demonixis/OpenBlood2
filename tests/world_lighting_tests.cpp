@@ -169,8 +169,8 @@ namespace
         float fraction = 0;
         CHECK(shade.trace({0, 10, 0}, {0, -10, 0}, std::vector<WorldDraw>{{0, {}, {{0, 0, 0}, 1}}}, light, fraction));
         const auto* center = texel(2, 2);
-        CHECK(near(light, {world_lightmap_scale * center[0] / 255.f, world_lightmap_scale * center[1] / 255.f,
-                           world_lightmap_scale * center[2] / 255.f}));
+        CHECK(near(light, {world_saturate_scale * center[0] / 255.f, world_saturate_scale * center[1] / 255.f,
+                           world_saturate_scale * center[2] / 255.f}));
         // Fully bright, sky, empty entries and models without a located block use no lightmap.
         for (int variant = 0; variant < 4; ++variant)
         {
@@ -190,6 +190,51 @@ namespace
         // A reference beyond the stored texels fails the build.
         w.models[0].polygons[0].lightmap_offset = 1;
         CHECK(!mesh.build(w, error, &resources) && error == "Invalid world lightmap reference");
+        return true;
+    }
+    WorldObject light_object(std::string type, std::vector<WorldProperty> properties)
+    {
+        return {std::move(type), std::move(properties)};
+    }
+    bool lights()
+    {
+        std::string error;
+        World w;
+        w.objects.push_back(light_object("Light", {{"Pos", 2, 0, DVector{0, 100, 0}},
+                                                   {"LightRadius", 3, 0, 200.f},
+                                                   {"LightColor", 2, 0, DVector{255, 128, 0}},
+                                                   {"BrightScale", 3, 0, .5f},
+                                                   {"LightObjects", 5, 0, true}}));
+        // A cone pointing down (pitch 90 degrees) with a 90-degree FOV.
+        w.objects.push_back(light_object("DirLight", {{"Pos", 2, 0, DVector{0, 100, 0}},
+                                                      {"LightRadius", 3, 0, 100.f},
+                                                      {"InnerColor", 2, 0, DVector{255, 255, 255}},
+                                                      {"FOV", 3, 0, 90.f},
+                                                      {"Rotation", 7, 0, EulerAngles{{1.57079632679f, 0, 0}}},
+                                                      {"ClipLight", 5, 0, false}}));
+        w.objects.push_back(light_object("Light", {{"Pos", 2, 0, DVector{}},
+                                                   {"LightRadius", 3, 0, 50.f},
+                                                   {"LightColor", 2, 0, DVector{1, 1, 1}},
+                                                   {"LightObjects", 5, 0, false}}));
+        w.objects.push_back(light_object("ObjectLight", {{"Pos", 2, 0, DVector{}}, {"LightRadius", 3, 0, -1.f}}));
+        w.objects.push_back(light_object("GlobalDirLight", {}));
+        std::vector<StaticLight> out;
+        StaticLightStats stats;
+        CHECK(world_static_lights(w, out, stats, error) && out.size() == 2 && stats.without_objects == 1 &&
+              stats.invalid == 1);
+        CHECK(near(out[0].color, {.5f, 64 / 255.f, 0}) && out[0].cos_half < -1 && out[0].clip);
+        CHECK(near(out[1].direction, {0, -1, 0}) && std::abs(out[1].cos_half - std::cos(.785398163f)) < 1e-5f &&
+              !out[1].clip);
+        // Linear falloff, no N.L: half the radius gives half the color.
+        CHECK(near(static_light_at(out[0], {0, 0, 0}), vector_scale(out[0].color, .5f)));
+        CHECK(near(static_light_at(out[0], {0, 300, 0}), {0, 0, 0}));
+        // Cone: on axis (1 - 50/100) * 1; at 45 degrees off axis the linear cone factor reaches zero.
+        CHECK(near(static_light_at(out[1], {0, 50, 0}), {.5f, .5f, .5f}));
+        CHECK(near(static_light_at(out[1], {30, 70, 0}), {0, 0, 0}));
+        // 18.4 degrees off axis at distance sqrt(1000): linear falloff times the linear cone factor.
+        const float cone = (3 / std::sqrt(10.f) - std::cos(.785398163f)) / (1 - std::cos(.785398163f));
+        CHECK(
+            near(static_light_at(out[1], {10, 70, 0}), vector_scale({1, 1, 1}, (1 - std::sqrt(1000.f) / 100) * cone)));
         return true;
     }
     bool ambient()
@@ -231,6 +276,33 @@ namespace
                 }
             DVector world_ambient{};
             CHECK(world_info_ambient(game.world.info, world_ambient));
+            // The original light term with these light objects reproduces the preprocessor's
+            // vertex colors: unshadowed sums, no N.L (SubwayA every vertex, CityHub most).
+            std::vector<StaticLight> statics;
+            StaticLightStats light_stats;
+            CHECK(world_static_lights(game.world, statics, light_stats, error) && light_stats.invalid == 0);
+            std::size_t vertices = 0, matched = 0;
+            const auto& root = game.world.models.front();
+            for (std::size_t index = 0; index < root.polygons.size(); index += 7)
+            {
+                const auto& polygon = root.polygons[index];
+                if (root.surfaces[polygon.surface].flags & ((1u << 2) | (1u << 4)))
+                    continue;
+                for (std::size_t k = 0; k < polygon.base_points; ++k)
+                {
+                    DVector predicted = world_ambient;
+                    for (const auto& light : statics)
+                        predicted = vector_add(
+                            predicted, vector_scale(static_light_at(light, root.points[polygon.points[k]]), 255));
+                    const auto& rgb = polygon.colors[k];
+                    ++vertices;
+                    matched += std::abs(std::min(predicted.x, 255.f) - rgb[0]) <= 3 &&
+                               std::abs(std::min(predicted.y, 255.f) - rgb[1]) <= 3 &&
+                               std::abs(std::min(predicted.z, 255.f) - rgb[2]) <= 3;
+                }
+            }
+            CHECK(vertices > 1000 && matched * 100 >= vertices * (std::string(name) == "01_SubwayA" ? 99 : 90));
+            std::cout << name << ": light term matches " << matched << "/" << vertices << " baked vertices\n";
             CHECK(darkest[0] == int(world_ambient.x) && darkest[1] == int(world_ambient.y) &&
                   darkest[2] == int(world_ambient.z));
             std::size_t located = 0, entries = 0;
@@ -253,13 +325,36 @@ namespace
             CHECK(world_draws(mesh, game.objects, draws, stats, error));
             CHECK(update_model_scene(game, scene, error) && lighting.apply(game, mesh, draws, scene, error));
             CHECK(lighting.stats.models > 0 && lighting.stats.sampled == lighting.stats.models);
-            std::size_t lit = 0;
+            // Static lights reach models: Gouraud-shaded characters get directional sources and
+            // every light term stays within 0-1 after the ambient clamp.
+            std::size_t directional = 0;
             for (const auto& instance : scene.instances)
             {
-                CHECK(instance.color.x >= 0 && instance.color.x <= 1 && instance.color.z >= 0 && instance.color.z <= 1);
-                lit += instance.material && !near(instance.color, {1, 1, 1});
+                const auto& light = instance.light;
+                CHECK(light.count <= ModelLight::source_limit && light.ambient.x >= 0 && light.ambient.x <= 1 &&
+                      light.ambient.z >= 0 && light.ambient.z <= 1);
+                directional += light.count;
             }
-            CHECK(lit > 0);
+            CHECK(lighting.stats.lights.lights > 100 && lighting.stats.lights.invalid == 0 && directional > 0 &&
+                  directional == lighting.stats.sources);
+            // Sources are the strongest lights at the center, strongest first (view models use the camera).
+            for (const auto& entry : scene.entries)
+            {
+                if (entry.close || entry.range >= scene.instances.size())
+                    continue;
+                const auto& instance = scene.instances[entry.range];
+                for (std::uint32_t k = 1; k < instance.light.count; ++k)
+                {
+                    auto strength = [&](const ModelLight::Source& source)
+                    {
+                        const StaticLight light{source.position, source.color, source.radius, source.direction,
+                                                source.cos_half};
+                        const auto value = static_light_at(light, instance.center);
+                        return std::max({value.x, value.y, value.z});
+                    };
+                    CHECK(strength(instance.light.sources[k - 1]) >= strength(instance.light.sources[k]));
+                }
+            }
             // Unchanged models and ranges reuse their samples on the next frame.
             CHECK(update_model_scene(game, scene, error) && lighting.apply(game, mesh, draws, scene, error));
             CHECK(lighting.stats.reused + lighting.stats.sampled == lighting.stats.models && lighting.stats.reused > 0);
@@ -267,8 +362,9 @@ namespace
                       << darkest[1] << " " << darkest[2] << ", " << mesh.lightmapped << " lightmapped ("
                       << mesh.lightmap_pages << " pages, " << mesh.lightmap_texels << " texels) / " << mesh.lit
                       << " vertex-lit / " << mesh.fullbright << " fully bright faces, " << lighting.stats.models
-                      << " lit models, " << lighting.stats.ambient << " ambient fallbacks, ModelAdd "
-                      << lighting.stats.model_add.x << "\n";
+                      << " lit models (" << lighting.stats.sources << " directional sources, " << lighting.stats.flat
+                      << " flat, " << lighting.stats.occluded << " occluded), " << lighting.stats.lights.lights
+                      << " static lights, ModelAdd " << lighting.stats.model_add.x << "\n";
             CHECK(game.objects.finish_frame() && game.unload_world());
         }
         return true;
@@ -281,6 +377,7 @@ int main(int argc, char** argv)
     const bool ok = c == "mesh"       ? mesh(root)
                     : c == "shade"    ? shade(root)
                     : c == "origin"   ? origin()
+                    : c == "lights"   ? lights()
                     : c == "lightmap" ? lightmap(root)
                     : c == "ambient"  ? ambient()
                     : c == "retail"   ? retail(root)

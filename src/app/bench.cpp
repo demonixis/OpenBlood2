@@ -206,11 +206,12 @@ namespace OpenBlood2
             const auto& mesh = presenter.world_mesh;
             spdlog::info("Lightmaps: {} faces, {} pages, {} texels, {} unfitted origin axes", mesh.lightmapped,
                          mesh.lightmap_pages, mesh.lightmap_texels, mesh.lightmap_unfitted);
-            spdlog::info("Lighting: {} baked / {} fully bright textured faces; {} lit models ({} sampled, {} reused, "
-                         "{} ambient fallback, {} FLAG_NOLIGHT) last frame; ModelAdd {} {} {}",
-                         presenter.world_mesh.lit, presenter.world_mesh.fullbright, lighting.models, lighting.sampled,
-                         lighting.reused, lighting.ambient, lighting.unlit, lighting.model_add.x, lighting.model_add.y,
-                         lighting.model_add.z);
+            spdlog::info("Lighting: {} vertex-lit / {} fully bright textured faces; {} static lights; {} lit models "
+                         "({} sampled, {} reused, {} flat, {} FLAG_NOLIGHT, {} directional sources, {} occluded "
+                         "lights) last frame; ModelAdd {} {} {}",
+                         mesh.lit, mesh.fullbright, lighting.lights.lights, lighting.models, lighting.sampled,
+                         lighting.reused, lighting.flat, lighting.unlit, lighting.sources, lighting.occluded,
+                         lighting.model_add.x, lighting.model_add.y, lighting.model_add.z);
             if (!options.capture_file.empty())
             {
                 if (!capture.save(path_text(options.capture_file).c_str()))

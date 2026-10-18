@@ -115,3 +115,5 @@ GetPointShade, shadows and general dynamic illumination remain unavailable.
 Earlier blanket flashlight omissions are superseded only by this bounded subset.
 
 The [baked lighting continuation](baked_lighting_contracts.md) renders the preprocessed light of `Light`/`DirLight` objects that the DAT bakes into per-vertex colors, and lights models from it. Light objects themselves still have no runtime service, and dynamic lights other than the flashlight still illuminate nothing.
+
+The [static light continuation](static_light_contracts.md) reads `Light`/`DirLight`/`ObjectLight` properties directly to light models with the verified original term. These objects still create no runtime object.

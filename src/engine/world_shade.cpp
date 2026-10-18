@@ -159,9 +159,68 @@ namespace OpenBlood2
         };
         float out[3];
         for (int c = 0; c < 3; ++c)
-            out[c] = world_lightmap_scale * ((1 - fy) * ((1 - fx) * texel(x0, y0, c) + fx * texel(x0 + 1, y0, c)) +
+            out[c] = world_saturate_scale * ((1 - fy) * ((1 - fx) * texel(x0, y0, c) + fx * texel(x0 + 1, y0, c)) +
                                              fy * ((1 - fx) * texel(x0, y0 + 1, c) + fx * texel(x0 + 1, y0 + 1, c)));
         return {out[0], out[1], out[2]};
+    }
+    bool WorldShade::blocked(DVector from, DVector to, std::span<const WorldDraw> draws)
+    {
+        ++stats.traces;
+        const auto segment = vector_subtract(to, from);
+        const float length = std::sqrt(vector_dot(segment, segment));
+        if (!(length > 2))
+            return false;
+        const float margin = 1 / length; // One unit at each end: the light's own fixture and the probe.
+        for (const auto& draw : draws)
+        {
+            if (draw.range >= ranges_.size() || ranges_[draw.range].nodes.empty())
+                continue;
+            const auto& tree = ranges_[draw.range];
+            const auto inverse = inverse_rotation(draw.rotation);
+            const auto origin = rotate_vector(vector_subtract(from, draw.position), inverse);
+            const auto delta = vector_subtract(rotate_vector(vector_subtract(to, draw.position), inverse), origin);
+            stack_.assign(1, 0);
+            while (!stack_.empty())
+            {
+                const auto& node = tree.nodes[stack_.back()];
+                stack_.pop_back();
+                ++stats.node_tests;
+                if (!segment_box(origin, delta, 1 - margin, node.min, node.max))
+                    continue;
+                if (node.left || node.right)
+                {
+                    stack_.push_back(node.left);
+                    stack_.push_back(node.right);
+                    continue;
+                }
+                for (auto i = node.begin; i < node.end; ++i)
+                {
+                    const auto& t = tree.triangles[i];
+                    ++stats.triangle_tests;
+                    const auto e1 = vector_subtract(t.points[1], t.points[0]);
+                    const auto e2 = vector_subtract(t.points[2], t.points[0]);
+                    const auto p = cross(delta, e2);
+                    const float det = vector_dot(e1, p);
+                    if (std::abs(det) < 1e-12f)
+                        continue;
+                    const auto s = vector_subtract(origin, t.points[0]);
+                    const float u = vector_dot(s, p) / det;
+                    if (u < 0 || u > 1)
+                        continue;
+                    const auto q = cross(s, e1);
+                    const float v = vector_dot(delta, q) / det;
+                    if (v < 0 || u + v > 1)
+                        continue;
+                    const float f = vector_dot(e2, q) / det;
+                    if (f > margin && f < 1 - margin)
+                    {
+                        ++stats.blocked;
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
     bool WorldShade::trace(DVector from, DVector to, std::span<const WorldDraw> draws, DVector& light, float& fraction)
     {

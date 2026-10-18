@@ -8,14 +8,17 @@ namespace OpenBlood2
 {
     namespace
     {
-        // Matches the skinned.vert std140 View block: the world uniform, then scale, color and bases.
+        // Matches the skinned.vert std140 View block: the world uniform, then scale, color,
+        // bases, ambient (w = source count) and three float4 per light source.
         struct SkinnedUniform
         {
             WorldViewUniform view;
             std::array<float, 4> scale{}, color{};
             std::array<std::uint32_t, 4> bases{};
+            std::array<float, 4> ambient{};
+            std::array<std::array<float, 4>, 3 * ModelLight::source_limit> sources{};
         };
-        static_assert(sizeof(SkinnedUniform) == 176);
+        static_assert(sizeof(SkinnedUniform) == 384);
     } // namespace
     ModelRenderer::~ModelRenderer()
     {
@@ -225,9 +228,19 @@ namespace OpenBlood2
                 skinned.view.projection[2] = far / (far - near);
                 skinned.view.projection[3] = -near * far / (far - near);
             }
-            skinned.scale = {instance.scale.x, instance.scale.y, instance.scale.z, 0};
+            skinned.scale = {instance.scale.x, instance.scale.y, instance.scale.z, instance.light.scale};
             skinned.color = {instance.color.x, instance.color.y, instance.color.z, 1};
             skinned.bases = {instance.palette, instance.deformation, 0, 0};
+            const auto& model_light = instance.light;
+            skinned.ambient = {model_light.ambient.x, model_light.ambient.y, model_light.ambient.z,
+                               float(std::min<std::size_t>(model_light.count, ModelLight::source_limit))};
+            for (std::size_t i = 0; i < ModelLight::source_limit; ++i)
+            {
+                const auto& source = model_light.sources[i];
+                skinned.sources[i * 3] = {source.position.x, source.position.y, source.position.z, source.radius};
+                skinned.sources[i * 3 + 1] = {source.color.x, source.color.y, source.color.z, source.cos_half};
+                skinned.sources[i * 3 + 2] = {source.direction.x, source.direction.y, source.direction.z, 0};
+            }
             SDL_PushGPUVertexUniformData(target.commands, 0, &skinned, sizeof(skinned));
             const std::array<float, 12> fragment{d.alpha,
                                                  0,

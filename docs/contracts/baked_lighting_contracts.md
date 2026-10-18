@@ -129,3 +129,5 @@ CityHub reports 0 and its 89 `SURF_BRIGHT` faces are fully bright.
 - A later baked-plus-realtime design.
 
 The [lightmap continuation](lightmap_contracts.md) decodes the stored DAT lightmaps. Lightmapped faces now draw `albedo * 2 * min(lightmap + radial light, 1)` (the shipped Saturate default), and model sampling reads the hit face's lightmap with the same scale. Per-vertex light remains for Gouraud-only faces, for empty entries and for models whose lightmap block does not validate. Earlier statements that lightmaps are pending or undecoded are superseded.
+
+The [static light continuation](static_light_contracts.md) replaces the floor-sampling model light with the original light objects: Lambert-shaded sources plus `AmbientLight`, `ModelAdd` and object color, with N.L terms doubled like lightmaps. `WorldShade` now serves occlusion tests; `trace` remains for tests. Earlier statements that model lights come from the face below are superseded.

@@ -58,7 +58,7 @@ Blood II ships `defaults.cfg` with `"Saturate" "1"`, and the 1.x renderer expose
 `MODULATE2X`/`SRCCOLOR` while plain Gouraud stays unscaled. The fragment shaders
 therefore compute:
 
-- lightmapped faces: `albedo * world_lightmap_scale (2) * min(lightmap + radial light, 1)`,
+- lightmapped faces: `albedo * world_saturate_scale (2) * min(lightmap + radial light, 1)`,
   following the original order (lightmap, dynamic lights added in the framebuffer, then
   the texture multiply);
 - other faces: `albedo * (vertex light + radial light)`, unchanged.

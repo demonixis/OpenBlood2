@@ -5,8 +5,13 @@ StructuredBuffer<float4> palette : register(t0, space0);
 StructuredBuffer<float4> deformation : register(t1, space0);
 cbuffer View : register(b0, space1)
 {
-    float4 eye, right, up, forward, projection, translation, quaternion, textureOffset, scale, color;
-    uint4 bases; // x: palette base (float4 index), y: deformation base.
+    float4 eye, right, up, forward, projection, translation, quaternion, textureOffset;
+    float4 scale; // xyz: model scale; w: light scale after the clamp.
+    float4 color;
+    uint4 bases;    // x: palette base (float4 index), y: deformation base.
+    float4 ambient; // rgb; w: light source count (at most 4).
+    // Per source: position + radius, color + cone cosine (below -1: no cone), cone axis.
+    float4 sources[12];
 };
 struct Input
 {
@@ -14,6 +19,7 @@ struct Input
     float2 uv : TEXCOORD1;
     uint4 nodes : TEXCOORD2; // x: vertex node slot; yzw: the face's three corner slots.
     uint deform : TEXCOORD3; // Deformation slot, or 0xffffffff for the authored position.
+    float3 normal : TEXCOORD4;
 };
 struct Output
 {
@@ -46,7 +52,26 @@ Output main(Input input)
         0.0)
         output.position = float4(0.0, 0.0, 0.0, 0.0);
     output.worldPosition = world;
-    output.faceColor = color.xyz;
+    // Original light term (color * (1 - d/R) * cone) with Lambert N.L per vertex, as Gouraud
+    // model shading; the sum saturates like fixed-function vertex light, then scale.w applies
+    // the Saturate doubling of N.L terms (1 for unlit and flat instances).
+    float3 normal = rotate(quaternion, rotate(rotation, input.normal));
+    normal *= rsqrt(max(dot(normal, normal), 1e-12));
+    float3 light = ambient.rgb;
+    uint count = min(uint(ambient.w), 4u);
+    for (uint i = 0u; i < count; ++i)
+    {
+        float3 toLight = sources[i * 3u].xyz - world;
+        float distanceToLight = max(length(toLight), 1e-4);
+        float3 direction = toLight / distanceToLight;
+        float attenuation = saturate(1.0 - distanceToLight / sources[i * 3u].w);
+        float coneCosine = sources[i * 3u + 1u].w;
+        float cone = coneCosine >= -1.0
+                         ? saturate((dot(-direction, sources[i * 3u + 2u].xyz) - coneCosine) / (1.0 - coneCosine))
+                         : 1.0;
+        light += sources[i * 3u + 1u].rgb * (attenuation * cone * max(0.0, dot(normal, direction)));
+    }
+    output.faceColor = color.xyz * min(light, float3(1.0, 1.0, 1.0)) * scale.w;
     output.texCoord = input.uv + textureOffset.xy;
     output.lightmapCoord = float2(-1.0, -1.0);
     return output;

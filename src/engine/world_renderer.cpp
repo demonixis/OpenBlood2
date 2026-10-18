@@ -87,7 +87,7 @@ namespace OpenBlood2
         SDL_GPUVertexBufferDescription skinned_buffer{};
         skinned_buffer.pitch = sizeof(SkinnedVertex);
         skinned_buffer.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
-        SDL_GPUVertexAttribute skinned_attributes[4]{};
+        SDL_GPUVertexAttribute skinned_attributes[5]{};
         skinned_attributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
         skinned_attributes[0].offset = offsetof(SkinnedVertex, position);
         skinned_attributes[1].location = 1;
@@ -99,6 +99,9 @@ namespace OpenBlood2
         skinned_attributes[3].location = 3;
         skinned_attributes[3].format = SDL_GPU_VERTEXELEMENTFORMAT_UINT;
         skinned_attributes[3].offset = offsetof(SkinnedVertex, deform);
+        skinned_attributes[4].location = 4;
+        skinned_attributes[4].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
+        skinned_attributes[4].offset = offsetof(SkinnedVertex, normal);
         for (std::size_t i = 0; success && i < pipelines_.size(); ++i)
         {
             const auto kind = static_cast<WorldPipeline>(i);
@@ -121,7 +124,7 @@ namespace OpenBlood2
             SDL_GPUGraphicsPipelineCreateInfo create{};
             create.vertex_shader = skin ? skinned : vertex;
             create.fragment_shader = blend ? alpha : opaque;
-            create.vertex_input_state = skin ? SDL_GPUVertexInputState{&skinned_buffer, 1, skinned_attributes, 4}
+            create.vertex_input_state = skin ? SDL_GPUVertexInputState{&skinned_buffer, 1, skinned_attributes, 5}
                                              : SDL_GPUVertexInputState{&buffer, 1, attributes, 4};
             create.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
             create.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
@@ -454,7 +457,7 @@ namespace OpenBlood2
                 }
                 const bool illuminate = !sky && style_ == DrawStyle::Opaque && !close_view;
                 const std::array<float, 12> fragment{d.alpha,
-                                                     world_lightmap_scale,
+                                                     world_saturate_scale,
                                                      0,
                                                      0,
                                                      light.position.x,

@@ -22,6 +22,22 @@ namespace OpenBlood2
         std::array<float, 2> uv{};           // Authored face-corner UV.
         std::array<std::uint8_t, 4> nodes{}; // Vertex node slot, then the face's three corner node slots.
         std::uint32_t deform = UINT32_MAX;   // Last packed-deformation slot writing this vertex, if any.
+        DVector normal{};                    // Authored node-local vertex normal (lighting only).
+    };
+    // Per-instance model light: ambient plus up to four sources lit per vertex with N.L.
+    // The default is fully bright (no lighting service).
+    struct ModelLight
+    {
+        struct Source
+        {
+            DVector position{}, color{}, direction{0, 0, 1};
+            float radius = 0, cos_half = -2; // cos_half below -1: no cone.
+        };
+        static constexpr std::size_t source_limit = 4;
+        DVector ambient{1, 1, 1};
+        float scale = 1; // Applied after the 0-1 clamp: world_saturate_scale for N.L shading.
+        std::uint32_t count = 0;
+        std::array<Source, source_limit> sources{};
     };
     // Validates node, face, UV and deformation references and builds the static corner stream.
     bool build_skinned_vertices(const Model&, std::vector<SkinnedVertex>&, std::string& error);
@@ -36,6 +52,7 @@ namespace OpenBlood2
         DVector scale{1, 1, 1}, color{1, 1, 1};
         DVector min{}, max{}; // Conservative scaled model-space bounds when bounded.
         DVector center{};     // World-space bounds center (the pose position when unbounded).
+        ModelLight light;
         bool bounded = false, translucent = false;
     };
     // Presentation-only snapshot. No original object pointer survives add().
@@ -75,9 +92,9 @@ namespace OpenBlood2
         static constexpr std::size_t palette_limit = 262144, deformation_limit = 1000000;
         // Marks an entry's drawn geometry translucent in either mode.
         void mark_translucent(std::size_t entry);
-        // Sets a GPU-skinned entry's light (its face color); unresolved-material markers and
-        // the CPU path stay unlit. False when the entry has no drawn instance.
-        bool set_light(std::size_t entry, DVector light);
+        // Sets a GPU-skinned entry's light; unresolved-material markers and the CPU path stay
+        // unlit. False when the entry has no drawn instance.
+        bool set_light(std::size_t entry, const ModelLight& light);
 
       private:
         struct Prepared
