@@ -89,3 +89,7 @@ compares 4,096 generated cases and 1,188 decisions from 132 sections with bound
 styles. The other 24 sections retain their missing-style failures. This does not
 certify audible timing, band selection, curves, note ownership, live pattern
 activation, personality graphs or playlist transitions. MUSIC and M2 remain open.
+
+The [grid cursor](music_cursor_contracts.md) now composes these decisions into one
+manual section traversal with original restart/variation/end rules. Live transport,
+seeking, notifications, active notes and MUSIC playback remain unavailable.

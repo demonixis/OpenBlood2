@@ -10,7 +10,7 @@ namespace OpenBlood2
     bool check_world_sound_smoke(GameSession& g)
     {
         // The world-owned music data exists independently of inspector visibility/reload.
-        const auto& music = g.music_catalog;
+        auto& music = g.music_catalog;
         if (!music.error.empty() || music.assets.empty() || music.personalities.size() != 1 ||
             !music.personalities.front().metadata || !music.personalities.front().error.empty() ||
             !music.assets.front().bank || !music.assets.front().bank_error.empty())
@@ -69,6 +69,19 @@ namespace OpenBlood2
                 ImaNotePitch pitch;
                 if (!resolve_ima_note_pitch(note, {}, context, pitch, error) || !pitch.converted)
                     return false;
+                ImaCursorSeed seed;
+                seed.random_channels = 0xffff;
+                if (!music.cursor.start(asset.section, asset.section_style, asset.timeline, asset.harmony, seed, error))
+                    return false;
+                for (unsigned step = 0; step < 8 && music.cursor.active(); ++step)
+                {
+                    const std::array<std::uint16_t, 16> cursor_draws{};
+                    if (!music.cursor.step(cursor_draws, error) || !music.cursor.last_step() ||
+                        music.cursor.last_step()->interval <= 0 || music.cursor.state().steps != step + 1)
+                        return false;
+                }
+                music.cursor_file = asset.filename;
+                // Retained by the catalogue until actual world unload/reload, even with UI hidden.
                 ++section_count;
             }
             if (asset.kind == MusicAssetKind::Style)

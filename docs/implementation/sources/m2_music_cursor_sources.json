@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "90ed46370d12dee326e9fbc12dcef2f0fc9e74e5",
+  "status": "M2 incomplete; explicit grid traversal, MUSIC unsupported",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/IMUSIC25.DLL",
+      "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "rvas": [
+        "0x16908",
+        "0x16b2a..0x16e5d",
+        "0x16e5d..0x16fd9",
+        "0x17103..0x1712b",
+        "0x1759f..0x179d5"
+      ],
+      "use": "Portable independent expression of original grid rules; original instructions compared with explicit excluded side effects, no commercial bytes imported"
+    }
+  ],
+  "observations": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "rva": "0x16908",
+    "generated": {
+      "sections": 128,
+      "steps": 2799,
+      "sha256": "166dcfdb0cff0dae19dcb2afe496e68b1749aa89591d0accf350226734b8cab0",
+      "fnv64": 10075978454587385952
+    },
+    "private": {
+      "sections": 132,
+      "steps": 8174,
+      "sha256": "43a59ca5b55ef2f482a2ad74bbf1d2e2f565a66a328ed34ddf7c946d40765ea9",
+      "fnv64": 14793402716944126194
+    },
+    "scope": "Original normal-mode grid/chord/mute/pattern/variation/note-admission decisions and end reset. Prepared inputs come from previously verified readers/helpers. Section event list and active notes empty; notifications, metronome, MIDI emission, playlist lookahead/repeats/transitions explicitly intercepted. This is not a full tick/audio equivalence claim."
+  },
+  "target_sha256": {
+    "CMakeLists.txt": "4108d9dd108f9ab6a3d21c9f52c7457c810ef348dfd471ffc44cc0bfe9887e6e",
+    "tests/CMakeLists.txt": "f3a29c83a6c14ab51439c695006923541688013fdb5b2f1681000eb1eae74869",
+    "src/engine/ima_cursor.h": "97cda158a2ed4f4ca2df16435027130332776a8bc876a9c62ad1e9bf0c1e90c8",
+    "src/engine/ima_cursor.cpp": "c346143d954b8320648030e37255b51ae4a7453eda5c2613133760c4543442a9",
+    "src/game/music_catalog.h": "97d0f130f68ca36a847ae2c1db473b01c4845df476beb748ca6cddbb2528d337",
+    "src/app/inspector_world_sounds.cpp": "0c7b23a4cdda86132511373f2d179dddc8cdf415ad8febdebc4361d8fdbe02a7",
+    "src/app/world_sound_smoke.cpp": "60e8869ec5f44f7c289b8d28ca5539aeaced45706f994577dc96a55c2f76b5dc",
+    "tests/ima_cursor_tests.cpp": "d2a80e81b83e0d6287af03171494669919826c5c6bff2c37981234e5cffc35ee",
+    "tests/music_asset_tests.cpp": "bfe861d4e57802fc8fb59d53ec191bff3278112bb1a708f3b92d21c55a1ebf24"
+  }
+}

@@ -133,7 +133,7 @@ namespace OpenBlood2
     } // namespace
     void Inspector::draw_world_sounds(GameSession& game)
     {
-        const auto& music = game.music_catalog;
+        auto& music = game.music_catalog;
         if (ImGui::TreeNodeEx("DLS instruments, samples and diagnostic notes", ImGuiTreeNodeFlags_DefaultOpen))
         {
             auto& sampler = game.server.audio.instruments;
@@ -271,6 +271,48 @@ namespace OpenBlood2
                 "activation, curves, personality "
                 "graphs and playlist playback are not implemented. MUSIC commands "
                 "still report unsupported. Explicit DLS diagnostic notes above use the existing audio output.");
+            if (ImGui::TreeNode("Grid cursor (manual steps; no playback)"))
+            {
+                ImGui::TextWrapped("Start from an IMA section below. Explicit zero seed/draws, all channels random. "
+                                   "No wall clock, MIDI, curves, active notes, repeats or playlist transitions.");
+                ImGui::Text("Section: %s", music.cursor_file.c_str());
+                if (ImGui::Button("Step grid"))
+                {
+                    const std::array<std::uint16_t, 16> draws{};
+                    music.cursor.step(draws, music.cursor_error);
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Stop cursor"))
+                {
+                    music.cursor.stop();
+                    music.cursor_file.clear();
+                    music.cursor_error.clear();
+                }
+                const auto& state = music.cursor.state();
+                ImGui::Text("%s | steps %llu | next tick %d / grid %d / serial %u",
+                            state.ended             ? "Traversal finished"
+                            : music.cursor.active() ? "Ready"
+                                                    : "Stopped",
+                            (unsigned long long)state.steps, state.tick, state.grid, state.serial);
+                if (const auto& last = music.cursor.last_step())
+                {
+                    ImGui::Text("Processed tick %d | pattern %zu | old ordinal %d (%s) | interval %d / count %d",
+                                last->tick, *last->pattern.pattern, last->grid_ordinal,
+                                last->grid ? "grid present" : "silent missing grid", last->interval,
+                                last->pattern_grids);
+                    ImGui::Text(
+                        "Restart %d | pattern chosen %d | chord changed %d | variations evaluated %d / draws %zu",
+                        last->command_restart, last->pattern_selected, last->chord_changed, last->variations_changed,
+                        last->draws_used);
+                    ImGui::Text("Note rows admitted %zu / muted %zu / variation excluded %zu | mute %04x",
+                                last->admitted, last->muted, last->excluded_variation, last->section.mute_mask);
+                    for (unsigned i = 0; i < 16; ++i)
+                        ImGui::Text("Channel %u variation %04x", i, state.channels.variations[i]);
+                }
+                if (!music.cursor_error.empty())
+                    ImGui::TextWrapped("Cursor refused: %s", music.cursor_error.c_str());
+                ImGui::TreePop();
+            }
             const auto prepared =
                 std::count_if(music.assets.begin(), music.assets.end(), [](const auto& a) { return bool(a.harmony); });
             const auto failed = std::count_if(music.assets.begin(), music.assets.end(),
@@ -368,6 +410,14 @@ namespace OpenBlood2
                 if (!asset.harmony_error.empty())
                     ImGui::TextWrapped("Harmony unavailable: %s", asset.harmony_error.c_str());
                 draw_section_selection(asset);
+                if (ImGui::Button("Start grid cursor probe"))
+                {
+                    ImaCursorSeed seed;
+                    seed.random_channels = 0xffff;
+                    if (music.cursor.start(asset.section, asset.section_style, asset.timeline, asset.harmony, seed,
+                                           music.cursor_error))
+                        music.cursor_file = asset.filename;
+                }
                 if (asset.harmony && ImGui::TreeNode("Prepared harmony (no live activation)"))
                 {
                     const auto& h = *asset.harmony;

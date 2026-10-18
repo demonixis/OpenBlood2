@@ -2,6 +2,7 @@
 #include "engine/config.h"
 #include "engine/dls_bank.h"
 #include "engine/ima_band.h"
+#include "engine/ima_cursor.h"
 #include "engine/ima_harmony.h"
 #include "engine/ima_section.h"
 #include "engine/ima_style.h"
@@ -35,6 +36,8 @@ namespace OpenBlood2
     struct MusicCatalog
     {
         MusicAssetPlan plan;
+        ImaSectionCursor cursor; // Explicit inspection traversal; reset with the world catalogue.
+        std::string cursor_file, cursor_error;
         std::vector<MusicAssetRecord> assets;
         std::vector<MusicPersonalityRecord> personalities; // Dependencies, separate from original playlist requests.
         std::string error;

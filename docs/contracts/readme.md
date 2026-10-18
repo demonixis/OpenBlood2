@@ -186,3 +186,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [IMA harmonic note conversion](music_pitch_contracts.md): effective-context mode/scale/chord arithmetic, bounded failure and diagnostic event preparation.
 
 - [IMA prepared harmony](music_harmony_contracts.md): bounded personality metadata, original chord flags and explicit live-selection limits.
+
+- [IMA grid cursor](music_cursor_contracts.md): original stateful section progression, explicit draws and world-owned diagnostic lifetime.

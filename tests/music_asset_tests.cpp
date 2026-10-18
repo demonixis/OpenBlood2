@@ -483,8 +483,16 @@ namespace
                   catalog.assets[section_index].timeline.get() == timeline_lifetime.lock().get());
             CHECK(!harmony_lifetime.expired() &&
                   catalog.assets[section_index].harmony.get() == harmony_lifetime.lock().get());
+            const auto& cursor_asset = catalog.assets[section_index];
+            ImaCursorSeed cursor_seed;
+            cursor_seed.random_channels = 0xffff;
+            CHECK(game.music_catalog.cursor.start(cursor_asset.section, cursor_asset.section_style,
+                                                  cursor_asset.timeline, cursor_asset.harmony, cursor_seed, error));
+            const std::array<std::uint16_t, 16> cursor_draws{};
+            CHECK(game.music_catalog.cursor.step(cursor_draws, error));
             CHECK(game.unload_world() && game.music_catalog.personalities.empty() &&
-                  game.music_catalog.assets.empty() && game.music_catalog.plan.requests.empty());
+                  game.music_catalog.assets.empty() && game.music_catalog.plan.requests.empty() &&
+                  !game.music_catalog.cursor.active() && !game.music_catalog.cursor.last_step());
             CHECK(bank_lifetime.expired() && style_lifetime.expired() && bands_lifetime.expired() &&
                   section_lifetime.expired() && timeline_lifetime.expired() && personality_lifetime.expired() &&
                   harmony_lifetime.expired());

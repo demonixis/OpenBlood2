@@ -44,3 +44,5 @@ the original log or patch.
 - [IMA prepared harmony](../../../Documentation/Implementation/m2_music_harmony.md): original chord classification, external scale metadata and inspected bindings; MUSIC remains unavailable.
 
 - [IMA section and pattern decisions](../../../Documentation/Implementation/m2_music_selection.md): original lookup/request/choice, explicit tick inspection and remaining live-music gaps.
+
+- [IMA grid cursor](../../../Documentation/Implementation/m2_music_cursor.md): original consecutive-grid decisions, inspected manual traversal and explicit remaining playback gaps.
