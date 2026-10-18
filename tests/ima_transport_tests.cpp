@@ -281,7 +281,8 @@ namespace
         CHECK(!audio.music_loop.active() && audio.instruments.pending_midi().empty());
         parts = sections();
         CHECK(audio.music_loop.start(parts, 1, b, audio.instruments, .2, error));
-        const auto count = audio.instruments.pending_midi().size(), passes = audio.music_loop.passes_submitted();
+        const auto count = audio.instruments.pending_midi().size();
+        const auto passes = audio.music_loop.passes_submitted();
         CHECK(!audio.music_loop.start(parts, 0, b, audio.instruments, .2, error));
         CHECK(!audio.music_loop.pump(audio.instruments, UINT64_MAX, error));
         CHECK(audio.instruments.pending_midi().size() == count && audio.music_loop.passes_submitted() == passes);

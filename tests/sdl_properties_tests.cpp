@@ -16,10 +16,16 @@ int main()
                           !SDL_SetBooleanProperty(stale, "enabled", true) &&
                           !SDL_SetStringProperty(stale, "label", "gone");
     const bool intact = SDL_GetFloatProperty(live, "headroom", 0) == 2.0f;
+    // Metal debug devices query an uninitialized sampler property ID; unknown IDs
+    // must read as absent rather than dereference a missed lookup.
+    const bool absent = !SDL_HasProperty(stale, "headroom") &&
+                        SDL_GetPropertyType(stale, "headroom") == SDL_PROPERTY_TYPE_INVALID &&
+                        SDL_GetFloatProperty(stale, "headroom", -1.0f) == -1.0f &&
+                        !SDL_HasProperty(0x7fff1234, "SDL.gpu.sampler.create.name");
     SDL_DestroyProperties(live);
     SDL_Quit();
-    if (!rejected || !intact)
+    if (!rejected || !intact || !absent)
         return 1;
-    std::cout << "Destroyed SDL property IDs reject assignments; live properties remain intact\n";
+    std::cout << "Destroyed SDL property IDs reject assignments and read as absent; live properties remain intact\n";
     return 0;
 }
