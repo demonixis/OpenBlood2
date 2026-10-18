@@ -124,7 +124,8 @@ bool AI_Mgr::Fire(bool alternate)
         return fail(FireResult::Unavailable, "AI has no current weapon");
     if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_SUBMACHINEGUN &&
         weapon->data.m_nType != WEAP_ASSAULTRIFLE && weapon->data.m_nType != WEAP_FLAREGUN &&
-        weapon->data.m_nType != WEAP_TESLACANNON &&
+        weapon->data.m_nType != WEAP_TESLACANNON && weapon->data.m_nType != WEAP_SOUL_CROWBAR &&
+        weapon->data.m_nType != WEAP_SOUL_AXE && weapon->data.m_nType != WEAP_SOUL_PIPE &&
         weapon->data.m_nType != WEAP_MELEE && weapon->data.m_nType != WEAP_NAGA_EYEBEAM &&
         weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST && weapon->data.m_nType != WEAP_GIDEON_WIND &&
         weapon->data.m_nType != WEAP_GIDEON_SHIELD)
@@ -141,7 +142,16 @@ bool AI_Mgr::Fire(bool alternate)
         return fail(FireResult::Unavailable, "Energy blast r_hand_extra2 node unavailable");
     if (naga && !fire_gun_node)
         return fail(FireResult::Unavailable, "Naga beam head_gun node unavailable");
-    if (fire_gun_node)
+    const auto type = weapon->data.m_nType;
+    if (type == WEAP_SOUL_CROWBAR || type == WEAP_SOUL_AXE || type == WEAP_SOUL_PIPE)
+    {
+        // Original weapon-specific branch: body position along the cached forward vector.
+        fire_gun_node = false;
+        if (server->GetObjectPos(m_hObject, &fire_origin) != DE_OK || !m_MoveObj.initialized)
+            return fail(FireResult::Unavailable, "AI body position/forward cache unavailable");
+        fire_direction = m_MoveObj.GetForwardVector();
+    }
+    else if (fire_gun_node)
         fire_direction = vector_subtract(m_vTargetPos, fire_origin);
     else
     {

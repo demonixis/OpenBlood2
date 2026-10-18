@@ -73,6 +73,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Original TripLaser](trip_laser_contracts.md)
 - [Original timed powers (Stealth)](powerup_contracts.md)
 - [Original Tesla Cannon](tesla_contracts.md)
+- [Original SoulDrudge](souldrudge_contracts.md)
 - [Original Spawner](spawner_contracts.md)
 - [Original world-model debris](world_debris_contracts.md)
 - [Keyframed translating world models](worldpath_contracts.md)

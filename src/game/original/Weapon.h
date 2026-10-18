@@ -187,6 +187,22 @@ class CSubMachineGun final : public CWeapon
   public:
     CSubMachineGun() : CWeapon(WEAP_SUBMACHINEGUN) {}
 };
+// Original CSoulCrowbar/CSoulAxe/CSoulPipe: every Fire draws IntRandom(0, 4) for the
+// alternate slash sound, primary or not (the source writes m_szAltFireSound).
+class CSoulWeapon final : public CWeapon
+{
+  public:
+    explicit CSoulWeapon(DBYTE type) : CWeapon(type)
+    {
+        damage_type = OpenBlood2::DamageType::Melee;
+    }
+    const char* alt_sound = nullptr;
+    void BeginFire(bool) override;
+    const char* FireSound(bool alternate) const override
+    {
+        return alternate && alt_sound ? alt_sound : CWeapon::FireSound(alternate);
+    }
+};
 class CMelee final : public CWeapon
 {
   public:

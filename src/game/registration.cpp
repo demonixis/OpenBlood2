@@ -19,6 +19,7 @@
 #include "game/original/ExitHint.h"
 #include "game/original/ExitTrigger.h"
 #include "game/original/Fanatic.h"
+#include "game/original/SoulDrudge.h"
 #include "game/original/FlareProjectile.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Gib.h"
@@ -497,6 +498,13 @@ namespace OpenBlood2
                                  {"Fuel", 100.0f},
                                  {"Proximity_Bombs", 25.0f},
                                  {"Dims", DVector{21, 38, 19}}}};
+        // Original BEGIN_CLASS(SoulDrudge): RandomHitPoints, AIState and hidden Dims only.
+        const ClassInfo soul_drudge{"SoulDrudge",
+                                    &ai_manager,
+                                    construct_npc<SoulDrudge, AI_Mgr::NPCType::SoulDrudge>,
+                                    {{"RandomHitPoints", 50.0f},
+                                     {"AIState", std::string("IDLE"), true, 31},
+                                     {"Dims", DVector{21, 36, 18}}}};
         const ClassInfo prophet{"Prophet",
                                 &ai_manager,
                                 construct_npc<Prophet, AI_Mgr::NPCType::Prophet>,
@@ -973,7 +981,8 @@ namespace OpenBlood2
                objects.register_class(smell) && objects.register_class(exit_hint) &&
                objects.register_class(character) && objects.register_class(ai_manager) &&
                objects.register_class(cultist) && objects.register_class(civilian) && objects.register_class(gideon) &&
-               objects.register_class(fanatic) && objects.register_class(prophet) && objects.register_class(player) &&
+               objects.register_class(fanatic) && objects.register_class(prophet) && objects.register_class(soul_drudge) &&
+               objects.register_class(player) &&
                objects.register_class(polygrid) && objects.register_class(volume) && objects.register_class(water) &&
                objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
                objects.register_class(conveyor) && objects.register_class(damage) && objects.register_class(freefall) &&

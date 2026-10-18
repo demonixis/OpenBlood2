@@ -106,3 +106,13 @@ void CWeapon::KillSounds()
             ++sounds_released;
         }
 }
+void CSoulWeapon::BeginFire(bool)
+{
+    int sound = 0;
+    if (!BaseClass::GetServerDE()->RandomInt(0, 4, sound))
+        return;
+    alt_sound = sound < 1   ? "Sounds\\Slash1.wav"
+                : sound < 2 ? "Sounds\\Slash2.wav"
+                : sound < 3 ? "Sounds\\Slash3.wav"
+                            : "Sounds\\Slash4.wav";
+}

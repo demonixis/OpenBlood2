@@ -41,9 +41,9 @@ namespace
                                              {"PROX_BOMB", 0, false},
                                              {"SHIKARI_CLAW", 0, false},
                                              {"SHIKARI_SPIT", 0, false},
-                                             {"SOUL_CROWBAR", 0, false},
-                                             {"SOUL_AXE", 0, false},
-                                             {"SOUL_PIPE", 0, false},
+                                             {"SOUL_CROWBAR", WEAP_SOUL_CROWBAR, true},
+                                             {"SOUL_AXE", WEAP_SOUL_AXE, true},
+                                             {"SOUL_PIPE", WEAP_SOUL_PIPE, true},
                                              {"SOUL_HOOK", 0, false},
                                              {"BEHEMOTH_CLAW", 0, false},
                                              {"HEAL", 0, false},
@@ -123,6 +123,22 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         npc_ammo = fanatic ? std::array<float, 10>{300, 50, 50, 50, 25, 40, 120, 200, 100, 0}
                            : std::array<float, 10>{750, 0, 150, 50, 100, 100, 400, 600, 200, 0};
     }
+    if (type == NPCType::SoulDrudge)
+    {
+        // Original SoulDrudge constructor; its weapon is drawn here, before the skin.
+        m_fHearingDist = m_fSeeingDist = 1000;
+        m_fSensingDist = 100;
+        m_fWalkSpeed = 60;
+        m_fRollSpeed = 3.5f;
+        m_dwFlags = 0x200; // FLAG_NOAMMOCOLLECT only.
+        m_bCabal = false;
+        npc_hp = 120;
+        npc_armor = 0;
+        int weapon = 1;
+        if (!GetServerDE()->RandomInt(1, 3, weapon))
+            configure_error = "SoulDrudge weapon RNG failed";
+        npc_weapons[0] = weapon == 1 ? "SOUL_CROWBAR" : weapon == 2 ? "SOUL_AXE" : "SOUL_PIPE";
+    }
     if (type == NPCType::Gideon)
     {
         m_fHearingDist = 0;
@@ -155,6 +171,8 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
 {
     if (!state || reason == PRECREATE_SAVEGAME)
         return RuntimeFailure("NPC save restoration is not implemented");
+    if (!configure_error.empty())
+        return RuntimeFailure(configure_error);
     auto* s = GetServerDE();
     GenericProp prop;
     if (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP)
@@ -228,6 +246,15 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         model = "Models/Enemies/" + name + ".abc";
         skin = "Skins/Enemies/" + name + ".dtx";
     }
+    else if (npc_type == NPCType::SoulDrudge)
+    {
+        // Original PostPropRead: one of three skins on the shared model.
+        if (!s->RandomInt(1, 3, variant))
+            return RuntimeFailure("NPC skin RNG failed");
+        model = "Models/Enemies/SoulDrudge.abc";
+        skin = variant == 1 ? "Skins/Enemies/SoulDrudge.dtx"
+                            : "Skins/Enemies/SoulDrudge" + std::to_string(variant) + ".dtx";
+    }
     else if (npc_type == NPCType::Cultist)
     {
         if (npc_robe)
@@ -280,7 +307,9 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     const auto group = npc_type == NPCType::Gideon    ? 4
                        : npc_type == NPCType::Fanatic ? 5
                        : npc_type == NPCType::Prophet ? 6
-                                                      : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
+                       : npc_type == NPCType::SoulDrudge
+                           ? 7
+                           : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
     auto initialize_table = [&](unsigned slot, bool refresh, const char* root)
     {
         if (!refresh)
@@ -311,6 +340,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
                                npc_type == NPCType::Gideon    ? "sounds/enemies/Gideon"
                                : npc_type == NPCType::Fanatic ? "sounds/enemies/fanatic"
                                : npc_type == NPCType::Prophet ? "sounds/enemies/Prophet"
+                               : npc_type == NPCType::SoulDrudge ? "sounds/enemies/souldrudge"
                                : male_group                   ? "sounds/enemies/m_cultist"
                                                               : "sounds/enemies/f_cultist"))
         return RuntimeFailure("NPC shared animation table initialization failed");

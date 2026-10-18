@@ -104,11 +104,12 @@ class AI_Mgr : public CBaseCharacter
         Civilian,
         Gideon,
         Fanatic,
-        Prophet
+        Prophet,
+        SoulDrudge
     };
     static void ResetRuntimeTables();
-    // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet.
-    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 7>;
+    // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet, SoulDrudge.
+    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 8>;
     // Original WeaponStrToInt prefixes; false for a matched family not integrated here.
     static bool WeaponStrToInt(std::string_view, DBYTE&);
     static void ExchangeRuntimeTables(RuntimeTables&);
@@ -122,6 +123,7 @@ class AI_Mgr : public CBaseCharacter
     bool runtime_initialized = false, runtime_failed = false, m_bSetShutdown = false, m_bRemoveMe = false;
     bool npc_male = true, npc_labtech = false, npc_clown = false, npc_robe = false, npc_sorority = false;
     float m_fLastUpdate = 0, npc_hp = 30, npc_random_hp = 0, npc_armor = 0;
+    std::string configure_error; // A constructor RNG draw failed; RuntimePrecreate reports it.
     std::array<std::string, 5> npc_weapons{"NONE", "NONE", "NONE", "NONE", "NONE"};
     std::array<float, 10>
         npc_ammo{}; // Source bullets, BMG, shells, grenades, rockets, flares, charges, cells, fuel, prox.
