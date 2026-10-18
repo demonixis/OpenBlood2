@@ -38,3 +38,5 @@ the original log or patch.
 - [IMA pattern channels and variations](../../../Documentation/Implementation/m2_music_variations.md): original loader and 786 private decisions; live music remains unavailable.
 
 - [IMA note event preparation](../../../Documentation/Implementation/m2_music_events.md): original post-harmonization arithmetic and diagnostic inspection; live MUSIC remains unavailable.
+
+- [IMA harmonic note conversion](../../../Documentation/Implementation/m2_music_pitch.md): original executable comparison, explicit contexts and remaining live-music limits.

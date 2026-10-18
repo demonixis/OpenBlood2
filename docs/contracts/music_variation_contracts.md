@@ -84,3 +84,8 @@ covers the loader and selection block with controlled state. Full MUSIC playback
 pattern/band choice, chord/personality pitch handling, live event dispatch, curves
 and playlist transitions are still required. [Event preparation](music_event_contracts.md)
 now reproduces the post-harmonization arithmetic with explicit inputs. M2 remains incomplete.
+
+The [harmonic-pitch continuation](music_pitch_contracts.md) now implements the
+mode/chord/scale arithmetic for explicit effective runtime harmony and feeds it
+to the diagnostic event probe. Earlier missing-pitch statements are superseded
+only for this step; personality/current-chord selection and live MUSIC remain open.

@@ -78,3 +78,8 @@ and [band setup](music_band_contracts.md).
 Harmonic pitch processing, pattern/band selection, live note/curve scheduling,
 controller application, playlist transitions and actual MUSIC playback remain
 required. M2 remains incomplete.
+
+The [harmonic-pitch continuation](music_pitch_contracts.md) now implements the
+mode/chord/scale arithmetic for explicit effective runtime harmony and feeds it
+to the diagnostic event probe. Earlier missing-pitch statements are superseded
+only for this step; personality/current-chord selection and live MUSIC remain open.

@@ -182,3 +182,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [IMA pattern channels and variations](music_variation_contracts.md): raw/effective fields, original decision rules and explicit random inputs.
 
 - [IMA note event preparation](music_event_contracts.md): signed variation, transpose, paired messages and explicit unresolved pitch context.
+
+- [IMA harmonic note conversion](music_pitch_contracts.md): effective-context mode/scale/chord arithmetic, bounded failure and diagnostic event preparation.

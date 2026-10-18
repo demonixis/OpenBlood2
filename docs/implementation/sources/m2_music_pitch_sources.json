@@ -1,0 +1,889 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "37d34f571ce05f974514f16d704a6f1e18e96b9b",
+  "status": "M2 incomplete; explicit effective harmony only",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/IMUSIC25.DLL",
+      "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "dispatch_rva": "0x1714d..0x173ee",
+      "core_rva": "0x11b82..0x11c7a",
+      "use": "Bounded isolated executable observation; no native execution or binary import"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/Music.cpp",
+      "sha256": "1024e355e8da92ba670b96fc7cec5a57f301ea45e18f0a43f910a914f6e24ee0",
+      "use": "Original request plan unchanged"
+    }
+  ],
+  "observations": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "dispatch_rva": "0x1714d..0x173ee",
+    "core_rva": "0x11b82..0x11c7a",
+    "fixtures": [
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          128,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          129,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 48
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          130,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          131,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          132,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 57
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          133,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          134,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          135,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          136,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          137,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          138,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          139,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          140,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          141,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          142,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16681,
+          37,
+          60,
+          143,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 36
+      },
+      {
+        "note": [
+          16920,
+          159,
+          60,
+          131,
+          0
+        ],
+        "channel": [
+          3,
+          true,
+          48,
+          72
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          -7,
+          11,
+          16
+        ],
+        "ok": true,
+        "pitch": 59
+      },
+      {
+        "note": [
+          16920,
+          159,
+          60,
+          131,
+          0
+        ],
+        "channel": [
+          3,
+          true,
+          48,
+          72
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          -7,
+          11,
+          39
+        ],
+        "ok": true,
+        "pitch": 62
+      },
+      {
+        "note": [
+          16920,
+          159,
+          60,
+          131,
+          0
+        ],
+        "channel": [
+          3,
+          true,
+          48,
+          72
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          -7,
+          11,
+          71
+        ],
+        "ok": true,
+        "pitch": 50
+      },
+      {
+        "note": [
+          16920,
+          159,
+          60,
+          131,
+          0
+        ],
+        "channel": [
+          3,
+          true,
+          48,
+          72
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          -7,
+          11,
+          87
+        ],
+        "ok": true,
+        "pitch": 50
+      },
+      {
+        "note": [
+          16920,
+          159,
+          60,
+          131,
+          0
+        ],
+        "channel": [
+          3,
+          true,
+          48,
+          72
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          -7,
+          11,
+          119
+        ],
+        "ok": true,
+        "pitch": 50
+      },
+      {
+        "note": [
+          16640,
+          0,
+          60,
+          131,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          1,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 0
+      },
+      {
+        "note": [
+          16640,
+          159,
+          60,
+          131,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 40
+      },
+      {
+        "note": [
+          16640,
+          159,
+          60,
+          131,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          1,
+          2147483648,
+          -128,
+          127,
+          0
+        ],
+        "ok": true,
+        "pitch": 202
+      },
+      {
+        "note": [
+          16384,
+          128,
+          60,
+          132,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          1,
+          2147483648,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 70
+      },
+      {
+        "note": [
+          16384,
+          248,
+          60,
+          132,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          1,
+          4294967295,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 55
+      },
+      {
+        "note": [
+          16384,
+          16,
+          60,
+          132,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        "ok": false,
+        "pitch": 0
+      },
+      {
+        "note": [
+          16384,
+          128,
+          60,
+          132,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": false,
+        "pitch": 0
+      },
+      {
+        "note": [
+          0,
+          0,
+          255,
+          131,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": -1
+      },
+      {
+        "note": [
+          16384,
+          0,
+          255,
+          131,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          false,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": -1
+      },
+      {
+        "note": [
+          16384,
+          0,
+          12,
+          129,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": 0
+      },
+      {
+        "note": [
+          16384,
+          0,
+          128,
+          129,
+          0
+        ],
+        "channel": [
+          3,
+          false,
+          0,
+          127
+        ],
+        "harmony": [
+          true,
+          145,
+          2741,
+          0,
+          0,
+          0
+        ],
+        "ok": true,
+        "pitch": -140
+      },
+      {
+        "note": [
+          16384,
+          0,
+          90,
+          129,
+          0
+        ],
+        "channel": [
+          1,
+          true,
+          100,
+          20
+        ],
+        "harmony": [
+          true,
+          0,
+          0,
+          0,
+          0,
+          16
+        ],
+        "ok": true,
+        "pitch": 102
+      }
+    ],
+    "generated": {
+      "cases": 2048,
+      "refused_infinite_walks": 25,
+      "fnv64": 15763711143549854140,
+      "sha256": "d3cb6c9ec3f739f791b8dd6788e2c42f5132a937767e330c87aeab492faf6173"
+    },
+    "files": 39,
+    "notes": 7030,
+    "private": {
+      "cases": 21090,
+      "refused_infinite_walks": 0,
+      "fnv64": 809768487747410926,
+      "sha256": "6bce959137f679868774a0eea2775deb9e59e4ccc6b50d4f7bb84fe499e15b62"
+    },
+    "scope": "Explicit synthetic effective harmony; no personality reconciliation, authored song pitch or playback claim."
+  },
+  "replacement_code": [
+    "Typed pure original mode/pitch preparation with explicit effective harmony",
+    "Bounded scale-only nontermination refusal and exact finite-walk shortcut",
+    "Inspection feeding converted pitch into existing note event preparation"
+  ],
+  "deliberate_limits": [
+    "No personality/chord reconciliation or current harmony selection",
+    "No mute/variation eligibility, pattern/band selection or live scheduling",
+    "No MUSIC playback, MIDI/controller application or new synthesis",
+    "Nonterminating original scale-only walks fail atomically",
+    "Probe harmony is synthetic; no authored soundtrack pitch claim"
+  ],
+  "target_sha256": {
+    "CMakeLists.txt": "a4fef17eb1f90b8b4d28b3d1549b75caf71c80cd65f8c0d0b8f5fffcb82a5849",
+    "tests/CMakeLists.txt": "f14ed4039304cd3c7ad5634b5e76ac2bdab6dd5ab104fcac5a0a4cd201df0801",
+    "src/engine/ima_note_pitch.h": "8e491a5b64236f1aa93c34410f27e6c93bb2afbf0fb99e91cff0445d88c7122b",
+    "src/engine/ima_note_pitch.cpp": "c50266c43e4150d0765419de20f6594ae11d24cbda2928f671b8f7af3e61156e",
+    "src/app/inspector_world_sounds.cpp": "3e329f459bf49b2c661c38721cc9cd4e0cd4fc2bd8af4e4a9ef3368c3316564b",
+    "src/app/world_sound_smoke.cpp": "306c8796d57f379e3c6274290420e5237e57b1f2be644ababa614273e3bb5adf",
+    "tests/ima_note_pitch_tests.cpp": "5855abc40b613e1d770501f682ee973e61c5392cbed80abd33529b30cc1865da"
+  }
+}

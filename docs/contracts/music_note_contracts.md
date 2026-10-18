@@ -86,3 +86,8 @@ See [evidence](../../../Documentation/Implementation/m2_music_notes.md),
 The [section continuation](music_section_contracts.md) now exposes bounded authored
 section timing, commands, mute and chord records. It does not reconcile the style
 meter, schedule events, resolve personality or implement MUSIC playback.
+
+The [harmonic-pitch continuation](music_pitch_contracts.md) now implements the
+mode/chord/scale arithmetic for explicit effective runtime harmony and feeds it
+to the diagnostic event probe. Earlier missing-pitch statements are superseded
+only for this step; personality/current-chord selection and live MUSIC remain open.

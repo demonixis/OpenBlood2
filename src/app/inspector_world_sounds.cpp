@@ -1,5 +1,6 @@
 #include "engine/audio_stream.h"
 #include "engine/ima_note_event.h"
+#include "engine/ima_note_pitch.h"
 #include "engine/ima_variation.h"
 #include "inspector.h"
 #include <algorithm>
@@ -8,18 +9,52 @@ namespace OpenBlood2
 {
     namespace
     {
-        void draw_note_event_probe(const ImaGrid& grid)
+        void draw_note_event_probe(const ImaGrid& grid, const ImaPattern& pattern)
         {
             if (grid.notes.empty() || !ImGui::TreeNode("Note event probe (explicit inputs; no playback)"))
                 return;
             static int index = 0, tick = 10000, pitch = 60, transpose = 0;
             static int random[3]{0, 0, 0};
-            ImGui::TextWrapped("This probes the step AFTER pitch conversion. Supply the resolved pitch explicitly; "
-                               "no chord interpretation, musical RNG, percussion remap or MIDI output occurs.");
+            static bool convert = true, harmony_enabled = true;
+            static std::uint32_t chord_mask = 0x91, scale_mask = 0xab5;
+            static int chord_root = 0, scale_root = 0, chord_flags = 0;
+            ImGui::TextWrapped("Explicit diagnostic context, not the song's selected harmony. No personality "
+                               "reconciliation, musical RNG, percussion remap or MIDI output occurs.");
             ImGui::SliderInt("Source note", &index, 0, static_cast<int>(grid.notes.size()) - 1);
             index = std::clamp(index, 0, static_cast<int>(grid.notes.size()) - 1);
             ImGui::InputInt("Grid tick", &tick);
-            ImGui::SliderInt("Resolved pitch (0 suppresses)", &pitch, -32768, 32767);
+            ImGui::Checkbox("Convert original note pitch", &convert);
+            bool pitch_ok = true;
+            if (convert)
+            {
+                ImGui::Checkbox("Harmonic mode active", &harmony_enabled);
+                ImGui::InputScalar("Effective chord mask (hex)", ImGuiDataType_U32, &chord_mask, nullptr, nullptr,
+                                   "%08X", ImGuiInputTextFlags_CharsHexadecimal);
+                ImGui::InputScalar("Effective scale mask (hex)", ImGuiDataType_U32, &scale_mask, nullptr, nullptr,
+                                   "%08X", ImGuiInputTextFlags_CharsHexadecimal);
+                ImGui::SliderInt("Chord root", &chord_root, -128, 127);
+                ImGui::SliderInt("Scale root", &scale_root, -128, 127);
+                ImGui::SliderInt("Chord flags", &chord_flags, 0, 255);
+                ImaNotePitch resolved;
+                std::string pitch_error;
+                const ImaHarmonicContext harmony{harmony_enabled,
+                                                 chord_mask,
+                                                 scale_mask,
+                                                 static_cast<std::int8_t>(std::clamp(chord_root, -128, 127)),
+                                                 static_cast<std::int8_t>(std::clamp(scale_root, -128, 127)),
+                                                 static_cast<std::uint8_t>(std::clamp(chord_flags, 0, 255))};
+                pitch_ok = resolve_ima_note_pitch(grid.notes[index], pattern, harmony, resolved, pitch_error);
+                if (pitch_ok)
+                {
+                    pitch = resolved.pitch;
+                    ImGui::Text("Resolved pitch %d | %s | mode %u", pitch,
+                                resolved.converted ? "converted" : "raw bypass", resolved.mode);
+                }
+                else
+                    ImGui::TextWrapped("Pitch refused: %s", pitch_error.c_str());
+            }
+            else
+                ImGui::SliderInt("Explicit resolved pitch (0 suppresses)", &pitch, -32768, 32767);
             ImGui::SliderInt("Band transpose", &transpose, -128, 127);
             ImGui::SliderInt3("Explicit draws in consumption order", random, 0, 32767);
             const auto& note = grid.notes[index];
@@ -35,7 +70,9 @@ namespace OpenBlood2
                                               static_cast<std::int16_t>(std::clamp(pitch, -32768, 32767)),
                                               static_cast<std::int8_t>(std::clamp(transpose, -128, 127)),
                                               {}};
-            if (!prepare_ima_note_events(note, context, std::span(draws).first(count), events, error))
+            if (!pitch_ok)
+                ImGui::TextUnformatted("No event preparation: pitch conversion failed.");
+            else if (!prepare_ima_note_events(note, context, std::span(draws).first(count), events, error))
                 ImGui::TextWrapped("Probe refused: %s", error.c_str());
             else if (!events.emitted)
                 ImGui::TextUnformatted("Zero resolved pitch: no events and no draws.");
@@ -440,7 +477,7 @@ namespace OpenBlood2
                             if (ImGui::TreeNode("grid", "Grid %d: %zu notes / %zu opaque curves", grid.index,
                                                 grid.notes.size(), grid.curve_chunks))
                             {
-                                draw_note_event_probe(grid);
+                                draw_note_event_probe(grid, pattern);
                                 ImGuiListClipper clipper;
                                 clipper.Begin(static_cast<int>(grid.notes.size()),
                                               ImGui::GetTextLineHeightWithSpacing());

@@ -1278,3 +1278,14 @@ processing, scheduler and MUSIC playback. No commercial binary/source bytes
 are imported; original Music.cpp is unchanged. See [source ledger](sources/m2_music_events_sources.json),
 [contracts](../contracts/music_event_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_events.md).
+
+## IMA harmonic note conversion
+
+Independent portable implementation of the installed external IMUSIC25 pitch
+blocks, checked by bounded isolated x86 execution. No commercial binary bytes
+or source are imported. Explicit effective harmony keeps the original arithmetic
+separate from unimplemented personality reconciliation and live scheduling.
+Nonterminating scale-only walks fail explicitly; finite long walks retain their
+original low-word result. Original Music.cpp is unchanged. See [source ledger](sources/m2_music_pitch_sources.json),
+[contracts](../contracts/music_pitch_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_pitch.md).
