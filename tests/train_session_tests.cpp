@@ -73,8 +73,136 @@ namespace
         std::cout << "GPU checkpoint " << path.filename() << ": " << filled << " textured pixels, no fallback\n";
         return true;
     }
-    bool trace_services(const GameSession& g, const char* phase, std::string& error)
+    // Inspect failures independently of attempted-service counts. Kept in the
+    // route harness so acceptance cannot turn a positive counter into success.
+    bool check_inventory(const CInventoryMgr& inventory, std::string& error)
     {
+        CHECK(inventory.drop_error.empty());
+        for (unsigned slot = 0; slot < inventory_weapon_slots; ++slot)
+            for (bool left : {false, true})
+                if (const auto* weapon = inventory.GetWeapon(slot, left))
+                {
+                    error =
+                        weapon->fire_sound_error + weapon->hand_error + weapon->projectile_error + weapon->impact_error;
+                    CHECK(error.empty() && !weapon->sound_failures && !weapon->sound_alert_failures &&
+                          !weapon->impact_sound_failures);
+                    for (const auto& impact : weapon->impacts)
+                    {
+                        error = impact.effect.error + impact.effect.sprite_error + impact.effect.blood_error +
+                                impact.effect.spark_error;
+                        CHECK(error.empty());
+                    }
+                }
+        return true;
+    }
+    bool check_actor(const CPlayerObj& actor, std::string& error)
+    {
+        CHECK(check_inventory(actor.m_InventoryMgr, error));
+        error = actor.motion_error + actor.m_Anim_Sound.sound_error;
+        CHECK(error.empty() && !actor.motion_failures && !actor.m_Anim_Sound.sound_failures);
+        return true;
+    }
+    struct RouteAudit
+    {
+        std::set<std::uint64_t> absent_blood_sounds;
+    };
+    bool check_effects(const GameSession& g, RouteAudit& audit, const char* phase, std::string& error)
+    {
+        std::size_t reports = 0;
+        auto check = [&](const auto& effects)
+        {
+            if constexpr (requires { effects.failed; })
+                CHECK(effects.failed == 0);
+            if constexpr (requires { effects.update_error; })
+            {
+                error = effects.update_error;
+                CHECK(error.empty());
+            }
+            for (const auto& report : effects.reports)
+            {
+                ++reports;
+                error = report.error;
+                if constexpr (requires { report.splat_error; })
+                    error += report.splat_error;
+                if constexpr (requires { report.sound_error; })
+                {
+                    if constexpr (requires { report.sound_resource; })
+                    {
+                        // Original GetRandom(0,NRES(5)) requests this absent retail
+                        // file. Preserve refusal, never count it as decoded audio.
+                        if (!report.sound_error.empty() &&
+                            report.sound_resource == "sounds/gibs/flesh/gib_impact0.wav" &&
+                            !g.resources.find(report.sound_resource) &&
+                            report.sound_error == "Missing or oversized sound resource")
+                            audit.absent_blood_sounds.insert(report.id);
+                        else
+                            error += report.sound_error;
+                    }
+                    else
+                        error += report.sound_error;
+                }
+                CHECK(error.empty());
+            }
+            return true;
+        };
+        const auto& s = g.server;
+        CHECK(check(s.explosion_sprites) && check(s.sparks) && check(s.blood_spurts) && check(s.blood_splats) &&
+              check(s.weapon_sprites) && check(s.explosion_models) && check(s.laser_beams) &&
+              check(s.object_particles) && check(s.polygrids) && check(s.particle_streams) &&
+              check(s.explosion_lights) && check(s.explosion_rings) && check(s.explosion_flames) &&
+              check(s.flesh_gibs) && check(s.explosion_fragments));
+        for (const auto& report : s.scene_explosions)
+        {
+            error = report.sound_error + report.fragment_error + report.flame_error + report.ring_error +
+                    report.light_error + report.model_error + report.sprite_error;
+            CHECK(error.empty());
+        }
+        for (const auto& [id, voice] : s.audio.voices())
+        {
+            error = voice.error;
+            CHECK(error.empty());
+        }
+        const auto& client = g.client_shell;
+        // client.blocker is a historical scope note, not a failure result.
+        error = client.objectives_error + client.item_audio_error + client.world_exit.error + s.audio.music_error +
+                s.audio.output_error;
+        CHECK(error.empty() && !client.voice_manager.failures && !client.communication.sound_failures &&
+              !client.music.failures);
+        if (phase)
+            std::cout << "TRAIN_EFFECTS\t" << phase << '\t' << reports
+                      << " retained FX reports; unexpected failures=0; original absent gib_impact0 requests="
+                      << audit.absent_blood_sounds.size() << '\n';
+        return true;
+    }
+    bool audit_rejections()
+    {
+        GameSession g;
+        RouteAudit audit;
+        std::string error;
+        CHECK(check_effects(g, audit, nullptr, error));
+        BloodSpurtReport report;
+        report.id = 1;
+        report.sound_resource = "sounds/gibs/flesh/gib_impact0.wav";
+        report.sound_error = "Missing or oversized sound resource";
+        g.server.blood_spurts.reports.push_back(report);
+        CHECK(check_effects(g, audit, nullptr, error) && audit.absent_blood_sounds.size() == 1);
+        g.server.blood_spurts.reports.back().sound_resource = "sounds/gibs/flesh/gib_impact1.wav";
+        CHECK(!check_effects(g, audit, nullptr, error));
+        g.server.blood_spurts.reports.back().sound_resource = report.sound_resource;
+        g.server.blood_spurts.reports.back().sound_error = "Audio decode failed";
+        CHECK(!check_effects(g, audit, nullptr, error));
+        g.server.blood_spurts.clear();
+        g.server.weapon_sprites.failed = 1;
+        CHECK(!check_effects(g, audit, nullptr, error));
+        g.server.weapon_sprites.clear();
+        g.client_shell.voice_manager.failures = 1;
+        CHECK(!check_effects(g, audit, nullptr, error));
+        std::cout << "Acceptance negative controls: unrelated absent sound, decode, FX and voice failures rejected\n";
+        return true;
+    }
+    bool trace_services(const GameSession& g, RouteAudit& audit, const char* phase, std::string& error)
+    {
+        CHECK(check_effects(g, audit, phase, error));
         for (const auto& row : service_coverage(g.server.service_calls))
         {
             CHECK(row.support != ServiceSupport::Unclassified &&
@@ -113,13 +241,14 @@ namespace
             std::filesystem::create_directories(captures, ec);
             CHECK(!ec);
         }
+        RouteAudit audit;
         const double dt = 1. / hz;
         auto game = std::make_unique<GameSession>();
         Config config;
         config.data_dir = root;
         auto& g = *game;
         if (!g.initialize() || !g.resources.mount_game(config, error) || !g.request_world("01_SubwayA", error) ||
-            !g.enter_player(error) || !test_camera::complete_subway_intro(g))
+            !g.run_world(error) || !test_camera::complete_subway_intro(g))
             return false;
         for (const auto& entry : g.entries)
             CHECK(entry.state != EntryState::Unsupported && entry.state != EntryState::Failed);
@@ -192,6 +321,12 @@ namespace
                 {
                     std::cerr << "AI failure " << record->state.m_Name << ": " << ai->runtime_error << '\n';
                     return false;
+                }
+                if (ai)
+                {
+                    CHECK(check_inventory(ai->m_InventoryMgr, error));
+                    error = ai->ai_key_error + ai->gib_error + ai->death_error + ai->damage_reaction_error;
+                    CHECK(error.empty() && !ai->key_failures && !ai->unavailable_keys);
                 }
                 if (ai && ai->npc_type == AI_Mgr::NPCType::Cultist)
                 {
@@ -279,6 +414,12 @@ namespace
                 if (damaged.contains(handle) && (!ai || ai->m_damage.IsDead()))
                     dead.insert(handle);
             }
+            CHECK(check_effects(g, audit, nullptr, error));
+            CHECK(check_actor(*p, error));
+            error = p->entry_error + p->locomotion_error + p->death_error + p->death_effect_error +
+                    p->player_trigger_error + p->sound_error + p->smell_error;
+            CHECK(error.empty() && !p->unsupported_triggers && !p->sound_failures && !p->voice_delivery_failures &&
+                  !p->activation_ping_failures && !p->unavailable_sound_alerts);
             ammo_pickup |= p->m_InventoryMgr.GetAmmoCount(1) > old_ammo;
             health_pickup |= p->m_damage.m_fHitPoints > old_health;
             black |= g.client_shell.fade.Scale() == 0;
@@ -318,7 +459,7 @@ namespace
         if (hz == 30)
             CHECK(p->m_damage.damage_impulses > 0);
         std::cout << "Player damage impulses=" << p->m_damage.damage_impulses << '\n';
-        CHECK(trace_services(g, "SubwayA", error));
+        CHECK(trace_services(g, audit, "SubwayA", error));
         const float health = p->m_damage.m_fHitPoints, ammo = p->m_InventoryMgr.GetAmmoCount(1);
         const auto revision = g.world_revision;
         std::cout << "Completed train at " << hz << " Hz: " << damaged.size() << " damaged / " << dead.size()
@@ -346,23 +487,30 @@ namespace
             CHECK(controls.sync_mouse(runtime.window, true, false, error) &&
                   !SDL_GetWindowRelativeMouseMode(runtime.window));
         CHECK(!controls.sample_fire(false).primary && !controls.sample_use(false));
+        audit.absent_blood_sounds.clear();
+        CHECK(game->run_world(error));
         for (unsigned tick = 0; tick < hz; ++tick)
+        {
             CHECK(game->step(dt));
+            CHECK(check_effects(*game, audit, nullptr, error));
+        }
         if (gpu)
         {
             CHECK(game->server.audio.has_output() && game->server.audio.submitted_frames > 0);
             CHECK(capture_scene(*game, runtime, captures / "cityhub.png", error));
         }
-        CHECK(trace_services(*game, "CityHub", error));
+        CHECK(trace_services(*game, audit, "CityHub", error));
         CHECK(game->unload_world() && game->objects.snapshot().empty());
         CHECK(!game->server.string_count() && !game->server.list_count() && !game->server.message_count() &&
               !game->server.client_count() && game->server.audio.voices().empty());
-        CHECK(trace_services(*game, "teardown", error));
+        CHECK(trace_services(*game, audit, "teardown", error));
         return true;
     }
 } // namespace
 int main(int argc, char** argv)
 {
+    if (argc == 2 && std::string_view(argv[1]) == "audit")
+        return audit_rejections() ? 0 : 1;
     if (argc < 3 || argc > 4 || (std::string_view(argv[2]) != "30" && std::string_view(argv[2]) != "60"))
         return 2;
     return traverse(argv[1], std::string_view(argv[2]) == "30" ? 30 : 60, argc == 4 ? argv[3] : "") ? 0 : 1;

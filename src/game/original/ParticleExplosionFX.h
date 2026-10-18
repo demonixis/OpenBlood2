@@ -26,5 +26,5 @@ class CParticleExplosionFX
     float alpha = 1;
     double start_time = 0, last_time = 0, last_emission = 0, next_update = 0;
     std::uint64_t id = 0, event = 0, updates = 0, emitted = 0, impacts = 0, splat_event = 0;
-    std::string texture, error, splat_error, sound_error;
+    std::string texture, error, splat_error, sound_resource, sound_error;
 };

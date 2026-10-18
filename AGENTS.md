@@ -1,8 +1,6 @@
 # Blood2 Project Instructions
 
-Implementation notes below are chronological snapshots: later linked evidence
-supersedes older missing-service statements. The current continuous SubwayA route
-reaches CityHub; consolidated M2 acceptance is still incomplete.
+The [final M2 review](../Documentation/Implementation/m2_acceptance.md) consolidates the selected SubwayA-to-CityHub criteria. No progression blocker is reproduced in that scope; formal closure remains open for the independently reproduced NVIDIA/D-Bus GPU LeakSanitizer failure. Do not expand M2 into unrelated campaign features to address this platform failure. Graphics optimization is assigned to another computer; preserve the stack until the user reports a push. Historical notes below retain their original scope.
 
 Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentation/Roadmap/readme.md).
 

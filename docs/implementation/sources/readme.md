@@ -30,3 +30,5 @@ Runtime test logs and measurements belong in the
 - [Session startup source ledger](m2_session_start_sources.json): engine validation extraction and unchanged original shell/player call paths.
 
 - [GPU lifetime diagnostic sources](m2_gpu_lifetime_sources.json): project teardown baseline, pinned SDL APIs and system Vulkan probe; no original-game import.
+
+- [M2 acceptance](m2_acceptance_sources.json): original missing-zero sound selection, inspection provenance and stronger selected-session checks; no graphics-stack change.

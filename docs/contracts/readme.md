@@ -1,5 +1,7 @@
 # Service contracts
 
+The [selected M2 acceptance contract](m2_acceptance_contracts.md) defines the current review scope, negative controls and separation of game failures from GPU platform qualification.
+
 Use these references before changing a subsystem. They describe original rules,
 replacement engine behavior, ownership and explicit limitations. Earlier
 increment snapshots can be superseded by later linked evidence; an old omission

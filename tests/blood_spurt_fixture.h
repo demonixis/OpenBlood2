@@ -3,7 +3,8 @@
 #include "blood_splat_fixture.h"
 namespace test_blood_spurt
 {
-    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error)
+    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error,
+                      int missing_variant = -1)
     {
         if (!test_blood_splat::mount(resources, root, error))
             return false;
@@ -14,8 +15,9 @@ namespace test_blood_spurt
         for (int i = 1; i <= 3; ++i)
             dir.children["spritetextures"].children["particles"].files["blooddrop_" + std::to_string(i) + ".dtx"] = dtx;
         for (int i = 0; i <= 3; ++i)
-            dir.children["sounds"].children["gibs"].children["flesh"].files["gib_impact" + std::to_string(i) + ".wav"] =
-                test_audio::wave();
+            if (i != missing_variant)
+                dir.children["sounds"].children["gibs"].children["flesh"].files["gib_impact" + std::to_string(i) +
+                                                                                ".wav"] = test_audio::wave();
         test_model::Writer w;
         w.b.resize(168);
         w.b[0] = w.b[62] = w.b[124] = 13;

@@ -259,6 +259,7 @@ namespace OpenBlood2
                             fx.particles.size(), fx.alpha, (unsigned long long)fx.updates);
                 ImGui::Text("Impact splat event %llu | lifetime %.2f / fade %.2f", (unsigned long long)fx.splat_event,
                             fx.settings.lifetime, fx.settings.fade_time);
+                ImGui::TextWrapped("Impact sound: %s", fx.sound_resource.c_str());
                 ImGui::TextWrapped("%s | %s | %s", fx.error.c_str(), fx.splat_error.c_str(), fx.sound_error.c_str());
                 if (sprite_view)
                     for (const auto& entry : sprite_view->entries)
@@ -272,12 +273,15 @@ namespace OpenBlood2
             ImGui::PopID();
         }
         for (const auto& r : effects.reports)
+        {
             ImGui::TextWrapped("Event %llu %s -> #%llu | immediate %d / ended %d | drops %llu / impacts %llu / "
                                "splat %llu | %s %s %s",
                                (unsigned long long)r.id, r.source.c_str(), (unsigned long long)r.effect, r.immediate,
                                r.ended, (unsigned long long)r.emitted, (unsigned long long)r.impacts,
                                (unsigned long long)r.splat_event, r.error.c_str(), r.splat_error.c_str(),
                                r.sound_error.c_str());
+            ImGui::TextWrapped("Impact sound: %s", r.sound_resource.c_str());
+        }
     }
 } // namespace OpenBlood2
 

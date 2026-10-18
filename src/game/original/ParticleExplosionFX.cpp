@@ -120,6 +120,7 @@ bool CParticleExplosionFX::Update(double now, double dt, ServerDE& server, std::
         SoundRequest sound;
         // Original B2_LITE GetRandom(0,NRES(5)) includes zero; do not alias a missing file.
         sound.resource = "sounds/gibs/flesh/gib_impact" + std::to_string(rng() % 4) + ".wav";
+        sound_resource = sound.resource;
         sound.outer_radius = 300;
         sound.inner_radius = 30;
         server.PlayClientSound(sound, next, sound_error);

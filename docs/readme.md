@@ -1,7 +1,8 @@
 # Developer documentation
 
-Start here when building or changing OpenBlood2. M2 is still in progress; working
-features and test results do not imply that the complete game is supported.
+Start here when building or changing OpenBlood2. The [M2 review](contracts/m2_acceptance_contracts.md)
+separates the tested original session from the open NVIDIA GPU sanitizer qualification.
+The complete game and later milestones are not yet supported.
 
 | Guide | Contents |
 | --- | --- |

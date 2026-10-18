@@ -75,3 +75,5 @@ trigger, AI action, client service or future resource request. M2 remains open
 until the complete selected-slice acceptance review passes.
 
 The [session-cost continuation](session_cost_contracts.md) removes redundant work while preserving these ownership, timing and inspection rules.
+
+The [final M2 review](m2_acceptance_contracts.md) now consolidates this trace with continuous combat, startup, malformed-resource, callback and lifetime evidence. Its platform qualification remains open; the review itself is no longer pending.

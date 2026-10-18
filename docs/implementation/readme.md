@@ -1,5 +1,7 @@
 # Implementation records
 
+Current decision and criterion matrix: [M2 acceptance review](../../../Documentation/Implementation/m2_acceptance.md). Functional checks and the open external GPU sanitizer result are distinct.
+
 This directory holds work-in-progress history and source evidence. Start with the
 [developer guides](../readme.md) for routine development and the
 [contracts](../contracts/readme.md) for subsystem behavior.

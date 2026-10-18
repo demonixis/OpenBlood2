@@ -10,7 +10,7 @@ code and a new, small, portable C++20 engine. The stack uses CMake, pinned SDL3
 | --- | ---: |
 | M0 | 100% |
 | M1 | 100% |
-| M2 | ~85% |
+| M2 | ~99% |
 | M3 | ~60% |
 | M4 | ~35% |
 | M5 | ~10% |
@@ -19,8 +19,9 @@ code and a new, small, portable C++20 engine. The stack uses CMake, pinned SDL3
 | M8 | 0% |
 
 The percentages above are rough task estimates, not milestone acceptance.
-M0/M1 are complete for their documented Linux scope; **M2 remains in progress**.
-A continuous SubwayA combat route and transition into CityHub are tested.
+M0/M1 are complete for their documented Linux scope. The [M2 acceptance review](docs/contracts/m2_acceptance_contracts.md)
+validates the selected SubwayA-to-CityHub session; **M2 remains open for the external
+NVIDIA/D-Bus GPU sanitizer failure**. This is separate from game progression.
 Linux/NVIDIA is tested; macOS/Metal works according to user testing. The full game,
 other platforms and later milestones remain incomplete.
 

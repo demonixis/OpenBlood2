@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "bfa0f75a8ff2dd6ab66a7ad5883acd59dd57a7b5",
+  "original_imports": [],
+  "dependencies_changed": false,
+  "graphics_changes": false,
+  "changes": [
+    "Retain and inspect actual blood-spurt impact sound resource, including original absent variant zero.",
+    "Use checked startup in continuous route and independently audit selected actor, client, effect and audio failures.",
+    "Add missing-sound lifecycle and acceptance negative controls."
+  ],
+  "references": [
+    {
+      "path": "sources/blood2/ClientShellDLL/ParticleExplosionFX.cpp",
+      "sha256": "68ba5c98212936d16d940834ea0d0f2967b189d338b612f48b96a55379a8f60f",
+      "use": "Original zero-inclusive impact-sound selection and independent splat creation."
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "use": "B2_LITE NRES(5) is 3; no alternate resource alias."
+    },
+    {
+      "path": "Blood2/src/game/original/ParticleExplosionFX.cpp",
+      "sha256": "fc34af5d173704bfe1596d39bbafe3b7e63b04b7303058eeecb8c0c9fc3afdfd",
+      "use": "Existing source-port physics/RNG/audio flow; retain requested path without changing calls."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
+      "use": "Active SOUND_KEY message send is distinct from commented direct local playback; not reached by selected view assets."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
+      "use": "Original CMSG_WEAPON_SOUND routes to the player; not a source no-op."
+    }
+  ],
+  "frozen_sources": {
+    "src/game/original/ParticleExplosionFX.cpp": "fc34af5d173704bfe1596d39bbafe3b7e63b04b7303058eeecb8c0c9fc3afdfd",
+    "src/game/original/ParticleExplosionFX.h": "9d456e2171e96f203741ca0fe58aa04581411e1428495de4bf3b47bfd51da8e1",
+    "src/game/blood_spurts.cpp": "db3c62ba3dcbfdbbbe67168230d123f9de0835d95f9b583e84832819ce7dcb4e",
+    "src/game/blood_spurts.h": "8cdf96a5b10d6694eb40be4bff9bec451ed151be05061d2a3b801b3d539a1b06",
+    "src/app/inspector_sprites.cpp": "fda1a73d154f34a851cec390f2ae8e8f8896ef3769f9d8760ac099ee7508447b",
+    "tests/train_session_tests.cpp": "ab7adabc49a4acbdf4d92d883ecfdcd9dcd7d5ea2a1fc1c292306b3d5828c3ac",
+    "tests/blood_spurt_tests.cpp": "3336d6044d51a2a6667c671bcbf3e3ab8a59d013132e855821002ccb27872221",
+    "tests/blood_spurt_fixture.h": "1a329298d1ec50fda631dc80f7223d1bad33b923e032769b99fa468825d6a910",
+    "tests/CMakeLists.txt": "6eea1524af8c61417f5a35c12a475b7d8fefb0f1eafde8628c8ade89901d918a"
+  }
+}

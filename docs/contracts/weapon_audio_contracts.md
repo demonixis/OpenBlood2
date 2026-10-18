@@ -70,3 +70,5 @@ as gameplay through an active cinematic. Required world services, Gideon, safe
 NEW_LEVEL and actual M2 acceptance remain open.
 
 The [shield continuation](shield_weapon_contracts.md) reuses retained original WAV/hearing for both modes. Its visual-only FireVector has no damage ray or collision preflight; armor remains a separate boss action. All checked hearing/voice lifetime rules remain in force.
+
+The [final M2 review](m2_acceptance_contracts.md) confirms that the selected Beretta/knife view assets contain only FIRE_KEY events. Original OnModelKey still actively sends CMSG_WEAPON_SOUND for SOUND_KEY; only its direct local playback is commented out. Indexed-only key references do not implement that message path. Treat it as unimplemented for other view assets, not as redundant fire playback or a source no-op.

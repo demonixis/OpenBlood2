@@ -1396,3 +1396,5 @@ The original ClientShellDLL/Music.cpp request matrix is adapted into a pure sele
 - [Original MUSIC messages](sources/m2_music_message_sources.json): selected server parsing, player dispatch and client level/lifetime rules, connected to a bounded replacement transport. See [contracts](../contracts/music_message_contracts.md); no retail tail/activation/variation parity is claimed.
 
 The [session-cost audit](../../../Documentation/Implementation/m2_session_cost.md) removes temporary trace-name allocations and zero-depth audio modulation work. Read [contracts](../contracts/session_cost_contracts.md); preserve owned counters, exact scalar PCM/cursor progression and all existing session/test deadlines. The full M2 acceptance review and runtime-start guard remain open.
+
+The [M2 acceptance review](../../../Documentation/Implementation/m2_acceptance.md) changes no original rule or import. It retains the exact blood-impact sound request in inspection and strengthens the selected route audit; see [source ledger](sources/m2_acceptance_sources.json).

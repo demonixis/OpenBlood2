@@ -77,3 +77,5 @@ commented out in original corpse/player/living-AI code stay disabled. This
 continuation does not enable living-NPC limb loss or add collision to cosmetic FX.
 
 The [original impact sparks](spark_contracts.md) continuation supersedes the flesh/metal spark omission only. Underwater bubbles, generic recipes and remaining M2 services stay unavailable.
+
+The [M2 acceptance review](m2_acceptance_contracts.md) adds the exact requested impact-sound path to live/expired inspection, checks the original absent-zero asset explicitly, and keeps unrelated failures rejecting the route.

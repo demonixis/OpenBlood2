@@ -7,7 +7,7 @@ namespace OpenBlood2
         std::uint64_t id = 0, effect = 0, emitted = 0, impacts = 0, splat_event = 0;
         BloodSpurtSettings settings;
         bool immediate = false, ended = false;
-        std::string source, error, splat_error, sound_error;
+        std::string source, error, splat_error, sound_resource, sound_error;
     };
     class BloodSpurts
     {

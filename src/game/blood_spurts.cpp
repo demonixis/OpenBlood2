@@ -19,6 +19,7 @@ namespace OpenBlood2
                 r.splat_event = fx.splat_event;
                 r.error = fx.error;
                 r.splat_error = fx.splat_error;
+                r.sound_resource = fx.sound_resource;
                 r.sound_error = fx.sound_error;
                 r.ended = ended;
                 break;

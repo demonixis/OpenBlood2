@@ -20,11 +20,11 @@ namespace
     {
         return std::abs(a - b) < .0001f;
     }
-    bool setup(GameSession& g, const std::filesystem::path& root)
+    bool setup(GameSession& g, const std::filesystem::path& root, int missing_variant = -1)
     {
         std::string error;
         CHECK(test_player::setup(g, root, false));
-        CHECK(test_blood_spurt::mount(g.resources, root, error));
+        CHECK(test_blood_spurt::mount(g.resources, root, error, missing_variant));
         CHECK(test_blood_spurt::floor(g, error));
         return true;
     }
@@ -70,6 +70,51 @@ namespace
               g.server.blood_spurts.active.back().particles.empty());
         CHECK(g.server.blood_spurts.advance(g.objects.time(), g.server) &&
               g.server.blood_spurts.live_particles() == 24);
+        return true;
+    }
+    bool missing_sound(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(setup(g, root, 0));
+        std::string error;
+        CHECK(!g.resources.find("sounds/gibs/flesh/gib_impact0.wav"));
+        BloodSpurtSettings s;
+        s.position = {0, 1, 0};
+        s.min_velocity = s.max_velocity = {0, -20, 0};
+        for (unsigned i = 0; i < 32; ++i)
+            CHECK(g.server.PublishClientBloodSpurt(s, "absent original zero", false, error) && error.empty());
+        auto& effects = g.server.blood_spurts;
+        CHECK(effects.advance(.1, g.server));
+        unsigned absent = 0, played = 0;
+        for (const auto& report : effects.reports)
+        {
+            CHECK(report.impacts == 1 && report.splat_event && report.error.empty() && report.splat_error.empty());
+            CHECK(!report.sound_resource.empty());
+            if (report.sound_resource == "sounds/gibs/flesh/gib_impact0.wav")
+            {
+                CHECK(report.sound_error == "Missing or oversized sound resource");
+                ++absent;
+            }
+            else
+            {
+                CHECK(report.sound_error.empty());
+                ++played;
+            }
+        }
+        CHECK(absent > 0 && played > 0 && g.server.audio.voices().size() == played);
+        CHECK(effects.advance(1.0, g.server) && effects.advance(1.8, g.server) && effects.advance(2.101, g.server) &&
+              effects.active.empty());
+        unsigned retained = 0;
+        for (const auto& report : effects.reports)
+        {
+            CHECK(report.ended && report.error.empty() && !report.sound_resource.empty());
+            retained += !report.sound_error.empty();
+        }
+        CHECK(retained == absent);
+        effects.clear();
+        CHECK(effects.reports.empty());
+        std::cout << "Original absent-zero requests=" << absent << ", decoded starts=" << played
+                  << "; splats survive audio refusal, history survives emitter expiry\n";
         return true;
     }
     bool impact(const std::filesystem::path& root)
@@ -297,11 +342,12 @@ int main(int argc, char** argv)
     if (argc != 3)
         return 2;
     std::string mode = argv[1];
-    return (mode == "formulas"   ? formulas(argv[2])
-            : mode == "impact"   ? impact(argv[2])
-            : mode == "weapon"   ? weapon(argv[2])
-            : mode == "failures" ? failures(argv[2])
-                                 : mode == "private" && private_world(argv[2]))
+    return (mode == "formulas"        ? formulas(argv[2])
+            : mode == "missing_sound" ? missing_sound(argv[2])
+            : mode == "impact"        ? impact(argv[2])
+            : mode == "weapon"        ? weapon(argv[2])
+            : mode == "failures"      ? failures(argv[2])
+                                      : mode == "private" && private_world(argv[2]))
                ? 0
                : 1;
 }
