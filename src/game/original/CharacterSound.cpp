@@ -1,3 +1,4 @@
+#include "CharacterProfiles.h"
 // Selected original Anim_Sound voice helpers and PlayerObj model-key sound path.
 // See docs/contracts/character_audio_contracts.md for preserved rules and unavailable callers.
 #include "PlayerObj.h"
@@ -233,8 +234,9 @@ bool CPlayerObj::GetFootstepSound(std::string& sound)
             sound_error = "No original footstep mapping for surface " + std::to_string(footstep_surface);
             return false;
     }
-    sound = std::string("sounds/player/footsteps/") + material + (m_bNextFootstepLeft ? "/leftm.wav" : "/rightm.wav");
-    m_bNextFootstepLeft = !m_bNextFootstepLeft; // Caleb is the only admitted character; female entry still rejects.
+    sound = std::string("sounds/player/footsteps/") + material + (m_bNextFootstepLeft ? "/left" : "/right") +
+            (OpenBlood2::character_profiles[m_nCharacter].female ? "f.wav" : "m.wav");
+    m_bNextFootstepLeft = !m_bNextFootstepLeft;
     return true;
 }
 void CPlayerObj::UpdateSound()

@@ -79,6 +79,7 @@ class CBloodClientShell
     bool StartNewWorld(const char*, OpenBlood2::WorldMessage&);
     bool OnEnterWorld(HCLIENT, bool restored = false);
     bool restored_entry = false;
+    OpenBlood2::PlayerInit entry_profile;
     void OnExitWorld();
     bool OnMessage(const OpenBlood2::PlayerEvent&, CBloodServerShell&);
     bool Update();

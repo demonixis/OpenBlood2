@@ -1,5 +1,6 @@
+#include "CharacterProfiles.h"
 // Selected original PlayerObj HandleDeath/DoDeath/CreateCorpse/CreateGibs.
-// Single-player Caleb only; source selections and limits: player_death_contracts.md.
+// Single-player default Chosen profiles; source selections and limits: player_death_contracts.md.
 #include "Corpse.h"
 #include "Gib.h"
 #include "PlayerObj.h"
@@ -28,10 +29,10 @@ void CPlayerObj::HandleDeath()
         death_error = "Original HandleDeath waits for a non-null lethal attacker";
         return;
     }
-    if (s->GetVarValueFloat(s->GetGameConVar("GAME_GAMETYPE")) != 0 || m_nCharacter != 0 ||
+    if (s->GetVarValueFloat(s->GetGameConVar("GAME_GAMETYPE")) != 0 || !OpenBlood2::character_profile(m_nCharacter) ||
         std::any_of(m_bPowerupActivated.begin(), m_bPowerupActivated.end(), [](bool active) { return active; }))
     {
-        death_error = "Multiplayer, other characters and active timed-power death are unavailable";
+        death_error = "Multiplayer and active timed-power death are unavailable";
         return;
     }
     // DoDeath: these supported players have no active power, zoom, slow-death,

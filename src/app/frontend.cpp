@@ -138,8 +138,9 @@ namespace OpenBlood2
                 break;
             if (command.action == MenuAction::NewGame)
             {
-                // UI-M2 starts every selected solo path through the validated original entry.
-                if (!GameSession::start_new_game(game, "01_SubwayA", 1, 0, error))
+                // Execute the owned profile request outside SDL event dispatch.
+                if (!GameSession::start_new_game(game, "01_SubwayA", DBYTE(command.difficulty),
+                                                 DBYTE(command.story ? 0 : command.character), error))
                     menu.error = error;
                 else
                 {

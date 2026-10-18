@@ -1,3 +1,4 @@
+#include "game/original/CharacterProfiles.h"
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
@@ -22,10 +23,14 @@ namespace OpenBlood2
                             "requires the same world");
             if (s.name.size() > 100 || s.name.find('\0') != std::string::npos)
                 return fail("Invalid saved player object name");
-            std::string model_path, skin_path;
-            if (!resource_path(s.model, model_path) || model_path != "models/characters/caleb.abc" ||
-                !resource_path(s.skin, skin_path) || skin_path != "skins/characters/caleb1.dtx" ||
-                !game.resources.find(s.skin))
+            std::string model_path, skin_path, expected_model, expected_skin;
+            const auto* profile = character_profile(s.player.character);
+            if (!profile)
+                return fail("Unsupported saved character");
+            resource_path(profile->model, expected_model);
+            resource_path(profile->skin, expected_skin);
+            if (!resource_path(s.model, model_path) || model_path != expected_model ||
+                !resource_path(s.skin, skin_path) || skin_path != expected_skin || !game.resources.find(s.skin))
                 return fail("Saved player model/skin is unavailable or unsupported");
             const auto norm = vector_dot(s.rotation.m_Vec, s.rotation.m_Vec) + s.rotation.m_Spin * s.rotation.m_Spin;
             if (!physics_vector(s.position) || !physics_vector(s.dimensions) || s.dimensions.x <= 0 ||
@@ -33,7 +38,7 @@ namespace OpenBlood2
                 s.scale.y <= 0 || s.scale.z <= 0 || !physics_vector(s.velocity) || !physics_vector(s.acceleration) ||
                 !physics_vector(s.rotation.m_Vec) || !std::isfinite(norm) || std::abs(norm - 1) > .001f ||
                 !std::isfinite(s.next_update) || s.next_update < 0 || s.next_update > 3600 ||
-                s.eye_level != (s.crouched ? 12.0f : 36.0f))
+                s.eye_level != (s.crouched ? 12.0f : profile->eye))
                 return fail("Invalid saved player transform, body, eye or update deadline");
             auto channel = [](float v) { return std::isfinite(v) && v >= 0 && v <= 1; };
             if (!channel(s.color.x) || !channel(s.color.y) || !channel(s.color.z) || !channel(s.alpha))

@@ -1,3 +1,4 @@
+#include "CharacterProfiles.h"
 // Selected original PlayerObj.cpp HandleMovement/GetLandingSound and saved fall history.
 // Copyright (c) 1997, 1998 Monolith Productions Inc.
 #include "PlayerObj.h"
@@ -58,8 +59,9 @@ bool CPlayerObj::GetLandingSound(std::string& sound)
             landing_error = "No original landing mapping for surface " + std::to_string(landing_surface);
             return false;
     }
-    // Only Caleb is admitted by player entry; unlike footsteps this never changes foot alternation.
-    sound = std::string("sounds/player/footsteps/") + material + "/landm.wav";
+    // Source male/female suffix; landing never changes foot alternation.
+    sound = std::string("sounds/player/footsteps/") + material +
+            (OpenBlood2::character_profiles[m_nCharacter].female ? "/landf.wav" : "/landm.wav");
     landing_error.clear();
     return true;
 }

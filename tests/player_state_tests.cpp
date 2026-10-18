@@ -228,7 +228,7 @@ namespace
             [](auto& s) { s.strength = 0; },
             [](auto& s) { s.magic = 7; },
             [](auto& s) { s.move_state = 15; },
-            [](auto& s) { s.character = 1; },
+            [](auto& s) { s.character = 4; },
             [](auto& s) { s.skin = 1; },
             [](auto& s) { s.trigger = std::string(101, 'x'); },
             [](auto& s) { s.name = std::string("x\0y", 3); }};

@@ -2,8 +2,10 @@
 #include "app/menu_renderer.h"
 #include "app/session_playback.h"
 #include "app/ui_runtime.h"
+#include "camera_fixture.h"
 #include "engine/capture.h"
 #include "game/menu_audio.h"
+#include "game/original/CharacterProfiles.h"
 #include "game/original/MenuIds.h"
 #include "game/server_adapter.h"
 #include <imgui.h>
@@ -211,6 +213,64 @@ namespace
         CHECK(!audio.ambient);
         return true;
     }
+    bool profiles(const std::filesystem::path& content)
+    {
+        std::string error;
+        Config config;
+        config.data_dir = content;
+        auto game = std::make_unique<GameSession>();
+        CHECK(game->resources.mount_game(config, error) && game->initialize());
+        for (unsigned c = 0; c < 4; ++c)
+        {
+            CHECK(GameSession::start_new_game(game, "01_SubwayA", DBYTE(c % 3), DBYTE(c), error));
+            auto* player = game->server_shell.Player(game->local_client);
+            const auto& p = character_profiles[c];
+            CHECK(player && player->m_nCharacter == c && player->eye_level == p.eye);
+            CHECK(player->m_nAttribStrength == p.strength && player->m_nAttribSpeed == p.speed &&
+                  player->m_nAttribResistance == p.resistance && player->m_nAttribMagic == p.magic);
+            CHECK(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_DIFFICULTY")) == c % 3);
+            CHECK(game->step(1. / 60));
+            CHECK(test_camera::complete_subway_intro(*game));
+            CHECK(player->m_Anim_Sound.GetSoundRoot() == p.sound_root);
+            player->m_eLastSurface = SURFTYPE_STONE;
+            std::string foot;
+            CHECK(player->GetFootstepSound(foot));
+            CHECK(foot.ends_with(p.female ? "f.wav" : "m.wav"));
+            CHECK(player->PlayPlayerSound(foot, 400, 70, false, 0));
+            CHECK(player->GetLandingSound(foot) && player->PlayPlayerSound(foot, 400, 70, false, 0));
+            game->client_shell.movement_input.crouch = true;
+            for (int i = 0; i < 10; ++i)
+                CHECK(game->step(1. / 60));
+            CHECK(player->crouched && player->eye_level == 12);
+            game->client_shell.movement_input = {};
+            for (int i = 0; i < 10; ++i)
+                CHECK(game->step(1. / 60));
+            CHECK(!player->crouched && player->eye_level == p.eye);
+            CHECK(game->command_weapon(0, error));
+            const auto& weapon = game->client_shell.weapons[0];
+            CHECK(weapon.character == c && weapon.skin_path.find(std::string(1, p.hands) + "_") != std::string::npos);
+            CHECK(weapon.model_path.find(std::string(1, p.hands) + "_") != std::string::npos);
+            PlayerRestoreState saved;
+            CHECK(game->capture_player(saved, error) && game->leave_player() && game->restore_player(saved, error));
+            CHECK(game->server_shell.Player(game->local_client)->m_nCharacter == c);
+            WorldMessage message;
+            CHECK(original_world_request("02_CityHub", 0, LOADTYPE_NEW_LEVEL, 1, message));
+            CHECK(game->queue_level_change(message, "01_egressa", error));
+            CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Committed);
+            player = game->server_shell.Player(game->local_client);
+            CHECK(player->m_nCharacter == c && player->eye_level == p.eye);
+            CHECK(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_DIFFICULTY")) == c % 3);
+            DVector pos;
+            CHECK(game->server.GetObjectPos(player->m_hObject, &pos) == DE_OK);
+            auto damage = game->server.StartMessageToObject(player, player->m_hObject, damage_message);
+            CHECK(damage && game->server.WriteDamage(
+                                damage, {{0, 0, 1}, pos, 10000, DamageType::Normal, player->m_hObject}) == DE_OK);
+            CHECK(game->server.EndMessage(damage) == DE_OK && game->step(1. / 60));
+            CHECK(player->m_bDead && player->death_error.empty() && game->client_shell.death_camera.active);
+            std::cout << "Profile " << c << ": resources, crouch, hands, restore, CityHub transfer and death passed\n";
+        }
+        return true;
+    }
     bool artwork(const std::filesystem::path& content, bool gpu, const std::filesystem::path& output)
     {
         std::string error;
@@ -289,6 +349,8 @@ int main(int argc, char** argv)
         return state() ? 0 : 1;
     if (argc < 3)
         return 2;
+    if (mode == "profiles")
+        return profiles(path_from_utf8(argv[2])) ? 0 : 1;
     if (mode == "session")
         return session(path_from_utf8(argv[2])) ? 0 : 1;
     return artwork(path_from_utf8(argv[2]), mode == "gpu", argc > 3 ? path_from_utf8(argv[3]) : std::filesystem::path{})

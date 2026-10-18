@@ -1,5 +1,6 @@
 #include "ViewWeapon.h"
 #include "BloodShells.h"
+#include "CharacterProfiles.h"
 #include "engine/collision.h"
 #include "engine/model_commands.h"
 #include <cmath>
@@ -17,25 +18,43 @@ bool CViewWeapon::AdjustAngleAndSetPos(float pitch, float yaw, DVector eye, Node
     out.position = vector_add(eye, rotate_vector(out.rotation, offset));
     return physics_vector(out.position);
 }
-bool CViewWeapon::Create(DBYTE weapon, bool left_hand, ModelStore& models, Resources& resources, std::string& error)
+bool CViewWeapon::Create(DBYTE weapon, bool left_hand, ModelStore& models, Resources& resources, std::string& error,
+                         DBYTE profile_id)
 {
     const auto* definition = weapon_definition(weapon);
-    if (!definition)
+    const auto* profile = character_profile(profile_id);
+    if (!definition || !profile)
     {
         error = "Unsupported view weapon";
         return false;
     }
-    std::shared_ptr<const Model> loaded;
-    if (!models.load(left_hand ? definition->m_szLeftViewModelFilename : definition->m_szViewModelFilename, loaded,
-                     error))
-        return false;
-    if (!resources.find(definition->m_szViewModelSkin))
+    std::string resolved_model = left_hand ? definition->m_szLeftViewModelFilename : definition->m_szViewModelFilename;
+    std::string resolved_skin = definition->m_szViewModelSkin;
+    auto substitute = [&](std::string& path)
     {
-        error = "Weapon skin is not indexed";
+        for (auto& c : path)
+            if (c >= 'a' && c <= 'z')
+                c = char(c - 'a' + 'A');
+        const auto found = path.find("C_");
+        if (found != path.npos)
+            path[found] = profile->hands;
+    };
+    substitute(resolved_skin);
+    if (weapon == WEAP_MELEE)
+        substitute(resolved_model);
+    std::shared_ptr<const Model> loaded;
+    if (!models.load(resolved_model, loaded, error))
+        return false;
+    if (!resources.find(resolved_skin))
+    {
+        error = "Selected character weapon skin is not indexed: " + resolved_skin;
         return false;
     }
     *this = {};
     type = weapon;
+    character = profile_id;
+    model_path = std::move(resolved_model);
+    skin_path = std::move(resolved_skin);
     left = left_hand;
     model = std::move(loaded);
     resources_ = &resources;

@@ -1,3 +1,4 @@
+#include "CharacterProfiles.h"
 // Selected CPlayerObj::UpdateAnim/Do*Anim/SetAnimation and CAnim_Sound mappings.
 // See docs/contracts/locomotion_contracts.md for source evidence and engine adaptations.
 #include "PlayerObj.h"
@@ -167,7 +168,7 @@ bool CPlayerObj::UpdateAnim(const PlayerControls& controls)
         locomotion_clip = std::move(name);
         crouched = duck;
         forced_crouch = duck && !input.crouch;
-        eye_level = duck ? 12.0f : 36.0f;
+        eye_level = duck ? 12.0f : OpenBlood2::character_profiles[m_nCharacter].eye;
         if (!forced_crouch)
             locomotion_error.clear();
         return true;

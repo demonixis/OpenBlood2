@@ -309,9 +309,8 @@ void CBloodClientShell::OnExitWorld()
 bool CBloodClientShell::InitSinglePlayer(CBloodServerShell& server)
 {
     if (!m_bFirstWorld)
-        return restored_entry;   // Restored worlds skip the profile; retain fresh-entry duplicate rejection.
-    OpenBlood2::PlayerInit init; // Default entry profile; original fields/order retained.
-    if (!server.OnMessage(client_, init))
+        return restored_entry; // Restored worlds skip the profile; retain fresh-entry duplicate rejection.
+    if (!server.OnMessage(client_, entry_profile))
         return false;
     m_bFirstWorld = false;
     // Original next requests CMSG_AUTOSAVE and sets GS_PLAYING. Both remain
@@ -494,7 +493,7 @@ bool CBloodClientShell::SyncWeapons(OpenBlood2::ModelStore& models, OpenBlood2::
     {
         const auto* weapon = owner->m_InventoryMgr.CurrentWeapon(i != 0);
         const auto type = weapon ? weapon->data.m_nType : 0;
-        changed[i] = type != weapons[i].type;
+        changed[i] = type != weapons[i].type || (type && weapons[i].character != owner->m_nCharacter);
         if (changed[i] && weapon)
         {
             std::shared_ptr<const OpenBlood2::Model> held;
@@ -506,7 +505,7 @@ bool CBloodClientShell::SyncWeapons(OpenBlood2::ModelStore& models, OpenBlood2::
                 return false;
             }
         }
-        if (changed[i] && type && !prepared[i].Create(type, i != 0, models, resources, error))
+        if (changed[i] && type && !prepared[i].Create(type, i != 0, models, resources, error, owner->m_nCharacter))
             return false;
     }
     for (unsigned i = 0; i < 2; ++i)

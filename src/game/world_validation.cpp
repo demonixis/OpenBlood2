@@ -124,7 +124,7 @@ namespace OpenBlood2
             if (weapon.model)
             {
                 const auto* definition = weapon_definition(weapon.type);
-                if (!definition || !image(definition->m_szViewModelSkin))
+                if (!definition || !image(weapon.skin_path))
                     return false;
             }
         report.checked_textures = checked.size();

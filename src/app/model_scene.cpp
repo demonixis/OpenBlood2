@@ -97,7 +97,7 @@ namespace OpenBlood2
                 error = "Original view-weapon placement failed";
                 return false;
             }
-            if (!scene.add(weapon.model, weapon.animation, definition->m_szViewModelSkin, pose, {1, 1, 1},
+            if (!scene.add(weapon.model, weapon.animation, weapon.skin_path, pose, {1, 1, 1},
                            owner && !owner->m_damage.IsDead() && client.weapons_visible, true, {},
                            weapon.left ? "left view weapon" : "right view weapon", game.resources, error))
                 return false;

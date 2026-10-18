@@ -61,3 +61,21 @@ for both paths. The later UI-M3 replaces that temporary selection policy.
 replacement, independent menu cursor advancement and paused game output. NVIDIA
 normal-launch capture exercises the application frontend; this is not a human
 playthrough or native macOS qualification.
+
+## UI-M3 character request and transfer
+
+Story forces Caleb; Chosen transports its selected default profile and difficulty.
+The four original tables are centralized in `CharacterProfiles.h`: character order
+is Caleb, Ophelia, Ishmael, Gabriella (menu order remains source order). Entry
+attributes, model/skin, sound root, standing eye and gender footsteps/landing follow
+the selected profile. Existing animation dimensions and atomic crouch resizing are
+unchanged. Initial object construction still starts as source-default Caleb before
+the original client profile message; animation selection sets the selected body.
+
+ViewWeapon retains resolved owned model/skin names: source uppercase `C_` substitution
+changes all hand skins and the melee model, independently for both hands. Renderer
+and startup preflight consume the same identities. Player state/engine validation
+accepts all four default profiles; restored attributes and stats are never reset.
+Existing NEW_LEVEL carries difficulty and captured character. Character death uses
+the selected model/voice and existing original corpse/gib rules. Addon/multiplayer
+skins and full Action rules remain outside scope; Chosen uses the existing solo game.

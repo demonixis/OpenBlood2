@@ -1,3 +1,4 @@
+#include "game/original/CharacterProfiles.h"
 #include "game/original_globals.h"
 #include "game/server_adapter.h"
 #include <limits>
@@ -8,8 +9,8 @@ namespace OpenBlood2
     {
         error.clear();
         if (!current || current->objects.busy() || ServerAdapter::active_ != &current->server ||
-            g_pServerDE != &current->server || !current->server.bound_ || character != 0 || difficulty > 2 ||
-            world.empty() || world.size() > 255 || world.find('\0') != world.npos ||
+            g_pServerDE != &current->server || !current->server.bound_ || !character_profile(character) ||
+            difficulty > 2 || world.empty() || world.size() > 255 || world.find('\0') != world.npos ||
             current->world_revision == std::numeric_limits<std::uint64_t>::max())
         {
             error = "New game requires an active idle owner and supported solo profile";
@@ -30,6 +31,7 @@ namespace OpenBlood2
         g_pServerDE = nullptr;
         auto destination = std::make_unique<GameSession>();
         destination->resources = source.resources;
+        select_character(character, destination->client_shell.entry_profile);
         const bool ready =
             destination->initialize() && destination->load_world(request, error) && destination->run_world(error);
         auto restore_source = [&]

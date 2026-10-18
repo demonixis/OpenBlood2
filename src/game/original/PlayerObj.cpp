@@ -5,6 +5,7 @@
 #include "AI_Mgr.h"
 #include "CameraObj.h"
 #include "CharacterNodes.h"
+#include "CharacterProfiles.h"
 #include "GameStartPoint.h"
 #include <algorithm>
 #include <cmath>
@@ -111,15 +112,13 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
 }
 bool CPlayerObj::SetCharacter(DBYTE character)
 {
-    // Caleb, default skin only until the other original character branches
-    // are ported. Reject before mutation.
-    if (character != 0 || m_nSkin != 0)
+    const auto* profile = OpenBlood2::character_profile(character);
+    if (!profile || m_nSkin != 0)
     {
-        entry_error = "Only Caleb's default entry profile is ported";
+        entry_error = "Only the four default Chosen profiles are supported";
         return false;
     }
-    if (GetServerDE()->SetModelFilenames(m_hObject, "Models\\Characters\\Caleb.abc", "Skins\\Characters\\Caleb1.dtx") !=
-        DE_OK)
+    if (GetServerDE()->SetModelFilenames(m_hObject, profile->model, profile->skin) != DE_OK)
     {
         entry_error = "Player model could not be loaded";
         return false;
@@ -127,7 +126,7 @@ bool CPlayerObj::SetCharacter(DBYTE character)
     if (!m_Anim_Sound.SetAnimationIndexes(m_hObject))
         return false;
     m_Anim_Sound.GenerateHitSpheres(m_hObject);
-    m_Anim_Sound.SetSoundRoot("sounds\\chosen\\caleb");
+    m_Anim_Sound.SetSoundRoot(profile->sound_root);
     m_nCharacter = character;
     return true;
 }
@@ -164,7 +163,7 @@ bool CPlayerObj::Respawn()
     // UpdateAnim can actually grow the shared body; never advertise a tall eye
     // and standing speed while collision still has the crouched dimensions.
     crouch_requested = forced_crouch = false;
-    eye_level = crouched ? 12.0f : 36.0f;
+    eye_level = crouched ? 12.0f : OpenBlood2::character_profiles[m_nCharacter].eye;
     m_fAirLevel = 100;
     containers = {};
     for (DBYTE i = 1; i <= 12; ++i)
@@ -199,7 +198,7 @@ void CPlayerObj::ValidateAttributes()
 bool CPlayerObj::OnSinglePlayerInit(const OpenBlood2::PlayerInit& init)
 {
     if (restore_initialization || attributes_received || !m_hClient || init.name.size() > 100 ||
-        init.name.find('\0') != std::string::npos || init.character != 0 || init.skin != 0)
+        init.name.find('\0') != std::string::npos || !OpenBlood2::character_profile(init.character) || init.skin != 0)
         return false;
     // Reject unsupported loadouts before allocating strings or weapons.
     for (auto type : init.weapons)
@@ -325,8 +324,11 @@ bool CPlayerObj::UpdateClientPhysics()
     if (!m_hClient)
         return true; // Original InitialUpdate has no client yet.
     OpenBlood2::PlayerPhysics physics;
-    physics.model = "Models\\Characters\\Caleb.abc";
-    physics.skin = "Skins\\Characters\\Caleb1.dtx";
+    const auto* profile = OpenBlood2::character_profile(m_nCharacter);
+    if (!profile)
+        return false;
+    physics.model = profile->model;
+    physics.skin = profile->skin;
     auto* server = GetServerDE();
     if (server->GetObjectDims(m_hObject, &physics.dimensions) != DE_OK ||
         server->GetGlobalForce(&physics.gravity) != DE_OK)

@@ -17,12 +17,13 @@ namespace OpenBlood2
 class CViewWeapon
 {
   public:
-    bool Create(DBYTE, bool, OpenBlood2::ModelStore&, OpenBlood2::Resources&, std::string&);
+    bool Create(DBYTE, bool, OpenBlood2::ModelStore&, OpenBlood2::Resources&, std::string&, DBYTE character = 0);
     bool Update(ServerDE&, CBloodServerShell&, HCLIENT, const OpenBlood2::WeaponInput&, DVector, DVector, double,
                 std::string&);
     // Selected original placement, with the unimplemented bob inputs held at zero.
     bool AdjustAngleAndSetPos(float pitch, float yaw, DVector eye, OpenBlood2::NodePose&) const;
-    DBYTE type = 0;
+    DBYTE type = 0, character = 0;
+    std::string model_path, skin_path;
     bool left = false;
     std::shared_ptr<const OpenBlood2::Model> model;
     OpenBlood2::AnimationTrack animation;

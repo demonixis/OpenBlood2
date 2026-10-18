@@ -49,6 +49,18 @@
     {
       "path": "Shared/ClientRes.h",
       "sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b"
+    },
+    {
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "path": "ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9"
     }
   ],
   "adaptations": [
@@ -56,5 +68,6 @@
     "Mouse picking, viewport scaling and independent menu lifetime are replacement services.",
     "mm_font.fnt final glyph advances one pixel beyond the 1345-pixel bitmap; bounded final-glyph overhang only.",
     "Quarter-height spacing replaces the unavailable CoolFont space implementation; not retail pixel equivalence."
-  ]
+  ],
+  "profile_adaptations": "Selected original gCharacterValues/default skins, SetCharacter attributes, sound roots, gender footsteps/landing and SetupViewModel C_ substitution. PlayerInit carries owned defaults. Restore validates the selected default profile and retains existing atomic animation-driven body resizing. Chosen remains single-player; Action rules and addon profiles are unavailable."
 }

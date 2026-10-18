@@ -1,3 +1,4 @@
+#include "CharacterProfiles.h"
 // Selected PlayerObj.cpp:6541-6865 values and model/flag/velocity Load tail.
 // Complete engine, client-data and unported gameplay restoration remain unavailable.
 #include "CharacterNodes.h"
@@ -25,7 +26,8 @@ namespace
             error = "Invalid saved player fall history";
             return false;
         }
-        if (state.character != 0 || state.skin != 0 || (state.move_state > 14 && state.move_state != 16))
+        if (!OpenBlood2::character_profile(state.character) || state.skin != 0 ||
+            (state.move_state > 14 && state.move_state != 16))
         {
             error = "Unsupported saved player character, skin or movement state";
             return false;

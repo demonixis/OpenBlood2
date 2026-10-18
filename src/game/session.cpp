@@ -1,4 +1,5 @@
 #include "game/original/AI_Mgr.h"
+#include "game/original/CharacterProfiles.h"
 #include "game/original/ClientParticleStreamSFX.h"
 #include "game/original/DestructableModel.h"
 #include "game/original/DetailSprite.h"
@@ -290,11 +291,17 @@ namespace OpenBlood2
         // Preflight before creating original objects. Keep inspection usable on
         // missing assets and do not leave an ABC-less original player alive.
         std::shared_ptr<const Model> model;
-        if (!models.load("models/characters/caleb.abc", model, error))
-            return false;
-        if (!resources.find("skins/characters/caleb1.dtx"))
+        const auto* profile = character_profile(client_shell.entry_profile.character);
+        if (!profile)
         {
-            error = "Caleb skin is not indexed";
+            error = "Invalid player profile";
+            return false;
+        }
+        if (!models.load(profile->model, model, error))
+            return false;
+        if (!resources.find(profile->skin))
+        {
+            error = "Selected character skin is not indexed";
             return false;
         }
         const auto before = objects.snapshot();
