@@ -157,6 +157,7 @@ bool CPlayerObj::Respawn()
     m_bDead = DFALSE;
     move_state = MoveState::None;
     locomotion_clip.clear();
+    locomotion_clip_retained = false;
     locomotion_requested_clip.clear();
     locomotion_error.clear();
     // Entry reset may occur beneath a ceiling. Keep the accepted stance until

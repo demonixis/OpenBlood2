@@ -5,14 +5,15 @@
 #include <algorithm>
 #include <cmath>
 #include <map>
+#include <sstream>
 
 namespace OpenBlood2
 {
     CollisionQuery ServerAdapter::sweep_scene(HOBJECT ignore, DVector from, DVector to, DVector dims,
                                               CollisionHit& nearest, const std::vector<ObjectId>& ids,
-                                              HOBJECT ignore_extra, StartOverlap start)
+                                              HOBJECT ignore_extra, double allowed_penetration, StartOverlap start)
     {
-        auto result = collision->sweep(from, to, dims, nearest, start);
+        auto result = collision->sweep(from, to, dims, nearest, allowed_penetration, start);
         if (result == CollisionQuery::Invalid)
             return result;
         auto departed = nearest.departed;
@@ -23,11 +24,13 @@ namespace OpenBlood2
                 other->handle == ignore_extra || !(other->state.m_Flags & FLAG_SOLID))
                 continue;
             CollisionHit hit;
-            auto query = sweep_object(*other, from, to, dims, hit, start);
+            auto query = sweep_object(*other, from, to, dims, hit, allowed_penetration, start);
             if (query == CollisionQuery::Invalid)
                 return query;
             departed += hit.departed;
-            if (query == CollisionQuery::Hit && (result != CollisionQuery::Hit || hit.fraction < nearest.fraction))
+            if (query == CollisionQuery::Hit &&
+                (result != CollisionQuery::Hit || hit.fraction < nearest.fraction ||
+                 (hit.fraction == nearest.fraction && nearest.allowed_overlap && !hit.allowed_overlap)))
             {
                 nearest = hit;
                 nearest.object = other->handle;
@@ -106,6 +109,8 @@ namespace OpenBlood2
         state.start_departures = r->start_departures;
         state.stair_steps = r->stair_steps;
         state.last_step_height = r->last_step_height;
+        state.overlap_contacts = r->overlap_contacts;
+        state.last_overlap_depth = r->last_overlap_depth;
         if (!physics_vector(state.position) || !physics_vector(state.velocity) || !physics_vector(state.acceleration) ||
             !physics_vector(state.dimensions) || state.dimensions.x < 0 || state.dimensions.y < 0 ||
             state.dimensions.z < 0)
@@ -264,19 +269,30 @@ namespace OpenBlood2
         r->contact_object = nullptr;
         r->contact_polygon = UINT32_MAX;
         bool blocked_start = false;
-        // Replacement policy: a face the body already overlaps does not block a move
-        // that does not go deeper into it (later LithTech's one-sided world polygons
-        // ignore contacts facing along the motion). See collision_traversal_contracts.md.
-        const auto start = StartOverlap::Depart;
+        CollisionHit start_contact;
+        // Contact points are float-rounded, so separating from one face of a
+        // crease or wedge can leave the body a few ulps (1.7e-5 units at a
+        // CityHub floor/wall corner) inside the adjacent face. Later LithTech
+        // classifies planes with a 0.001 tolerance and never stops on this.
+        // Replacement policy: tolerate such overlaps but never move deeper.
+        constexpr double allowed_penetration = 0.01;
+        // Deeper overlaps (later LithTech's one-sided world polygons ignore contacts
+        // facing along the motion): a solid body may only leave them, which lets the
+        // original MoveObjectToGround lower a player whose start crosses a ceiling;
+        // sliding or going deeper still fails below. A non-solid passive object
+        // (pickup, debris) may also slide along an authored overlap while settling.
+        // See contact_overlap_contracts.md and collision_traversal_contracts.md.
+        const auto start = (r->state.m_Flags & FLAG_SOLID) ? StartOverlap::Leave : StartOverlap::LeaveOrSlide;
         for (unsigned iteration = 0; iteration < 4; ++iteration)
         {
             auto end = vector_add(position, remaining);
             CollisionHit nearest;
-            auto query = (r->state.m_Flags & FLAG_SOLID)
-                             ? sweep_scene(h, position, end, r->dimensions, nearest, ids, nullptr, start)
-                             : ((r->state.m_Flags & FLAG_GRAVITY) && !(r->state.m_Flags & FLAG_GOTHRUWORLD)
-                                    ? collision->sweep(position, end, r->dimensions, nearest, start)
-                                    : CollisionQuery::Miss);
+            auto query =
+                (r->state.m_Flags & FLAG_SOLID)
+                    ? sweep_scene(h, position, end, r->dimensions, nearest, ids, nullptr, allowed_penetration, start)
+                    : ((r->state.m_Flags & FLAG_GRAVITY) && !(r->state.m_Flags & FLAG_GOTHRUWORLD)
+                           ? collision->sweep(position, end, r->dimensions, nearest, allowed_penetration, start)
+                           : CollisionQuery::Miss);
             r->start_departures += nearest.departed;
             if (query == CollisionQuery::Invalid)
             {
@@ -284,6 +300,11 @@ namespace OpenBlood2
                 return DE_ERROR;
             }
             const bool found = query == CollisionQuery::Hit;
+            if (found && nearest.allowed_overlap)
+            {
+                ++r->overlap_contacts;
+                r->last_overlap_depth = static_cast<float>(nearest.penetration);
+            }
             auto* obstacle = found ? objects_.get(nearest.object) : nullptr;
             if (found && !nearest.start_solid && std::abs(nearest.normal.y) < .01f && obstacle &&
                 (obstacle->world_body || obstacle->model_body) && obstacle->body_properties.pushable &&
@@ -293,7 +314,8 @@ namespace OpenBlood2
                 const auto push = vector_scale(nearest.normal, into * float(1 - nearest.fraction) - .002f);
                 CollisionHit clearance;
                 auto actor_end = end;
-                auto clear = sweep_scene(h, position, actor_end, r->dimensions, clearance, ids, obstacle->handle);
+                auto clear = sweep_scene(h, position, actor_end, r->dimensions, clearance, ids, obstacle->handle,
+                                         allowed_penetration);
                 MovementState flat_support;
                 const bool flatten = clear == CollisionQuery::Hit && !clearance.start_solid &&
                                      clearance.normal.y > .99999f && actor_end.y < position.y &&
@@ -305,7 +327,8 @@ namespace OpenBlood2
                     // Revalidate the complete horizontal path before pushing;
                     // otherwise successive grounded commands stick at the box.
                     actor_end.y = position.y;
-                    clear = sweep_scene(h, position, actor_end, r->dimensions, clearance, ids, obstacle->handle);
+                    clear = sweep_scene(h, position, actor_end, r->dimensions, clearance, ids, obstacle->handle,
+                                        allowed_penetration);
                 }
                 const auto planned =
                     clear == CollisionQuery::Miss
@@ -346,7 +369,8 @@ namespace OpenBlood2
                 auto down = across;
                 down.y = position.y - 0.02f;
                 CollisionHit probe, landing;
-                if (sweep_scene(h, position, up, r->dimensions, probe, ids) == CollisionQuery::Miss &&
+                if (sweep_scene(h, position, up, r->dimensions, probe, ids, nullptr, allowed_penetration) ==
+                        CollisionQuery::Miss &&
                     sweep_scene(h, up, across, r->dimensions, probe, ids) == CollisionQuery::Miss &&
                     sweep_scene(h, across, down, r->dimensions, landing, ids) == CollisionQuery::Hit &&
                     !landing.start_solid && landing.normal.y >= 0.5f && landing.point.y > position.y + 0.001f &&
@@ -404,10 +428,14 @@ namespace OpenBlood2
             if (nearest.start_solid)
             {
                 blocked_start = true;
+                start_contact = nearest;
                 break;
             }
             // A small separation avoids repeatedly reporting the same touching face.
-            position = vector_add(reached, vector_scale(nearest.normal, 0.001f));
+            // A tolerated overlap is lifted out completely; otherwise alternating
+            // wedge separations can ratchet it deeper over many frames.
+            const auto separation = 0.001f + (nearest.allowed_overlap ? float(nearest.penetration) : 0.f);
+            position = vector_add(reached, vector_scale(nearest.normal, separation));
             remaining = vector_scale(remaining, static_cast<float>(1 - nearest.fraction));
             auto into = vector_dot(remaining, nearest.normal);
             if (into < 0)
@@ -470,9 +498,18 @@ namespace OpenBlood2
         moving_ = false;
         if (blocked_start)
         {
-            objects_.fail(ObjectError::Unsupported,
-                          "MoveObject starts penetrating geometry; depenetration is not implemented: " + r->type->name +
-                              " / " + r->state.m_Name);
+            const auto* other = objects_.get(start_contact.object);
+            std::ostringstream detail;
+            detail << "MoveObject starts penetrating geometry; depenetration is not implemented: " << r->type->name
+                   << " / " << r->state.m_Name << " (";
+            if (other)
+                detail << other->type->name << " / " << other->state.m_Name;
+            else
+                detail << "world polygon " << start_contact.polygon;
+            detail << ", depth " << start_contact.penetration << ", normal " << start_contact.normal.x << ' '
+                   << start_contact.normal.y << ' ' << start_contact.normal.z << ", at " << r->state.m_Pos.x << ' '
+                   << r->state.m_Pos.y << ' ' << r->state.m_Pos.z << ')';
+            objects_.fail(ObjectError::Unsupported, detail.str());
             return DE_ERROR;
         }
         return DE_OK;

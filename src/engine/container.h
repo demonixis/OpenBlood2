@@ -12,7 +12,7 @@ namespace OpenBlood2
         bool transform(DRotation, DVector destination);
         bool contains(DVector point) const;
         bool overlaps(DVector center, DVector half) const;
-        CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit&,
+        CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit&, double allowed_penetration = 0,
                              StartOverlap start = StartOverlap::Block) const;
         DVector min{}, max{}, origin{};
         bool convex = false;

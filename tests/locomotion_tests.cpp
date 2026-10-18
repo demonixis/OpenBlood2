@@ -1,9 +1,11 @@
 #include "app/movement_controls.h"
 #include "camera_fixture.h"
+#include "game/original/CharacterProfiles.h"
 #include "player_fixture.h"
 #include <cmath>
 #include <functional>
 #include <limits>
+#include <random>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
     do                                                                                                                 \
@@ -212,7 +214,9 @@ namespace
         c.weapon_input.primary = true;
         CHECK(step(game));
         CHECK(p->locomotion_clip == "fire_crawl_knife1");
-        // Missing clips fail visibly without swapping the body or animation.
+        // A wholly absent chain is an invalid source index: like the engine's
+        // ignored SetModelAnimation, the current clip and body are kept, the
+        // clip restarts and only looping follows the request.
         auto model = std::make_shared<Model>(*r->model);
         model->animations[animation_index(*model, "run_knife1")].name = "absent";
         model->animations[animation_index(*model, "run_pistol")].name = "absent2";
@@ -222,12 +226,29 @@ namespace
         c.movement_input.crouch = false;
         c.movement_input.run = true;
         const auto old = r->animation.animation;
+        const auto old_name = r->model->animations[old].name;
         const auto dims = r->dimensions;
+        const auto changes = p->animation_changes;
+        CHECK(step(game));
+        CHECK(p->move_state == CPlayerObj::MoveState::Run && p->locomotion_requested_clip == "run_knife1");
+        CHECK(p->locomotion_clip == old_name && p->locomotion_clip_retained && p->locomotion_error.empty());
+        CHECK(r->animation.animation == old && r->dimensions.y == dims.y && r->animation.looping);
+        CHECK(p->animation_changes == changes + 1 && p->retained_clip_requests == 1 && r->animation.time < 50);
+        CHECK(step(game, 5));
+        CHECK(p->animation_changes == changes + 1 && p->retained_clip_requests == 1);
+        c.movement_input.run = false;
+        CHECK(step(game));
+        CHECK(p->locomotion_clip == "walk_knife1" && !p->locomotion_clip_retained);
+        // Without any valid current clip the request still fails visibly.
+        c.movement_input.run = true;
+        const auto walk = r->animation.animation;
+        r->animation.animation = static_cast<std::uint32_t>(r->model->animations.size());
         // Test the typed branch directly: GameSession intentionally tears down a
         // client on a failed step, so its raw player pointer must not be reused.
         CHECK(!game.server_shell.OnMessage(game.local_client, PlayerControls{c.movement_input, false, 0}));
         CHECK(p->locomotion_error.find("run_knife1") != std::string::npos);
-        CHECK(r->animation.animation == old && r->dimensions.y == dims.y);
+        CHECK(p->locomotion_clip == "walk_knife1");
+        r->animation.animation = walk;
         return true;
     }
     bool lifetime(const std::filesystem::path& root)
@@ -357,9 +378,120 @@ namespace
         CHECK(game.unload_world() && game.objects.snapshot().empty() && game.server.string_count() == 0);
         return true;
     }
+    // Installed Ishmael/Gabriella name their jumps jump_*, so the source jmp_*
+    // chain is invalid for them; every Chosen must still walk, jump and land.
+    bool private_chosen(const std::filesystem::path& root)
+    {
+        for (DBYTE character = 0; character < 4; ++character)
+        {
+            GameSession game;
+            CHECK(game.initialize());
+            Config config;
+            config.data_dir = root;
+            std::string error;
+            CHECK(game.resources.mount_game(config, error));
+            CHECK(select_character(character, game.client_shell.entry_profile));
+            CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error));
+            CHECK(test_camera::complete_subway_intro(game));
+            auto& c = game.client_shell;
+            auto* r = game.objects.get(c.player);
+            CHECK(step(game, 20));
+            auto* p = game.server_shell.Player(game.local_client);
+            CHECK(p && p->m_nCharacter == character);
+            c.movement_input.forward = c.movement_input.run = true;
+            CHECK(step(game, 10));
+            CHECK(p->move_state == CPlayerObj::MoveState::Run && p->locomotion_clip == "run_rifle");
+            const auto run = r->animation.animation;
+            c.movement_input.jump = true;
+            CHECK(step(game, 10));
+            CHECK(p->move_state == CPlayerObj::MoveState::Jump && p->locomotion_requested_clip == "jmp_pistol");
+            const bool jump_clip = character < 2;
+            CHECK(p->locomotion_clip_retained == !jump_clip && !r->animation.looping);
+            CHECK(jump_clip ? p->locomotion_clip == "jmp_rifle"
+                            : p->locomotion_clip == "run_rifle" && r->animation.animation == run);
+            c.movement_input = {};
+            CHECK(step(game, 80));
+            CHECK(c.move_mgr.m_bOnGround && c.move_mgr.jumps == 1 && p->locomotion_error.empty());
+            CHECK(p->retained_clip_requests == (jump_clip ? 0u : 1u));
+            CHECK(game.unload_world());
+        }
+        return true;
+    }
+    // Seeded random roaming in CityHub at ~100 Hz: walk/run/strafe/jump/crouch,
+    // turning and firing. Float-rounded crease/wedge contacts must not stop play.
+    bool roam_cityhub(const std::filesystem::path& root, unsigned seed, DBYTE character, double seconds)
+    {
+        GameSession game;
+        CHECK(game.initialize());
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(game.resources.mount_game(config, error));
+        CHECK(select_character(character, game.client_shell.entry_profile));
+        CHECK(game.request_world("02_CityHub", error) && game.enter_player(error));
+        auto& c = game.client_shell;
+        std::mt19937 random(seed);
+        std::uniform_real_distribution<float> unit(0, 1);
+        double time = 0, next = 0;
+        float yaw_speed = 0;
+        DVector last{};
+        while (time < seconds)
+        {
+            if (time >= next)
+            {
+                next = time + 0.1 + unit(random) * 0.8;
+                auto& m = c.movement_input;
+                m = {};
+                m.forward = unit(random) < .6f;
+                m.backward = !m.forward && unit(random) < .3f;
+                m.left = unit(random) < .2f;
+                m.right = !m.left && unit(random) < .2f;
+                m.run = unit(random) < .6f;
+                m.jump = unit(random) < .25f;
+                m.crouch = unit(random) < .1f;
+                c.weapon_input = {};
+                c.weapon_input.primary = unit(random) < .15f;
+                yaw_speed = (unit(random) - .5f) * 6;
+            }
+            c.rotation.yaw += yaw_speed * 0.01f;
+            const double delta = 0.0095 + unit(random) * 0.001;
+            if (auto* r = game.objects.get(c.player))
+                last = r->state.m_Pos;
+            if (!game.step(delta))
+            {
+                std::cerr << "seed " << seed << " character " << int(character) << " failed at t=" << time
+                          << " last=" << last.x << ',' << last.y << ',' << last.z << '\n';
+                for (auto& d : game.objects.diagnostics())
+                    std::cerr << "  " << d << '\n';
+                for (auto& t : game.trace)
+                    std::cerr << "  " << t << '\n';
+                return false;
+            }
+            time += delta;
+            CHECK(game.local_client);
+        }
+        if (auto* r = game.objects.get(c.player))
+            std::cout << "seed " << seed << " character " << int(character) << " at " << r->state.m_Pos.x << ','
+                      << r->state.m_Pos.y << ',' << r->state.m_Pos.z << ", overlap contacts " << r->overlap_contacts
+                      << ", last depth " << r->last_overlap_depth << '\n';
+        return true;
+    }
+    bool cityhub_roam(const std::filesystem::path& root)
+    {
+        // Each pair stopped with a start penetration before the overlap tolerance.
+        for (const auto& [seed, character] : {std::pair{1u, 0}, {4u, 0}, {1u, 1}, {3u, 3}})
+            CHECK(roam_cityhub(root, seed, DBYTE(character), 30));
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
+    // Reproduction hook: locomotion_tests roam DATA SEED CHARACTER SECONDS.
+    if (argc == 6 && std::string_view(argv[1]) == "roam")
+        return roam_cityhub(path_from_utf8(argv[2]), unsigned(std::stoul(argv[3])), DBYTE(std::stoul(argv[4])),
+                            std::stod(argv[5]))
+                   ? 0
+                   : 1;
     if (argc != 3)
         return 2;
     const std::string_view name = argv[1];
@@ -372,6 +504,8 @@ int main(int argc, char** argv)
                     : name == "lifetime"     ? lifetime(root)
                     : name == "contacts"     ? contacts(root)
                     : name == "private"      ? private_world(root)
+                    : name == "chosen"       ? private_chosen(root)
+                    : name == "cityhub_roam" ? cityhub_roam(root)
                                              : false;
     return ok ? 0 : 1;
 }

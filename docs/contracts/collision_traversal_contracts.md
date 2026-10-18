@@ -45,33 +45,41 @@ CPU skeleton poses are also needed independently for model-node queries and
 attachments. This collision change does not claim GPU skinning, rendering culling,
 retail physics equivalence, universally smooth transitions or M2 completion.
 
-## Departure from initial overlap
+## Departure from deep initial overlap
 
-`CollisionWorld::sweep` takes a `StartOverlap` policy. `Block` (the default) keeps
-initial penetration a `start_solid` failure. `Depart` ignores a triangle the box
-already overlaps when a nonzero displacement does not go deeper into it
-(`outward normal . delta >= 0`: leaving or sliding along it). Moving deeper and
-zero-length queries still fail, and a box center inside a closed container component
-stays start-solid. Triangles are wound toward their polygon plane normal at build
-time (the empty side); all 338,275 retail and demo DAT polygons already wind that
-way, synthetic brushes may not, and the two-sided SAT is unaffected by the order.
-Container boundaries are built from rotated planes. Ignored faces are counted in
-`CollisionHit::departed`; later hits are unaffected.
+This extends the shallow [contact overlap tolerance](contact_overlap_contracts.md):
+overlaps up to `allowed_penetration` (0.01 in MoveObject) keep that policy. Deeper
+start overlaps follow a `StartOverlap` policy. `Block` (the default) keeps them a
+`start_solid` failure. `Leave` ignores a triangle the box already overlaps when a
+nonzero displacement leaves it along its outward normal (`outward . delta > 0`).
+`LeaveOrSlide` also ignores it for motion parallel to the face (`>= 0`). Moving
+deeper and zero-length queries always fail, and a box center inside a closed
+container component stays start-solid. Triangles are wound toward their polygon
+plane normal at build (the empty side); all 338,275 retail and demo DAT polygons
+already wind that way, synthetic brushes may not, and the two-sided SAT is unaffected
+by the order. Container boundaries are built from rotated planes. Ignored faces are
+counted in `CollisionHit::departed`; later hits are unaffected.
 
-`MoveObject` sweeps use `Depart`; stair probes, movers, world bodies, body placement,
-resize clearance and every other query keep `Block`. Evidence: GoToStartPoint
-teleports the player to `05_egress` (retail 05_CDMB and the demo's Demo_02), 112
-units above the `endelevator` floor, where the standing box crosses the car ceiling
-by 25 units. The source then lowers it with MoveObjectToGround; the old solver
-rejected that move. In 12_Train_Station the authored `SniperRiflePU` lies with its
-33-unit half-length through a wall: its placement and later gravity steps move
-parallel to that face. The authored data, start rules and positions are unchanged;
-nothing is teleported or pushed out. This mirrors later LithTech's mover, whose
-one-sided world-model polygons ignore contacts facing along the motion
-(`moveplayer.cpp`); it is replacement policy, not a verified 1998 engine trace, and
-general depenetration remains unavailable.
+`MoveObject` uses `Leave` for solid bodies and `LeaveOrSlide` for non-solid passive
+objects (pickups, debris), which never block others and only need to settle; stair
+probes, movers, world bodies, body placement, resize clearance and every other query
+keep `Block`. A solid body that slides along or pushes into a deep overlap therefore
+still fails, as the contact-overlap contract requires.
 
-Movement snapshots and the Movement inspector report the faces a body's moves left or
-slid along (`start_departures`). Tests: `services.start_departure` (synthetic
-ceiling/floor/wall) and `services.elevator_entry` / `elevator_entry_demo` (retail
+Evidence: GoToStartPoint teleports the player to `05_egress` (retail 05_CDMB and the
+demo's Demo_02), 112 units above the `endelevator` floor, where the standing box
+crosses the car ceiling by 25 units. The source then lowers it with
+MoveObjectToGround, a move leaving that ceiling. In 12_Train_Station the authored
+`SniperRiflePU` lies with its 33-unit half-length through a wall; its placement and
+gravity steps move parallel to that face. The original pickup also falls back to a
+raw `SetObjectDims` when its size does not fit. Authored data, start rules and
+positions are unchanged; nothing is teleported or pushed out. This mirrors later
+LithTech's mover, whose one-sided world-model polygons ignore contacts facing along
+the motion (`moveplayer.cpp`); it is replacement policy, not a verified 1998 engine
+trace, and general depenetration remains unavailable.
+
+Movement snapshots and the Movement inspector report the faces a body's moves left
+or slid along (`start_departures`). Tests: `services.start_departure` (synthetic
+ceiling/floor/wall, solid and non-solid), `services.contact_overlap` (deep solid
+slides still fail) and `services.elevator_entry` / `elevator_entry_demo` (retail
 05_CDMB and Demo_02 player entry); `keyframe_audio.private` steps 12_Train_Station.

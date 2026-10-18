@@ -54,7 +54,10 @@ namespace OpenBlood2
         if (active)
         {
             random_state = random_state * 1664525u + 1013904223u;
-            ambient = start("ambient0" + std::to_string(1 + (random_state >> 30)) + ".wav", true);
+            auto sound = 1 + (random_state >> 30);
+            if (resources_.demo() && (sound == 1 || sound == 3))
+                ++sound; // Original _DEMO CMainMenus::SetFocus: the demo ships ambient02/04 only.
+            ambient = start("ambient0" + std::to_string(sound) + ".wav", true);
         }
         else if (ambient)
         {

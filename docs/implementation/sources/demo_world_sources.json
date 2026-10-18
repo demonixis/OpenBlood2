@@ -134,7 +134,7 @@
     "Base Escape_Hide/Special handlers are no-ops for the Prophet and Fanatic Special2..8, as the original empty virtuals.",
     "A howitzer shell whose shooter is already pending removal unlinks it and attributes the blast to no one.",
     "Prophet Fire keeps primary fire when the target velocity is unavailable (the source reads an uninitialized vector).",
-    "MoveObject sweeps ignore an initially overlapped face unless a nonzero move goes deeper into it; triangles are wound toward their plane normal at build.",
+    "Beyond the 0.01 contact-overlap tolerance, MoveObject lets a solid body leave an initially overlapped face and a non-solid passive object also slide along it; deeper and zero-length moves still fail. Triangles are wound toward their plane normal at build.",
     "SniperRiflePU is registered; the sniper rifle weapon is not integrated, so the inventory refuses the offer."
   ],
   "references": [

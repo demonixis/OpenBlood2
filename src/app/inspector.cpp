@@ -1795,12 +1795,18 @@ namespace OpenBlood2
         ImGui::Text("Stairs %llu / %llu | rise %.1f | limit %.1f", static_cast<unsigned long long>(body.stair_steps),
                     static_cast<unsigned long long>(body.stair_attempts), body.last_step_height,
                     body.dimensions.y * 0.5f);
+        ImGui::Text("Allowed-overlap contacts %llu | last depth %.6f",
+                    static_cast<unsigned long long>(body.overlap_contacts), body.last_overlap_depth);
         ImGui::Text("Moves left/slid along %llu initially overlapped faces",
                     static_cast<unsigned long long>(body.start_departures));
         const auto* record = game.objects.get(player->m_hObject);
         ImGui::TextWrapped("Requested clip: %s", player->locomotion_requested_clip.c_str());
         ImGui::TextWrapped("Clip: %s | fallback %s", player->locomotion_clip.c_str(),
-                           player->locomotion_requested_clip != player->locomotion_clip ? "yes" : "no");
+                           player->locomotion_clip_retained                               ? "current clip kept"
+                           : player->locomotion_requested_clip != player->locomotion_clip ? "yes"
+                                                                                          : "no");
+        ImGui::Text("Invalid source index requests %llu",
+                    static_cast<unsigned long long>(player->retained_clip_requests));
         if (record && record->model && record->animation.animation < record->model->animations.size())
             ImGui::Text("%.1f / %u ms | loop %s | done %s", record->animation.time,
                         record->model->animations[record->animation.animation].duration,

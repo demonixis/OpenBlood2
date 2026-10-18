@@ -161,7 +161,9 @@ class CPlayerObj : public CBaseCharacter
     bool crouch_requested = false, crouched = false, forced_crouch = false;
     float eye_level = 36;
     std::string locomotion_clip, locomotion_requested_clip, locomotion_error;
-    std::uint64_t animation_changes = 0, blocked_resizes = 0;
+    // The source index was invalid, so the current clip was kept (engine no-op).
+    bool locomotion_clip_retained = false;
+    std::uint64_t animation_changes = 0, blocked_resizes = 0, retained_clip_requests = 0;
     bool OnCommandUse();
     bool OnCommandItem(DBYTE);
     bool command_run = false;

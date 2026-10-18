@@ -1,3 +1,4 @@
+#include "game/demo_menu_strings.h"
 #include "game/menu.h"
 #include "game/original/MenuIds.h"
 #include <algorithm>
@@ -51,12 +52,15 @@ namespace OpenBlood2
         if (surface)
             return true;
         std::vector<std::uint8_t> bytes;
-        const auto* dll = resources_.find("cres.dll");
-        if (!dll || dll->size > 32 * 1024 * 1024 || !resources_.read("cres.dll", bytes, error) ||
-            !read_string_resources(bytes, strings, error))
+        // The demo's Build 108 client compiles its labels into cshell.dll instead.
+        const char* source = resources_.demo() ? "cshell.dll" : "cres.dll";
+        const auto* dll = resources_.find(source);
+        if (!dll || dll->size > 32 * 1024 * 1024 || !resources_.read(source, bytes, error) ||
+            !(resources_.demo() ? read_demo_menu_strings(bytes, strings, error)
+                                : read_string_resources(bytes, strings, error)))
         {
             if (error.empty())
-                error = "Missing/oversized menu strings: cres.dll";
+                error = std::string("Missing/oversized menu strings: ") + source;
             return false;
         }
         if (!canvas.load_font("interface/fonts/MenuFont1.pcx", "interface/fonts/MenuFont1.fnt", small_) ||
@@ -72,6 +76,9 @@ namespace OpenBlood2
         thumb_ = canvas.CreateSurfaceFromBitmap("interface/mainmenus/SliderTab.pcx");
         for (const auto* name : {"mainmenu.pcx", "singleplayer.pcx", "options.pcx", "loadgame.pcx", "savegame.pcx"})
             titles_[name] = canvas.CreateSurfaceFromBitmap((std::string("interface/mainmenus/") + name).c_str());
+        if (resources_.demo())
+            for (const auto* name : {"screens/bloodbath.pcx", "screens/info.pcx", "screens/modes.pcx"})
+                splashes_[name] = canvas.CreateSurfaceFromBitmap(name);
         if (!canvas.error.empty())
         {
             error = canvas.error;
@@ -87,6 +94,21 @@ namespace OpenBlood2
         if (composed_ == menu.revision)
             return true;
         canvas.FillRect(surface, nullptr, 0);
+        if (menu.splash)
+        {
+            // Original Splash_Update scales the 640x480 PCX to the screen; the canvas
+            // viewport keeps its aspect like every other menu page.
+            const auto it = splashes_.find(menu.splash);
+            if (it == splashes_.end() || !it->second)
+            {
+                error = std::string("Missing original splash screen: ") + menu.splash;
+                return false;
+            }
+            canvas.DrawSurfaceToSurface(surface, it->second, nullptr, 0, 0);
+            ++revision;
+            composed_ = menu.revision;
+            return true;
+        }
         canvas.DrawSurfaceToSurface(surface, background_, nullptr, 0, 0);
         canvas.DrawSurfaceToSurfaceTransparent(surface, titles_.at(menu.title()), nullptr, 82, 52, hud_magenta);
         int y = 140;

@@ -111,6 +111,7 @@ namespace OpenBlood2
                    penetration = std::numeric_limits<double>::infinity();
             const PlacementAnchor* anchor = nullptr;
             Separations* alternatives = nullptr;
+            double allowed = 0;
             bool axis(DVector axis, double low, double high)
             {
                 const double length = std::sqrt(precise_dot(axis, axis));
@@ -189,6 +190,20 @@ namespace OpenBlood2
                 if (enter > leave + 1e-9 || leave <= 1e-8 || enter > 1)
                     return false;
                 hit.start_solid = enter < -1e-6;
+                if (hit.start_solid && allowed > 0 && penetration <= allowed)
+                {
+                    // Allowed contact penetration: never go deeper along the
+                    // escape normal, but do not block leaving or sliding.
+                    if (precise_dot(delta, penetration_normal) >= 0)
+                        return false;
+                    hit.start_solid = false;
+                    hit.allowed_overlap = true;
+                    hit.penetration = penetration;
+                    hit.fraction = 0;
+                    hit.normal = penetration_normal;
+                    hit.point = from;
+                    return true;
+                }
                 hit.penetration = hit.start_solid ? penetration : 0;
                 hit.fraction = std::max(0.0, enter);
                 hit.normal = hit.start_solid ? penetration_normal : normal;
@@ -197,11 +212,13 @@ namespace OpenBlood2
             }
         };
         bool triangle_hit(const std::array<DVector, 3>& p, DVector from, DVector to, DVector half, CollisionHit& hit,
-                          const PlacementAnchor* anchor = nullptr, Separations* alternatives = nullptr)
+                          const PlacementAnchor* anchor = nullptr, Separations* alternatives = nullptr,
+                          double allowed_penetration = 0)
         {
             Sweep s{from, vector_subtract(to, from), half};
             s.anchor = anchor;
             s.alternatives = alternatives;
+            s.allowed = allowed_penetration;
             const std::array<DVector, 3> edges{
                 {vector_subtract(p[1], p[0]), vector_subtract(p[2], p[1]), vector_subtract(p[0], p[2])}};
             auto test = [&](DVector axis)
@@ -249,13 +266,14 @@ namespace OpenBlood2
         }
     } // namespace
     CollisionQuery sweep_box(DVector from, DVector to, DVector half, DVector center, DVector other_half,
-                             CollisionHit& hit)
+                             CollisionHit& hit, double allowed_penetration)
     {
         hit = {};
         if (!physics_vector(from) || !physics_vector(to) || !extents(half) || !physics_vector(center) ||
             !extents(other_half))
             return CollisionQuery::Invalid;
         Sweep s{from, vector_subtract(to, from), half};
+        s.allowed = allowed_penetration;
         auto low = vector_subtract(center, other_half), high = vector_add(center, other_half);
         for (auto axis : axes)
             if (!s.axis(axis, vector_dot(low, axis), vector_dot(high, axis)))
@@ -344,7 +362,7 @@ namespace OpenBlood2
     }
     void CollisionWorld::query(std::uint32_t index, DVector from, DVector to, DVector half, CollisionHit& hit,
                                bool& found, const PlacementAnchor* anchor, const Triangle** selected,
-                               StartOverlap start, std::uint32_t* departed) const
+                               double allowed_penetration, StartOverlap start, std::uint32_t* departed) const
     {
         const auto& n = nodes_[index];
         ++work_.node_tests;
@@ -359,8 +377,8 @@ namespace OpenBlood2
         }
         if (n.left)
         {
-            query(n.left, from, to, half, hit, found, anchor, selected, start, departed);
-            query(n.right, from, to, half, hit, found, anchor, selected, start, departed);
+            query(n.left, from, to, half, hit, found, anchor, selected, allowed_penetration, start, departed);
+            query(n.right, from, to, half, hit, found, anchor, selected, allowed_penetration, start, departed);
             return;
         }
         for (auto i = n.begin; i < n.end; ++i)
@@ -373,20 +391,27 @@ namespace OpenBlood2
             }
             ++work_.triangle_tests;
             CollisionHit candidate;
-            if (!triangle_hit(triangles_[i].points, from, to, half, candidate, anchor))
+            if (!triangle_hit(triangles_[i].points, from, to, half, candidate, anchor, nullptr, allowed_penetration))
                 continue;
-            if (start == StartOverlap::Depart && candidate.start_solid && precise_dot(delta, delta) > 0)
+            // Overlaps deeper than the tolerance: ignore a face the motion leaves (or slides along).
+            if (start != StartOverlap::Block && candidate.start_solid && precise_dot(delta, delta) > 0)
             {
                 const auto& p = triangles_[i].points;
-                const auto outward = cross(vector_subtract(p[1], p[0]), vector_subtract(p[2], p[0]));
-                if (precise_dot(outward, delta) >= 0)
+                const auto outward =
+                    precise_dot(cross(vector_subtract(p[1], p[0]), vector_subtract(p[2], p[0])), delta);
+                if (outward > 0 || (outward == 0 && start == StartOverlap::LeaveOrSlide))
                 {
                     ++*departed;
                     continue;
                 }
             }
-            if ((!found || candidate.fraction < hit.fraction ||
-                 (candidate.fraction == hit.fraction && triangles_[i].polygon < hit.polygon)))
+            // A tolerated overlap loses equal-time ties so it never masks a
+            // real contact or deeper start penetration; otherwise source
+            // polygon order decides.
+            if (!found || candidate.fraction < hit.fraction ||
+                (candidate.fraction == hit.fraction &&
+                 (candidate.allowed_overlap != hit.allowed_overlap ? hit.allowed_overlap
+                                                                   : triangles_[i].polygon < hit.polygon)))
             {
                 hit = candidate;
                 hit.polygon = triangles_[i].polygon;
@@ -398,7 +423,7 @@ namespace OpenBlood2
         }
     }
     CollisionQuery CollisionWorld::sweep(DVector from, DVector to, DVector half, CollisionHit& hit,
-                                         StartOverlap start) const
+                                         double allowed_penetration, StartOverlap start) const
     {
         hit = {};
         if (!physics_vector(from) || !physics_vector(to) || !extents(half))
@@ -407,7 +432,7 @@ namespace OpenBlood2
             return CollisionQuery::Miss;
         bool found = false;
         std::uint32_t departed = 0;
-        query(0, from, to, half, hit, found, nullptr, nullptr, start, &departed);
+        query(0, from, to, half, hit, found, nullptr, nullptr, allowed_penetration, start, &departed);
         hit.departed = departed;
         return found ? CollisionQuery::Hit : CollisionQuery::Miss;
     }

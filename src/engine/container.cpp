@@ -280,10 +280,10 @@ namespace OpenBlood2
         return std::abs(angle) > 2 * std::numbers::pi;
     }
     CollisionQuery ContainerShape::sweep(DVector from, DVector to, DVector half, CollisionHit& hit,
-                                         StartOverlap start) const
+                                         double allowed_penetration, StartOverlap start) const
     {
         // A center inside a closed component remains start-solid under every policy.
-        auto result = boundary_.sweep(from, to, half, hit, start);
+        auto result = boundary_.sweep(from, to, half, hit, allowed_penetration, start);
         if (result != CollisionQuery::Invalid && contains(from))
         {
             hit = {};

@@ -12,19 +12,24 @@ namespace OpenBlood2
         std::uint32_t polygon = UINT32_MAX;
         HOBJECT object = nullptr;
         bool start_solid = false;
+        // A start overlap within the caller's allowed penetration, reported as a
+        // fraction-zero contact because the motion would go deeper.
+        bool allowed_overlap = false;
         double penetration = 0;
         std::uint16_t texture_flags = 0;
-        // Initially overlapped faces ignored under StartOverlap::Depart.
+        // Initially overlapped faces ignored under StartOverlap::Leave/LeaveOrSlide.
         std::uint32_t departed = 0;
     };
-    // Block: any initial overlap is start_solid. Depart: an initially overlapped
-    // face does not block a nonzero displacement that does not go deeper into it
-    // (outward normal . delta >= 0; DAT winding agrees with the plane normal).
+    // Start overlaps deeper than any allowed penetration. Block: start_solid.
+    // Leave: an overlapped face does not block a nonzero displacement leaving it
+    // (outward normal . delta > 0). LeaveOrSlide: nor one sliding along it (>= 0).
+    // The outward normal is the triangle winding, oriented to its plane at build.
     // Zero-length queries and deeper moves still block.
     enum class StartOverlap
     {
         Block,
-        Depart
+        Leave,
+        LeaveOrSlide
     };
     enum class CollisionQuery
     {
@@ -51,7 +56,10 @@ namespace OpenBlood2
             nodes_.clear();
             work_ = {};
         }
-        CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit& hit,
+        // allowed_penetration > 0 tolerates a start overlap up to that depth:
+        // motion leaving or parallel to it is free, deeper motion stops at zero.
+        // A StartOverlap other than Block also frees deeper overlaps as described above.
+        CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit& hit, double allowed_penetration = 0,
                              StartOverlap start = StartOverlap::Block) const;
         BodyPlacement place_body(DVector anchor, DVector anchor_half, DVector requested, DVector half) const;
         std::size_t triangles() const
@@ -88,14 +96,15 @@ namespace OpenBlood2
         std::uint32_t partition(std::uint32_t begin, std::uint32_t end);
         void query(std::uint32_t node, DVector from, DVector to, DVector half, CollisionHit& hit, bool& found,
                    const PlacementAnchor* anchor = nullptr, const Triangle** selected = nullptr,
-                   StartOverlap start = StartOverlap::Block, std::uint32_t* departed = nullptr) const;
+                   double allowed_penetration = 0, StartOverlap start = StartOverlap::Block,
+                   std::uint32_t* departed = nullptr) const;
     };
     DVector rotate_vector(DVector, DRotation);
     DRotation multiply_rotation(DRotation, DRotation);
     DRotation inverse_rotation(DRotation);
     bool physics_vector(DVector v);
     CollisionQuery sweep_box(DVector from, DVector to, DVector half, DVector center, DVector other_half,
-                             CollisionHit& hit);
+                             CollisionHit& hit, double allowed_penetration = 0);
     DVector vector_add(DVector a, DVector b);
     DVector vector_subtract(DVector a, DVector b);
     DVector vector_scale(DVector a, float scale);
