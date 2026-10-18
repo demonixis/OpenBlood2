@@ -62,3 +62,7 @@ covers 1296 generated decisions and all 47 installed points with explicit contex
 Read [curve records](music_curve_contracts.md) and [note events](music_event_contracts.md)
 before connecting dispatch. Admission, curve/note order, section tracks, controller
 application to voices, playlists and live MUSIC remain pending; M2 is incomplete.
+
+The [ordered dispatch continuation](music_grid_dispatch_contracts.md) now connects
+curve admission and note/curve order with an exact-style binding. Older blanket
+ordering omissions are superseded for prepared dispatch; delivery/MUSIC stay open.

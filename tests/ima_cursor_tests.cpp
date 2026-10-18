@@ -690,10 +690,243 @@ namespace
             c = char(std::tolower(static_cast<unsigned char>(c)));
         return s;
     }
-    bool private_data(const std::filesystem::path& root, std::ostream* output = nullptr, bool notes = false,
-                      bool active = false)
+    struct DispatchDigest
+    {
+        std::uint64_t hash = 14695981039346656037ull;
+        std::size_t steps = 0, messages = 0, curves = 0, muted = 0, excluded = 0;
+    };
+    bool dispatch_walk(const Fixture& f, const ImaCurves& curves, DispatchDigest& digest, std::ostream* output,
+                       std::string& error)
+    {
+        ImaSectionCursor c;
+        CHECK(f.start(c, error));
+        while (c.active())
+        {
+            const auto pool = draws(c.state().steps);
+            const auto tick = c.state().tick + 7001;
+            CHECK(c.step_notes(pool, tick, f.band, {}, error, &curves));
+            const auto& report = *c.last_step();
+            const auto& notes = *c.last_notes();
+            CHECK(notes.curves_prepared && !notes.opaque_curve_chunks);
+            CHECK(notes.dispatch.size() ==
+                  notes.rows.size() - notes.suppressed + notes.curve_messages + notes.note_offs.size());
+            CHECK(std::equal(notes.note_offs.begin(), notes.note_offs.end(),
+                             notes.dispatch.end() - notes.note_offs.size()));
+            std::vector<std::uint8_t> result;
+            const auto count = notes.dispatch.size() - notes.note_offs.size();
+            word(result, count);
+            for (std::size_t i = 0; i < count; ++i)
+                for (auto v : {std::uint32_t(notes.dispatch[i].time), std::uint32_t(notes.dispatch[i].status),
+                               std::uint32_t(notes.dispatch[i].key), std::uint32_t(notes.dispatch[i].velocity)})
+                    word(result, v);
+            for (auto v : result)
+                digest.hash = (digest.hash ^ v) * 1099511628211ull;
+            ++digest.steps;
+            digest.messages += count;
+            digest.curves += notes.curves_admitted;
+            digest.muted += notes.curves_muted;
+            digest.excluded += notes.curves_excluded;
+            if (output)
+            {
+                std::vector<std::uint8_t> b, events;
+                auto add = [&](auto v) { word(b, static_cast<std::uint32_t>(v)); };
+                auto event = [&](auto v) { word(events, static_cast<std::uint32_t>(v)); };
+                add(tick);
+                add(report.section.mute_mask);
+                for (auto v : c.state().channels.variations)
+                    add(v);
+                for (auto ch : f.band.channels)
+                    add(ch.transpose);
+                add(notes.draws_used);
+                for (std::size_t i = 0; i < notes.draws_used; ++i)
+                    add(pool[report.draws_used + i]);
+                std::size_t records = 0;
+                if (report.grid)
+                {
+                    const auto& grid = f.style->patterns[*report.pattern.pattern].grids[*report.grid];
+                    bool inside = false;
+                    std::size_t row = 0;
+                    for (const auto& chunk : f.style->source.chunks)
+                    {
+                        if (inside && chunk.depth <= 2)
+                            break;
+                        if (!inside)
+                        {
+                            inside = chunk.offset == grid.offset && chunk.depth == 2;
+                            continue;
+                        }
+                        if (chunk.depth != 3)
+                            continue;
+                        if (chunk.id == "note")
+                            for (std::size_t i = 0; i < (chunk.size - 2) / 18; ++i, ++row)
+                            {
+                                const auto& n = grid.notes[row];
+                                event(0);
+                                event(n.type);
+                                event(n.channel);
+                                event(n.time_offset);
+                                event(n.variations);
+                                event(n.velocity);
+                                event(n.duration);
+                                event(n.time_range);
+                                event(n.duration_range);
+                                event(n.velocity_range);
+                                auto it = std::find_if(notes.rows.begin(), notes.rows.end(),
+                                                       [&](const auto& x) { return x.row == row; });
+                                event(it == notes.rows.end() ? 0 : it->pitch.pitch);
+                                ++records;
+                            }
+                        else if (chunk.id == "curv")
+                            for (const auto& curve : curves.curves)
+                                if (curve.chunk_offset == chunk.offset)
+                                {
+                                    event(1);
+                                    event(curve.type);
+                                    event(curve.channel);
+                                    event(curve.time_offset);
+                                    event(curve.variations);
+                                    event(curve.controller);
+                                    event(curve.points.size());
+                                    for (auto p : curve.points)
+                                        for (auto v : {int(p.shape), int(p.flags), int(p.start), int(p.value),
+                                                       int(p.end), int(p.target)})
+                                            event(v);
+                                    ++records;
+                                }
+                    }
+                }
+                add(records);
+                b.insert(b.end(), events.begin(), events.end());
+                b.insert(b.end(), result.begin(), result.end());
+                output->write(reinterpret_cast<const char*>(b.data()), b.size());
+            }
+        }
+        return true;
+    }
+    Fixture dispatch_fixture(unsigned i, ImaCurves& curves)
+    {
+        auto f = fixture(i, true);
+        f.style->patterns.resize(1);
+        auto& p = f.style->patterns[0];
+        p.offset = 12;
+        p.length = 192;
+        p.grids.resize(1);
+        auto& g = p.grids[0];
+        g.offset = 32;
+        g.curve_chunks = 1;
+        f.style->source.chunks = {{"RIFF", "AAPT", 12, 480, 1},
+                                  {"LIST", "AACL", 32, 400, 2},
+                                  {"note", "", 44, 146, 3},
+                                  {"curv", "", 198, 42, 3},
+                                  {"note", "", 248, 146, 3}};
+        ImaCurve c;
+        c.pattern_offset = 12;
+        c.grid_offset = 32;
+        c.chunk_offset = 198;
+        c.type = 3;
+        c.channel = i % 16;
+        c.variations = 1u << (i % 16);
+        c.controller = 7;
+        c.points = {{std::uint8_t(i % 5), std::uint8_t(i % 4), -1, 1513, 798, 8192}};
+        curves.curves = {c};
+        c.ordinal = 1;
+        c.type = 4;
+        c.channel = (i + 3) % 16;
+        c.variations = 0xffff;
+        c.points = {{1, 0, -5, 1, 20, 90}};
+        curves.curves.push_back(c);
+        curves.chunks = 1;
+        curves.points = 2;
+        f.section->mutes = {{0, std::uint16_t(i * 511), 0}};
+        f.percussion_map.clear();
+        return f;
+    }
+    bool dispatch_generated(std::ostream* output = nullptr)
     {
         std::string error;
+        DispatchDigest d;
+        for (unsigned i = 0; i < 64; ++i)
+        {
+            ImaCurves curves;
+            auto f = dispatch_fixture(i, curves);
+            CHECK(f.prepare(error) && dispatch_walk(f, curves, d, output, error));
+        }
+        std::cout << "Generated dispatch " << d.steps << " steps / " << d.messages << " messages / curves " << d.curves
+                  << " muted " << d.muted << " excluded " << d.excluded << " FNV64 " << d.hash << '\n';
+        CHECK(d.steps == 1024 && d.messages == 4348 && d.curves == 336 && d.muted == 1280 && d.excluded == 432 &&
+              d.hash == 15334764557161491361ull);
+        return true;
+    }
+    bool dispatch_behavior()
+    {
+        std::string error;
+        ImaCurves curves;
+        auto f = dispatch_fixture(0, curves);
+        f.seed.random_channels = f.seed.cycle_channels = 0;
+        f.seed.variations.fill(0xffff);
+        CHECK(f.prepare(error));
+        ImaSectionCursor c;
+        CHECK(f.start(c, error));
+        CHECK(c.step_notes(draws(0), 100, f.band, {}, error, &curves));
+        const auto state = c.state();
+        const auto saved = *c.last_notes();
+        const auto active = c.active_notes();
+        CHECK(saved.curves_prepared && saved.curves_admitted == 2 && saved.curve_messages > 1);
+        auto bad = curves;
+        bad.curves[0].ordinal = 2;
+        CHECK(!c.step_notes(draws(1), 200, f.band, {}, error, &bad) && c.state() == state &&
+              c.last_notes()->dispatch == saved.dispatch && c.active_notes() == active);
+        bad = curves;
+        bad.curves[0].points.clear();
+        CHECK(!c.step_notes(draws(1), 200, f.band, {}, error, &bad) && c.state() == state);
+        bad = curves;
+        bad.curves[0].channel = 16;
+        CHECK(!c.step_notes(draws(1), 200, f.band, {}, error, &bad) && c.state() == state);
+        bad = curves;
+        bad.curves[0].type = 7;
+        CHECK(!c.step_notes(draws(1), 200, f.band, {}, error, &bad) && c.state() == state);
+        CHECK(c.step_notes(draws(1), 200, f.band, {}, error) && !c.last_notes()->curves_prepared &&
+              c.last_notes()->dispatch.empty());
+        c.stop();
+        curves = {};
+        CHECK(!c.last_notes() && !saved.dispatch.empty());
+        // Combined dispatch is bounded independently of each curve's event limit.
+        ImaCurves many;
+        auto large = dispatch_fixture(0, many);
+        large.seed.random_channels = large.seed.cycle_channels = 0;
+        large.seed.variations.fill(0xffff);
+        auto curve = many.curves.front();
+        curve.points = {{0, 0, 0, 0, 19200, 19200}};
+        many.curves.assign(1500, curve);
+        for (std::size_t i = 0; i < many.curves.size(); ++i)
+            many.curves[i].ordinal = i;
+        auto& chunks = large.style->source.chunks;
+        chunks[3].size = 4 + 19 * 1500;
+        chunks[4].offset = chunks[3].offset + 8 + chunks[3].size;
+        CHECK(large.prepare(error) && large.start(c, error));
+        const auto initial = c.state();
+        CHECK(!c.step_notes(draws(0), 0, large.band, {}, error, &many) && c.state() == initial && !c.last_notes());
+        MusicCatalog catalog;
+        catalog.cursor = std::move(c);
+        catalog.cursor_file = "test.sec";
+        MusicAssetRecord section;
+        section.filename = catalog.cursor_file;
+        section.selected_band = std::make_shared<ImaBand>(large.band);
+        section.section_style = large.style;
+        MusicAssetRecord style;
+        style.style = large.style;
+        catalog.assets = {section, style}; // Failed independent curve decode must not silently skip it.
+        CHECK(!catalog.step_cursor_notes(draws(0)) && catalog.cursor.state() == initial &&
+              !catalog.cursor_error.empty());
+        catalog.inspect({}, {});
+        CHECK(!catalog.cursor.active() && catalog.cursor_error.empty());
+        return true;
+    }
+    bool private_data(const std::filesystem::path& root, std::ostream* output = nullptr, bool notes = false,
+                      bool active = false, bool dispatch = false)
+    {
+        std::string error;
+        DispatchDigest digest;
         std::vector<std::filesystem::path> files;
         for (const auto& p : std::filesystem::recursive_directory_iterator(root / "Music"))
             if (p.path().extension() == ".sec")
@@ -730,8 +963,23 @@ namespace
             CHECK(read_ima_personality(read(path.parent_path() / "SILENCE.PER"), personality, error));
             CHECK(prepare_ima_timeline(*f.section, *f.style, *f.timeline, error) &&
                   prepare_ima_harmony(*f.section, *f.timeline, personality, *f.harmony, error) &&
-                  walk(f, hash, steps, output, error, notes, active));
+                  (dispatch || walk(f, hash, steps, output, error, notes, active)));
+            if (dispatch)
+            {
+                ImaCurves curves;
+                CHECK(read_ima_curves(read(style), curves, error) && dispatch_walk(f, curves, digest, output, error));
+            }
             ++bound;
+        }
+        if (dispatch)
+        {
+            std::cout << "Private dispatch " << digest.steps << " steps / " << digest.messages << " messages / curves "
+                      << digest.curves << " muted " << digest.muted << " excluded " << digest.excluded << " FNV64 "
+                      << digest.hash << '\n';
+            CHECK(bound == 132 && missing == 24 && digest.steps == 8174 && digest.messages == 9063 &&
+                  digest.curves == 42 && digest.muted == 0 && digest.excluded == 2 &&
+                  digest.hash == 10183239741431151107ull);
+            return true;
         }
         std::cout << "Private cursor steps " << steps << "; bound/missing " << bound << '/' << missing << "; FNV64 "
                   << hash << '\n';
@@ -756,6 +1004,17 @@ int main(int argc, char** argv)
         return out && generated(&out, notes, active) && private_data(argv[3], &out, notes, active) && out.good() ? 0
                                                                                                                  : 1;
     }
+    if (mode == "dispatch_export" && argc == 4)
+    {
+        std::ofstream out(argv[2], std::ios::binary);
+        return out && dispatch_generated(&out) && private_data(argv[3], &out, true, false, true) && out.good() ? 0 : 1;
+    }
+    if (mode == "dispatch_generated")
+        return dispatch_generated() ? 0 : 1;
+    if (mode == "dispatch_behavior")
+        return dispatch_behavior() ? 0 : 1;
+    if (mode == "dispatch_private" && argc == 3)
+        return private_data(argv[2], nullptr, true, false, true) ? 0 : 1;
     if (mode == "active_generated")
         return generated(nullptr, true, true) ? 0 : 1;
     if (mode == "active_private" && argc == 3)

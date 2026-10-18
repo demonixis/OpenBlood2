@@ -90,7 +90,10 @@ namespace OpenBlood2
                         music.cursor.last_step()->interval <= 0 || music.cursor.state().steps != step + 1)
                         return false;
                     const auto& notes = *music.cursor.last_notes();
-                    if (music.cursor.active_notes().size() + notes.note_offs.size() !=
+                    if (!notes.curves_prepared || notes.opaque_curve_chunks ||
+                        notes.dispatch.size() !=
+                            notes.rows.size() - notes.suppressed + notes.curve_messages + notes.note_offs.size() ||
+                        music.cursor.active_notes().size() + notes.note_offs.size() !=
                             active_before + notes.rows.size() - notes.suppressed ||
                         notes.shortened > active_before)
                         return false;

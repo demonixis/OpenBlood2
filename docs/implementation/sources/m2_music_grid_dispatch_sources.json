@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "f37dfb1d58c25673e98d984a9ac102d82585ce0a",
+  "status": "M2 incomplete; original curve admission and merged grid dispatch preparation; no live MUSIC",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/IMUSIC25.DLL",
+      "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "rvas": {
+        "grid_loader_order": "0x8900..0x8a2f",
+        "grid_filters_dispatch": "0x17103..0x1759f",
+        "non_note_dispatch": "0x168ae..0x16905",
+        "subsequent_active_note_phase": "0x1759f..0x17654"
+      },
+      "use": "Read-only analysis and isolated grid-loop execution; explicit pitches/owners/variations/ticks; allocation/free/random/send intercepted"
+    }
+  ],
+  "replacement_code": [
+    "src/engine/ima_cursor.cpp: atomic optional exact-style curve binding, source-range merge and bounded dispatch",
+    "src/game/music_catalog.cpp: require curve decode from the section bound style",
+    "src/app/inspector_world_sounds.cpp: owned cursor dispatch/filter inspection"
+  ],
+  "deliberate_limits": [
+    "No actual MIDI or synth delivery, active voice control, transport or playlist execution",
+    "Oracle inputs supply pitch/variation/tick and checked point owners; original loader pointer fixups remain outside the probe",
+    "Older no-curve argument retains explicitly labelled note-only diagnostic behavior",
+    "262144 combined messages, 8192 chunk metadata rows and 65536 actual curve/point records; atomic failure",
+    "No commercial content, new dependency or reference repository changes"
+  ],
+  "original_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "entry_rva": "0x17103..0x1759f",
+    "generated": {
+      "steps": 1024,
+      "messages": 4348,
+      "fnv64": 15334764557161491361,
+      "sha256": "56091cd26e828656bee948a47152d59e9584d99e78a26f362b00eca0afa2f62e"
+    },
+    "private": {
+      "steps": 8174,
+      "messages": 9063,
+      "fnv64": 10183239741431151107,
+      "sha256": "ef746052f946f07bbe678fec188271810e5b4189e095d9512a8cf03a86eb1dd9"
+    },
+    "scope": "Original grid mute/variation filtering, note event tail and curve expansion/send order. Explicit checked point owners, pre-resolved pitches, variations and tick. Allocation/free/rand/send intercepted. Section selection and subsequent note-off phase have separate evidence; loader owner fixups, synth and transport remain outside this probe."
+  },
+  "target_sha256": {
+    "src/engine/ima_cursor.h": "5d2642992ea77158fbbc12eee94977194a77f48438d169a21e10785c576fbf22",
+    "src/engine/ima_cursor.cpp": "1a7239eae861fb734b3940bfe73f8671d27e876a966b50dc2e5a8fe63586ed01",
+    "src/game/music_catalog.cpp": "a688ce4d057418c54ebddbab97a23718534d0055193377ac12216dfc63ffd050",
+    "src/app/inspector_world_sounds.cpp": "e8219d24efca00ec8a451bf703ba0405485a8d69f760d341893437f052eedbb9",
+    "src/app/world_sound_smoke.cpp": "2c6fdbcae02064d179e26a88569215f3a161d3690d6d45d29107c31789ea57f8",
+    "tests/ima_cursor_tests.cpp": "5b7af72c080bc9b45c77587d4570d349ca4e76875bdebb426ec99ed38c977f66",
+    "tests/CMakeLists.txt": "c91d26be2c6c57666b0b0491a3335aed6a04d13cac4c2f6e2203547eace7a07c"
+  }
+}

@@ -1,4 +1,5 @@
 #include "engine/ima_cursor.h"
+#include "engine/ima_curve_event.h"
 #include <algorithm>
 #include <bit>
 #include <limits>
@@ -23,6 +24,113 @@ namespace OpenBlood2
             auto mask = chord.chord_mask | (chord.chord_mask << 12);
             mask |= mask << 12;
             return (mask & (std::uint32_t(1) << (degree & 31))) != 0;
+        }
+        bool prepare_dispatch(const ImaStyle& style, const ImaCurves& curves, const ImaCursorStep& step,
+                              const ImaCursorState& state, ImaCursorNotes& notes, std::string& error)
+        {
+            const auto fail = [&]()
+            {
+                error = "IMA cursor dispatch: mismatched source ranges, record order or event budget";
+                return false;
+            };
+            if (style.source.chunks.size() > 8192 || curves.curves.size() > 65536)
+                return fail();
+            std::size_t records = curves.curves.size();
+            for (std::size_t i = 0; i < curves.curves.size(); ++i)
+            {
+                const auto& c = curves.curves[i];
+                if (c.points.size() > 65536 - records)
+                    return fail();
+                records += c.points.size();
+                if ((!i || curves.curves[i - 1].chunk_offset != c.chunk_offset)
+                        ? c.ordinal != 0
+                        : c.ordinal != curves.curves[i - 1].ordinal + 1)
+                    return fail();
+                if (i && c.chunk_offset < curves.curves[i - 1].chunk_offset)
+                    return fail();
+            }
+            const auto append = [&](std::span<const ImaTimedMidiMessage> messages)
+            {
+                if (messages.size() > ImaSectionCursor::dispatch_message_limit - notes.dispatch.size())
+                    return fail();
+                notes.dispatch.insert(notes.dispatch.end(), messages.begin(), messages.end());
+                return true;
+            };
+            if (step.grid)
+            {
+                const auto& pattern = style.patterns[*step.pattern.pattern];
+                const auto& grid = pattern.grids[*step.grid];
+                bool found = false;
+                std::uint32_t pattern_offset = 0;
+                std::size_t note_row = 0, prepared_row = 0, curve_chunks = 0;
+                for (const auto& chunk : style.source.chunks)
+                {
+                    if (found && chunk.depth <= 2)
+                        break;
+                    if (chunk.depth == 1)
+                        pattern_offset = chunk.id == "RIFF" && chunk.form == "AAPT" ? chunk.offset : 0;
+                    if (!found)
+                    {
+                        if (chunk.offset == grid.offset && chunk.depth == 2 && chunk.id == "LIST" &&
+                            chunk.form == "AACL" && pattern_offset == pattern.offset)
+                            found = true;
+                        continue;
+                    }
+                    if (chunk.depth != 3)
+                        continue;
+                    if (chunk.id == "note")
+                    {
+                        if (chunk.size < 2 || (chunk.size - 2) % 18)
+                            return fail();
+                        const auto count = (chunk.size - 2) / 18;
+                        if (count > grid.notes.size() - note_row)
+                            return fail();
+                        for (unsigned i = 0; i < count; ++i, ++note_row)
+                            if (prepared_row < notes.rows.size() && notes.rows[prepared_row].row == note_row)
+                            {
+                                const auto& row = notes.rows[prepared_row++];
+                                if (row.events.emitted && !append(std::span(row.events.messages).first(1)))
+                                    return false;
+                            }
+                    }
+                    else if (chunk.id == "curv")
+                    {
+                        ++curve_chunks;
+                        std::uint64_t bytes = 4;
+                        auto it = std::lower_bound(curves.curves.begin(), curves.curves.end(), chunk.offset,
+                                                   [](const auto& c, auto offset) { return c.chunk_offset < offset; });
+                        for (; it != curves.curves.end() && it->chunk_offset == chunk.offset; ++it)
+                        {
+                            if (it->pattern_offset != pattern.offset || it->grid_offset != grid.offset ||
+                                it->channel >= 16)
+                                return fail();
+                            bytes += 9 + 10 * it->points.size();
+                            if (step.section.mute_mask & (1u << it->channel))
+                                ++notes.curves_muted;
+                            else if (!(state.channels.variations[it->channel] & it->variations))
+                                ++notes.curves_excluded;
+                            else
+                            {
+                                ++notes.curves_admitted;
+                                std::vector<ImaTimedMidiMessage> events;
+                                if (!prepare_ima_curve_events(*it, notes.grid_time, events, error) || !append(events))
+                                    return false;
+                                notes.curve_messages += events.size();
+                            }
+                        }
+                        if (bytes != chunk.size)
+                            return fail();
+                    }
+                }
+                if (!found || note_row != grid.notes.size() || prepared_row != notes.rows.size() ||
+                    curve_chunks != grid.curve_chunks)
+                    return fail();
+            }
+            if (!append(notes.note_offs))
+                return false;
+            notes.opaque_curve_chunks = 0;
+            notes.curves_prepared = true;
+            return true;
         }
     } // namespace
     bool ImaSectionCursor::start(std::shared_ptr<const ImaSection> section, std::shared_ptr<const ImaStyle> style,
@@ -181,7 +289,8 @@ namespace OpenBlood2
         return true;
     }
     bool ImaSectionCursor::step_notes(std::span<const std::uint16_t> draws, std::int32_t grid_time, const ImaBand& band,
-                                      std::span<const std::uint8_t> percussion_map, std::string& error)
+                                      std::span<const std::uint8_t> percussion_map, std::string& error,
+                                      const ImaCurves* curves)
     {
         error.clear();
         if (!percussion_map.empty() && percussion_map.size() != 128)
@@ -271,6 +380,8 @@ namespace OpenBlood2
         // Both partitions are built by head insertion in the original. Pending order reverses every step.
         std::reverse(notes.note_offs.begin(), notes.note_offs.end());
         std::reverse(next.active_notes_.begin(), next.active_notes_.end());
+        if (curves && !prepare_dispatch(*style_, *curves, report, next.state_, notes, error))
+            return false;
         next.notes_ = std::move(notes);
         *this = std::move(next);
         return true;

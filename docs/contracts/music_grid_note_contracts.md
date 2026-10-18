@@ -73,3 +73,7 @@ The [active-note continuation](music_active_note_contracts.md) now carries pendi
 off values, applies original chord/serial rules and prepares due stops. This
 supersedes the active-lifetime omission above; that paragraph describes the earlier
 probe. Live transport, external MIDI delivery and MUSIC remain unavailable.
+
+The [ordered dispatch continuation](music_grid_dispatch_contracts.md) now connects
+curve admission and note/curve order with an exact-style binding. Older blanket
+ordering omissions are superseded for prepared dispatch; delivery/MUSIC stay open.

@@ -1351,3 +1351,12 @@ Lookup tables are regenerated from mathematical expressions and compared with al
 772 original entries; no table bytes are imported. See [source ledger](sources/m2_music_curve_events_sources.json),
 [contracts](../contracts/music_curve_event_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_curve_events.md).
+
+## Original ordered IMA grid dispatch
+
+Curve admission and source-order merging follow the original grid loader and
+isolated tick-loop execution. Existing pitch, curve and note-lifetime services
+remain separate verified components. No commercial bytes are imported. See
+[source ledger](sources/m2_music_grid_dispatch_sources.json),
+[contracts](../contracts/music_grid_dispatch_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_grid_dispatch.md).

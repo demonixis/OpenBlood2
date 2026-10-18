@@ -194,3 +194,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [IMA style curves](music_curve_contracts.md): original authored curve/point records, strict bounds and independent world-owned inspection.
 
 - [IMA style curve events](music_curve_event_contracts.md): original point expansion with explicit ticks and raw messages; no controller playback.
+
+- [IMA ordered grid dispatch](music_grid_dispatch_contracts.md): curve filters and source-order merged note/curve messages, then due stops; no playback.

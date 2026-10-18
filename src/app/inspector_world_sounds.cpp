@@ -326,7 +326,24 @@ namespace OpenBlood2
                 {
                     ImGui::Text("Prepared clock %d | rows %zu / suppressed %zu | note draws %zu", notes->grid_time,
                                 notes->rows.size(), notes->suppressed, notes->draws_used);
-                    ImGui::Text("Opaque grid curves: %zu (not prepared)", notes->opaque_curve_chunks);
+                    ImGui::Text("Curve dispatch %s | admitted %zu / muted %zu / excluded %zu | messages %zu",
+                                notes->curves_prepared ? "prepared" : "unavailable", notes->curves_admitted,
+                                notes->curves_muted, notes->curves_excluded, notes->curve_messages);
+                    ImGui::Text("Unprepared curve chunks: %zu", notes->opaque_curve_chunks);
+                    if (notes->curves_prepared && ImGui::TreeNode("Ordered grid dispatch (no playback)"))
+                    {
+                        ImGui::TextUnformatted("Source-order note-ons and curves, then due stops; not time-sorted.");
+                        ImGuiListClipper clipper;
+                        clipper.Begin(static_cast<int>(notes->dispatch.size()));
+                        while (clipper.Step())
+                            for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
+                            {
+                                const auto& m = notes->dispatch[static_cast<std::size_t>(i)];
+                                ImGui::Text("%d: tick %d | status %02x | data %u %u", i, m.time, m.status, m.key,
+                                            m.velocity);
+                            }
+                        ImGui::TreePop();
+                    }
                     ImGui::Text("Active notes %zu / %zu | chord-adjusted %zu | due stops %zu",
                                 music.cursor.active_notes().size(), ImaSectionCursor::active_note_limit,
                                 notes->shortened, notes->note_offs.size());

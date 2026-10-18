@@ -58,3 +58,5 @@ the original log or patch.
 - [IMA style curve decoding](../../../Documentation/Implementation/m2_music_curves.md): 47 curves checked against the original reader; evaluated controllers and MUSIC remain incomplete.
 
 - [IMA style curve events](../../../Documentation/Implementation/m2_music_curve_events.md): original expansion checked against 1296 generated cases and 47 installed points; MUSIC remains unavailable.
+
+- [IMA ordered grid dispatch](../../../Documentation/Implementation/m2_music_grid_dispatch.md): 9198 grid visits checked against original filtering and emission order; MUSIC remains unavailable.

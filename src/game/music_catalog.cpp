@@ -77,9 +77,20 @@ namespace OpenBlood2
     bool MusicCatalog::step_cursor_notes(std::span<const std::uint16_t> draws)
     {
         for (const auto& asset : assets)
-            if (asset.filename == cursor_file && asset.selected_band)
-                return cursor.step_notes(draws, cursor.state().tick, *asset.selected_band, {}, cursor_error);
-        cursor_error = "IMA cursor notes: no selected band for this section";
+            if (asset.filename == cursor_file && asset.selected_band && asset.section_style)
+                for (const auto& candidate : assets)
+                    if (candidate.style == asset.section_style)
+                    {
+                        if (!candidate.curves)
+                        {
+                            cursor_error =
+                                "IMA cursor dispatch: exact style curves unavailable: " + candidate.curves_error;
+                            return false;
+                        }
+                        return cursor.step_notes(draws, cursor.state().tick, *asset.selected_band, {}, cursor_error,
+                                                 candidate.curves.get());
+                    }
+        cursor_error = "IMA cursor dispatch: no selected band/exact style binding for this section";
         return false;
     }
     void MusicCatalog::inspect(const std::filesystem::path& root, const std::map<std::string, std::string>& properties)

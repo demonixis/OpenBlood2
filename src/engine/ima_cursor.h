@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/ima_band.h"
+#include "engine/ima_curve.h"
 #include "engine/ima_harmony.h"
 #include "engine/ima_note_event.h"
 #include "engine/ima_selection.h"
@@ -49,6 +50,9 @@ namespace OpenBlood2
         std::size_t draws_used = 0, suppressed = 0, opaque_curve_chunks = 0;
         std::vector<ImaCursorNote> rows; // Admitted rows in source order; paired events are not sorted.
         std::size_t shortened = 0;       // Chord deadline assignments, including extension under explicit clock jumps.
+        bool curves_prepared = false;
+        std::size_t curves_admitted = 0, curves_muted = 0, curves_excluded = 0, curve_messages = 0;
+        std::vector<ImaTimedMidiMessage> dispatch;  // Merged source-order on/curve messages, then due offs.
         std::vector<ImaTimedMidiMessage> note_offs; // Due through grid_time + interval, original dispatch order.
     };
     struct ImaActiveNote
@@ -69,9 +73,12 @@ namespace OpenBlood2
         bool step(std::span<const std::uint16_t> draws, std::string& error);
         // Normal-mode harmonic activation, selected-band transpose, then note event preparation.
         // One draw prefix: variations first, then admitted nonzero notes in source order.
-        // Band/map are borrowed for this call. Failure preserves state AND prior inspection.
+        // Band/map and optional exact-style curves are borrowed for this call. Curves
+        // enable source-chunk ordered dispatch preparation, never actual MIDI delivery.
+        // Failure preserves state AND prior inspection.
         bool step_notes(std::span<const std::uint16_t> draws, std::int32_t grid_time, const ImaBand&,
-                        std::span<const std::uint8_t> percussion_map, std::string& error);
+                        std::span<const std::uint8_t> percussion_map, std::string& error,
+                        const ImaCurves* curves = nullptr);
         void stop();
         bool active() const
         {
@@ -94,6 +101,7 @@ namespace OpenBlood2
             return active_notes_;
         }
         static constexpr std::size_t active_note_limit = 65536;
+        static constexpr std::size_t dispatch_message_limit = 262144;
 
       private:
         std::shared_ptr<const ImaSection> section_;
