@@ -35,6 +35,7 @@ namespace OpenBlood2
         std::uint32_t deformation = 0; // First deformation slot.
         DVector scale{1, 1, 1}, color{1, 1, 1};
         DVector min{}, max{}; // Conservative scaled model-space bounds when bounded.
+        DVector center{};     // World-space bounds center (the pose position when unbounded).
         bool bounded = false, translucent = false;
     };
     // Presentation-only snapshot. No original object pointer survives add().
@@ -74,6 +75,9 @@ namespace OpenBlood2
         static constexpr std::size_t palette_limit = 262144, deformation_limit = 1000000;
         // Marks an entry's drawn geometry translucent in either mode.
         void mark_translucent(std::size_t entry);
+        // Sets a GPU-skinned entry's light (its face color); unresolved-material markers and
+        // the CPU path stay unlit. False when the entry has no drawn instance.
+        bool set_light(std::size_t entry, DVector light);
 
       private:
         struct Prepared

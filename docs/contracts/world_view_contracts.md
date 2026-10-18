@@ -114,3 +114,5 @@ liquid-surface omission for static VolumeBrush surfaces. Underwater fog, moving
 volumes, rendering parity and the actual M2 gate remain open.
 
 The [presentation performance continuation](render_performance_contracts.md) records sky, world, models, alpha, PolyGrids, sprites and view models in one scene pass with shared depth and eagerly created shared pipelines, followed by the ImGui pass. Opaque world batches are grouped by material and bounded draws outside the view frustum are skipped. Projection, coordinates, revisions and object lifetime rules are unchanged.
+
+The [baked lighting continuation](baked_lighting_contracts.md) modulates resolved, non-sky textured faces by their baked per-vertex light. `SURF_BRIGHT` faces and geometry without colors stay fully bright; magenta markers and resource-free orientation colors are unchanged.

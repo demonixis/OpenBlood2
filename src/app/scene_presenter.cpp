@@ -41,8 +41,11 @@ namespace OpenBlood2
             registry.clear_textures(); // Material textures belong to one world revision.
             world_mesh = {};
             world_draws.clear();
+            model_lighting.clear();
             if (!game.world_path.empty() && !world_mesh.build(game.world, error, &game.resources))
                 return fail("World mesh");
+            if (!model_lighting.build(world_mesh, game.world, error))
+                return fail("Model lighting");
             mesh_revision = game.world_revision;
         }
         render_world = game.client_shell.m_bInWorld && !world_mesh.ranges.empty();
@@ -55,6 +58,8 @@ namespace OpenBlood2
         const auto world_done = SDL_GetTicksNS();
         if (!update_model_scene(game, model_scene, error))
             return fail("Model presentation");
+        if (!model_lighting.apply(game, world_mesh, world_draws, model_scene, error))
+            return fail("Model lighting");
         if (!update_explosion_model_scene(game, explosion_model_scene, error))
             return fail("Explosion model presentation");
         const auto models_done = SDL_GetTicksNS();

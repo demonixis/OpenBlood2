@@ -87,3 +87,5 @@ replace bit-4 portal markers; unavailable skies retain diagnostics. No retail
 lighting, fog or complete M2 acceptance is implied.
 
 The [presentation performance continuation](render_performance_contracts.md) keeps one batch per translucent polygon and the far-to-near order, now computed over frustum-visible draws only; submitted counts therefore exclude culled draws. The former separate alpha/FX passes are recorded in one scene pass in the same order.
+
+The [baked lighting continuation](baked_lighting_contracts.md) modulates translucent faces by their baked per-vertex light; SubwayA's flat-shaded glass carries 128 on every corner. Alpha, sorting, depth and pass policy are unchanged.

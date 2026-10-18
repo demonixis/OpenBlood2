@@ -109,3 +109,5 @@ The [DTX continuation](texture_contracts.md) supersedes the absence of world tex
 The [destination preparation continuation](destination_contracts.md) shares const property validation and structural CPU preparation with fresh loading.
 Blocked exits now perform read-only destination lookup after refusing transfer; earlier blanket resource-lookup omissions are historical.
 No destination callbacks run and no active session is discarded; safe automatic NEW_LEVEL and M2 remain incomplete.
+
+The [baked lighting continuation](baked_lighting_contracts.md) keeps each polygon's per-vertex baked RGB in `Polygon::colors` (parallel to points, empty for generated geometry). The polygon prefix and model tail remain opaque.

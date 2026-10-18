@@ -391,6 +391,7 @@ namespace
         inspector.world_render = &world_renderer.stats;
         inspector.presentation = &presenter.stats;
         inspector.gpu_resources = &presenter.registry.stats;
+        inspector.model_lighting = &presenter.model_lighting.stats;
         if (options.keepalive_smoke)
             SAFE_STRCPY(inspector.keep_start_name, "01_egressa");
         inspector.select_services = options.gpu_smoke;
@@ -1735,7 +1736,7 @@ int main(int argc, char** argv)
                      "  --bench             Headless offscreen timing of --world presentation; no window\n"
                      "  --bench-size WxH    Bench render size (default 1920x1080); implies --bench\n"
                      "  --bench-sweep       Bench with a presentation-only 360-degree yaw sweep\n"
-                     "  --capture FILE.png  Save the third GPU frame after UI layout has settled\n"
+                     "  --capture FILE.png  Save the third GPU frame after UI layout has settled (bench: last frame)\n"
                      "  --menu-smoke        Original-menu SDL traversal, isolated preferences and pause checks\n"
                      "  --gpu-smoke         Exercise GPU presentation, inspector toggle, resize and quit\n"
                      "  --world-smoke       GPU lifecycle with real world unload/reload assertions\n"

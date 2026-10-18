@@ -12,17 +12,18 @@ struct Input
     float2 texCoord : TEXCOORD1;
     float3 worldPosition : TEXCOORD2;
 };
-// Bounded radial brightening over the existing unlit base. No shadow/lightmap claim.
-float3 illumination(float3 worldPosition)
+// Face light plus the bounded radial point light, added before the albedo multiply as
+// the original renderer adds dynamic lights to baked light. No shadowing.
+float3 illumination(float3 faceColor, float3 worldPosition)
 {
     float radial =
         positionRadius.w > 0.0 ? max(0.0, 1.0 - distance(worldPosition, positionRadius.xyz) / positionRadius.w) : 0.0;
-    return float3(1.0, 1.0, 1.0) + lightColor.xyz * radial;
+    return faceColor + lightColor.xyz * radial;
 }
 float4 main(Input input) : SV_Target0
 {
     float4 texel = albedo.Sample(albedoSampler, input.texCoord);
     if (texel.a == 0.0)
         discard;
-    return float4(texel.rgb * input.faceColor * illumination(input.worldPosition), texel.a * modulation.x);
+    return float4(texel.rgb * illumination(input.faceColor, input.worldPosition), texel.a * modulation.x);
 }

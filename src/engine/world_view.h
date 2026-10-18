@@ -6,7 +6,8 @@
 
 namespace OpenBlood2
 {
-    // Unlit base textures; authored transparent faces use decoded DTX alpha.
+    // Albedo modulated by the baked per-vertex light (color); authored transparent faces
+    // use decoded DTX alpha.
     struct WorldVertex
     {
         DVector position, color;
@@ -59,6 +60,8 @@ namespace OpenBlood2
         std::vector<WorldSurfaceEffect> effects; // Includes hidden/invisible/unbound authored surfaces.
         std::size_t texture_bytes = 0;
         std::size_t invisible = 0, degenerate = 0, transparent = 0, sky = 0, blended = 0;
+        // Textured faces using baked per-vertex light, and textured faces drawn fully bright.
+        std::size_t lit = 0, fullbright = 0;
         bool build(const World&, std::string&, const Resources* = nullptr);
     };
     bool world_material_frame(const WorldMesh&, std::uint32_t material, double time, std::uint32_t& image);

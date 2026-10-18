@@ -329,12 +329,18 @@ namespace OpenBlood2
                         if (materials[found->second].error.empty())
                         {
                             material = found->second;
-                            color = {1, 1, 1}; // Unlit authored albedo.
+                            color = {1, 1, 1}; // Albedo; baked light is applied per vertex below.
                         }
                         else
                             color = {1, 0, 1}; // Explicit unresolved material marker.
                     }
                 }
+                // Baked per-vertex light modulates resolved albedo. SURF_BRIGHT (bit 5) is
+                // fully bright; geometry without baked colors stays unlit.
+                const bool baked =
+                    material && !(surface.flags & (1u << 5)) && polygon.colors.size() == polygon.points.size();
+                if (material)
+                    ++(baked ? lit : fullbright);
                 std::array<double, 2> uv_rate{};
                 if (material && effect_ids[polygon.surface] != UINT32_MAX)
                 {
@@ -380,9 +386,15 @@ namespace OpenBlood2
                     }
                     group->batch.count += 3;
                     pending += 3;
-                    for (auto p : {a, b, c})
+                    for (const std::size_t corner : {std::size_t(0), i, i + 1})
                     {
+                        const auto p = model.points[polygon.points[corner]];
                         WorldVertex vertex{vector_subtract(p, range.pivot), color};
+                        if (baked)
+                        {
+                            const auto& rgb = polygon.colors[corner];
+                            vertex.color = {rgb[0] / 255.f, rgb[1] / 255.f, rgb[2] / 255.f};
+                        }
                         if (material)
                         {
                             const auto delta = vector_subtract(p, surface.origin);

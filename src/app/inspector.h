@@ -14,6 +14,7 @@ namespace OpenBlood2
 {
     struct PresentationStats;
     struct GpuRegistryStats;
+    struct ModelLightingStats;
 
     struct Inspector
     {
@@ -29,6 +30,7 @@ namespace OpenBlood2
         const WorldViewStats* world_render = nullptr;
         const PresentationStats* presentation = nullptr;
         const GpuRegistryStats* gpu_resources = nullptr;
+        const ModelLightingStats* model_lighting = nullptr;
         bool select_models = false;
         bool select_services = false;
         bool select_skeleton = false;

@@ -86,3 +86,5 @@ load rule. Reading inspection or rendering does not advance clocks.
 CityHub's FlashlightPU is now supported. Its separate missing `fallengrills`
 world-model binding still fails and blocks automatic destination promotion.
 Class counts are not proof of complete M2 services or a full-level playthrough.
+
+The [baked lighting continuation](baked_lighting_contracts.md) renders baked per-vertex world light and model light. The radial light is now added to that face light before the albedo multiply, `albedo * (faceColor + color * radial)`, as later LithTech adds dynamic lights to baked light. With an unlit face (1) the result equals the former formula. It still has no normals, shadows or occlusion.

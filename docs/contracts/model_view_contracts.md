@@ -115,3 +115,5 @@ subset. World/model opacity policy is unchanged; required FX and M2 remain open.
 The [Gideon fade/teleport continuation](gideon_teleport_contracts.md) adds the original selected states, live model color/alpha, real transparent model presentation and supported player color preservation. Earlier blanket omissions are historical; production boss lifecycle and M2 remain incomplete.
 
 The [presentation performance continuation](render_performance_contracts.md) renders application models with GPU skinning (`ModelView::gpu_skinning`, `ModelRenderer`). Poses, deformation arithmetic, basis conversion, hidden-face omission, skins, magenta fallback and inspection entries are unchanged; close-view models use a reserved near depth slice of the single scene pass instead of a cleared depth target.
+
+The [baked lighting continuation](baked_lighting_contracts.md) sets GPU-skinned instance face colors from the baked world light below each model (`ModelView::set_light`, `SkinnedInstance::center`). Unresolved-material markers keep magenta. The CPU model path stays unlit.

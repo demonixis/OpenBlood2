@@ -184,7 +184,8 @@ namespace OpenBlood2
                     if (!r.require(index < points))
                         return false;
                     p.points.push_back(index);
-                    r.skip(3); // Per-vertex RGB, opaque for now.
+                    const auto red = r.u8(), green = r.u8(), blue = r.u8();
+                    p.colors.push_back({red, green, blue});
                 }
                 out.polygons.push_back(std::move(p));
             }

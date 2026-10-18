@@ -30,17 +30,17 @@ struct main0_in
 fragment main0_out main0(main0_in in [[stage_in]], constant type_Light& Light [[buffer(0)]], texture2d<float> albedo [[texture(0)]], sampler albedoSampler [[sampler(0)]])
 {
     main0_out out = {};
-    float4 _43 = albedo.sample(albedoSampler, in.in_var_TEXCOORD1);
-    float _59;
+    float4 _42 = albedo.sample(albedoSampler, in.in_var_TEXCOORD1);
+    float _57;
     if (Light.positionRadius.w > 0.0)
     {
-        _59 = precise::max(0.0, 1.0 - (distance(in.in_var_TEXCOORD2, Light.positionRadius.xyz) / Light.positionRadius.w));
+        _57 = precise::max(0.0, 1.0 - (distance(in.in_var_TEXCOORD2, Light.positionRadius.xyz) / Light.positionRadius.w));
     }
     else
     {
-        _59 = 0.0;
+        _57 = 0.0;
     }
-    out.out_var_SV_Target0 = float4((_43.xyz * in.in_var_TEXCOORD0) * (float3(1.0) + (Light.lightColor.xyz * _59)), 1.0);
+    out.out_var_SV_Target0 = float4(_42.xyz * (in.in_var_TEXCOORD0 + (Light.lightColor.xyz * _57)), 1.0);
     return out;
 }
 

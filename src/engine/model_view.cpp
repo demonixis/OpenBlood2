@@ -480,9 +480,22 @@ namespace OpenBlood2
         for (const auto& local : deformed_)
             deformation.push_back({local.x, local.y, local.z, 0});
         instance.bounded = bounded && physics_vector(instance.min) && physics_vector(instance.max);
+        instance.center = pose.position;
+        if (instance.bounded)
+            instance.center = vector_add(
+                pose.position, rotate_vector(vector_scale(vector_add(instance.min, instance.max), .5f), pose.rotation));
         entry.range = static_cast<std::uint32_t>(instances.size());
         instances.push_back(std::move(instance));
         (close ? close_draws : world_draws).push_back({entry.range, pose.position, pose.rotation, alpha});
+        return true;
+    }
+    bool ModelView::set_light(std::size_t index, DVector light)
+    {
+        if (!gpu_skinning || index >= entries.size() || entries[index].range >= instances.size())
+            return false;
+        auto& instance = instances[entries[index].range];
+        if (instance.material)
+            instance.color = light;
         return true;
     }
     void ModelView::mark_translucent(std::size_t index)

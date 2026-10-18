@@ -275,9 +275,8 @@ namespace OpenBlood2
             error = "--view-world is a separate interactive inspection mode";
             return false;
         }
-        if (options.bench &&
-            (options.view_world || options.inspect_world || options.start_game || options.check_data ||
-             options.gpu_smoke || options.world_smoke || options.player_smoke || !options.capture_file.empty()))
+        if (options.bench && (options.view_world || options.inspect_world || options.start_game || options.check_data ||
+                              options.gpu_smoke || options.world_smoke || options.player_smoke))
         {
             error = "--bench is a separate headless measurement mode";
             return false;

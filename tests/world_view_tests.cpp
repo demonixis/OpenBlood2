@@ -229,7 +229,9 @@ namespace
                         CHECK(material.image.flags == 10 && material.image.width == 64 && material.image.height == 64);
                         for (std::size_t i = 3; i < material.image.rgba.size(); i += 4)
                             CHECK(material.image.rgba[i] >= 51 && material.image.rgba[i] <= 102);
-                        CHECK(batch.count == 6 && mesh.vertices[batch.first].color.x == 1);
+                        // Authored flat-shaded glass carries baked light 128 on every corner.
+                        CHECK(batch.count == 6 && mesh.vertices[batch.first].color.x == 128 / 255.f &&
+                              mesh.vertices[batch.first + 5].color.z == 128 / 255.f);
                     }
             CHECK(glass_faces == 31);
             std::cout << "SubwayA glass: 31 faces bind textures/greys/dirtyglass.dtx; 64x64, flags=10, alpha=51..102\n";

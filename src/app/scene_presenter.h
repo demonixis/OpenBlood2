@@ -1,4 +1,5 @@
 #pragma once
+#include "app/model_lighting.h"
 #include "app/model_scene.h"
 #include "app/polygrid_scene.h"
 #include "app/sprite_scene.h"
@@ -49,6 +50,7 @@ namespace OpenBlood2
         ModelRenderer model_renderer, explosion_model_renderer; // GPU skinning of both model views.
         WorldRenderer polygrid_renderer, sprite_renderer;
         ModelView model_scene, explosion_model_scene;
+        ModelLighting model_lighting; // Baked world light read by model_scene instances.
         PolyGridView polygrid_scene;
         SpriteView sprite_scene;
         PresentationStats stats;

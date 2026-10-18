@@ -528,6 +528,24 @@ namespace OpenBlood2
                         ImGui::Text(
                             "Faces: %zu invisible / %zu degenerate / %zu authored transparent / %zu authored sky",
                             world_mesh->invisible, world_mesh->degenerate, world_mesh->transparent, world_mesh->sky);
+                        ImGui::Text("Baked light: %zu per-vertex lit / %zu fully bright textured faces",
+                                    world_mesh->lit, world_mesh->fullbright);
+                        if (model_lighting)
+                        {
+                            const auto& l = *model_lighting;
+                            ImGui::Text("Model light: %zu models (%zu sampled, %zu reused, %zu ambient fallback, %zu "
+                                        "FLAG_NOLIGHT) | %llu traces, %llu node / %llu triangle tests",
+                                        l.models, l.sampled, l.reused, l.ambient, l.unlit,
+                                        (unsigned long long)l.shade.traces, (unsigned long long)l.shade.node_tests,
+                                        (unsigned long long)l.shade.triangle_tests);
+                            ImGui::Text("AmbientLight %.0f %.0f %.0f | ModelAdd %.0f %.0f %.0f | ModelDirAdd %.0f %.0f "
+                                        "%.0f (not applied: needs model normals)",
+                                        l.world_ambient.x, l.world_ambient.y, l.world_ambient.z, l.model_add.x,
+                                        l.model_add.y, l.model_add.z, l.model_dir_add.x, l.model_dir_add.y,
+                                        l.model_dir_add.z);
+                            ImGui::TextWrapped("Replacement model light: baked world light below each model, no "
+                                               "static/dynamic light objects, normals or shadows; not retail parity.");
+                        }
                         ImGui::Text("Alpha: %zu prepared faces / %zu submitted batches / %llu passes",
                                     world_mesh->blended, world_render->alpha_batches,
                                     (unsigned long long)world_render->alpha_frames);

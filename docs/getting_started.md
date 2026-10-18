@@ -101,7 +101,8 @@ cmake --build --preset dev --parallel
 ```
 
 It reports simulation, presentation and GPU completion times per frame plus draw
-call, pass and culling counters. The inspector's 3D view shows the same counters
+call, pass, culling and lighting counters. Add `--capture FILE.png` to save the last
+measured frame. The inspector's 3D view shows the same counters
 for the last presented frame. See [presentation performance](contracts/render_performance_contracts.md).
 
 For a separate Clang sanitizer build:

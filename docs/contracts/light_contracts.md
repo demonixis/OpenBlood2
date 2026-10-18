@@ -113,3 +113,5 @@ active-only charge, local audio, checked child lifetime and forced-inactive
 Restore/KeepAlive. One radial point light is rendered over the unlit world/models;
 GetPointShade, shadows and general dynamic illumination remain unavailable.
 Earlier blanket flashlight omissions are superseded only by this bounded subset.
+
+The [baked lighting continuation](baked_lighting_contracts.md) renders the preprocessed light of `Light`/`DirLight` objects that the DAT bakes into per-vertex colors, and lights models from it. Light objects themselves still have no runtime service, and dynamic lights other than the flashlight still illuminate nothing.

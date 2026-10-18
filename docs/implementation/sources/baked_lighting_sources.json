@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-18",
+  "scope": "Baked DAT per-vertex world light, additive radial light composition and replacement model light sampling; no renderer or gameplay code imported",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/AppHeaders/engineobjects.c",
+      "source_sha256": "70730e7e8aa704de5c6ddfa40194227832260812f951a49fd76e7735b530f75f",
+      "purpose": "CF_NORUNTIME Light/DirLight/GlobalDirLight/ObjectLight classes and brush lighting properties: world light is preprocessed, DirLight is a cone and GlobalDirLight lights only the world."
+    },
+    {
+      "source": "sources/lithtech/Blood2/AppHeaders/basetypes_de.h",
+      "source_sha256": "9447597d4d3d893572d0e74929352e9ffd742a7520aaf2d3f3c37ff4598fe4cb",
+      "purpose": "FLAG_NOLIGHT (object color and global light scale only) and FLAG_SHADOW definitions."
+    },
+    {
+      "source": "sources/lithtech/Blood2/AppHeaders/server_de.h",
+      "source_sha256": "3b61477e2c14f331f0847ae6cbe48e2a93b6e25444bb7956c83c00f71d409275",
+      "purpose": "SetObjectColor documented as brightening a model's shading; GetPointShade exists but is not implemented here."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006",
+      "purpose": "Client reads ModelAddR/G/B and ModelDirAddR/G/B server variables and truncates them into the ModelAdd/ModelDirAdd console commands; LightMap 0 option."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/DestructableModel.cpp",
+      "source_sha256": "a725d5d5d84f539de382f73ea266b0ab92380eb4911fa2188c997322e69efd86",
+      "purpose": "Default TintColor 0 passed to SetObjectColor, corroborating additive model color."
+    },
+    {
+      "source": "sources/lithtech/runtime/world/src/de_world.h",
+      "source_sha256": "04f5649e6bfbd7c67bf7f8862919cebb6ac28104a3e2f1504efc1331d639b0c5",
+      "purpose": "Later-generation surface flag bits (SURF_BRIGHT, SURF_FLATSHADE, SURF_LIGHTMAP, SURF_GOURAUDSHADE) matching the v56 flags observed in retail worlds."
+    },
+    {
+      "source": "sources/lithtech/tools/PreProcessor/LightMapMaker.cpp",
+      "source_sha256": "00c72b54ec3da5b20dce4f0220ea742cc90368c3b6b011653e0a26e1a5be4bb6",
+      "purpose": "Later-generation baker: vertex colors computed for every polygon including lightmapped ones, ambient as the starting value, 20-unit default lightmap grid."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/d3d_rendershader_lightmap.cpp",
+      "source_sha256": "39339e78e573e579afae10098dde10ba2e3ddb8785b9854974706ad7cf17313f",
+      "purpose": "Later-generation composition (lightmap + dynamic lights) * texture, consulted for the additive radial light order."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/d3d_rendershader_gouraud.cpp",
+      "source_sha256": "e03219fdb04660c46df27308e4688c14694750fe21f048332aa5dceabbf4757f",
+      "purpose": "Later-generation Gouraud path: vertex color, then dynamic lights, then texture multiply."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/setupmodel.cpp",
+      "source_sha256": "2b3b684fe980ae2bd8438e2ceefb496e9e136f2d915b62d84dd7afd0d7f11602",
+      "purpose": "Later-generation model light setup (light grid ambient, ranked static/dynamic lights), consulted to document what the replacement sampler does not reproduce."
+    }
+  ],
+  "reference_revision": {
+    "repository": "https://github.com/jsj2008/lithtech",
+    "revision": "0eab18289bed72879eddb648d3311075b108cf46"
+  },
+  "adaptations": [
+    "DAT v56 per-vertex RGB is read as baked light including world ambient, established by retail data analysis rather than an original reader.",
+    "Model light is sampled from the baked face light below each model with a presentation-owned BVH; it replaces the unavailable original model shading service and is not retail parity.",
+    "ModelDirAdd is read but not applied until model normals are available."
+  ]
+}

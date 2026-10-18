@@ -1430,3 +1430,7 @@ substitution are recorded in the existing [menu source ledger](sources/original_
 Preferences, session transaction glue, input ownership, sliders, error presentation
 and the SDL traversal probe are new portable implementation code. Save slots are
 unavailable screens, never a new persistence service.
+
+## Baked world lighting (2026-10-18)
+
+DAT v56 per-vertex RGB is read as baked light (world ambient included), as established by retail data analysis. Original light classes, ModelAdd/ModelDirAdd client commands and SetObjectColor semantics are consulted; later LithTech baker/renderer code corroborates vertex colors on lightmapped polygons and the `(baked + dynamic) * texture` order. No code is imported. The model light sampler is a replacement policy. See [source ledger](sources/baked_lighting_sources.json) and [contracts](../contracts/baked_lighting_contracts.md).

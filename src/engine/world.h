@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/objects.h"
+#include <array>
 
 namespace OpenBlood2
 {
@@ -36,6 +37,9 @@ namespace OpenBlood2
         std::vector<std::uint16_t> points;
         // v56 base ring size; sentinel for generated geometry. Extras remain in points.
         std::uint16_t base_points = UINT16_MAX;
+        // Baked per-vertex light (0-255 RGB, world ambient included), parallel to points.
+        // Empty for generated geometry, which has no baked lighting.
+        std::vector<std::array<std::uint8_t, 3>> colors{};
     };
     struct WorldModel
     {

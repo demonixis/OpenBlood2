@@ -242,3 +242,5 @@ set 1 vertex uniforms, set 2 fragment textures/samplers and set 3 fragment unifo
 - DXIL artifacts and a D3D12 path, once they can be signed and tested on Windows.
 - Instanced model draws, spatial world clusters and PVS when lighting/shadow passes
   need them; simulation and collision cost.
+
+The [baked lighting continuation](baked_lighting_contracts.md) adds model light sampling to the models stage. Samples are cached per object, so CityHub's frame time and model stage are within measurement noise. `--bench --capture FILE.png` saves the last measured frame.

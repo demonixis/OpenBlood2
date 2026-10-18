@@ -77,7 +77,8 @@ int main(int argc, char** argv)
         DVector eye{};
         DRotation view;
         draw = {};
-        PointLight light{{0, 0, 5}, {1, 1, 1}, 2};
+        // Radial light adds to the face light before the albedo multiply: .2 + .3 at the center.
+        PointLight light{{0, 0, 5}, {.3f, .3f, .3f}, 2};
         if (cycle == 2)
         {
             eye = {100, 20, -50};
@@ -101,7 +102,7 @@ int main(int argc, char** argv)
                          mode == 5 ? WorldPass::Sky : WorldPass::Opaque, 0, use));
             CHECK(download(runtime.gpu, cmd, capture, pixels));
             const int center = pixels[(h / 2 * w + w / 2) * 4], edge = pixels[(h / 2 * w + w * 9 / 10) * 4];
-            CHECK(std::abs(center - (mode == 1 ? 101 : 51)) <= 2 && std::abs(edge - 51) <= 1 &&
+            CHECK(std::abs(center - (mode == 1 ? 127 : 51)) <= 3 && std::abs(edge - 51) <= 1 &&
                   pixels[(h / 2 * w + w / 2) * 4 + 3] == 255);
             std::cout << "Synthetic light cycle=" << cycle << " mode=" << mode << " center=" << center
                       << " outside=" << edge << '\n';

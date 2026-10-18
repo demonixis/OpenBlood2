@@ -1,6 +1,7 @@
 #include "app/bench.h"
 #include "app/scene_presenter.h"
 #include "app/session_playback.h"
+#include "engine/capture.h"
 #include "engine/world_shaders.h"
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_timer.h>
@@ -101,6 +102,7 @@ namespace OpenBlood2
         }
         {
             ScenePresenter presenter(device.gpu);
+            Capture capture;
             Series step, world, models, effects, record, gpu, total, draws, culled;
             std::size_t passes = 0, max_draws = 0;
             const auto base = game->client_shell.view.rotation;
@@ -132,10 +134,25 @@ namespace OpenBlood2
                     return 3;
                 }
                 const auto updated = SDL_GetTicksNS();
-                if (presenter.render_world && !presenter.record(*game, commands, device.target, format,
-                                                                options.bench_width, options.bench_height, error))
+                // The last measured frame can be saved for visual comparison (--capture).
+                const bool last = frame + 1 == frames + warmup_frames && !options.capture_file.empty();
+                if (last && !capture.initialize(device.gpu, format, options.bench_width, options.bench_height))
+                {
+                    spdlog::error("Bench capture target: {}", SDL_GetError());
+                    SDL_SubmitGPUCommandBuffer(commands);
+                    return 3;
+                }
+                if (presenter.render_world &&
+                    !presenter.record(*game, commands, last ? capture.texture : device.target, format,
+                                      options.bench_width, options.bench_height, error))
                 {
                     spdlog::error("Bench {}", error);
+                    SDL_SubmitGPUCommandBuffer(commands);
+                    return 3;
+                }
+                if (last && !capture.enqueue(commands, device.target, options.bench_width, options.bench_height))
+                {
+                    spdlog::error("Bench capture copy: {}", SDL_GetError());
                     SDL_SubmitGPUCommandBuffer(commands);
                     return 3;
                 }
@@ -185,6 +202,21 @@ namespace OpenBlood2
                 presenter.model_renderer.asset_vertices + presenter.explosion_model_renderer.asset_vertices,
                 presenter.registry.stats.staged_bytes, presenter.sprite_scene.draws.size(),
                 presenter.polygrid_scene.draws.size(), presenter.world_renderer.stats.triangles);
+            const auto& lighting = presenter.model_lighting.stats;
+            spdlog::info("Lighting: {} baked / {} fully bright textured faces; {} lit models ({} sampled, {} reused, "
+                         "{} ambient fallback, {} FLAG_NOLIGHT) last frame; ModelAdd {} {} {}",
+                         presenter.world_mesh.lit, presenter.world_mesh.fullbright, lighting.models, lighting.sampled,
+                         lighting.reused, lighting.ambient, lighting.unlit, lighting.model_add.x, lighting.model_add.y,
+                         lighting.model_add.z);
+            if (!options.capture_file.empty())
+            {
+                if (!capture.save(path_text(options.capture_file).c_str()))
+                {
+                    spdlog::error("Bench capture save: {}", SDL_GetError());
+                    return 3;
+                }
+                spdlog::info("Captured last bench frame to {}", path_text(options.capture_file));
+            }
             const auto& resources = presenter.registry.stats;
             spdlog::info("GPU registry: {} textures ({} bytes, {} uploads, {} shared hits), {} targets, {} buffers ({} "
                          "bytes), {} shared assets, {} flushes",

@@ -199,10 +199,16 @@ int main(int argc, char** argv)
             const auto* texel = texture.rgba.data() + (ty * texture.width + tx) * 4;
             const auto* actual = pixels + (120 * 320 + 160) * 4;
             const float clear[3] = {.025f, .035f, .05f};
+            // The flat-shaded pane carries one baked light on every corner (128 in SubwayA).
+            const auto face = real.vertices[batch.first].color;
+            for (std::uint32_t v = batch.first; v < batch.first + batch.count; ++v)
+                CHECK(real.vertices[v].color.x == face.x && real.vertices[v].color.y == face.y &&
+                      real.vertices[v].color.z == face.z);
+            const float light[3] = {face.x, face.y, face.z};
             bool matched = true;
             for (unsigned channel = 0; channel < 3; ++channel)
             {
-                const auto expected = int(std::lround(texel[channel] * texel[3] / 255.f +
+                const auto expected = int(std::lround(texel[channel] * light[channel] * texel[3] / 255.f +
                                                       std::round(clear[channel] * 255) * (1 - texel[3] / 255.f)));
                 matched &= std::abs(int(actual[channel]) - expected) <= 1;
                 std::cout << "glass channel " << channel << " expected=" << expected
