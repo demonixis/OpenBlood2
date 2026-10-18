@@ -93,6 +93,9 @@ ctest --preset debug -L headless
 ctest --preset debug -L gpu
 ```
 
+Demo-data checks (label `demo`) are enabled separately with
+`-DBLOOD2_DEMO_DATA_DIR="/path/to/Blood2 Demo"` (the directory holding `B2Demo.rez`).
+
 GPU tests open windows and should run without concurrent interactive sessions.
 Captures stay under `build/debug/tests/`. Use the local NVIDIA environment above
 for GPU tests on this developer machine; dummy audio may be selected for unattended

@@ -1,5 +1,6 @@
 #include "cpp_engineobjects_de.h"
 #include "game/original/BuiltinModel.h"
+#include "game/original/BuiltinSprite.h"
 
 #include "engineobjects_de.h"
 #include "serverobj_de.h"
@@ -9,6 +10,62 @@ DDWORD OpenBlood2::BuiltinModel::EngineMessageFn(DDWORD message, void* data, flo
     // Original mdl_MessageFn forces the type even for a non-normal incoming type.
     if (message == MID_PRECREATE)
         static_cast<ObjectCreateStruct*>(data)->m_ObjectType = OT_MODEL;
+    return bc_EngineMessageFn(this, message, data, reason);
+}
+
+namespace
+{
+    // The source casts unchecked floats to DBYTE. Out-of-range values have no
+    // defined result, so they reject creation instead of guessing a wrap.
+    bool sprite_byte(float value, DBYTE& out)
+    {
+        if (!(value >= 0 && value < 256))
+            return false;
+        out = static_cast<DBYTE>(value);
+        return true;
+    }
+} // namespace
+
+DDWORD OpenBlood2::BuiltinSprite::EngineMessageFn(DDWORD message, void* data, float reason)
+{
+    GenericProp prop;
+    switch (message)
+    {
+        case MID_PRECREATE:
+        {
+            auto* state = static_cast<ObjectCreateStruct*>(data);
+            state->m_ObjectType = OT_SPRITE;
+            // Original spr_MessageFn reads these for every creation reason and
+            // ignores the getter results; the registered defaults are always present.
+            if (g_pServerDE->GetPropGeneric("Color", &prop) != DE_OK || !sprite_byte(prop.m_Color.x, m_Color[0]) ||
+                !sprite_byte(prop.m_Color.y, m_Color[1]) || !sprite_byte(prop.m_Color.z, m_Color[2]))
+            {
+                error = "Sprite Color is unavailable or outside 0..255";
+                return 0;
+            }
+            if (g_pServerDE->GetPropGeneric("Scale", &prop) != DE_OK)
+            {
+                error = "Sprite Scale is unavailable";
+                return 0;
+            }
+            VEC_COPY(state->m_Scale, prop.m_Vec);
+            if (g_pServerDE->GetPropGeneric("Alpha", &prop) != DE_OK || !sprite_byte(prop.m_Float * 255.0f, m_Color[3]))
+            {
+                error = "Sprite Alpha is unavailable or outside 0..1";
+                return 0;
+            }
+            break;
+        }
+        case MID_INITIALUPDATE:
+        {
+            // Source quirk: blue is taken from the green byte.
+            const DVector color{m_Color[0] / 255.0f, m_Color[1] / 255.0f, m_Color[1] / 255.0f};
+            color_applied = g_pServerDE->SetObjectColor(m_hObject, color, m_Color[3] / 255.0f);
+            if (!color_applied)
+                error = "Sprite SetObjectColor failed";
+            break;
+        }
+    }
     return bc_EngineMessageFn(this, message, data, reason);
 }
 
