@@ -38,7 +38,7 @@ int main(int argc, char** argv)
         for (const auto& e : scene.entries)
             if (e.close)
             {
-                CHECK(e.visible && e.triangles > 0 && e.error.empty() && e.skin.find("C4remote") != std::string::npos);
+                CHECK(e.visible && e.triangles > 0 && e.error.empty() && e.skin.find("C4REMOTE") != std::string::npos);
                 ++close;
             }
         CHECK(close == 1);

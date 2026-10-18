@@ -36,7 +36,7 @@ int main(int argc, char** argv)
         for (const auto& e : scene.entries)
             if (e.close)
             {
-                CHECK(e.visible && e.triangles > 0 && e.error.empty() && e.skin.find("Mac10") != std::string::npos);
+                CHECK(e.visible && e.triangles > 0 && e.error.empty() && e.skin.find("MAC10") != std::string::npos);
                 ++close;
             }
         CHECK(close == 2);
