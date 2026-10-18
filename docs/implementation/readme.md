@@ -46,3 +46,5 @@ the original log or patch.
 - [IMA section and pattern decisions](../../../Documentation/Implementation/m2_music_selection.md): original lookup/request/choice, explicit tick inspection and remaining live-music gaps.
 
 - [IMA grid cursor](../../../Documentation/Implementation/m2_music_cursor.md): original consecutive-grid decisions, inspected manual traversal and explicit remaining playback gaps.
+
+- [IMA effective band selection](../../../Documentation/Implementation/m2_music_band_selection.md): original section/style priority, prepared configuration and owned inspection.

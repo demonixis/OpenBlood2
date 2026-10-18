@@ -30,7 +30,11 @@ namespace OpenBlood2
             }
             if (asset.kind == MusicAssetKind::Section)
             {
-                if (!asset.harmony || !asset.harmony_error.empty() || asset.harmony->chords.size() != 1 ||
+                if (!asset.selected_band || !asset.band_choice || asset.band_choice->scope != ImaBandScope::Section ||
+                    asset.band_choice->index != 0 || asset.selected_band.get() != &asset.bands->bands.front() ||
+                    !asset.selected_band_error.empty() || asset.selected_band_file != asset.filename ||
+                    !asset.band_setup_ready || !asset.band_setup_error.empty() || asset.band_setup[25].status != 0xb9 ||
+                    !asset.harmony || !asset.harmony_error.empty() || asset.harmony->chords.size() != 1 ||
                     asset.harmony->base.scale_mask != 0xab5ab5 || !asset.harmony->base_flag ||
                     asset.harmony->chords.front().harmony.enabled || !asset.timeline || !asset.timeline_error.empty() ||
                     asset.timeline->mutes.empty() || asset.timeline->chords.size() != 1 ||

@@ -210,6 +210,35 @@ namespace OpenBlood2
                 asset.section_style = std::move(style);
             }
         }
+        for (auto& asset : assets)
+        {
+            if (asset.kind != MusicAssetKind::Section)
+                continue;
+            if (!asset.section || !asset.bands)
+            {
+                asset.selected_band_error = "IMA band selection: section or band decoding unavailable";
+                continue;
+            }
+            std::shared_ptr<const ImaBands> style_bands;
+            std::string style_file;
+            // Use the existing validated filename/identity binding, never the instruments
+            // bootstrap style or an arbitrary catalogue entry.
+            if (asset.section_style)
+                for (const auto& candidate : assets)
+                    if (candidate.kind == MusicAssetKind::Style && candidate.style == asset.section_style)
+                    {
+                        style_bands = candidate.bands;
+                        style_file = candidate.filename;
+                        break;
+                    }
+            if (!select_ima_band(*asset.bands, style_bands.get(), asset.band_choice, asset.selected_band_error))
+                continue;
+            const bool own = asset.band_choice->scope == ImaBandScope::Section;
+            const auto& source = own ? asset.bands : style_bands;
+            asset.selected_band = std::shared_ptr<const ImaBand>(source, &source->bands[asset.band_choice->index]);
+            asset.selected_band_file = own ? asset.filename : style_file;
+            asset.band_setup_ready = ima_band_setup(*asset.selected_band, asset.band_setup, asset.band_setup_error);
+        }
         // Bounded installed-file profile, not the historical general UUID/resource resolver.
         // Never turn a personality label into a directory or resolve it across music folders.
         for (auto& asset : assets)

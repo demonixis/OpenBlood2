@@ -272,6 +272,39 @@ namespace
         catalog.inspect(root, props);
         CHECK(find_section()->timeline && find_section()->section_style && find_section()->timeline_error.empty() &&
               find_section()->timeline->mutes.size() == 4);
+        CHECK(!find_section()->selected_band && !find_section()->selected_band_error.empty());
+        Bytes band_header(202);
+        band_header[0] = 'D';
+        band_header[104] = 255; // Original nonzero (including negative) style-default flag.
+        band_header[56] = 80;
+        const auto style_with_band = [&]()
+        {
+            auto parts = chunk("styl", sh);
+            const auto band = container("AABN", chunk("band", band_header));
+            parts.insert(parts.end(), band.begin(), band.end());
+            return container("AASY", parts);
+        };
+        CHECK(write(root / "Music/Test/SHARED.STY", style_with_band()));
+        catalog.inspect(root, props);
+        CHECK(find_section()->selected_band && find_section()->band_choice &&
+              find_section()->band_choice->scope == ImaBandScope::Style &&
+              find_section()->selected_band_file == "Shared.sty" && find_section()->band_setup_ready &&
+              find_section()->band_setup[0].data2 == 80);
+        const std::weak_ptr<const ImaBand> old_selected = find_section()->selected_band;
+        band_header[56] = 255; // Valid raw data and selection, invalid controller setup.
+        CHECK(write(root / "Music/Test/SHARED.STY", style_with_band()));
+        catalog.inspect(root, props);
+        CHECK(old_selected.expired() && find_section()->selected_band && !find_section()->band_setup_ready &&
+              find_section()->selected_band_error.empty() && !find_section()->band_setup_error.empty() &&
+              (find_section()->band_setup == std::array<ImaMidiSetup, 80>{}));
+        band_header[104] = 0;
+        CHECK(write(root / "Music/Test/SHARED.STY", style_with_band()));
+        catalog.inspect(root, props);
+        CHECK(!find_section()->selected_band && !find_section()->band_choice &&
+              !find_section()->selected_band_error.empty() && !find_section()->band_setup_ready &&
+              find_section()->selected_band_file.empty());
+        CHECK(write(root / "Music/Test/SHARED.STY", container("AASY", chunk("styl", sh))));
+        catalog.inspect(root, props);
         const std::weak_ptr<const ImaTimeline> old_timeline = find_section()->timeline;
         const std::weak_ptr<const ImaStyle> old_bound_style = find_section()->section_style;
         sh[46] = 8;
@@ -422,6 +455,7 @@ namespace
                   catalog.personalities.front().error.empty());
             const std::weak_ptr<const ImaPersonality> personality_lifetime = catalog.personalities.front().metadata;
             std::weak_ptr<const ImaHarmony> harmony_lifetime;
+            std::weak_ptr<const ImaBand> selected_band_lifetime;
             const std::weak_ptr<const DlsBank> bank_lifetime = catalog.assets.front().bank;
             std::weak_ptr<const ImaStyle> style_lifetime;
             const std::weak_ptr<const ImaBands> bands_lifetime = catalog.assets[1].bands;
@@ -441,6 +475,12 @@ namespace
                 }
                 if (asset.kind == MusicAssetKind::Section)
                 {
+                    CHECK(asset.selected_band && asset.band_choice &&
+                          asset.band_choice->scope == ImaBandScope::Section && asset.band_choice->index == 0 &&
+                          asset.selected_band.get() == &asset.bands->bands.front() &&
+                          asset.selected_band_error.empty() && asset.selected_band_file == asset.filename &&
+                          asset.band_setup_ready && asset.band_setup_error.empty());
+                    selected_band_lifetime = asset.selected_band;
                     CHECK(asset.section && asset.section_error.empty() && asset.section->commands.size() == 1);
                     ImaSectionTiming timing;
                     CHECK(ima_section_timing(*asset.section, timing, error));
@@ -495,7 +535,7 @@ namespace
                   !game.music_catalog.cursor.active() && !game.music_catalog.cursor.last_step());
             CHECK(bank_lifetime.expired() && style_lifetime.expired() && bands_lifetime.expired() &&
                   section_lifetime.expired() && timeline_lifetime.expired() && personality_lifetime.expired() &&
-                  harmony_lifetime.expired());
+                  harmony_lifetime.expired() && selected_band_lifetime.expired());
             CHECK(game.objects.snapshot().empty() && !game.server.message_count() && !game.server.string_count());
         }
         return true;

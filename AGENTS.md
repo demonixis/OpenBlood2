@@ -680,3 +680,6 @@ The [IMA section/pattern continuation](../Documentation/Implementation/m2_music_
 
 
 The [IMA grid-cursor continuation](../Documentation/Implementation/m2_music_cursor.md) connects original normal-mode grid progression, exact-command restarts, variation cadence and note admission. Read [contracts](docs/contracts/music_cursor_contracts.md); preserve the saved old ordinal, mask/root-only change test, explicit draws, silent missing grids and atomic world-owned lifetime. This is a manual single-section diagnostic, not audio playback. Clocks, bands/curves, active notes and playlists remain; MUSIC and M2 stay incomplete.
+
+
+The [IMA band-selection continuation](../Documentation/Implementation/m2_music_band_selection.md) connects original last-section-band priority and reverse-order marked style fallback. Read [contracts](docs/contracts/music_band_selection_contracts.md); preserve header-before-band guards, any-nonzero byte104, absent-default failure and immutable source ownership. Selection and controller-setup errors remain distinct. No live MIDI/soundtrack is claimed; remaining music services and M2 stay incomplete.

@@ -1300,3 +1300,14 @@ graph traversal; no full personality decoder or live MUSIC is claimed. Original
 Music.cpp remains unchanged. See [source ledger](sources/m2_music_harmony_sources.json),
 [contracts](../contracts/music_harmony_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_harmony.md).
+
+## Original IMA band choice
+
+Independent typed selection derived from read-only inspection and isolated x86
+execution of the installed IMUSIC25 loader/default getter. Original Music.cpp
+and external assets are unchanged; no executable bytes or native ABI structures
+are imported. The selected band aliases its immutable catalogue, and existing
+setup arithmetic remains separate from MIDI delivery. See the
+[source ledger](sources/m2_music_band_selection_sources.json),
+[contracts](../contracts/music_band_selection_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_band_selection.md).

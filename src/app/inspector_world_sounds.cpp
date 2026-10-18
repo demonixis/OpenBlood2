@@ -499,20 +499,43 @@ namespace OpenBlood2
         }
         if (ImGui::TreeNode("IMA bands (data and setup only)"))
         {
-            ImGui::TextWrapped("Style and section bands stay separate, in file order. Collection names are labels; "
-                               "no bank is loaded from them. Setup messages are planned, not played. "
-                               "Effective band selection and original MUSIC playback remain unavailable.");
+            ImGui::TextWrapped(
+                "Style and section bands stay separate, in file order. Collection names are labels; "
+                "no bank is loaded from them. Setup messages are planned, not played. "
+                "Section band selection is prepared below; original MUSIC playback remains unavailable.");
             for (const auto& asset : music.assets)
             {
-                if (!asset.bands || !ImGui::TreeNode(asset.filename.c_str()))
+                if (asset.kind == MusicAssetKind::Instruments || !ImGui::TreeNode(asset.filename.c_str()))
                     continue;
+                if (asset.kind == MusicAssetKind::Section)
+                {
+                    if (asset.selected_band)
+                    {
+                        ImGui::Text("Selected %s band: %s | source %s | index %zu",
+                                    asset.band_choice->scope == ImaBandScope::Section ? "section" : "style",
+                                    asset.selected_band->name.c_str(), asset.selected_band_file.c_str(),
+                                    asset.band_choice->index);
+                        ImGui::Text("Ordered setup: %s",
+                                    asset.band_setup_ready ? "80 messages prepared, not sent" : "unavailable");
+                        if (!asset.band_setup_error.empty())
+                            ImGui::TextWrapped("%s", asset.band_setup_error.c_str());
+                    }
+                    else
+                        ImGui::TextWrapped("Selection unavailable: %s", asset.selected_band_error.c_str());
+                }
+                if (!asset.bands)
+                {
+                    ImGui::TextWrapped("Band data unavailable: %s", asset.bands_error.c_str());
+                    ImGui::TreePop();
+                    continue;
+                }
                 ImGui::Text("%zu direct bands", asset.bands->bands.size());
                 for (const auto& band : asset.bands->bands)
                 {
                     ImGui::PushID(static_cast<int>(band.offset));
                     if (ImGui::TreeNode("band", "%s (offset %u)", band.name.c_str(), band.offset))
                     {
-                        ImGui::Text("Collection: %s | raw byte104 %d / byte105 %u", band.collection.c_str(),
+                        ImGui::Text("Collection: %s | style default flag %d / raw byte105 %u", band.collection.c_str(),
                                     band.byte104, band.byte105);
                         std::array<ImaMidiSetup, 80> setup;
                         std::string error;

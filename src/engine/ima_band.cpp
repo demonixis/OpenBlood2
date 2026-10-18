@@ -89,6 +89,63 @@ namespace OpenBlood2
         out = std::move(next);
         return true;
     }
+    bool select_ima_band(const ImaBands& section, const ImaBands* style, std::optional<ImaBandChoice>& out,
+                         std::string& error)
+    {
+        out.reset();
+        error.clear();
+        // Structural readers retain early bands, but the original loader skips them until
+        // its owning secn/styl header has initialized the runtime section/style.
+        const auto header =
+            [](const ImaBands& source, std::string_view form, std::string_view id, std::uint32_t& offset)
+        {
+            if (source.bands.size() > 256 || source.source.chunks.empty() || source.source.chunks.size() > 8192 ||
+                source.source.chunks.front().form != form)
+                return false;
+            bool found = false;
+            for (const auto& c : source.source.chunks)
+                if (c.depth == 1 && c.id == id)
+                {
+                    if (found)
+                        return false;
+                    found = true;
+                    offset = c.offset;
+                }
+            return found;
+        };
+        std::uint32_t offset = 0;
+        if (!header(section, "AASE", "secn", offset))
+        {
+            error = "IMA band selection: invalid section header or catalogue budget";
+            return false;
+        }
+        for (std::size_t i = section.bands.size(); i > 0; --i)
+            if (section.bands[i - 1].offset > offset)
+            {
+                out = ImaBandChoice{ImaBandScope::Section, i - 1};
+                return true;
+            }
+        if (!style)
+        {
+            error = "IMA band selection: no section band; missing style/default GM band remains unsupported";
+            return false;
+        }
+        if (!header(*style, "AASY", "styl", offset))
+        {
+            error = "IMA band selection: invalid style header or catalogue budget";
+            return false;
+        }
+        // The original style loader prepends bands, then its getter returns the first
+        // nonzero runtime +0x38 (sign-extended file byte104), without a head fallback.
+        for (std::size_t i = style->bands.size(); i > 0; --i)
+            if (style->bands[i - 1].offset > offset && style->bands[i - 1].byte104 != 0)
+            {
+                out = ImaBandChoice{ImaBandScope::Style, i - 1};
+                return true;
+            }
+        error = "IMA band selection: referenced style has no marked loaded band";
+        return false;
+    }
     std::uint32_t ima_band_patch(const ImaBandChannel& c, bool has_collection, bool percussion)
     {
         std::uint32_t patch = (std::uint32_t(c.bank) << 7) | c.program;

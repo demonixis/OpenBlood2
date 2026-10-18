@@ -1,6 +1,7 @@
 #pragma once
 #include "engine/music_asset.h"
 #include <array>
+#include <optional>
 
 namespace OpenBlood2
 {
@@ -22,8 +23,24 @@ namespace OpenBlood2
     struct ImaBands
     {
         MusicAssetInfo source;      // Including nested/unknown ranges not interpreted here.
-        std::vector<ImaBand> bands; // Direct AABN containers, in file order; no effective-band selection.
+        std::vector<ImaBand> bands; // Direct AABN containers, in file order.
     };
+    enum class ImaBandScope
+    {
+        Section,
+        Style
+    };
+    struct ImaBandChoice
+    {
+        ImaBandScope scope = ImaBandScope::Section;
+        std::size_t index = 0; // Index in the selected immutable source, never a runtime pointer.
+        bool operator==(const ImaBandChoice&) const = default;
+    };
+    // Loaded section overrides its style. Within each file, respect header-before-band loading.
+    // Style fallback requires nonzero byte104; no implicit GM/default band is invented.
+    // Failure clears output. Inputs must be reader-produced immutable catalogues.
+    bool select_ima_band(const ImaBands& section, const ImaBands* style, std::optional<ImaBandChoice>&,
+                         std::string& error);
     struct ImaMidiSetup
     {
         std::uint8_t status = 0, data1 = 0, data2 = 0;

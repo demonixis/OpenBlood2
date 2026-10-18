@@ -1,8 +1,10 @@
 #include "engine/ima_band.h"
 #include <algorithm>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <memory>
 using namespace OpenBlood2;
 using Bytes = std::vector<std::uint8_t>;
 #define CHECK(x)                                                                                                       \
@@ -199,6 +201,98 @@ namespace
         std::cout << "IMA bands malformed: truncation, scope/header/name errors, fixed size and whole-file budgets\n";
         return true;
     }
+    ImaBands selection_fixture(bool section, unsigned count, unsigned early, unsigned mask = 0)
+    {
+        Bytes children;
+        for (unsigned i = 0; i <= count; ++i)
+        {
+            if (i == early)
+                append(children, chunk(section ? "secn" : "styl", Bytes(120)));
+            if (i < count)
+            {
+                auto p = fixture();
+                p[104] = (mask & (1u << i)) ? (i % 2 ? 128 : 255) : 0;
+                append(children, form("AABN", chunk("band", p)));
+            }
+        }
+        if (section)
+            append(children, chunk("sref", {'S', 0, 0, 0}));
+        ImaBands result;
+        std::string error;
+        if (!read_ima_bands(form(section ? "AASE" : "AASY", children),
+                            section ? MusicAssetKind::Section : MusicAssetKind::Style, result, error))
+            std::abort();
+        return result;
+    }
+    bool selection()
+    {
+        std::string error;
+        std::optional<ImaBandChoice> choice;
+        auto section = selection_fixture(true, 3, 0);
+        auto style = selection_fixture(false, 4, 0, 15);
+        CHECK(select_ima_band(section, &style, choice, error));
+        CHECK((choice == ImaBandChoice{ImaBandScope::Section, 2})); // Section flag is irrelevant.
+        section = selection_fixture(true, 3, 3);                    // All early bands are retained, but not loaded.
+        CHECK(select_ima_band(section, &style, choice, error));
+        CHECK((choice == ImaBandChoice{ImaBandScope::Style, 3})); // Negative flags also mark defaults.
+        style.bands.back().byte104 = 0;
+        CHECK(select_ima_band(section, &style, choice, error));
+        CHECK((choice == ImaBandChoice{ImaBandScope::Style, 2}));
+        for (auto& b : style.bands)
+            b.byte104 = 0;
+        CHECK(!select_ima_band(section, &style, choice, error) && !choice && !error.empty());
+        CHECK(!select_ima_band(section, nullptr, choice, error) && !choice && !error.empty());
+        section = selection_fixture(true, 1, 0);
+        CHECK(select_ima_band(section, nullptr, choice, error) && error.empty());
+        auto owner = std::make_shared<const ImaBands>(section);
+        std::weak_ptr<const ImaBands> lifetime = owner;
+        auto selected = std::shared_ptr<const ImaBand>(owner, &owner->bands[choice->index]);
+        owner.reset();
+        CHECK(!lifetime.expired() && selected->channels[0].volume == 56);
+        selected.reset();
+        CHECK(lifetime.expired());
+        section.bands.resize(257);
+        CHECK(!select_ima_band(section, &style, choice, error) && !choice);
+        section = selection_fixture(true, 0, 0);
+        style.source.chunks.front().form = "AASE";
+        CHECK(!select_ima_band(section, &style, choice, error) && !choice);
+        section.source.chunks.push_back({"secn", "", 500, 120, 1});
+        CHECK(!select_ima_band(section, nullptr, choice, error) && !choice);
+        section.source.chunks.clear();
+        CHECK(!select_ima_band(section, nullptr, choice, error) && !choice);
+        std::cout << "Band selection: section priority, reverse style defaults, early bands, missing defaults, "
+                     "bounds/lifetime\n";
+        return true;
+    }
+    bool selection_generated()
+    {
+        std::string error;
+        std::uint64_t hash = 14695981039346656037ull;
+        unsigned cases = 0;
+        for (unsigned mask = 0; mask < 16; ++mask)
+            for (unsigned style_early = 0; style_early <= 4; ++style_early)
+                for (unsigned count = 0; count <= 3; ++count)
+                    for (unsigned early = 0; early <= count; ++early)
+                    {
+                        const auto section = selection_fixture(true, count, early);
+                        const auto style = selection_fixture(false, 4, style_early, mask);
+                        std::optional<ImaBandChoice> choice;
+                        const bool ok = select_ima_band(section, &style, choice, error);
+                        CHECK(ok == choice.has_value() && ok == error.empty());
+                        // Pinned to the isolated original loader/getter probe below, not a second chooser.
+                        for (auto value :
+                             {choice ? unsigned(choice->scope) + 1 : 0u, choice ? unsigned(choice->index) + 1 : 0u})
+                            for (unsigned byte = 0; byte < 4; ++byte)
+                            {
+                                hash ^= (value >> (byte * 8)) & 255;
+                                hash *= 1099511628211ull;
+                            }
+                        ++cases;
+                    }
+        std::cout << "Band selection generated: " << cases << " cases / FNV64 " << hash << '\n';
+        CHECK(cases == 800 && hash == 9953174249627237157ull);
+        return true;
+    }
     bool private_data(const std::filesystem::path& root)
     {
         std::string error;
@@ -207,7 +301,7 @@ namespace
             if (f.path().extension() == ".sty" || f.path().extension() == ".sec")
                 files.push_back(f.path());
         std::sort(files.begin(), files.end());
-        std::size_t bands = 0, events = 0;
+        std::size_t bands = 0, events = 0, selected_sections = 0;
         std::uint64_t hash = 14695981039346656037ull;
         for (const auto& file : files)
         {
@@ -217,6 +311,13 @@ namespace
             CHECK(read_ima_bands(data, file.extension() == ".sty" ? MusicAssetKind::Style : MusicAssetKind::Section,
                                  decoded, error));
             CHECK(decoded.bands.size() == 1);
+            if (file.extension() == ".sec")
+            {
+                std::optional<ImaBandChoice> choice;
+                CHECK(select_ima_band(decoded, nullptr, choice, error));
+                CHECK((choice == ImaBandChoice{ImaBandScope::Section, 0}));
+                ++selected_sections;
+            }
             for (const auto& b : decoded.bands)
             {
                 ++bands;
@@ -234,7 +335,7 @@ namespace
                 }
             }
         }
-        CHECK(files.size() == 195 && bands == 195 && events == 15600);
+        CHECK(files.size() == 195 && bands == 195 && events == 15600 && selected_sections == 156);
         std::cout << "Private IMA bands: " << bands << " / setup messages " << events << " / FNV64 " << hash << '\n';
         // Pinned against the isolated original IMUSIC25 band loader/apply probe, not this implementation.
         CHECK(hash == 7277285548350807734ull);
@@ -247,6 +348,8 @@ int main(int argc, char** argv)
         return 2;
     const std::string_view test = argv[1];
     return (test == "reader"                 ? reader()
+            : test == "selection"            ? selection()
+            : test == "selection_generated"  ? selection_generated()
             : test == "setup"                ? setup()
             : test == "malformed"            ? malformed()
             : test == "private" && argc == 3 ? private_data(argv[2])

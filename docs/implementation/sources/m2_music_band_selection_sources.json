@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "2b9f1901115a7040baa102a082a2006dd0fd70b8",
+  "status": "M2 incomplete; original initial band selection, no MIDI delivery or MUSIC playback",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/IMUSIC25.DLL",
+      "binary_sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "synthetic_cases": 800,
+      "fnv64": 9953174249627237157,
+      "sha256": "1b74b20d16fb13fadd3904d07b4e8bb8a4750edc8378ccc6ee51252a6b9ee7a9",
+      "private_section_choices": 156,
+      "rvas": {
+        "section_assignment": [
+          "0xb37c",
+          "0xb6af"
+        ],
+        "style_prepend": [
+          "0xe93f",
+          "0xe967"
+        ],
+        "section_fallback": [
+          "0xb749",
+          "0xb791"
+        ],
+        "style_default_getter": "0xd9eb"
+      },
+      "limits": "Isolated loaded-band selection; band decoder previously verified; allocation, constructor, refcounts, critical sections and band read are intercepted. No MIDI or collection playback; absent-style GM construction excluded."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/Music.cpp",
+      "sha256": "1024e355e8da92ba670b96fc7cec5a57f301ea45e18f0a43f910a914f6e24ee0",
+      "use": "Original initialization/playlist requests unchanged. Section referenced style is distinct from InstrumentFiles bootstrap style."
+    }
+  ],
+  "replacement_code": [
+    "Typed bounded initial band selector over immutable reader metadata",
+    "Aliasing catalogue ownership and separately validated ordered setup snapshot",
+    "Read-only source, choice and failure inspection"
+  ],
+  "deliberate_limits": [
+    "Absent-style default GM construction remains unsupported",
+    "Catalogue style fallback requires existing filename/identifier/meter validation",
+    "No DLS instrument lookup, controller application, curves, scheduling, native ABI structures or MUSIC success",
+    "Original isolated probe stubs allocation/constructor/refcounts/critical sections/band decoding; no full loader or soundtrack comparison"
+  ],
+  "target_sha256": {
+    "src/app/inspector_world_sounds.cpp": "ea7886a828b424f98487480ecdee30db6cb980b4776375b785124d5d22c7b311",
+    "src/app/world_sound_smoke.cpp": "83fb06a78db9bdb7f823f4c88858fe13317425746e849630c99c59015a6a9c17",
+    "src/engine/ima_band.cpp": "fcae34985db616eef7a0d4cf759cfd17dee32bc22fe80dff7e09069cdc9bb169",
+    "src/engine/ima_band.h": "35fbf44b9c97c0cd4ea6799a46cfbb32f67258788e2f9bfb3dc801741075c49f",
+    "src/game/music_catalog.cpp": "64ba3e8a68f78c5127800c07167f9b9ac42ba32040e657eaec033cc2e5b6b85e",
+    "src/game/music_catalog.h": "5693e4132e46f506ffd45091ad92a60409cd6501af522780b6ffa2ccf5ce117c",
+    "tests/CMakeLists.txt": "f9ba22ab4406e8685bd88f5ea295e1d8b8631252431e6eb5b91e11b32e56f1e6",
+    "tests/ima_band_tests.cpp": "73a662b1b3fa739d524fb09b3bf642b013c3da6e036ee8a80ff301897589db5a",
+    "tests/music_asset_tests.cpp": "a4af0bcbb65a812f700c31ef303c54284dde573f3fac39282e46c7423f92f73d"
+  }
+}

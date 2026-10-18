@@ -2,8 +2,10 @@
 
 `read_ima_bands` reads the installed 202-byte `band` records in direct
 `RIFF/AABN` children of AASY styles and AASE sections. `ima_band_setup` prepares
-the original ordered channel-configuration messages. Neither function selects
-an effective band, loads an instrument collection, sends MIDI or plays music.
+the original ordered channel-configuration messages. These two functions do not select
+an effective band, load an instrument collection, send MIDI or play music.
+The separate [selection stage](music_band_selection_contracts.md) now chooses a
+section override or the marked default in its referenced style.
 `MUSIC` remains unsupported until the original sequencing path is connected.
 
 ## Ownership and decoding
@@ -12,8 +14,8 @@ The existing structural reader validates the entire RIFF tree first, including
 section style references. Each direct AABN requires exactly one direct `band`
 header of exactly 202 bytes. Missing/duplicate headers and other sizes fail.
 Zero bands is valid data, not evidence of a ready-to-play style or section.
-Repeated names and multiple bands retain file order; no merge, override or
-selection rule is inferred. Bands in nested/unknown containers remain opaque.
+Repeated names and multiple bands retain file order; raw decoding does not merge or override entries. The separate selection stage
+uses original header guards, section override and style-default order. Bands in nested/unknown containers remain opaque.
 All source chunk ranges are retained, including partial and undecoded records.
 
 | Payload offset | Stored field |
@@ -24,7 +26,7 @@ All source chunk ranges are retained, including partial and undecoded records.
 | 56–71 | Sixteen volume bytes |
 | 72–87 | Sixteen pan bytes (64 is the original getter's center) |
 | 88–103 | Sixteen signed transpose bytes |
-| 104, 105 | Signed byte104 and raw byte105; meaning not inferred |
+| 104, 105 | Signed byte104 (style default flag) and raw byte105 |
 | 106–137 | Sixteen little-endian packed bank/flag words |
 | 138–153 | Sixteen custom program bytes |
 | 154–169 | Sixteen raw channel bytes; meaning not inferred |
@@ -84,8 +86,9 @@ The World sounds inspector separates style and section assets, exposes decoded
 channels, raw/derived patch values, signed transpose and unknown bytes, and can
 show the ordered setup messages. It labels these messages **not sent** and
 reports invalid MIDI values. Hidden/disabled inspection does not affect decoding
-or lifetime. Remaining selection, timing, personality, curves and playlist
-semantics must be verified before connecting the soundtrack.
+or lifetime. Initial effective-band selection is covered by the separate contract. Remaining
+controller application, curves, live scheduling and playlist semantics must be
+connected before the soundtrack is available.
 
 See [evidence](../../../Documentation/Implementation/m2_music_bands.md),
 [note contracts](music_note_contracts.md) and [asset contracts](music_asset_contracts.md).

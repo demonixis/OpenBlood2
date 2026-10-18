@@ -15,11 +15,16 @@ namespace OpenBlood2
     struct MusicAssetRecord
     {
         std::string filename, error, style_reference, bank_error, style_error, bands_error, section_error,
-            timeline_error, harmony_error;
+            timeline_error, harmony_error, selected_band_error, band_setup_error;
         std::shared_ptr<const DlsBank> bank;
         std::shared_ptr<const ImaStyle> style;
         std::shared_ptr<const ImaStyle> section_style; // Validated exact binding; no second style copy.
         std::shared_ptr<const ImaBands> bands;
+        std::shared_ptr<const ImaBand> selected_band; // Aliasing owner of its immutable source catalogue.
+        std::optional<ImaBandChoice> band_choice;
+        std::string selected_band_file;
+        std::array<ImaMidiSetup, 80> band_setup{}; // Prepared, not submitted to a MIDI device.
+        bool band_setup_ready = false;
         std::shared_ptr<const ImaSection> section;
         std::shared_ptr<const ImaTimeline> timeline;
         std::shared_ptr<const ImaHarmony> harmony;
