@@ -45,7 +45,7 @@ namespace OpenBlood2
         BufferHandle palette_, deformation_;
         std::vector<TextureHandle> textures_;
         std::vector<std::string> texture_paths_;
-        SDL_GPUSampler* sampler_ = nullptr; // Owned by the registry.
+        SDL_GPUSampler *sampler_ = nullptr, *lightmap_sampler_ = nullptr; // Owned by the registry.
         std::uint64_t revision_ = UINT64_MAX;
         Uint32 width_ = 0, height_ = 0;
         std::vector<Visible> visible_;

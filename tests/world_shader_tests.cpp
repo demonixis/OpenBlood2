@@ -29,7 +29,8 @@ int main()
             // Only the skinned vertex stage reads storage: its node palette and packed deformation.
             CHECK(info.num_storage_buffers == (shader == WorldShader::SkinnedVertex ? 2u : 0u) &&
                   info.num_storage_textures == 0);
-            CHECK(info.num_samplers == (vertex ? 0u : 1u));
+            // Fragments sample the albedo (slot 0) and the lightmap page (slot 1).
+            CHECK(info.num_samplers == (vertex ? 0u : 2u));
             CHECK(info.num_uniform_buffers == 1u);
             CHECK(info.stage == (vertex ? SDL_GPU_SHADERSTAGE_VERTEX : SDL_GPU_SHADERSTAGE_FRAGMENT));
             if (formats & SDL_GPU_SHADERFORMAT_SPIRV)
@@ -48,14 +49,16 @@ int main()
                 if (info.num_uniform_buffers)
                     CHECK(source.find("[[buffer(0)]]") != source.npos);
                 if (info.num_samplers)
-                    CHECK(source.find("[[texture(0)]]") != source.npos && source.find("[[sampler(0)]]") != source.npos);
+                    CHECK(source.find("[[texture(0)]]") != source.npos && source.find("[[sampler(0)]]") != source.npos &&
+                          source.find("[[texture(1)]]") != source.npos && source.find("[[sampler(1)]]") != source.npos);
                 if (shader == WorldShader::SkinnedVertex)
                     CHECK(source.find("[[buffer(1)]]") != source.npos && source.find("[[buffer(2)]]") != source.npos &&
                           source.find("uint4 bases;") != source.npos);
                 // HLSL cbuffer members keep their names; varyings are matched by location.
                 if (vertex)
                     CHECK(source.find("View._textureOffset.xy") != source.npos &&
-                          source.find("[[user(locn2)]]") != source.npos);
+                          source.find("[[user(locn2)]]") != source.npos &&
+                          source.find("[[user(locn3)]]") != source.npos);
                 else
                     CHECK(source.find("float4 positionRadius;") != source.npos &&
                           source.find("float4 lightColor;") != source.npos &&

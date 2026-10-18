@@ -111,3 +111,5 @@ Blocked exits now perform read-only destination lookup after refusing transfer; 
 No destination callbacks run and no active session is discarded; safe automatic NEW_LEVEL and M2 remain incomplete.
 
 The [baked lighting continuation](baked_lighting_contracts.md) keeps each polygon's per-vertex baked RGB in `Polygon::colors` (parallel to points, empty for generated geometry). The polygon prefix and model tail remain opaque.
+
+The [lightmap continuation](lightmap_contracts.md) reads surface lightmap axes, polygon lightmap extents and the trailing per-polygon RGB565 lightmap block, which is accepted only when exactly one offset validates. The bytes before the block stay opaque (`opaque_bytes`).

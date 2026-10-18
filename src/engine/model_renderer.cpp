@@ -56,6 +56,7 @@ namespace OpenBlood2
         if (revision_ != view.revision)
         {
             if (!(sampler_ = registry_->sampler(style_ == DrawStyle::SpriteAlpha, error)) ||
+                !(lightmap_sampler_ = registry_->lightmap_sampler(error)) ||
                 !registry_->refresh_textures(view.mesh.materials, textures_, texture_paths_, error))
             {
                 revision_ = UINT64_MAX;
@@ -249,8 +250,10 @@ namespace OpenBlood2
             }
             if (auto* skin = registry_->get(textures_[instance.material]); skin != bound_texture)
             {
-                SDL_GPUTextureSamplerBinding texture{skin, sampler_};
-                SDL_BindGPUFragmentSamplers(target.pass, 0, &texture, 1);
+                // Models have no lightmap; slot 1 holds white to keep the binding valid.
+                const SDL_GPUTextureSamplerBinding textures[]{{skin, sampler_},
+                                                              {registry_->get(textures_[0]), lightmap_sampler_}};
+                SDL_BindGPUFragmentSamplers(target.pass, 0, textures, 2);
                 bound_texture = skin;
             }
             SDL_DrawGPUPrimitives(target.pass, asset.count, 1, 0, 0);

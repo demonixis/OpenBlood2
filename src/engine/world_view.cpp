@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <charconv>
 #include <cmath>
+#include <limits>
 #include <map>
 #include <tuple>
 
@@ -131,6 +132,26 @@ namespace OpenBlood2
         return image < mesh.materials.size() && mesh.materials[image].error.empty() &&
                mesh.materials[image].frames.empty() && mesh.materials[image].fps == 0;
     }
+    bool lightmap_origin(double minimum, double maximum, unsigned texels, double& origin)
+    {
+        constexpr double grid = 20, tolerance = .01;
+        const double remainder = std::fmod(minimum, grid);
+        const double snapped = remainder > 0 ? minimum - remainder : minimum - (grid + remainder);
+        origin = snapped;
+        if (!texels || !std::isfinite(minimum) || !std::isfinite(maximum))
+            return false;
+        const double extent = double(texels - 1) * grid;
+        for (const double candidate : {snapped, snapped + grid, snapped - grid})
+        {
+            const double span = maximum - candidate;
+            if (candidate <= minimum + tolerance && span > extent - grid - tolerance && span <= extent + tolerance)
+            {
+                origin = candidate;
+                return true;
+            }
+        }
+        return false;
+    }
     void bound_range(std::span<const WorldVertex> vertices, WorldRange& range)
     {
         range.bounded = false;
@@ -163,6 +184,53 @@ namespace OpenBlood2
         texture_bytes = 4;
         std::map<std::string, std::uint32_t> material_ids;
         std::size_t effect_bytes = 0, frame_references = 0;
+        // Shelf-packed lightmap pages; each lightmap gets a one-texel replicated border so
+        // bilinear filtering never reads a neighbor.
+        constexpr std::uint32_t page_size = lightmap_page_size;
+        std::uint32_t page = 0, page_x = 0, page_y = 0, shelf = 0;
+        auto place_lightmap = [&](const WorldModel& model, const Polygon& polygon, std::uint32_t& x0, std::uint32_t& y0)
+        {
+            const std::uint32_t w = polygon.lightmap_width, h = polygon.lightmap_height;
+            if (page && page_x + w + 2 > page_size)
+            {
+                page_x = 0;
+                page_y += shelf;
+                shelf = 0;
+            }
+            if (!page || page_y + h + 2 > page_size)
+            {
+                if (materials.size() >= 4097 || texture_bytes > 128 * 1024 * 1024 - page_size * page_size * 4)
+                    return false;
+                WorldMaterial entry;
+                entry.path = "lightmap page " + std::to_string(lightmap_pages++);
+                entry.image.width = entry.image.height = page_size;
+                entry.image.rgba.assign(std::size_t(page_size) * page_size * 4, 255);
+                texture_bytes += entry.image.rgba.size();
+                page = static_cast<std::uint32_t>(materials.size());
+                materials.push_back(std::move(entry));
+                page_x = page_y = shelf = 0;
+            }
+            x0 = page_x;
+            y0 = page_y;
+            page_x += w + 2;
+            shelf = std::max(shelf, h + 2);
+            auto& rgba = materials[page].image.rgba;
+            for (std::uint32_t j = 0; j < h + 2; ++j)
+                for (std::uint32_t i = 0; i < w + 2; ++i)
+                {
+                    const auto sx = std::min(std::max(int(i) - 1, 0), int(w) - 1);
+                    const auto sy = std::min(std::max(int(j) - 1, 0), int(h) - 1);
+                    const auto texel = model.lightmap_texels[polygon.lightmap_offset + sy * w + sx];
+                    const unsigned r = texel >> 11 & 31, g = texel >> 5 & 63, b = texel & 31;
+                    auto* out = &rgba[(std::size_t(y0 + j) * page_size + x0 + i) * 4];
+                    out[0] = static_cast<std::uint8_t>(r << 3 | r >> 2);
+                    out[1] = static_cast<std::uint8_t>(g << 2 | g >> 4);
+                    out[2] = static_cast<std::uint8_t>(b << 3 | b >> 2);
+                    out[3] = 255;
+                }
+            lightmap_texels += std::size_t(w) * h;
+            return true;
+        };
         auto add_image = [&](const std::string& key, std::uint32_t& id)
         {
             if (auto found = material_ids.find(key); found != material_ids.end())
@@ -221,7 +289,7 @@ namespace OpenBlood2
                 std::vector<WorldVertex> vertices;
             };
             std::vector<Group> groups, faces;
-            std::map<std::tuple<std::uint32_t, bool, double, double>, std::size_t> group_ids;
+            std::map<std::tuple<std::uint32_t, bool, double, double, std::uint32_t>, std::size_t> group_ids;
             std::size_t pending = 0;
             for (const auto& polygon : model.polygons)
             {
@@ -335,11 +403,39 @@ namespace OpenBlood2
                             color = {1, 0, 1}; // Explicit unresolved material marker.
                     }
                 }
-                // Baked per-vertex light modulates resolved albedo. SURF_BRIGHT (bit 5) is
-                // fully bright; geometry without baked colors stays unlit.
-                const bool baked =
-                    material && !(surface.flags & (1u << 5)) && polygon.colors.size() == polygon.points.size();
-                if (material)
+                // A stored lightmap replaces the baked vertex light (original "LightMap 1"); other
+                // faces keep their per-vertex light. SURF_BRIGHT (bit 5) is fully bright and
+                // geometry without baked colors stays unlit.
+                const bool bright = (surface.flags & (1u << 5)) != 0;
+                std::uint32_t lightmap = 0, atlas_x = 0, atlas_y = 0;
+                std::array<double, 2> lightmap_origin_value{};
+                if (material && !bright && model.lightmaps && (surface.flags & (1u << 7)) && polygon.lightmap_width &&
+                    polygon.lightmap_height)
+                {
+                    if (std::size_t(polygon.lightmap_offset) +
+                            std::size_t(polygon.lightmap_width) * polygon.lightmap_height >
+                        model.lightmap_texels.size())
+                        return fail("Invalid world lightmap reference");
+                    const std::array<DVector, 2> axes{surface.lightmap_p, surface.lightmap_q};
+                    const std::array<unsigned, 2> texels{polygon.lightmap_width, polygon.lightmap_height};
+                    for (int k = 0; k < 2; ++k)
+                    {
+                        double lo = std::numeric_limits<double>::max(), hi = -lo;
+                        for (std::size_t i = 0; i < count; ++i)
+                        {
+                            const double d = vector_dot(axes[k], model.points[polygon.points[i]]);
+                            lo = std::min(lo, d);
+                            hi = std::max(hi, d);
+                        }
+                        lightmap_unfitted += !lightmap_origin(lo, hi, texels[k], lightmap_origin_value[k]);
+                    }
+                    if (!place_lightmap(model, polygon, atlas_x, atlas_y))
+                        return fail("World lightmap page budget exceeded");
+                    lightmap = page;
+                    ++lightmapped;
+                }
+                const bool baked = material && !bright && !lightmap && polygon.colors.size() == polygon.points.size();
+                if (material && !lightmap)
                     ++(baked ? lit : fullbright);
                 std::array<double, 2> uv_rate{};
                 if (material && effect_ids[polygon.surface] != UINT32_MAX)
@@ -372,16 +468,16 @@ namespace OpenBlood2
                     }
                     if (!group && translucent)
                     {
-                        faces.push_back({{0, 0, material, true, center, uv_rate, sky_portal}, {}});
+                        faces.push_back({{0, 0, material, true, center, uv_rate, sky_portal, lightmap}, {}});
                         group = &faces.back();
                         ++blended;
                     }
                     else if (!group)
                     {
-                        const auto key = std::make_tuple(material, sky_portal, uv_rate[0], uv_rate[1]);
+                        const auto key = std::make_tuple(material, sky_portal, uv_rate[0], uv_rate[1], lightmap);
                         auto [found, added] = group_ids.emplace(key, groups.size());
                         if (added)
-                            groups.push_back({{0, 0, material, false, {}, uv_rate, sky_portal}, {}});
+                            groups.push_back({{0, 0, material, false, {}, uv_rate, sky_portal, lightmap}, {}});
                         group = &groups[found->second];
                     }
                     group->batch.count += 3;
@@ -394,6 +490,17 @@ namespace OpenBlood2
                         {
                             const auto& rgb = polygon.colors[corner];
                             vertex.color = {rgb[0] / 255.f, rgb[1] / 255.f, rgb[2] / 255.f};
+                        }
+                        if (lightmap)
+                        {
+                            // Texel centers lie on the grid: texel coordinate = axis offset / 20 + .5,
+                            // inside the bordered rectangle.
+                            const double s = (vector_dot(surface.lightmap_p, p) - lightmap_origin_value[0]) / 20 + .5;
+                            const double t = (vector_dot(surface.lightmap_q, p) - lightmap_origin_value[1]) / 20 + .5;
+                            vertex.lightmap = {float((atlas_x + 1 + s) / page_size),
+                                               float((atlas_y + 1 + t) / page_size)};
+                            if (!std::isfinite(vertex.lightmap[0]) || !std::isfinite(vertex.lightmap[1]))
+                                return fail("World lightmap coordinates exceed limits");
                         }
                         if (material)
                         {

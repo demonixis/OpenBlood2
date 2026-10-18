@@ -62,6 +62,8 @@ namespace OpenBlood2
         void release(TextureHandle&);
         // Nearest filtering with point mip selection over authored DTX levels.
         SDL_GPUSampler* sampler(bool clamp, std::string& error);
+        // Bilinear, clamped, single level: lightmap pages (texels sit on the light grid).
+        SDL_GPUSampler* lightmap_sampler(std::string& error);
 
         BufferHandle create_buffer(SDL_GPUBufferUsageFlags, Uint32 bytes, std::string& error);
         // Replaces the buffer with a larger one when needed; contents are not preserved.
@@ -134,7 +136,7 @@ namespace OpenBlood2
         std::vector<std::uint32_t> free_buffers_;
         std::unordered_map<std::string, TextureHandle> content_; // key + content hash -> texture
         std::map<const void*, SharedSlot> shared_;
-        std::array<SDL_GPUSampler*, 2> samplers_{};
+        std::array<SDL_GPUSampler*, 3> samplers_{}; // Repeat, clamp, lightmap.
         std::vector<std::uint8_t> staging_;
         std::vector<BufferCopy> buffer_copies_;
         std::vector<TextureCopy> texture_copies_;

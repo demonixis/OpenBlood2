@@ -1434,3 +1434,7 @@ unavailable screens, never a new persistence service.
 ## Baked world lighting (2026-10-18)
 
 DAT v56 per-vertex RGB is read as baked light (world ambient included), as established by retail data analysis. Original light classes, ModelAdd/ModelDirAdd client commands and SetObjectColor semantics are consulted; later LithTech baker/renderer code corroborates vertex colors on lightmapped polygons and the `(baked + dynamic) * texture` order. No code is imported. The model light sampler is a replacement policy. See [source ledger](sources/baked_lighting_sources.json) and [contracts](../contracts/baked_lighting_contracts.md).
+
+## Original DAT lightmaps (2026-10-18)
+
+The DAT v56 lightmap block, axes, extents and origin rule are reverse-engineered from the 58 retail worlds and corroborated by later LithTech preprocessor and renderer code. Composition follows the shipped `defaults.cfg` Saturate default and the strings in the installed renderer; no code is imported or executed. Atlas packing and bilinear sampling are replacement policies. See [source ledger](sources/lightmap_sources.json) and [contracts](../contracts/lightmap_contracts.md).

@@ -73,7 +73,7 @@ namespace OpenBlood2
         SDL_GPUVertexBufferDescription buffer{};
         buffer.pitch = sizeof(WorldVertex);
         buffer.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
-        SDL_GPUVertexAttribute attributes[3]{};
+        SDL_GPUVertexAttribute attributes[4]{};
         attributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
         attributes[1].location = 1;
         attributes[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
@@ -81,6 +81,9 @@ namespace OpenBlood2
         attributes[2].location = 2;
         attributes[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
         attributes[2].offset = offsetof(WorldVertex, uv);
+        attributes[3].location = 3;
+        attributes[3].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
+        attributes[3].offset = offsetof(WorldVertex, lightmap);
         SDL_GPUVertexBufferDescription skinned_buffer{};
         skinned_buffer.pitch = sizeof(SkinnedVertex);
         skinned_buffer.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
@@ -119,7 +122,7 @@ namespace OpenBlood2
             create.vertex_shader = skin ? skinned : vertex;
             create.fragment_shader = blend ? alpha : opaque;
             create.vertex_input_state = skin ? SDL_GPUVertexInputState{&skinned_buffer, 1, skinned_attributes, 4}
-                                             : SDL_GPUVertexInputState{&buffer, 1, attributes, 3};
+                                             : SDL_GPUVertexInputState{&buffer, 1, attributes, 4};
             create.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
             create.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
             create.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
@@ -215,7 +218,7 @@ namespace OpenBlood2
             textures_ = std::move(handles);
             texture_paths_ = std::move(paths);
             if (!(sampler_ = registry_->sampler(style_ == DrawStyle::SpriteAlpha, error)) ||
-                !upload_vertices(mesh, error) ||
+                !(lightmap_sampler_ = registry_->lightmap_sampler(error)) || !upload_vertices(mesh, error) ||
                 !registry_->refresh_textures(mesh.materials, textures_, texture_paths_, error) || !textures_[0] ||
                 !registry_->get(textures_[0]))
             {
@@ -298,7 +301,8 @@ namespace OpenBlood2
             {
                 std::uint32_t image = 0;
                 if (!world_material_frame(mesh, b.material, surface_time, image) || image >= textures_.size() ||
-                    !registry_->get(textures_[image]) || b.first < r.first ||
+                    !registry_->get(textures_[image]) || b.lightmap >= textures_.size() ||
+                    !registry_->get(textures_[b.lightmap]) || b.first < r.first ||
                     b.first > std::size_t(r.first) + r.count || b.count > std::size_t(r.first) + r.count - b.first ||
                     !world_texture_offset(b.uv_rate, surface_time, texture_offset))
                 {
@@ -424,7 +428,7 @@ namespace OpenBlood2
             SDL_BindGPUVertexBuffers(target.pass, 0, &binding, 1);
             // Redundant state is skipped within this record; another renderer may have
             // pushed uniforms or bound samplers in between, so nothing is assumed on entry.
-            SDL_GPUTexture* bound_texture = nullptr;
+            SDL_GPUTexture *bound_texture = nullptr, *bound_lightmap = nullptr;
             WorldViewUniform uniform, pushed;
             bool has_pushed = false;
             auto bind = [&](SDL_GPUGraphicsPipeline* pipeline)
@@ -433,7 +437,7 @@ namespace OpenBlood2
                     return;
                 SDL_BindGPUGraphicsPipeline(target.pass, pipeline);
                 bound = pipeline;
-                bound_texture = nullptr;
+                bound_texture = bound_lightmap = nullptr;
                 has_pushed = false;
             };
             auto emit = [&](const WorldDraw& d, const WorldBatch* face)
@@ -450,7 +454,7 @@ namespace OpenBlood2
                 }
                 const bool illuminate = !sky && style_ == DrawStyle::Opaque && !close_view;
                 const std::array<float, 12> fragment{d.alpha,
-                                                     0,
+                                                     world_lightmap_scale,
                                                      0,
                                                      0,
                                                      light.position.x,
@@ -462,8 +466,8 @@ namespace OpenBlood2
                                                      light.color.z,
                                                      0};
                 SDL_PushGPUFragmentUniformData(target.commands, 0, fragment.data(), sizeof(fragment));
-                auto batch =
-                    [&](std::uint32_t first, std::uint32_t count, std::uint32_t material, std::array<double, 2> rate)
+                auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material,
+                                 std::array<double, 2> rate, std::uint32_t lightmap)
                 {
                     world_texture_offset(rate, surface_time, uniform.texture_offset);
                     if (!has_pushed || std::memcmp(&pushed, &uniform, sizeof(uniform)) != 0)
@@ -475,17 +479,22 @@ namespace OpenBlood2
                     pan_batches += rate[0] != 0 || rate[1] != 0;
                     std::uint32_t image = material;
                     world_material_frame(mesh, material, surface_time, image); // Validated before recording.
-                    if (auto* image_texture = registry_->get(textures_[image]); image_texture != bound_texture)
+                    // Faces without a lightmap ignore slot 1; white keeps the binding valid.
+                    auto* image_texture = registry_->get(textures_[image]);
+                    auto* lightmap_texture = registry_->get(textures_[lightmap]);
+                    if (image_texture != bound_texture || lightmap_texture != bound_lightmap)
                     {
-                        SDL_GPUTextureSamplerBinding texture{image_texture, sampler_};
-                        SDL_BindGPUFragmentSamplers(target.pass, 0, &texture, 1);
+                        const SDL_GPUTextureSamplerBinding textures[]{{image_texture, sampler_},
+                                                                      {lightmap_texture, lightmap_sampler_}};
+                        SDL_BindGPUFragmentSamplers(target.pass, 0, textures, 2);
                         bound_texture = image_texture;
+                        bound_lightmap = lightmap_texture;
                     }
                     SDL_DrawGPUPrimitives(target.pass, count, 1, first, 0);
                     ++stats.draw_calls;
                 };
                 if (face)
-                    batch(face->first, face->count, face->material, face->uv_rate);
+                    batch(face->first, face->count, face->material, face->uv_rate, face->lightmap);
                 else if (r.batches.empty())
                 {
                     if (sky)
@@ -493,7 +502,7 @@ namespace OpenBlood2
                         bind(pipelines_->get(WorldPipeline::Sky));
                         ++stats.sky_batches;
                     }
-                    batch(r.first, r.count, 0, {});
+                    batch(r.first, r.count, 0, {}, 0);
                 }
                 else
                     for (const auto& b : r.batches)
@@ -501,12 +510,12 @@ namespace OpenBlood2
                         if (sky)
                         {
                             bind(pipelines_->get(b.translucent ? WorldPipeline::SkyAlpha : WorldPipeline::Sky));
-                            batch(b.first, b.count, b.material, b.uv_rate);
+                            batch(b.first, b.count, b.material, b.uv_rate, b.lightmap);
                             ++stats.sky_batches;
                         }
                         else if ((style_ == DrawStyle::SpriteAlpha || !b.translucent) &&
                                  !(world_pass == WorldPass::OpaqueWithSky && b.sky_portal))
-                            batch(b.first, b.count, b.material, b.uv_rate);
+                            batch(b.first, b.count, b.material, b.uv_rate, b.lightmap);
                     }
             };
             if (translucent)

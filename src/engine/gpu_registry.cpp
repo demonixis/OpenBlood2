@@ -241,6 +241,21 @@ namespace OpenBlood2
         }
         return sampler;
     }
+    SDL_GPUSampler* GpuRegistry::lightmap_sampler(std::string& error)
+    {
+        auto*& sampler = samplers_[2];
+        if (!sampler)
+        {
+            SDL_GPUSamplerCreateInfo info{};
+            info.min_filter = info.mag_filter = SDL_GPU_FILTER_LINEAR;
+            info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+            info.address_mode_u = info.address_mode_v = info.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+            sampler = SDL_CreateGPUSampler(device_, &info);
+            if (!sampler)
+                error = SDL_GetError();
+        }
+        return sampler;
+    }
     BufferHandle GpuRegistry::create_buffer(SDL_GPUBufferUsageFlags usage, Uint32 bytes, std::string& error)
     {
         if (stats.buffers >= buffer_limit || !bytes)

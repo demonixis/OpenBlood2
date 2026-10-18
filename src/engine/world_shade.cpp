@@ -1,6 +1,8 @@
 #include "engine/world_shade.h"
 #include "engine/collision.h"
 #include <algorithm>
+#include <cmath>
+#include <map>
 
 namespace OpenBlood2
 {
@@ -50,6 +52,7 @@ namespace OpenBlood2
     void WorldShade::clear()
     {
         ranges_.clear();
+        pages_.clear();
         stack_.clear();
         stats = {};
     }
@@ -89,6 +92,7 @@ namespace OpenBlood2
         error.clear();
         ranges_.resize(mesh.ranges.size());
         std::size_t total = 0;
+        std::map<std::uint32_t, std::uint32_t> pages; // Mesh material -> pages_ index.
         for (std::size_t r = 0; r < mesh.ranges.size(); ++r)
         {
             auto& tree = ranges_[r];
@@ -104,13 +108,29 @@ namespace OpenBlood2
                     return false;
                 }
                 total += batch.count / 3;
+                std::uint32_t page = UINT32_MAX;
+                if (batch.lightmap)
+                {
+                    if (batch.lightmap >= mesh.materials.size() || !mesh.materials[batch.lightmap].error.empty())
+                    {
+                        clear();
+                        error = "Invalid world shade lightmap page";
+                        return false;
+                    }
+                    auto [found, added] = pages.emplace(batch.lightmap, static_cast<std::uint32_t>(pages_.size()));
+                    if (added)
+                        pages_.push_back(mesh.materials[batch.lightmap].image);
+                    page = found->second;
+                }
                 for (std::uint32_t i = batch.first; i < batch.first + batch.count; i += 3)
                 {
                     Triangle t;
+                    t.page = page;
                     for (int k = 0; k < 3; ++k)
                     {
                         t.points[k] = mesh.vertices[i + k].position;
                         t.colors[k] = mesh.vertices[i + k].color;
+                        t.lightmap[k] = mesh.vertices[i + k].lightmap;
                     }
                     t.min = minv(t.points[0], minv(t.points[1], t.points[2]));
                     t.max = maxv(t.points[0], maxv(t.points[1], t.points[2]));
@@ -123,6 +143,25 @@ namespace OpenBlood2
         }
         stats.triangles = total;
         return true;
+    }
+    DVector WorldShade::sample_page(const Triangle& t, float u, float v) const
+    {
+        // Bilinear like the renderer's lightmap sampler, then the lightmap scale.
+        const auto& page = pages_[t.page];
+        const float x = u * page.width - .5f, y = v * page.height - .5f;
+        const int x0 = int(std::floor(x)), y0 = int(std::floor(y));
+        const float fx = x - x0, fy = y - y0;
+        auto texel = [&](int i, int j, int channel)
+        {
+            i = std::clamp(i, 0, int(page.width) - 1);
+            j = std::clamp(j, 0, int(page.height) - 1);
+            return page.rgba[(std::size_t(j) * page.width + i) * 4 + channel] / 255.f;
+        };
+        float out[3];
+        for (int c = 0; c < 3; ++c)
+            out[c] = world_lightmap_scale * ((1 - fy) * ((1 - fx) * texel(x0, y0, c) + fx * texel(x0 + 1, y0, c)) +
+                                             fy * ((1 - fx) * texel(x0, y0 + 1, c) + fx * texel(x0 + 1, y0 + 1, c)));
+        return {out[0], out[1], out[2]};
     }
     bool WorldShade::trace(DVector from, DVector to, std::span<const WorldDraw> draws, DVector& light, float& fraction)
     {
@@ -177,9 +216,13 @@ namespace OpenBlood2
                     best = f;
                     found = true;
                     const float w = 1 - u - v;
-                    light = {w * t.colors[0].x + u * t.colors[1].x + v * t.colors[2].x,
-                             w * t.colors[0].y + u * t.colors[1].y + v * t.colors[2].y,
-                             w * t.colors[0].z + u * t.colors[1].z + v * t.colors[2].z};
+                    if (t.page != UINT32_MAX)
+                        light = sample_page(t, w * t.lightmap[0][0] + u * t.lightmap[1][0] + v * t.lightmap[2][0],
+                                            w * t.lightmap[0][1] + u * t.lightmap[1][1] + v * t.lightmap[2][1]);
+                    else
+                        light = {w * t.colors[0].x + u * t.colors[1].x + v * t.colors[2].x,
+                                 w * t.colors[0].y + u * t.colors[1].y + v * t.colors[2].y,
+                                 w * t.colors[0].z + u * t.colors[1].z + v * t.colors[2].z};
                 }
             }
         }

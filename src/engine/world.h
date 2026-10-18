@@ -25,6 +25,9 @@ namespace OpenBlood2
     struct Surface
     {
         DVector origin, u, v;
+        // Lightmap axes: a texel every 20 units of dot(lightmap_p/q, point). Not unit length;
+        // later LithTech derives them from the face normal and a principal plane.
+        DVector lightmap_p, lightmap_q;
         std::uint16_t texture = 0;
         std::uint32_t plane = 0, flags = 0;
         std::uint16_t texture_flags = 0; // Serialized v56 surface material, not render flags.
@@ -40,6 +43,12 @@ namespace OpenBlood2
         // Baked per-vertex light (0-255 RGB, world ambient included), parallel to points.
         // Empty for generated geometry, which has no baked lighting.
         std::vector<std::array<std::uint8_t, 3>> colors{};
+        // Grid-rounded lightmap extents along lightmap_p/q, from the polygon prefix.
+        std::array<std::uint16_t, 2> lightmap_extent{};
+        // Stored lightmap (RGB565 texels at WorldModel::lightmap_texels[lightmap_offset],
+        // row-major along lightmap_p); 0x0 when the polygon stores none.
+        std::uint8_t lightmap_width = 0, lightmap_height = 0;
+        std::uint32_t lightmap_offset = 0;
     };
     struct WorldModel
     {
@@ -51,7 +60,11 @@ namespace OpenBlood2
         std::vector<Surface> surfaces;
         std::vector<Polygon> polygons;
         std::vector<std::string> textures;
-        std::size_t opaque_bytes = 0; // Bounded lightmap/visibility tail, not decoded.
+        // Trailing lightmap block: one entry per SURF_LIGHTMAP polygon, located and validated
+        // against the polygon extents. lightmaps is false when no unique block validates.
+        bool lightmaps = false;
+        std::vector<std::uint16_t> lightmap_texels;
+        std::size_t opaque_bytes = 0; // Undecoded tail before the lightmap block (grid/visibility data).
     };
     struct World
     {

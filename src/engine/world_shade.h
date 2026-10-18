@@ -8,9 +8,10 @@ namespace OpenBlood2
         std::size_t triangles = 0, nodes = 0;
         std::uint64_t traces = 0, hits = 0, node_tests = 0, triangle_tests = 0;
     };
-    // Baked per-vertex light of the textured opaque faces of every world range, for reading
-    // the light around a point. Built from the presentation mesh, so its faces, colors and
-    // local positions are exactly the drawn ones; traces use the current range transforms.
+    // Baked light of the textured opaque faces of every world range, for reading the light
+    // around a point: the face's lightmap (scaled like the renderer) or its vertex light.
+    // Built from the presentation mesh, so faces, colors, lightmap coordinates and local
+    // positions are exactly the drawn ones; traces use the current range transforms.
     // Translucent, sky-portal and unresolved-material faces are excluded.
     class WorldShade
     {
@@ -27,6 +28,8 @@ namespace OpenBlood2
         struct Triangle
         {
             std::array<DVector, 3> points, colors;
+            std::array<std::array<float, 2>, 3> lightmap{};
+            std::uint32_t page = UINT32_MAX; // Index into pages_, or none.
             DVector min, max;
         };
         struct Node
@@ -40,7 +43,9 @@ namespace OpenBlood2
             std::vector<Node> nodes;
         };
         std::uint32_t partition(Tree&, std::uint32_t begin, std::uint32_t end);
-        std::vector<Tree> ranges_; // Indexed by WorldMesh range.
+        std::vector<Tree> ranges_;   // Indexed by WorldMesh range.
+        std::vector<Texture> pages_; // Copies of the mesh lightmap pages.
         std::vector<std::uint32_t> stack_;
+        DVector sample_page(const Triangle&, float u, float v) const;
     };
 } // namespace OpenBlood2

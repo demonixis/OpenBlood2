@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-18",
+  "scope": "DAT v56 lightmap axes, polygon extents and trailing lightmap block; texel origin rule; Saturate composition; atlas pages and shader sampling. No renderer, preprocessor or game code imported",
+  "retail_evidence": [
+    {
+      "file": "defaults.cfg (installed Blood II)",
+      "sha256": "5607dd29bc5985e82548ba9d9ad63136e6008f5378a8d8d44bc2b4333eeb1808",
+      "purpose": "Shipped \"Saturate\" \"1\" default selecting the doubled lightmap modulation."
+    },
+    {
+      "file": "detailhi.cfg (installed Blood II)",
+      "sha256": "e4170df11ccfc96426120e9f29dc1fd2b22d92bcb2d7d028474750be11b6cf78",
+      "purpose": "High detail enables \"LightMap\" 1 (and MaxModelShadows 1 for later work)."
+    },
+    {
+      "file": "d3d.ren (installed Blood II renderer)",
+      "sha256": "7aae288739ea01d20697ef81b3aba0b496a40764b4b49276bcbdb693320d9510",
+      "purpose": "Strings only: Saturate, LightSaturate, LightMap and 1/2-pass lightmapping. No code is executed or disassembled."
+    },
+    {
+      "file": "58 retail worlds/*.dat",
+      "purpose": "Block location, entry sizes, origin rule and orientation validated on every model of the 57 readable worlds; RGB565 hue and vertex-color correlation."
+    }
+  ],
+  "references": [
+    {
+      "source": "sources/lithtech/tools/PreProcessor/PrePoly.cpp",
+      "source_sha256": "45d667bfc02335e0b8bd46bc912f1165ecccec7d6ac6be4ff365915761c1f388",
+      "purpose": "Later-generation FindTextureOrigin/AdjustForVec grid snapping and CalculateTextureSize, the basis of the origin rule; Blood II differs on grid lines and in using the non-unit axes."
+    },
+    {
+      "source": "sources/lithtech/tools/PreProcessor/Packer_PC/PCRenderVert.h",
+      "source_sha256": "73e7d8c08fa2c001cf5693ec41aff312d34fea6a7521cd8322300e0cdad0e6ca",
+      "purpose": "Later-generation lightmap texel coordinate P.(v - O) / grid + 0.5."
+    },
+    {
+      "source": "sources/lithtech/runtime/shared/src/lightmap_planes.cpp",
+      "source_sha256": "1644233c2e6fb579642fdb57aa9479114e997a3238209ab33466f13eaf90dddd",
+      "purpose": "Later-generation principal-plane lightmap basis (N x axis), matching the non-unit stored axes."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/d3d_rendershader_lightmap.cpp",
+      "source_sha256": "39339e78e573e579afae10098dde10ba2e3ddb8785b9854974706ad7cf17313f",
+      "purpose": "Later-generation pass order (lightmap, dynamic lights, texture multiply) and Saturate SRCCOLOR blend."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/d3d_rendershader_gouraud_fullbright.cpp",
+      "source_sha256": "2fa56a507d674e264cb27bf25700f3a38c26837544cea2243c83094d83aaf22a",
+      "purpose": "Saturate MODULATE2X is limited to lightmap and fullbright shaders; plain Gouraud stays unscaled."
+    },
+    {
+      "source": "sources/lithtech/runtime/shared/src/lightmap_compress.cpp",
+      "source_sha256": "878121a4968a37d657a822e58027a92070d99125235dd547021e5ec57dc14fcb",
+      "purpose": "Later-generation RLE RGB888 storage, consulted to confirm Blood II's uncompressed RGB565 entries differ."
+    }
+  ],
+  "reference_revision": {
+    "repository": "https://github.com/jsj2008/lithtech",
+    "revision": "0eab18289bed72879eddb648d3311075b108cf46"
+  },
+  "adaptations": [
+    "The lightmap block is located by exact length and accepted only when one offset validates; the preceding grid/cell data stays opaque.",
+    "The origin on a grid line is chosen by the stored texel count among the snapped line and its neighbors, replacing the unknown original float evaluation.",
+    "Lightmaps are packed into 1024x1024 RGBA8 atlas pages with replicated borders and sampled bilinearly; the original paged per-surface textures differently."
+  ]
+}

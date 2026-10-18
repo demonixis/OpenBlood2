@@ -60,6 +60,69 @@ namespace OpenBlood2
             }
             return r.good() && p.good() && !p.remaining() && !out.name.empty();
         }
+        // The model tail ends with u32 byte count, then per SURF_LIGHTMAP polygon in order:
+        // u8 width, u8 height, width * height RGB565 texels. Entries are 0x0 or match the
+        // grid-rounded extents (sky portals store unrelated sizes). The preceding bytes are
+        // not decoded, so the block is located by its exact length and accepted only when a
+        // single offset validates; otherwise the model keeps baked vertex light only.
+        void read_lightmaps(std::span<const std::uint8_t> tail, WorldModel& out)
+        {
+            constexpr std::size_t texel_limit = 16 * 1024 * 1024;
+            std::vector<std::uint32_t> lightmapped;
+            for (std::uint32_t i = 0; i < out.polygons.size(); ++i)
+                if (out.surfaces[out.polygons[i].surface].flags & (1u << 7))
+                    lightmapped.push_back(i);
+            auto u32 = [&](std::size_t at)
+            {
+                return std::uint32_t(tail[at]) | std::uint32_t(tail[at + 1]) << 8 | std::uint32_t(tail[at + 2]) << 16 |
+                       std::uint32_t(tail[at + 3]) << 24;
+            };
+            auto validate = [&](std::size_t at)
+            {
+                std::size_t q = at + 4, texels = 0;
+                for (auto index : lightmapped)
+                {
+                    const auto& polygon = out.polygons[index];
+                    if (q + 2 > tail.size())
+                        return false;
+                    const unsigned w = tail[q], h = tail[q + 1];
+                    const bool sky = out.surfaces[polygon.surface].flags & (1u << 4);
+                    if (!sky && (w || h) &&
+                        (polygon.lightmap_extent[0] % 20 || polygon.lightmap_extent[1] % 20 ||
+                         w != polygon.lightmap_extent[0] / 20u + 1 || h != polygon.lightmap_extent[1] / 20u + 1))
+                        return false;
+                    texels += std::size_t(w) * h;
+                    if (texels > texel_limit || 2 * std::size_t(w) * h > tail.size() - q - 2)
+                        return false;
+                    q += 2 + 2 * std::size_t(w) * h;
+                }
+                return q == tail.size();
+            };
+            std::size_t found = SIZE_MAX;
+            for (std::size_t at = 0; at + 4 <= tail.size(); ++at)
+                if (u32(at) == tail.size() - at - 4 && validate(at))
+                {
+                    if (found != SIZE_MAX)
+                        return; // Ambiguous: keep vertex light only.
+                    found = at;
+                }
+            if (found == SIZE_MAX)
+                return;
+            std::size_t q = found + 4;
+            for (auto index : lightmapped)
+            {
+                auto& polygon = out.polygons[index];
+                const unsigned w = tail[q], h = tail[q + 1];
+                q += 2;
+                polygon.lightmap_width = static_cast<std::uint8_t>(w);
+                polygon.lightmap_height = static_cast<std::uint8_t>(h);
+                polygon.lightmap_offset = static_cast<std::uint32_t>(out.lightmap_texels.size());
+                for (std::size_t i = 0; i < std::size_t(w) * h; ++i, q += 2)
+                    out.lightmap_texels.push_back(static_cast<std::uint16_t>(tail[q] | tail[q + 1] << 8));
+            }
+            out.lightmaps = true;
+            out.opaque_bytes = found;
+        }
         bool bsp(Reader& file, WorldModel& out, std::size_t& budget, std::size_t& effect_bytes)
         {
             const auto start = file.position();
@@ -141,8 +204,8 @@ namespace OpenBlood2
                 s.origin = r.vec();
                 s.u = r.vec();
                 s.v = r.vec();
-                r.vec();
-                r.vec();
+                s.lightmap_p = r.vec();
+                s.lightmap_q = r.vec();
                 r.skip(12); // Unspecified packed surface payload, not a float color.
                 s.texture = r.u16();
                 s.plane = r.u32();
@@ -172,8 +235,9 @@ namespace OpenBlood2
                 total_vertices += count;
                 if (total_vertices > 2000000)
                     return false;
-                r.skip(12);
                 Polygon p;
+                p.lightmap_extent = {r.u16(), r.u16()};
+                r.skip(8); // Unspecified runtime values, not lightmap data.
                 p.base_points = static_cast<std::uint16_t>(base);
                 p.surface = r.u32();
                 if (!r.require(p.surface < surfaces))
@@ -207,7 +271,11 @@ namespace OpenBlood2
                 return false;
             for (std::uint32_t i = 0; i < points; ++i)
                 out.points.push_back(r.vec());
-            out.opaque_bytes = r.remaining();
+            if (!r.good())
+                return false;
+            const auto tail = r.take(r.remaining());
+            out.opaque_bytes = tail.size();
+            read_lightmaps(tail, out);
             return r.good() && file.good();
         }
     } // namespace

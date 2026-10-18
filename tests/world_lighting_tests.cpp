@@ -4,6 +4,7 @@
 #include "app/model_scene.h"
 #include "engine/collision.h"
 #include "sprite_view_fixture.h"
+#include <algorithm>
 #include <cmath>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
@@ -99,6 +100,98 @@ namespace
         CHECK(!shade.trace({0, 10, 0}, {0, -10, 0}, draws, light, fraction));
         return true;
     }
+    bool origin()
+    {
+        std::string error;
+        double o = 0;
+        CHECK(lightmap_origin(1925, 1984, 5, o) && o == 1920);       // Ordinary floor snap.
+        CHECK(lightmap_origin(1920, 1984, 6, o) && o == 1900);       // On a line: one cell lower...
+        CHECK(lightmap_origin(1920, 1984, 5, o) && o == 1920);       // ...or on it, as stored.
+        CHECK(lightmap_origin(-40, -24, 2, o) && o == -40);          // Negative line.
+        CHECK(lightmap_origin(-239.99998, -144, 7, o) && o == -260); // Noise above a line.
+        CHECK(!lightmap_origin(1925, 1984, 50, o) && o == 1920);     // Nothing fits: snapped minimum.
+        CHECK(!lightmap_origin(0, 10, 0, o));
+        return true;
+    }
+    // The floor quad with a stored 3x3 lightmap: x/z in [-10, 10] snap to origin -20.
+    World lightmapped_world()
+    {
+        auto w = floor_world();
+        auto& m = w.models[0];
+        m.surfaces[0].flags = 1u << 7;
+        m.surfaces[0].lightmap_p = {1, 0, 0};
+        m.surfaces[0].lightmap_q = {0, 0, 1};
+        auto& p = m.polygons[0];
+        p.lightmap_extent = {40, 40};
+        p.lightmap_width = p.lightmap_height = 3;
+        p.lightmap_offset = 0;
+        // RGB565: texel i has red = 2i, green = 4i, blue = 31 - i.
+        for (unsigned i = 0; i < 9; ++i)
+            m.lightmap_texels.push_back(static_cast<std::uint16_t>((2 * i) << 11 | (4 * i) << 5 | (31 - i)));
+        m.lightmaps = true;
+        return w;
+    }
+    bool lightmap(const std::filesystem::path& root)
+    {
+        std::string error;
+        Resources resources;
+        CHECK(test_sprite_view::mount(resources, root, error));
+        auto w = lightmapped_world();
+        WorldMesh mesh;
+        CHECK(mesh.build(w, error, &resources));
+        CHECK(mesh.lightmapped == 1 && mesh.lit == 0 && mesh.lightmap_pages == 1 && mesh.lightmap_texels == 9 &&
+              mesh.lightmap_unfitted == 0);
+        const auto page = static_cast<std::uint32_t>(mesh.materials.size() - 1);
+        const auto& image = mesh.materials[page].image;
+        CHECK(mesh.materials[page].path == "lightmap page 0" && image.width == WorldMesh::lightmap_page_size &&
+              mesh.ranges[0].batches.size() == 1 && mesh.ranges[0].batches[0].lightmap == page);
+        // Texel (i, j) sits at page (1 + i, 1 + j); the one-texel border replicates edges.
+        auto texel = [&](unsigned x, unsigned y) { return &image.rgba[(std::size_t(y) * image.width + x) * 4]; };
+        auto expand = [](unsigned v, unsigned bits) { return bits == 5 ? (v << 3 | v >> 2) : (v << 2 | v >> 4); };
+        for (unsigned j = 0; j < 3; ++j)
+            for (unsigned i = 0; i < 3; ++i)
+            {
+                const unsigned k = j * 3 + i;
+                const auto* t = texel(1 + i, 1 + j);
+                CHECK(t[0] == expand(2 * k, 5) && t[1] == expand(4 * k, 6) && t[2] == expand(31 - k, 5) && t[3] == 255);
+            }
+        CHECK(std::equal(texel(0, 0), texel(0, 0) + 4, texel(1, 1)) &&
+              std::equal(texel(4, 4), texel(4, 4) + 4, texel(3, 3)));
+        // Corner (-10, -10) is half a cell from the origin: texel coordinate .5 + .5 = 1, plus the border.
+        const auto& v = mesh.vertices[0];
+        CHECK(v.position.x == -10 && v.position.z == -10);
+        CHECK(std::abs(v.lightmap[0] - 2.f / image.width) < 1e-7f &&
+              std::abs(v.lightmap[1] - 2.f / image.height) < 1e-7f);
+        // Model sampling reads the scaled lightmap at the hit: the quad center is texel (1, 1).
+        WorldShade shade;
+        CHECK(shade.build(mesh, error));
+        DVector light{};
+        float fraction = 0;
+        CHECK(shade.trace({0, 10, 0}, {0, -10, 0}, std::vector<WorldDraw>{{0, {}, {{0, 0, 0}, 1}}}, light, fraction));
+        const auto* center = texel(2, 2);
+        CHECK(near(light, {world_lightmap_scale * center[0] / 255.f, world_lightmap_scale * center[1] / 255.f,
+                           world_lightmap_scale * center[2] / 255.f}));
+        // Fully bright, sky, empty entries and models without a located block use no lightmap.
+        for (int variant = 0; variant < 4; ++variant)
+        {
+            auto other = lightmapped_world();
+            auto& m = other.models[0];
+            if (variant == 0)
+                m.surfaces[0].flags |= 1u << 5;
+            if (variant == 1)
+                m.surfaces[0].flags |= 1u << 4;
+            if (variant == 2)
+                m.polygons[0].lightmap_width = m.polygons[0].lightmap_height = 0;
+            if (variant == 3)
+                m.lightmaps = false;
+            CHECK(mesh.build(other, error, &resources) && mesh.lightmapped == 0 && mesh.lightmap_pages == 0);
+            CHECK(mesh.vertices.empty() || mesh.vertices[0].lightmap[0] < 0);
+        }
+        // A reference beyond the stored texels fails the build.
+        w.models[0].polygons[0].lightmap_offset = 1;
+        CHECK(!mesh.build(w, error, &resources) && error == "Invalid world lightmap reference");
+        return true;
+    }
     bool ambient()
     {
         std::string error;
@@ -140,8 +233,17 @@ namespace
             CHECK(world_info_ambient(game.world.info, world_ambient));
             CHECK(darkest[0] == int(world_ambient.x) && darkest[1] == int(world_ambient.y) &&
                   darkest[2] == int(world_ambient.z));
+            std::size_t located = 0, entries = 0;
+            for (const auto& model : game.world.models)
+            {
+                located += model.lightmaps;
+                for (const auto& polygon : model.polygons)
+                    entries += polygon.lightmap_width != 0;
+            }
+            CHECK(located == game.world.models.size() && entries > 1000);
             WorldMesh mesh;
-            CHECK(mesh.build(game.world, error, &game.resources) && mesh.lit > 1000);
+            CHECK(mesh.build(game.world, error, &game.resources) && mesh.lightmapped > 1000 &&
+                  mesh.lightmap_unfitted == 0);
             ModelView scene;
             scene.gpu_skinning = true;
             ModelLighting lighting;
@@ -162,9 +264,11 @@ namespace
             CHECK(update_model_scene(game, scene, error) && lighting.apply(game, mesh, draws, scene, error));
             CHECK(lighting.stats.reused + lighting.stats.sampled == lighting.stats.models && lighting.stats.reused > 0);
             std::cout << name << ": " << polygons << " polygons, darkest lightmapped light " << darkest[0] << " "
-                      << darkest[1] << " " << darkest[2] << ", " << mesh.lit << " baked / " << mesh.fullbright
-                      << " fully bright faces, " << lighting.stats.models << " lit models, " << lighting.stats.ambient
-                      << " ambient fallbacks, ModelAdd " << lighting.stats.model_add.x << "\n";
+                      << darkest[1] << " " << darkest[2] << ", " << mesh.lightmapped << " lightmapped ("
+                      << mesh.lightmap_pages << " pages, " << mesh.lightmap_texels << " texels) / " << mesh.lit
+                      << " vertex-lit / " << mesh.fullbright << " fully bright faces, " << lighting.stats.models
+                      << " lit models, " << lighting.stats.ambient << " ambient fallbacks, ModelAdd "
+                      << lighting.stats.model_add.x << "\n";
             CHECK(game.objects.finish_frame() && game.unload_world());
         }
         return true;
@@ -174,11 +278,13 @@ int main(int argc, char** argv)
 {
     const std::string c = argc > 1 ? argv[1] : "";
     const std::filesystem::path root = argc > 2 ? argv[2] : "";
-    const bool ok = c == "mesh"      ? mesh(root)
-                    : c == "shade"   ? shade(root)
-                    : c == "ambient" ? ambient()
-                    : c == "retail"  ? retail(root)
-                                     : false;
+    const bool ok = c == "mesh"       ? mesh(root)
+                    : c == "shade"    ? shade(root)
+                    : c == "origin"   ? origin()
+                    : c == "lightmap" ? lightmap(root)
+                    : c == "ambient"  ? ambient()
+                    : c == "retail"   ? retail(root)
+                                      : false;
     if (ok)
         std::cout << "world_lighting." << c << " passed\n";
     return ok ? 0 : 1;

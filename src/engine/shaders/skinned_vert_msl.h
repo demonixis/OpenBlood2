@@ -33,6 +33,7 @@ struct main0_out
     float3 out_var_TEXCOORD0 [[user(locn0)]];
     float2 out_var_TEXCOORD1 [[user(locn1)]];
     float3 out_var_TEXCOORD2 [[user(locn2)]];
+    float2 out_var_TEXCOORD3 [[user(locn3)]];
     float4 gl_Position [[position]];
 };
 
@@ -47,24 +48,25 @@ struct main0_in
 vertex main0_out main0(main0_in in [[stage_in]], constant type_View& View [[buffer(0)]], const device type_StructuredBuffer_v4float& palette [[buffer(1)]], const device type_StructuredBuffer_v4float& deformation [[buffer(2)]])
 {
     main0_out out = {};
-    uint _66 = View.bases.x + (in.in_var_TEXCOORD2.x * 2u);
-    float3 _83;
+    uint _69 = View.bases.x + (in.in_var_TEXCOORD2.x * 2u);
+    float3 _86;
     if (in.in_var_TEXCOORD3 == 4294967295u)
     {
-        _83 = in.in_var_TEXCOORD0;
+        _86 = in.in_var_TEXCOORD0;
     }
     else
     {
-        _83 = deformation._m0[View.bases.y + in.in_var_TEXCOORD3].xyz;
+        _86 = deformation._m0[View.bases.y + in.in_var_TEXCOORD3].xyz;
     }
-    float3 _96 = (palette._m0[_66 + 1u].xyz + (_83 + (cross(palette._m0[_66].xyz, cross(palette._m0[_66].xyz, _83) + (_83 * palette._m0[_66].w)) * 2.0))) * View.scale.xyz;
-    float3 _110 = (_96 + (cross(View.quaternion.xyz, cross(View.quaternion.xyz, _96) + (_96 * View.quaternion.w)) * 2.0)) + View.translation.xyz;
-    float3 _114 = _110 - View.eye.xyz;
-    float _118 = dot(_114, View.forward.xyz);
+    float3 _99 = (palette._m0[_69 + 1u].xyz + (_86 + (cross(palette._m0[_69].xyz, cross(palette._m0[_69].xyz, _86) + (_86 * palette._m0[_69].w)) * 2.0))) * View.scale.xyz;
+    float3 _113 = (_99 + (cross(View.quaternion.xyz, cross(View.quaternion.xyz, _99) + (_99 * View.quaternion.w)) * 2.0)) + View.translation.xyz;
+    float3 _117 = _113 - View.eye.xyz;
+    float _121 = dot(_117, View.forward.xyz);
     out.out_var_TEXCOORD0 = View.color.xyz;
     out.out_var_TEXCOORD1 = in.in_var_TEXCOORD1 + View._textureOffset.xy;
-    out.out_var_TEXCOORD2 = _110;
-    out.gl_Position = select(float4(dot(_114, View.right.xyz) * View.projection.x, dot(_114, View.up.xyz) * View.projection.y, (_118 * View.projection.z) + View.projection.w, _118), float4(0.0), bool4(((((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.y * 2u)) + 1u])[3] + ((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.z * 2u)) + 1u])[3]) + ((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.w * 2u)) + 1u])[3]) > 0.0));
+    out.out_var_TEXCOORD2 = _113;
+    out.out_var_TEXCOORD3 = float2(-1.0);
+    out.gl_Position = select(float4(dot(_117, View.right.xyz) * View.projection.x, dot(_117, View.up.xyz) * View.projection.y, (_121 * View.projection.z) + View.projection.w, _121), float4(0.0), bool4(((((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.y * 2u)) + 1u])[3] + ((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.z * 2u)) + 1u])[3]) + ((device float*)&palette._m0[(View.bases.x + (in.in_var_TEXCOORD2.w * 2u)) + 1u])[3]) > 0.0));
     return out;
 }
 

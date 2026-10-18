@@ -203,6 +203,9 @@ namespace OpenBlood2
                 presenter.registry.stats.staged_bytes, presenter.sprite_scene.draws.size(),
                 presenter.polygrid_scene.draws.size(), presenter.world_renderer.stats.triangles);
             const auto& lighting = presenter.model_lighting.stats;
+            const auto& mesh = presenter.world_mesh;
+            spdlog::info("Lightmaps: {} faces, {} pages, {} texels, {} unfitted origin axes", mesh.lightmapped,
+                         mesh.lightmap_pages, mesh.lightmap_texels, mesh.lightmap_unfitted);
             spdlog::info("Lighting: {} baked / {} fully bright textured faces; {} lit models ({} sampled, {} reused, "
                          "{} ambient fallback, {} FLAG_NOLIGHT) last frame; ModelAdd {} {} {}",
                          presenter.world_mesh.lit, presenter.world_mesh.fullbright, lighting.models, lighting.sampled,

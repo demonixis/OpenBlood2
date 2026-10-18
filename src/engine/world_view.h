@@ -12,7 +12,17 @@ namespace OpenBlood2
     {
         DVector position, color;
         std::array<float, 2> uv{};
+        // Lightmap page coordinates; negative when the face uses its vertex light instead.
+        std::array<float, 2> lightmap{-1, -1};
     };
+    // Shipped Blood II defaults.cfg sets "Saturate" 1: lightmapped faces draw texture * 2 * light
+    // (later LithTech's MODULATE2X/SRCCOLOR blend); Gouraud faces stay texture * light.
+    constexpr float world_lightmap_scale = 2;
+    // Lightmap texel origin along one axis (dot with the surface lightmap axis): the
+    // polygon minimum snapped to the 20-unit grid. Points exactly on a grid line snap to
+    // either neighbor depending on preprocessor float noise, so the stored texel count picks
+    // the candidate whose span it covers. False (origin = snapped minimum) when none fits.
+    bool lightmap_origin(double minimum, double maximum, unsigned texels, double& origin);
     struct WorldMaterial
     {
         std::string path, error;
@@ -38,6 +48,7 @@ namespace OpenBlood2
         DVector center{};                // One local-space center per translucent polygon, for sorting.
         std::array<double, 2> uv_rate{}; // Cycles/second; independent of the shared texture.
         bool sky_portal = false;
+        std::uint32_t lightmap = 0; // Material index of the lightmap page; 0 when none.
     };
     struct WorldRange
     {
@@ -62,6 +73,10 @@ namespace OpenBlood2
         std::size_t invisible = 0, degenerate = 0, transparent = 0, sky = 0, blended = 0;
         // Textured faces using baked per-vertex light, and textured faces drawn fully bright.
         std::size_t lit = 0, fullbright = 0;
+        // Faces drawn with their stored lightmap, lightmap atlas pages (materials named
+        // "lightmap page N"), packed texels and axes whose origin no candidate fitted.
+        std::size_t lightmapped = 0, lightmap_pages = 0, lightmap_texels = 0, lightmap_unfitted = 0;
+        static constexpr std::uint32_t lightmap_page_size = 1024;
         bool build(const World&, std::string&, const Resources* = nullptr);
     };
     bool world_material_frame(const WorldMesh&, std::uint32_t material, double time, std::uint32_t& image);

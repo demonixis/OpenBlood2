@@ -20,6 +20,7 @@ struct Output
     float3 faceColor : TEXCOORD0;
     float2 texCoord : TEXCOORD1;
     float3 worldPosition : TEXCOORD2;
+    float2 lightmapCoord : TEXCOORD3; // Models have no lightmap.
     float4 position : SV_Position;
 };
 float3 rotate(float4 q, float3 v)
@@ -47,5 +48,6 @@ Output main(Input input)
     output.worldPosition = world;
     output.faceColor = color.xyz;
     output.texCoord = input.uv + textureOffset.xy;
+    output.lightmapCoord = float2(-1.0, -1.0);
     return output;
 }

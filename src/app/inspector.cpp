@@ -528,8 +528,14 @@ namespace OpenBlood2
                         ImGui::Text(
                             "Faces: %zu invisible / %zu degenerate / %zu authored transparent / %zu authored sky",
                             world_mesh->invisible, world_mesh->degenerate, world_mesh->transparent, world_mesh->sky);
-                        ImGui::Text("Baked light: %zu per-vertex lit / %zu fully bright textured faces",
-                                    world_mesh->lit, world_mesh->fullbright);
+                        ImGui::Text("Baked light: %zu lightmapped / %zu per-vertex lit / %zu fully bright textured "
+                                    "faces",
+                                    world_mesh->lightmapped, world_mesh->lit, world_mesh->fullbright);
+                        ImGui::Text("Lightmaps: %zu pages (%u px), %zu texels, %zu unfitted origin axes; x%.0f "
+                                    "(Saturate)",
+                                    world_mesh->lightmap_pages, WorldMesh::lightmap_page_size,
+                                    world_mesh->lightmap_texels, world_mesh->lightmap_unfitted,
+                                    double(world_lightmap_scale));
                         if (model_lighting)
                         {
                             const auto& l = *model_lighting;

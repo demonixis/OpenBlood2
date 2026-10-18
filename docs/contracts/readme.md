@@ -160,6 +160,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Packaged SPIR-V and Metal shaders](metal_shader_contracts.md)
 - [Presentation performance: single scene pass, batching, culling and mips](render_performance_contracts.md)
 - [Baked world lighting and replacement model light](baked_lighting_contracts.md)
+- [Original DAT lightmaps](lightmap_contracts.md)
 - [Prepared ABC geometry and CPU sampling](model_preparation_contracts.md)
 - [Animated model presentation](model_view_contracts.md)
 - [Current budget continuation](object_particle_contracts.md)

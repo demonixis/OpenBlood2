@@ -25,6 +25,7 @@ struct main0_out
     float3 out_var_TEXCOORD0 [[user(locn0)]];
     float2 out_var_TEXCOORD1 [[user(locn1)]];
     float3 out_var_TEXCOORD2 [[user(locn2)]];
+    float2 out_var_TEXCOORD3 [[user(locn3)]];
     float4 gl_Position [[position]];
 };
 
@@ -33,18 +34,20 @@ struct main0_in
     float3 in_var_TEXCOORD0 [[attribute(0)]];
     float3 in_var_TEXCOORD1 [[attribute(1)]];
     float2 in_var_TEXCOORD2 [[attribute(2)]];
+    float2 in_var_TEXCOORD3 [[attribute(3)]];
 };
 
 vertex main0_out main0(main0_in in [[stage_in]], constant type_View& View [[buffer(0)]])
 {
     main0_out out = {};
-    float3 _54 = (in.in_var_TEXCOORD0 + (cross(View.quaternion.xyz, cross(View.quaternion.xyz, in.in_var_TEXCOORD0) + (in.in_var_TEXCOORD0 * View.quaternion.w)) * 2.0)) + View.translation.xyz;
-    float3 _58 = _54 - View.eye.xyz;
-    float _62 = dot(_58, View.forward.xyz);
+    float3 _57 = (in.in_var_TEXCOORD0 + (cross(View.quaternion.xyz, cross(View.quaternion.xyz, in.in_var_TEXCOORD0) + (in.in_var_TEXCOORD0 * View.quaternion.w)) * 2.0)) + View.translation.xyz;
+    float3 _61 = _57 - View.eye.xyz;
+    float _65 = dot(_61, View.forward.xyz);
     out.out_var_TEXCOORD0 = in.in_var_TEXCOORD1;
     out.out_var_TEXCOORD1 = in.in_var_TEXCOORD2 + View._textureOffset.xy;
-    out.out_var_TEXCOORD2 = _54;
-    out.gl_Position = float4(dot(_58, View.right.xyz) * View.projection.x, dot(_58, View.up.xyz) * View.projection.y, (_62 * View.projection.z) + View.projection.w, _62);
+    out.out_var_TEXCOORD2 = _57;
+    out.out_var_TEXCOORD3 = in.in_var_TEXCOORD3;
+    out.gl_Position = float4(dot(_61, View.right.xyz) * View.projection.x, dot(_61, View.up.xyz) * View.projection.y, (_65 * View.projection.z) + View.projection.w, _65);
     return out;
 }
 

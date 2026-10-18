@@ -147,7 +147,7 @@ namespace OpenBlood2
         TextureHandle depth_;
         std::vector<TextureHandle> textures_;
         std::vector<std::string> texture_paths_;
-        SDL_GPUSampler* sampler_ = nullptr; // Owned by the registry.
+        SDL_GPUSampler *sampler_ = nullptr, *lightmap_sampler_ = nullptr; // Owned by the registry.
         Uint32 width_ = 0, height_ = 0;
         std::uint64_t revision_ = UINT64_MAX;
         // Checks every input and selects visible_/alpha_order_ before any pass is begun.

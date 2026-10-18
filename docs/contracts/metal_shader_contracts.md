@@ -106,3 +106,5 @@ The [presentation performance continuation](render_performance_contracts.md) add
 The [presentation performance continuation](render_performance_contracts.md) moves the four shaders to HLSL compiled by SDL_shadercross with DXC (Vulkan SDK 1.4.350, dxcompiler 1.9.0.5347). Bindings, vertex attribute locations, varying locations and uniform layouts are unchanged; standalone renderer readbacks and application captures are compared against the GLSL-generated artifacts in that contract.
 
 The [baked lighting continuation](baked_lighting_contracts.md) changes both fragment shaders to add the radial light to the face color before the albedo multiply. Only the four fragment artifacts changed when all eight were regenerated; bindings and uniform layouts are unchanged.
+
+The [lightmap continuation](lightmap_contracts.md) adds vertex attribute/varying 3 (lightmap page coordinates; skinned models output -1) and fragment texture/sampler 1 (the lightmap page, a bilinear clamped sampler) to all shaders. The fragment uniform's `modulation.y` carries the lightmap scale. All eight artifacts were regenerated.
