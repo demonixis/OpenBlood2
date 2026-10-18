@@ -1,4 +1,5 @@
 #include "engine/audio_stream.h"
+#include "engine/ima_variation.h"
 #include "inspector.h"
 #include <algorithm>
 #include <imgui.h>
@@ -342,8 +343,9 @@ namespace OpenBlood2
         }
         if (ImGui::TreeNode("IMA pattern notes (data only)"))
         {
-            ImGui::TextWrapped("File order and raw timing/variation/pitch fields; these are not final MIDI notes. "
-                               "Curves, header tails and personality rules remain undecoded. No playback.");
+            ImGui::TextWrapped(
+                "File order and raw timing/variation/pitch fields; these are not final MIDI notes. "
+                "Curves and personality rules remain undecoded. Channel defaults are prepared, not played.");
             for (const auto& asset : music.assets)
             {
                 if (!asset.style || !ImGui::TreeNode(asset.filename.c_str()))
@@ -363,6 +365,31 @@ namespace OpenBlood2
                         ImGui::Text("Length %d | raw word0 %08x / flags %08x | timing %d, %d, %d, %d", pattern.length,
                                     pattern.word0, pattern.flags, pattern.timing[0], pattern.timing[1],
                                     pattern.timing[2], pattern.timing[3]);
+                        if (ImGui::TreeNode("Channel defaults and variation flags"))
+                        {
+                            const auto channels = prepare_ima_pattern_channels(pattern);
+                            ImGui::Text(
+                                "Chord/scale masks %08x / %08x | root %+d | pitch channels %04x | raw word606 %04x",
+                                pattern.chord_mask, pattern.scale_mask, pattern.root, pattern.pitch_range_channels,
+                                pattern.word606);
+                            ImGui::TextWrapped("Authored -> effective loader values. Each row is a source channel; "
+                                               "flags belong to variants 0..15. No live selection or RNG here.");
+                            for (std::size_t ch = 0; ch < 16; ++ch)
+                            {
+                                ImGui::PushID(static_cast<int>(ch));
+                                if (ImGui::TreeNode("channel", "Ch %zu: pitch %+d..%+d | mode %02x -> %02x", ch,
+                                                    pattern.lower_pitch[ch], pattern.upper_pitch[ch],
+                                                    pattern.play_modes[ch], channels.play_modes[ch]))
+                                {
+                                    for (std::size_t v = 0; v < 16; ++v)
+                                        ImGui::Text("Variant %zu: %04x -> %04x", v, pattern.variation_flags[ch][v],
+                                                    channels.variation_flags[ch][v]);
+                                    ImGui::TreePop();
+                                }
+                                ImGui::PopID();
+                            }
+                            ImGui::TreePop();
+                        }
                         for (const auto& grid : pattern.grids)
                         {
                             ImGui::PushID(static_cast<int>(grid.offset));

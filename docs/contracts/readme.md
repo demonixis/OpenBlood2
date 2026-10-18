@@ -178,3 +178,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [IMA section records and authored timing](music_section_contracts.md): header timing, command/mute/chord data, original-reader checks and explicit sequencing limits.
 
 - [IMA style meter and section timeline](music_timeline_contracts.md): binding, signed times, mute sampling and bounded immutable ownership.
+
+- [IMA pattern channels and variations](music_variation_contracts.md): raw/effective fields, original decision rules and explicit random inputs.

@@ -130,7 +130,20 @@ namespace OpenBlood2
                             value = signed16(r);
                         if (!name(r, pattern.name))
                             return false;
-                        // The remaining 573 bytes include ranges/variation tables; keep their source range.
+                        pattern.chord_mask = r.u32();
+                        pattern.scale_mask = r.u32();
+                        for (auto& value : pattern.upper_pitch)
+                            value = std::bit_cast<std::int8_t>(r.u8());
+                        for (auto& value : pattern.lower_pitch)
+                            value = std::bit_cast<std::int8_t>(r.u8());
+                        pattern.pitch_range_channels = r.u16();
+                        for (auto& channel : pattern.variation_flags)
+                            for (auto& value : channel)
+                                value = r.u16();
+                        pattern.word606 = r.u16();
+                        pattern.root = std::bit_cast<std::int8_t>(r.u8());
+                        for (auto& value : pattern.play_modes)
+                            value = r.u8();
                     }
                     else if (c.id == "LIST" && c.form == "AACL" && !grid(child, pattern))
                         return false;

@@ -29,6 +29,12 @@ namespace OpenBlood2
         std::uint32_t offset = 0, word0 = 0, flags = 0;
         std::int32_t length = 0;
         std::array<std::int16_t, 4> timing{}; // Raw fields at patt offsets 12..19.
+        std::uint32_t chord_mask = 0, scale_mask = 0;
+        std::array<std::int8_t, 16> upper_pitch{}, lower_pitch{};
+        std::uint16_t pitch_range_channels = 0, word606 = 0;
+        std::array<std::array<std::uint16_t, 16>, 16> variation_flags{};
+        std::int8_t root = 0;
+        std::array<std::uint8_t, 16> play_modes{}; // Authored; defaults are prepared separately.
         std::vector<ImaGrid> grids;
     };
     struct ImaStyle

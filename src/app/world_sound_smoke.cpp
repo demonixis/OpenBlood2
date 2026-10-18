@@ -1,5 +1,6 @@
 #include "world_sound_smoke.h"
 #include "engine/audio_stream.h"
+#include "engine/ima_variation.h"
 #include "game/original/SoundFX.h"
 namespace OpenBlood2
 {
@@ -41,6 +42,20 @@ namespace OpenBlood2
                 if (!asset.style || !asset.style_error.empty())
                     return false;
                 pattern_notes += asset.style->notes;
+                for (const auto& pattern : asset.style->patterns)
+                {
+                    const auto effective = prepare_ima_pattern_channels(pattern);
+                    ImaVariationChoice choice;
+                    std::string error;
+                    std::array<std::uint16_t, 16> current{}, draws{};
+                    // Explicit diagnostic decision, independent of UI and game RNG.
+                    if (!choose_ima_variations(effective, 0, current, 0xffff, 0, draws, choice, error) ||
+                        choice.draws_used != 16 || choice.fallback_channels != 0)
+                        return false;
+                    for (std::size_t ch = 0; ch < 16; ++ch)
+                        if (!effective.play_modes[ch] || choice.selected[ch] != 1 || choice.candidates[ch] != 0xffff)
+                            return false;
+                }
             }
         }
         if (pattern_notes != 3049 || band_count != 44 || !section_count)

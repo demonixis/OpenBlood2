@@ -3,8 +3,8 @@
 `read_ima_style` decodes the installed AASY pattern-note profile. It is an
 independent portable reader, informed by the external original `IMUSIC25.DLL`
 loader and checked against that loader in an isolated emulator. It is **not a
-sequencer**: `MUSIC`, section transitions, personality/pitch conversion, variations,
-humanization, applied channel routing and controllers remain unavailable. Band
+sequencer**: `MUSIC`, section transitions, personality/pitch conversion,
+live variation scheduling, humanization, applied channel routing and controllers remain unavailable. Band
 setup data is now available separately under the [band contracts](music_band_contracts.md).
 
 ## Record boundaries and ownership
@@ -48,7 +48,8 @@ before use; do not send these raw fields directly to the DLS sampler.
 
 The pattern prefix exposes word0, signed length, flags, four raw signed timing
 fields and its fixed 16-code-unit name. Timing fields are intentionally not
-converted to seconds or inferred tempo. Header tails, `curv`, `pref` and
+converted to seconds or inferred tempo. The full pattern header is now decoded
+under the [pattern-channel contracts](music_variation_contracts.md); `curv`, `pref` and
 other records remain opaque source ranges. Direct style/section bands are decoded
 separately under the [band contracts](music_band_contracts.md). Curves are counted separately and
 never called played/decoded events. All source chunks, offsets, sizes and nesting

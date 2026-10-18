@@ -1258,3 +1258,13 @@ are a bounded binding profile; chord pitch harmonization and playback remain
 unimplemented. See [source ledger](sources/m2_music_timeline_sources.json),
 [contracts](../contracts/music_timeline_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_timeline.md).
+
+## IMA pattern channel defaults and variations
+
+Independent portable decoding and pure channel-variation preparation, checked
+against the installed external IMUSIC25 header/default/selection blocks using
+isolated x86 execution and explicit random returns. No code or commercial binary
+bytes are imported. Original Music.cpp remains unchanged; there is no live MUSIC
+success or inferred pattern/personality scheduler. See [source ledger](sources/m2_music_variations_sources.json),
+[contracts](../contracts/music_variation_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_variations.md).

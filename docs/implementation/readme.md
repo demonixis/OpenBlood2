@@ -34,3 +34,5 @@ the original log or patch.
 - [IMA sections and authored timing](../../../Documentation/Implementation/m2_music_sections.md): original header/event-reader equivalence and explicit remaining sequence semantics.
 
 - [IMA style meter and section timeline](../../../Documentation/Implementation/m2_music_timeline.md): original reconciliation, explicit missing style bindings and pending sequence playback.
+
+- [IMA pattern channels and variations](../../../Documentation/Implementation/m2_music_variations.md): original loader and 786 private decisions; live music remains unavailable.
