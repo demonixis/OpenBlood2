@@ -203,16 +203,15 @@ namespace
         CHECK(g.unload_world() && !g.server.string_count());
         return true;
     }
-    bool private_world(const char* path, bool demo)
+    bool private_world(const char* path)
     {
         GameSession g;
         CHECK(g.initialize());
         Config c;
         c.data_dir = path;
-        c.demo = demo;
         std::string e;
         CHECK(g.resources.mount_game(c, e));
-        CHECK(g.request_world(demo ? "Demo_02" : "05_cdmb", e));
+        CHECK(g.request_world("05_cdmb", e));
         unsigned count = 0;
         for (std::size_t i = 0; i < g.entries.size(); ++i)
         {
@@ -226,7 +225,7 @@ namespace
             CHECK(s->m_dwRespawnCount == 0xffffffffu && !r->scheduled);
             ++count;
         }
-        std::cout << (demo ? "Demo_02" : "05_CDMB") << " spawners: " << count << " created\n";
+        std::cout << "05_CDMB spawners: " << count << " created\n";
         CHECK(count == 2 && g.unload_world());
         return true;
     }
@@ -240,8 +239,7 @@ int main(int argc, char** argv)
             : mode == "commands" ? commands(argv[2])
             : mode == "respawn"  ? respawn(argv[2])
             : mode == "spawn"    ? spawn(argv[2])
-            : mode == "private"  ? private_world(argv[2], false)
-                                 : mode == "demo" && private_world(argv[2], true))
+                                 : mode == "private" && private_world(argv[2]))
                ? 0
                : 1;
 }

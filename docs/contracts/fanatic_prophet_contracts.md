@@ -4,7 +4,7 @@
 `prophet.cpp` classes, registered for world, string (Spawner) and runtime creation.
 They build on the existing [AI lifecycle](ai_runtime_contracts.md),
 [state](ai_state_contracts.md) and [weapon](ai_fire_contracts.md) ports. Read those
-and the [demo contracts](demo_contracts.md) before extending them.
+before extending them.
 
 ## Construction, properties and initialization
 
@@ -36,17 +36,16 @@ owners" statements are historical.
 `AI_Mgr::WeaponStrToInt` follows the original prefix order and lengths
 (`SHOTGU` compares five bytes). A name matching no compiled branch takes the
 source default Beretta. The `_ADD_ON` COMBAT/FLAYER/ROCK/NIGHTMARE_FIREBALL branches
-are absent: the shipped demo and patched retail (`BLOOD2.REZ`, `BLOOD2P.REZ`,
-`BLOOD2P2.REZ`) `object.lto` contain no FLAYER literal, which appears only inside
-that block; only `BLOOD2NM.REZ` (the add-on, not mounted) has it. The fallback
-therefore applies to both editions. Authored `COMBAT` becomes the Beretta the actor
+are absent: the patched retail (`BLOOD2.REZ`, `BLOOD2P.REZ`, `BLOOD2P2.REZ`)
+`object.lto` contain no FLAYER literal, which appears only inside that block; only
+`BLOOD2NM.REZ` (the add-on, not mounted) has it. Authored `COMBAT` becomes the Beretta the actor
 already holds. A matched family that is not integrated (SHOTGUN, SNIPER, HOWITZER,
 PROX_BOMB, ...) still rejects creation; it is never replaced by a Beretta.
 
 ### Proximity bombs
 
 The source calls `AddInventoryWeapon(INV_PROXIMITY, (int)Proximity_Bombs)` for every
-NPC. `_DEMO` returns CHWEAP_NOTAVAIL. Retail stores a slot-10 inventory weapon with
+NPC. Retail stores a slot-10 inventory weapon with
 the ammo capped at 10 (the original table for every strength). The AI never selects
 it: `FindBestWeapon` scans slots 0..9 and `MC_LayProximity` has no caller. The port
 makes the call only for a nonzero count; the source's empty zero-count weapon is
@@ -128,13 +127,13 @@ The Skeletons AI panel shows shared attack values, dodge flags and roll command,
 FindHealth calls, kamikaze start/fuse/detonations, smoke source/attachment/effect,
 errors, and the Prophet's melee swings and alternate choices.
 
-Retail 05_CDMB and Demo_02 initialize four Fanatics and the Prophet; `--start-game`
-passes for both, and a Spawner trigger creates a ready Fanatic. Tests:
+Retail 05_CDMB initializes four Fanatics and the Prophet; `--start-game` passes, and
+a Spawner trigger creates a ready Fanatic. Tests:
 `fanatic_prophet.weapons`, `decisions` and `howitzer` (synthetic, labelled actors and
-targets), `catalog`/`catalog_demo` (real models, three difficulties), `kamikaze`
+targets), `catalog` (real models, three difficulties), `kamikaze`
 (real Fanatic sprints to the player, smokes and its blast deals damage), `actions`
-(rolls, crouch fire, melee swing) and `world`/`world_demo`.
+(rolls, crouch fire, melee swing) and `world`.
 Not implemented: CacheFiles, save/load (restore rejects), the Fanatic's Load smoke
 re-creation, the howitzer explosion visuals, the sniper rifle and Howitzer player
 weapons, and verified retail AI timing. See the
-[source ledger](../implementation/sources/demo_world_sources.json).
+[source ledger](../implementation/sources/cdmb_world_sources.json).

@@ -52,7 +52,7 @@ removing the spawner never removes them.
 After creation the source sends a rift explosion (`SFX_EXPLOSIONFX_ID`,
 `EXP_RIFT_1`) when CreateRiftEffect is set. No client rift effect exists yet: the
 request is counted and named in the spawn report, never presented as success.
-150 retail spawners set it; none in the demo. Then the source plays Sound with
+150 retail spawners set it. Then the source plays Sound with
 `PlaySoundFromPos` (3D, reverb requested, inner radius = radius * 0.1,
 SOUNDPRIORITY_MISC_LOW) at the spawn position, even when creation failed; the
 port plays a detached voice there and appends any playback failure to the report.
@@ -64,11 +64,11 @@ trigger/attempt/success/failure/rift counters, the last child token and voice.
 
 ## Evidence and limits
 
-Demo_02 and retail 05_CDMB each have two Spawners (`spawn1`, `spawn2`) spawning
+Retail 05_CDMB has two Spawners (`spawn1`, `spawn2`) spawning
 `Fanatic` at (0,500,0), count -1, inactive. Both create, and a trigger now creates a
 ready [Fanatic](fanatic_prophet_contracts.md): `Fanatic` and `Prophet` joined the
 supported spawn classes. Tests:
 `spawner.properties`, `commands`, `respawn`, `spawn` (synthetic pickups and WAV),
-`spawner.private` (05_CDMB) and `spawner.demo` (Demo_02).
+and `spawner.private` (05_CDMB).
 The rift FX, save/restore and retail velocity-random parity remain unavailable.
-See the [source ledger](../implementation/sources/demo_world_sources.json).
+See the [source ledger](../implementation/sources/cdmb_world_sources.json).

@@ -55,7 +55,7 @@ nonzero displacement leaves it along its outward normal (`outward . delta > 0`).
 `LeaveOrSlide` also ignores it for motion parallel to the face (`>= 0`). Moving
 deeper and zero-length queries always fail, and a box center inside a closed
 container component stays start-solid. Triangles are wound toward their polygon
-plane normal at build (the empty side); all 338,275 retail and demo DAT polygons
+plane normal at build (the empty side); all retail DAT polygons
 already wind that way, synthetic brushes may not, and the two-sided SAT is unaffected
 by the order. Container boundaries are built from rotated planes. Ignored faces are
 counted in `CollisionHit::departed`; later hits are unaffected.
@@ -66,8 +66,8 @@ probes, movers, world bodies, body placement, resize clearance and every other q
 keep `Block`. A solid body that slides along or pushes into a deep overlap therefore
 still fails, as the contact-overlap contract requires.
 
-Evidence: GoToStartPoint teleports the player to `05_egress` (retail 05_CDMB and the
-demo's Demo_02), 112 units above the `endelevator` floor, where the standing box
+Evidence: GoToStartPoint teleports the player to `05_egress` (retail 05_CDMB),
+112 units above the `endelevator` floor, where the standing box
 crosses the car ceiling by 25 units. The source then lowers it with
 MoveObjectToGround, a move leaving that ceiling. In 12_Train_Station the authored
 `SniperRiflePU` lies with its 33-unit half-length through a wall; its placement and
@@ -81,5 +81,5 @@ trace, and general depenetration remains unavailable.
 Movement snapshots and the Movement inspector report the faces a body's moves left
 or slid along (`start_departures`). Tests: `services.start_departure` (synthetic
 ceiling/floor/wall, solid and non-solid), `services.contact_overlap` (deep solid
-slides still fail) and `services.elevator_entry` / `elevator_entry_demo` (retail
-05_CDMB and Demo_02 player entry); `keyframe_audio.private` steps 12_Train_Station.
+slides still fail) and `services.elevator_entry` (retail 05_CDMB player entry);
+`keyframe_audio.private` steps 12_Train_Station.

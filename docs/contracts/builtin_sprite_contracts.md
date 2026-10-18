@@ -5,8 +5,8 @@ The registered `Sprite` class runs the original `spr_MessageFn` from
 engine's decoded SPR manifest keeps the name `Sprite`. This is distinct from
 [DetailSprite](sprite_contracts.md) (a B2BaseClass object with flush/repeat rules).
 `FastApproxArea` is an original `CF_NORUNTIME` class. Read the
-[object](object_contracts.md), [sprite presentation](sprite_view_contracts.md) and
-[demo](demo_contracts.md) contracts before extending either.
+[object](object_contracts.md) and [sprite presentation](sprite_view_contracts.md)
+contracts before extending either.
 
 ## Sprite source behavior
 
@@ -56,11 +56,10 @@ classes. No visibility optimisation is derived from them.
 
 ## Evidence
 
-Demo_02 and its retail counterpart 05_CDMB each contain 28 Sprites (sprites
-`redlight1/2.spr`, `shiplightred/white.spr`, Flags 1, white, Alpha 1, scales .15,
-.25 and 1) and one FastApproxArea. All 28 now create, bind their manifests and
+Retail 05_CDMB contains 28 Sprites (sprites `redlight1/2.spr`,
+`shiplightred/white.spr`, Flags 1, white, Alpha 1, scales .15, .25 and 1) and one
+FastApproxArea. All 28 now create, bind their manifests and
 prepare quads; FastApproxArea is editor-only. Tests: `builtin_sprite.rules`,
 `rejects`, `scene` and `editor_only` (synthetic), `builtin_sprite.private`
-(retail 05_CDMB, `BLOOD2_TEST_DATA_DIR`) and `builtin_sprite.demo` (Demo_02,
-`BLOOD2_DEMO_DATA_DIR`), each repeated across a world unload/reload.
-See the [source ledger](../implementation/sources/demo_world_sources.json).
+(retail 05_CDMB, `BLOOD2_TEST_DATA_DIR`), repeated across a world unload/reload.
+See the [source ledger](../implementation/sources/cdmb_world_sources.json).

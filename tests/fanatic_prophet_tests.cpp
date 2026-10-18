@@ -20,7 +20,7 @@ using namespace OpenBlood2;
     } while (false)
 namespace
 {
-    bool setup(GameSession& g, const char* root = "", bool demo = false)
+    bool setup(GameSession& g, const char* root = "")
     {
         CHECK(g.initialize());
         auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
@@ -33,13 +33,12 @@ namespace
         {
             Config cfg;
             cfg.data_dir = root;
-            cfg.demo = demo;
             CHECK(g.resources.mount_game(cfg, e));
         }
         return true;
     }
     // Labelled synthetic actor: the real class code with injected model/table data;
-    // the private cases cover actual initialization from the retail/demo resources.
+    // the private cases cover actual initialization from the retail resources.
     template <class T> T* actor(GameSession& g, const char* name, DVector pos = {0, 10, 0})
     {
         static const ClassInfo type{name,
@@ -252,10 +251,10 @@ namespace
                 std::cerr << d << '\n';
         return g.server.IsObjectAlive(h) ? dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h)) : nullptr;
     }
-    bool catalog(const char* root, bool demo)
+    bool catalog(const char* root)
     {
         GameSession g;
-        CHECK(setup(g, root, demo));
+        CHECK(setup(g, root));
         for (int difficulty : {0, 1, 2})
         {
             g.server.set_game_settings(difficulty, 0);
@@ -284,14 +283,11 @@ namespace
             for (unsigned i = 0; i < 10; ++i)
                 melee |= p->m_InventoryMgr.GetWeapon(i) && p->m_InventoryMgr.GetWeapon(i)->data.m_nType == WEAP_MELEE;
             CHECK(melee && p->m_InventoryMgr.CurrentWeapon()->data.m_nType == WEAP_BERETTA);
-            // Proximity_Bombs 25: _DEMO refuses the inventory weapon; retail keeps it unused in slot 10.
-            // Retail AddAmmo caps proximity bombs at 10 for every strength.
-            CHECK(demo ? !f->m_InventoryMgr.GetWeapon(10)
-                       : f->m_InventoryMgr.GetWeapon(10) && f->m_InventoryMgr.GetAmmoCount(AMMO_PROXIMITYBOMB) == 10);
+            // Proximity_Bombs 25: kept unused in slot 10; AddAmmo caps proximity bombs at 10 for every strength.
+            CHECK(f->m_InventoryMgr.GetWeapon(10) && f->m_InventoryMgr.GetAmmoCount(AMMO_PROXIMITYBOMB) == 10);
             CHECK(!p->m_InventoryMgr.GetWeapon(10));
-            std::cout << (demo ? "demo" : "retail") << " difficulty=" << difficulty
-                      << " Fanatic hp=" << f->m_damage.m_fHitPoints << " Prophet hp=" << p->m_damage.m_fHitPoints
-                      << " armor=" << p->m_damage.m_fArmorPoints << '\n';
+            std::cout << "retail difficulty=" << difficulty << " Fanatic hp=" << f->m_damage.m_fHitPoints
+                      << " Prophet hp=" << p->m_damage.m_fHitPoints << " armor=" << p->m_damage.m_fArmorPoints << '\n';
             for (auto* a : {f, f2, p})
                 CHECK(g.objects.remove(a->m_hObject));
             CHECK(g.objects.finish_frame());
@@ -373,16 +369,15 @@ namespace
         CHECK(g.unload_world());
         return true;
     }
-    bool world(const char* root, bool demo)
+    bool world(const char* root)
     {
         GameSession g;
         CHECK(g.initialize());
         Config c;
         c.data_dir = root;
-        c.demo = demo;
         std::string e;
         CHECK(g.resources.mount_game(c, e));
-        CHECK(g.request_world(demo ? "Demo_02" : "05_cdmb", e));
+        CHECK(g.request_world("05_cdmb", e));
         unsigned fanatics = 0, prophets = 0;
         HOBJECT spawner = nullptr;
         for (std::size_t i = 0; i < g.entries.size(); ++i)
@@ -413,7 +408,7 @@ namespace
         CHECK(report.request == "Fanatic" && report.child && report.outcome == "Created");
         CHECK(dynamic_cast<Fanatic*>(g.server.HandleToObject(report.child))->RuntimeReady());
         CHECK(g.run_world(e));
-        std::cout << (demo ? "Demo_02" : "05_CDMB") << ": " << fanatics << " Fanatics, " << prophets
+        std::cout << "05_CDMB: " << fanatics << " Fanatics, " << prophets
                   << " Prophet, spawned Fanatic, run_world passed\n";
         CHECK(g.unload_world());
         return true;
@@ -430,12 +425,10 @@ int main(int argc, char** argv)
                                       : mode == "howitzer" && howitzer())
                    ? 0
                    : 1;
-    return (mode == "catalog"        ? catalog(argv[2], false)
-            : mode == "catalog_demo" ? catalog(argv[2], true)
-            : mode == "kamikaze"     ? kamikaze(argv[2])
-            : mode == "actions"      ? actions(argv[2])
-            : mode == "world"        ? world(argv[2], false)
-                                     : mode == "world_demo" && world(argv[2], true))
+    return (mode == "catalog"    ? catalog(argv[2])
+            : mode == "kamikaze" ? kamikaze(argv[2])
+            : mode == "actions"  ? actions(argv[2])
+                                 : mode == "world" && world(argv[2]))
                ? 0
                : 1;
 }

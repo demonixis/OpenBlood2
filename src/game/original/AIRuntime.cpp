@@ -18,8 +18,8 @@ namespace
         bool supported;
     };
     // Original AI_Mgr::WeaponStrToInt order (AI_Mgr.cpp:377-663). The _ADD_ON
-    // COMBAT/FLAYER/ROCK/NIGHTMARE_FIREBALL branches are absent: the shipped demo
-    // and patched retail object.lto contain no FLAYER literal (only BLOOD2NM does).
+    // COMBAT/FLAYER/ROCK/NIGHTMARE_FIREBALL branches are absent: the patched retail
+    // object.lto contains no FLAYER literal (only BLOOD2NM does).
     constexpr WeaponPrefix weapon_prefixes[]{{"BERET", WEAP_BERETTA, true},
                                              {"SHOTG", 0, false}, // "SHOTGU" compared on 5 bytes.
                                              {"SNIPE", 0, false},
@@ -344,14 +344,14 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         if (m_InventoryMgr.AddAmmo(ammo[i], npc_ammo[i]) == InventoryResult::Invalid)
             return RuntimeFailure("NPC ammunition initialization failed");
     m_InventoryMgr.AddAmmo(9, 200);
-    // Source AddInventoryWeapon(INV_PROXIMITY, (int)m_fProxBombs). _DEMO refuses it;
-    // retail stores a slot-10 inventory weapon the AI never selects (FindBestWeapon
+    // Source AddInventoryWeapon(INV_PROXIMITY, (int)m_fProxBombs): a slot-10
+    // inventory weapon the AI never selects (FindBestWeapon
     // scans slots 0..9 and MC_LayProximity has no caller). The source also makes the
     // call with a zero count; that empty weapon is omitted here.
     if (npc_ammo[9] != 0)
     {
         const auto result = m_InventoryMgr.AddInventoryWeapon(7, static_cast<DBYTE>(static_cast<int>(npc_ammo[9])));
-        if (result != InventoryResult::Ok && result != InventoryResult::NotAvailable)
+        if (result != InventoryResult::Ok)
             return RuntimeFailure("NPC proximity inventory initialization failed");
     }
     const float difficulty = GetGameDifficulty() == 0 ? .25f : GetGameDifficulty() == 2 ? 1.5f : 1;

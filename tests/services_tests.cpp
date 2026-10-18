@@ -659,16 +659,15 @@ namespace
     }
     // GameStartPoint 05_egress lies 112 units above the endelevator floor; the
     // standing box crosses the car ceiling until MoveObjectToGround lowers it.
-    bool elevator_entry(const char* root, bool demo)
+    bool elevator_entry(const char* root)
     {
         GameSession game;
         CHECK(game.initialize());
         Config config;
         config.data_dir = path_from_utf8(root);
-        config.demo = demo;
         std::string error;
         CHECK(game.resources.mount_game(config, error));
-        CHECK(game.request_world(demo ? "Demo_02" : "05_cdmb", error));
+        CHECK(game.request_world("05_cdmb", error));
         if (!game.enter_player(error))
         {
             std::cerr << error << '\n';
@@ -677,8 +676,8 @@ namespace
         const auto* player = game.objects.get(game.client_shell.player);
         CHECK(player && player->life == Life::Alive && player->state.m_Pos.x == 0 && player->state.m_Pos.z == -1520);
         const float feet = player->state.m_Pos.y - player->dimensions.y;
-        std::cout << (demo ? "Demo_02" : "05_CDMB") << " entry at " << player->state.m_Pos.y << ", feet " << feet
-                  << ", departed faces " << player->start_departures << '\n';
+        std::cout << "05_CDMB entry at " << player->state.m_Pos.y << ", feet " << feet << ", departed faces "
+                  << player->start_departures << '\n';
         CHECK(player->start_departures > 0 && std::abs(feet + 5568) < 5);
         CHECK(game.leave_player() && game.unload_world());
         return true;
@@ -799,9 +798,7 @@ int main(int argc, char** argv)
     else if (name == "original_services")
         ok = original_services();
     else if (name == "elevator_entry" && argc == 3)
-        ok = elevator_entry(argv[2], false);
-    else if (name == "elevator_entry_demo" && argc == 3)
-        ok = elevator_entry(argv[2], true);
+        ok = elevator_entry(argv[2]);
     else if (name == "private" && argc == 3)
         ok = private_services(argv[2]);
     callback = {};

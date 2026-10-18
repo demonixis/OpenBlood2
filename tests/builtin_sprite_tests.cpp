@@ -158,18 +158,17 @@ namespace
         CHECK(g.initialize() && !g.objects.find_class("FastApproxArea"));
         return true;
     }
-    bool private_world(const char* path, bool demo)
+    bool private_world(const char* path)
     {
         GameSession g;
         CHECK(g.initialize());
         Config c;
         c.data_dir = path;
-        c.demo = demo;
         std::string e;
         CHECK(g.resources.mount_game(c, e));
         for (int cycle = 0; cycle < 2; ++cycle)
         {
-            CHECK(g.request_world(demo ? "Demo_02" : "05_cdmb", e));
+            CHECK(g.request_world("05_cdmb", e));
             unsigned sprites = 0, approx = 0;
             for (std::size_t i = 0; i < g.entries.size(); ++i)
             {
@@ -199,8 +198,7 @@ namespace
                     CHECK(entry.error.empty());
                     prepared += entry.range != UINT32_MAX;
                 }
-            std::cout << (demo ? "Demo_02" : "05_CDMB") << " built-in sprites: " << sprites << " created, " << prepared
-                      << " quads prepared\n";
+            std::cout << "05_CDMB built-in sprites: " << sprites << " created, " << prepared << " quads prepared\n";
             CHECK(prepared == 28);
             CHECK(g.unload_world());
         }
@@ -219,8 +217,7 @@ int main(int argc, char** argv)
     return (mode == "rules"     ? rules(argv[2])
             : mode == "rejects" ? rejects(argv[2])
             : mode == "scene"   ? scene(argv[2])
-            : mode == "private" ? private_world(argv[2], false)
-                                : mode == "demo" && private_world(argv[2], true))
+                                : mode == "private" && private_world(argv[2]))
                ? 0
                : 1;
 }

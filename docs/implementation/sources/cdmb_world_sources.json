@@ -1,7 +1,7 @@
 {
   "date": "2026-10-18",
   "baseline_commit": "cf5281b4faeb751a4f8f438ee7fa05700b3f5b1a",
-  "scope": "Demo_02 / retail 05_CDMB world initialization and entry: engine Sprite and FastApproxArea, ObjectDLL Spawner, Fanatic, Prophet, CHowitzerShell and SniperRiflePU, FindHealth, crouch fire and forward/backward rolls; MoveObject departure from initial overlap",
+  "scope": "Retail 05_CDMB world initialization and entry: engine Sprite and FastApproxArea, ObjectDLL Spawner, Fanatic, Prophet, CHowitzerShell and SniperRiflePU, FindHealth, crouch fire and forward/backward rolls; MoveObject departure from initial overlap",
   "source_files": [
     {
       "path": "sources/lithtech/Blood2/AppHeaders/engineobjects.c",
@@ -46,7 +46,7 @@
     {
       "path": "sources/lithtech/Blood2/ObjectDLL/InventoryMgr.cpp",
       "sha256": "aab29291e988ac7c3e1424f41076b5c0adc6243cd60198ea2cc6381d402d0e53",
-      "use": "WEAP_COMBATSHOTGUN construction under _ADD_ON; _DEMO AddInventoryWeapon CHWEAP_NOTAVAIL; ProximityBomb ammo cap 10; FindBestWeapon scans slots 0..9."
+      "use": "WEAP_COMBATSHOTGUN construction under _ADD_ON; ProximityBomb ammo cap 10; FindBestWeapon scans slots 0..9."
     },
     {
       "path": "sources/lithtech/Blood2/ObjectDLL/AI_Mgr.h",
@@ -86,19 +86,9 @@
   ],
   "retail_evidence": [
     {
-      "file": "B2Demo.rez worlds/demo_02.dat (installed 1998 demo)",
-      "sha256": "244f41bbac29f6a5514b0fb6d0813bff31c655938bed0b876041699db1b9c727",
-      "purpose": "28 Sprites, 2 Spawners (Fanatic, count -1, inactive), 1 FastApproxArea, 4 Fanatics (SUBMA/COMBAT and SUBMA-only, Proximity_Bombs 25), 1 Prophet (ASSAULTRIFLE x5, PASSIVE); GameStartPoint 05_egress."
-    },
-    {
       "file": "BLOOD2.REZ worlds/05_cdmb.dat (retail)",
       "sha256": "c248c96cc6d568304dd0db2c9fcbb5a6926457c666769c7d67a9ae98e20689be",
-      "purpose": "Retail counterpart of Demo_02 with the same Sprite/Spawner/FastApproxArea/Fanatic/Prophet counts plus SniperRiflePU."
-    },
-    {
-      "file": "B2Demo.rez object.lto (demo server DLL)",
-      "sha256": "81d84b42a7ae36924e15af1b0ab0e655bed439de4fc4f7d6d4718f4fa531bf93",
-      "purpose": "String pool of WeaponStrToInt has no COMBAT or FLAYER prefix; COMBAT occurs only as the Fanatic AIWeapon2 default. Inspected as data; never executed."
+      "purpose": "28 Sprites, 2 Spawners (Fanatic, count -1, inactive), 1 FastApproxArea, 4 Fanatics, 1 Prophet and a SniperRiflePU; GameStartPoint 05_egress."
     },
     {
       "file": "BLOOD2.REZ object.lto (retail base server DLL)",
@@ -116,9 +106,9 @@
       "purpose": "SniperRiflePU0 (-864,432,-4944) with half-length 32.9 through a wall: placement and gravity move parallel to the overlapped face."
     },
     {
-      "file": "All retail and demo DAT v56 worlds",
+      "file": "All retail DAT v56 worlds",
       "sha256": "n/a (aggregate)",
-      "purpose": "338,275 polygons: winding agrees with the plane normal for every non-degenerate polygon (one degenerate)."
+      "purpose": "Winding agrees with the plane normal for every non-degenerate polygon."
     }
   ],
   "adaptations": [
@@ -128,8 +118,8 @@
     "Spawner strings are value-owned; velocity draws use one unit draw per axis with the linear interval formula.",
     "The rift explosion request is counted and reported as unavailable; the spawn and sound still follow the source order.",
     "Spawner velocity, sound radius and respawn rate are bounded; restore creation rejects.",
-    "WeaponStrToInt's unmatched-name Beretta default applies to both editions; matched families that are not integrated still reject.",
-    "The zero-count proximity AddInventoryWeapon call is omitted; nonzero counts follow the source (demo refuses, retail slot 10 capped at 10).",
+    "WeaponStrToInt's unmatched-name Beretta default applies; matched families that are not integrated still reject.",
+    "The zero-count proximity AddInventoryWeapon call is omitted; nonzero counts follow the source (slot 10, capped at 10).",
     "FindHealth reproduces the always-empty powerup search; its unreachable path commands fail explicitly.",
     "Base Escape_Hide/Special handlers are no-ops for the Prophet and Fanatic Special2..8, as the original empty virtuals.",
     "A howitzer shell whose shooter is already pending removal unlinks it and attributes the blast to no one.",

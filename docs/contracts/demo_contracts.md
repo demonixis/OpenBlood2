@@ -81,25 +81,8 @@ and Keyboard stay disabled as in retail.
 
 ## Still unavailable
 
-Both demo worlds are DAT v56, but the world initialization gate rejects them:
-
-`Demo_02` ("Movin' On Up", the demo cut of retail `05_CDMB`) now passes
-`--start-game --demo --world Demo_02`, as does retail `--start-game --world 05_CDMB`:
-
-- The engine [Sprite ×28 and FastApproxArea](builtin_sprite_contracts.md), the two
-  [Spawners](spawner_contracts.md) and the [Fanatic ×4 and Prophet](fanatic_prophet_contracts.md)
-  initialize. The authored `COMBAT` weapons resolve to the original WeaponStrToInt
-  default Beretta (no `_ADD_ON` branch in the demo or patched retail `object.lto`), and
-  `_DEMO` `AddInventoryWeapon` refuses the authored `Proximity_Bombs` 25.
-- Player entry at GameStartPoint `05_egress` (0, -5456, -1520) starts with the
-  standing box through the `endelevator` ceiling (polygon 78). A solid MoveObject may
-  now leave a face it overlaps, so the original MoveObjectToGround lands the player on
-  the car floor; see [collision traversal](collision_traversal_contracts.md).
-
-`Demo_01` ("Center for Di…") is still rejected: 15 unsupported classes (TripLaser ×7,
-SoulDrudge ×4, Container, ShikariAI, StealthPU, VoodooDollPU) and 28 failed entries
-(24 CGib reject their `DamageTriggerMessage` property, three CDestructableModels fail,
-and one Fanatic is authored with the non-integrated `TESLA` weapon).
+Both demo worlds are DAT v56. Playing them is not a goal: original classes are
+ported for the retail worlds, and no demo-specific world support is kept.
 
 Several source `_DEMO` features are not connected:
 
@@ -113,7 +96,4 @@ splash input and label validation. `menus.demo` composes every reachable page, t
 three splash screens and both ambiences from the real demo. `config.demo` covers
 parsing, smoke rejection, edition inspection and mismatch hints. `world.resource_mount` covers edition-exclusive mounting.
 `remote.demo` covers weapon/bomb/detonate rules and pickup removal on a labelled
-synthetic index. `builtin_sprite.demo`, `spawner.demo`, `services.elevator_entry_demo`
-and `fanatic_prophet.catalog_demo`/`world_demo` load the real demo when
-`BLOOD2_DEMO_DATA_DIR` is set; `world_demo` runs the startup check. No test plays
-through the demo worlds.
+synthetic index. No test plays the real demo worlds.
