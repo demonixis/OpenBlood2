@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "5c825dc1f8897e44ea1dc0d1cca12fb4bdad1acf",
+  "status": "M2 incomplete; actual explicit-voice controls, no timed channel delivery or live MUSIC",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/MSynth25.dll",
+      "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+      "rvas": {
+        "controller_dispatch": "0x3ec4..0x43ed",
+        "pitch_default": "0xa330..0xa354",
+        "pitch_value": "0xa360..0xa390"
+      },
+      "use": "Isolated original control decoding and default-range arithmetic; queue insertion intercepted; no PCM or OS execution"
+    },
+    {
+      "url": "https://midi.org/dls-level-1",
+      "pdf_sha256": "d58664f5f25ea3313e504d2b310464b32453dc9a2fb5e16ad0df105675b663b0",
+      "use": "Existing DLS volume/expression/pan equations, not copied text, tables or implementation"
+    }
+  ],
+  "replacement_code": [
+    "src/engine/dls_sampler.cpp: explicit live-voice updates, nominal gain, pitch bounds and original bend arithmetic",
+    "src/app/inspector_world_sounds.cpp: actual voice controls and refusal state"
+  ],
+  "deliberate_limits": [
+    "Explicit checked destination voice; low MIDI channel nibble is not a routing implementation",
+    "CC7/10/11 and default 200-cent pitch only; other control messages fail",
+    "Raw pitch-byte extension preserved; CC values above 127 reject unsafe table inputs",
+    "Existing replacement gain/pan law, not retail PCM or table quantization",
+    "Current audio boundary, not a timed event queue or playlist",
+    "No commercial assets, dependencies or reference source modifications"
+  ],
+  "original_probe": {
+    "binary": "MSynth25.dll",
+    "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+    "unicorn": "2.1.4",
+    "decode_cases": 645,
+    "pitch_cases": 32768,
+    "pitch_fnv64": 10930475445258237893,
+    "fnv64": 13983738688242496418,
+    "decisions_sha256": "a6d7e0d61c5774764656402d8fa4c8ff8eda73bc58fe2886e3fecec0e85f9847",
+    "scope": "Original CC7/10/11 and pitch-byte decoding with queue insertion intercepted; original default-range signed floor pitch arithmetic. No timing-list scheduling, PCM, OS calls or native DLL execution."
+  },
+  "target_sha256": {
+    "src/engine/dls_sampler.h": "ea653286cb50c9efb5dd939a8f7bf0159c2728b0d32c5f123b76cbf98153d2e0",
+    "src/engine/dls_sampler.cpp": "a411edc310208ee4afbb88651d1693fc8b59c22b2b2ca57afd018a62568d2af9",
+    "src/app/inspector_world_sounds.cpp": "d34456ccb0908c33362f661b223a4aab942a1122ef2ccdcd6f14924d15aff12d",
+    "src/app/world_sound_smoke.cpp": "9100f7db64861e6bc8c54b91ce317bf6cc69caaa42fdfe8269390c03e0845adf",
+    "tests/dls_sampler_tests.cpp": "36247af9caabaaaee06b2b07e5273483187b2c1663324e71934ed2f5cfc3fb93",
+    "tests/CMakeLists.txt": "6896c9fb0325d962a8172236d15bc33fbe68c23e77a511c6053f67757c8de6bf"
+  }
+}

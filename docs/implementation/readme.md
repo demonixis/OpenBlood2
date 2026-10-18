@@ -60,3 +60,5 @@ the original log or patch.
 - [IMA style curve events](../../../Documentation/Implementation/m2_music_curve_events.md): original expansion checked against 1296 generated cases and 47 installed points; MUSIC remains unavailable.
 
 - [IMA ordered grid dispatch](../../../Documentation/Implementation/m2_music_grid_dispatch.md): 9198 grid visits checked against original filtering and emission order; MUSIC remains unavailable.
+
+- [DLS live voice controls](../../../Documentation/Implementation/m2_music_live_controls.md): actual sample-voice changes without restarting clocks; original MUSIC transport remains incomplete.

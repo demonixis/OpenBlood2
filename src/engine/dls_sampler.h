@@ -12,8 +12,15 @@ namespace OpenBlood2
     struct DlsControllers
     {
         unsigned volume = 100, expression = 127, pan = 64;
+        unsigned pitch_bend = 8192; // Original raw-byte decoder admits 0..32767; normal MIDI uses 0..16383.
         bool operator==(const DlsControllers&) const = default;
     };
+    // Installed synth default range: 200 cents, signed floor division. Requires bend <= 32767.
+    int dls_pitch_bend_cents(unsigned bend);
+    // CC7/10/11 and pitch bend only. Explicit caller-selected voice/channel; low status nibble is not routing.
+    // Failure preserves state. Raw bend bytes are not masked to seven bits.
+    bool apply_dls_controller(DlsControllers&, std::uint8_t status, std::uint8_t first, std::uint8_t second,
+                              std::string& error);
     struct DlsMidiChannel
     {
         unsigned bank_msb = 0, bank_lsb = 0, program = 0;
@@ -36,6 +43,7 @@ namespace OpenBlood2
         DlsControllers controllers;
         std::optional<DlsMidiChannel> channel; // Present only for routed notes; immutable note-on snapshot.
         double cursor = 0, base_step = 0, gain = 0, left = 0, right = 0;
+        double nominal_gain = 0, bend_step = 1, pitch_extent = 0; // Uncontrolled gain and pitch budget.
         double pan = 0;               // Constant offset in 0.1-percent units, before CC10 and clamping.
         unsigned pan_destination = 0; // Last constant-pan writer: 2 (integer legacy), 4 (16.16 DLS), or none.
         bool legacy_pan = false;      // The selected graph contained a validated legacy pan record.
@@ -52,6 +60,8 @@ namespace OpenBlood2
                            double gate_seconds, double gain, std::string& error, DlsControllers = {});
         std::uint64_t play_channel(std::shared_ptr<const DlsBank>, const DlsMidiChannel&, unsigned key,
                                    unsigned velocity, double gate_seconds, double gain, std::string& error);
+        // Immediate update at the current audio sample boundary. Does not reset any voice clock or envelope.
+        bool set_controllers(std::uint64_t id, DlsControllers, std::string& error);
         bool release(std::uint64_t id);
         // Adds to an interleaved stereo prefix. All frames advance, including unrendered ones.
         bool advance(std::uint64_t frames, std::span<float> stereo);
@@ -61,6 +71,8 @@ namespace OpenBlood2
             return voices_;
         }
         std::uint64_t started = 0, completed = 0, rejected = 0;
+        std::uint64_t controls_updated = 0, controls_rejected = 0;
+        std::string last_control_error;
         std::string last_error;
 
       private:

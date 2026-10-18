@@ -143,11 +143,20 @@ namespace OpenBlood2
                 error = "DLS articulation exceeds the supported level-1 parameter range";
                 return false;
             }
-            // DLS equal-power pan: CC10/127 plus the constant offset in 0.1 percent units.
-            const double position = std::clamp(voice.controllers.pan / 127.0 + voice.pan / 1000, 0.0, 1.0);
-            voice.left = std::sqrt(1 - position);
-            voice.right = std::sqrt(position);
             return true;
+        }
+        bool valid_controllers(DlsControllers c)
+        {
+            return c.volume <= 127 && c.expression <= 127 && c.pan <= 127 && c.pitch_bend <= 32767;
+        }
+        void set_voice_controllers(DlsVoice& v, DlsControllers c)
+        {
+            v.controllers = c;
+            v.gain = v.nominal_gain * std::pow(c.volume / 127.0, 2) * std::pow(c.expression / 127.0, 2);
+            const double position = std::clamp(c.pan / 127.0 + v.pan / 1000, 0.0, 1.0);
+            v.left = std::sqrt(1 - position);
+            v.right = std::sqrt(position);
+            v.bend_step = std::exp2(dls_pitch_bend_cents(c.pitch_bend) / 1200.0);
         }
         double held_level(const DlsEnvelope& e, double time, bool amplitude)
         {
@@ -186,6 +195,40 @@ namespace OpenBlood2
             return v.frames > 0 && v.amplitude.sustain == 0 && time >= v.amplitude.attack + v.amplitude.decay;
         }
     } // namespace
+    int dls_pitch_bend_cents(unsigned bend)
+    {
+        const int scaled = (int(bend) - 8192) * 200;
+        return scaled >= 0 ? scaled / 8192 : -((-scaled + 8191) / 8192);
+    }
+    bool apply_dls_controller(DlsControllers& state, std::uint8_t status, std::uint8_t first, std::uint8_t second,
+                              std::string& error)
+    {
+        error.clear();
+        auto next = state;
+        if ((status & 0xf0) == 0xe0)
+            next.pitch_bend = (unsigned(second) << 7) | first;
+        else if ((status & 0xf0) == 0xb0 && second <= 127 && (first == 7 || first == 10 || first == 11))
+        {
+            if (first == 7)
+                next.volume = second;
+            else if (first == 10)
+                next.pan = second;
+            else
+                next.expression = second;
+        }
+        else
+        {
+            error = "Unsupported DLS live controller or out-of-range data";
+            return false;
+        }
+        if (!valid_controllers(next))
+        {
+            error = "Invalid DLS controller state";
+            return false;
+        }
+        state = next;
+        return true;
+    }
     std::uint32_t dls_instrument_patch(const DlsInstrument& instrument)
     {
         return instrument.program | ((instrument.bank & 0x7f) << 7) | ((instrument.bank & 0x7f00) << 6) |
@@ -267,7 +310,7 @@ namespace OpenBlood2
         };
         if (!bank || instrument >= bank->instruments.size() || key > 127 || velocity == 0 || velocity > 127 ||
             !std::isfinite(gate_seconds) || gate_seconds <= 0 || gate_seconds > 10 || !std::isfinite(gain) ||
-            gain < 0 || gain > 1 || controllers.volume > 127 || controllers.expression > 127 || controllers.pan > 127)
+            gain < 0 || gain > 1 || !valid_controllers(controllers))
             return fail("Invalid DLS diagnostic note request");
         if (voices_.size() >= max_voices || next_id_ == std::numeric_limits<std::uint64_t>::max())
             return fail("DLS voice/identity limit reached");
@@ -306,14 +349,15 @@ namespace OpenBlood2
         if (!configure(region.articulation.present ? region.articulation : inst.articulation, v, error))
             return fail(error);
         const double cents = (double(key) - sample.unity_note) * 100 + sample.fine_tune;
-        if (std::abs(cents) + std::abs(v.lfo_pitch) + std::abs(v.envelope_pitch) > 9600)
+        v.pitch_extent = std::abs(cents) + std::abs(v.lfo_pitch) + std::abs(v.envelope_pitch);
+        if (v.pitch_extent + std::abs(dls_pitch_bend_cents(controllers.pitch_bend)) > 9600)
             return fail("DLS pitch exceeds the bounded sampler range");
         v.base_step = double(wave.rate) / rate * std::exp2(cents / 1200);
         // DLS 1.1 errata: signed centibel values are gain, capped at unity.
         const double sample_gain =
             sample.attenuation == zero_time ? 0 : std::pow(10.0, std::min(0.0, sample.attenuation / fixed) / 200);
-        v.gain = gain * sample_gain * std::pow(velocity / 127.0, 2) * std::pow(controllers.volume / 127.0, 2) *
-                 std::pow(controllers.expression / 127.0, 2);
+        v.nominal_gain = gain * sample_gain * std::pow(velocity / 127.0, 2);
+        set_voice_controllers(v, controllers);
         v.gate = std::max<std::uint64_t>(1, std::uint64_t(std::llround(gate_seconds * rate)));
         v.bank = std::move(bank);
         v.id = next_id_++;
@@ -321,6 +365,22 @@ namespace OpenBlood2
         ++started;
         last_error.clear();
         return voices_.back().id;
+    }
+    bool DlsSampler::set_controllers(std::uint64_t id, DlsControllers controllers, std::string& error)
+    {
+        error.clear();
+        const auto it = std::find_if(voices_.begin(), voices_.end(), [&](const auto& v) { return v.id == id; });
+        if (!valid_controllers(controllers) || it == voices_.end() ||
+            it->pitch_extent + std::abs(dls_pitch_bend_cents(controllers.pitch_bend)) > 9600)
+        {
+            error = last_control_error = "Invalid/stale DLS voice controls or pitch budget exceeded";
+            ++controls_rejected;
+            return false;
+        }
+        set_voice_controllers(*it, controllers);
+        ++controls_updated;
+        last_control_error.clear();
+        return true;
     }
     bool DlsSampler::release(std::uint64_t id)
     {
@@ -365,7 +425,7 @@ namespace OpenBlood2
                 }
                 const double pitch =
                     v.envelope_pitch * level(v.pitch, time, double(v.gate) / rate, false) + v.lfo_pitch * lfo;
-                v.cursor += v.base_step * std::exp2(pitch / 1200);
+                v.cursor += v.base_step * v.bend_step * std::exp2(pitch / 1200);
                 if (r.settings.loop)
                 {
                     const auto loop = *r.settings.loop;
@@ -392,6 +452,8 @@ namespace OpenBlood2
     {
         voices_.clear();
         started = completed = rejected = 0;
+        controls_updated = controls_rejected = 0;
+        last_control_error.clear();
         last_error.clear();
     }
 } // namespace OpenBlood2

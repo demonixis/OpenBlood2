@@ -56,15 +56,17 @@ gain path ramps its depth over the first cycle to avoid a start-bias step.
 
 Direct diagnostic notes default to volume 100, expression 127 and pan 64.
 [Band-routed notes](music_routing_contracts.md) now capture supplied CC7/CC11/CC10
-values; modulation and pitch bend remain unavailable. Velocity, volume and expression use the
+values. [Explicit live controls](music_live_control_contracts.md) add volume, expression,
+pan and original default-range pitch bend; modulation remains unavailable. Velocity, volume and expression use the
 squared gain law; stereo pan uses the DLS square-root equal-power law. Constant
 pan adds to `CC10/127` (default `64/127`), so the default is slightly right of the exact mathematical
-center. No dynamic MIDI controller or same-key exclusivity behavior is claimed.
+center. There is no timed MIDI controller queue or same-key exclusivity behavior.
 The UI's additional 20% gain is an audition setting, not a game music-volume rule.
 
 ## Ownership, work bounds and inspection
 
-The mixer owns up to 32 voices. Every voice retains the immutable bank until its
+Checked live updates retain voice clocks and gates; their current controller values
+are separate from the original routed note-on snapshot. The mixer owns up to 32 voices. Every voice retains the immutable bank until its
 sample/envelope finishes or the world is cleared. IDs are never reused within a
 sampler, including after clear; they are local to that mixer, not engine handles.
 A failure allocates no voice and changes no existing note. Note-off only shortens

@@ -453,10 +453,111 @@ namespace
                      "and lifetime verified\n";
         return true;
     }
-    bool private_data(const std::filesystem::path& root)
+    bool live_controls()
     {
         std::string error;
-        unsigned accepted = 0, audible = 0, legacy = 0;
+        auto bank = fixture();
+        bank->waves[0].samples.assign(10000, 1);
+        bank->instruments[0].regions[0].settings.loop = DlsLoop{0, 10000};
+        connection(*bank, 0, 0x206, -1200); // Half-second attack; controller edits must not restart it.
+        connection(*bank, 0, 0x209, -1200);
+        DlsSampler sampler;
+        DlsMidiChannel channel;
+        channel.controllers = {127, 127, 0};
+        const auto id = sampler.play_channel(bank, channel, 60, 127, 1, 1, error);
+        const auto other = sampler.play(bank, 0, 60, 127, 1, .1, error);
+        CHECK(id && other && sampler.advance(12000, {}));
+        const auto before = sampler.voices()[0];
+        auto control = channel.controllers;
+        CHECK(apply_dls_controller(control, 0xb4, 7, 0, error));
+        CHECK(apply_dls_controller(control, 0xe4, 0, 0, error));
+        CHECK(sampler.set_controllers(id, control, error));
+        CHECK(sampler.voices()[0].frames == before.frames && sampler.voices()[0].cursor == before.cursor &&
+              sampler.voices()[0].gate == before.gate &&
+              sampler.voices()[0].channel->controllers == channel.controllers);
+        CHECK(sampler.voices()[0].gain == 0 && sampler.voices()[1].controllers == DlsControllers{});
+        CHECK(sampler.release(other) && sampler.advance(24001, {}));
+        CHECK(sampler.voices().size() == 1);
+        std::vector<float> out(2);
+        CHECK(sampler.advance(1, out) && out == std::vector<float>(2));
+        CHECK(apply_dls_controller(control, 0xbf, 7, 127, error) &&
+              apply_dls_controller(control, 0xbf, 11, 64, error) &&
+              apply_dls_controller(control, 0xbf, 10, 127, error) && apply_dls_controller(control, 0xef, 0, 64, error));
+        CHECK(sampler.set_controllers(id, control, error));
+        CHECK(sampler.advance(1, out) && out[0] == 0 && near(out[1], std::pow(64.0 / 127, 2)));
+        const auto cursor = sampler.voices()[0].cursor;
+        CHECK(apply_dls_controller(control, 0xe0, 127, 127, error));
+        CHECK(sampler.set_controllers(id, control, error) && sampler.advance(1, {}));
+        CHECK(near(sampler.voices()[0].cursor - cursor, std::exp2(199.0 / 1200)));
+        // Restore gain from its immutable base, including after repeated silent updates.
+        for (unsigned i = 0; i < 100; ++i)
+        {
+            CHECK(sampler.set_controllers(id, {0, 0, 0}, error));
+            CHECK(sampler.set_controllers(id, {127, 127, 0}, error));
+        }
+        CHECK(sampler.voices()[0].gain == 1 && sampler.voices()[0].bend_step == 1);
+        auto saved = sampler.voices()[0];
+        for (auto bad : {DlsControllers{128, 127, 0}, DlsControllers{127, 128, 0}, DlsControllers{127, 127, 128},
+                         DlsControllers{127, 127, 0, 32768}})
+            CHECK(!sampler.set_controllers(id, bad, error));
+        CHECK(!sampler.set_controllers(0, {}, error) && sampler.controls_rejected == 5 && sampler.rejected == 0);
+        CHECK(sampler.voices()[0].controllers == saved.controllers && sampler.voices()[0].frames == saved.frames &&
+              sampler.voices()[0].cursor == saved.cursor && sampler.voices()[0].gain == saved.gain);
+        for (auto message :
+             {std::array<unsigned, 3>{0xb0, 1, 127}, {0xb0, 7, 128}, {0xd0, 0, 20}, {0xa0, 60, 50}, {0x90, 60, 100}})
+        {
+            const auto prior = control;
+            CHECK(!apply_dls_controller(control, message[0], message[1], message[2], error) && control == prior);
+        }
+        // Original raw byte combination, not seven-bit masking or a fabricated center.
+        CHECK(apply_dls_controller(control, 0xe0, 255, 255, error) && control.pitch_bend == 32767);
+        CHECK(sampler.set_controllers(id, control, error) && dls_pitch_bend_cents(control.pitch_bend) == 599);
+        CHECK(sampler.release(id));
+        const auto release_frame = sampler.voices()[0].gate;
+        CHECK(sampler.advance(2400, {}) && sampler.set_controllers(id, {127, 127, 0}, error));
+        CHECK(sampler.voices()[0].gate == release_frame); // Updating release never reopens a gate.
+        CHECK(sampler.advance(24000, {}) && sampler.voices().empty());
+        CHECK(!sampler.set_controllers(id, {}, error));
+        const auto next = sampler.play(bank, 0, 60, 100, 1, 1, error);
+        CHECK(next > other && !sampler.set_controllers(id, {}, error));
+        sampler.clear();
+        CHECK(!sampler.controls_updated && !sampler.controls_rejected && sampler.last_control_error.empty());
+        // A valid controller can exceed this particular voice's total pitch budget.
+        auto extreme = fixture();
+        extreme->instruments[0].regions[0].settings.unity_note = 0;
+        CHECK(sampler.play(extreme, 0, 95, 100, 1, 1, error));
+        const auto edge = sampler.voices()[0].id;
+        CHECK(!sampler.set_controllers(edge, {127, 127, 0, 0}, error) && sampler.voices()[0].bend_step == 1);
+        CHECK(!sampler.play(extreme, 0, 95, 100, 1, 1, error, {127, 127, 0, 16383}));
+        // Inaudible sample attenuation cannot be undone by volume edits.
+        extreme = fixture();
+        extreme->instruments[0].regions[0].settings.attenuation = std::numeric_limits<std::int32_t>::min();
+        const auto silent = sampler.play(extreme, 0, 60, 100, 1, 1, error);
+        CHECK(silent && sampler.set_controllers(silent, {127, 127, 0}, error) && sampler.voices().back().gain == 0);
+        std::cout << "Live controls preserve clocks, note-on snapshots, release and peer voices; zero-gain recovery, "
+                     "raw bend, atomic bounds and stale identities verified\n";
+        return true;
+    }
+    bool bend_reference()
+    {
+        std::string error;
+        std::uint64_t hash = 14695981039346656037ull;
+        for (unsigned bend = 0; bend < 32768; ++bend)
+        {
+            const auto value = std::uint32_t(dls_pitch_bend_cents(bend));
+            for (unsigned byte = 0; byte < 4; ++byte)
+                hash = (hash ^ ((value >> (byte * 8)) & 255)) * 1099511628211ull;
+        }
+        CHECK(dls_pitch_bend_cents(8191) == -1 && dls_pitch_bend_cents(8192) == 0 && dls_pitch_bend_cents(0) == -200 &&
+              dls_pitch_bend_cents(16383) == 199);
+        std::cout << "Original 32768 pitch values FNV64 " << hash << '\n';
+        CHECK(hash == 10930475445258237893ull);
+        return true;
+    }
+    bool private_data(const std::filesystem::path& root, bool live = false)
+    {
+        std::string error;
+        unsigned accepted = 0, audible = 0, legacy = 0, control_updates = 0;
         std::ifstream in(root / "Music/Cabal/Cabal.dls", std::ios::binary);
         CHECK(in.good());
         std::vector<std::uint8_t> bytes((std::istreambuf_iterator<char>(in)), {});
@@ -479,6 +580,17 @@ namespace
                 bool nonzero = false;
                 for (unsigned frame = 0; frame < 60; ++frame)
                 {
+                    CHECK(s.voices().size() == hidden.voices().size());
+                    if (live && frame < 12 && !s.voices().empty())
+                    {
+                        DlsControllers c{frame == 2 ? 0u : 100u, frame == 3 ? 0u : 127u, (frame * 17) % 128,
+                                         frame % 2 ? 16383u : 8191u};
+                        const auto before = s.voices()[0];
+                        CHECK(s.set_controllers(id, c, error) &&
+                              hidden.set_controllers(hidden.voices()[0].id, c, error));
+                        CHECK(s.voices()[0].frames == before.frames && s.voices()[0].cursor == before.cursor);
+                        ++control_updates;
+                    }
                     std::vector<float> pcm(1600);
                     CHECK(s.advance(800, pcm) && hidden.advance(800, {}));
                     for (float x : pcm)
@@ -495,6 +607,9 @@ namespace
                 CHECK(s.advance(48000 * 30, {}) && s.voices().empty());
             }
         CHECK(accepted == 38 && accepted == audible && legacy == 5);
+        CHECK(!live || control_updates >= 38);
+        if (live)
+            std::cout << "Private live controller updates " << control_updates << '\n';
         std::cout << "Cabal region notes: " << accepted << " synthesized/nonzero, " << legacy
                   << " with legacy pan; no refused regions; hidden clocks and release cleanup verified\n";
         return true;
@@ -503,13 +618,16 @@ namespace
 int main(int argc, char** argv)
 {
     std::string test = argc > 1 ? argv[1] : "";
-    const bool ok = test == "pcm"                    ? pcm()
-                    : test == "envelopes"            ? envelopes()
-                    : test == "lifetime"             ? lifetime()
-                    : test == "legacy_pan"           ? legacy_pan()
-                    : test == "routing"              ? routing()
-                    : test == "controllers"          ? controllers()
-                    : test == "private" && argc == 3 ? private_data(argv[2])
-                                                     : false;
+    const bool ok = test == "pcm"                         ? pcm()
+                    : test == "envelopes"                 ? envelopes()
+                    : test == "lifetime"                  ? lifetime()
+                    : test == "legacy_pan"                ? legacy_pan()
+                    : test == "routing"                   ? routing()
+                    : test == "live_controls"             ? live_controls()
+                    : test == "bend_reference"            ? bend_reference()
+                    : test == "live_private" && argc == 3 ? private_data(argv[2], true)
+                    : test == "controllers"               ? controllers()
+                    : test == "private" && argc == 3      ? private_data(argv[2])
+                                                          : false;
     return ok ? 0 : 1;
 }

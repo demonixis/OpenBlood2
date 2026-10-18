@@ -58,8 +58,10 @@ articulation before the existing clamp and square-root stereo gain calculation.
 All three controllers must be in 0..127. Zero volume/expression makes a silent
 voice whose clock and cleanup still run. Failed routing/controllers allocate no
 voice, preserve existing voices and increment refusal accounting exactly once.
-There is no live controller mutation, pitch bend, sustain, same-key exclusivity
-or MIDI event queue in this increment.
+[Explicit live controls](music_live_control_contracts.md) can now change current-voice
+volume/expression/pan and default-range pitch bend while keeping the note-on snapshot.
+Channel-to-voice assignment, sustain, same-key exclusivity and the timed MIDI event
+queue remain unavailable.
 
 World reinspection/unload drops catalogue bank aliases. Audio voices own their
 bank until completion/clear, with existing non-reused IDs and world audio cleanup.

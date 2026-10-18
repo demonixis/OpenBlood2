@@ -196,3 +196,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [IMA style curve events](music_curve_event_contracts.md): original point expansion with explicit ticks and raw messages; no controller playback.
 
 - [IMA ordered grid dispatch](music_grid_dispatch_contracts.md): curve filters and source-order merged note/curve messages, then due stops; no playback.
+
+- [DLS live voice controls](music_live_control_contracts.md): current-voice controller mutation, original raw bend arithmetic and checked lifetime.

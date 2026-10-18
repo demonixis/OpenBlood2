@@ -1360,3 +1360,13 @@ remain separate verified components. No commercial bytes are imported. See
 [source ledger](sources/m2_music_grid_dispatch_sources.json),
 [contracts](../contracts/music_grid_dispatch_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_grid_dispatch.md).
+
+## DLS live voice controllers
+
+Raw controller decoding and default pitch arithmetic follow read-only execution
+of the installed MSynth25, with original queue insertion intercepted. Existing DLS
+volume/expression/pan equations remain independent replacement synthesis. No code,
+lookup tables or commercial bytes are imported. See
+[source ledger](sources/m2_music_live_controls_sources.json),
+[contracts](../contracts/music_live_control_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_live_controls.md).

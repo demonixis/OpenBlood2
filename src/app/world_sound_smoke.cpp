@@ -193,8 +193,18 @@ namespace OpenBlood2
             return false;
         const auto before_note = g.server.audio.submitted_frames;
         if (!g.server.advance_audio(.02, {}, {}) || sampler.voices().size() != 2 || sampler.voices()[0].frames != 960 ||
-            sampler.voices()[1].frames != 960 || g.server.audio.submitted_frames <= before_note ||
-            !sampler.release(note) || !sampler.release(routed_note))
+            sampler.voices()[1].frames != 960 || g.server.audio.submitted_frames <= before_note)
+            return false;
+        auto controls = channel.controllers;
+        if (!apply_dls_controller(controls, 0xb4, 7, 0, note_error) ||
+            !apply_dls_controller(controls, 0xb4, 10, 127, note_error) ||
+            !apply_dls_controller(controls, 0xe4, 127, 127, note_error) ||
+            !sampler.set_controllers(routed_note, controls, note_error) || !g.server.advance_audio(.01, {}, {}) ||
+            sampler.voices().size() != 2 || sampler.voices()[1].frames != 1440 || sampler.voices()[1].gain != 0 ||
+            sampler.voices()[1].controllers != controls ||
+            sampler.voices()[1].channel->controllers != channel.controllers ||
+            !sampler.set_controllers(routed_note, channel.controllers, note_error) || sampler.controls_updated != 2 ||
+            sampler.controls_rejected || !sampler.release(note) || !sampler.release(routed_note))
             return false;
         if (!g.server.advance_audio(4, {}, {}) || !sampler.voices().empty() || sampler.completed == 0)
             return false;

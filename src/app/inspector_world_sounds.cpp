@@ -138,15 +138,19 @@ namespace OpenBlood2
         if (ImGui::TreeNodeEx("DLS instruments, samples and diagnostic notes", ImGuiTreeNodeFlags_DefaultOpen))
         {
             auto& sampler = game.server.audio.instruments;
-            ImGui::TextWrapped(
-                "Audition creates a one-second note at the region midpoint, velocity 100, gain 20%%. "
-                "This is a sample/envelope diagnostic, not original music playback. Unsupported "
-                "connections refuse the note; no MIDI controller, exclusivity or sequence service is claimed.");
+            ImGui::TextWrapped("Audition creates a one-second note at the region midpoint, velocity 100, gain 20%%. "
+                               "This is a sample/envelope diagnostic, not original music playback. Unsupported "
+                               "connections refuse the note. Live voice controls are explicit diagnostics; channel "
+                               "routing, exclusivity and sequence playback remain unavailable.");
             ImGui::Text("Voices %zu/%u | started %llu | completed %llu | refused %llu", sampler.voices().size(),
                         DlsSampler::max_voices, (unsigned long long)sampler.started,
                         (unsigned long long)sampler.completed, (unsigned long long)sampler.rejected);
             if (!sampler.last_error.empty())
                 ImGui::TextWrapped("Last note failure: %s", sampler.last_error.c_str());
+            ImGui::Text("Live controls: applied %llu / refused %llu", (unsigned long long)sampler.controls_updated,
+                        (unsigned long long)sampler.controls_rejected);
+            if (!sampler.last_control_error.empty())
+                ImGui::TextWrapped("Last control failure: %s", sampler.last_control_error.c_str());
             for (const auto& v : sampler.voices())
             {
                 ImGui::PushID(int(v.id));
@@ -159,11 +163,30 @@ namespace OpenBlood2
                             v.envelope_pitch, v.lfo_hz);
                 ImGui::Text("Constant pan %.3f (0.1%% units) | last destination %u | legacy record %s | L/R %.3f/%.3f",
                             v.pan, v.pan_destination, v.legacy_pan ? "yes" : "no", v.left, v.right);
-                ImGui::Text("Note-on CC7 %u / CC11 %u / CC10 %u", v.controllers.volume, v.controllers.expression,
+                ImGui::Text("Current CC7 %u / CC11 %u / CC10 %u", v.controllers.volume, v.controllers.expression,
                             v.controllers.pan);
                 if (v.channel)
                     ImGui::Text("MIDI bank %u:%u / program %u / percussion %s", v.channel->bank_msb,
                                 v.channel->bank_lsb, v.channel->program, v.channel->percussion ? "yes" : "no");
+                ImGui::Text("Pitch bend %u | %+d cents | rate multiplier %.6f", v.controllers.pitch_bend,
+                            dls_pitch_bend_cents(v.controllers.pitch_bend), v.bend_step);
+                if (ImGui::TreeNode("Live voice controls"))
+                {
+                    int volume = v.controllers.volume, expression = v.controllers.expression;
+                    int pan = v.controllers.pan, bend = v.controllers.pitch_bend;
+                    bool changed = ImGui::SliderInt("Volume (CC7)", &volume, 0, 127);
+                    changed |= ImGui::SliderInt("Expression (CC11)", &expression, 0, 127);
+                    changed |= ImGui::SliderInt("Pan (CC10)", &pan, 0, 127);
+                    changed |= ImGui::SliderInt("Pitch wheel", &bend, 0, 16383);
+                    if (changed)
+                    {
+                        std::string error;
+                        sampler.set_controllers(
+                            v.id, {unsigned(volume), unsigned(expression), unsigned(pan), unsigned(bend)}, error);
+                    }
+                    ImGui::TextUnformatted("Applies at the audio boundary; does not restart the note.");
+                    ImGui::TreePop();
+                }
                 if (ImGui::SmallButton("Release note"))
                     sampler.release(v.id);
                 ImGui::PopID();
