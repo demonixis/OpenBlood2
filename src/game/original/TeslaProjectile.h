@@ -75,3 +75,21 @@ class CTeslaBallProjectile final : public CProjectile
     void AddExplosion(DVector, DVector) override;
     void FireBolt();
 };
+// Original CShikariLoogieProjectile (GameProjectiles.cpp): an OT_NORMAL Acid spit that
+// damages what it hits directly (no radius, no explosion); its bug-spray trail is
+// client-only.
+class CShikariLoogieProjectile final : public CProjectile
+{
+  public:
+    CShikariLoogieProjectile() : CProjectile(OT_NORMAL)
+    {
+        filename = "Sprites\\napalmprime.spr";
+        skin = nullptr;
+        damage_type = OpenBlood2::DamageType::Acid;
+        trail_error = "OBJFX_BUGSPRAY_1 trail (scale 0.25, SCALELIFETIME) unavailable";
+        flags |= FLAG_FORCECLIENTUPDATE;
+    }
+  protected:
+    bool Update() override;
+    void AddExplosion(DVector, DVector) override;
+};

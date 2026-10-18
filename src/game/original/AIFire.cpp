@@ -125,6 +125,7 @@ bool AI_Mgr::Fire(bool alternate)
     if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_SUBMACHINEGUN &&
         weapon->data.m_nType != WEAP_ASSAULTRIFLE && weapon->data.m_nType != WEAP_FLAREGUN &&
         weapon->data.m_nType != WEAP_TESLACANNON && weapon->data.m_nType != WEAP_SOUL_CROWBAR &&
+        weapon->data.m_nType != WEAP_SHIKARI_CLAW && weapon->data.m_nType != WEAP_SHIKARI_SPIT &&
         weapon->data.m_nType != WEAP_SOUL_AXE && weapon->data.m_nType != WEAP_SOUL_PIPE &&
         weapon->data.m_nType != WEAP_MELEE && weapon->data.m_nType != WEAP_NAGA_EYEBEAM &&
         weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST && weapon->data.m_nType != WEAP_GIDEON_WIND &&
@@ -143,7 +144,16 @@ bool AI_Mgr::Fire(bool alternate)
     if (naga && !fire_gun_node)
         return fail(FireResult::Unavailable, "Naga beam head_gun node unavailable");
     const auto type = weapon->data.m_nType;
-    if (type == WEAP_SOUL_CROWBAR || type == WEAP_SOUL_AXE || type == WEAP_SOUL_PIPE)
+    if (type == WEAP_SHIKARI_SPIT)
+    {
+        // Original branch: from the head node toward the cached target position.
+        DRotation head_rotation;
+        if (!server->GetModelNodeTransform(m_hObject, "head", &fire_origin, &head_rotation))
+            return fail(FireResult::Unavailable, "Shikari spit head node unavailable");
+        fire_gun_node = false;
+        fire_direction = vector_subtract(m_vTargetPos, fire_origin);
+    }
+    else if (type == WEAP_SOUL_CROWBAR || type == WEAP_SOUL_AXE || type == WEAP_SOUL_PIPE || type == WEAP_SHIKARI_CLAW)
     {
         // Original weapon-specific branch: body position along the cached forward vector.
         fire_gun_node = false;

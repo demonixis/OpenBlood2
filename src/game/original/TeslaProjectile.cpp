@@ -202,3 +202,17 @@ void CTeslaBallProjectile::AddExplosion(DVector position, DVector normal)
     publish(m_hObject, effect, 8 /* EXP_TESLA_ALT */, position, normal, "Sounds\\Weapons\\Tesla\\altimpact.wav",
             2000);
 }
+bool CShikariLoogieProjectile::Update()
+{
+    // Hidden (scale zero) for its first 0.01 s, then 0.25. An OT_NORMAL object has no
+    // visual, so the scale is state only.
+    const float scale = g_pServerDE->GetTime() - m_fStartTime < .01f ? 0 : .25f;
+    if (!g_pServerDE->ScaleObject(m_hObject, {scale, scale, scale}))
+        return Fail("Loogie scale rejected");
+    return CProjectile::Update();
+}
+void CShikariLoogieProjectile::AddExplosion(DVector, DVector)
+{
+    // m_bExplosion is false in the source, so AddImpact never calls this override (its
+    // EXP_FLAME_SMALL placeholder and impact.wav are unreachable). Nothing to publish.
+}

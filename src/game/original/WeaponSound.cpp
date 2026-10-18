@@ -116,3 +116,14 @@ void CSoulWeapon::BeginFire(bool)
                 : sound < 3 ? "Sounds\\Slash3.wav"
                             : "Sounds\\Slash4.wav";
 }
+void CShikariClaw::BeginFire(bool alternate)
+{
+    int sound = 0;
+    if (!BaseClass::GetServerDE()->RandomInt(0, 4, sound))
+        return;
+    const char* slash = sound < 1   ? "Sounds\\Slash1.wav"
+                        : sound < 2 ? "Sounds\\Slash2.wav"
+                        : sound < 3 ? "Sounds\\Slash3.wav"
+                                    : "Sounds\\Slash4.wav";
+    (alternate ? fire_sound : alt_sound) = slash;
+}

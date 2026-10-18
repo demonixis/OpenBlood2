@@ -20,6 +20,7 @@
 #include "game/original/ExitTrigger.h"
 #include "game/original/Fanatic.h"
 #include "game/original/SoulDrudge.h"
+#include "game/original/ShikariAI.h"
 #include "game/original/FlareProjectile.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Gib.h"
@@ -132,6 +133,7 @@ namespace OpenBlood2
         const ClassInfo tesla_projectile{"CTeslaProjectile", &base, construct<CTeslaProjectile>, {}};
         const ClassInfo tesla_bolt{"CTeslaBoltProjectile", &base, construct<CTeslaBoltProjectile>, {}};
         const ClassInfo tesla_ball{"CTeslaBallProjectile", &base, construct<CTeslaBallProjectile>, {}};
+        const ClassInfo loogie{"CShikariLoogieProjectile", &base, construct<CShikariLoogieProjectile>, {}};
         const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {}};
         const ClassInfo flare_burst{"CFlareBurstProjectile", &base, construct<CFlareBurstProjectile>, {}};
         const ClassInfo energy_projectile{"CEnergyBlastProjectile", &base, construct<CEnergyBlastProjectile>, {}};
@@ -505,6 +507,13 @@ namespace OpenBlood2
                                     {{"RandomHitPoints", 50.0f},
                                      {"AIState", std::string("IDLE"), true, 31},
                                      {"Dims", DVector{21, 36, 18}}}};
+        // Original BEGIN_CLASS(ShikariAI): RandomHitPoints, AIState and hidden Dims only.
+        const ClassInfo shikari{"ShikariAI",
+                                &ai_manager,
+                                construct_npc<ShikariAI, AI_Mgr::NPCType::Shikari>,
+                                {{"RandomHitPoints", 50.0f},
+                                 {"AIState", std::string("IDLE"), true, 31},
+                                 {"Dims", DVector{19, 30, 24}}}};
         const ClassInfo prophet{"Prophet",
                                 &ai_manager,
                                 construct_npc<Prophet, AI_Mgr::NPCType::Prophet>,
@@ -981,7 +990,7 @@ namespace OpenBlood2
                objects.register_class(smell) && objects.register_class(exit_hint) &&
                objects.register_class(character) && objects.register_class(ai_manager) &&
                objects.register_class(cultist) && objects.register_class(civilian) && objects.register_class(gideon) &&
-               objects.register_class(fanatic) && objects.register_class(prophet) && objects.register_class(soul_drudge) &&
+               objects.register_class(fanatic) && objects.register_class(prophet) && objects.register_class(soul_drudge) && objects.register_class(shikari) &&
                objects.register_class(player) &&
                objects.register_class(polygrid) && objects.register_class(volume) && objects.register_class(water) &&
                objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
@@ -1014,7 +1023,7 @@ namespace OpenBlood2
                objects.register_class(remote) && objects.register_class(grenade) &&
                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
                objects.register_class(tesla_projectile) && objects.register_class(tesla_bolt) &&
-               objects.register_class(tesla_ball) &&
+               objects.register_class(tesla_ball) && objects.register_class(loogie) &&
                objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
                objects.register_class(howitzer_shell) && objects.register_class(shockwave_projectile);
     }

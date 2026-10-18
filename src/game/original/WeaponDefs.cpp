@@ -300,6 +300,124 @@ namespace
             "interface\\statusbar\\weapons\\tesla.pcx",   // Icon for status bar
             "interface\\statusbar\\weapons\\tesla_h.pcx", // Highlighted icon for status bar
         },
+        // Shikari Hand Claw
+        {
+            "Models\\Weapons\\knifec_pv.abc", // Model
+            "Models\\Weapons\\knifec_pv.abc", // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx", // Skin
+            DNULL,        // Model
+            DNULL,        // Skin
+            WEAP_SHIKARI_CLAW,    // Type
+            TYPE_MELEE,    // Fire type
+            AMMO_NONE,       // Ammo type
+            1,      // Ammo Use
+            1,      // Alt Ammo Use
+            30.0f,     // Min Damage
+            60.0f,     // Max Damage
+            30.0f,     // Min Alt damage
+            60.0f,     // Max Alt damage
+            1.00f,     // Reload time
+            0.0f,     // Alt reload time
+            {0.0f, 0.0f},   // Spread
+            {0.0f, 0.0f},   // Alt Spread
+            0.0f,     // Projectile Velocity
+            0.0f,     // Alt Projectile Velocity
+            100.0f,        // Range
+            100.0f,        // Alt Range
+            1,      // Shots per fire
+            1,      // Alt Shots per fire
+            1,      // Strength or Magic required
+            0,      // Two-handed Strength or Magic required
+            0,      // Damage Radius (projectiles)
+            0,      // Alt Damage Radius (projectiles)
+            DFALSE,     // Alt fire zoom
+            DFALSE,     // Semi-auto
+            "Sounds\\Weapons\\Knife\\fire.wav", // Fire sound
+            "Sounds\\Weapons\\Knife\\alt.wav", // Alt Fire sound
+            "", // Empty weapon sound
+            "", // Alt Empty weapon sound
+            NULL,     // Projectile class
+            NULL,     // Alt Projectile class
+            0,      // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},  // Muzzle Flash color
+            "Shikari_Claw",   // Name
+            0,      // Name ID (resource)
+            "",      // flash sprite name
+            "",      // alt flash Sprite name
+            0.25f,     // Flash duration
+            0.10f,     // Flash scale
+            {0.0f, 0.0f, 0.0f},  // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f}, // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},  // Muzzle Offset
+            {0.03f, 0.03f, 0.15f}, // Recoil
+            {0.0f, 0.0f, 0.1f},  // Flash position
+            0.625f,     // Eject interval
+            0.0f,     // View kick
+            DFALSE,     // View kick is Cumulative
+            DFALSE,     // Animation looping
+            DFALSE,     // Alt anim looping
+            DNULL,     // Icon for status bar
+            DNULL,     // Highlighted icon for status bar
+        },
+        // Shikari Spit
+        {
+            "Models\\Weapons\\knifec_pv.abc", // Model
+            "Models\\Weapons\\knifec_pv.abc", // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx", // Skin
+            DNULL,        // Model
+            DNULL,        // Skin
+            WEAP_SHIKARI_SPIT,   // Type
+            TYPE_RIFLE,    // Fire type
+            AMMO_NONE,       // Ammo type
+            1,      // Ammo Use
+            1,      // Alt Ammo Use
+            30.0f,     // Min Damage
+            50.0f,     // Max Damage
+            30.0f,     // Min Alt damage
+            50.0f,     // Max Alt damage
+            1.00f,     // Reload time
+            0.0f,     // Alt reload time
+            {0.0f, 0.0f},   // Spread
+            {0.0f, 0.0f},   // Alt Spread
+            1000.0f,     // Projectile Velocity
+            1000.0f,     // Alt Projectile Velocity
+            75.0f,        // Range
+            75.0f,        // Alt Range
+            1,      // Shots per fire
+            1,      // Alt Shots per fire
+            1,      // Strength or Magic required
+            0,      // Two-handed Strength or Magic required
+            0,      // Damage Radius (projectiles)
+            0,      // Alt Damage Radius (projectiles)
+            DFALSE,     // Alt fire zoom
+            DFALSE,     // Semi-auto
+            "Sounds\\Enemies\\Shikari\\sh_spit_3.wav", // Fire sound
+            "Sounds\\Enemies\\Shikari\\sh_spit_3.wav", // Alt Fire sound
+            "Sounds\\Enemies\\Shikari\\sh_spit_1.wav", // Empty Fire sound
+            "Sounds\\Enemies\\Shikari\\sh_spit_1.wav", // Alt EmptyFire sound
+            "CShikariLoogieProjectile", // Projectile class
+            "CShikariLoogieProjectile", // Alt Projectile class
+            0,      // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},  // Muzzle Flash color
+            "Shikari_Spit",   // Name
+            0,      // Name ID (resource)
+            "",      // flash sprite name
+            "",      // alt flash Sprite name
+            0.25f,     // Flash duration
+            0.10f,     // Flash scale
+            {0.0f, 0.0f, 0.0f},  // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f}, // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},  // Muzzle Offset
+            {0.03f, 0.03f, 0.15f}, // Recoil
+            {0.0f, 0.0f, 0.1f},  // Flash position
+            0.625f,     // Eject interval
+            0.0f,     // View kick
+            DFALSE,     // View kick is Cumulative
+            DFALSE,     // Animation looping
+            DFALSE,     // Alt anim looping
+            DNULL,     // Icon for status bar
+            DNULL,     // Highlighted icon for status bar
+        },
         // SoulDrudge Crowbar
         {
             "Models\\Weapons\\knifec_pv.abc", // Model

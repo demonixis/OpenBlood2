@@ -203,6 +203,32 @@ class CSoulWeapon final : public CWeapon
         return alternate && alt_sound ? alt_sound : CWeapon::FireSound(alternate);
     }
 };
+// Original CShikariClaw: every Fire draws IntRandom(0, 4); the primary writes the
+// alternate slash sound and the alternate writes the primary one (source swap).
+class CShikariClaw final : public CWeapon
+{
+  public:
+    CShikariClaw() : CWeapon(WEAP_SHIKARI_CLAW)
+    {
+        damage_type = OpenBlood2::DamageType::Melee;
+    }
+    const char *fire_sound = nullptr, *alt_sound = nullptr;
+    void BeginFire(bool alternate) override;
+    const char* FireSound(bool alternate) const override
+    {
+        const char* chosen = alternate ? alt_sound : fire_sound;
+        return chosen ? chosen : CWeapon::FireSound(alternate);
+    }
+};
+// Original CShikariSpit: an Acid loogie projectile with gravity removed.
+class CShikariSpit final : public CWeapon
+{
+  public:
+    CShikariSpit() : CWeapon(WEAP_SHIKARI_SPIT)
+    {
+        damage_type = OpenBlood2::DamageType::Acid;
+    }
+};
 class CMelee final : public CWeapon
 {
   public:

@@ -39,8 +39,8 @@ namespace
                                              {"SINGULAR", 0, false},
                                              {"NONE", 0, true},
                                              {"PROX_BOMB", 0, false},
-                                             {"SHIKARI_CLAW", 0, false},
-                                             {"SHIKARI_SPIT", 0, false},
+                                             {"SHIKARI_CLAW", WEAP_SHIKARI_CLAW, true},
+                                             {"SHIKARI_SPIT", WEAP_SHIKARI_SPIT, true},
                                              {"SOUL_CROWBAR", WEAP_SOUL_CROWBAR, true},
                                              {"SOUL_AXE", WEAP_SOUL_AXE, true},
                                              {"SOUL_PIPE", WEAP_SOUL_PIPE, true},
@@ -138,6 +138,23 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         if (!GetServerDE()->RandomInt(1, 3, weapon))
             configure_error = "SoulDrudge weapon RNG failed";
         npc_weapons[0] = weapon == 1 ? "SOUL_CROWBAR" : weapon == 2 ? "SOUL_AXE" : "SOUL_PIPE";
+    }
+    if (type == NPCType::Shikari)
+    {
+        // Original ShikariAI constructor.
+        m_fHearingDist = 2000;
+        m_fSensingDist = 500;
+        m_fSmellingDist = 2000;
+        m_fSeeingDist = 1000;
+        m_fWalkSpeed = 180;
+        m_fRunSpeed = m_fRollSpeed = 320;
+        m_fJumpSpeed = 600;
+        m_dwFlags = 0x0b; // FLAG_CRAWL | FLAG_JUMP | FLAG_DODGE.
+        m_bCabal = false;
+        npc_hp = 175;
+        npc_armor = 50;
+        npc_weapons[0] = "SHIKARI_CLAW";
+        npc_weapons[1] = "SHIKARI_SPIT";
     }
     if (type == NPCType::Gideon)
     {
@@ -246,6 +263,11 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         model = "Models/Enemies/" + name + ".abc";
         skin = "Skins/Enemies/" + name + ".dtx";
     }
+    else if (npc_type == NPCType::Shikari)
+    {
+        model = "Models/Enemies/Shikari.abc";
+        skin = "Skins/Enemies/Shikari.dtx";
+    }
     else if (npc_type == NPCType::SoulDrudge)
     {
         // Original PostPropRead: one of three skins on the shared model.
@@ -307,9 +329,9 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     const auto group = npc_type == NPCType::Gideon    ? 4
                        : npc_type == NPCType::Fanatic ? 5
                        : npc_type == NPCType::Prophet ? 6
-                       : npc_type == NPCType::SoulDrudge
-                           ? 7
-                           : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
+                       : npc_type == NPCType::SoulDrudge ? 7
+                       : npc_type == NPCType::Shikari    ? 8
+                                                         : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
     auto initialize_table = [&](unsigned slot, bool refresh, const char* root)
     {
         if (!refresh)
@@ -341,6 +363,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
                                : npc_type == NPCType::Fanatic ? "sounds/enemies/fanatic"
                                : npc_type == NPCType::Prophet ? "sounds/enemies/Prophet"
                                : npc_type == NPCType::SoulDrudge ? "sounds/enemies/souldrudge"
+                               : npc_type == NPCType::Shikari    ? "sounds/enemies/shikari"
                                : male_group                   ? "sounds/enemies/m_cultist"
                                                               : "sounds/enemies/f_cultist"))
         return RuntimeFailure("NPC shared animation table initialization failed");

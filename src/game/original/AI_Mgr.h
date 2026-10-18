@@ -105,11 +105,12 @@ class AI_Mgr : public CBaseCharacter
         Gideon,
         Fanatic,
         Prophet,
-        SoulDrudge
+        SoulDrudge,
+        Shikari
     };
     static void ResetRuntimeTables();
-    // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet, SoulDrudge.
-    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 8>;
+    // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet, SoulDrudge, Shikari.
+    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 9>;
     // Original WeaponStrToInt prefixes; false for a matched family not integrated here.
     static bool WeaponStrToInt(std::string_view, DBYTE&);
     static void ExchangeRuntimeTables(RuntimeTables&);
@@ -197,7 +198,7 @@ class AI_Mgr : public CBaseCharacter
     bool MC_Taunt_Bold();
     virtual bool AI_STATE_Escape_RunAway();
     virtual bool AI_STATE_Escape_Hide();
-    bool AI_STATE_GuardLocation();
+    virtual bool AI_STATE_GuardLocation();
     bool SetTrackedObject(HOBJECT);
     bool RefreshTrackedPosition();
     HOBJECT GetTrackedObject() const;
