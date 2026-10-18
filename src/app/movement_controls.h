@@ -37,6 +37,8 @@ namespace OpenBlood2
         bool mouse_requested = false, mouse_captured = false;
         std::array<bool, 2> mouse_buttons{}, fire_suppressed{};
         float mouse_x = 0, mouse_y = 0;
+        float mouse_sensitivity = .0025f;
+        bool invert_y = false;
         struct FireButtons
         {
             bool primary = false, alternate = false;
@@ -285,8 +287,8 @@ namespace OpenBlood2
             // Device mapping policy: radians per relative mouse unit, independent of frame duration.
             if (mouse_captured)
             {
-                rotation.yaw = std::remainder(rotation.yaw + dx * .0025f, 6.28318530718f);
-                rotation.pitch += dy * .0025f;
+                rotation.yaw = std::remainder(rotation.yaw + dx * mouse_sensitivity, 6.28318530718f);
+                rotation.pitch += dy * mouse_sensitivity * (invert_y ? -1.f : 1.f);
             }
             rotation.yaw += (int(keys[SDL_SCANCODE_RIGHT]) - int(keys[SDL_SCANCODE_LEFT])) * 2 * dt;
             rotation.pitch = std::clamp(

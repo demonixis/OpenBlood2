@@ -114,6 +114,13 @@ namespace OpenBlood2
                     break;
             }
         }
+        if (!items.empty() && !enabled(items[selected]))
+            for (unsigned i = 0; i < items.size(); ++i)
+                if (enabled(items[i]))
+                {
+                    selected = int(i);
+                    break;
+                }
     }
     void Menu::open(bool world, bool living)
     {
@@ -173,7 +180,7 @@ namespace OpenBlood2
         for (std::size_t i = 0; i < items.size(); ++i)
         {
             next = (next + int(items.size()) + (direction < 0 ? -1 : 1)) % int(items.size());
-            if (items[next].enabled)
+            if (enabled(items[next]))
             {
                 if (selected != next)
                 {
@@ -187,7 +194,7 @@ namespace OpenBlood2
     }
     void Menu::activate()
     {
-        if (!active || selected < 0 || selected >= int(items.size()) || !items[selected].enabled ||
+        if (!active || selected < 0 || selected >= int(items.size()) || !enabled(items[selected]) ||
             pending_.action == MenuAction::NewGame || pending_.action == MenuAction::Quit)
             return;
         if (items[selected].setting >= 0)
@@ -262,7 +269,7 @@ namespace OpenBlood2
     }
     void Menu::adjust(int direction)
     {
-        if (!active || selected < 0 || selected >= int(items.size()) || !items[selected].enabled)
+        if (!active || selected < 0 || selected >= int(items.size()) || !enabled(items[selected]))
             return;
         auto before = settings;
         switch (items[selected].setting)
@@ -305,7 +312,7 @@ namespace OpenBlood2
         for (std::size_t i = 0; i < items.size(); ++i)
         {
             auto r = items[i].rect;
-            if (items[i].enabled && x >= r.left && x < r.right && y >= r.top && y < r.bottom)
+            if (enabled(items[i]) && x >= r.left && x < r.right && y >= r.top && y < r.bottom)
             {
                 hit = int(i);
                 break;
@@ -325,8 +332,26 @@ namespace OpenBlood2
             if (hit >= 0 && pressed == hit)
             {
                 selected = hit;
-                if (items[hit].setting >= 0 && x >= 280)
-                    adjust(x < 360 ? -1 : 1);
+                const auto& item = items[hit];
+                const auto r = item.slider_rect;
+                if (r.right > r.left && x >= 280 && (item.setting != 1 || settings.sound) &&
+                    (item.setting != 3 || settings.music))
+                {
+                    const int low = item.setting == 4 ? 100 : 0, high = item.setting == 4 ? 1500 : 50;
+                    const int step = item.setting == 4 ? 20 : 5;
+                    const float ratio = std::clamp((x - r.left) / float(r.right - r.left), 0.f, 1.f);
+                    const int value = std::clamp(low + int((ratio * (high - low) + step / 2) / step) * step, low, high);
+                    int& target = item.setting == 1   ? settings.sound_volume
+                                  : item.setting == 3 ? settings.music_volume
+                                                      : settings.sensitivity;
+                    if (target != value)
+                    {
+                        target = value;
+                        pending_.action = MenuAction::Settings;
+                        cue(MenuCue::Select);
+                        ++revision;
+                    }
+                }
                 else
                     activate();
             }

@@ -114,9 +114,20 @@ namespace OpenBlood2
                     return false;
                 }
                 label = it->second;
+                if (menu.page == MenuPage::Load)
+                {
+                    // Original cres.dll uses FormatMessage's numbered string insertion.
+                    const auto marker = label.find("%1!s!");
+                    if (marker == label.npos)
+                    {
+                        error = "Unsupported load-menu string insertion";
+                        return false;
+                    }
+                    label.replace(marker, 5, "unavailable");
+                }
+                item.literal = label;
             }
-            const bool enabled = item.enabled && !(item.setting == 1 && !menu.settings.sound) &&
-                                 !(item.setting == 3 && !menu.settings.music);
+            const bool enabled = menu.enabled(item);
             const auto& font = menu.small()              ? small_
                                : !enabled                ? disabled_
                                : int(i) == menu.selected ? selected_
@@ -151,6 +162,8 @@ namespace OpenBlood2
                     const int minimum = item.setting == 4 ? 100 : 0, maximum = item.setting == 4 ? 1500 : 50;
                     canvas.DrawSurfaceToSurfaceTransparent(surface, slider_, nullptr, 280, y, hud_magenta);
                     const int travel = std::max(0, int(slider_->width) - int(thumb_->width));
+                    item.slider_rect = {280 + int(thumb_->width) / 2, y, 280 + int(thumb_->width) / 2 + travel,
+                                        y + int(font.height)};
                     const int x = 280 + travel * (value - minimum) / (maximum - minimum);
                     canvas.DrawSurfaceToSurfaceTransparent(surface, thumb_, nullptr, x, y, hud_magenta);
                     text(*surface, small_, std::to_string(value), 460, y);
@@ -167,6 +180,8 @@ namespace OpenBlood2
         }
         if (menu.page == MenuPage::Save || menu.page == MenuPage::Load)
             text(*surface, small_, "Saving and loading are not available yet.", 180, 440);
+        if (menu.audio_failed)
+            text(*surface, small_, "Menu audio unavailable - see log.", 180, 460);
         ++revision;
         composed_ = menu.revision;
         return true;

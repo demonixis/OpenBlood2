@@ -6,7 +6,16 @@ restrictions and MoveMgr remain responsible for gameplay. No game rules or new
 integrator are introduced. See [evidence](../../../Documentation/Implementation/m2_player_controls.md)
 and [provenance](../implementation/sources/m2_player_control_sources.json). **M2 remains incomplete.**
 
-## Bindings and inspector
+## Current normal frontend
+
+[Original menus](menu_contracts.md) supersede the interactive bindings below:
+normal startup opens the main menu; F10 toggles inspection, Esc pauses/resumes,
+and F1/F2/F3 do not change game input ownership. Inspection alone keeps simulation
+running; inspection over a menu keeps it paused. Audio/Mouse options supply gains,
+sensitivity and vertical inversion. The earlier adapter below remains the explicit
+smoke path, preserving its test commands and clocks.
+
+## Historical diagnostic bindings and inspector
 
 Physical WASD/ZQSD, Shift, Space, Ctrl, arrows and E retain walk/run/jump/crouch/look/USE.
 F fires primary; G fires alternate. F2 enables/disables these game controls.

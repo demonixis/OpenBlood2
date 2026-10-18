@@ -64,6 +64,13 @@ namespace OpenBlood2
             {
                 if (e.type == SDL_EVENT_KEY_DOWN)
                 {
+                    if (menu.page == MenuPage::Quit && !e.key.repeat &&
+                        (e.key.scancode == SDL_SCANCODE_Y || e.key.scancode == SDL_SCANCODE_N))
+                    {
+                        menu.selected = e.key.scancode == SDL_SCANCODE_Y ? 0 : 1;
+                        menu.activate();
+                        return false;
+                    }
                     switch (e.key.scancode)
                     {
                         case SDL_SCANCODE_UP:

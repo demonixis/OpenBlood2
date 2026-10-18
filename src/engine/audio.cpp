@@ -322,7 +322,7 @@ namespace OpenBlood2
                 stream_failed = true;
                 continue;
             }
-            float gain = v.request.volume, pan = 0;
+            float gain = v.request.volume * sound_gain_, pan = 0;
             if (v.request.space != SoundSpace::Local)
             {
                 const auto direction = vector_subtract(v.position, listener);
@@ -386,7 +386,10 @@ namespace OpenBlood2
         }
         std::string instrument_error;
         const bool music_was_active = music_loop.active() || music_loop.pending();
-        if (!music_loop.advance(instruments, frames, mixed, instrument_error))
+        if (music_gain_ != 1)
+            music_mix_.assign(mixed.size(), 0);
+        auto& music_output = music_gain_ == 1 ? mixed : music_mix_;
+        if (!music_loop.advance(instruments, frames, music_output, instrument_error))
         {
             if (music_was_active)
                 music_error = instrument_error;
@@ -394,6 +397,9 @@ namespace OpenBlood2
             output_error = instrument_error;
             return false; // Clock has advanced; never submit partially failed instrument output.
         }
+        if (music_gain_ != 1)
+            for (std::size_t i = 0; i < mixed.size(); ++i)
+                mixed[i] += music_mix_[i] * music_gain_;
         if (stream_failed)
         {
             mixed.clear();
@@ -458,9 +464,26 @@ namespace OpenBlood2
         output_error.clear();
         return true;
     }
+    bool AudioMixer::set_gains(float sound, float music)
+    {
+        if (!std::isfinite(sound) || !std::isfinite(music) || sound < 0 || sound > 1 || music < 0 || music > 1)
+            return false;
+        if (sound == sound_gain_ && music == music_gain_)
+            return true;
+        // Queued PCM has already been mixed with old gains. Discard it on a setting change.
+        if (output_ && !SDL_ClearAudioStream(output_))
+        {
+            output_error = SDL_GetError();
+            return false;
+        }
+        sound_gain_ = sound;
+        music_gain_ = music;
+        return true;
+    }
     bool AudioMixer::pause_output(bool paused, std::string& error)
     {
-        if (paused == paused_) return true;
+        if (paused == paused_)
+            return true;
         if (output_ && !(paused ? SDL_PauseAudioStreamDevice(output_) : SDL_ResumeAudioStreamDevice(output_)))
         {
             error = output_error = SDL_GetError();
@@ -487,6 +510,8 @@ namespace OpenBlood2
         destination.audio_initialized_ = audio_initialized_;
         destination.inspect_pcm = inspect_pcm;
         destination.paused_ = paused_;
+        destination.sound_gain_ = sound_gain_;
+        destination.music_gain_ = music_gain_;
         output_ = nullptr;
         audio_initialized_ = false;
         return true;

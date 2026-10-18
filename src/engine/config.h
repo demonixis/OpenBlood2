@@ -29,6 +29,7 @@ namespace OpenBlood2
              scene_explosions_smoke = false;
         bool view_world = false, viewport_smoke = false;
         bool start_game = false;
+        bool menu_smoke = false;
         bool explicit_config = false;
         bool help = false;
         bool check_data = false;

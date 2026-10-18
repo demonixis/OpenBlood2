@@ -15,6 +15,16 @@ namespace OpenBlood2
         prune();
         if (mixer.voices().size() >= 16)
         {
+            // Rapid navigation keeps recent feedback; never evict the ambience.
+            for (const auto& [id, voice] : mixer.voices())
+                if (!voice.request.loop)
+                {
+                    mixer.kill(id);
+                    break;
+                }
+        }
+        if (mixer.voices().size() >= 16)
+        {
             error = "Menu audio voice limit reached";
             ++failures;
             return 0;
@@ -25,11 +35,15 @@ namespace OpenBlood2
         request.loop = loop;
         request.streaming = loop;
         request.reverb_requested = false;
-        auto id = mixer.play(resources_, nullptr, request, {}, error);
+        std::string failure;
+        auto id = mixer.play(resources_, nullptr, request, {}, failure);
         if (id)
             ++starts;
         else
+        {
+            error = std::move(failure);
             ++failures;
+        }
         return id;
     }
     void MenuAudio::focus(bool active)

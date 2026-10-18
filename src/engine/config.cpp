@@ -98,7 +98,9 @@ namespace OpenBlood2
         for (std::size_t i = 0; i < args.size(); ++i)
         {
             const auto arg = args[i];
-            if (arg == "--help" || arg == "-h")
+            if (arg == "--menu-smoke")
+                options.menu_smoke = true;
+            else if (arg == "--help" || arg == "-h")
                 options.help = true;
             else if (arg == "--inspect-world")
                 options.inspect_world = true;
@@ -259,6 +261,13 @@ namespace OpenBlood2
                 error = "Unknown option: " + std::string(arg);
                 return false;
             }
+        }
+        if (options.menu_smoke &&
+            (options.view_world || options.inspect_world || options.start_game || options.check_data ||
+             options.gpu_smoke || options.world_smoke || options.bench || options.frame_limit))
+        {
+            error = "--menu-smoke is a separate diagnostic with its own frame count";
+            return false;
         }
         if (options.view_world && (options.inspect_world || options.start_game || options.check_data ||
                                    options.gpu_smoke || options.world_smoke))

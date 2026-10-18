@@ -52,7 +52,7 @@ namespace OpenBlood2
         std::string literal;
         // Setting IDs: sound, volume, music, volume, sensitivity, invert Y.
         int setting = -1;
-        HudRect rect{};
+        HudRect rect{}, slider_rect{};
     };
     // Typed service adapter for the selected original menu Build/OnCommand code.
     // No original client ABI or hidden dependency on ImGui/SDL input.
@@ -73,6 +73,7 @@ namespace OpenBlood2
         }
         MenuCommand take_command();
         bool active = false, in_world = false, alive = true;
+        bool audio_failed = false; // Nonmodal application-owned audio status.
         MenuPage page = MenuPage::Main;
         std::vector<MenuItem> items;
         std::vector<MenuCue> cues;
@@ -82,6 +83,10 @@ namespace OpenBlood2
         unsigned character = 0;
         bool story = true;
         std::uint64_t revision = 0;
+        bool enabled(const MenuItem& item) const
+        {
+            return item.enabled && !(item.setting == 1 && !settings.sound) && !(item.setting == 3 && !settings.music);
+        }
         bool small() const;
         const char* title() const;
 

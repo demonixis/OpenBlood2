@@ -67,7 +67,12 @@
     "Typed menu/control service replaces unavailable binary LTGUI implementation; original Build ordering and identifiers retained.",
     "Mouse picking, viewport scaling and independent menu lifetime are replacement services.",
     "mm_font.fnt final glyph advances one pixel beyond the 1345-pixel bitmap; bounded final-glyph overhang only.",
-    "Quarter-height spacing replaces the unavailable CoolFont space implementation; not retail pixel equivalence."
+    "Quarter-height spacing replaces the unavailable CoolFont space implementation; not retail pixel equivalence.",
+    "Application-owned menu audio uses an independent RNG and a 16-voice budget, replacing oldest feedback while retaining ambience.",
+    "Preferences use SDL user paths and atomic sibling replacement; mute gains preserve source audio clocks.",
+    "Save/load rows are unavailable and use source FormatMessage string insertion; no save-file implementation is claimed.",
+    "Quit retains the original prompt, with owned Yes/No keyboard/mouse controls; unavailable screens/actions remain disabled.",
+    "Normal frontend and tagged SDL diagnostic traversal are separate from existing smoke/benchmark clocks."
   ],
   "profile_adaptations": "Selected original gCharacterValues/default skins, SetCharacter attributes, sound roots, gender footsteps/landing and SetupViewModel C_ substitution. PlayerInit carries owned defaults. Restore validates the selected default profile and retains existing atomic animation-driven body resizing. Chosen remains single-player; Action rules and addon profiles are unavailable."
 }

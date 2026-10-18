@@ -68,6 +68,7 @@ namespace OpenBlood2
         ~AudioMixer();
         bool open_output(std::string& error);
         bool pause_output(bool paused, std::string& error);
+        bool set_gains(float sound, float music);
         bool paused() const
         {
             return paused_;
@@ -115,5 +116,7 @@ namespace OpenBlood2
         SDL_AudioStream* output_ = nullptr;
         bool audio_initialized_ = false;
         bool paused_ = false;
+        float sound_gain_ = 1, music_gain_ = 1;
+        std::vector<float> music_mix_;
     };
 } // namespace OpenBlood2

@@ -1422,3 +1422,11 @@ The [M2 acceptance review](../../../Documentation/Implementation/m2_acceptance.m
 ## Original menu frontend (2026-10-18)
 
 Selective original menu construction and command identifiers with typed replacement controls. See [source ledger](sources/original_menu_sources.json), [contracts](../contracts/menu_contracts.md) and [validation](../../../Documentation/Implementation/original_menus.md). Commercial images, fonts, strings and audio remain external.
+
+UI-M1 through UI-M6 connect the selected original menu controller to a replacement
+SDL application frontend. Original interface WAV paths/ambience choices and the
+four original character tables, gender footstep branches and view-model `C_`
+substitution are recorded in the existing [menu source ledger](sources/original_menu_sources.json).
+Preferences, session transaction glue, input ownership, sliders, error presentation
+and the SDL traversal probe are new portable implementation code. Save slots are
+unavailable screens, never a new persistence service.

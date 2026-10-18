@@ -12,6 +12,7 @@
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlgpu3.h>
 #include <iostream>
+int test_menu_preferences(int, char**);
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
     do                                                                                                                 \
@@ -147,6 +148,28 @@ namespace
         key.key.scancode = SDL_SCANCODE_F;
         CHECK(input.event(key, 42, menu, true, true, true, 640, 480));
         CHECK(!input.controls.sample_fire(false).primary);
+        input.inspector = false;
+        menu.close();
+        input.reset(menu, true);
+        SDL_Event focus{};
+        focus.type = SDL_EVENT_WINDOW_FOCUS_LOST;
+        focus.window.windowID = 42;
+        input.event(focus, 42, menu, true, true, true, 640, 480);
+        CHECK(menu.active && !input.controls.focused && !input.controls.sample(false).forward);
+        focus.type = SDL_EVENT_WINDOW_FOCUS_GAINED;
+        input.event(focus, 42, menu, true, true, true, 640, 480);
+        key.key.scancode = SDL_SCANCODE_F10;
+        input.event(key, 42, menu, true, true, false, 640, 480);
+        CHECK(!input.inspector && menu.active);
+        key.key.scancode = SDL_SCANCODE_RETURN;
+        key.key.repeat = true;
+        input.event(key, 42, menu, true, true, false, 640, 480);
+        CHECK(menu.page == MenuPage::Main);
+        Resources no_audio_resources;
+        MenuAudio missing_audio(no_audio_resources);
+        // Explicit missing resources: no fabricated successful voice and no navigation dependency.
+        missing_audio.focus(true);
+        CHECK(missing_audio.failures == 1 && !missing_audio.ambient && !missing_audio.error.empty());
         HudSurface bitmap{1, 1, std::vector<std::uint8_t>(4)};
         HudFont font;
         std::vector<std::uint8_t> widths(190);
@@ -162,6 +185,10 @@ namespace
         Resources missing;
         MenuCanvas canvas(missing);
         CHECK(!canvas.initialize(error) && !error.empty());
+        menu.open(false);
+        menu.audio_failed = true;
+        menu.activate();
+        CHECK(menu.page == MenuPage::Solo && menu.error.empty());
         return true;
     }
     bool session(const std::filesystem::path& content)
@@ -182,6 +209,27 @@ namespace
         audio.play(MenuCue::Enter);
         audio.play(MenuCue::Back);
         CHECK(audio.starts == 4 && audio.failures == 0);
+        for (int i = 0; i < 40; ++i)
+            audio.play(MenuCue::Select);
+        CHECK(audio.mixer.voices().size() <= 16 && audio.mixer.get(audio.ambient) && audio.failures == 0);
+        AudioMixer audible, quiet, music_off;
+        SoundRequest cue;
+        cue.resource = "sounds/interface/mainmenus/select01.wav";
+        cue.space = SoundSpace::Local;
+        SoundId quiet_id = 0;
+        for (auto* mixer : {&audible, &quiet, &music_off})
+        {
+            mixer->inspect_pcm = true;
+            auto id = mixer->play(resources, nullptr, cue, {}, error);
+            CHECK(id);
+            if (mixer == &quiet)
+                quiet_id = id;
+        }
+        CHECK(quiet.set_gains(0, 1) && music_off.set_gains(1, 0));
+        for (auto* mixer : {&audible, &quiet, &music_off})
+            CHECK(mixer->advance(.05, {}, {}));
+        CHECK(audible.peak > 0 && quiet.peak == 0 && quiet.get(quiet_id)->cursor > 0 &&
+              audible.mixed == music_off.mixed);
         auto game = std::make_unique<GameSession>();
         game->resources = resources;
         CHECK(game->initialize());
@@ -189,6 +237,16 @@ namespace
         CHECK(GameSession::start_new_game(game, "01_SubwayA", 1, 0, error));
         CHECK(game->client_shell.m_bInWorld);
         CHECK(step_app_session(*game, 1. / 60));
+        auto& shell = game->client_shell;
+        shell.use_down = shell.use_was_down = shell.medkit_was_down = shell.flashlight_was_down = true;
+        shell.proximity_was_down = shell.remote_was_down = shell.detonate_was_down = true;
+        shell.movement_input.forward = shell.weapon_input.primary = shell.move_mgr.m_bLastJumpCommand = true;
+        const auto before_release = game->objects.time();
+        neutralize_app_input(shell);
+        CHECK(!shell.use_down && !shell.use_was_down && !shell.medkit_was_down && !shell.flashlight_was_down &&
+              !shell.proximity_was_down && !shell.remote_was_down && !shell.detonate_was_down &&
+              !shell.movement_input.forward && !shell.weapon_input.primary && !shell.move_mgr.m_bLastJumpCommand);
+        CHECK(game->objects.time() == before_release);
         auto* previous = game.get();
         const auto player = game->client_shell.player;
         const auto time = game->objects.time();
@@ -246,6 +304,15 @@ namespace
             for (int i = 0; i < 10; ++i)
                 CHECK(game->step(1. / 60));
             CHECK(!player->crouched && player->eye_level == p.eye);
+            CHECK(player->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA, 1) == InventoryResult::Ok);
+            CHECK(game->client_shell.SyncWeapons(game->models, game->resources, game->server_shell, error));
+            for (const auto& hand : game->client_shell.weapons)
+                CHECK(hand.model && hand.character == c &&
+                      hand.skin_path.find(std::string(1, p.hands) + "_") != std::string::npos);
+            auto& voices = game->client_shell.voice_manager;
+            CHECK(!voices.groups[c][11].sounds.empty());
+            CHECK(voices.PlaySound(player->m_hObject, voices.groups[c][11].sounds.front(), false));
+            CHECK(game->server.audio.get(voices.voice) && game->server.audio.get(voices.voice)->clip->frames() > 0);
             CHECK(game->command_weapon(0, error));
             const auto& weapon = game->client_shell.weapons[0];
             CHECK(weapon.character == c && weapon.skin_path.find(std::string(1, p.hands) + "_") != std::string::npos);
@@ -305,6 +372,10 @@ namespace
             const auto rev = canvas.revision;
             CHECK(canvas.compose(menu, 0, error) && canvas.revision == rev);
             CHECK(canvas.surface->rgba.size() == 640 * 480 * 4);
+            if (menu.page == MenuPage::Load)
+                for (unsigned i = 0; i < 2; ++i)
+                    CHECK(menu.items[i].literal.ends_with("unavailable") &&
+                          menu.items[i].literal.find('%') == std::string::npos);
             for (const auto& item : menu.items)
                 CHECK(item.rect.bottom <= 425 && item.rect.right <= 625);
             if (!gpu)
@@ -345,6 +416,8 @@ int main(int argc, char** argv)
     if (argc < 2)
         return 2;
     const std::string mode = argv[1];
+    if (mode == "preferences")
+        return test_menu_preferences(argc - 1, argv + 1);
     if (mode == "state")
         return state() ? 0 : 1;
     if (argc < 3)

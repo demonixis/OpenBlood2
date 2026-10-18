@@ -2,11 +2,13 @@
 #include "app/hud.h"
 #include "app/menu_input.h"
 #include "app/menu_renderer.h"
+#include "app/menu_smoke.h"
 #include "app/scene_presenter.h"
 #include "app/session_playback.h"
 #include "app/ui_runtime.h"
 #include "engine/capture.h"
 #include "game/menu_audio.h"
+#include "game/menu_preferences.h"
 #if BLOOD2_INSPECTOR
 #include "app/inspector.h"
 #endif
@@ -43,6 +45,11 @@ namespace OpenBlood2
         if (!artwork.mount_game(config, error))
             return failed(5);
         Menu menu;
+        std::filesystem::path preferences;
+        std::string preference_error;
+        if (!options.menu_smoke && (!menu_preferences_path(preferences, preference_error) ||
+                                    !load_menu_preferences(preferences, menu.settings, preference_error)))
+            spdlog::warn("Preferences: {}", preference_error);
         MenuCanvas canvas(artwork);
         if (!canvas.initialize(error))
             return failed(5);
@@ -50,7 +57,10 @@ namespace OpenBlood2
         MenuAudio menu_audio(artwork);
         menu_audio.random_state = std::uint32_t(SDL_GetTicksNS());
         if (!menu_audio.mixer.open_output(error))
+        {
+            menu_audio.error = error;
             spdlog::warn("Menu audio output: {}", error);
+        }
         auto game = std::make_unique<GameSession>();
         game->resources = artwork;
         if (!game->initialize())
@@ -67,6 +77,10 @@ namespace OpenBlood2
         }
         else
             menu.open(false);
+        if (!preference_error.empty())
+            menu.open(game->client_shell.m_bInWorld);
+        menu.error = preference_error;
+        auto stored_settings = menu.settings;
         MenuInput input;
         input.controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
         input.reset(menu, game->client_shell.m_bInWorld);
@@ -87,6 +101,7 @@ namespace OpenBlood2
 #else
         (void)data;
 #endif
+        MenuSmoke smoke;
         bool done = false, captured = false, dismiss_error = false;
         std::uint64_t frames = 0;
         auto previous = SDL_GetTicksNS();
@@ -94,16 +109,21 @@ namespace OpenBlood2
         std::string reported_audio;
         while (!done && (!options.frame_limit || frames < options.frame_limit))
         {
+            const bool paused_at_start = menu.active;
             const auto tick = SDL_GetTicksNS();
-            const double delta = app_frame_delta(double(tick - previous) / 1e9);
+            const double delta = options.menu_smoke ? 1. / 60 : app_frame_delta(double(tick - previous) / 1e9);
             previous = tick;
             if (menu.active && !canvas.compose(menu, 0, error))
+                return failed(4);
+            if (options.menu_smoke && !smoke.before(frames, runtime.window, *game, menu, input, menu_audio, error))
                 return failed(4);
             SDL_Event event;
             int width = 0, height = 0;
             SDL_GetWindowSize(runtime.window, &width, &height);
             while (SDL_PollEvent(&event))
             {
+                if (options.menu_smoke && MenuSmoke::unrelated(event))
+                    continue;
                 if (event.type == SDL_EVENT_QUIT || (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED &&
                                                      event.window.windowID == SDL_GetWindowID(runtime.window)))
                 {
@@ -112,6 +132,9 @@ namespace OpenBlood2
                 }
                 if (!menu.error.empty())
                 {
+                    if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST || event.type == SDL_EVENT_WINDOW_FOCUS_GAINED)
+                        input.event(event, SDL_GetWindowID(runtime.window), menu, game->client_shell.m_bInWorld, false,
+                                    BLOOD2_INSPECTOR && options.inspector, float(width), float(height));
                     ImGui_ImplSDL3_ProcessEvent(&event);
                     if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat &&
                         event.key.scancode == SDL_SCANCODE_ESCAPE)
@@ -119,9 +142,17 @@ namespace OpenBlood2
                     continue;
                 }
                 auto* player = game->server_shell.Player(game->local_client);
+                const bool old_inspector = input.inspector, old_menu = menu.active;
                 const bool forward = input.event(event, SDL_GetWindowID(runtime.window), menu,
                                                  game->client_shell.m_bInWorld, player && !player->m_damage.IsDead(),
                                                  BLOOD2_INSPECTOR && options.inspector, float(width), float(height));
+                if (old_inspector != input.inspector || old_menu != menu.active)
+                {
+                    neutralize_app_input(game->client_shell);
+                    ImGui::GetIO().ClearEventsQueue();
+                    ImGui::GetIO().ClearInputKeys();
+                    ImGui::GetIO().ClearInputMouse();
+                }
                 // SDL backend still needs platform/focus/resize events when its windows are hidden.
                 const bool device_input = event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP ||
                                           event.type == SDL_EVENT_TEXT_INPUT || event.type == SDL_EVENT_MOUSE_MOTION ||
@@ -133,6 +164,9 @@ namespace OpenBlood2
             }
             if (done)
                 break;
+            // Freeze queued game output before any potentially slow preparation.
+            if (!game->server.audio.pause_output(menu.active, error))
+                return failed(4);
             auto command = menu.take_command();
             if (command.action == MenuAction::Quit)
                 break;
@@ -155,6 +189,23 @@ namespace OpenBlood2
                 }
                 previous = SDL_GetTicksNS();
             }
+            if (stored_settings != menu.settings)
+            {
+                stored_settings = menu.settings;
+                if (!options.menu_smoke && !save_menu_preferences(preferences, menu.settings, error))
+                    menu.error = error;
+            }
+            const auto& settings = menu.settings;
+            const float sound_gain = settings.sound ? settings.sound_volume / 50.f : 0;
+            const float music_gain = settings.music ? settings.music_volume / 50.f : 0;
+            if (!game->server.audio.set_gains(sound_gain, music_gain) ||
+                !menu_audio.mixer.set_gains(sound_gain, music_gain))
+            {
+                error = "Cannot apply audio preferences";
+                return failed(4);
+            }
+            input.controls.mouse_sensitivity = .0025f * (settings.sensitivity / 150.f);
+            input.controls.invert_y = settings.invert_y;
             menu_audio.focus(menu.active);
             for (auto cue : menu.cues)
                 menu_audio.play(cue);
@@ -164,11 +215,17 @@ namespace OpenBlood2
             {
                 reported_audio = menu_audio.error;
                 if (!reported_audio.empty())
+                {
                     spdlog::warn("Menu audio: {}", reported_audio);
+                    menu.audio_failed = true;
+                    ++menu.revision;
+                }
             }
             if (!game->server.audio.pause_output(menu.active, error))
                 return failed(4);
             auto& shell = game->client_shell;
+            if (menu.active || input.inspector)
+                neutralize_app_input(shell);
             shell.movement_input = {};
             shell.weapon_input = {};
             shell.use_down = shell.medkit_down = shell.flashlight_down = shell.proximity_down = shell.remote_down =
@@ -216,7 +273,7 @@ namespace OpenBlood2
                         spdlog::info("Weapon selection: {}", error);
                 input.controls.look(shell.rotation, delta, false);
             }
-            if (!menu.active)
+            if (!menu.active && !paused_at_start)
             {
                 if (!step_app_session(*game, delta))
                 {
@@ -301,7 +358,9 @@ namespace OpenBlood2
                 return failed(3);
             }
             Capture capture;
-            const bool save = target && frames >= 2 && !captured && !options.capture_file.empty();
+            const bool phase_capture = options.menu_smoke && (frames == 8 || frames == 17 || frames == 23 ||
+                                                              frames == 120 || frames == 208 || frames == 214);
+            const bool save = target && ((frames >= 2 && !captured) || phase_capture) && !options.capture_file.empty();
             if (save &&
                 !capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), w, h))
             {
@@ -348,7 +407,11 @@ namespace OpenBlood2
             }
             if (save)
             {
-                if (!capture.save(path_text(options.capture_file).c_str()))
+                const auto capture_path =
+                    phase_capture ? options.capture_file.parent_path() /
+                                        (path_text(options.capture_file.stem()) + "-" + std::to_string(frames) + ".png")
+                                  : options.capture_file;
+                if (!capture.save(path_text(capture_path).c_str()))
                 {
                     error = SDL_GetError();
                     return failed(3);
@@ -359,6 +422,14 @@ namespace OpenBlood2
             if (!target)
                 SDL_Delay(10);
         }
+        if (options.menu_smoke && !smoke.confirmed)
+        {
+            error = "Menu smoke did not reach quit confirmation";
+            return failed(4);
+        }
+        if (options.menu_smoke)
+            spdlog::info("Menu traversal passed: startup, pause snapshots, independent audio, options, resize, "
+                         "inspector, resume and quit");
         spdlog::info("Frontend complete: {} frames, world {}, menu audio starts {}/failures {}", frames,
                      game->world_path, menu_audio.starts, menu_audio.failures);
         return 0;

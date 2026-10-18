@@ -2381,3 +2381,12 @@ if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME menus.profiles COMMAND menu_tests profiles "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(menus.profiles PROPERTIES LABELS "headless;private;menus" TIMEOUT 180)
 endif()
+
+target_sources(menu_tests PRIVATE menu_preferences_tests.cpp)
+add_test(NAME menus.preferences COMMAND menu_tests preferences "${CMAKE_CURRENT_BINARY_DIR}/menu-preferences")
+set_tests_properties(menus.preferences PROPERTIES LABELS "headless;menus" TIMEOUT 10)
+
+if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+    add_test(NAME gpu.menu_traversal COMMAND blood2_app --menu-smoke --data-dir "${BLOOD2_TEST_DATA_DIR}" --capture "${CMAKE_CURRENT_BINARY_DIR}/menu-traversal.png")
+    set_tests_properties(gpu.menu_traversal PROPERTIES LABELS "gpu;private;menus" TIMEOUT 120 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy" FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+endif()

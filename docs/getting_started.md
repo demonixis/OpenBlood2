@@ -1,3 +1,8 @@
+> Current normal menu controls: launch without `--view-world` for the main menu;
+> F10 toggles inspection and Esc pauses/resumes the game and its audio. The older
+> F1/F2/F3 bindings below apply only to diagnostic smokes. Audio/Mouse preferences
+> use SDL's OpenBlood2/Blood2 user directory. See [menu contracts](contracts/menu_contracts.md).
+
 # Setup, controls and validation
 
 The [README](../README.md) contains the basic build. Run the following commands

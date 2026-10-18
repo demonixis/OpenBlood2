@@ -38,8 +38,13 @@ Run from this repository:
 ```sh
 cmake --preset debug
 cmake --build --preset debug --parallel
-./build/debug/blood2 --data-dir "/path/to/Blood II" --view-world
+./build/debug/blood2 --data-dir "/path/to/Blood II"
 ```
+
+Normal launch opens the original main menu. F10 toggles the development inspector;
+Esc opens the pause menu. Use `--view-world` for direct entry. Four default Chosen
+profiles, difficulty, Audio and Mouse options are connected; save/load slots remain
+explicitly unavailable. See [menu contracts](docs/contracts/menu_contracts.md).
 
 Use the `dev` presets (optimized, with inspector) for playtesting and the `release`
 presets for an optimized build without the inspector; Debug is several times slower
