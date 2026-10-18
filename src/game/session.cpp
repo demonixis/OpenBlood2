@@ -5,6 +5,7 @@
 #include "game/original/SkyObjects.h"
 #include "game/original/Sound.h"
 #include "game/server_adapter.h"
+#include "game/world_validation.h"
 #include <algorithm>
 #include <cmath>
 
@@ -335,6 +336,8 @@ namespace OpenBlood2
             return false;
         pending_level_change.reset();
         client_shell.OnExitWorld();
+        if (state == SessionState::Ready)
+            state = SessionState::Inspection;
         if (local_client)
         {
             server_shell.OnClientExitWorld(local_client);
@@ -397,31 +400,90 @@ namespace OpenBlood2
     }
     bool GameSession::run_world(std::string& error)
     {
-        if (state == SessionState::Empty)
+        error.clear();
+        if (objects.busy() || ServerAdapter::active_ != &server || g_pServerDE != &server || !server.bound_)
         {
-            error = "No world loaded";
-            return false;
+            error = "RunWorld requires the active session outside callbacks";
+            return false; // Reentrant/foreign calls must not overwrite the last report.
         }
-        if (objects.busy())
+        const auto attempts = startup.attempts + 1;
+        startup = {};
+        startup.attempts = attempts;
+        startup.revision = world_revision;
+        startup.time = objects.time();
+        bool entered = false;
+        const auto reject = [&]
         {
-            error = "RunWorld during a callback rejected";
+            startup.error = error;
+            // Original start triggers are not transactional. Remove only a player
+            // entered by this attempt; retain world mutations and the explicit report.
+            if (entered && !leave_player())
+                startup.error += "; failed player cleanup";
+            state = world_path.empty() ? SessionState::Empty : SessionState::Blocked;
+            if (trace.empty() || trace.back() != startup.error)
+                trace.push_back(startup.error);
+            error = startup.error;
             return false;
+        };
+        if (world_path.empty() || !server.collision_ready)
+        {
+            error = "No collision world loaded";
+            return reject();
         }
-        std::string entry_error;
+        if (pending_level_change)
+        {
+            error = "RunWorld refused while a level change is pending";
+            return reject();
+        }
+        if (!check_world_initialization(*this, startup, error))
+            return reject();
+        const auto check_actors = [&]
+        {
+            for (auto id : objects.snapshot())
+                if (const auto* record = objects.get(id); record->life == Life::Alive)
+                    if (const auto* ai = dynamic_cast<const AI_Mgr*>(record->game.get()); ai && ai->runtime_failed)
+                    {
+                        error = "Original NPC failure: " + std::string(record->state.m_Name) + ": " + ai->runtime_error;
+                        return reject();
+                    }
+            return true;
+        };
+        if (!check_actors())
+            return false;
         if (!local_client)
-            enter_player(entry_error);
-        state = SessionState::Blocked;
-        const auto missing =
-            std::count_if(entries.begin(), entries.end(), [](const auto& e)
-                          { return e.state == EntryState::Unsupported || e.state == EntryState::Failed; });
-        error = "RunWorld acceptance gate not passed: " + std::to_string(missing) +
-                " uninstantiated required objects. Inspect Services for bounded implementation/trace coverage; "
-                "remaining required paths must pass M2 acceptance.";
-        if (!entry_error.empty())
-            error += "; player entry: " + entry_error;
-        if (trace.empty() || trace.back() != error)
-            trace.push_back(error);
-        return false;
+        {
+            if (!enter_player(error))
+            {
+                error = "Player entry: " + error;
+                return reject();
+            }
+            entered = startup.player_entered = true;
+        }
+        const auto* player = server_shell.Player(local_client);
+        if (!client_shell.m_bInWorld || !player || client_shell.player != player->m_hObject ||
+            !server.IsObjectAlive(player->m_hObject) || player->m_bDead || player->m_damage.IsDead())
+        {
+            error = "RunWorld requires a live player associated with the original client";
+            return reject();
+        }
+        if (pending_level_change)
+        {
+            error = "Start trigger requested another level during entry";
+            return reject();
+        }
+        if (!check_world_initialization(*this, startup, error) || !check_world_presentation(*this, startup, error))
+            return reject();
+        if (!check_actors())
+            return false;
+        if (client_shell.music.failures || !server.audio.music_error.empty())
+        {
+            error = "Original client music failed: " + client_shell.music.error + " " + server.audio.music_error;
+            return reject();
+        }
+        state = SessionState::Ready;
+        startup.accepted = true;
+        trace.push_back("Original session startup validated; future simulation/resource requests remain checked");
+        return true;
     }
     bool GameSession::unload_world()
     {
@@ -459,6 +521,7 @@ namespace OpenBlood2
         world_path.clear();
         trace.clear();
         state = SessionState::Empty;
+        startup = {};
         return true;
     }
     bool GameSession::step(double seconds)

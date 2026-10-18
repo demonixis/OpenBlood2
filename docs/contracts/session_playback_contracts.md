@@ -1,5 +1,8 @@
 # Interactive world entry and NPC preservation
 
+The finite CLI and direct 3D entry are now covered by [checked session startup](session_start_contracts.md).
+The M2 acceptance gate remains separate.
+
 The application now holds a loaded world's simulation until the original local
 player enters. This is an application playback policy, not an alteration of the
 original AI rules. See [evidence](../../../Documentation/Implementation/m2_npc_entry.md)

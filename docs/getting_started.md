@@ -101,3 +101,12 @@ records an additional GPU LeakSanitizer failure separately from the passing
 headless sanitizer checks. The [door-audio audit](../../Documentation/Implementation/m2_door_audio.md)
 reproduces it without a world/player and attributes the reported allocation
 sites to NVIDIA/DBus mappings. It remains an unsuppressed failed GPU leak check.
+
+## Validate session startup
+
+Run `./build/debug/blood2 --start-game` for a finite original-shell/player startup
+check and one update, followed by cleanup. It returns a nonzero exit code for
+missing classes/resources, unavailable services or invalid player entry.
+`--view-world` applies the same check before graphical entry. See
+[the startup contract](contracts/session_start_contracts.md) for diagnostic modes,
+ownership and the distinction from full M2 acceptance.

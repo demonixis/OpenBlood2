@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "8a0db703cde22a96d8f1d7ca84e94938432d49ce",
+  "original_imports": [],
+  "reference": {
+    "path": "src/game/level_change.cpp",
+    "commit": "8a0db703cde22a96d8f1d7ca84e94938432d49ce",
+    "sha256": "a712e650d23bcbd4490fe703f02879963a0cec2aed006c06074bdb7badccc717",
+    "use": "Extract the existing NEW_LEVEL entry accounting and presentation resource checks into shared world_validation helpers; retain limits and strict decode behavior."
+  },
+  "adaptations": [
+    "Replace unconditional RunWorld refusal with bound-session/callback, source-entry, current NPC, client/player, resource and music failure checks.",
+    "Record owned startup report and a Ready checkpoint; distinguish player cleanup from nontransactional original start-trigger world changes.",
+    "Enter the player before the finite CLI startup update; reuse the check for direct 3D entry.",
+    "Preserve diagnostic entry/step APIs and existing NEW_LEVEL policy; add source-accounting length guard."
+  ],
+  "limits": [
+    "No new original gameplay rule, class, dependency or retail binary compatibility.",
+    "Validation is a current-state startup checkpoint, not certification of every future resource request or full M2 acceptance.",
+    "No native macOS, Windows or mobile execution in this run.",
+    "Existing GPU LeakSanitizer failure from the earlier acceptance audit is not superseded by headless sanitizer checks."
+  ],
+  "frozen_sources": {
+    "CMakeLists.txt": "181c925d83de966abe2aa5335d056d95324108846488c2d8eafa8a0ac6df4ebc",
+    "src/app/inspector.cpp": "cd52ce3662da7dadb52836edabd9fc984c5b4a5e9e89c22cc3dc20b5ea3c5693",
+    "src/app/main.cpp": "781b5a68e8f67f2713979351eaf466ce089a48c63144f2f37f21673ce43c6a42",
+    "src/game/level_change.cpp": "729bf060bb1f100d3351cc29ded1434e342b2fd79db008dd4996a67f1a1419e8",
+    "src/game/server_adapter.h": "5117501f5fc3735ca38d77a48c4c0e9a24164c4e01d13a08f59c706c80aa0e8b",
+    "src/game/session.cpp": "f7f711524dee30785c41f74696a9343105ee28a7db1a3f6e7404adfd61d3bde1",
+    "src/game/session.h": "1036d0ec9e60c369b8c5306432343fdd339b7a5148b043af0eb972e3f90f8c2e",
+    "src/game/world_preparation.h": "2d7bf6fb84f6f9a90f434a7b53db915a82b8d4e218a11274ec5f710c768c2b66",
+    "tests/CMakeLists.txt": "6c66abe27bb8ddba26a222004b681cf50aa16f2d4ce6081dccf6617559c72547",
+    "tests/exit_tests.cpp": "587f961276e54615349d04581bc193693d638f27572df256772b9925c632f9ca",
+    "tests/gideon_runtime_tests.cpp": "7c586566790f5a9c2cd7ab5393bddd395d0b11d5c6fa5f894b82906047f1a692",
+    "tests/player_tests.cpp": "42287c4998ede003734ac6f7fadbeb167d53ba42f44e99bab599c7dcd4b27d6a",
+    "tests/scene_explosion_tests.cpp": "61732cd2bd508e4dd818ad6025b32d78b270a891d5fee111ebdcb57e7569498a",
+    "tests/sound_tests.cpp": "37b4963ae81cabc8d0bb2a4e280a4cd92479c43c115380aca7ac3c838ee636d5",
+    "tests/sprite_tests.cpp": "5459e9f4cf4695874a006c3f748e0dff528431897f1af47f5e6dc7ba9b9a0c37",
+    "tests/world_cli_test.cmake": "846b73fcd60d7b41a1cba44240b0bd2e22953172c7f53b5f8b0347b085cf0b3b",
+    "tests/world_tests.cpp": "627581ea61d76a0c5650f6a328ec87212ba57d9ab6f99132321665291706d864",
+    "src/game/world_validation.cpp": "6066fd2eb4df163f43bafa38ff49f0df26c565316fcc3440399c5e1eb4a9f1f5",
+    "src/game/world_validation.h": "717c0c77cf9abc684bd960bd9bae75d98da21d15df0de31f7717fc78b461f91f"
+  }
+}

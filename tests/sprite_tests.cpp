@@ -391,13 +391,13 @@ namespace
                 if (r->sprite)
                     CHECK(r->sprite_track.frame == 0 && std::abs(r->sprite_track.milliseconds - 20) < 1e-6);
             }
-            CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11 && !g.run_world(error) &&
-                  error.find("0 uninstantiated") != std::string::npos);
+            CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11 && g.run_world(error) &&
+                  error.empty() && g.state == SessionState::Ready);
             CHECK(g.unload_world() && weak.expired() && g.objects.snapshot().empty() && g.server.string_count() == 0 &&
                   g.server.message_count() == 0 && g.server.list_count() == 0);
             std::cout << "cycle=" << cycle
                       << " 12 DetailSprite source instances, exact SPR frame resources, hidden-independent clocks and "
-                         "unload verified; M2 blocked (17)\n";
+                         "unload verified; full M2 acceptance remains separate\n";
         }
         return true;
     }

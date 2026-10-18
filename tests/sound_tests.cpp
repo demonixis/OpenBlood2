@@ -382,7 +382,7 @@ namespace
             const auto pos = g.server.audio.get(ids.front())->position;
             CHECK(g.server.advance_audio(.02, pos, {}) && g.server.audio.peak > 0 &&
                   g.server.audio.mixed_frames == 960);
-            CHECK(!g.run_world(error) && error.find("0 uninstantiated") != std::string::npos);
+            CHECK(g.run_world(error) && error.empty() && g.state == SessionState::Ready);
             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
                   !g.server.audio.cached_clips());
             for (auto id : ids)

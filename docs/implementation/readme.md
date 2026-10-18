@@ -78,3 +78,5 @@ the original log or patch.
 - [Live MUSIC messages](../../../Documentation/Implementation/m2_music_messages.md): original player/client requests, real immediate/next-song playback and truthful pending/failure inspection; M2 remains incomplete.
 
 The [session-cost audit](../../../Documentation/Implementation/m2_session_cost.md) removes temporary trace-name allocations and zero-depth audio modulation work. Read [contracts](../contracts/session_cost_contracts.md); preserve owned counters, exact scalar PCM/cursor progression and all existing session/test deadlines. The full M2 acceptance review and runtime-start guard remain open.
+
+- [Checked session startup](../../../Documentation/Implementation/m2_session_start.md): actual admission/refusal checks, shared NEW_LEVEL resource validation and startup inspection; M2 remains incomplete.

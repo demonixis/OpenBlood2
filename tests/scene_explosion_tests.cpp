@@ -334,7 +334,7 @@ namespace
             CHECK(g.server.scene_explosions.size() == 9 && player->m_damage.m_fHitPoints == health && g.step(.11));
             for (auto h : emitted)
                 CHECK(!g.objects.get(h));
-            CHECK(!g.run_world(error) && error.find("0 uninstantiated") != std::string::npos);
+            CHECK(g.run_world(error) && error.empty() && g.state == SessionState::Ready);
             CHECK(g.unload_world() && g.server.scene_explosions.empty() && g.server.audio.voices().empty() &&
                   g.server.string_count() == 0 && g.server.message_count() == 0 && g.server.list_count() == 0);
             std::cout << "cycle=" << cycle

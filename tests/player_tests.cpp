@@ -228,9 +228,11 @@ namespace
         {
             auto& game = *callback_game;
             std::string error;
+            const auto attempts = game.startup.attempts;
+            const auto state = game.state;
             rejected_reentry = !game.leave_player() && !game.unload_world() && !game.enter_player(error) &&
                                !game.run_world(error) && !game.step(.01) && !game.pump_player_messages(error) &&
-                               game.local_client;
+                               game.local_client && game.startup.attempts == attempts && game.state == state;
             if (remove_on_trigger)
                 game.objects.remove(game.server.GetClientUserData(game.local_client));
             return BaseClass::ObjectMessageFn(sender, message, read);
@@ -292,8 +294,7 @@ namespace
                 CHECK(game.step(1.0 / 60.0));
             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
-            CHECK(!game.run_world(error) && error.find("0 uninstantiated") != std::string::npos &&
-                  error.find("acceptance gate not passed") != std::string::npos && game.state == SessionState::Blocked);
+            CHECK(game.run_world(error) && error.empty() && game.state == SessionState::Ready);
             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()

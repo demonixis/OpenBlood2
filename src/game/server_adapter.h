@@ -439,6 +439,7 @@ namespace OpenBlood2
         DestinationInspection destination_inspection;
         DestinationTrial destination_trial;
         LevelChangeReport level_change;
+        SessionStartReport startup;
         std::optional<LevelChangeRequest> pending_level_change;
         bool queue_level_change(const WorldMessage&, std::string_view start, std::string&);
         // Called only at an owning frame boundary, after all callbacks/step references have returned.

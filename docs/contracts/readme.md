@@ -211,3 +211,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Finite music playlists](music_playlist_contracts.md): original level choices, ordered one-pass playback and shared tempo/lifetime limits.
 
 - [Repeating music transport](music_transport_contracts.md): bounded continuous audio, fractional clocks, cancellation and remaining live-MUSIC limits.
+
+- [Checked session startup](session_start_contracts.md): original entry, strict resource/service checks, failure ownership and the finite CLI harness.

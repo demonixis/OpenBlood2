@@ -37,6 +37,7 @@ namespace OpenBlood2
     {
         Empty,
         Inspection,
+        Ready, // Explicit startup checkpoint passed; not a promise about future requests.
         Blocked
     };
     // Local source-level message transport; deliberately not the retail network ABI.

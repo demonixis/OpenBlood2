@@ -396,7 +396,7 @@ namespace
                   boss->CurrentScriptCommand().argument == "PASSIVE" && boss->script_selections == 2 &&
                   boss->script_failures == 0 && !g_hActiveCamera && !g.client_shell.view.object &&
                   !g.server_shell.Player(g.local_client)->activation_ping_failures);
-            CHECK(!g.run_world(error));
+            CHECK(g.run_world(error) && g.state == SessionState::Ready && error.empty());
             CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.objects.get(previous));
             CHECK(!AI_Mgr::m_dwNumMonster && !AI_Mgr::m_dwNumCabal && !CDestructable::m_dwNumDestructables);
         }

@@ -1,5 +1,8 @@
 # Resource, World and Session Contracts
 
+Historical unconditional RunWorld refusal below is superseded by [checked session startup](session_start_contracts.md).
+The M2 acceptance gate remains separate.
+
 The [CityHub entry continuation](cityhub_entry_contracts.md) supersedes earlier
 missing-named-world-model and CityHub refusal statements: absent named BSPs are
 explicitly omitted before initial update, with no runtime instance. All other

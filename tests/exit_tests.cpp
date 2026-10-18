@@ -243,7 +243,7 @@ namespace
             CHECK(g.objects.snapshot().size() == 233 && g.objects.attachments().size() == 11);
             CHECK(g.client_shell.world_exit.received == 1 && g.client_shell.world_exit.queued == 1);
             CHECK(g.world_path == "worlds/01_subwaya.dat" && g.client_shell.m_bInWorld);
-            CHECK(!g.run_world(error) && error.find("0 uninstantiated") != std::string::npos);
+            CHECK(!g.run_world(error) && error.find("level change is pending") != std::string::npos);
             CHECK(g.unload_world() && g.server.string_count() == 0 && g.objects.snapshot().empty());
             CHECK(SmellHint::m_dwNumSmells == 0);
         }

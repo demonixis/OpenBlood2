@@ -31,6 +31,7 @@ add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/ScreenFa
     src/game/original/trigger_helpers.cpp
     src/game/original/session_load.cpp
     src/game/session.cpp
+    src/game/world_validation.cpp
     src/game/player_restore.cpp
     src/game/registration.cpp
     src/game/server_adapter.cpp

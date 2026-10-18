@@ -1165,7 +1165,20 @@ namespace OpenBlood2
         if (ImGui::Button("Check session startup"))
             run_request = true;
         ImGui::SameLine();
-        ImGui::TextColored(ImVec4(1, .65f, .3f, 1), "Inspection / full gameplay blocked");
+        ImGui::TextUnformatted(game.state == SessionState::Ready     ? "Startup checkpoint passed"
+                               : game.state == SessionState::Blocked ? "Startup check rejected"
+                                                                     : "Inspection");
+        if (game.startup.attempts)
+        {
+            const auto& report = game.startup;
+            ImGui::Text(
+                "Last startup check: %s at %.3f s | %zu decoded images | %zu unknown / %zu failed / %zu omitted",
+                report.accepted ? "passed" : "rejected", report.time, report.checked_textures, report.unknown,
+                report.failed, report.omitted);
+            if (!report.error.empty())
+                ImGui::TextWrapped("%s", report.error.c_str());
+            ImGui::TextDisabled("Snapshot only; future requests and full M2 acceptance are separate.");
+        }
         if (!world_error.empty())
             ImGui::TextWrapped("%s", world_error.c_str());
         ImGui::InputTextWithHint("##class-filter", "Filter class or object name", world_filter, sizeof(world_filter));

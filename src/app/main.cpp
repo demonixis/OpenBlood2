@@ -129,11 +129,14 @@ namespace
                          game->world.objects.size(), game->objects.snapshot().size(), game->world.models.size());
             if (options.player_smoke || options.view_world)
             {
-                if (!game->enter_player(error))
+                if (!(options.view_world ? game->run_world(error) : game->enter_player(error)))
                 {
                     spdlog::error("Player entry: {}", error);
                     return 6;
                 }
+                if (options.view_world)
+                    spdlog::info("Startup checkpoint passed before first frame: {} decoded images, {} omitted entries",
+                                 game->startup.checked_textures, game->startup.omitted);
                 if ((options.weapons_smoke || options.movement_smoke || options.interaction_smoke ||
                      options.pickups_smoke) &&
                     !OpenBlood2::finish_camera_intro_for_smoke(*game))
@@ -1875,7 +1878,7 @@ int main(int argc, char** argv)
                      "  --view-world        Enter diagnostic 3D view with original player/cameras; F1 inspector, F2 "
                      "controls; 1..9/0 weapon slots, HUD health/armor/ammo\n"
                      "  --viewport-smoke    GPU 3D depth view, movement and unload/reload checks\n"
-                     "  --start-game        Check session startup; fails explicitly on missing M2 services\n"
+                     "  --start-game        Validate original entry and one headless update; exits after checks\n"
                      "  --no-inspector      Start with the inspector hidden\n"
                      "  --frames N          Exit after N presented frames\n"
                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled\n"
@@ -1952,14 +1955,24 @@ int main(int argc, char** argv)
             spdlog::error("Player entry: {}", error);
             return 6;
         }
-        if (!game.step(1.0 / 60.0))
-            return 5;
         if (options.start_game && !game.run_world(error))
         {
             spdlog::error("{}", error);
             return 6;
         }
-        if (options.inspect_player)
+        if (!game.step(1.0 / 60.0))
+            return 5;
+        if (options.start_game && !game.run_world(error))
+        {
+            spdlog::error("Startup update: {}", error);
+            return 6;
+        }
+        if (options.start_game)
+            spdlog::info(
+                "Original session startup validated: player associated before first update; {} decoded images; "
+                "bounded headless check, not full M2 acceptance",
+                game.startup.checked_textures);
+        else if (options.inspect_player)
             spdlog::info("Original shell/player entry inspection succeeded: CPlayerObj at {}, {}, {}; full gameplay "
                          "remains blocked",
                          game.client_shell.position.x, game.client_shell.position.y, game.client_shell.position.z);

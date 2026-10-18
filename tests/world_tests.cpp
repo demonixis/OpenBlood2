@@ -540,7 +540,7 @@ namespace
         CHECK(!game.objects.get(path));
         CHECK(!game.run_world(error));
         CHECK(game.state == SessionState::Blocked);
-        CHECK(error.find("player entry: Model resource not mounted") != std::string::npos);
+        CHECK(error.find("unsupported classes") != std::string::npos && !game.local_client);
         CHECK(!game.request_world("../bad", error));
         CHECK(game.objects.get(old)); // Failed parse doesn't discard current world.
         CHECK(game.request_world("fixture", error));
@@ -1014,7 +1014,7 @@ namespace
             CHECK(game.objects.snapshot() == ids && game.world_revision == revision && game.objects.time() == time);
             CHECK(!game.destination_inspection.scan_complete && game.destination_inspection.entries.empty());
             std::cout << "Malformed destination preserves source: " << error << '\n';
-            CHECK(!game.run_world(error));
+            CHECK(game.run_world(error) && error.empty());
             CHECK(game.unload_world() && game.server.client_count() == 0 && game.server.string_count() == 0);
         }
         return true;
@@ -1200,6 +1200,109 @@ namespace
         CHECK(save(root / "images.rez", archive.b));
         std::string error;
         CHECK(game.resources.mount(root / "images.rez", error));
+        return true;
+    }
+    bool session_start(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(trial_fixture(game, root));
+        std::string error;
+        CHECK(game.unload_world());
+        CHECK(!game.run_world(error) && game.state == SessionState::Empty &&
+              error.find("No collision world") != error.npos);
+        CHECK(game.request_world("trial5", error));
+        const auto before = game.objects.snapshot();
+        CHECK(!game.run_world(error) && game.startup.unknown == 1 && !game.local_client &&
+              game.objects.snapshot() == before && game.state == SessionState::Blocked);
+        CHECK(game.request_world("trial4", error));
+        CHECK(!game.run_world(error) && game.startup.failed == 1 && !game.local_client);
+        CHECK(game.request_world("trial1", error));
+        game.entries.pop_back(); // Deliberately inconsistent diagnostic state must not index out of bounds.
+        CHECK(!game.run_world(error) && error.find("accounting") != error.npos && !game.local_client);
+        CHECK(transition_images(game, root));
+        CHECK(game.request_world("trial1", error));
+        // Entry works, but the generated fixture deliberately has no music assets.
+        CHECK(!game.run_world(error) && error.find("music failed") != error.npos && game.startup.player_entered &&
+              !game.client_shell.m_bInWorld && !game.local_client && game.server.client_count() == 0 &&
+              game.startup.checked_textures > 0);
+        const auto report = game.startup;
+        {
+            GameSession foreign;
+            CHECK(!foreign.initialize());
+            CHECK(!foreign.run_world(error) && foreign.startup.attempts == 0 &&
+                  game.startup.attempts == report.attempts && game.startup.error == report.error);
+        }
+        CHECK(game.enter_player(error));
+        const auto player = game.client_shell.player;
+        const auto client = game.local_client;
+        const auto ids = game.objects.snapshot();
+        CHECK(!game.run_world(error) && game.local_client == client && game.client_shell.player == player &&
+              game.objects.snapshot() == ids && !game.startup.player_entered);
+        game.server.record_unavailable("synthetic required service failure");
+        CHECK(!game.run_world(error) && game.startup.unavailable_services.size() == 1 &&
+              error.find("unavailable services") != error.npos);
+        CHECK(game.request_world("trial6", error));
+        CHECK(!game.run_world(error) && error.find("another level") != error.npos && !game.local_client &&
+              !game.pending_level_change);
+        CHECK(game.request_world("trial1", error));
+        // The indexed-only skin fixture is malformed; strict startup must decode it.
+        CHECK(game.resources.mount(root / "synthetic.rez", error));
+        CHECK(!game.run_world(error) && error.find("image") != error.npos && !game.local_client &&
+              !game.startup.accepted);
+        CHECK(game.unload_world() && game.startup.attempts == 0 && game.server.string_count() == 0 &&
+              game.server.client_count() == 0 && game.objects.snapshot().empty());
+        std::cout << "Startup rejects unknown/failed entries, incomplete accounting, missing music, unavailable "
+                     "services, recursive exits and malformed images; foreign/report and player ownership preserved\n";
+        return true;
+    }
+    bool session_start_private(const std::filesystem::path& root)
+    {
+        GameSession game;
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(game.initialize() && game.resources.mount_game(config, error));
+        for (const char* world : {"01_SubwayA", "02_CityHub", "01_SubwayA"})
+        {
+            CHECK(game.request_world(world, error));
+            const auto entry_time = game.objects.time();
+            CHECK(game.run_world(error) && game.objects.time() == entry_time);
+            CHECK(error.empty() && game.state == SessionState::Ready && game.startup.accepted &&
+                  game.startup.player_entered && game.startup.checked_textures > 0 && !game.startup.failed &&
+                  !game.startup.unknown && game.startup.unavailable_services.empty());
+            const auto client = game.local_client;
+            const auto player = game.client_shell.player;
+            const auto count = game.objects.snapshot().size();
+            CHECK(game.run_world(error) && game.local_client == client && game.client_shell.player == player &&
+                  game.objects.snapshot().size() == count && game.objects.time() == entry_time &&
+                  !game.startup.player_entered && game.startup.attempts == 2);
+            for (unsigned frame = 0; frame < 60; ++frame)
+                CHECK(game.step(1.0 / 60));
+            CHECK(game.run_world(error));
+            CHECK(game.server_shell.updates == 60 && game.client_shell.m_bInWorld);
+            game.client_shell.player = nullptr; // Controlled association fault; never create a second player.
+            CHECK(!game.run_world(error) && error.find("associated") != error.npos && game.local_client == client);
+            game.client_shell.player = player;
+            AI_Mgr* actor = nullptr;
+            for (auto id : game.objects.snapshot())
+                if (auto* ai = dynamic_cast<AI_Mgr*>(game.objects.get(id)->game.get()); ai && !ai->runtime_failed)
+                {
+                    actor = ai;
+                    break;
+                }
+            CHECK(actor);
+            actor->runtime_failed = true;
+            actor->runtime_error = "controlled startup failure probe";
+            CHECK(!game.run_world(error) && error.find("controlled startup failure probe") != error.npos);
+            actor->runtime_failed = false;
+            actor->runtime_error.clear();
+            CHECK(game.run_world(error));
+            std::cout << world << " startup: " << game.startup.checked_textures << " decoded images, "
+                      << game.startup.omitted << " original missing-BSP omissions; 60 original updates\n";
+            CHECK(game.leave_player() && game.state == SessionState::Inspection && !game.local_client);
+            CHECK(game.unload_world() && game.startup.attempts == 0 && game.state == SessionState::Empty &&
+                  !game.server.string_count() && !game.server.client_count() && game.objects.snapshot().empty());
+        }
         return true;
     }
     bool level_change(const std::filesystem::path& root)
@@ -1548,7 +1651,7 @@ namespace
         auto id = game.entries[0].object;
         CHECK(game.request_world("01_SubwayA", error));
         CHECK(!game.objects.get(id));
-        CHECK(!game.run_world(error));
+        CHECK(game.run_world(error) && error.empty());
         std::cout << error << '\n';
         game.unload_world();
         CHECK(game.server.string_count() == 0);
@@ -1564,6 +1667,8 @@ int main(int argc, char** argv)
     std::filesystem::path root = argc > 2 ? path_from_utf8(argv[2]) : std::filesystem::path{};
     if (name == "private")
         ok = private_world(root);
+    else if (name == "session_start_private")
+        ok = session_start_private(root);
     else if (name == "level_change_private")
         ok = level_change_private(root);
     else if (name == "destination_trial_private")
@@ -1579,6 +1684,8 @@ int main(int argc, char** argv)
             return 2;
         if (name == "surface_effects")
             ok = surface_effects();
+        else if (name == "session_start")
+            ok = session_start(root);
         else if (name == "level_change")
             ok = level_change(root);
         else if (name == "destination_trials")
