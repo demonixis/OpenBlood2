@@ -44,7 +44,10 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         create.m_Flags &= ~FLAG_SHADOW;
         return 1;
     }
-    if (message == MID_INITIALUPDATE)
+    // A subclass may already have removed itself (original _DEMO bomb pickups).
+    // The source keeps configuring the doomed object; checked transforms reject a
+    // pending removal, so skip placement while the base chain still runs.
+    if (message == MID_INITIALUPDATE && g_pServerDE->IsObjectAlive(m_hObject))
     {
         DVector dims;
         if (g_pServerDE->GetModelAnimUserDims(m_hObject, &dims, g_pServerDE->GetModelAnimation(m_hObject)) != DE_OK)

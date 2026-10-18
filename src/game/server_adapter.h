@@ -154,6 +154,11 @@ namespace OpenBlood2
             trace_service("GetWorldTime");
             return static_cast<float>(world_time());
         }
+        bool DemoBuild() override
+        {
+            trace_service("DemoBuild");
+            return client_resources && client_resources->demo();
+        }
         void reset_world_time()
         {
             audio.clear();

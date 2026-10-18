@@ -1719,8 +1719,10 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --log-dir DIR       Log root (default: SDL user directory / logs)\n"
                      "  --log-level LEVEL   trace, debug, info (default), warn or error\n"
                      "  --data-dir DIR      External Blood II directory; overrides BLOOD2_DATA_DIR and config\n"
+                     "  --demo              The data directory is the original 1998 demo (B2Demo.rez); "
+                     "first world Demo_01\n"
                      "  --check-data        Check file metadata without opening a window or parsing archives\n"
-                     "  --world NAME        World resource (default: 01_SubwayA)\n"
+                     "  --world NAME        World resource (default: 01_SubwayA, Demo_01 with --demo)\n"
                      "  --inspect-world     Parse/mount/create original subset headlessly; does not run a game\n"
                      "  --inspect-player    Exercise original shell/player entry headlessly; not playable\n"
                      "  --view-world        Start directly in the original world; F10 inspector, Esc pause; "
@@ -1817,7 +1819,14 @@ static int application_main(const OpenBlood2::Options& options)
             return 6;
         }
         if (!game.step(1.0 / 60.0))
+        {
+            spdlog::error("Inspection update failed");
+            for (const auto& diagnostic : game.objects.diagnostics())
+                spdlog::error("Object: {}", diagnostic);
+            for (const auto& diagnostic : game.step_errors())
+                spdlog::error("{}", diagnostic);
             return 5;
+        }
         if (options.start_game && !game.run_world(error))
         {
             spdlog::error("Startup update: {}", error);
@@ -1857,10 +1866,10 @@ int main(int argc, char** argv)
     std::string log_error;
     if (!logs.start({options.log_dir, options.log_level}, log_error))
         spdlog::error("File logging unavailable; console remains active: {}", log_error);
-    spdlog::info("Requested world={}; config={}; inspector={}; view={}; bench={}; headless={}; frames={}",
-                 options.world, OpenBlood2::path_text(options.config_file), bool(BLOOD2_INSPECTOR) && options.inspector,
-                 options.view_world, options.bench, options.check_data || options.inspect_world || options.start_game,
-                 options.frame_limit);
+    spdlog::info("Requested world={}; demo={}; config={}; inspector={}; view={}; bench={}; headless={}; frames={}",
+                 options.world, options.demo, OpenBlood2::path_text(options.config_file),
+                 bool(BLOOD2_INSPECTOR) && options.inspector, options.view_world, options.bench,
+                 options.check_data || options.inspect_world || options.start_game, options.frame_limit);
     int result = 2;
     if (!parsed)
         spdlog::error("{}", error);

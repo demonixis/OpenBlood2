@@ -9,6 +9,7 @@
 #include "engine/capture.h"
 #include "game/menu_audio.h"
 #include "game/menu_preferences.h"
+#include "game/original/MenuIds.h"
 #if BLOOD2_INSPECTOR
 #include "app/inspector.h"
 #endif
@@ -53,6 +54,17 @@ namespace OpenBlood2
         MenuCanvas canvas(artwork);
         if (!canvas.initialize(error))
             return failed(5);
+        // The shipped demo client (Build 108/178) predates the menu string table:
+        // its labels are compiled into cshell.dll. Never substitute invented text.
+        if (config.demo && !canvas.strings.strings.contains(IDS_MENU_MAIN_SINGLEPLAYER))
+        {
+            error = "The demo's cres.dll has no original menu strings (its labels are compiled into cshell.dll); "
+                    "the original menu is unavailable for this demo build";
+            if (!options.view_world)
+                return failed(5);
+            spdlog::warn("{}; Esc will fail instead of pausing", error);
+            error.clear();
+        }
         MenuRenderer menu_renderer(runtime.gpu);
         MenuAudio menu_audio(artwork);
         menu_audio.random_state = std::uint32_t(SDL_GetTicksNS());
@@ -178,10 +190,11 @@ namespace OpenBlood2
                 break;
             if (command.action == MenuAction::NewGame)
             {
-                spdlog::info("New game requested: world=01_SubwayA; character={}; difficulty={}",
+                const char* world = first_level(config.demo);
+                spdlog::info("New game requested: world={}; character={}; difficulty={}", world,
                              command.story ? 0 : int(command.character), int(command.difficulty));
                 // Execute the owned profile request outside SDL event dispatch.
-                if (!GameSession::start_new_game(game, "01_SubwayA", DBYTE(command.difficulty),
+                if (!GameSession::start_new_game(game, world, DBYTE(command.difficulty),
                                                  DBYTE(command.story ? 0 : command.character), error))
                 {
                     menu.error = error;

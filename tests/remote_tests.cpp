@@ -242,6 +242,29 @@ namespace
         CHECK(g.objects.finish_frame());
         return true;
     }
+    // Original _DEMO branches, selected at runtime by the mounted edition.
+    bool demo(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(test_remote::setup(g, root));
+        g.resources.set_demo(true); // As mount_game selects with --demo.
+        CHECK(g.server.DemoBuild() && IsDemoBuild());
+        auto* p = g.server_shell.Player(g.local_client);
+        CHECK(p);
+        auto& inv = p->m_InventoryMgr;
+        CHECK(inv.AddInventoryWeapon(8, 1) == InventoryResult::NotAvailable && !inv.GetWeapon(11));
+        CHECK(inv.ObtainWeapon(WEAP_PROXIMITYBOMB, -1) == InventoryResult::NotAvailable && !inv.GetWeapon(10));
+        CHECK(inv.ObtainWeapon(WEAP_FLAREGUN, -1) == InventoryResult::NotAvailable); // Not an IsDemoWeapon.
+        CHECK(inv.ObtainWeapon(WEAP_ASSAULTRIFLE, -1) == InventoryResult::Ok);
+        auto h = g.objects.create(g.objects.find_class("RemotesPU"), {}, Creation::World);
+        CHECK(h && g.objects.finish_frame() && !g.objects.get(h) && g.objects.diagnostics().empty());
+        const auto commands = p->remote_commands;
+        CHECK(p->OnCommandDetonate() && p->remote_commands == commands);
+        g.resources.set_demo(false);
+        CHECK(!IsDemoBuild() && inv.AddInventoryWeapon(8, 1) == InventoryResult::Ok && inv.GetWeapon(11));
+        CHECK(g.unload_world());
+        return true;
+    }
     bool restore(const std::filesystem::path& root)
     {
         GameSession g;
@@ -393,6 +416,7 @@ int main(int argc, char** argv)
             : mode == "reentrant" ? reentrant(root)
             : mode == "inventory" ? inventory(root)
             : mode == "restore"   ? restore(root)
+            : mode == "demo"      ? demo(root)
             : mode == "private"   ? private_world(argv[2])
                                   : mode == "private_fire" && private_fire(argv[2]))
                ? 0

@@ -1447,3 +1447,7 @@ The original light term is established by fitting light objects against retail b
 
 The original flag usage and the shipped detail configuration (`MaxModelShadows`) select casters and the default; later LithTech's projected silhouette technique is consulted. No code is imported. Tile shadows along the strongest static light are a replacement policy. See [source ledger](sources/model_shadow_sources.json) and [contracts](../contracts/model_shadow_contracts.md).
 
+
+## Original demo edition (2026-10-18)
+
+Selected `_DEMO` branches of original `InventoryMgr.cpp` (IsDemoWeapon, bomb construction, AddInventoryWeapon), `ItemPickups.cpp` and `PlayerObj.cpp` (COMMAND_DETONATE) are ported as a runtime edition, together with the `Demo_01` first level. The single-archive layout comes from the installed demo. The compile-time define becomes a session constant; no demo menu text is substituted. See [source ledger](sources/demo_sources.json) and [contracts](../contracts/demo_contracts.md).

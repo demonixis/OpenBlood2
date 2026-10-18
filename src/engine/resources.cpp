@@ -1,6 +1,7 @@
 #include "engine/resources.h"
 #include "engine/formats/reader.h"
 #include <algorithm>
+#include <array>
 #include <fstream>
 #include <functional>
 #include <set>
@@ -221,14 +222,17 @@ namespace OpenBlood2
             error = "Cannot enumerate content directory";
             return false;
         }
-        for (const char* name : {"blood2.rez", "sound.rez", "blood2p.rez", "blood2p2.rez"})
+        static constexpr std::array<const char*, 4> full{"blood2.rez", "sound.rez", "blood2p.rez", "blood2p2.rez"};
+        static constexpr std::array<const char*, 1> demo{"b2demo.rez"};
+        const auto archives = config.demo ? std::span<const char* const>(demo) : std::span<const char* const>(full);
+        for (const char* name : archives)
         {
             const auto found = files.find(name);
             if (found == files.end())
             {
-                if (std::string_view(name) == "blood2.rez")
+                if (name == archives.front()) // The first archive is required.
                 {
-                    error = "Missing BLOOD2.REZ";
+                    error = config.demo ? "Missing B2DEMO.REZ" : "Missing BLOOD2.REZ";
                     return false;
                 }
             }
@@ -236,6 +240,7 @@ namespace OpenBlood2
                 return false;
         }
         next.content_root_ = config.data_dir;
+        next.demo_ = config.demo;
         *this = std::move(next);
         return true;
     }

@@ -118,6 +118,8 @@ class ServerDE : public CSBase
                                     OpenBlood2::BodyPlacement&) = 0;
     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
     virtual float GetWorldTime() = 0;
+    // Replaces the original compile-time _DEMO switch; fixed by the mounted edition.
+    virtual bool DemoBuild() = 0;
     virtual OpenBlood2::SegmentResult CastRay(DVector, DVector, OpenBlood2::SegmentHit&, HOBJECT ignore = nullptr) = 0;
     virtual OpenBlood2::SegmentResult CastWorldRay(DVector from, DVector direction, OpenBlood2::SegmentHit&) = 0;
     virtual OpenBlood2::SegmentResult IntersectWorldSegment(DVector from, DVector to,

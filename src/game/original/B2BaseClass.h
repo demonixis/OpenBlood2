@@ -16,6 +16,12 @@
 extern char g_szVarDifficulty[];
 extern char g_szVarGameType[];
 
+// Runtime replacement for the original compile-time _DEMO build (--demo).
+inline bool IsDemoBuild()
+{
+    return g_pServerDE && g_pServerDE->DemoBuild();
+}
+
 #define OPT_FLAG_EASY 1
 #define OPT_FLAG_MED 2
 #define OPT_FLAG_HARD 4

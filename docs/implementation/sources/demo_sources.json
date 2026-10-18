@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-18",
+  "scope": "--demo edition: original _DEMO weapon, bomb, pickup and first-level branches selected at runtime; demo archive layout",
+  "retail_evidence": [
+    {
+      "file": "B2Demo.rez (installed Blood2 demo, 1998)",
+      "sha256": "e410ce2944210c776c7407a79e01cfa031c782132f68407cd0871379c5e7218c",
+      "purpose": "Single archive: 1364 resources, worlds/demo_01.dat and demo_02.dat (DAT v56), cres.dll Ver 1.0 (Build 178) with 43 strings (ids 0..48, no IDS_MENU_*), cshell.dll DEMO v1.0 (Build 108) with menu labels compiled in."
+    }
+  ],
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ObjectDLL.dsp",
+      "source_sha256": "18c5f120f166b052897981099441a8faf18942ab9980e82889b54ea0fa3f2063",
+      "purpose": "The demo configurations define _DEMO for the server DLL (ClientShellDLL.dsp does the same)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/InventoryMgr.cpp",
+      "source_sha256": "aab29291e988ac7c3e1424f41076b5c0adc6243cd60198ea2cc6381d402d0e53",
+      "purpose": "ObtainWeapon IsDemoWeapon player gate after the slot search, no bomb construction, AddInventoryWeapon returning CHWEAP_NOTAVAIL, IsDemoWeapon list."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ItemPickups.cpp",
+      "source_sha256": "1ae96d4e47ea46a709e06eacba3f2e9f206632791884af3ad421520a08ef801a",
+      "purpose": "ItemPickupWeapon MID_INITIALUPDATE removes bomb pickups and breaks before multiplayer/USRFLG_GLOW."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "93056622f9f083f11447a471ecae6f115b7dc3937daf7d251d2396724f3d2003",
+      "purpose": "COMMAND_DETONATE is compiled out of the demo."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006",
+      "purpose": "MenuNewGame sFirstLevel Demo_01; EndGame exit, loading screens and other unconnected demo branches."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/BloodClientShell.h",
+      "source_sha256": "83956dffff04cd998463716315eabd8b255a8c94f6164d803954b4ca8f36e93f",
+      "purpose": "Source demo version string DEMO v1.0a (Build 109), newer than the shipped client."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MenuMain.cpp",
+      "source_sha256": "91c95e3b35eb3dfafdcd278b03e70afcfa7ecda8d356fe4a11e9beb63503fdfe",
+      "purpose": "Demo main-menu splash branches (not connected) using IDS_MENU_* string ids absent from the shipped demo cres.dll."
+    },
+    {
+      "source": "sources/lithtech/Blood2/Shared/SharedDefs.h",
+      "source_sha256": "24c3d2752c18bf884afa0f376a129e68d0885b13da93410253e69db46d549423",
+      "purpose": "WEAP_TESLACANNON 13 and WEAP_VOODOO 14 for IsDemoWeapon."
+    }
+  ],
+  "adaptations": [
+    "The compile-time _DEMO define is a runtime edition fixed by mount_game and carried by Resources copies.",
+    "A pickup removed during its own initial update skips model placement; the source configured the doomed object, which checked transforms reject.",
+    "No demo menu text is substituted for the missing string table."
+  ]
+}

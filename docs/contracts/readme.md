@@ -228,3 +228,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Checked session startup](session_start_contracts.md): original entry, strict resource/service checks, failure ownership and the finite CLI harness.
 
 - [Platform lifetime diagnostics](gpu_lifetime_contracts.md): isolated SDL controls, explicit sanitizer failures and NVIDIA module attribution.
+
+- [Original demo edition](demo_contracts.md): `--demo` archive layout, first level, runtime `_DEMO` weapon/pickup rules and the remaining demo blockers.

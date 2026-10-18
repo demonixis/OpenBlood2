@@ -24,6 +24,14 @@ relative paths in a config are resolved against that file's directory.
 ctest --preset debug -L headless
 ```
 
+The 1998 two-level demo (`B2Demo.rez`) needs `--demo`; its first world is `Demo_01`.
+Its worlds still use unported classes and its menu has no string table, so it does
+not start yet. See [demo contracts](contracts/demo_contracts.md).
+
+```sh
+./build/debug/blood2 --demo --data-dir "/path/to/Blood2 Demo" --inspect-world
+```
+
 The default world is SubwayA. `--view-world` enters the original player and
 requests mouse capture. The inspector can also **Enter player and play**.
 The authored intro restricts movement/fire for roughly twelve simulation seconds.

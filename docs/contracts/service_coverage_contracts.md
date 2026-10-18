@@ -21,7 +21,7 @@ all client-shell operations, or a list of completed gameplay features.
   independently of the implementation classification. Neither a positive count
   nor the absence of a generic failure proves successful gameplay.
 
-The catalogue contains 171 ServerDE/CSBase entries and three supporting boundaries.
+The catalogue contains 173 ServerDE/CSBase entries and three supporting boundaries.
 Trace names are canonical method names; old descriptive suffixes and the sky
 aliases are historical. Six previously missing service boundaries now trace directly:
 GetPathManager, PlayClientSound, PublishBloodSpurt, PublishFleshGibs,

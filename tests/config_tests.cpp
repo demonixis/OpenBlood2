@@ -160,6 +160,46 @@ namespace
         return true;
     }
 
+    bool demo(const fs::path& root)
+    {
+        Options options;
+        std::string error;
+        const std::array<std::string_view, 1> plain{"--demo"};
+        CHECK(parse_options(plain, options, error) && options.demo && options.world == first_level(true));
+        const std::array<std::string_view, 3> world{"--world", "Demo_02", "--demo"};
+        CHECK(parse_options(world, options, error) && options.demo && options.world == "Demo_02");
+        const std::array<std::string_view, 2> view{"--demo", "--view-world"};
+        CHECK(parse_options(view, options, error) && options.view_world);
+        for (const auto smoke : {"--weapons-smoke", "--menu-smoke", "--gpu-smoke", "--player-smoke"})
+        {
+            const std::array<std::string_view, 2> args{"--demo", smoke};
+            CHECK(!parse_options(args, options, error) && error.find("--demo") != std::string::npos);
+        }
+        const std::array<std::string_view, 0> none{};
+        CHECK(parse_options(none, options, error) && !options.demo && options.world == first_level(false));
+
+        options.config_file = root / "absent.ini";
+        options.data_dir = root;
+        options.demo = true;
+        Config config;
+        CHECK(load_config(options, "", config, error) && config.demo);
+        DataStatus data;
+        CHECK(write(root / "BLOOD2.REZ", "synthetic full metadata"));
+        CHECK(!inspect_data(config, data, error));
+        CHECK(error.find("B2DEMO.REZ is missing") != std::string::npos &&
+              error.find("omit --demo") != std::string::npos);
+        CHECK(write(root / "B2Demo.rez", "synthetic demo metadata"));
+        CHECK(inspect_data(config, data, error));
+        CHECK(data.archives.size() == 1 && data.archives[0].name == "B2DEMO.REZ" && data.archives[0].present);
+        std::error_code ec;
+        CHECK(fs::remove(root / "BLOOD2.REZ", ec) && !ec);
+        config.demo = false;
+        CHECK(!inspect_data(config, data, error));
+        CHECK(error.find("BLOOD2.REZ is missing") != std::string::npos &&
+              error.find("add --demo") != std::string::npos);
+        return true;
+    }
+
     bool case_lookup(const fs::path& root)
     {
         Config config{root, "test"};
@@ -200,6 +240,8 @@ int main(int argc, char** argv)
         test = content_validation;
     else if (name == "case_lookup")
         test = case_lookup;
+    else if (name == "demo")
+        test = demo;
     if (!test)
         return 2;
     std::error_code ec;

@@ -40,10 +40,20 @@ namespace OpenBlood2
         {
             return content_root_;
         }
+        // Content edition chosen by mount_game (--demo); copies carry it to new sessions.
+        bool demo() const
+        {
+            return demo_;
+        }
+        void set_demo(bool demo) // Synthetic indexes built with mount() select it explicitly.
+        {
+            demo_ = demo;
+        }
 
       private:
         std::map<std::string, Resource> index_;
         std::vector<Mount> mounts_;
         std::filesystem::path content_root_; // Set only by a successful mount_game; loose music remains external.
+        bool demo_ = false;
     };
 } // namespace OpenBlood2

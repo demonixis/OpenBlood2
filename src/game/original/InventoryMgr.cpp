@@ -184,6 +184,12 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         }
     if (empty < 0)
         return InventoryResult::Full;
+    // Original _DEMO: players only obtain the demo weapons, and no bomb weapon
+    // class exists for any owner. Checked after the slot search, as in the source.
+    if (IsDemoBuild() &&
+        (inventory_bomb(type) ||
+         (!IsDemoWeapon(type) && dynamic_cast<CPlayerObj*>(BaseClass::GetServerDE()->HandleToObject(m_hOwner)))))
+        return InventoryResult::NotAvailable;
     // Original strength gate was commented out; do not introduce a new one.
     std::unique_ptr<CWeapon> weapon;
     if (type == WEAP_REMOTEBOMB)
@@ -438,6 +444,8 @@ void CInventoryMgr::RemoveDeathItems()
 // Original AddInventoryWeapon/SelectInventoryWeapon and exhaustion fallback.
 InventoryResult CInventoryMgr::AddInventoryWeapon(DBYTE type, DBYTE count)
 {
+    if (IsDemoBuild())
+        return InventoryResult::NotAvailable; // Original _DEMO body: unconditional CHWEAP_NOTAVAIL.
     auto* server = BaseClass::GetServerDE();
     if (!server || !server->IsObjectAlive(m_hOwner))
         return InventoryResult::Invalid;

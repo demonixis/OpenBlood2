@@ -4,10 +4,17 @@
 inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_FLAREGUN = 3, WEAP_ASSAULTRIFLE = 9,
                        WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38, WEAP_ZEALOT_ENERGYBLAST = 27, WEAP_SOUL_HOOK = 23,
                        WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42, WEAP_PROXIMITYBOMB = 49, WEAP_REMOTEBOMB = 50;
+inline constexpr DBYTE WEAP_TESLACANNON = 13, WEAP_VOODOO = 14; // Referenced by IsDemoWeapon only.
 inline constexpr DBYTE AMMO_PROXIMITYBOMB = 10, AMMO_REMOTEBOMB = 11;
 inline constexpr bool inventory_bomb(DBYTE type)
 {
     return type == WEAP_PROXIMITYBOMB || type == WEAP_REMOTEBOMB;
+}
+// Original InventoryMgr.cpp IsDemoWeapon: the player weapons of the _DEMO build.
+inline constexpr bool IsDemoWeapon(DBYTE type)
+{
+    return type == WEAP_MELEE || type == WEAP_BERETTA || type == WEAP_SUBMACHINEGUN || type == WEAP_ASSAULTRIFLE ||
+           type == WEAP_VOODOO || type == WEAP_TESLACANNON;
 }
 inline constexpr unsigned inventory_weapon_slots = 13;
 inline constexpr DBYTE TYPE_RIFLE = 0, TYPE_AUTORIFLE = 1, TYPE_PISTOL = 2, TYPE_MELEE = 4, TYPE_MAGIC = 8,

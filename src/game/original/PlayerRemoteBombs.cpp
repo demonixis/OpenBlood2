@@ -59,6 +59,8 @@ void CPlayerObj::ClearRemoteBombs()
 }
 bool CPlayerObj::OnCommandDetonate()
 {
+    if (IsDemoBuild())
+        return true; // Original _DEMO compiles COMMAND_DETONATE out: the command does nothing.
     if (!g_pServerDE->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() || movement_blocked ||
         camera_movement_blocked)
         return false;

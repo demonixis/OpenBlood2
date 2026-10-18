@@ -402,6 +402,21 @@ namespace
         CHECK(save(root / "b.rez", {0}));
         CHECK(!r.read("sample.dat", read, error));
         CHECK(read.empty());
+        // The original demo ships one archive; each mode ignores the other edition's files.
+        const auto demo_root = root / "demo";
+        std::error_code ec;
+        std::filesystem::create_directories(demo_root, ec);
+        CHECK(!ec && save(demo_root / "B2Demo.rez", rez({4}, "demo").data));
+        CHECK(save(demo_root / "BLOOD2.REZ", rez({5}, "full").data));
+        Config config{demo_root, "test", true};
+        Resources editions;
+        CHECK(editions.mount_game(config, error) && editions.mounts().size() == 1);
+        CHECK(editions.find("demo.dat") && !editions.find("full.dat"));
+        config.demo = false;
+        CHECK(editions.mount_game(config, error) && editions.find("full.dat") && !editions.find("demo.dat"));
+        CHECK(std::filesystem::remove(demo_root / "B2Demo.rez", ec) && !ec);
+        config.demo = true;
+        CHECK(!editions.mount_game(config, error) && error == "Missing B2DEMO.REZ" && editions.find("full.dat"));
         return true;
     }
     bool world_properties()

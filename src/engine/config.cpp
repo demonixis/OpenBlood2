@@ -95,11 +95,14 @@ namespace OpenBlood2
     {
         options = {};
         error.clear();
+        bool explicit_world = false;
         for (std::size_t i = 0; i < args.size(); ++i)
         {
             const auto arg = args[i];
             if (arg == "--menu-smoke")
                 options.menu_smoke = true;
+            else if (arg == "--demo")
+                options.demo = true;
             else if (arg == "--help" || arg == "-h")
                 options.help = true;
             else if (arg == "--inspect-world")
@@ -238,7 +241,10 @@ namespace OpenBlood2
                     return false;
                 }
                 if (arg == "--world")
+                {
                     options.world = args[i];
+                    explicit_world = true;
+                }
                 else if (arg == "--log-dir")
                     options.log_dir = path_from_utf8(args[i]);
                 else if (arg == "--log-level")
@@ -297,6 +303,23 @@ namespace OpenBlood2
             error = "--bench is a separate headless measurement mode";
             return false;
         }
+        // The scripted smokes assert full-game SubwayA/CityHub content.
+        const bool content_smoke =
+            options.menu_smoke || options.gpu_smoke || options.world_smoke || options.player_smoke ||
+            options.restore_smoke || options.keepalive_smoke || options.weapons_smoke || options.skeleton_smoke ||
+            options.movement_smoke || options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
+            options.interaction_smoke || options.brushes_smoke || options.pickups_smoke || options.objectives_smoke ||
+            options.cameras_smoke || options.keyframes_smoke || options.worldpaths_smoke || options.lights_smoke ||
+            options.cinematics_smoke || options.random_sounds_smoke || options.world_sounds_smoke ||
+            options.sprites_smoke || options.scene_explosions_smoke;
+        if (options.demo && content_smoke)
+        {
+            error = "--demo supports normal launch, --view-world, --check-data, --inspect-world, --inspect-player, "
+                    "--start-game and --bench; smoke diagnostics need the full game";
+            return false;
+        }
+        if (options.demo && !explicit_world)
+            options.world = first_level(true);
         if (options.world_smoke && options.gpu_smoke)
         {
             error = "Choose one GPU smoke mode";
@@ -348,6 +371,7 @@ namespace OpenBlood2
     {
         config = {};
         error.clear();
+        config.demo = options.demo;
         std::error_code ec;
         const bool exists = fs::exists(options.config_file, ec);
         if (ec || (options.explicit_config && !exists))
@@ -393,7 +417,12 @@ namespace OpenBlood2
     {
         data = {};
         error.clear();
-        data.archives = {{"BLOOD2.REZ", true}, {"SOUND.REZ"}, {"BLOOD2P.REZ"}, {"BLOOD2P2.REZ"}, {"BLOOD2NM.REZ"}};
+        // The 1998 demo ships every resource in one archive (B2Demo.rez).
+        if (config.demo)
+            data.archives = {{"B2DEMO.REZ", true}};
+        else
+            data.archives = {{"BLOOD2.REZ", true}, {"SOUND.REZ"}, {"BLOOD2P.REZ"}, {"BLOOD2P2.REZ"}, {"BLOOD2NM.REZ"}};
+        bool other_edition = false;
         std::error_code ec;
         if (!fs::is_directory(config.data_dir, ec) || ec)
         {
@@ -414,6 +443,7 @@ namespace OpenBlood2
             const auto lower = ascii_lower(path_text(it->path().filename()));
             if (lower == "readme.txt")
                 readme = it->path();
+            other_edition |= lower == (config.demo ? "blood2.rez" : "b2demo.rez");
             for (auto& archive : data.archives)
             {
                 if (lower != ascii_lower(archive.name))
@@ -445,7 +475,10 @@ namespace OpenBlood2
         }
         if (!data.archives.front().present)
         {
-            error = "Required archive BLOOD2.REZ is missing from " + path_text(config.data_dir);
+            error = "Required archive " + data.archives.front().name + " is missing from " + path_text(config.data_dir);
+            if (other_edition)
+                error += config.demo ? "; this looks like the full game: omit --demo"
+                                     : "; this looks like the original demo: add --demo";
             return false;
         }
         // Version is informational: the readme is not proof of the executable version.
