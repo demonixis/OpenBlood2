@@ -14,9 +14,12 @@ per-world counts in the contracts are historical.
 Update after L0/L1 (same data, `--start-game`): `drop` and `multi/bb_deathcanyon`
 now start; 17 equal-radius Sounds now play (434 → 417 failed entries over all
 worlds); every precreate rejection names its cause. After L13 `08_subwayb`
-also starts; after L3, 147 entries still fail, and after L4 115. Of the seven
-worlds that pass entry validation, six start with `--start-game`; `bb_midgard`
-fails its first update (L14). The tables below are regenerated from
+also starts; after L3, 147 entries still fail, and after L4 115. The 05_CDM
+series (Container, TripLaser, StealthPU, Tesla Cannon, SoulDrudge, ShikariAI and
+the container-texture presentation fix) leaves 112 failed entries; eleven worlds
+pass entry validation and eight start through `start_new_game` (the Levels tab
+path): 01_SubwayA, 02_CityHub, 05_CDM, 05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon,
+BB_Drain. `bb_midgard` and `bb_area15` still fail at startup (L14). The tables below are regenerated from
 the latest run.
 
 ## How to refresh
@@ -31,63 +34,63 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 
 ## Status by world
 
-`starts` means the world passes entry validation and `--start-game` (01_SubwayA,
-02_CityHub, 05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon). Batches are defined in the next section.
+`starts` means the world passes entry validation and starts (01_SubwayA,
+02_CityHub, 05_CDM, 05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon, BB_Drain). Batches are defined in the next section.
 
 | World | Created | Unported (classes) | Failed | Batches needed |
 |---|---:|---:|---:|---|
 | 01_subwaya | 204 | 0 (0) | 0 | **starts** |
 | 02_cityhub | 453 | 0 (0) | 0 | **starts** |
-| 02_cityhubb | 392 | 19 (3) | 0 | L7 |
-| 02_cityhubc | 370 | 34 (4) | 2 | L2, L7, L10 |
-| 03_museum | 559 | 86 (6) | 6 | L6, L8, L10, L11, L12 |
-| 04_steamtunnels | 449 | 55 (6) | 6 | L2, L5, L6, L7, L10 |
-| 05_cdm | 534 | 14 (5) | 2 | L6, L7, L10, L11 |
+| 02_cityhubb | 404 | 7 (1) | 0 | L7 |
+| 02_cityhubc | 386 | 18 (2) | 2 | L2, L7, L10 |
+| 03_museum | 641 | 4 (4) | 6 | L6, L8, L10, L12 |
+| 04_steamtunnels | 494 | 10 (4) | 6 | L2, L5, L6, L7, L10 |
+| 05_cdm | 550 | 0 (0) | 0 | **starts** |
 | 05_cdmb | 129 | 0 (0) | 0 | **starts** |
 | 06_airship1 | 191 | 0 (0) | 5 | L6, L12 |
 | 06_airship2 | 243 | 2 (2) | 17 | L6, L10 |
-| 07_cathedral | 207 | 18 (9) | 4 | L2, L6, L7, L8, L10, L11 |
+| 07_cathedral | 218 | 7 (6) | 4 | L2, L6, L7, L8, L10 |
 | 08_subwayb | 175 | 0 (0) | 0 | **starts** |
-| 09_abandoned_buildings | 641 | 38 (11) | 32 | L2, L4, L5, L6, L7, L8, L10, L11 |
-| 10_sewagetreatmentplant | 99 | 25 (5) | 1 | L6, L7, L11 |
-| 11_slaughter_house | 467 | 26 (8) | 14 | L6, L7, L8, L10, L12 |
-| 21_laboratory | 282 | 38 (9) | 7 | L6, L7, L8, L11 |
-| 22_office | 490 | 6 (3) | 9 | L2, L6, L7, L8, L10 |
-| 23_rooftop | 136 | 8 (6) | 0 | L8, L9, L10, L11 |
-| 24_ancientcity | 255 | 57 (9) | 1 | L6, L7, L8, L10 |
-| 24b_arena | 152 | 18 (11) | 0 | L7, L9, L10, L11 |
+| 09_abandoned_buildings | 657 | 22 (9) | 32 | L2, L4, L5, L6, L7, L8, L10, L11 |
+| 10_sewagetreatmentplant | 110 | 13 (2) | 1 | L6, L7 |
+| 11_slaughter_house | 472 | 21 (7) | 14 | L6, L7, L8, L10, L12 |
+| 21_laboratory | 303 | 17 (7) | 7 | L6, L7, L8, L11 |
+| 22_office | 494 | 4 (2) | 7 | L2, L6, L7, L8, L10 |
+| 23_rooftop | 136 | 6 (5) | 0 | L8, L9, L10 |
+| 24_ancientcity | 288 | 24 (7) | 1 | L6, L7, L8, L10 |
+| 24b_arena | 153 | 16 (9) | 1 | L7, L9, L10, L11, L12 |
 | 25_ancientone | 123 | 30 (10) | 1 | L2, L8, L9, L10, L11 |
 | credits | 21 | 1 (1) | 0 | L9 |
 | drop | 5 | 0 (0) | 0 | **starts** |
 | end | 20 | 4 (4) | 0 | L9 |
-| multi/bb_area15 | 75 | 1 (1) | 0 | L10 |
-| multi/bb_bloodarena | 125 | 5 (5) | 0 | L10 |
+| multi/bb_area15 | 76 | 0 (0) | 0 | L14 |
+| multi/bb_bloodarena | 126 | 4 (4) | 0 | L10 |
 | multi/bb_bloodkeep | 81 | 2 (2) | 1 | L2, L10 |
 | multi/bb_bodies | 66 | 2 (2) | 0 | L10 |
 | multi/bb_brownstar | 132 | 2 (2) | 0 | L10 |
-| multi/bb_cabana | 65 | 3 (3) | 0 | L10 |
+| multi/bb_cabana | 66 | 2 (2) | 0 | L10 |
 | multi/bb_chosenarena | 123 | 2 (2) | 0 | L10 |
-| multi/bb_condemned | 181 | 4 (4) | 3 | L2, L4, L10 |
-| multi/bb_crypt | 116 | 6 (4) | 0 | L10, L11 |
+| multi/bb_condemned | 182 | 3 (3) | 3 | L2, L4, L10 |
+| multi/bb_crypt | 120 | 2 (2) | 0 | L10, L11 |
 | multi/bb_deathcanyon | 44 | 0 (0) | 0 | **starts** |
-| multi/bb_drain | 50 | 2 (1) | 0 | L10 |
+| multi/bb_drain | 52 | 0 (0) | 0 | **starts** |
 | multi/bb_fields | 97 | 8 (1) | 0 | L11 |
 | multi/bb_jgrave | 135 | 11 (4) | 4 | L2, L10 |
 | multi/bb_midgard | 81 | 0 (0) | 0 | L14 |
 | multi/bb_power | 140 | 1 (1) | 0 | L10 |
-| multi/bb_rooftop | 104 | 4 (4) | 0 | L10, L11 |
-| multi/ctf_cabana | 122 | 8 (4) | 0 | L10, L11 |
+| multi/bb_rooftop | 105 | 2 (2) | 0 | L10 |
+| multi/ctf_cabana | 124 | 6 (3) | 0 | L10, L11 |
 | multi/ctf_deadcities | 153 | 8 (4) | 0 | L10, L11 |
 | multi/ctf_dmx | 99 | 7 (3) | 0 | L10, L11 |
 | multi/ctf_jam | 219 | 21 (7) | 0 | L10, L11 |
 
 Closest to starting:
 
-- **L14 only:** `multi/bb_midgard` (passes entry validation, fails first update).
+- **L14 only:** `multi/bb_midgard`, `multi/bb_area15` (pass entry validation, fail at startup).
 - **L9 only:** `credits`, `end` (the Chosen as scripted actors).
 - **L10 only:** `multi/bb_bloodarena`, `multi/bb_area15`, `bb_brownstar`, `bb_cabana`, `bb_chosenarena`, `bb_drain`, `bb_power`.
 - **L11 only:** `multi/bb_fields`.
-- **L7 only:** `02_cityhubb`. **L6 + L10:** `06_airship2`.
+- **L7 only (BoneLeech):** `02_cityhubb`. **L6 + L10:** `06_airship2`.
 
 ## Batches
 
@@ -170,7 +173,10 @@ CDestructableBrush with `Gravity` but neither `BoxPhysics` nor `Pushable`
 (28 entries: 26 in 09_abandoned_buildings, 2 in 04_steamtunnels). The bounded
 body solver refuses them. Needs falling non-box world models.
 
-### L6 — Weapons and weapon pickups (12 worlds)
+### L6 — Weapons and weapon pickups (Tesla Cannon done)
+
+The Tesla Cannon (weapon 13, its three projectiles, TeslaCannonPU and the AI
+`TESLA*` branch) is ported; see the Tesla contracts. The other families remain.
 
 Fanatic/Prophet are rejected when an authored `AIWeapon` names a weapon family
 that is not ported (34 NPCs): SHOTGUN (20), TESLA/TESLACANNON (4), NAPALMCANNON
@@ -181,7 +187,11 @@ as pickups/spawns: `ShotgunPU`, `HowitzerPU`, `RocketAmmoPU`, `TeslaCannonPU`,
 Each family ports the player weapon, the AI branch of `WeaponStrToInt` and the
 pickup together.
 
-### L7 — Cabal creatures (12 worlds)
+### L7 — Cabal creatures (SoulDrudge and ShikariAI done)
+
+SoulDrudge (with its crowbar/axe/pipe) and ShikariAI (claw, spit, loogie) are
+ported; see their contracts. BoneLeech, Thief, DrudgeLord, Gremlin and DrudgePriest
+remain.
 
 | Class | Entries | Worlds |
 |---|---:|---:|
@@ -208,7 +218,10 @@ CalebAI (4), OpheliaAI (3), IshmaelAI (2), GabriellaAI (2), and the Revenant
 variants OpheliaREV, IshmaelREV, GabriellaREV (1 each). Unblocks `credits` and
 `end` alone; also needed by 23, 24b, 25.
 
-### L10 — Power-ups and inventory items (30 worlds, most multiplayer maps)
+### L10 — Power-ups and inventory items (StealthPU done)
+
+StealthPU and the player invisibility power are ported (timed-power contracts);
+the other powers remain and still refuse death/capture while active.
 
 | Class | Entries | Worlds |
 |---|---:|---:|
@@ -225,7 +238,10 @@ variants OpheliaREV, IshmaelREV, GabriellaREV (1 each). Unblocks `credits` and
 Also SpawnObject `LifeEssencePU` (2). The timed powers need the timer
 preservation that player restoration currently refuses.
 
-### L11 — Level mechanics and effects (16 worlds)
+### L11 — Level mechanics and effects (Container and TripLaser done)
+
+The built-in Container and TripLaser are ported (container and TripLaser
+contracts). The remaining classes stay open.
 
 | Class | Entries | Worlds |
 |---|---:|---:|
@@ -257,9 +273,10 @@ source spring is never reached. The allow-list admits the ported item and weapon
 pickups; 02_cityhubb, 03, 04, 05_cdm, 06_airship1, 07 and 08_subwayb lost those
 failures.
 
-### L14 — Runtime start placement (1 world)
+### L14 — Startup after entry validation (2 worlds)
 
-`multi/bb_midgard` passes entry validation now, but its first update fails:
+`multi/bb_area15` has no usable single-player start point (multiplayer map).
+`multi/bb_midgard` passes entry validation, but its first update fails:
 `NecroWardPU0` lies 1.29 units inside world polygon 449 after its initial ground
 placement, beyond the 0.01-unit contact overlap tolerance. Investigate the
 pickup's MoveObjectToGround result against that slope; no depenetration
@@ -268,26 +285,22 @@ shortcut.
 ## Details by world
 
 ### 02_cityhubb
-392 created instances · 19 unported entries (3 classes) · 0 failed entries
+404 created instances · 7 unported entries (1 classes) · 0 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
-| SoulDrudge | 10 | L7 |
 | BoneLeech | 7 | L7 |
-| ShikariAI | 2 | L7 |
 
 ### 02_cityhubc
-370 created instances · 34 unported entries (4 classes) · 2 failed entries
+386 created instances · 18 unported entries (2 classes) · 2 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
 | BoneLeech | 17 | L7 |
-| SoulDrudge | 10 | L7 |
-| ShikariAI | 6 | L7 |
 | BugSprayPU | 1 | L10 |
 
 **Failed entries**
@@ -298,14 +311,12 @@ shortcut.
 | CDestructableModel | Model clip-zero dimensions unavailable | 1 | L2 |
 
 ### 03_museum
-559 created instances · 86 unported entries (6 classes) · 6 failed entries
+641 created instances · 4 unported entries (4 classes) · 6 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
-| Container | 44 | L11 |
-| TripLaser | 38 | L11 |
 | InvulnerabilityPU | 1 | L10 |
 | MadScientistAI | 1 | L8 |
 | ShotgunPU | 1 | L6 |
@@ -323,14 +334,12 @@ shortcut.
 | Prophet | authored AI weapon unavailable: SINGULARITY | 1 | L6 |
 
 ### 04_steamtunnels
-449 created instances · 55 unported entries (6 classes) · 6 failed entries
+494 created instances · 10 unported entries (4 classes) · 6 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
-| SoulDrudge | 32 | L7 |
-| ShikariAI | 13 | L7 |
 | Gremlin | 5 | L7 |
 | RocketAmmoPU | 3 | L6 |
 | DrudgeLord | 1 | L7 |
@@ -345,26 +354,6 @@ shortcut.
 | DetailSprite | Missing, oversized or non-SPR sprite resource: sprites\bloodsplat3.dtx | 1 | L2 |
 | CDestructableBrush | Gravity without BoxPhysics (polygon dynamics) | 2 | L5 |
 | Fanatic | authored AI weapon unavailable: SHOTGU | 1 | L6 |
-
-### 05_cdm
-534 created instances · 14 unported entries (5 classes) · 2 failed entries
-
-**Unported classes**
-
-| Class | Entries | Batch |
-|---|---:|---|
-| TripLaser | 7 | L11 |
-| SoulDrudge | 4 | L7 |
-| Container | 1 | L11 |
-| ShikariAI | 1 | L7 |
-| StealthPU | 1 | L10 |
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| CDestructableModel | SpawnObject class not accepted: TeslaCannonPU | 1 | L6 |
-| Fanatic | authored AI weapon unavailable: TESLA | 1 | L6 |
 
 ### 06_airship1
 191 created instances · 0 unported entries (0 classes) · 5 failed entries
@@ -393,17 +382,14 @@ shortcut.
 | Fanatic | authored AI weapon unavailable: SHOTGUN | 17 | L6 |
 
 ### 07_cathedral
-207 created instances · 18 unported entries (9 classes) · 4 failed entries
+218 created instances · 7 unported entries (6 classes) · 4 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
-| SoulDrudge | 6 | L7 |
-| ShikariAI | 4 | L7 |
 | BoneLeech | 2 | L7 |
 | AngerPU | 1 | L10 |
-| Container | 1 | L11 |
 | DrudgeLord | 1 | L7 |
 | Naga | 1 | L8 |
 | NightGogglesPU | 1 | L10 |
@@ -418,15 +404,13 @@ shortcut.
 | CDestructableModel | SpawnObject class not accepted: ShotgunPU | 1 | L6 |
 
 ### 09_abandoned_buildings
-641 created instances · 38 unported entries (11 classes) · 32 failed entries
+657 created instances · 22 unported entries (9 classes) · 32 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
-| SoulDrudge | 10 | L7 |
 | Thief | 7 | L7 |
-| ShikariAI | 6 | L7 |
 | TimeBombPU | 6 | L10 |
 | ZealotAI | 3 | L8 |
 | CClientWarpGateSFX | 1 | L11 |
@@ -446,16 +430,13 @@ shortcut.
 | Prophet | authored AI weapon unavailable: SINGULARITY | 1 | L6 |
 
 ### 10_sewagetreatmentplant
-99 created instances · 25 unported entries (5 classes) · 1 failed entries
+110 created instances · 13 unported entries (2 classes) · 1 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
 | Thief | 12 | L7 |
-| SoulDrudge | 9 | L7 |
-| ShikariAI | 2 | L7 |
-| Container | 1 | L11 |
 | DrudgeLord | 1 | L7 |
 
 **Failed entries**
@@ -465,14 +446,13 @@ shortcut.
 | Fanatic | authored AI weapon unavailable: HOWITZ | 1 | L6 |
 
 ### 11_slaughter_house
-467 created instances · 26 unported entries (8 classes) · 14 failed entries
+472 created instances · 21 unported entries (7 classes) · 14 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
 | BoneLeech | 9 | L7 |
-| SoulDrudge | 5 | L7 |
 | Thief | 5 | L7 |
 | TimeBombPU | 2 | L10 |
 | ZealotAI | 2 | L8 |
@@ -495,14 +475,12 @@ shortcut.
 | CDestructableModel | SpawnObject class not accepted: BoneLeech | 5 | L7 |
 
 ### 21_laboratory
-282 created instances · 38 unported entries (9 classes) · 7 failed entries
+303 created instances · 17 unported entries (7 classes) · 7 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
-| ShikariAI | 12 | L7 |
-| SoulDrudge | 9 | L7 |
 | BoneLeech | 6 | L7 |
 | Gremlin | 5 | L7 |
 | TheHandAI | 2 | L8 |
@@ -518,14 +496,13 @@ shortcut.
 | CDestructableModel | SpawnObject class not accepted: boneleech | 7 | L7 |
 
 ### 22_office
-490 created instances · 6 unported entries (3 classes) · 9 failed entries
+494 created instances · 4 unported entries (2 classes) · 7 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
 | BoneLeech | 3 | L7 |
-| ShikariAI | 2 | L7 |
 | DeathShroud | 1 | L8 |
 
 **Failed entries**
@@ -534,36 +511,33 @@ shortcut.
 |---|---|---:|---|
 | CDestructableBrush | SpawnObject class not accepted: TheAngerPU | 1 | L10 |
 | CDestructableModel | Model clip-zero dimensions unavailable: Model resource not mounted: modelsworldobjects\urinal2.abc | 1 | L2 |
-| Fanatic | authored AI weapon unavailable: TESLACANNON | 3 | L6 |
 | CDestructableBrush | SpawnObject class not accepted: RocketAmmoPU | 1 | L6 |
+| Fanatic | authored AI weapon unavailable: SHOTGUN | 1 | L6 |
 | Fanatic | authored AI weapon unavailable: SNIPERRIFLE | 1 | L6 |
 | Fanatic | authored AI weapon unavailable: NAPALMCANNON | 1 | L6 |
 | Prophet | authored AI weapon unavailable: MINIGUN | 1 | L6 |
 
 ### 23_rooftop
-136 created instances · 8 unported entries (6 classes) · 0 failed entries
+136 created instances · 6 unported entries (5 classes) · 0 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
 | AngerPU | 2 | L10 |
-| Container | 2 | L11 |
 | CalebAI | 1 | L9 |
 | EnhancedGideon | 1 | L8 |
 | LifeLeechPU | 1 | L10 |
 | OpheliaAI | 1 | L9 |
 
 ### 24_ancientcity
-255 created instances · 57 unported entries (9 classes) · 1 failed entries
+288 created instances · 24 unported entries (7 classes) · 1 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
-| SoulDrudge | 23 | L7 |
 | DrudgeLord | 13 | L7 |
-| ShikariAI | 10 | L7 |
 | DeathShroud | 4 | L8 |
 | DrudgePriest | 3 | L7 |
 | Behemoth | 1 | L8 |
@@ -578,7 +552,7 @@ shortcut.
 | Fanatic | authored AI weapon unavailable: SHOTGUN | 1 | L6 |
 
 ### 24b_arena
-152 created instances · 18 unported entries (11 classes) · 0 failed entries
+153 created instances · 16 unported entries (9 classes) · 1 failed entries
 
 **Unported classes**
 
@@ -592,9 +566,13 @@ shortcut.
 | InvulnerabilityPU | 1 | L10 |
 | IshmaelREV | 1 | L9 |
 | OpheliaREV | 1 | L9 |
-| SoulDrudge | 1 | L7 |
-| StealthPU | 1 | L10 |
 | VoodooDollPU | 1 | L10 |
+
+**Failed entries**
+
+| Class | Cause | Entries | Batch |
+|---|---|---:|---|
+| SoulDrudge | NPC world ground placement failed | 1 | L12 |
 
 ### 25_ancientone
 123 created instances · 30 unported entries (10 classes) · 1 failed entries
@@ -641,17 +619,8 @@ shortcut.
 | IshmaelAI | 1 | L9 |
 | OpheliaAI | 1 | L9 |
 
-### multi/bb_area15
-75 created instances · 1 unported entries (1 classes) · 0 failed entries
-
-**Unported classes**
-
-| Class | Entries | Batch |
-|---|---:|---|
-| StealthPU | 1 | L10 |
-
 ### multi/bb_bloodarena
-125 created instances · 5 unported entries (5 classes) · 0 failed entries
+126 created instances · 4 unported entries (4 classes) · 0 failed entries
 
 **Unported classes**
 
@@ -660,7 +629,6 @@ shortcut.
 | AngerPU | 1 | L10 |
 | BinocularsPU | 1 | L10 |
 | InvulnerabilityPU | 1 | L10 |
-| StealthPU | 1 | L10 |
 | TheEyePU | 1 | L10 |
 
 ### multi/bb_bloodkeep
@@ -700,7 +668,7 @@ shortcut.
 | TheEyePU | 1 | L10 |
 
 ### multi/bb_cabana
-65 created instances · 3 unported entries (3 classes) · 0 failed entries
+66 created instances · 2 unported entries (2 classes) · 0 failed entries
 
 **Unported classes**
 
@@ -708,7 +676,6 @@ shortcut.
 |---|---:|---|
 | AngerPU | 1 | L10 |
 | RevenantPU | 1 | L10 |
-| StealthPU | 1 | L10 |
 
 ### multi/bb_chosenarena
 123 created instances · 2 unported entries (2 classes) · 0 failed entries
@@ -721,7 +688,7 @@ shortcut.
 | InvulnerabilityPU | 1 | L10 |
 
 ### multi/bb_condemned
-181 created instances · 4 unported entries (4 classes) · 3 failed entries
+182 created instances · 3 unported entries (3 classes) · 3 failed entries
 
 **Unported classes**
 
@@ -729,7 +696,6 @@ shortcut.
 |---|---:|---|
 | AngerPU | 1 | L10 |
 | InvulnerabilityPU | 1 | L10 |
-| StealthPU | 1 | L10 |
 | TheEyePU | 1 | L10 |
 
 **Failed entries**
@@ -740,25 +706,14 @@ shortcut.
 | Door | Open or non-manifold container shell: 4 edges / balance 0 in component 3 | 1 | L4 |
 
 ### multi/bb_crypt
-116 created instances · 6 unported entries (4 classes) · 0 failed entries
+120 created instances · 2 unported entries (2 classes) · 0 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
-| Container | 3 | L11 |
 | InvulnerabilityPU | 1 | L10 |
 | ParticleSystem | 1 | L11 |
-| StealthPU | 1 | L10 |
-
-### multi/bb_drain
-50 created instances · 2 unported entries (1 classes) · 0 failed entries
-
-**Unported classes**
-
-| Class | Entries | Batch |
-|---|---:|---|
-| StealthPU | 2 | L10 |
 
 ### multi/bb_fields
 97 created instances · 8 unported entries (1 classes) · 0 failed entries
@@ -797,19 +752,17 @@ shortcut.
 | AngerPU | 1 | L10 |
 
 ### multi/bb_rooftop
-104 created instances · 4 unported entries (4 classes) · 0 failed entries
+105 created instances · 2 unported entries (2 classes) · 0 failed entries
 
 **Unported classes**
 
 | Class | Entries | Batch |
 |---|---:|---|
 | AngerPU | 1 | L10 |
-| Container | 1 | L11 |
 | InvulnerabilityPU | 1 | L10 |
-| StealthPU | 1 | L10 |
 
 ### multi/ctf_cabana
-122 created instances · 8 unported entries (4 classes) · 0 failed entries
+124 created instances · 6 unported entries (3 classes) · 0 failed entries
 
 **Unported classes**
 
@@ -818,7 +771,6 @@ shortcut.
 | AngerPU | 2 | L10 |
 | FlagStand | 2 | L11 |
 | RevenantPU | 2 | L10 |
-| StealthPU | 2 | L10 |
 
 ### multi/ctf_deadcities
 153 created instances · 8 unported entries (4 classes) · 0 failed entries
@@ -863,4 +815,10 @@ shortcut.
 Passes entry validation but `--start-game` fails on the first update:
 `NecroWardPU0` starts 1.29 units inside world polygon 449 (MoveObject refuses
 start penetration deeper than 0.01; depenetration is not implemented). Batch L14.
+
+### multi/bb_area15
+
+Passes entry validation but single-player entry fails ("Original player
+creation/start-point entry failed"): this multiplayer map offers no usable
+single-player start. Batch L14.
 
