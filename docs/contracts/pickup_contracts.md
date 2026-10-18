@@ -153,3 +153,14 @@ charges have left that list. Restore/KeepAlive preserve weapon/ammo, never old b
 handles. The shared model-projectile solver now admits CGrenade, CProximityBomb
 and CRemoteBomb. Earlier remote omissions are historical; time bombs and the
 complete M2 gate remain open.
+
+## Spawn classes absent from the original
+
+`SpawnClassAbsentFromOriginal` names the authored spawn classes that no original
+ObjectDLL class defines: `RocketAmmoPU` (only ever looked up, by AI_Mgr's ammo
+search), and the authoring errors `DieBugDieAmmo`, `FareAmmoPU` and
+`LifeEssencePU` (each absent from the whole original tree). The original
+`SpawnObject` helper gets a null class from GetClass and spawns nothing, so a
+destructible naming one is accepted and its death records "No original class:
+nothing spawns" with no child. They stay rejected by ValidateSpawnObject; other
+unknown names still reject creation, so unported original classes stay visible.

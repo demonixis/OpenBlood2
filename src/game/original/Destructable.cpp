@@ -96,7 +96,7 @@ DDWORD CDestructable::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* d
         text("SpawnObject", spawn_object);
         if (server->GetPropGeneric("SpawnObjectVel", &prop) == DE_OK)
             spawn_velocity = prop.m_Vec;
-        spawn_valid = spawn_object.empty() ||
+        spawn_valid = spawn_object.empty() || SpawnClassAbsentFromOriginal(spawn_object) ||
                       (server->ValidateSpawnObject(spawn_object) && OpenBlood2::physics_vector(spawn_velocity));
         if (server->GetPropGeneric("CanDamage", &prop) == DE_OK)
             can_damage = prop.m_Bool != 0;
@@ -269,6 +269,8 @@ void CDestructable::HandleDestruction()
         server->GetObjectPos(m_hObject, &report.position);
         if (server->GetObjectRotation(m_hObject, &rotation) != DE_OK)
             report.outcome = "Failed: source rotation unavailable";
+        else if (SpawnClassAbsentFromOriginal(spawn_object))
+            report.outcome = "No original class: nothing spawns (source GetClass returns null)";
         else
         {
             report.child = SpawnObject(spawn_object, report.position, rotation, spawn_velocity);

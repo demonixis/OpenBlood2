@@ -221,7 +221,7 @@ namespace
     {
         GameSession g;
         CHECK(setup(g, root));
-        for (auto text : {"Spawner", "RocketAmmoPU", "SniperRiflePU", "AmmoPickup", "  ", "BulletAmmoPU Unknown 1",
+        for (auto text : {"Spawner", "SniperRiflePU", "AmmoPickup", "  ", "BulletAmmoPU Unknown 1",
                           "BulletAmmoPU Name \"bad", "BulletAmmoPU Name a; Name b"})
             CHECK(!g.server.ValidateSpawnObject(text) && !brush(g, text));
         CHECK(!brush(g, "BulletAmmoPU", {{"SpawnObjectVel", DVector{1e8f, 0, 0}}}));
@@ -252,6 +252,16 @@ namespace
             CHECK(near(p->rest_position.y, 100) && near(r->state.m_Pos.y, 110) && near(r->state.m_Pos.x, 100));
         }
         CHECK(!g.server.ValidateSpawnObject("SniperRiflePU"));
+        // Classes no original ObjectDLL defines: GetClass returns null, so the destroyed
+        // container spawns nothing (03_Museum RocketAmmoPU, authoring typos).
+        for (auto text : {"RocketAmmoPU", "rocketammopu Name x", "DieBugDieAmmo", "FareAmmoPU", "LifeEssencePU"})
+        {
+            CHECK(!g.server.ValidateSpawnObject(text));
+            auto crate = brush(g, text);
+            CHECK(crate && kill(g, crate) && !g.server.spawn_reports.empty());
+            CHECK(!g.server.spawn_reports.back().child &&
+                  g.server.spawn_reports.back().outcome.starts_with("No original class"));
+        }
         return true;
     }
     struct Probe : BaseClass

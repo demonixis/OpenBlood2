@@ -1,6 +1,7 @@
 #include "brush_fixture.h"
 #include "engine/container.h"
 #include "game/original/RotatingBrush.h"
+#include "game/original/spawn_object.h"
 #include "game/original/Trigger.h"
 #include "player_fixture.h"
 #include <functional>
@@ -249,7 +250,7 @@ namespace
         struct Count
         {
             unsigned created = 0, rejected = 0, filtered = 0, moved = 0, explosive = 0, detonated = 0, dynamic = 0,
-                     blocked = 0, spawned = 0, compound = 0;
+                     blocked = 0, spawned = 0, compound = 0, absent_spawns = 0;
         };
         std::map<std::string, Count> counts;
         std::map<std::string, unsigned> failures, spawns;
@@ -368,12 +369,21 @@ namespace
                         {
                             CHECK(!g.server.spawn_reports.empty());
                             auto child = g.server.spawn_reports.back().child;
-                            CHECK(child && g.objects.get(child)->model);
-                            CHECK(g.objects.get(child)->velocity.x == brush.m_damage.spawn_velocity.x &&
-                                  g.objects.get(child)->velocity.y == brush.m_damage.spawn_velocity.y &&
-                                  g.objects.get(child)->velocity.z == brush.m_damage.spawn_velocity.z);
-                            ++count.spawned;
-                            CHECK(g.objects.remove(child));
+                            if (SpawnClassAbsentFromOriginal(brush.m_damage.spawn_object))
+                            {
+                                // No original class: nothing spawns, as GetClass returns null.
+                                CHECK(!child);
+                                ++count.absent_spawns;
+                            }
+                            else
+                            {
+                                CHECK(child && g.objects.get(child)->model);
+                                CHECK(g.objects.get(child)->velocity.x == brush.m_damage.spawn_velocity.x &&
+                                      g.objects.get(child)->velocity.y == brush.m_damage.spawn_velocity.y &&
+                                      g.objects.get(child)->velocity.z == brush.m_damage.spawn_velocity.z);
+                                ++count.spawned;
+                                CHECK(g.objects.remove(child));
+                            }
                         }
                         CHECK(g.objects.remove(h));
                     }
@@ -394,13 +404,13 @@ namespace
             std::cout << name << "=" << n << '\n';
         CHECK(unreadable == 1 && counts["RotatingBrush"].created == 136 && counts["RotatingBrush"].rejected == 0 &&
               counts["RotatingBrush"].moved == 136 && counts["RotatingBrush"].filtered == 0 &&
-              counts["CDestructableBrush"].created == 2389 && counts["CDestructableBrush"].rejected == 66 &&
+              counts["CDestructableBrush"].created == 2390 && counts["CDestructableBrush"].rejected == 65 &&
               counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 50 &&
               counts["CDestructableBrush"].detonated == 50 && counts["CDestructableBrush"].spawned == 67 &&
               counts["CDestructableBrush"].compound == 3);
         CHECK(failures["CDestructableBrush/shell"] == 2 && !failures.contains("CDestructableBrush/schema") &&
               !failures.contains("CDestructableBrush/ambiguous") && failures["CDestructableBrush/missing"] == 32 &&
-              failures["CDestructableBrush/polygon dynamics"] == 28 && failures["CDestructableBrush/spawn"] == 4 && !failures.contains("RotatingBrush/ambiguous"));
+              failures["CDestructableBrush/polygon dynamics"] == 28 && failures["CDestructableBrush/spawn"] == 3 && counts["CDestructableBrush"].absent_spawns == 1 && !failures.contains("RotatingBrush/ambiguous"));
         CHECK(g.request_world("01_SubwayA", error));
         std::map<EntryState, unsigned> entries;
         for (const auto& e : g.entries)
