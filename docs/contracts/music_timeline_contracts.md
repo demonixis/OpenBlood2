@@ -77,3 +77,8 @@ curves, live sequence clocks and playlist transitions remain incomplete. `MUSIC`
 still reports unsupported; M2 is open. See [evidence](../../../Documentation/Implementation/m2_music_timeline.md),
 [sections](music_section_contracts.md), [notes](music_note_contracts.md) and
 [bands](music_band_contracts.md).
+
+The [section/pattern continuation](music_selection_contracts.md) now supplies original
+explicit-tick current chord/mute and pattern decisions. Earlier missing-selection
+statements are superseded only for normal section decisions; live activation,
+seek/restart, band selection and MUSIC remain unavailable.

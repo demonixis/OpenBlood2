@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "08e3978f76c4de977a00e20497b41ff17f5fa00f",
+  "status": "M2 incomplete; explicit section/pattern decisions, MUSIC unsupported",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/IMUSIC25.DLL",
+      "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "rvas": [
+        "0x16afc..0x16b1a",
+        "0x16970..0x16996",
+        "0x17b33",
+        "0x17a4f",
+        "0x8748..0x879d",
+        "0xba4b",
+        "0x1a4fe",
+        "0xce94"
+      ],
+      "use": "Portable independently expressed decisions from original local disassembly and bounded emulation; no commercial bytes imported"
+    }
+  ],
+  "observations": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "rvas": [
+      "0x16afc..0x16b1a",
+      "0x16970..0x16996",
+      "0x17b33",
+      "0x17a4f"
+    ],
+    "generated": {
+      "cases": 4096,
+      "sha256": "7b8a629fa84cca632c63c8bf37babf7bf8c995edcf5ba7326295ee92b1ddda01",
+      "fnv64": 12281621980575432131
+    },
+    "private": {
+      "cases": 1188,
+      "sha256": "a1c4ad7fa377894e2a1bd6890095f6dd074439575a27508297238611b0082e83",
+      "fnv64": 2704444894253380274
+    },
+    "bound_sections": 132,
+    "missing_style_sections": 24,
+    "scope": "Original current chord/mute lookup, normal section pattern request, and pattern selection only; no global fallback, seek, activation or playback"
+  },
+  "target_sha256": {
+    "CMakeLists.txt": "14ab32e3c41b862ad13fd1257cda1689adfbf3715e095b2134ff37a3d052ceb2",
+    "tests/CMakeLists.txt": "78d40d68ae67d2b057a1e15f91ae1460d45e91b0668dbfd6129d4c688d2e1435",
+    "src/engine/ima_selection.h": "8b59466476d73900521f31ed6774c59e4cda10cd0f040caf36129119b2625372",
+    "src/engine/ima_selection.cpp": "c9c5d9684ee8622b88af554d4d2fd5886d056bed6c32a9c749e5bd7093f2259f",
+    "src/game/music_catalog.h": "f833e96592329fdd01f00a0651295fcfc0f526ddb404bd08a50b6e380a137fd3",
+    "src/game/music_catalog.cpp": "d31aa7cdb46253e098cca32430fa634aa8844803c0992de8019d346d554fdd5d",
+    "src/app/inspector_world_sounds.cpp": "9a97521e98c6f6ab76ef1d6bc00acca3ef1ff4a57b10bf3d7adf042c7b3facfa",
+    "src/app/world_sound_smoke.cpp": "bc9771d2bff05bbc285661c429324fb551b2ceb266a3efa88dc2975ab62d9d39",
+    "tests/ima_selection_tests.cpp": "8bc308ff90fea5811dd4ca35a427a354bdc8f8cfd50d0eaf5dd29b4f8c5027e7",
+    "tests/music_asset_tests.cpp": "585b3929ddae6e8b2b30a0aca76e7c644a6aef37cfdef45651188d0117013e73"
+  },
+  "validation_note": "After headless validation, changed only an inspector summary label; rebuilt the Debug app and reran NVIDIA checks. Release/sanitizer do not compile the inspector."
+}

@@ -270,14 +270,15 @@ namespace
         CHECK(!find_section()->timeline && !find_section()->timeline_error.empty());
         CHECK(write(root / "Music/Test/SHARED.STY", container("AASY", chunk("styl", sh))));
         catalog.inspect(root, props);
-        CHECK(find_section()->timeline && find_section()->timeline_error.empty() &&
+        CHECK(find_section()->timeline && find_section()->section_style && find_section()->timeline_error.empty() &&
               find_section()->timeline->mutes.size() == 4);
         const std::weak_ptr<const ImaTimeline> old_timeline = find_section()->timeline;
+        const std::weak_ptr<const ImaStyle> old_bound_style = find_section()->section_style;
         sh[46] = 8;
         CHECK(write(root / "Music/Test/SHARED.STY", container("AASY", chunk("styl", sh))));
         catalog.inspect(root, props);
-        CHECK(old_timeline.expired() && !find_section()->timeline &&
-              find_section()->timeline_error.find("disagree") != std::string::npos);
+        CHECK(old_timeline.expired() && old_bound_style.expired() && !find_section()->section_style &&
+              !find_section()->timeline && find_section()->timeline_error.find("disagree") != std::string::npos);
         sc[56] = 0;
         CHECK(write(root / "Music/Test/a1.sec", complete_section()));
         catalog.inspect(root, props);
@@ -443,8 +444,9 @@ namespace
                     CHECK(asset.section && asset.section_error.empty() && asset.section->commands.size() == 1);
                     ImaSectionTiming timing;
                     CHECK(ima_section_timing(*asset.section, timing, error));
-                    CHECK(asset.timeline && asset.timeline_error.empty() && !asset.timeline->mutes.empty() &&
-                          asset.timeline->duration == timing.duration_ticks && asset.timeline->chords.size() == 1);
+                    CHECK(asset.timeline && asset.section_style && asset.timeline_error.empty() &&
+                          !asset.timeline->mutes.empty() && asset.timeline->duration == timing.duration_ticks &&
+                          asset.timeline->chords.size() == 1);
                     CHECK(asset.harmony && asset.harmony_error.empty() && asset.harmony->chords.size() == 1 &&
                           asset.harmony->base.scale_mask == 0xab5ab5 && !asset.harmony->chords.front().harmony.enabled);
                     harmony_lifetime = asset.harmony;

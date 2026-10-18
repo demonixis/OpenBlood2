@@ -183,13 +183,13 @@ namespace OpenBlood2
                 asset.timeline_error = "IMA timeline: invalid style reference";
                 continue;
             }
-            const ImaStyle* style = nullptr;
+            std::shared_ptr<const ImaStyle> style;
             for (const auto& candidate : assets)
             {
                 std::string candidate_key;
                 if (candidate.kind == MusicAssetKind::Style && resource_path(candidate.filename, candidate_key) &&
                     candidate_key == key)
-                    style = candidate.style.get();
+                    style = candidate.style;
             }
             if (!style)
             {
@@ -207,6 +207,7 @@ namespace OpenBlood2
             {
                 timeline_records += timeline->records();
                 asset.timeline = std::move(timeline);
+                asset.section_style = std::move(style);
             }
         }
         // Bounded installed-file profile, not the historical general UUID/resource resolver.

@@ -1,6 +1,7 @@
 #include "engine/audio_stream.h"
 #include "engine/ima_note_event.h"
 #include "engine/ima_note_pitch.h"
+#include "engine/ima_selection.h"
 #include "engine/ima_variation.h"
 #include "inspector.h"
 #include <algorithm>
@@ -9,6 +10,50 @@ namespace OpenBlood2
 {
     namespace
     {
+        void draw_section_selection(const MusicAssetRecord& asset)
+        {
+            if (!ImGui::TreeNode("Section selection probe (explicit tick; no playback)"))
+                return;
+            static std::int32_t tick = 0;
+            ImGui::InputScalar("Section tick", ImGuiDataType_S32, &tick);
+            ImGui::TextWrapped("Normal authored-section decision. This does not advance a clock, seek, "
+                               "activate a pattern, consume RNG or send notes.");
+            ImaSectionSelection selected;
+            ImaPatternSelection pattern;
+            std::string error;
+            if (!asset.timeline || !asset.section_style)
+                ImGui::TextUnformatted("Unavailable: no validated style/timeline binding.");
+            else if (!select_ima_section(*asset.section, *asset.timeline, tick, selected, error) ||
+                     !select_ima_pattern(*asset.section_style, selected.request, pattern, error))
+                ImGui::TextWrapped("Selection refused: %s", error.c_str());
+            else
+            {
+                ImGui::Text("Measure %d | mute mask %04x | requested measures %d / flags %08x", selected.measure,
+                            selected.mute_mask, selected.request.measures, selected.request.flags);
+                const auto& chord = asset.timeline->chords[selected.chord];
+                ImGui::Text("Retained chord %zu | source %zu | tick %d", selected.chord, chord.source, chord.time);
+                if (selected.mute)
+                    ImGui::Text("Mute sample %zu | tick %d", *selected.mute,
+                                asset.timeline->mutes[*selected.mute].time);
+                else
+                    ImGui::TextUnformatted("No prepared mute record.");
+                if (asset.harmony && selected.chord < asset.harmony->chords.size())
+                {
+                    const auto& h = asset.harmony->chords[selected.chord];
+                    ImGui::Text("Selected chord/scale %08x / %08x | roots %d / %d | pitch %02x / variation %04x",
+                                h.harmony.chord_mask, h.harmony.scale_mask, h.harmony.chord_root, h.harmony.scale_root,
+                                h.harmony.chord_flags, h.variation_flags);
+                }
+                if (pattern.pattern)
+                {
+                    const auto& p = asset.section_style->patterns[*pattern.pattern];
+                    ImGui::Text("Pattern %zu: %s | %d measures | flags %08x", *pattern.pattern, p.name.c_str(),
+                                p.timing[3], p.flags);
+                }
+                ImGui::Text("Decision: %s", ima_pattern_match_name(pattern.match));
+            }
+            ImGui::TreePop();
+        }
         void draw_note_event_probe(const ImaGrid& grid, const ImaPattern& pattern)
         {
             if (grid.notes.empty() || !ImGui::TreeNode("Note event probe (explicit inputs; no playback)"))
@@ -222,8 +267,8 @@ namespace OpenBlood2
                                music.plan.directory.c_str(), music.plan.requests.size(), music.assets.size(),
                                music.bytes_read);
             ImGui::TextWrapped(
-                "Decoded IMA sections/bands/pattern notes and DLS sample/region data. Pattern "
-                "selection, curves, personality "
+                "Decoded IMA sections/bands/pattern notes and DLS sample/region data. Live pattern "
+                "activation, curves, personality "
                 "graphs and playlist playback are not implemented. MUSIC commands "
                 "still report unsupported. Explicit DLS diagnostic notes above use the existing audio output.");
             const auto prepared =
@@ -322,7 +367,8 @@ namespace OpenBlood2
                     ImGui::TextWrapped("Timeline unavailable: %s", asset.timeline_error.c_str());
                 if (!asset.harmony_error.empty())
                     ImGui::TextWrapped("Harmony unavailable: %s", asset.harmony_error.c_str());
-                if (asset.harmony && ImGui::TreeNode("Prepared harmony (no current chord selected)"))
+                draw_section_selection(asset);
+                if (asset.harmony && ImGui::TreeNode("Prepared harmony (no live activation)"))
                 {
                     const auto& h = *asset.harmony;
                     ImGui::Text("Base scale %08x | root %d | pitch flags %02x | base flag %d", h.base.scale_mask,
@@ -332,8 +378,8 @@ namespace OpenBlood2
                                     "variation %04x",
                                     c.source, c.time, c.harmony.chord_mask, c.harmony.scale_mask, c.harmony.chord_root,
                                     c.harmony.scale_root, c.harmony.chord_flags, c.variation_flags);
-                    ImGui::TextWrapped(
-                        "Activation, current-chord choice and live sequence playback remain unavailable.");
+                    ImGui::TextWrapped("The explicit tick probe selects a chord; live activation and sequence playback "
+                                       "remain unavailable.");
                     ImGui::TreePop();
                 }
                 if (asset.timeline && ImGui::TreeNode("Style-reconciled timeline (not playback)"))

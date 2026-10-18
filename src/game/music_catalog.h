@@ -17,6 +17,7 @@ namespace OpenBlood2
             timeline_error, harmony_error;
         std::shared_ptr<const DlsBank> bank;
         std::shared_ptr<const ImaStyle> style;
+        std::shared_ptr<const ImaStyle> section_style; // Validated exact binding; no second style copy.
         std::shared_ptr<const ImaBands> bands;
         std::shared_ptr<const ImaSection> section;
         std::shared_ptr<const ImaTimeline> timeline;

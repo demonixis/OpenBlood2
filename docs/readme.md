@@ -15,3 +15,5 @@ Keep this directory focused on developer guides. Put subsystem reference materia
 in `contracts/` and work-in-progress records in `implementation/`. Historical
 workspace reports and raw evidence have their own dedicated directory, linked
 from the implementation index.
+
+- [Music selection contracts](contracts/music_selection_contracts.md): current section chord/mute and original pattern decisions; live sequencing remains incomplete.

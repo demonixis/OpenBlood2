@@ -89,3 +89,8 @@ The [harmonic-pitch continuation](music_pitch_contracts.md) now implements the
 mode/chord/scale arithmetic for explicit effective runtime harmony and feeds it
 to the diagnostic event probe. Earlier missing-pitch statements are superseded
 only for this step; personality/current-chord selection and live MUSIC remain open.
+
+The [section/pattern continuation](music_selection_contracts.md) now supplies original
+explicit-tick current chord/mute and pattern decisions. Earlier missing-selection
+statements are superseded only for normal section decisions; live activation,
+seek/restart, band selection and MUSIC remain unavailable.

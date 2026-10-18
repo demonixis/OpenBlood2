@@ -42,3 +42,5 @@ the original log or patch.
 - [IMA harmonic note conversion](../../../Documentation/Implementation/m2_music_pitch.md): original executable comparison, explicit contexts and remaining live-music limits.
 
 - [IMA prepared harmony](../../../Documentation/Implementation/m2_music_harmony.md): original chord classification, external scale metadata and inspected bindings; MUSIC remains unavailable.
+
+- [IMA section and pattern decisions](../../../Documentation/Implementation/m2_music_selection.md): original lookup/request/choice, explicit tick inspection and remaining live-music gaps.

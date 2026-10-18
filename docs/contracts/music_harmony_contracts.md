@@ -91,3 +91,8 @@ soundtrack playback or musical timing. See [evidence](../../../Documentation/Imp
 Current-chord/pattern/band selection, personality graphs, curves, MIDI/controller
 application, live note ownership and playlist transitions remain incomplete.
 Missing styles and invalid effective DLS loops remain failures. M2 stays open.
+
+The [section/pattern continuation](music_selection_contracts.md) now supplies original
+explicit-tick current chord/mute and pattern decisions. Earlier missing-selection
+statements are superseded only for normal section decisions; live activation,
+seek/restart, band selection and MUSIC remain unavailable.

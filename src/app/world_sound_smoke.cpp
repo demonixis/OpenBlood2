@@ -2,6 +2,7 @@
 #include "engine/audio_stream.h"
 #include "engine/ima_note_event.h"
 #include "engine/ima_note_pitch.h"
+#include "engine/ima_selection.h"
 #include "engine/ima_variation.h"
 #include "game/original/SoundFX.h"
 namespace OpenBlood2
@@ -39,8 +40,24 @@ namespace OpenBlood2
                     return false;
                 ImaSectionTiming timing;
                 std::string error;
-                if (!ima_section_timing(*asset.section, timing, error))
+                if (!asset.section_style || !ima_section_timing(*asset.section, timing, error))
                     return false;
+                for (auto tick : {0, int(asset.timeline->ticks_per_measure), asset.timeline->duration - 1})
+                {
+                    ImaSectionSelection selected;
+                    ImaPatternSelection pattern;
+                    if (!select_ima_section(*asset.section, *asset.timeline, tick, selected, error) ||
+                        !select_ima_pattern(*asset.section_style, selected.request, pattern, error) ||
+                        !pattern.pattern || selected.chord != 0 || !selected.mute)
+                        return false;
+                    const auto channels = prepare_ima_pattern_channels(asset.section_style->patterns[*pattern.pattern]);
+                    ImaVariationChoice variation;
+                    std::array<std::uint16_t, 16> current{}, draws{};
+                    if (!choose_ima_variations(channels, asset.harmony->chords[selected.chord].variation_flags, current,
+                                               0xffff, 0, draws, variation, error) ||
+                        variation.draws_used != 16)
+                        return false;
+                }
                 // Explicitly activate this retained chord for a diagnostic note conversion only.
                 // This runs with the UI hidden and in inspector-free builds, without choosing a live song chord.
                 auto context = asset.harmony->chords.front().harmony;

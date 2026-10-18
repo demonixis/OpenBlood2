@@ -675,3 +675,5 @@ The [IMA harmonic-pitch continuation](../Documentation/Implementation/m2_music_p
 
 
 The [IMA prepared-harmony continuation](../Documentation/Implementation/m2_music_harmony.md) connects bounded external REPs metadata and original retained-chord pitch/variation flags. Read [contracts](docs/contracts/music_harmony_contracts.md); preserve signed remainders, original mask/flag order, next-retained-chord classification and explicit missing bindings. Keep opaque personality graphs and the limited zero-ID filename profile visible. Prepared harmony does not select or activate a live chord, schedule music or satisfy MUSIC; M2 remains incomplete.
+
+The [IMA section/pattern continuation](../Documentation/Implementation/m2_music_selection.md) reproduces original current chord/mute lookup and pattern request/choice with explicit ticks. Read [contracts](docs/contracts/music_selection_contracts.md); preserve first-future/file-order behavior, first equal command, low-word signed lengths, exact category matching and fallback order. The bounded linear chooser is executable-checked. Empty-chord global fallback, seek/activation, live MUSIC and the actual M2 gate remain open.
