@@ -65,9 +65,9 @@ queued audio restart, rather than being mistaken for saved game state.
 
 This is not full inventory-list/HUD selection, bomb items, flashlight, timed
 bonuses, multiplayer scaling/respawn, retail save-file compatibility or safe
-NEW_LEVEL. String-created inventory pickups are rejected because their original
-SpawnItem bounce is unavailable; destruction spawning is not silently enabled.
-Only authored world creation is supported. Missing models retain explicit pickup
+NEW_LEVEL. String-created inventory pickups were initially rejected; the later
+[pickup contracts](pickup_contracts.md) supersede this with the original
+bouncing SpawnItem and admit MedKitPU in destruction spawning. Missing models retain explicit pickup
 failure diagnostics. No ECS, new dependency, reference edit or commercial asset
 copy is introduced.
 

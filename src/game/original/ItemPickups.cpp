@@ -3,9 +3,9 @@
 #include "game/game_settings.h"
 DDWORD ItemPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
-    // String-spawn bounce and multiplayer scaling/respawn are not implemented.
+    // Multiplayer scaling/respawn are not implemented; string creation bounces (PickupObject).
     if (message == MID_PRECREATE &&
-        (reason != PRECREATE_WORLDFILE ||
+        ((reason != PRECREATE_WORLDFILE && reason != PRECREATE_STRINGPROP) ||
          g_pServerDE->GetVarValueFloat(g_pServerDE->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE))
         return 0;
     return PickupObject::EngineMessageFn(message, data, reason);

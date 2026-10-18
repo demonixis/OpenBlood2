@@ -11,7 +11,7 @@ and [safe level transfer](level_change_contracts.md). See the
 `RemotesPU` retains ItemPickupWeapon ancestry, item8, quantity one, name resource307,
 `Remotes_pu` model/skin, ammo2.wav request and the original glow flag. The inherited
 single-player/world-file restriction and rejected TypeAction schemas remain.
-Actual pickup sound output, string-spawn bounce and multiplayer are unavailable.
+Actual pickup sound output and multiplayer are unavailable. The later [pickup contracts](pickup_contracts.md) supersede the string-creation refusal: string-created item/weapon pickups follow the original bouncing SpawnItem.
 
 Original AddInventoryWeapon uses weapon50, reserved slot11 and ammo11, capped at
 ten independently of attributes. Slots0..9 remain ordinary weapons, slot10 remains

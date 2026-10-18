@@ -221,7 +221,7 @@ namespace
     {
         GameSession g;
         CHECK(setup(g, root));
-        for (auto text : {"Spawner", "RocketAmmoPU", "MedKitPU", "AmmoPickup", "  ", "BulletAmmoPU Unknown 1",
+        for (auto text : {"Spawner", "RocketAmmoPU", "SniperRiflePU", "AmmoPickup", "  ", "BulletAmmoPU Unknown 1",
                           "BulletAmmoPU Name \"bad", "BulletAmmoPU Name a; Name b"})
             CHECK(!g.server.ValidateSpawnObject(text) && !brush(g, text));
         CHECK(!brush(g, "BulletAmmoPU", {{"SpawnObjectVel", DVector{1e8f, 0, 0}}}));
@@ -236,6 +236,22 @@ namespace
         h = SpawnObject("WardPU", {123, 321, 456}, q, {});
         CHECK(h);
         CHECK(near(g.objects.get(h)->state.m_Rotation.m_Vec.y, .5f));
+        CHECK(!dynamic_cast<PickupObject*>(g.objects.get(h)->game.get())->bouncing); // Ammo/health: no bounce.
+        // Authored container contents: original SpawnItem raises bouncing item/weapon leaves by 10
+        // units and keeps them flagged, with no update scheduled for the source spring.
+        for (auto text : {"MedKitPU", "FlashLightPU", "ProximitiesPU", "RemotesPU", "BerettaPU", "SubMachineGunPU",
+                          "FlareGunPU", "AssaultRiflePU"})
+        {
+            CHECK(g.server.ValidateSpawnObject(text));
+            h = SpawnObject(text, {100, 100, 100}, {}, {});
+            auto* r = h ? g.objects.get(h) : nullptr;
+            auto* p = r ? dynamic_cast<PickupObject*>(r->game.get()) : nullptr;
+            // The fixture lacks some pickup models (dimension errors); the bounce itself must succeed.
+            CHECK(p && p->bouncing && p->error.find("String-spawn") == std::string::npos &&
+                  p->bounce_acceleration == 500);
+            CHECK(near(p->rest_position.y, 100) && near(r->state.m_Pos.y, 110) && near(r->state.m_Pos.x, 100));
+        }
+        CHECK(!g.server.ValidateSpawnObject("SniperRiflePU"));
         return true;
     }
     struct Probe : BaseClass
@@ -457,7 +473,8 @@ namespace
         CHECK(failures["ProximitiesPU: invalid property TypeAction"] == 28);
         CHECK(failures["RemotesPU: invalid property TypeAction"] == 14);
         // 1530 includes the four SniperRiflePU offers (their weapon is not integrated).
-        CHECK(worlds == 57 && created == 1530 && missing == 0 && rejected == 220 && spawns == 60);
+        // 68 container spawns include the bouncing item/weapon leaves.
+        CHECK(worlds == 57 && created == 1530 && missing == 0 && rejected == 220 && spawns == 68);
         return true;
     }
 } // namespace

@@ -13,8 +13,9 @@ per-world counts in the contracts are historical.
 
 Update after L0/L1 (same data, `--start-game`): `drop` and `multi/bb_deathcanyon`
 now start; 17 equal-radius Sounds now play (434 → 417 failed entries over all
-worlds); every precreate rejection names its cause. The tables below are
-regenerated from that run.
+worlds); every precreate rejection names its cause. After L13 `08_subwayb`
+also starts and 405 entries still fail. The tables below are regenerated from
+the latest run.
 
 ## How to refresh
 
@@ -29,22 +30,22 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 ## Status by world
 
 `starts` means the world passes entry validation (01_SubwayA, 02_CityHub,
-05_CDMB, Drop, BB_DeathCanyon). Batches are defined in the next section.
+05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon). Batches are defined in the next section.
 
 | World | Created | Unported (classes) | Failed | Batches needed |
 |---|---:|---:|---:|---|
 | 01_subwaya | 204 | 0 (0) | 0 | **starts** |
 | 02_cityhub | 453 | 0 (0) | 0 | **starts** |
-| 02_cityhubb | 390 | 19 (3) | 2 | L7, L13 |
+| 02_cityhubb | 392 | 19 (3) | 0 | L7 |
 | 02_cityhubc | 370 | 34 (4) | 2 | L2, L7, L10 |
-| 03_museum | 554 | 86 (6) | 11 | L4, L6, L8, L10, L11, L12, L13 |
-| 04_steamtunnels | 447 | 55 (6) | 8 | L2, L5, L6, L7, L10, L13 |
-| 05_cdm | 508 | 14 (5) | 28 | L3, L6, L7, L10, L11, L13 |
+| 03_museum | 555 | 86 (6) | 10 | L4, L6, L8, L10, L11, L12 |
+| 04_steamtunnels | 449 | 55 (6) | 6 | L2, L5, L6, L7, L10 |
+| 05_cdm | 510 | 14 (5) | 26 | L3, L6, L7, L10, L11 |
 | 05_cdmb | 129 | 0 (0) | 0 | **starts** |
-| 06_airship1 | 187 | 0 (0) | 9 | L4, L6, L12, L13 |
+| 06_airship1 | 189 | 0 (0) | 7 | L4, L6, L12 |
 | 06_airship2 | 243 | 2 (2) | 17 | L6, L10 |
-| 07_cathedral | 205 | 18 (9) | 6 | L2, L6, L7, L8, L10, L11, L13 |
-| 08_subwayb | 174 | 0 (0) | 1 | L13 |
+| 07_cathedral | 207 | 18 (9) | 4 | L2, L6, L7, L8, L10, L11 |
+| 08_subwayb | 175 | 0 (0) | 0 | **starts** |
 | 09_abandoned_buildings | 638 | 38 (11) | 35 | L2, L3, L4, L5, L6, L7, L8, L10, L11 |
 | 10_sewagetreatmentplant | 99 | 25 (5) | 1 | L6, L7, L11 |
 | 11_slaughter_house | 465 | 26 (8) | 16 | L4, L6, L7, L8, L10, L12 |
@@ -80,17 +81,16 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 
 Closest to starting:
 
-- **L13 only:** `08_subwayb`.
 - **L3 only:** `multi/bb_midgard`.
 - **L9 only:** `credits`, `end` (the Chosen as scripted actors).
 - **L10 only:** `multi/bb_area15`, `bb_brownstar`, `bb_cabana`, `bb_chosenarena`, `bb_drain`, `bb_power`.
 - **L11 only:** `multi/bb_fields`.
-- **L7 + L13:** `02_cityhubb`. **L6 + L10:** `06_airship2`.
+- **L7 only:** `02_cityhubb`. **L6 + L10:** `06_airship2`.
 
 ## Batches
 
-L0 and L1 are done. L2–L5 are fixes and policies on code that already exists;
-L6–L13 port new original code. Unported-class totals count source entries over all 44 worlds.
+L0, L1 and L13 are done. L2–L5 are fixes and policies on code that already exists;
+L6–L12 port new original code. Unported-class totals count source entries over all 44 worlds.
 
 ### L0 — Diagnostics (done)
 
@@ -237,21 +237,23 @@ CultistAI (6) and CivilianAI (1) fail "NPC world ground placement failed" in
 03_museum, 06_airship1 and 11_slaughter_house. Investigate the placement probe
 against those spawn positions (no relocation shortcut).
 
-### L13 — String-created pickups (7 worlds)
+### L13 — String-created pickups (done)
 
 Destructible containers whose `SpawnObject` names an already ported pickup are
 rejected: `MedKitPU` (5), `FlashlightPU`/`FlashLightPU` (3), `FlareGunPU` (2),
 `SubMachineGunPU`, `AssaultRiflePU`. `ValidateSpawnObject` does not admit them
 because `ItemPickup` and the weapon pickups refuse `PRECREATE_STRINGPROP`: the
 original string-spawn path (PickupObject.cpp, `m_bBounce` / rest-position
-spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
-03, 04, 05_cdm, 06_airship1, 07, 08_subwayb).
+spring) was not ported. It now is (see the pickup contracts): SpawnItem raises
+the pickup 10 units and leaves it bouncing with no update scheduled, so the
+source spring is never reached. The allow-list admits the ported item and weapon
+pickups; 02_cityhubb, 03, 04, 05_cdm, 06_airship1, 07 and 08_subwayb lost those
+failures.
 
 ## Details by world
 
 ### 02_cityhubb
-
-390 created instances · 19 unported entries (3 classes) · 2 failed entries
+392 created instances · 19 unported entries (3 classes) · 0 failed entries
 
 **Unported classes**
 
@@ -261,15 +263,7 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | BoneLeech | 7 | L7 |
 | ShikariAI | 2 | L7 |
 
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| CDestructableBrush | SpawnObject class not accepted: MedKitPU | 1 | L13 |
-| CDestructableBrush | SpawnObject class not accepted: FlashlightPU | 1 | L13 |
-
 ### 02_cityhubc
-
 370 created instances · 34 unported entries (4 classes) · 2 failed entries
 
 **Unported classes**
@@ -289,8 +283,7 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | CDestructableModel | Model clip-zero dimensions unavailable | 1 | L2 |
 
 ### 03_museum
-
-554 created instances · 86 unported entries (6 classes) · 11 failed entries
+555 created instances · 86 unported entries (6 classes) · 10 failed entries
 
 **Unported classes**
 
@@ -310,15 +303,13 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | CDestructableModel | SpawnObject class not accepted: InvulnerabilityPU | 1 | L10 |
 | CDestructableBrush | SpawnObject class not accepted: BinocularsPU | 1 | L10 |
 | CultistAI | NPC world ground placement failed | 1 | L12 |
-| CDestructableBrush | SpawnObject class not accepted: MedKitPU | 1 | L13 |
 | CDestructableBrush | Ambiguous named world model | 4 | L4 |
 | CDestructableModel | SpawnObject class not accepted: RocketAmmoPU | 1 | L6 |
 | Fanatic | authored AI weapon unavailable: SHOTGUN | 1 | L6 |
 | Prophet | authored AI weapon unavailable: SINGULARITY | 1 | L6 |
 
 ### 04_steamtunnels
-
-447 created instances · 55 unported entries (6 classes) · 8 failed entries
+449 created instances · 55 unported entries (6 classes) · 6 failed entries
 
 **Unported classes**
 
@@ -335,8 +326,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| CDestructableModel | SpawnObject class not accepted: FlareGunPU | 1 | L13 |
-| CDestructableModel | SpawnObject class not accepted: SubMachineGunPU | 1 | L13 |
 | DetailSprite | Missing, oversized or non-SPR sprite resource: sprites\bloodsplat1.dtx | 1 | L2 |
 | DetailSprite | Missing, oversized or non-SPR sprite resource: sprites\bloodsplat2.dtx | 1 | L2 |
 | DetailSprite | Missing, oversized or non-SPR sprite resource: sprites\bloodsplat3.dtx | 1 | L2 |
@@ -344,8 +333,7 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | Fanatic | authored AI weapon unavailable: SHOTGU | 1 | L6 |
 
 ### 05_cdm
-
-508 created instances · 14 unported entries (5 classes) · 28 failed entries
+510 created instances · 14 unported entries (5 classes) · 26 failed entries
 
 **Unported classes**
 
@@ -361,28 +349,22 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| CDestructableModel | SpawnObject class not accepted: MedKitPU | 1 | L13 |
-| CDestructableModel | SpawnObject class not accepted: FlashlightPU | 1 | L13 |
 | CGib | CGib: invalid property DamageTriggerMessage | 24 | L3 |
 | CDestructableModel | SpawnObject class not accepted: TeslaCannonPU | 1 | L6 |
 | Fanatic | authored AI weapon unavailable: TESLA | 1 | L6 |
 
 ### 06_airship1
-
-187 created instances · 0 unported entries (0 classes) · 9 failed entries
+189 created instances · 0 unported entries (0 classes) · 7 failed entries
 
 **Failed entries**
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
 | CultistAI | NPC world ground placement failed | 3 | L12 |
-| CDestructableBrush | SpawnObject class not accepted: MedKitPU | 1 | L13 |
-| CDestructableBrush | SpawnObject class not accepted: FlashLightPU | 1 | L13 |
 | Door | Ambiguous named world model | 2 | L4 |
 | Fanatic | authored AI weapon unavailable: SNIPE | 2 | L6 |
 
 ### 06_airship2
-
 243 created instances · 2 unported entries (2 classes) · 17 failed entries
 
 **Unported classes**
@@ -399,8 +381,7 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | Fanatic | authored AI weapon unavailable: SHOTGUN | 17 | L6 |
 
 ### 07_cathedral
-
-205 created instances · 18 unported entries (9 classes) · 6 failed entries
+207 created instances · 18 unported entries (9 classes) · 4 failed entries
 
 **Unported classes**
 
@@ -420,24 +401,11 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 
 | Class | Cause | Entries | Batch |
 |---|---|---:|---|
-| CDestructableModel | SpawnObject class not accepted: FlareGunPU | 1 | L13 |
-| CDestructableModel | SpawnObject class not accepted: AssaultRiflePU | 1 | L13 |
 | CDestructableModel | SpawnObject class not accepted: DieBugDieAmmo | 2 | L2 |
 | Sprite | Missing, oversized or non-SPR sprite resource:  | 1 | L2 |
 | CDestructableModel | SpawnObject class not accepted: ShotgunPU | 1 | L6 |
 
-### 08_subwayb
-
-174 created instances · 0 unported entries (0 classes) · 1 failed entries
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| CDestructableBrush | SpawnObject class not accepted: MedKitPU | 1 | L13 |
-
 ### 09_abandoned_buildings
-
 638 created instances · 38 unported entries (11 classes) · 35 failed entries
 
 **Unported classes**
@@ -467,7 +435,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | Prophet | authored AI weapon unavailable: SINGULARITY | 1 | L6 |
 
 ### 10_sewagetreatmentplant
-
 99 created instances · 25 unported entries (5 classes) · 1 failed entries
 
 **Unported classes**
@@ -487,7 +454,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | Fanatic | authored AI weapon unavailable: HOWITZ | 1 | L6 |
 
 ### 11_slaughter_house
-
 465 created instances · 26 unported entries (8 classes) · 16 failed entries
 
 **Unported classes**
@@ -519,7 +485,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | CDestructableModel | SpawnObject class not accepted: BoneLeech | 5 | L7 |
 
 ### 21_laboratory
-
 280 created instances · 38 unported entries (9 classes) · 9 failed entries
 
 **Unported classes**
@@ -544,7 +509,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | CDestructableModel | SpawnObject class not accepted: boneleech | 7 | L7 |
 
 ### 22_office
-
 482 created instances · 6 unported entries (3 classes) · 17 failed entries
 
 **Unported classes**
@@ -571,7 +535,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | Prophet | authored AI weapon unavailable: MINIGUN | 1 | L6 |
 
 ### 23_rooftop
-
 136 created instances · 8 unported entries (6 classes) · 0 failed entries
 
 **Unported classes**
@@ -586,7 +549,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | OpheliaAI | 1 | L9 |
 
 ### 24_ancientcity
-
 254 created instances · 57 unported entries (9 classes) · 2 failed entries
 
 **Unported classes**
@@ -611,7 +573,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | Fanatic | authored AI weapon unavailable: SHOTGUN | 1 | L6 |
 
 ### 24b_arena
-
 149 created instances · 18 unported entries (11 classes) · 3 failed entries
 
 **Unported classes**
@@ -637,7 +598,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | Spawner | Spawner: invalid property SpawnObject | 3 | L3 |
 
 ### 25_ancientone
-
 123 created instances · 30 unported entries (10 classes) · 1 failed entries
 
 **Unported classes**
@@ -662,7 +622,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | CDestructableModel | SpawnObject class not accepted: FareAmmoPU | 1 | L2 |
 
 ### credits
-
 21 created instances · 1 unported entries (1 classes) · 0 failed entries
 
 **Unported classes**
@@ -672,7 +631,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | CalebAI | 1 | L9 |
 
 ### end
-
 20 created instances · 4 unported entries (4 classes) · 0 failed entries
 
 **Unported classes**
@@ -685,7 +643,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | OpheliaAI | 1 | L9 |
 
 ### multi/bb_area15
-
 75 created instances · 1 unported entries (1 classes) · 0 failed entries
 
 **Unported classes**
@@ -695,7 +652,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | StealthPU | 1 | L10 |
 
 ### multi/bb_bloodarena
-
 16 created instances · 5 unported entries (5 classes) · 109 failed entries
 
 **Unported classes**
@@ -733,7 +689,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | MedKitPU | MedKitPU: invalid property TypeAction | 1 | L3 |
 
 ### multi/bb_bloodkeep
-
 81 created instances · 2 unported entries (2 classes) · 1 failed entries
 
 **Unported classes**
@@ -750,7 +705,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | Sound | Missing or oversized sound resource | 1 | L2 |
 
 ### multi/bb_bodies
-
 12 created instances · 2 unported entries (2 classes) · 54 failed entries
 
 **Unported classes**
@@ -784,7 +738,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | Ladder | Ladder: invalid property TypeAction | 1 | L3 |
 
 ### multi/bb_brownstar
-
 132 created instances · 2 unported entries (2 classes) · 0 failed entries
 
 **Unported classes**
@@ -795,7 +748,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | TheEyePU | 1 | L10 |
 
 ### multi/bb_cabana
-
 65 created instances · 3 unported entries (3 classes) · 0 failed entries
 
 **Unported classes**
@@ -807,7 +759,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | StealthPU | 1 | L10 |
 
 ### multi/bb_chosenarena
-
 123 created instances · 2 unported entries (2 classes) · 0 failed entries
 
 **Unported classes**
@@ -818,7 +769,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | InvulnerabilityPU | 1 | L10 |
 
 ### multi/bb_condemned
-
 177 created instances · 4 unported entries (4 classes) · 7 failed entries
 
 **Unported classes**
@@ -840,7 +790,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | Door | Open or non-manifold container shell: 4 edges / balance 0 in component 3 | 1 | L4 |
 
 ### multi/bb_crypt
-
 116 created instances · 6 unported entries (4 classes) · 0 failed entries
 
 **Unported classes**
@@ -853,7 +802,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | StealthPU | 1 | L10 |
 
 ### multi/bb_drain
-
 50 created instances · 2 unported entries (1 classes) · 0 failed entries
 
 **Unported classes**
@@ -863,7 +811,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | StealthPU | 2 | L10 |
 
 ### multi/bb_fields
-
 97 created instances · 8 unported entries (1 classes) · 0 failed entries
 
 **Unported classes**
@@ -873,7 +820,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | Minefield | 8 | L11 |
 
 ### multi/bb_jgrave
-
 131 created instances · 11 unported entries (4 classes) · 8 failed entries
 
 **Unported classes**
@@ -893,7 +839,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | Door | Ambiguous named world model | 4 | L4 |
 
 ### multi/bb_midgard
-
 13 created instances · 0 unported entries (0 classes) · 68 failed entries
 
 **Failed entries**
@@ -919,7 +864,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | NecroWardPU | NecroWardPU: invalid property TypeAction | 1 | L3 |
 
 ### multi/bb_power
-
 140 created instances · 1 unported entries (1 classes) · 0 failed entries
 
 **Unported classes**
@@ -929,7 +873,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | AngerPU | 1 | L10 |
 
 ### multi/bb_rooftop
-
 104 created instances · 4 unported entries (4 classes) · 0 failed entries
 
 **Unported classes**
@@ -942,7 +885,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | StealthPU | 1 | L10 |
 
 ### multi/ctf_cabana
-
 122 created instances · 8 unported entries (4 classes) · 0 failed entries
 
 **Unported classes**
@@ -955,7 +897,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | StealthPU | 2 | L10 |
 
 ### multi/ctf_deadcities
-
 153 created instances · 8 unported entries (4 classes) · 0 failed entries
 
 **Unported classes**
@@ -968,7 +909,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | TheEyePU | 2 | L10 |
 
 ### multi/ctf_dmx
-
 97 created instances · 7 unported entries (3 classes) · 2 failed entries
 
 **Unported classes**
@@ -986,7 +926,6 @@ spring) is not ported. Port it, then extend the allow-list (affects 02_cityhubb,
 | CDestructableBrush | Ambiguous named world model | 2 | L4 |
 
 ### multi/ctf_jam
-
 219 created instances · 21 unported entries (7 classes) · 0 failed entries
 
 **Unported classes**

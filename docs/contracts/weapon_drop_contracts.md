@@ -72,8 +72,7 @@ bodies, retail slope response and collision recovery remain unverified.
 WeaponPickup and BerettaPU retain their ancestry, filenames, resource ID 350,
 weapon1.wav request and glow bit 7. World creation uses existing ground placement;
 runtime drops retain their supplied position. The source bouncing string-spawn
-path is rejected explicitly, and the general destruction SpawnObject whitelist
-is unchanged. Other weapon pickup classes are unavailable.
+path is now ported; see the [pickup contracts](pickup_contracts.md). Other weapon pickup classes are unavailable.
 
 MID_ADDWEAPON=1004 carries an owned typed Weapon pickup, type 1 and finite ammo
 amount. Routing, kind/type/amount, mixed payload and outstanding acknowledgement

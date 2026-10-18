@@ -13,8 +13,8 @@ M2 remains incomplete.
 model/skin, item ID 7, resource 306, quantity one and `ammo2.wav` pickup request.
 The weapon-pickup glow bit is set before the base initial update; the base now
 preserves preexisting user bits as the original does. Single-player world creation
-is supported. String-spawn bounce, multiplayer respawn/scaling and actual pickup
-sound output remain unavailable; unsupported schemas still reject.
+is supported. Multiplayer respawn/scaling and actual pickup sound output remain
+unavailable; unsupported schemas still reject. The later [pickup contracts](pickup_contracts.md) supersede the string-creation refusal: string-created item/weapon pickups follow the original bouncing SpawnItem.
 
 Original AddInventoryWeapon creates weapon 49 in reserved slot 10, distinct from
 the ten ordinary slots. Later pickups add ammo pool 10, capped at ten independently

@@ -99,7 +99,10 @@ namespace
         player->m_bDead = true;
         CHECK(touch(g, p->m_hObject) && !p->picked_up && !player->m_InventoryMgr.CurrentWeapon(true));
         CHECK(player->m_InventoryMgr.GetAmmoCount(1) == initial && !g.server.message_count());
-        CHECK(!g.objects.create_props(g.objects.find_class("BerettaPU"), {}, "Name bounce"));
+        // String creation now follows the original bouncing SpawnItem (no update scheduled).
+        auto bounced = g.objects.create_props(g.objects.find_class("BerettaPU"), {}, "Name bounce");
+        auto* b = bounced ? dynamic_cast<WeaponPickup*>(g.objects.get(bounced)->game.get()) : nullptr;
+        CHECK(b && b->bounce && b->bouncing);
         return true;
     }
     bool drop(const std::filesystem::path& path)

@@ -56,9 +56,6 @@ const char* WeaponPickupClass(DDWORD type)
 }
 DDWORD WeaponPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
-    // The source string-spawn path bounces by default; that path is not imported.
-    if (message == MID_PRECREATE && reason == PRECREATE_STRINGPROP)
-        return 0;
     auto result = PickupObject::EngineMessageFn(message, data, reason);
     if (message == MID_INITIALUPDATE)
     {

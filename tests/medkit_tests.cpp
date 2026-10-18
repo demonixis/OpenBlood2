@@ -105,7 +105,9 @@ namespace
             CHECK(g.objects.finish_frame() && !g.objects.get(h));
         }
         CHECK(g.server.pickup_reports.size() == 3 && !g.server.message_count());
-        CHECK(!g.objects.create(g.objects.find_class("MedKitPU"), {}, Creation::String, {}));
+        auto spawned = g.objects.create(g.objects.find_class("MedKitPU"), {}, Creation::String, {});
+        auto* bounced = spawned ? dynamic_cast<MedKitPU*>(g.objects.get(spawned)->game.get()) : nullptr;
+        CHECK(bounced && bounced->bouncing); // Original string-created SpawnItem bounce.
         CHECK(g.unload_world() && !g.server.string_count());
         return true;
     }

@@ -76,7 +76,9 @@ namespace
             CHECK(p.m_InventoryMgr.flashlight->count == 100 && p.m_InventoryMgr.flashlight->remaining == 120);
             CHECK(!g.server.IsObjectAlive(h) && g.objects.finish_frame() && !g.objects.get(h));
         }
-        CHECK(!g.objects.create(g.objects.find_class("FlashlightPU"), {}, Creation::String, {}));
+        auto spawned = g.objects.create(g.objects.find_class("FlashlightPU"), {}, Creation::String, {});
+        auto* bounced = spawned ? dynamic_cast<FlashlightPU*>(g.objects.get(spawned)->game.get()) : nullptr;
+        CHECK(bounced && bounced->bouncing); // Original string-created SpawnItem bounce.
         CHECK(!g.server.message_count() && g.unload_world() && !g.server.string_count());
         return true;
     }

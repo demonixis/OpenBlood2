@@ -88,8 +88,11 @@ order and the existing recursive-damage guard. If DeathTrigger removes the
 source, the adaptation cancels its spawn and records why.
 
 The selected global helper from Spawner.cpp splits class name from properties
-without mutating the authored string. Only the twelve supported leaves above
-are admitted; the Spawner class and arbitrary object spawning are not imported.
+without mutating the authored string. Only the twelve supported leaves above,
+the item pickups MedKitPU, FlashlightPU, ProximitiesPU and RemotesPU and the
+weapon pickups BerettaPU, SubMachineGunPU, FlareGunPU and AssaultRiflePU are
+admitted (SniperRiflePU's weapon is not integrated); the Spawner class and
+arbitrary object spawning are not imported.
 The request is bounded to 100 bytes and validated against the existing typed
 property grammar before brush creation. Unknown classes/properties, repeated
 properties and malformed strings reject creation. Spawn velocity must fit the
@@ -102,6 +105,19 @@ INITIALUPDATE, matching the helper. Failed velocity assignment removes the new
 object. A spawned pickup has an independent lifetime, surviving parent removal
 and being reclaimed on world unload. It is not a SelfTrigger-style owned child.
 Resource failure is reported separately from successful object allocation.
+
+## String-created bouncing pickups
+
+ItemPickup and WeaponPickup set the original `m_bBounce`; ammo, health and ward
+pickups do not. On string creation (INITIALUPDATE_STRINGPROP) the base initial
+update runs first and schedules no update, exactly as the source does while
+`m_bBouncing` is still false. SpawnItem then stores the rest position, sets the
+bounce acceleration to 500 and `bouncing`, and moves the pickup 10 units up with
+the collision-checked MoveObject; FLAG_GRAVITY lets it fall back. Because no update
+is ever scheduled, the source spring (`50 * (rest.y - y) - 3 * vel.y`) is never
+reached in single player, so it is not ported. A failed position query or move is
+recorded in the pickup error. Item pickups keep the single-player restriction;
+SpawnWeaponPickup drops keep `SetBounce(false)` behavior (normal creation).
 
 ## Inspection and limits
 

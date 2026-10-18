@@ -16,6 +16,11 @@ class PickupObject : public B2BaseClass
     std::string pickup_target, pickup_command, error;
     std::int32_t resource_id = 0;
     bool picked_up = false, rotate_fx = false;
+    // Original m_bBounce (item/weapon constructors) and the SpawnItem state it sets on
+    // string creation. No update is scheduled afterwards, so the source spring never runs.
+    bool bounce = false, bouncing = false;
+    DVector rest_position{};
+    float bounce_acceleration = 0;
     std::uint64_t attempts = 0, sound_requests = 0;
     bool IsOfferingTo(HOBJECT receiver) const
     {
@@ -24,6 +29,7 @@ class PickupObject : public B2BaseClass
 
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+    void SpawnBounce();
     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
 
   private:

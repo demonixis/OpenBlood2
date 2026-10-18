@@ -6,6 +6,7 @@ class ItemPickup : public PickupObject
     ItemPickup()
     {
         pickup_sound = "sounds/powerups/inventory1.wav";
+        bounce = true;
     }
 
   protected:

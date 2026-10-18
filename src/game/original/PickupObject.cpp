@@ -66,8 +66,10 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3) | (1u << 10) |
                                                        (rotate_fx ? (1u << 4) : 0));
         g_pServerDE->SetNextUpdate(m_hObject, 0);
-        // String creation follows SpawnItem: no bounce for these source constructors,
-        // no ground snap, and the helper applies SpawnObjectVel after initial update.
+        // String creation follows SpawnItem, with no ground snap; the helper applies
+        // SpawnObjectVel after initial update. Bouncing pickups rise 10 units first.
+        if (reason == INITIALUPDATE_STRINGPROP && bounce)
+            SpawnBounce();
     }
     else if (message == MID_TOUCHNOTIFY && !touching_ && !picked_up &&
              (g_pServerDE->GetObjectFlags(m_hObject) & FLAG_TOUCH_NOTIFY) &&
@@ -88,6 +90,21 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         touching_ = nullptr;
     }
     return B2BaseClass::EngineMessageFn(message, data, reason);
+}
+void PickupObject::SpawnBounce()
+{
+    // Original SpawnItem: InitialUpdate already scheduled no update (m_bBouncing was
+    // false), so the bounce flag stays set but the Update spring is never reached.
+    if (g_pServerDE->GetObjectPos(m_hObject, &rest_position) != DE_OK)
+    {
+        error = "String-spawn rest position unavailable";
+        return;
+    }
+    bounce_acceleration = 500;
+    bouncing = true;
+    DVector raised{rest_position.x, rest_position.y + 10, rest_position.z};
+    if (g_pServerDE->MoveObject(m_hObject, &raised) != DE_OK)
+        error = "String-spawn bounce move failed";
 }
 DDWORD PickupObject::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
 {

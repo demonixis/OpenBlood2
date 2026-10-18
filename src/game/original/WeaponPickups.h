@@ -7,6 +7,7 @@ class WeaponPickup : public PickupObject
     WeaponPickup()
     {
         pickup_sound = "sounds\\powerups\\weapon1.wav";
+        bounce = true;
     }
 
   protected:
