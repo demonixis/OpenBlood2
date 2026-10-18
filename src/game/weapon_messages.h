@@ -15,6 +15,7 @@ namespace OpenBlood2
     {
         Normal = 0,
         Fire = 1,
+        Singularity = 3, // Singularity generator (both projectiles).
         Melee = 4,
         Explode = 5,
         Suffocate = 6,

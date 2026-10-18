@@ -173,12 +173,13 @@ CDestructableBrush with `Gravity` but neither `BoxPhysics` nor `Pushable`
 (28 entries: 26 in 09_abandoned_buildings, 2 in 04_steamtunnels). The bounded
 body solver refuses them. Needs falling non-box world models.
 
-### L6 — Weapons and weapon pickups (Tesla Cannon and Shotgun done)
+### L6 — Weapons and weapon pickups (Tesla Cannon, Shotgun and Singularity done)
 
 The Tesla Cannon (weapon 13, its three projectiles, TeslaCannonPU and the AI
-`TESLA*` branch) and the sawed-off shotgun (weapon 4, sixteen-vector FireSpread,
-ShotgunPU and the AI `SHOTG*` branch) are ported; see their contracts. The other
-families remain.
+`TESLA*` branch), the sawed-off shotgun (weapon 4, sixteen-vector FireSpread,
+ShotgunPU and the AI `SHOTG*` branch) and the Singularity generator (weapon 8,
+blue beam, attracting projectile, SingularityPU and the AI `SINGULAR*` branch)
+are ported; see their contracts. The other families remain.
 
 Fanatic/Prophet are rejected when an authored `AIWeapon` names a weapon family
 that is not ported (34 NPCs): SHOTGUN (20), TESLA/TESLACANNON (4), NAPALMCANNON

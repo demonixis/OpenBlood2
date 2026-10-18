@@ -31,7 +31,7 @@ namespace OpenBlood2
         for (const auto& fx : game.server.laser_beams.active)
         {
             if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, fx.updates != 0,
-                           false, {}, "Original red beam", game.resources, error, {}, fx.alpha, true))
+                           false, {}, "Original laser beam", game.resources, error, {}, fx.alpha, true))
                 return false;
             scene.entries.back().laser_effect = fx.id;
         }

@@ -165,6 +165,17 @@ class CShotgun final : public CWeapon
   public:
     CShotgun() : CWeapon(WEAP_SHOTGUN) {}
 };
+// Original CSingularity::FireProjectile: a blue-large laser to the first solid hit,
+// then the ordinary (zero-velocity) CSingularityProjectile.
+class CSingularity final : public CWeapon
+{
+  public:
+    CSingularity() : CWeapon(WEAP_SINGULARITY) {}
+    FireResult FireProjectile() override;
+    std::uint64_t beam = 0;
+    DVector beam_end{};
+    std::string beam_error;
+};
 class CAssaultRifle final : public CWeapon
 {
   public:

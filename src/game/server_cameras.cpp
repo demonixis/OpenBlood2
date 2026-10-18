@@ -10,6 +10,12 @@ namespace OpenBlood2
         const auto* r = objects_.get(h);
         return r ? r->user_flags : 0;
     }
+    DBYTE ServerAdapter::GetObjectType(HOBJECT h)
+    {
+        trace_service("GetObjectType");
+        const auto* r = objects_.get(h);
+        return r ? r->state.m_ObjectType : DBYTE(OT_NORMAL);
+    }
     bool ServerAdapter::PublishCameraEffect(HOBJECT h, const CameraSettings& settings)
     {
         trace_service("PublishCameraEffect");

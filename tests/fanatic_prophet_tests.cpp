@@ -91,12 +91,12 @@ namespace
                                                         {"MELEEX", WEAP_MELEE},
                                                         {"TESLACANNON", WEAP_TESLACANNON},
                                                         {"SHOTGUN", WEAP_SHOTGUN},
-                                                        {"SHOTGXX", WEAP_SHOTGUN}};
+                                                        {"SHOTGXX", WEAP_SHOTGUN},
+                                                        {"SINGULARITY", WEAP_SINGULARITY}};
         for (auto [name, expected] : supported)
             CHECK(AI_Mgr::WeaponStrToInt(name, id) && id == expected);
         // A matched branch whose weapon is not integrated is never replaced by Beretta.
-        for (auto name : {"SNIPER", "HOWITZER", "PROX_BOMB", "HEAL", "SHIELD", "SKULL",
-                          "GIDEON_GOO", "ORB", "SINGULARITY"})
+        for (auto name : {"SNIPER", "HOWITZER", "PROX_BOMB", "HEAL", "SHIELD", "SKULL", "GIDEON_GOO", "ORB"})
             CHECK(!AI_Mgr::WeaponStrToInt(name, id));
         return true;
     }

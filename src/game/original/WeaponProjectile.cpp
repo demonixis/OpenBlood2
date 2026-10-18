@@ -1,6 +1,8 @@
 #include "InventoryMgr.h"
+#include "LaserBeamFX.h"
 #include "Projectile.h"
 #include "Weapon.h"
+#include "engine/collision.h"
 using namespace OpenBlood2;
 FireResult CWeapon::FireProjectile()
 {
@@ -10,8 +12,8 @@ FireResult CWeapon::FireProjectile()
     if (!server || !m_pInventoryMgr || !firing || !server->IsObjectAlive(m_hOwner))
         return last_shot.result = FireResult::Invalid;
     const bool alt = last_shot.request.alternate;
-    const auto* name = alt ? (alt_projectile_class ? alt_projectile_class : data.m_szAltProjectileClass)
-                           : data.m_szProjectileClass;
+    const auto* name =
+        alt ? (alt_projectile_class ? alt_projectile_class : data.m_szAltProjectileClass) : data.m_szProjectileClass;
     if (!name)
         return last_shot.result = FireResult::Unavailable;
     ObjectCreateStruct state;
@@ -47,5 +49,28 @@ FireResult CTeslaCannon::FireProjectile()
     // The alternate shot's SFX_LIGHTNING_ID beam to the first solid hit is client-only.
     if (last_shot.request.alternate)
         ++lightning_unavailable;
+    return CWeapon::FireProjectile();
+}
+FireResult CSingularity::FireProjectile()
+{
+    beam = 0;
+    beam_error.clear();
+    auto* server = BaseClass::GetServerDE();
+    if (!server || !firing || !server->IsObjectAlive(m_hOwner))
+        return last_shot.result = FireResult::Invalid;
+    // INTERSECT_OBJECTS | IGNORE_NONSOLID without a filter, from the fire position along
+    // the range; the visual beam never suppresses the projectile.
+    const auto from = last_shot.request.position;
+    const auto to = vector_add(from, vector_scale(last_shot.direction, data.m_fRange));
+    SegmentHit hit;
+    const auto query = server->IntersectSegment(from, to, nullptr, hit, false, SegmentObjects::SolidOnly,
+                                                SegmentFilter::None, SegmentStart::SkipInterior);
+    if (query == SegmentResult::Hit || query == SegmentResult::Miss)
+    {
+        beam_end = query == SegmentResult::Hit ? hit.point : to;
+        beam = server->PublishLaserBeam(m_hOwner, from, beam_end, beam_error, LASER_BLUE_LARGE);
+    }
+    else
+        beam_error = "Singularity beam ray unavailable";
     return CWeapon::FireProjectile();
 }

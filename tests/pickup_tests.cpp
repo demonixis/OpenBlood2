@@ -480,12 +480,13 @@ namespace
         CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2 &&
               counts["AssaultRiflePU"] == 5 && counts["MedKitPU"] == 22 && counts["ProximitiesPU"] == 161 &&
               counts["RemotesPU"] == 107 && counts["FlashlightPU"] == 10 && counts["SniperRiflePU"] == 4 &&
-              counts["BinocularsPU"] == 4 && counts["ShotgunPU"] == 3);
+              counts["BinocularsPU"] == 4 && counts["ShotgunPU"] == 3 && counts["SingularityPU"] == 1);
         CHECK(failures.empty()); // Retired TypeAction rows are created.
-        // 1784 includes the four SniperRiflePU offers (their weapon is not integrated), 14 StealthPU,
-        // 13 InvulnerabilityPU, 4 BinocularsPU and 3 ShotgunPU. 70 container spawns include the bouncing item/weapon leaves.
+        // 1785 includes the four SniperRiflePU offers (their weapon is not integrated), 14 StealthPU,
+        // 13 InvulnerabilityPU, 4 BinocularsPU, 3 ShotgunPU and 1 SingularityPU. 70 container spawns include the
+        // bouncing item/weapon leaves.
         CHECK(counts["StealthPU"] == 14 && counts["InvulnerabilityPU"] == 13);
-        CHECK(worlds == 57 && created == 1784 && missing == 0 && rejected == 0 && spawns == 70);
+        CHECK(worlds == 57 && created == 1785 && missing == 0 && rejected == 0 && spawns == 70);
         return true;
     }
 } // namespace

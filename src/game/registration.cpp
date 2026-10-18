@@ -23,6 +23,7 @@
 #include "game/original/ShikariAI.h"
 #include "game/original/MadScientistAI.h"
 #include "game/original/Tchernotronic.h"
+#include "game/original/SingularityProjectile.h"
 #include "game/original/FlareProjectile.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Gib.h"
@@ -136,6 +137,7 @@ namespace OpenBlood2
         const ClassInfo tesla_bolt{"CTeslaBoltProjectile", &base, construct<CTeslaBoltProjectile>, {}};
         const ClassInfo tesla_ball{"CTeslaBallProjectile", &base, construct<CTeslaBallProjectile>, {}};
         const ClassInfo loogie{"CShikariLoogieProjectile", &base, construct<CShikariLoogieProjectile>, {}};
+        const ClassInfo singularity_projectile{"CSingularityProjectile", &base, construct<CSingularityProjectile>, {}};
         const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {}};
         const ClassInfo flare_burst{"CFlareBurstProjectile", &base, construct<CFlareBurstProjectile>, {}};
         const ClassInfo energy_projectile{"CEnergyBlastProjectile", &base, construct<CEnergyBlastProjectile>, {}};
@@ -693,6 +695,7 @@ namespace OpenBlood2
         const ClassInfo flare_pickup{"FlareGunPU", &weapon_pickup, construct<FlareGunPU>, {}};
         const ClassInfo tesla_pickup{"TeslaCannonPU", &weapon_pickup, construct<TeslaCannonPU>, {}};
         const ClassInfo shotgun_pickup{"ShotgunPU", &weapon_pickup, construct<ShotgunPU>, {}};
+        const ClassInfo singularity_pickup{"SingularityPU", &weapon_pickup, construct<SingularityPU>, {}};
         const ClassInfo mac10_pickup{"SubMachineGunPU", &weapon_pickup, construct<SubMachineGunPU>, {}};
         const ClassInfo sniper_pickup{"SniperRiflePU", &weapon_pickup, construct<SniperRiflePU>, {}};
         const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}};
@@ -1029,6 +1032,7 @@ namespace OpenBlood2
                objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
                objects.register_class(assault_pickup) && objects.register_class(flare_pickup) &&
                objects.register_class(tesla_pickup) && objects.register_class(shotgun_pickup) &&
+               objects.register_class(singularity_pickup) &&
                objects.register_class(mac10_pickup) && objects.register_class(sniper_pickup) &&
                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
                objects.register_class(health_base) && objects.register_class(armor_base) &&
@@ -1051,6 +1055,7 @@ namespace OpenBlood2
                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
                objects.register_class(tesla_projectile) && objects.register_class(tesla_bolt) &&
                objects.register_class(tesla_ball) && objects.register_class(loogie) &&
+               objects.register_class(singularity_projectile) &&
                objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
                objects.register_class(howitzer_shell) && objects.register_class(shockwave_projectile);
     }

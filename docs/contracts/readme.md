@@ -78,6 +78,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Original MadScientistAI](madscientist_contracts.md)
 - [Original Tchernotronic](tchernotronic_contracts.md)
 - [Original sawed-off shotgun](shotgun_contracts.md)
+- [Original Singularity generator](singularity_contracts.md)
 - [Original Spawner](spawner_contracts.md)
 - [Original world-model debris](world_debris_contracts.md)
 - [Keyframed translating world models](worldpath_contracts.md)

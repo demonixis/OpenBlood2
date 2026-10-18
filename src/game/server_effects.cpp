@@ -97,7 +97,8 @@ namespace OpenBlood2
         trace_service("PublishObjectParticles");
         return object_particles.publish(owner, type, *this, client_resources, objects_.time(), error);
     }
-    std::uint64_t ServerAdapter::PublishLaserBeam(HOBJECT source, DVector from, DVector to, std::string& error)
+    std::uint64_t ServerAdapter::PublishLaserBeam(HOBJECT source, DVector from, DVector to, std::string& error,
+                                                  DBYTE type)
     {
         trace_service("PublishLaserBeam");
         if (!IsObjectAlive(source) || !objects_.models || !client_resources)
@@ -106,7 +107,7 @@ namespace OpenBlood2
             return 0;
         }
         return laser_beams.publish(from, to, GetObjectName(source), *objects_.models, *client_resources,
-                                   objects_.time(), error);
+                                   objects_.time(), error, type);
     }
     std::uint64_t ServerAdapter::PublishWeaponSprites(HOBJECT source, const WeaponSpriteSettings& settings,
                                                       std::string& error)

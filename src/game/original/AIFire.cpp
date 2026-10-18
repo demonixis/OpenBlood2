@@ -123,13 +123,14 @@ bool AI_Mgr::Fire(bool alternate)
     if (!weapon)
         return fail(FireResult::Unavailable, "AI has no current weapon");
     if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_SUBMACHINEGUN &&
-        weapon->data.m_nType != WEAP_SHOTGUN && weapon->data.m_nType != WEAP_ASSAULTRIFLE &&
-        weapon->data.m_nType != WEAP_FLAREGUN && weapon->data.m_nType != WEAP_TESLACANNON &&
-        weapon->data.m_nType != WEAP_SOUL_CROWBAR && weapon->data.m_nType != WEAP_SHIKARI_CLAW &&
-        weapon->data.m_nType != WEAP_SHIKARI_SPIT && weapon->data.m_nType != WEAP_SOUL_AXE &&
-        weapon->data.m_nType != WEAP_SOUL_PIPE && weapon->data.m_nType != WEAP_MELEE &&
-        weapon->data.m_nType != WEAP_NAGA_EYEBEAM && weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST &&
-        weapon->data.m_nType != WEAP_GIDEON_WIND && weapon->data.m_nType != WEAP_GIDEON_SHIELD)
+        weapon->data.m_nType != WEAP_SHOTGUN && weapon->data.m_nType != WEAP_SINGULARITY &&
+        weapon->data.m_nType != WEAP_ASSAULTRIFLE && weapon->data.m_nType != WEAP_FLAREGUN &&
+        weapon->data.m_nType != WEAP_TESLACANNON && weapon->data.m_nType != WEAP_SOUL_CROWBAR &&
+        weapon->data.m_nType != WEAP_SHIKARI_CLAW && weapon->data.m_nType != WEAP_SHIKARI_SPIT &&
+        weapon->data.m_nType != WEAP_SOUL_AXE && weapon->data.m_nType != WEAP_SOUL_PIPE &&
+        weapon->data.m_nType != WEAP_MELEE && weapon->data.m_nType != WEAP_NAGA_EYEBEAM &&
+        weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST && weapon->data.m_nType != WEAP_GIDEON_WIND &&
+        weapon->data.m_nType != WEAP_GIDEON_SHIELD)
         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
     DRotation rotation;
     const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM;

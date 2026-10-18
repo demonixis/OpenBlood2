@@ -3,7 +3,7 @@
 namespace OpenBlood2
 {
     std::uint64_t LaserBeams::publish(DVector from, DVector to, std::string_view source, ModelStore& models,
-                                      const Resources& resources, double now, std::string& error)
+                                      const Resources& resources, double now, std::string& error, DBYTE type)
     {
         error.clear();
         LaserBeamReport report;
@@ -14,7 +14,9 @@ namespace OpenBlood2
             report.source = source;
             report.from = from;
             report.to = to;
+            report.type = type;
             CLaserBeamFX fx;
+            fx.SetupBeam(type);
             if (active.size() >= 128 || next_id_ == UINT64_MAX)
                 error = "Laser capacity exhausted";
             else if (fx.CreateObject(models, resources, from, to, now, error))

@@ -7,11 +7,13 @@ namespace OpenBlood2
         std::uint64_t id = 0;
         std::string source, error;
         DVector from{}, to{};
+        DBYTE type = LASER_RED_SMALL;
     };
     class LaserBeams
     {
       public:
-        std::uint64_t publish(DVector, DVector, std::string_view, ModelStore&, const Resources&, double, std::string&);
+        std::uint64_t publish(DVector, DVector, std::string_view, ModelStore&, const Resources&, double, std::string&,
+                              DBYTE type = LASER_RED_SMALL);
         bool advance(double);
         void clear();
         std::vector<CLaserBeamFX> active;

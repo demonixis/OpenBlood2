@@ -121,7 +121,7 @@ namespace OpenBlood2
         ParticleStreams particle_streams;
         std::uint64_t PublishParticleStream(HOBJECT, const ParticleStreamSettings&, std::string&) override;
         std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) override;
-        std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&) override;
+        std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&, DBYTE type = 0) override;
         ExplosionLights explosion_lights;
         ExplosionRings explosion_rings;
         ExplosionFlames explosion_flames;
@@ -236,6 +236,7 @@ namespace OpenBlood2
         MoverResult MoveKeyframedObject(HOBJECT, DVector, const DRotation*) override;
         DRESULT AlignRotation(DRotation&, DVector) override;
         DDWORD GetObjectUserFlags(HOBJECT) override;
+        DBYTE GetObjectType(HOBJECT) override;
         CBloodServerShell* session_shell = nullptr;
         DRESULT SendWorldExit(const WorldExit&, const std::string&) override;
         DRESULT SendBossHealth(const BossHealth&) override;

@@ -22,6 +22,13 @@ ShotgunPU::ShotgunPU()
     display_name = "Sawed-off Shotgun";
     resource_id = IDS_WEAPON_SHOTGUN;
 }
+SingularityPU::SingularityPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_SINGULARITY, 100};
+    file = "Singularity_pu";
+    display_name = "Singularity Generator";
+    resource_id = IDS_WEAPON_SINGULARITY;
+}
 TeslaCannonPU::TeslaCannonPU()
 {
     value = {OpenBlood2::PickupKind::Weapon, WEAP_TESLACANNON, 40};
@@ -66,6 +73,8 @@ const char* WeaponPickupClass(DDWORD type)
             return "TeslaCannonPU";
         case WEAP_SHOTGUN:
             return "ShotgunPU";
+        case WEAP_SINGULARITY:
+            return "SingularityPU";
         case WEAP_SNIPERRIFLE:
             return "SniperRiflePU";
         default:

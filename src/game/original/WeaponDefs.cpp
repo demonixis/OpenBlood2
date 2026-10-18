@@ -300,6 +300,65 @@ namespace
             "interface\\statusbar\\weapons\\shotgun.pcx",   // Icon for status bar
             "interface\\statusbar\\weapons\\shotgun_h.pcx", // Highlighted icon for status bar
         },
+        // Singularity
+        {
+            "Models\\Weapons\\Singularity_pv.abc",              // Model
+            "Models\\Weapons\\Singularity_pv.abc",              // Model
+            "Skins\\Weapons\\C_Single_pv_t.dtx",                // Skin
+            "Models\\Powerups\\Singularity_pu.abc",             // 3rd person model
+            "Skins\\Powerups\\Singularity_pu.dtx",              // 3rd person skin
+            WEAP_SINGULARITY,                                   // Type
+            TYPE_RIFLE,                                         // Fire type
+            AMMO_BATTERY,                                       // Ammo type
+            50,                                                 // Ammo Use
+            50,                                                 // Alt Ammo Use
+            5.0f,                                               // Min Damage
+            10.0f,                                              // Max Damage
+            5.0f,                                               // Min Alt damage
+            10.0f,                                              // Max Alt damage
+            5.0f,                                               // Reload time
+            5.0f,                                               // Alt reload time
+            {0.0f, 0.0f},                                       // Spread
+            {0.0f, 0.0f},                                       // Alt Spread
+            0.0f,                                               // Projectile Velocity
+            0.0f,                                               // Alt Projectile Velocity
+            3500.0f,                                            // Range
+            3500.0f,                                            // Alt Range
+            1,                                                  // Shots per fire
+            1,                                                  // Alt Shots per fire
+            5,                                                  // Strength or Magic required
+            0,                                                  // Two-handed Strength or Magic required
+            500,                                                // Damage Radius (projectiles)
+            500,                                                // Alt Damage Radius (projectiles)
+            DFALSE,                                             // Alt fire zoom
+            DFALSE,                                             // Semi-auto
+            "Sounds\\Weapons\\singularity\\fire.wav",           // Fire sound
+            "Sounds\\Weapons\\singularity\\fire.wav",           // Alt Fire sound
+            "",                                                 // Empty weapon sound
+            "",                                                 // Alt Empty weapon sound
+            "CSingularityProjectile",                           // Projectile class
+            "CSingularityProjectile",                           // Alt Projectile class
+            0,                                                  // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                                 // Muzzle Flash color
+            "Singularity Cannon",                               // Name
+            IDS_WEAPON_SINGULARITY,                             // Name ID (resource)
+            "",                                                 // flash sprite name
+            "",                                                 // alt flash Sprite name
+            0.10f,                                              // Flash duration
+            0.13f,                                              // Flash scale
+            {0.0f, 0.0f, 0.0f},                                 // 3rd person gun offset
+            {1.4f, -1.9f, 3.4f},                                // Gun Offset
+            {0.0f, 0.0f, 0.0f},                                 // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                              // Recoil
+            {4.25f, -4.25f, 25.0f},                             // Flash position
+            0.625f,                                             // Eject interval
+            0.2f,                                               // View kick
+            DFALSE,                                             // View kick is Cumulative
+            DFALSE,                                             // Animation looping
+            DFALSE,                                             // Alt anim looping
+            "interface\\statusbar\\weapons\\singularity.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\singularity_h.pcx", // Highlighted icon for status bar
+        },
         // Tesla Cannon
         {
             "Models\\Weapons\\TeslaRod_pv.abc",          // Model

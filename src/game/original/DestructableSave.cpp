@@ -29,6 +29,7 @@ namespace
         {
             case DamageType::Normal:
             case DamageType::Fire:
+            case DamageType::Singularity:
             case DamageType::Melee:
             case DamageType::Explode:
             case DamageType::Suffocate:

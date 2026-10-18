@@ -36,7 +36,7 @@ namespace
                                              {"LIFEL", 0, false},
                                              {"TESLA", WEAP_TESLACANNON, true},
                                              {"MELEE", WEAP_MELEE, true},
-                                             {"SINGULAR", 0, false},
+                                             {"SINGULAR", WEAP_SINGULARITY, true},
                                              {"NONE", 0, true},
                                              {"PROX_BOMB", 0, false},
                                              {"SHIKARI_CLAW", WEAP_SHIKARI_CLAW, true},

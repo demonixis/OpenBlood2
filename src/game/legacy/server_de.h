@@ -99,7 +99,7 @@ class ServerDE : public CSBase
     virtual std::uint64_t PublishBloodSplat(HOBJECT, const OpenBlood2::BloodSplatSettings&, std::string&) = 0;
     virtual std::uint64_t PublishFleshGibs(HOBJECT, DVector, DVector, DVector, float, unsigned, std::string&) = 0;
     virtual std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) = 0;
-    virtual std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&) = 0;
+    virtual std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&, DBYTE type = 0) = 0;
     virtual std::uint64_t PublishExplosionFragments(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
     virtual std::uint64_t PublishExplosionFlames(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
     virtual std::uint64_t PublishExplosionRings(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
@@ -147,6 +147,7 @@ class ServerDE : public CSBase
     virtual DRESULT InterpolateRotation(DRotation&, const DRotation&, const DRotation&, float) = 0;
     virtual OpenBlood2::MoverResult MoveKeyframedObject(HOBJECT, DVector, const DRotation*) = 0;
     virtual DDWORD GetObjectUserFlags(HOBJECT) = 0;
+    virtual DBYTE GetObjectType(HOBJECT) = 0; // OT_NORMAL for an unknown handle.
     virtual DRESULT SendWorldExit(const OpenBlood2::WorldExit&, const std::string& start_point) = 0;
     virtual DRESULT SendBossHealth(const OpenBlood2::BossHealth&) = 0;
     virtual DRESULT SendConversation(const OpenBlood2::Conversation&) = 0;

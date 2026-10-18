@@ -4,6 +4,20 @@
 #include "engine/objects.h"
 #include <cmath>
 using namespace OpenBlood2;
+void CLaserBeamFX::SetupBeam(DBYTE value)
+{
+    type = value;
+    const bool large = type <= 13 && type % 2;
+    min_scale = large ? .1f : .05f; // The default branch differs only in min scale 0.
+    if (type > 13)
+        min_scale = 0;
+    max_scale = large ? 2.5f : 1;
+    duration = large ? 1 : .5f;
+    scale_time = fade_time = large ? .35f : .25f;
+    full_alpha = alpha = .5f;
+    constexpr const char* colors[]{"red", "green", "blue", "white", "yellow", "orange", "purple"};
+    skin_path = std::string("Skins\\Ammo\\beam") + (type <= 13 ? colors[type / 2] : "red") + ".dtx";
+}
 bool CLaserBeamFX::CreateObject(ModelStore& models, const Resources& resources, DVector from, DVector to, double now,
                                 std::string& failure)
 {
@@ -45,12 +59,15 @@ bool CLaserBeamFX::Update(double now)
         start_time = now; // Source starts the lifetime on first Update, not publication.
         position = source;
         const auto delta = vector_subtract(destination, source);
-        scale = {.05f, .05f, std::sqrt(vector_dot(delta, delta))};
+        scale = {min_scale, min_scale, std::sqrt(vector_dot(delta, delta))};
     }
     ++updates;
     const auto time = now - start_time;
-    const float width = time <= .25 ? .05f + .95f * static_cast<float>(time / .25) : 1.f;
+    const float width =
+        time <= scale_time ? min_scale + (max_scale - min_scale) * static_cast<float>(time / scale_time) : max_scale;
     scale.x = scale.y = width;
-    alpha = time >= .25 ? .5f - .5f * static_cast<float>((time - .25) / .25) : .5f;
-    return time < .5; // Expired state is removed before presentation; never render negative alpha.
+    alpha = time >= duration - fade_time
+                ? full_alpha - full_alpha * static_cast<float>((time - (duration - fade_time)) / fade_time)
+                : full_alpha;
+    return time < duration; // Expired state is removed before presentation; never render negative alpha.
 }
