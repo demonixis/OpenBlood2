@@ -250,11 +250,15 @@ namespace
         CHECK(!loaded && allocations == 2 && g.server.string_count() == count);
         PlayerState after;
         CHECK(p->SaveFields(after, error) && after == s);
+        // The source saves no power state: invisibility is dropped, other powers stay unported.
         p->m_bPowerupActivated[PU_INVISIBLE] = true;
+        CHECK(p->SaveFields(after, error) && after == s);
+        p->m_bPowerupActivated[PU_INVISIBLE] = false;
+        p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = true;
         PlayerState untouched;
         untouched.name = "unchanged";
         CHECK(!p->SaveFields(untouched, error) && untouched.name == "unchanged" && !p->LoadFields(s, error));
-        p->m_bPowerupActivated[PU_INVISIBLE] = false;
+        p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = false;
         p->m_fYaw = std::numeric_limits<float>::infinity();
         CHECK(!p->SaveFields(untouched, error) && untouched.name == "unchanged");
         p->m_fYaw = s.yaw;

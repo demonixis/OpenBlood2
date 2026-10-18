@@ -31,3 +31,10 @@ NecroWardPU::NecroWardPU()
     resource_id = 312;
     pickup_sound = "sounds\\powerups\\powerup3.wav";
 }
+StealthPU::StealthPU()
+{
+    value = {OpenBlood2::PickupKind::Powerup, 6, 30}; // POWERUP_STEALTH, 30 seconds.
+    file = "Stealth_pu";
+    display_name = "Stealth";
+    resource_id = 314; // IDS_POWERUP_STEALTH; default powerup4.wav pickup sound.
+}

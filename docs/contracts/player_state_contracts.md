@@ -96,3 +96,7 @@ now supplies accepted ordinary-movement impulses, original player falling damage
 engine mass/friction and saved server-falling state. Earlier blanket omissions are
 superseded only for this boundary; dedicated mover/body/projectile forces, retail
 physics parity and the M2 gate remain open.
+
+The later [timed-power contracts](powerup_contracts.md) supersede the blanket
+active-power refusal for Stealth only: the source saves no power state, so
+capture drops an active invisibility. Other active powers still refuse.

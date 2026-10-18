@@ -47,6 +47,9 @@ CPlayerObj::~CPlayerObj()
     auto* server = GetServerDE();
     if (m_hCurSound)
         server->KillSound(m_hCurSound);
+    for (auto sound : {m_hPowerupStartSound, m_hPowerupEndSound, m_hPowerupLoopSound})
+        if (sound)
+            server->KillSound(sound);
     if (m_hClient)
         server->SetClientUserData(m_hClient, nullptr);
     if (m_hstrTrigger)
@@ -397,7 +400,8 @@ DBOOL CPlayerObj::Update(DVector*)
         if (!server->PingObjects(observer))
             ++activation_ping_failures;
     }
-    if (!UpdateStats() || !UpdateLandingSound() || !UpdateSmellTrail())
+    // Original order: UpdateStats, then CheckPowerups.
+    if (!UpdateStats() || !CheckPowerups() || !UpdateLandingSound() || !UpdateSmellTrail())
         return DFALSE;
     // Original Update handles the first death after stats and smell, before
     // aggregate update clears accumulated frame damage.

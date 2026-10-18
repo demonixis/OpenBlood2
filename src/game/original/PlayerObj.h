@@ -62,8 +62,20 @@ class CPlayerObj : public CBaseCharacter
     ObjectList* remote_bombs = nullptr;
     std::uint64_t remote_commands = 0, remote_signals = 0;
     std::string remote_error;
-    // Original activation storage/query only; collection/timing is still unported.
+    // Original activation storage/query. Only Stealth (PU_INVISIBLE) is collected and
+    // timed so far (PlayerPowers.cpp); the source never saves these fields.
     std::array<bool, PU_MAXTYPES> m_bPowerupActivated{};
+    float m_fInvisibleTime = 0;
+    std::array<PowerupType, 15> m_ePowerupSoundStack{PU_NONE}; // Source PU_MAXSTACK.
+    int m_nPowerupSoundStackPos = 0;
+    OpenBlood2::SoundId m_hPowerupStartSound = 0, m_hPowerupEndSound = 0, m_hPowerupLoopSound = 0;
+    std::uint64_t powerup_pickups = 0, powerup_expiries = 0, powerup_console_unavailable = 0;
+    std::string powerup_error;
+    bool AddPowerup(DBYTE type, float value);
+    bool CheckPowerups();
+    void ResetPowerups();
+    void StartPowerupSound(PowerupType);
+    void EndPowerupSound(PowerupType);
     bool IsPowerupActive(int index) const
     {
         return index >= 0 && index < PU_MAXTYPES && m_bPowerupActivated[index];

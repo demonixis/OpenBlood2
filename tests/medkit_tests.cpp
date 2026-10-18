@@ -1,5 +1,6 @@
 #include "app/movement_controls.h"
 #include "game/original/ItemPickups.h"
+#include "game/original/PowerupPickups.h"
 #include "player_fixture.h"
 #include <algorithm>
 #include <functional>
@@ -329,6 +330,60 @@ namespace
         }
         return true;
     }
+    // Original StealthPU and CPlayerObj invisibility timer, blink, sounds and resets.
+    bool stealth(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(setup(g, root));
+        auto& p = player(g);
+        auto pickup = g.objects.create(g.objects.find_class("StealthPU"), {}, Creation::World,
+                                       {{"Pos", DVector{300, 100, 300}}});
+        auto* item = pickup ? dynamic_cast<StealthPU*>(g.objects.get(pickup)->game.get()) : nullptr;
+        CHECK(item && item->value.kind == PickupKind::Powerup && item->value.type == 6 && item->value.amount == 30 &&
+              item->resource_id == 314 && item->file == "Stealth_pu");
+        // Deliver the pickup's original MID_ADDPOWERUP payload.
+        auto deliver = [&]
+        {
+            auto m = g.server.StartMessageToObject(g.server.HandleToObject(pickup), p.m_hObject, add_powerup_message);
+            return m && g.server.WritePickupMessage(m, item->value) == DE_OK && g.server.EndMessage(m) == DE_OK;
+        };
+        const float start = g.objects.time();
+        CHECK(deliver() && p.IsPowerupActive(PU_INVISIBLE) && p.powerup_pickups == 1);
+        const auto* r = g.objects.get(p.m_hObject);
+        CHECK(std::abs(r->alpha - .08f) < 1e-6f && !(r->state.m_Flags & FLAG_SHADOW));
+        CHECK(p.m_nPowerupSoundStackPos == 1 && p.m_ePowerupSoundStack[0] == PU_INVISIBLE);
+        CHECK(std::abs(p.m_fInvisibleTime - (start + 30)) < 1e-4f);
+        // Still invisible 20 s later; the last five seconds blink.
+        for (int i = 0; i < 200; ++i)
+            CHECK(g.step(.1));
+        CHECK(p.IsPowerupActive(PU_INVISIBLE) && std::abs(r->alpha - .08f) < 1e-6f);
+        bool shown = false, hidden = false;
+        for (int i = 0; i < 90; ++i)
+        {
+            CHECK(g.step(.05));
+            shown |= r->alpha == 1;
+            hidden |= std::abs(r->alpha - .08f) < 1e-6f;
+        }
+        CHECK(shown && hidden && p.IsPowerupActive(PU_INVISIBLE));
+        for (int i = 0; i < 20; ++i)
+            CHECK(g.step(.1));
+        CHECK(!p.IsPowerupActive(PU_INVISIBLE) && p.powerup_expiries == 1 && r->alpha == 1 &&
+              (r->state.m_Flags & FLAG_SHADOW) && p.powerup_console_unavailable == 1 && !p.m_nPowerupSoundStackPos);
+        // Death resets it (DoDeath -> ResetPowerups).
+        CHECK(p.AddPowerup(6, 30) && p.IsPowerupActive(PU_INVISIBLE));
+        p.ResetPowerups();
+        CHECK(!p.IsPowerupActive(PU_INVISIBLE) && r->alpha == 1 && (r->state.m_Flags & FLAG_SHADOW));
+        // The source saves no power state: capture drops it, the engine snapshot keeps the color.
+        CHECK(p.AddPowerup(6, 30));
+        PlayerRestoreState s;
+        std::string e;
+        CHECK(g.capture_player(s, e) && std::abs(s.alpha - .08f) < 1e-6f);
+        CHECK(g.leave_player() && g.restore_player(s, e));
+        auto& restored = player(g);
+        CHECK(!restored.IsPowerupActive(PU_INVISIBLE) && std::abs(g.objects.get(restored.m_hObject)->alpha - .08f) < 1e-6f);
+        CHECK(!p.AddPowerup(7, 30)); // Other powers stay unported.
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
@@ -336,7 +391,8 @@ int main(int argc, char** argv)
         return 2;
     const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests = {
         {"rules", rules},     {"pickup", pickup},     {"commands", commands}, {"transport", transport},
-        {"restore", restore}, {"lifetime", lifetime}, {"input", input},       {"private", private_game}};
+        {"restore", restore}, {"lifetime", lifetime}, {"input", input},       {"private", private_game},
+        {"stealth", stealth}};
     auto it = tests.find(argv[1]);
     return it != tests.end() && it->second(argv[2]) ? 0 : 1;
 }

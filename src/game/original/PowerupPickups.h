@@ -14,6 +14,15 @@ class HealthBase : public PowerupPickup
 class ArmorBase : public PowerupPickup
 {
 };
+// Original EnhancementBase: its multiplayer respawn/scaling branch is unported (single player only).
+class EnhancementBase : public PowerupPickup
+{
+};
+class StealthPU : public EnhancementBase
+{
+  public:
+    StealthPU();
+};
 class HealthPU : public HealthBase
 {
   public:

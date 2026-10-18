@@ -1,0 +1,43 @@
+# Original timed powers (Stealth)
+
+Selected original `PowerupPickups.cpp` StealthPU and `CPlayerObj`
+AddPowerup/CheckPowerups/ResetPowerups/Start/EndPowerupSound
+(PlayerObj.cpp:3670–4046). Only Stealth (POWERUP_STEALTH, PU_INVISIBLE) is
+collected and timed; Willpower, Anger, Revenant, incorporeal and silence remain
+unported and keep refusing death, capture and restore.
+
+## Pickup
+
+StealthPU derives EnhancementBase/PowerupPickup (rotating), model `Stealth_pu`,
+resource 314, default `powerup4.wav` pickup sound, and offers POWERUP_STEALTH for
+30 seconds. Typed pickup messages accept the original powerup range 1–8; the player
+acknowledges only the types it implements. EnhancementBase's multiplayer
+respawn/scaling branch is unported. Retail worlds author 14 StealthPU (05_CDM 1).
+
+## Invisibility
+
+AddPowerup sets `m_fInvisibleTime = now + value`, color (0,0,0) with alpha 0.08,
+clears FLAG_SHADOW, activates PU_INVISIBLE and pushes its sound. CheckPowerups runs
+after UpdateStats every player update. After expiry it deactivates, ends the sound
+and restores alpha 1 and FLAG_SHADOW; the IDS_GENERAL_INVISIBILITY_EXP console text
+is not delivered (counted). In the last five seconds the player blinks: visible
+when `frac(2·time)·2 > 1`. AI perception already ignores a target whose
+PU_INVISIBLE is active. Death (DoDeath) calls ResetPowerups, which ends it.
+
+## Power sounds
+
+The source stack (15 entries) records each activation. A retained start sound
+(`specialpowerupstart1.wav`, 1000 radius, player-low) plays if none is retained;
+when it finishes, or when nothing plays while the stack is non-empty, the top
+active power's loop (`revenantloop1b.wav` for Stealth, player-medium) starts,
+popping inactive or silent entries. Ending a power pops it only if it is on top,
+kills the loop and plays the retained end sound. The player destructor kills all
+three handles.
+
+## Save, KeepAlive and restore
+
+The source Save writes no power state or timer. Capture therefore drops an active
+invisibility; the engine snapshot keeps the translucent color, so a restored or
+transferred player stays translucent with PU_INVISIBLE inactive (AI sees it) until
+something resets its color — a source behavior, not a repair target. Later
+LithTech serializes object color (game_serialize.cpp), corroborating this.

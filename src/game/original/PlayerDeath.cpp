@@ -29,15 +29,19 @@ void CPlayerObj::HandleDeath()
         death_error = "Original HandleDeath waits for a non-null lethal attacker";
         return;
     }
+    bool unported_power = false;
+    for (int i = 0; i < PU_MAXTYPES; ++i)
+        unported_power |= m_bPowerupActivated[i] && i != PU_INVISIBLE;
     if (s->GetVarValueFloat(s->GetGameConVar("GAME_GAMETYPE")) != 0 || !OpenBlood2::character_profile(m_nCharacter) ||
-        std::any_of(m_bPowerupActivated.begin(), m_bPowerupActivated.end(), [](bool active) { return active; }))
+        unported_power)
     {
-        death_error = "Multiplayer and active timed-power death are unavailable";
+        death_error = "Multiplayer and active unported timed-power death are unavailable";
         return;
     }
-    // DoDeath: these supported players have no active power, zoom, slow-death,
-    // parasitic attachment or flag to reset. Do not fabricate those services.
+    // DoDeath: these supported players have no zoom, slow-death, parasitic
+    // attachment or flag to reset. ResetPowerups ends invisibility.
     m_bDead = DTRUE;
+    ResetPowerups();
     ++deaths;
     m_InventoryMgr.RemoveDeathItems();
     death_voice_event = m_damage.last_damage.attacker == m_hObject ? 8 : 4; // SUICIDE / DEATH.

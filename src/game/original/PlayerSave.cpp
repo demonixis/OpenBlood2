@@ -55,11 +55,14 @@ namespace
             error = "Player fields require a live initialized owner outside damage callbacks";
             return false;
         }
-        if (std::any_of(player.m_bPowerupActivated.begin(), player.m_bPowerupActivated.end(), [](bool v) { return v; }))
-        {
-            error = "Active player powers require unported saved expiration timers";
-            return false;
-        }
+        // The source Save writes no power state or timer: invisibility is simply dropped
+        // (the engine snapshot keeps its translucent color). Other powers stay refused.
+        for (int i = 0; i < PU_MAXTYPES; ++i)
+            if (player.m_bPowerupActivated[i] && i != PU_INVISIBLE)
+            {
+                error = "Active unported player powers require unported saved expiration timers";
+                return false;
+            }
         for (unsigned slot = 0; slot < inventory_weapon_slots; ++slot)
             for (bool left : {false, true})
                 if (const auto* weapon = player.m_InventoryMgr.GetWeapon(slot, left); weapon && weapon->firing)

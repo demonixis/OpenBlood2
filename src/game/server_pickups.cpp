@@ -73,7 +73,7 @@ namespace OpenBlood2
         const auto limit = value.kind == PickupKind::Ammo     ? 8
                            : value.kind == PickupKind::Weapon ? 255
                            : value.kind == PickupKind::Item   ? 8
-                                                              : 4;
+                                                              : 8; // POWERUP_HEALTH..POWERUP_REVENANT
         const auto request = value.kind == PickupKind::Ammo     ? add_ammo_message
                              : value.kind == PickupKind::Weapon ? add_weapon_message
                              : value.kind == PickupKind::Item   ? add_item_message
