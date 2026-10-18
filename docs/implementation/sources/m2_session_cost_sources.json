@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "309ae214afc9f53051076a791138a59da7731644",
+  "original_imports": [],
+  "reference": {
+    "path": "src/engine/dls_sampler.cpp",
+    "commit": "309ae214afc9f53051076a791138a59da7731644",
+    "sha256": "f6869b28c8835ba7dc02aebac0f1502236424355b8980032aaf0c9b7c6382efb",
+    "use": "Frozen held_level/level/amplitude_at/finished and scalar advance loop in tests/dls_scalar_reference.h; return completed delta instead of mutating sampler member."
+  },
+  "adaptations": [
+    "Transparent string-view lookup into owned ordered service counters; unknown observations remain owned.",
+    "Omit zero-depth sine/gain/pitch modulation only; preserve every cursor addition, loop wrap and voice age.",
+    "Exact differential PCM/state checks against the pre-change project scalar loop, including external Cabal regions.",
+    "Replace a stale hardcoded CityHub test summary with its existing verified counters; assertions unchanged."
+  ],
+  "limits": [
+    "No original AI/game rules, collision semantics or dependency changes.",
+    "Differential equality with the project baseline is not retail DLS audio fidelity.",
+    "Local timing observation does not guarantee frame rate or deadline on other machines/load.",
+    "M2 acceptance review and public run_world guard remain open."
+  ],
+  "frozen_sources": {
+    "src/app/main.cpp": "2b2b00a9b41281ddb81f00ca8dcfa6c65fe420bffbb1bfe7d780d98dac36b449",
+    "src/engine/dls_sampler.cpp": "d5a4e267da57fe9030d5f0fb544184ca265c88d2834ff1cd8d86a002c7700b01",
+    "src/game/server_adapter.h": "a8366ea2bfee1133738429594c5859e66273e159d3d986c470bc434caef49762",
+    "src/game/service_coverage.cpp": "69acbed7d351c25ff12ba034eb626f733c0d001f95c96f3c4d278254c50f187f",
+    "src/game/service_coverage.h": "9cb99be16fb61490e7019056dff966209513fb3b98d8894dab21793cf98f738b",
+    "tests/CMakeLists.txt": "fd7807c12ffa1cba37cba4b57bd12707f4c625e1df790a6fd251505f31cf6878",
+    "tests/dls_sampler_tests.cpp": "344af2f9493ff16e0b29455166f29f123b762e21bc433176ed3cb7099e9940d6",
+    "tests/service_coverage_tests.cpp": "4f5bf9f7aa318cb099efc71c8b60fcfbb793d803d9ff12c1ca0cf31242a2596d",
+    "tests/dls_scalar_reference.h": "3b3eb94507443205dd55459d7b5777e0523f47e64a5c8670c032546d307c20fc",
+    "tests/particle_stream_tests.cpp": "72af000b795e36abd6f7494be133b36d127b8036c7f875172091e187c7d23cf9"
+  }
+}

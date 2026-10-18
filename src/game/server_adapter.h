@@ -246,7 +246,7 @@ namespace OpenBlood2
         DBOOL CompareStringsUpper(HSTRING, HSTRING) override;
         void unbind();
         void set_game_settings(unsigned difficulty, unsigned game_type);
-        std::map<std::string, std::uint64_t> service_calls;
+        ServiceCalls service_calls;
         std::map<std::string, std::uint64_t> unavailable_services;
         // Retained through teardown; cleared alongside service_calls on the next world load.
         std::map<std::string, std::uint64_t> unavailable_history;
@@ -259,7 +259,13 @@ namespace OpenBlood2
         void trace_service(const char* name)
         {
             if (trace_enabled)
-                ++service_calls[name];
+            {
+                const auto found = service_calls.find(std::string_view(name));
+                if (found != service_calls.end())
+                    ++found->second;
+                else
+                    ++service_calls[name];
+            }
         }
         std::size_t string_count() const
         {

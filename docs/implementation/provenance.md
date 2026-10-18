@@ -1394,3 +1394,5 @@ The original ClientShellDLL/Music.cpp request matrix is adapted into a pure sele
 - [Repeating IMA transport](sources/m2_music_transport_sources.json): original PlayList ordering/loop contract, replacement bounded scheduler and existing original clock arithmetic; live MUSIC and variation state remain open.
 
 - [Original MUSIC messages](sources/m2_music_message_sources.json): selected server parsing, player dispatch and client level/lifetime rules, connected to a bounded replacement transport. See [contracts](../contracts/music_message_contracts.md); no retail tail/activation/variation parity is claimed.
+
+The [session-cost audit](../../../Documentation/Implementation/m2_session_cost.md) removes temporary trace-name allocations and zero-depth audio modulation work. Read [contracts](../contracts/session_cost_contracts.md); preserve owned counters, exact scalar PCM/cursor progression and all existing session/test deadlines. The full M2 acceptance review and runtime-start guard remain open.

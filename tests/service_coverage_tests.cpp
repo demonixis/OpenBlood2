@@ -138,6 +138,27 @@ namespace
         CHECK(game.unload_world());
         CHECK(s.unavailable_services.empty() && s.unavailable_history == failures);
         CHECK(s.string_count() == 0 && s.message_count() == 0 && s.client_count() == 0);
+        s.service_calls.clear();
+        {
+            ServiceTraceScope trace(s.trace_enabled);
+            std::string name = "temporary-diagnostic-boundary-long-name";
+            s.trace_service(name.c_str());
+            name.assign("changed caller storage");
+            for (int i = 0; i < 1000; ++i)
+                s.trace_service("temporary-diagnostic-boundary-long-name");
+        }
+        CHECK(s.service_calls.size() == 1 && s.service_calls.at("temporary-diagnostic-boundary-long-name") == 1001);
+        const auto retained = service_coverage(s.service_calls);
+        CHECK(find(retained, "temporary-diagnostic-boundary-long-name")->support == ServiceSupport::Unclassified);
+        s.service_calls.clear();
+        s.trace_service("disabled-boundary");
+        CHECK(s.service_calls.empty());
+        {
+            ServiceTraceScope trace(s.trace_enabled);
+            s.GetPathManager();
+        }
+        CHECK(s.service_calls.size() == 1 && s.service_calls.at("GetPathManager") == 1);
+        CHECK(find(retained, "temporary-diagnostic-boundary-long-name")->calls == 1001);
         return true;
     }
     bool report(const GameSession& game, std::string_view phase)

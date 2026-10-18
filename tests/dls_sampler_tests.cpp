@@ -1,3 +1,4 @@
+#include "dls_scalar_reference.h"
 #include "engine/audio.h"
 #include "engine/dls_sampler.h"
 #include "game/server_adapter.h"
@@ -44,6 +45,76 @@ namespace
         a.present = true;
         a.connections.push_back(
             {std::uint16_t(source), 0, std::uint16_t(destination), 0, std::int32_t(std::llround(value * 65536))});
+    }
+    bool compare_scalar(DlsSampler& sampler, std::uint64_t frames, std::vector<float>& output)
+    {
+        std::string error;
+        auto expected = sampler.voices();
+        auto pcm = output;
+        const auto completed = sampler.completed + ScalarReference::advance(expected, frames, pcm);
+        const auto clock = sampler.sample_clock();
+        CHECK(sampler.advance(frames, output));
+        CHECK(output == pcm && sampler.completed == completed && sampler.sample_clock() == clock + frames);
+        CHECK(sampler.voices().size() == expected.size());
+        for (std::size_t i = 0; i < expected.size(); ++i)
+        {
+            const auto& a = sampler.voices()[i];
+            const auto& b = expected[i];
+            CHECK(a.id == b.id && a.cursor == b.cursor && a.loops == b.loops && a.frames == b.frames &&
+                  a.gate == b.gate);
+        }
+        return true;
+    }
+    bool scalar_equivalence()
+    {
+        std::string error;
+        for (unsigned mask = 0; mask < 8; ++mask)
+            for (bool loop : {false, true})
+            {
+                auto bank = fixture();
+                bank->waves[0].samples.resize(8192);
+                for (unsigned i = 0; i < 8192; ++i)
+                    bank->waves[0].samples[i] = float(std::sin(i * .013));
+                auto& region = bank->instruments[0].regions[0];
+                if (!loop)
+                    region.settings.loop.reset();
+                else
+                    region.settings.loop = DlsLoop{101, 991};
+                connection(*bank, 0, 0x206, -12000);
+                connection(*bank, 0, 0x207, -2400);
+                connection(*bank, 0, 0x209, -2400);
+                connection(*bank, 0, 0x20a, 42);
+                if (mask & 1)
+                    connection(*bank, 1, 3, 71);
+                if (mask & 2)
+                    connection(*bank, 1, 1, -93);
+                if (mask & 4)
+                {
+                    connection(*bank, 5, 3, -333);
+                    connection(*bank, 0, 0x30a, -1200);
+                }
+                DlsSampler sampler;
+                CHECK(sampler.receive(bank, 0x90, 61, 99, .5, error));
+                const auto id = sampler.voices()[0].id;
+                for (const auto frames : {1u, 478u, 1u, 1u, 67u, 4096u, 800u})
+                {
+                    std::vector<float> pcm(frames * 2, .125f);
+                    CHECK(compare_scalar(sampler, frames, pcm));
+                }
+                if (!sampler.voices().empty())
+                    CHECK(sampler.set_controllers(id, {0, 111, 42, 16383}, error));
+                std::vector<float> hidden;
+                CHECK(compare_scalar(sampler, 799, hidden));
+                CHECK(sampler.receive(bank, 0x90, 61, 81, .5, error)); // Original fast choke of old key.
+                std::vector<float> prefix(258, .25f);
+                CHECK(compare_scalar(sampler, 4096, prefix));
+                CHECK(sampler.receive(bank, 0x80, 61, 0, .5, error));
+                CHECK(compare_scalar(sampler, 48000, hidden) && sampler.voices().empty());
+            }
+        std::cout
+            << "Frozen scalar reference: exact PCM/cursor/frame/loop/completion equality; all 8 modulation "
+               "combinations, one-shots/loops, delay seam, controllers, muted prefixes, choke and release verified\n";
+        return true;
     }
     bool midi_receiver()
     {
@@ -750,7 +821,7 @@ namespace
                         ++control_updates;
                     }
                     std::vector<float> pcm(1600);
-                    CHECK(s.advance(800, pcm) && hidden.advance(800, {}));
+                    CHECK(compare_scalar(s, 800, pcm) && hidden.advance(800, {}));
                     for (float x : pcm)
                     {
                         CHECK(std::isfinite(x) && std::abs(x) <= 1);
@@ -776,7 +847,8 @@ namespace
 int main(int argc, char** argv)
 {
     std::string test = argc > 1 ? argv[1] : "";
-    const bool ok = test == "midi_receiver"               ? midi_receiver()
+    const bool ok = test == "scalar_equivalence"          ? scalar_equivalence()
+                    : test == "midi_receiver"             ? midi_receiver()
                     : test == "midi_private" && argc == 3 ? midi_private(argv[2])
                     : test == "midi_limits"               ? midi_limits()
                     : test == "pcm"                       ? pcm()

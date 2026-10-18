@@ -334,8 +334,9 @@ namespace
             for (auto& i : streams.active)
                 CHECK(trigger(g, i.owner, "ON"));
             CHECK(g.step(.2) && streams.particle_count() == 42); // includes shack smoke + third spark source.
-            std::cout << "CityHub cycle " << cycle << ": 443 created / 10 unsupported / 1 failed; 8 streams, peak "
-                      << peak << ", off expiry and 42-particle rearm\n";
+            std::cout << "CityHub cycle " << cycle << ": " << created << " created / " << unknown << " unsupported / "
+                      << failed << " failed / " << omitted << " omitted; 8 streams, peak " << peak
+                      << ", off expiry and 42-particle rearm\n";
             CHECK(g.unload_world() && streams.active.empty() && streams.reports.empty() && !g.server.string_count());
         }
         return true;

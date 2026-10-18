@@ -19,6 +19,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [M1 Object Boundary](object_contracts.md)
 - [Owned object snapshots and callback membership](object_snapshot_contracts.md)
 - [Bounded service coverage](service_coverage_contracts.md)
+- [Session tracing and zero-depth audio work](session_cost_contracts.md)
 - [Resource, World and Session Contracts](world_contracts.md)
 
 ## Player and session

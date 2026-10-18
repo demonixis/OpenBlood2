@@ -915,8 +915,7 @@ namespace
                                                        game->client_shell.view.object != nullptr));
 #if BLOOD2_INSPECTOR
             const bool inspector_was_visible = inspector_visible;
-            const auto coverage_before =
-                options.gpu_smoke ? game->server.service_calls : std::map<std::string, std::uint64_t>{};
+            const auto coverage_before = options.gpu_smoke ? game->server.service_calls : OpenBlood2::ServiceCalls{};
             inspector.draw(config, data, inspector_visible, frames, *game, selection);
             if (options.gpu_smoke && coverage_before != game->server.service_calls)
             {

@@ -25,3 +25,4 @@ Runtime test logs and measurements belong in the
 - [IMA pattern notes](m2_music_notes_sources.json): independent reader, original binary identity and bounded loader probe.
 - [IMA bands](m2_music_bands_sources.json): independent reader/setup planner and original executable probe.
 - [IMA sections](m2_music_sections_sources.json): bounded header/event readers and original authored-timing arithmetic.
+- [Session cost](m2_session_cost_sources.json): project scalar baseline, transparent trace lookup and exact differential checks; no new original-code import.

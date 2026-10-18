@@ -73,3 +73,5 @@ include all catalogue rows and current NPC runtime failures. This stationary,
 limited-duration trace is not campaign traversal or evidence for every weapon,
 trigger, AI action, client service or future resource request. M2 remains open
 until the complete selected-slice acceptance review passes.
+
+The [session-cost continuation](session_cost_contracts.md) removes redundant work while preserving these ownership, timing and inspection rules.

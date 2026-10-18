@@ -2319,3 +2319,6 @@ if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME music_messages.private COMMAND music_message_tests private "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(music_messages.private PROPERTIES LABELS "headless;private;music_assets;audio" TIMEOUT 120)
 endif()
+
+add_test(NAME dls_sampler.scalar_equivalence COMMAND dls_sampler_tests scalar_equivalence)
+set_tests_properties(dls_sampler.scalar_equivalence PROPERTIES LABELS "headless;music_assets;audio" TIMEOUT 60)

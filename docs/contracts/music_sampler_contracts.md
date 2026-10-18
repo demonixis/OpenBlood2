@@ -107,3 +107,5 @@ sampler evidence, not its historical results. Full MIDI state/key-group exclusiv
 styles/personality semantics, original playlists/transitions, reverb and retail
 listening comparisons remain absent. Crudux/Track1 effective-loop failures remain
 unchanged. Do not turn `MUSIC` into success on the strength of these auditions.
+
+The [session-cost continuation](session_cost_contracts.md) removes redundant work while preserving these ownership, timing and inspection rules.

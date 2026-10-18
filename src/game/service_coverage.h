@@ -8,6 +8,9 @@
 
 namespace OpenBlood2
 {
+    // Own names for durable reports, but look up hot-path literals without
+    // constructing (and potentially allocating) a temporary std::string.
+    using ServiceCalls = std::map<std::string, std::uint64_t, std::less<>>;
     enum class ServiceSupport
     {
         Bounded,
@@ -36,7 +39,7 @@ namespace OpenBlood2
     };
     std::span<const ServiceDefinition> service_catalog();
     // Called by inspection/tools only. A counted attempt is never a success assertion.
-    std::vector<ServiceCoverage> service_coverage(const std::map<std::string, std::uint64_t>& calls);
+    std::vector<ServiceCoverage> service_coverage(const ServiceCalls& calls);
     const char* service_support_name(ServiceSupport);
     const char* service_boundary_name(ServiceBoundary);
     class ServiceTraceScope

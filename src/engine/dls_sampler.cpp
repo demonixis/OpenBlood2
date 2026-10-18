@@ -497,13 +497,19 @@ namespace OpenBlood2
         {
             const auto& r = v.bank->instruments[v.instrument].regions[v.region];
             const auto& wave = v.bank->waves[r.wave];
+            const bool fixed_pitch = v.envelope_pitch == 0 && v.lfo_pitch == 0;
+            const double step = v.base_step * v.bend_step;
             for (std::uint64_t f = 0; f < frames && !finished(v); ++f)
             {
                 if (!r.settings.loop && v.cursor >= wave.samples.size())
                     break;
                 const double time = double(v.frames) / rate;
-                const double lfo =
-                    time >= v.lfo_delay ? std::sin(2 * std::numbers::pi * v.lfo_hz * (time - v.lfo_delay)) : 0;
+                // Zero-depth modulation has no state: phase derives from the
+                // absolute voice age. Keep every cursor addition/sample intact.
+                const bool needs_lfo = v.lfo_pitch != 0 || (f < stereo.size() / 2 && v.lfo_gain != 0);
+                const double lfo = needs_lfo && time >= v.lfo_delay
+                                       ? std::sin(2 * std::numbers::pi * v.lfo_hz * (time - v.lfo_delay))
+                                       : 0;
                 if (f < stereo.size() / 2)
                 {
                     const auto a = std::size_t(v.cursor);
@@ -513,16 +519,22 @@ namespace OpenBlood2
                     const double pcm = wave.samples[a] + (wave.samples[b] - wave.samples[a]) * (v.cursor - a);
                     // LFO gain is unipolar; its delayed phase has no attenuation.
                     const double lfo_gain =
-                        time >= v.lfo_delay ? std::pow(10.0, v.lfo_gain * (lfo + 1) *
-                                                                 std::min(1.0, (time - v.lfo_delay) * v.lfo_hz) / 400)
-                                            : 1;
+                        v.lfo_gain != 0 && time >= v.lfo_delay
+                            ? std::pow(10.0,
+                                       v.lfo_gain * (lfo + 1) * std::min(1.0, (time - v.lfo_delay) * v.lfo_hz) / 400)
+                            : 1;
                     const double value = pcm * v.gain * amplitude_at(v, time) * lfo_gain;
                     stereo[f * 2] += float(value * v.left);
                     stereo[f * 2 + 1] += float(value * v.right);
                 }
-                const double pitch =
-                    v.envelope_pitch * level(v.pitch, time, double(v.gate) / rate, false) + v.lfo_pitch * lfo;
-                v.cursor += v.base_step * v.bend_step * std::exp2(pitch / 1200);
+                if (fixed_pitch)
+                    v.cursor += step;
+                else
+                {
+                    const double pitch =
+                        v.envelope_pitch * level(v.pitch, time, double(v.gate) / rate, false) + v.lfo_pitch * lfo;
+                    v.cursor += step * std::exp2(pitch / 1200);
+                }
                 if (r.settings.loop)
                 {
                     const auto loop = *r.settings.loop;

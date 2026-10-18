@@ -11,13 +11,13 @@ namespace OpenBlood2
         };
         return definitions;
     }
-    std::vector<ServiceCoverage> service_coverage(const std::map<std::string, std::uint64_t>& calls)
+    std::vector<ServiceCoverage> service_coverage(const ServiceCalls& calls)
     {
         std::vector<ServiceCoverage> rows;
         rows.reserve(service_catalog().size() + calls.size());
         for (const auto& service : service_catalog())
         {
-            const auto found = calls.find(std::string(service.name));
+            const auto found = calls.find(service.name);
             rows.push_back({std::string(service.name), service.support, service.boundary,
                             found == calls.end() ? 0 : found->second});
         }
