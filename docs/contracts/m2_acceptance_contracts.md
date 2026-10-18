@@ -1,5 +1,7 @@
 # Selected M2 acceptance and platform qualification
 
+**M2 closed with reservation M2-GPU-001 on 2026-10-18**, by explicit user authorization. Only the external NVIDIA/D-Bus GPU LeakSanitizer failure is excepted from milestone closure; it remains a failed test and an open platform qualification issue. No gameplay, loader or lifetime failure is waived. M3 is next and awaits a separate request. The [closure record](../../../Documentation/Implementation/m2_acceptance.md#reservation-m2-gpu-001) defines the evidence and conditions for lifting the reservation.
+
 The selected acceptance path is original SubwayA startup, intro, player combat,
 contacts, authored exit and preserved entry into CityHub, followed by teardown.
 CityHub's initial objects/resources and ten stationary simulated seconds have

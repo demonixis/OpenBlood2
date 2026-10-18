@@ -1,6 +1,6 @@
 # Implementation records
 
-Current decision and criterion matrix: [M2 acceptance review](../../../Documentation/Implementation/m2_acceptance.md). Functional checks and the open external GPU sanitizer result are distinct.
+Current decision and criterion matrix: [M2 closed with reservation M2-GPU-001](../../../Documentation/Implementation/m2_acceptance.md), authorized on 2026-10-18. Functional acceptance and the unresolved external GPU sanitizer failure remain distinct. M3 is next and is not yet accepted.
 
 This directory holds work-in-progress history and source evidence. Start with the
 [developer guides](../readme.md) for routine development and the
@@ -22,8 +22,9 @@ instead of copying them into both repositories. New source ledgers belong in
 `sources/`; new reports and measured results belong in the workspace implementation
 and evidence directories. Keep the top-level `docs/` for developer guides.
 
-Reports are chronological evidence, not blanket support claims. M2 remains
-incomplete. Preserve failed attempts, platform limitations and historical hashes;
+Reports are chronological evidence, not blanket support claims. Historical
+open-M2 statements do not override the closure decision above. Preserve failed
+attempts, platform limitations and historical hashes;
 later verified records may supersede an earlier limitation without rewriting
 the original log or patch.
 

@@ -1,7 +1,8 @@
 # Developer documentation
 
-Start here when building or changing OpenBlood2. The [M2 review](contracts/m2_acceptance_contracts.md)
-separates the tested original session from the open NVIDIA GPU sanitizer qualification.
+Start here when building or changing OpenBlood2. [M2 is closed with reservation
+M2-GPU-001](contracts/m2_acceptance_contracts.md): the selected original session is
+accepted, while NVIDIA/D-Bus GPU sanitizer qualification remains open. M3 is next.
 The complete game and later milestones are not yet supported.
 
 | Guide | Contents |

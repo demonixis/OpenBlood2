@@ -76,4 +76,4 @@ until the complete selected-slice acceptance review passes.
 
 The [session-cost continuation](session_cost_contracts.md) removes redundant work while preserving these ownership, timing and inspection rules.
 
-The [final M2 review](m2_acceptance_contracts.md) now consolidates this trace with continuous combat, startup, malformed-resource, callback and lifetime evidence. Its platform qualification remains open; the review itself is no longer pending.
+The [final M2 review](m2_acceptance_contracts.md) now consolidates this trace with continuous combat, startup, malformed-resource, callback and lifetime evidence. M2 is closed with the user-authorized M2-GPU-001 reservation; external GPU platform qualification remains open, and unexercised services are not certified by closure.

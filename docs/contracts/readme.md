@@ -1,6 +1,6 @@
 # Service contracts
 
-The [selected M2 acceptance contract](m2_acceptance_contracts.md) defines the current review scope, negative controls and separation of game failures from GPU platform qualification.
+The [selected M2 acceptance contract](m2_acceptance_contracts.md) records closure with reservation M2-GPU-001, the tested scope, negative controls and the still-open GPU platform qualification.
 
 Use these references before changing a subsystem. They describe original rules,
 replacement engine behavior, ownership and explicit limitations. Earlier

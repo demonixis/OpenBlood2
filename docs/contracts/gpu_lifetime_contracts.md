@@ -1,5 +1,7 @@
 # Platform lifetime diagnostics
 
+M2 is closed by user authorization with **reservation M2-GPU-001** for the external failure below; GPU qualification remains open. See the [closure record and clearance conditions](../../../Documentation/Implementation/m2_acceptance.md#reservation-m2-gpu-001). Do not change test outcomes or suppress leaks to remove this reservation.
+
 `platform_lifetime_tests` isolates the SDL/platform boundary from the engine and
 original game. It links only the pinned SDL target. No game, renderer, asset,
 ImGui, audio mixer or engine object is constructed.
