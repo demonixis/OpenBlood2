@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "013563793f4c9f6aed8ca1a9bbc3809500134c14",
+  "status": "M2 incomplete; decoded original style-grid curve records, no evaluated controllers or live MUSIC",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/IMUSIC25.DLL",
+      "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "image_base": "0x35440000",
+      "rvas": {
+        "grid_chunk_dispatch": "0x89c0..0x89ea",
+        "curve_reader": "0x8a30..0x8d5e",
+        "authored_header_copy": "0x8b5a..0x8b7d",
+        "authored_point_copy": "0x8c3a..0x8c65"
+      },
+      "use": "Read-only analysis and isolated original reader execution; bounded reads/seeks/allocation intercepted. Capture raw controller before original derived-summary overwrite; retain exact linked-list order"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/Music.cpp",
+      "use": "Original playlist asset requests unchanged; MUSIC remains explicitly unsupported"
+    }
+  ],
+  "replacement_code": [
+    "src/engine/ima_curve.cpp: independent strict 7/10 style-grid curve reader with owned values and source offsets",
+    "src/game/music_catalog.cpp: separate curve status and immutable world ownership with a total record budget",
+    "src/app/inspector_world_sounds.cpp: authored curve and point inspection, separate from unevaluated cursor curves"
+  ],
+  "deliberate_limits": [
+    "Exactly 7-byte header and 10-byte point profile; original larger-stride extension skipping is observed but refused by the portable reader",
+    "Only direct style/pattern/grid curve chunks; section curves and unknown nested containers remain opaque",
+    "Raw fields retained, including semantically unsupported channels/types/shapes; decoding does not imply safe controller dispatch",
+    "No derived source summaries, curve evaluation, note/curve merged execution or MIDI/audio delivery",
+    "65,536 curve-plus-point records per asset and 131,072 per survey; atomic explicit failure",
+    "No commercial code, samples, binary bytes or new runtime/build dependency imported"
+  ],
+  "original_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "entry_rva": "0x8a30",
+    "synthetic_cases": 3,
+    "curve_chunks": 42,
+    "curves": 47,
+    "points": 47,
+    "decoded_sha256": "2e676bf6e4d1f8f4dd7a07c013e0349906058a091c601d103a4c1ddfdd2692a5",
+    "fnv64": 4777673514653972974,
+    "curves_by_bank": {
+      "A1": 40,
+      "Cabal": 2,
+      "Track1": 5
+    },
+    "scope": "Original reader raw fields and list order. Header controller captured before derived summary overwrites; summary/evaluation not claimed. Bounded read/seek/allocation intercepted. No native DLL or synth execution."
+  },
+  "target_sha256": {
+    "src/engine/ima_curve.h": "64264bbb16591b2a2359991126f917ef806ed5a2232eea74450107d5e991ded5",
+    "src/engine/ima_curve.cpp": "5e9a5352eda25b434c4bb50a0e74b5bf0491e38c08bd15046ccf630b1ec710af",
+    "src/game/music_catalog.h": "684bc5ba8c5f3b6e34640defcdbe9cefdbd943c6056d32e4919f3c66d9a7895a",
+    "src/game/music_catalog.cpp": "5747593dc225971fe04034b365f284a5c89964a92b63e58f7dbc71ff581f60e2",
+    "src/app/inspector_world_sounds.cpp": "802fabc58d63c38286c8d2b221058558efbf271f6f6fa3610ce810fad4f25452",
+    "src/app/world_sound_smoke.cpp": "1c2469884c058078d4bb2205aa1e1d7854de89627a6bfbf7e6201aa0c212b7ea",
+    "tests/ima_curve_tests.cpp": "2ba1ae871b79a4ca1fbd2f10df71ffa451d80b134205ab85694b08efda3b0215",
+    "CMakeLists.txt": "2386d6af94185e81bc0dcc4aea6c349b835e4279c7f8a9c7144e955c1467fca9",
+    "tests/CMakeLists.txt": "27187e6c3dbf00c384b41ddc0c9d647388b1f85f1441440e68bd957a9518461d"
+  }
+}

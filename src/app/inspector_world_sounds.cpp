@@ -675,17 +675,58 @@ namespace OpenBlood2
             }
             ImGui::TreePop();
         }
+        if (ImGui::TreeNode("IMA curve records (data only)"))
+        {
+            ImGui::TextWrapped("Original curve headers and ordered points. These are authored values, not "
+                               "evaluated controllers or audible automation. Unknown types/shapes remain raw.");
+            for (const auto& asset : music.assets)
+            {
+                if (asset.kind != MusicAssetKind::Style || !ImGui::TreeNode(asset.filename.c_str()))
+                    continue;
+                if (!asset.curves)
+                    ImGui::TextWrapped("Unavailable: %s", asset.curves_error.c_str());
+                else
+                {
+                    const auto& decoded = *asset.curves;
+                    ImGui::Text("%zu curve chunks / %zu curves / %zu points", decoded.chunks, decoded.curves.size(),
+                                decoded.points);
+                    for (std::size_t i = 0; i < decoded.curves.size(); ++i)
+                    {
+                        const auto& c = decoded.curves[i];
+                        ImGui::PushID(static_cast<int>(i));
+                        if (ImGui::TreeNode("curve", "Curve %zu: type %u ch %u offset %+d var %04x controller %u", i,
+                                            c.type, c.channel, c.time_offset, c.variations, c.controller))
+                        {
+                            ImGui::Text("Pattern/grid/chunk offsets %u/%u/%u | record %zu", c.pattern_offset,
+                                        c.grid_offset, c.chunk_offset, c.ordinal);
+                            ImGuiListClipper clipper;
+                            clipper.Begin(static_cast<int>(c.points.size()));
+                            while (clipper.Step())
+                                for (int j = clipper.DisplayStart; j < clipper.DisplayEnd; ++j)
+                                {
+                                    const auto& p = c.points[static_cast<std::size_t>(j)];
+                                    ImGui::Text("%d: shape %u flags %02x start %d value %d end %d target %d", j,
+                                                p.shape, p.flags, p.start, p.value, p.end, p.target);
+                                }
+                            ImGui::TreePop();
+                        }
+                        ImGui::PopID();
+                    }
+                }
+                ImGui::TreePop();
+            }
+            ImGui::TreePop();
+        }
         if (ImGui::TreeNode("IMA pattern notes (data only)"))
         {
-            ImGui::TextWrapped(
-                "File order and raw timing/variation/pitch fields; these are not final MIDI notes. "
-                "Curves and personality rules remain undecoded. Channel defaults are prepared, not played.");
+            ImGui::TextWrapped("File order and raw timing/variation/pitch fields; these are not final MIDI notes. "
+                               "Curves have separate record inspection. Channel defaults are prepared, not played.");
             for (const auto& asset : music.assets)
             {
                 if (!asset.style || !ImGui::TreeNode(asset.filename.c_str()))
                     continue;
                 const auto& style = *asset.style;
-                ImGui::Text("%s: %zu patterns / %zu grids / %zu notes / %zu opaque curves", style.name.c_str(),
+                ImGui::Text("%s: %zu patterns / %zu grids / %zu notes / %zu curve chunks", style.name.c_str(),
                             style.patterns.size(), style.grids, style.notes, style.curve_chunks);
                 ImGui::Text("Meter %d/%d | grid %d ticks | authored beat/measure %d/%d ticks | tempo %d",
                             style.beats_per_measure, style.beat_unit, style.ticks_per_grid,
@@ -727,7 +768,7 @@ namespace OpenBlood2
                         for (const auto& grid : pattern.grids)
                         {
                             ImGui::PushID(static_cast<int>(grid.offset));
-                            if (ImGui::TreeNode("grid", "Grid %d: %zu notes / %zu opaque curves", grid.index,
+                            if (ImGui::TreeNode("grid", "Grid %d: %zu notes / %zu curve chunks", grid.index,
                                                 grid.notes.size(), grid.curve_chunks))
                             {
                                 draw_note_event_probe(grid, pattern);

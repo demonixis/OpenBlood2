@@ -54,3 +54,5 @@ the original log or patch.
 - [Connected IMA grid notes](../../../Documentation/Implementation/m2_music_grid_notes.md): atomic normal-mode pitch/event preparation and executable comparison; MUSIC remains unavailable.
 
 - [IMA active notes and due stops](../../../Documentation/Implementation/m2_music_active_notes.md): original lifetime/dispatch-order comparison and inspected pending tails; M2 remains incomplete.
+
+- [IMA style curve decoding](../../../Documentation/Implementation/m2_music_curves.md): 47 curves checked against the original reader; evaluated controllers and MUSIC remain incomplete.

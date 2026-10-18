@@ -4,6 +4,7 @@
 #include "engine/dls_sampler.h"
 #include "engine/ima_band.h"
 #include "engine/ima_cursor.h"
+#include "engine/ima_curve.h"
 #include "engine/ima_harmony.h"
 #include "engine/ima_section.h"
 #include "engine/ima_style.h"
@@ -16,9 +17,10 @@ namespace OpenBlood2
     struct MusicAssetRecord
     {
         std::string filename, error, style_reference, bank_error, style_error, bands_error, section_error,
-            timeline_error, harmony_error, selected_band_error, band_setup_error;
+            timeline_error, harmony_error, selected_band_error, band_setup_error, curves_error;
         std::shared_ptr<const DlsBank> bank;
         std::shared_ptr<const ImaStyle> style;
+        std::shared_ptr<const ImaCurves> curves;       // Independent bounded decoding; no controller playback.
         std::shared_ptr<const ImaStyle> section_style; // Validated exact binding; no second style copy.
         std::shared_ptr<const ImaBands> bands;
         std::shared_ptr<const ImaBand> selected_band; // Aliasing owner of its immutable source catalogue.

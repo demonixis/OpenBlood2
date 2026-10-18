@@ -91,3 +91,7 @@ The [harmonic-pitch continuation](music_pitch_contracts.md) now implements the
 mode/chord/scale arithmetic for explicit effective runtime harmony and feeds it
 to the diagnostic event probe. Earlier missing-pitch statements are superseded
 only for this step; personality/current-chord selection and live MUSIC remain open.
+
+The [curve continuation](music_curve_contracts.md) now decodes style-grid curve
+headers and points separately. Note decoding and its opaque chunk counts are
+unchanged; cursor curve evaluation and live MUSIC remain unavailable.

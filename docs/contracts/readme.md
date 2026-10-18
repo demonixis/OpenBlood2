@@ -190,3 +190,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [IMA grid cursor](music_cursor_contracts.md): original stateful section progression, explicit draws and world-owned diagnostic lifetime.
 
 - [IMA active note lifetime](music_active_note_contracts.md): original chord deadlines, serial exemption and ordered due/retained lists; live MUSIC remains unavailable.
+
+- [IMA style curves](music_curve_contracts.md): original authored curve/point records, strict bounds and independent world-owned inspection.

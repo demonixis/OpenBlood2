@@ -1334,3 +1334,12 @@ external MIDI/synth and transport side effects remain intercepted. No commercial
 code, binary bytes or samples are imported. See [source ledger](sources/m2_music_active_notes_sources.json),
 [contracts](../contracts/music_active_note_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_active_notes.md).
+
+## Original IMA style curves
+
+Independent portable curve decoding follows read-only inspection and isolated x86
+execution of the installed IMUSIC25 reader. No commercial source, binary bytes or
+samples are imported. Raw fields and ordered points are distinct from the original
+derived summaries and later interpolation. See [source ledger](sources/m2_music_curves_sources.json),
+[contracts](../contracts/music_curve_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_curves.md).

@@ -91,7 +91,7 @@ namespace OpenBlood2
         auto requests = plan.requests;
         std::set<std::string> seen;
         std::size_t reserved_bytes = 0, decoded_bytes = 0, decoded_notes = 0, decoded_bands = 0,
-                    decoded_section_records = 0;
+                    decoded_section_records = 0, decoded_curve_records = 0;
         for (std::size_t i = 0; i < requests.size(); ++i)
         {
             const auto request = requests[i];
@@ -143,6 +143,12 @@ namespace OpenBlood2
                             {
                                 decoded_notes += style->notes;
                                 record.style = std::move(style);
+                            }
+                            auto curves = std::make_shared<ImaCurves>();
+                            if (read_ima_curves(bytes, *curves, record.curves_error, 131072 - decoded_curve_records))
+                            {
+                                decoded_curve_records += curves->records();
+                                record.curves = std::move(curves);
                             }
                         }
                         if (record.container_valid && request.kind != MusicAssetKind::Instruments)
