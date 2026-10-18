@@ -1370,3 +1370,7 @@ lookup tables or commercial bytes are imported. See
 [source ledger](sources/m2_music_live_controls_sources.json),
 [contracts](../contracts/music_live_control_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_live_controls.md).
+
+## Immediate MIDI channel receiver (2026-10-18)
+
+Independent typed integration of the installed MSynth25 note/channel selection into the existing DLS sampler. No DLL, sample bytes or disassembly imported. See [source ledger](sources/m2_music_midi_receiver_sources.json), [contracts](../contracts/music_midi_receiver_contracts.md) and [executable/behavioral evidence](../../../Documentation/Implementation/m2_music_midi_receiver.md). Replacement full-precision envelopes retain the original fast-release cap; immediate manual dispatch does not implement soundtrack transport.

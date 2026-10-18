@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "cbe97b7af9ea75cfd3693ec72ed1d8417fe9b835",
+  "approach": "Independent typed receiver; original behavior checked against installed executable; no commercial bytes imported",
+  "sources": [
+    {
+      "path": "MSynth25.dll (external original install)",
+      "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+      "rva_ranges": [
+        "0x3ee3..0x3f11 note message normalization",
+        "0x35a8..0x3634 newest held note-off",
+        "0x3712..0x375a self-nonexclusive repeat selection",
+        "0x8841..0x8879 original region option extraction",
+        "0xd0a0..0xd123 normal release",
+        "0xd130..0xd233 fast release cap"
+      ],
+      "use": "Original selection, lifetime rules and integer release cap, with separately documented replacement full-precision envelopes"
+    },
+    {
+      "path": "src/engine/dls_sampler.cpp and src/engine/ima_band.cpp",
+      "use": "Existing checked DLS route, controls, synthesis and original band setup; no new resource or output service"
+    }
+  ],
+  "limitations": [
+    "Immediate sample boundary only; no timed queue, playlist or successful MUSIC",
+    "Explicit failure for sustain/modulation/RPN/channel aliasing/voice stealing/nonzero key groups",
+    "32 total voices, including release tails; validated immutable reader banks",
+    "Original probes do not execute native DLL/OS imports or prove retail PCM equivalence"
+  ],
+  "frozen_sources": {
+    "src/engine/dls_sampler.h": "f23a6c5098165af1828660b9273d2f0f82a487933eae12ec2a563668ce0406fe",
+    "src/engine/dls_sampler.cpp": "865780d987289830691864b486d39c84a5234f3b272d03e2fd7dcfd468623c85",
+    "src/app/inspector_world_sounds.cpp": "7c111e3e252f77671a1e96019ffdd29987ae0e7d5962d811a6ce845cf1e6471d",
+    "src/app/world_sound_smoke.cpp": "ccd5c443458b76b143f0161174d0ef920ce6f96350ae4e3da30d818198bc71ee",
+    "tests/dls_sampler_tests.cpp": "df89285fe7cbd11f6a4436e14735808bb2d9a665086016e6aa72fec2cf62eafa",
+    "tests/CMakeLists.txt": "c1fd4870c3c8f89ef5cc1879f10d9dc8041a81a6f517ce256aca91268bb2b02d"
+  }
+}

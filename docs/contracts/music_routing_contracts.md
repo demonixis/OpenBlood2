@@ -60,8 +60,9 @@ voice whose clock and cleanup still run. Failed routing/controllers allocate no
 voice, preserve existing voices and increment refusal accounting exactly once.
 [Explicit live controls](music_live_control_contracts.md) can now change current-voice
 volume/expression/pan and default-range pitch bend while keeping the note-on snapshot.
-Channel-to-voice assignment, sustain, same-key exclusivity and the timed MIDI event
-queue remain unavailable.
+The [immediate receiver](music_midi_receiver_contracts.md) adds explicit channel
+identity and original same-key stop/repeat selection. Sustain, nonzero key groups
+and the timed MIDI event queue remain unavailable.
 
 World reinspection/unload drops catalogue bank aliases. Audio voices own their
 bank until completion/clear, with existing non-reused IDs and world audio cleanup.

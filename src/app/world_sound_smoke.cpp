@@ -208,6 +208,27 @@ namespace OpenBlood2
             return false;
         if (!g.server.advance_audio(4, {}, {}) || !sampler.voices().empty() || sampler.completed == 0)
             return false;
+        // Immediate MIDI diagnostic: actual selected band setup, held notes, channel controls and note-off.
+        for (const auto& m : routed->band_setup)
+            if (!sampler.receive({}, m.status, m.data1, m.data2, .2, note_error))
+                return false;
+        const auto midi_key = std::uint8_t((routed_region.key_low + routed_region.key_high) / 2);
+        // This actual Cabal region explicitly allows same-key overlap; verify its authored rule.
+        if (routed_region.options != 1 || !sampler.receive(routed->band_bank, 0x94, midi_key, 100, .2, note_error) ||
+            !g.server.advance_audio(.02, {}, {}) || sampler.voices().size() != 1 ||
+            sampler.voices()[0].midi_channel != 4 || !sampler.receive({}, 0xb4, 7, 0, .2, note_error) ||
+            sampler.voices()[0].gain != 0 ||
+            !sampler.receive({}, 0xb4, 7, std::uint8_t(channel.controllers.volume), .2, note_error))
+            return false;
+        const auto older_note = sampler.voices()[0].id;
+        if (!sampler.receive(routed->band_bank, 0x94, midi_key, 100, .2, note_error) || sampler.midi_choked != 0 ||
+            !g.server.advance_audio(.02, {}, {}) || sampler.voices().size() != 2 ||
+            !sampler.receive({}, 0x84, midi_key, 100, .2, note_error) || !g.server.advance_audio(.001, {}, {}) ||
+            sampler.voices().size() != 1 || sampler.voices()[0].id != older_note ||
+            !sampler.receive({}, 0x84, midi_key, 100, .2, note_error) || !g.server.advance_audio(4, {}, {}) ||
+            !sampler.voices().empty() || sampler.midi_rejected || sampler.midi_received != 86 ||
+            sampler.midi_released != 2 || sampler.midi_unmatched_stops)
+            return false;
         unsigned count = 0;
         for (const auto& e : g.entries)
             if (e.state == EntryState::WorldSound)

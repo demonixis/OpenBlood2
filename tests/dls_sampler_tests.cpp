@@ -45,6 +45,107 @@ namespace
         a.connections.push_back(
             {std::uint16_t(source), 0, std::uint16_t(destination), 0, std::int32_t(std::llround(value * 65536))});
     }
+    bool midi_receiver()
+    {
+        std::string error;
+        auto bank = fixture();
+        connection(*bank, 0, 0x209, -1200); // half-second release
+        DlsSampler sampler;
+        auto send = [&](unsigned status, unsigned first, unsigned second)
+        { return sampler.receive(bank, std::uint8_t(status), std::uint8_t(first), std::uint8_t(second), 1, error); };
+        CHECK(sampler.midi_channels()[9].percussion && !sampler.midi_channels()[4].percussion);
+        CHECK(send(0xb4, 7, 91) && send(0xb4, 10, 0) && send(0xb4, 11, 82));
+        CHECK(send(0x94, 60, 100) && send(0x95, 60, 100));
+        CHECK(sampler.play(bank, 0, 60, 100, 1, 1, error)); // Independent diagnostic voice.
+        const auto first_id = sampler.voices()[0].id;
+        const auto note_on = *sampler.voices()[0].channel;
+        CHECK(sampler.voices()[0].midi_channel == 4 && sampler.voices()[0].controllers.volume == 91);
+        CHECK(sampler.advance(480, {}));
+        const auto other = sampler.voices()[1], diagnostic = sampler.voices()[2];
+        CHECK(send(0xb4, 7, 0) && send(0xe4, 255, 255));
+        CHECK(sampler.voices()[0].gain == 0 && sampler.voices()[0].controllers.pitch_bend == 32767);
+        CHECK(sampler.voices()[0].channel->controllers == note_on.controllers);
+        CHECK(sampler.voices()[1].controllers == other.controllers &&
+              sampler.voices()[2].controllers == diagnostic.controllers);
+        CHECK(send(0x84, 60, 100) && sampler.voices()[0].gate == 480 && sampler.midi_released == 1);
+        CHECK(send(0xb4, 10, 127) && sampler.voices()[0].controllers.pan == 127); // Release tails follow channels.
+        CHECK(send(0x84, 60, 1) && sampler.midi_unmatched_stops == 1);
+        CHECK(send(0xc4, 99, 0) && sampler.voices()[0].channel->program == 0);
+        const auto count = sampler.voices().size();
+        CHECK(!send(0x94, 62, 100) && sampler.voices().size() == count); // Missing program.
+        CHECK(!send(0xb4, 64, 127) && !send(0xb4, 7, 128) && !send(0x74, 60, 100));
+        CHECK(sampler.midi_channels()[4].controllers.volume == 0);
+        CHECK(sampler.advance(48000 * 11, {}));
+        CHECK(sampler.voices().size() == 1 && sampler.voices()[0].midi_channel == 5);
+        CHECK(send(0x95, 60, 0) && sampler.advance(24001, {}) && sampler.voices().empty());
+        sampler.clear();
+        CHECK(sampler.midi_received == 0 && sampler.last_midi_error.empty());
+        CHECK(sampler.midi_channels()[4].controllers == DlsControllers{});
+        CHECK(send(0x94, 60, 100) && sampler.voices()[0].id > first_id);
+        // Note-off on the start boundary preserves the first sample, like the original clamp.
+        CHECK(send(0x84, 60, 0) && sampler.voices()[0].gate == 1);
+        sampler.clear();
+        bank->instruments[0].regions[0].options = 1; // SELFNONEXCLUSIVE: overlap, newest-held stop only.
+        CHECK(send(0x94, 60, 100) && send(0x94, 60, 90) && sampler.advance(480, {}));
+        CHECK(sampler.midi_choked == 0 && send(0x84, 60, 100));
+        CHECK(sampler.voices()[0].gate == std::numeric_limits<std::uint64_t>::max());
+        CHECK(sampler.voices()[1].gate == 480 && send(0x94, 60, 0) && sampler.voices()[0].gate == 480);
+        sampler.clear();
+        bank->instruments[0].regions[0].options = 0;
+        CHECK(send(0x94, 60, 100) && sampler.advance(480, {}));
+        CHECK(send(0x84, 60, 100) && sampler.advance(480, {}));
+        const auto released = sampler.voices()[0];
+        CHECK(send(0x94, 60, 90) && sampler.midi_choked == 1);
+        CHECK(sampler.voices()[0].choke_frame == released.frames);
+        CHECK(sampler.voices()[0].choke_seconds <= 1.0 / 70 && sampler.voices()[0].cursor == released.cursor);
+        std::vector<float> out(1400);
+        CHECK(sampler.advance(700, out) && sampler.voices().size() == 1);
+        CHECK(std::all_of(out.begin(), out.end(), [](float value) { return std::isfinite(value); }));
+        CHECK(sampler.midi_released == 1 && send(0x84, 60, 100));
+        CHECK(sampler.advance(24001, {}) && sampler.voices().empty());
+        // A same-key note in another patch still replaces old channel/key voices.
+        bank->instruments.push_back(bank->instruments[0]);
+        bank->instruments[1].program = 1;
+        CHECK(send(0x94, 60, 100) && sampler.advance(480, {}));
+        CHECK(send(0xc4, 1, 0) && send(0x94, 60, 100));
+        CHECK(sampler.voices().back().instrument == 1 && sampler.voices().front().choke_frame);
+        return true;
+    }
+    bool midi_limits()
+    {
+        std::string error;
+        auto bank = fixture();
+        bank->instruments[0].regions[0].settings.unity_note = 0;
+        DlsSampler sampler;
+        auto send = [&](unsigned status, unsigned first, unsigned second)
+        { return sampler.receive(bank, std::uint8_t(status), std::uint8_t(first), std::uint8_t(second), 1, error); };
+        CHECK(send(0x90, 60, 100) && send(0x90, 94, 100) && sampler.advance(10, {}));
+        auto before = sampler.voices();
+        CHECK(!send(0xe0, 255, 255) && sampler.midi_channels()[0].controllers.pitch_bend == 8192);
+        CHECK(sampler.controls_updated == 0 && sampler.voices()[0].controllers == before[0].controllers &&
+              sampler.voices()[1].controllers == before[1].controllers);
+        CHECK(sampler.voices()[0].cursor == before[0].cursor && sampler.voices()[1].gate == before[1].gate);
+        CHECK(send(0xb0, 0, 3) && send(0xb0, 32, 4));
+        CHECK(sampler.midi_channels()[0].bank_msb == 3 && sampler.midi_channels()[0].bank_lsb == 4);
+        CHECK(!send(0x90, 60, 100) && !sampler.voices()[0].choke_frame);
+        sampler.clear();
+        bank->instruments[0].regions[0].settings.unity_note = 60;
+        for (unsigned i = 0; i < DlsSampler::max_voices; ++i)
+            CHECK(send(0x90, i, 100));
+        const auto id = sampler.voices()[0].id;
+        CHECK(!send(0x90, 0, 100) && sampler.voices().size() == DlsSampler::max_voices);
+        CHECK(sampler.voices()[0].id == id && !sampler.voices()[0].choke_frame);
+        CHECK(sampler.midi_rejected == 1);
+        sampler.clear();
+        before.clear(); // Owned inspection snapshots also retain their immutable bank.
+        std::weak_ptr<const DlsBank> weak = bank;
+        CHECK(send(0x90, 60, 100));
+        bank.reset();
+        CHECK(!weak.expired() && send(0x80, 60, 0)); // Stop needs no bank.
+        CHECK(sampler.advance(2, {}) && weak.expired());
+        CHECK(send(0x80, 60, 0) && sampler.midi_unmatched_stops == 1);
+        return true;
+    }
     bool pcm()
     {
         std::string error;
@@ -554,6 +655,63 @@ namespace
         CHECK(hash == 10930475445258237893ull);
         return true;
     }
+    bool midi_private(const std::filesystem::path& root)
+    {
+        std::string error;
+        std::ifstream in(root / "Music/Cabal/Cabal.dls", std::ios::binary);
+        CHECK(in.good());
+        std::vector<std::uint8_t> bytes((std::istreambuf_iterator<char>(in)), {});
+        auto bank = std::make_shared<DlsBank>();
+        CHECK(read_dls_bank(bytes, *bank, error));
+        unsigned regions = 0;
+        for (const auto& instrument : bank->instruments)
+            for (const auto& region : instrument.regions)
+            {
+                DlsSampler visible, hidden;
+                const unsigned slot = instrument.bank & 0x80000000U ? 9 : 4;
+                const auto key = std::uint8_t((region.key_low + region.key_high) / 2);
+                auto both = [&](unsigned kind, unsigned first, unsigned second)
+                {
+                    return visible.receive(bank, std::uint8_t(kind | slot), std::uint8_t(first), std::uint8_t(second),
+                                           .2, error) &&
+                           hidden.receive(bank, std::uint8_t(kind | slot), std::uint8_t(first), std::uint8_t(second),
+                                          .2, error);
+                };
+                CHECK(both(0xb0, 0, (instrument.bank >> 8) & 127) && both(0xb0, 32, instrument.bank & 127));
+                CHECK(both(0xc0, instrument.program, 0) && both(0x90, key, 100));
+                bool nonzero = false;
+                for (unsigned frame = 0; frame < 12; ++frame)
+                {
+                    if (frame == 2)
+                        CHECK(both(0xb0, 7, 0));
+                    if (frame == 3)
+                        CHECK(both(0xb0, 7, 100));
+                    if (frame == 4)
+                        CHECK(both(0xe0, 127, 127));
+                    if (frame == 8)
+                        CHECK(both(0x80, key, 100));
+                    std::vector<float> pcm(1600);
+                    CHECK(visible.advance(800, pcm) && hidden.advance(800, {}));
+                    CHECK(visible.voices().size() == hidden.voices().size());
+                    for (std::size_t i = 0; i < visible.voices().size(); ++i)
+                        CHECK(visible.voices()[i].cursor == hidden.voices()[i].cursor &&
+                              visible.voices()[i].frames == hidden.voices()[i].frames);
+                    for (auto value : pcm)
+                    {
+                        CHECK(std::isfinite(value));
+                        nonzero = nonzero || std::abs(value) > 1e-8;
+                    }
+                }
+                CHECK(nonzero && visible.midi_rejected == 0 && visible.midi_received == 8);
+                CHECK(visible.advance(48000 * 30, {}) && hidden.advance(48000 * 30, {}));
+                CHECK(visible.voices().empty() && hidden.voices().empty());
+                ++regions;
+            }
+        CHECK(regions == 38);
+        std::cout
+            << "38 Cabal regions: channel note/control/stop, finite PCM, hidden clocks, release cleanup verified\n";
+        return true;
+    }
     bool private_data(const std::filesystem::path& root, bool live = false)
     {
         std::string error;
@@ -618,7 +776,10 @@ namespace
 int main(int argc, char** argv)
 {
     std::string test = argc > 1 ? argv[1] : "";
-    const bool ok = test == "pcm"                         ? pcm()
+    const bool ok = test == "midi_receiver"               ? midi_receiver()
+                    : test == "midi_private" && argc == 3 ? midi_private(argv[2])
+                    : test == "midi_limits"               ? midi_limits()
+                    : test == "pcm"                       ? pcm()
                     : test == "envelopes"                 ? envelopes()
                     : test == "lifetime"                  ? lifetime()
                     : test == "legacy_pan"                ? legacy_pan()

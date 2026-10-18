@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/dls_bank.h"
+#include <array>
 #include <memory>
 #include <optional>
 
@@ -41,7 +42,10 @@ namespace OpenBlood2
         std::size_t instrument = 0, region = 0;
         unsigned key = 0, velocity = 0;
         DlsControllers controllers;
-        std::optional<DlsMidiChannel> channel; // Present only for routed notes; immutable note-on snapshot.
+        std::optional<unsigned> midi_channel; // Actual receiver slot; absent for independent auditions.
+        std::optional<std::uint64_t> choke_frame;
+        double choke_level = 0, choke_seconds = 0; // Bounded replacement fast-release envelope.
+        std::optional<DlsMidiChannel> channel;     // Present only for routed notes; immutable note-on snapshot.
         double cursor = 0, base_step = 0, gain = 0, left = 0, right = 0;
         double nominal_gain = 0, bend_step = 1, pitch_extent = 0; // Uncontrolled gain and pitch budget.
         double pan = 0;               // Constant offset in 0.1-percent units, before CC10 and clamping.
@@ -56,6 +60,17 @@ namespace OpenBlood2
     {
       public:
         static constexpr unsigned rate = 48000, max_voices = 32;
+        // Immediate MIDI receiver, not a timestamp queue. Channel 9 defaults to percussion.
+        // No bank is required except for note-on. Failure preserves channels and live voices.
+        bool receive(std::shared_ptr<const DlsBank>, std::uint8_t status, std::uint8_t first, std::uint8_t second,
+                     double gain, std::string& error);
+        const auto& midi_channels() const
+        {
+            return midi_channels_;
+        }
+        std::uint64_t midi_received = 0, midi_rejected = 0, midi_released = 0, midi_choked = 0;
+        std::uint64_t midi_unmatched_stops = 0;
+        std::string last_midi_error;
         std::uint64_t play(std::shared_ptr<const DlsBank>, std::size_t instrument, unsigned key, unsigned velocity,
                            double gate_seconds, double gain, std::string& error, DlsControllers = {});
         std::uint64_t play_channel(std::shared_ptr<const DlsBank>, const DlsMidiChannel&, unsigned key,
@@ -78,5 +93,11 @@ namespace OpenBlood2
       private:
         std::uint64_t next_id_ = 1; // Never reused, including across clear().
         std::vector<DlsVoice> voices_;
+        std::array<DlsMidiChannel, 16> midi_channels_ = []
+        {
+            std::array<DlsMidiChannel, 16> channels{};
+            channels[9].percussion = true;
+            return channels;
+        }();
     };
 } // namespace OpenBlood2

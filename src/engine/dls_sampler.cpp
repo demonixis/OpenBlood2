@@ -180,6 +180,12 @@ namespace OpenBlood2
         double amplitude_at(const DlsVoice& v, double time)
         {
             const double gate = double(v.gate) / DlsSampler::rate;
+            if (v.choke_frame && v.frames >= *v.choke_frame)
+            {
+                const double elapsed = double(v.frames - *v.choke_frame) / DlsSampler::rate;
+                const double env = v.choke_seconds > 0 ? v.choke_level * (1 - elapsed / v.choke_seconds) : 0;
+                return env <= 0 ? 0 : std::pow(10.0, (env - 1) * 96 / 20);
+            }
             if (time < gate && time < v.amplitude.attack)
                 return time / v.amplitude.attack;
             const double env = level(v.amplitude, time, gate, true);
@@ -187,6 +193,9 @@ namespace OpenBlood2
         }
         bool finished(const DlsVoice& v)
         {
+            if (v.choke_frame)
+                return v.frames >= *v.choke_frame &&
+                       double(v.frames - *v.choke_frame) / DlsSampler::rate >= v.choke_seconds;
             const double time = double(v.frames) / DlsSampler::rate;
             const double gate = double(v.gate) / DlsSampler::rate;
             if (time >= gate)
@@ -334,7 +343,7 @@ namespace OpenBlood2
         const auto& sample = region.settings;
         if (wave.samples.empty() || wave.rate < 8000 || wave.rate > 96000 || !sample.loop_in_bounds ||
             sample.unity_note > 127 || region.channel != 1 || region.wave_options || region.phase_group ||
-            region.key_group ||
+            region.key_group || (region.options & ~1U) ||
             (sample.loop &&
              (!sample.loop->length || std::uint64_t(sample.loop->start) + sample.loop->length > wave.samples.size())))
             return fail("Unsupported DLS sample, phase link or exclusive key group");
@@ -365,6 +374,95 @@ namespace OpenBlood2
         ++started;
         last_error.clear();
         return voices_.back().id;
+    }
+    bool DlsSampler::receive(std::shared_ptr<const DlsBank> bank, std::uint8_t status, std::uint8_t first,
+                             std::uint8_t second, double gain, std::string& error)
+    {
+        error.clear();
+        auto fail = [&](std::string reason)
+        {
+            error = last_midi_error = std::move(reason);
+            ++midi_rejected;
+            return false;
+        };
+        const unsigned slot = status & 15, kind = status & 0xf0;
+        auto next = midi_channels_[slot];
+        if (kind != 0xe0 && (first > 127 || (kind != 0xc0 && second > 127)))
+            return fail("Invalid MIDI data byte");
+        if (kind == 0x80 || (kind == 0x90 && second == 0))
+        {
+            // The original head-inserted list releases the newest still-held matching note only.
+            auto it = std::find_if(voices_.rbegin(), voices_.rend(),
+                                   [&](const auto& v)
+                                   {
+                                       return v.midi_channel == slot && v.key == first &&
+                                              v.gate == std::numeric_limits<std::uint64_t>::max() && !v.choke_frame;
+                                   });
+            if (it == voices_.rend())
+                ++midi_unmatched_stops;
+            else
+            {
+                // Original NoteOff clamps a stop at/before start to one subsequent sample.
+                it->gate = std::max<std::uint64_t>(1, it->frames);
+                ++midi_released;
+            }
+        }
+        else if (kind == 0x90)
+        {
+            // Validate and allocate before changing older voices. Exhaustion/unsupported regions
+            // explicitly fail rather than stealing voices or partly replacing existing notes.
+            const auto id = play_channel(std::move(bank), next, first, second, 1, gain, error);
+            if (!id)
+                return fail(error);
+            auto& created = voices_.back();
+            created.midi_channel = slot;
+            created.gate = std::numeric_limits<std::uint64_t>::max();
+            const auto& region = created.bank->instruments[created.instrument].regions[created.region];
+            if (!(region.options & 1))
+                for (auto& v : voices_)
+                    if (v.id != id && v.midi_channel == slot && v.key == first && !v.choke_frame)
+                    {
+                        // Original fast stop caps the remaining amplitude release at rate/70.
+                        // Retain our full-precision DLS envelope, rebased continuously at this boundary.
+                        const auto start = std::max<std::uint64_t>(1, v.frames);
+                        const double t = double(start) / rate;
+                        const double env = level(v.amplitude, t, double(v.gate) / rate, true);
+                        v.choke_frame = start;
+                        v.choke_level = env;
+                        v.choke_seconds = std::min(double(rate / 70) / rate, env * v.amplitude.release);
+                        v.gate = std::min(v.gate, start);
+                        ++midi_choked;
+                    }
+        }
+        else if (kind == 0xc0)
+            midi_channels_[slot].program = first;
+        else if (kind == 0xb0 && (first == 0 || first == 32))
+        {
+            if (first == 0)
+                midi_channels_[slot].bank_msb = second;
+            else
+                midi_channels_[slot].bank_lsb = second;
+        }
+        else
+        {
+            if (!apply_dls_controller(next.controllers, status, first, second, error))
+                return fail(error);
+            for (const auto& v : voices_)
+                if (v.midi_channel == slot &&
+                    v.pitch_extent + std::abs(dls_pitch_bend_cents(next.controllers.pitch_bend)) > 9600)
+                    return fail("MIDI channel pitch exceeds a sounding voice's budget");
+            // Preflight all voices before committing; include release tails and isolate auditions.
+            midi_channels_[slot] = next;
+            for (auto& v : voices_)
+                if (v.midi_channel == slot)
+                {
+                    set_voice_controllers(v, next.controllers);
+                    ++controls_updated;
+                }
+        }
+        ++midi_received;
+        last_midi_error.clear();
+        return true;
     }
     bool DlsSampler::set_controllers(std::uint64_t id, DlsControllers controllers, std::string& error)
     {
@@ -451,6 +549,10 @@ namespace OpenBlood2
     void DlsSampler::clear()
     {
         voices_.clear();
+        midi_channels_ = {};
+        midi_channels_[9].percussion = true;
+        midi_received = midi_rejected = midi_released = midi_choked = midi_unmatched_stops = 0;
+        last_midi_error.clear();
         started = completed = rejected = 0;
         controls_updated = controls_rejected = 0;
         last_control_error.clear();

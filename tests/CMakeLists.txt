@@ -2238,3 +2238,13 @@ if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME dls_sampler.live_private COMMAND dls_sampler_tests live_private "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(dls_sampler.live_private PROPERTIES LABELS "headless;private;music_assets" TIMEOUT 60)
 endif()
+
+foreach(case midi_receiver midi_limits)
+    add_test(NAME dls_sampler.${case} COMMAND dls_sampler_tests ${case})
+    set_tests_properties(dls_sampler.${case} PROPERTIES LABELS "headless;music_assets;audio" TIMEOUT 30)
+endforeach()
+
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME dls_sampler.midi_private COMMAND dls_sampler_tests midi_private "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(dls_sampler.midi_private PROPERTIES LABELS "headless;private;music_assets;audio" TIMEOUT 60)
+endif()

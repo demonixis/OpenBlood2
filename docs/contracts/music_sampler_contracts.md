@@ -60,7 +60,8 @@ values. [Explicit live controls](music_live_control_contracts.md) add volume, ex
 pan and original default-range pitch bend; modulation remains unavailable. Velocity, volume and expression use the
 squared gain law; stereo pan uses the DLS square-root equal-power law. Constant
 pan adds to `CC10/127` (default `64/127`), so the default is slightly right of the exact mathematical
-center. There is no timed MIDI controller queue or same-key exclusivity behavior.
+center. The [immediate MIDI receiver](music_midi_receiver_contracts.md) adds channel updates
+and original same-key stop/repeat selection; there is no timed MIDI queue.
 The UI's additional 20% gain is an audition setting, not a game music-volume rule.
 
 ## Ownership, work bounds and inspection
@@ -69,10 +70,12 @@ Checked live updates retain voice clocks and gates; their current controller val
 are separate from the original routed note-on snapshot. The mixer owns up to 32 voices. Every voice retains the immutable bank until its
 sample/envelope finishes or the world is cleared. IDs are never reused within a
 sampler, including after clear; they are local to that mixer, not engine handles.
-A failure allocates no voice and changes no existing note. Note-off only shortens
-the gate; stale IDs fail. There is no voice stealing or MIDI channel allocator.
+A failure allocates no voice and changes no existing note. Explicit-ID note-off
+only shortens the gate; stale IDs fail. The immediate receiver owns 16 fixed channels
+and held note gates, but there is no voice stealing or dynamic channel allocator.
 
-Gate duration is at most 10 seconds, release at most 20 seconds, attack at most
+Diagnostic gate duration is at most 10 seconds; receiver notes remain held until
+stop or natural completion. Release is at most 20 seconds, attack at most
 20 seconds and decay at most 40 seconds. Total possible pitch modulation is bounded
 to eight octaves in either direction. Phase-linked/stereo sample records, exclusive
 key groups and overlapping regions refuse playback. The selected graph's legal
@@ -99,7 +102,7 @@ Counters clear with their world; they are not inferred from visible widgets.
 
 All 38 Cabal regions now produce finite nonzero PCM at midpoint key/velocity 100;
 five use the legacy pan alias. This supersedes the earlier 33 accepted/five refused
-sampler evidence, not its historical results. Full MIDI state/exclusivity, authored note events,
+sampler evidence, not its historical results. Full MIDI state/key-group exclusivity, timed authored note events,
 styles/personality semantics, original playlists/transitions, reverb and retail
 listening comparisons remain absent. Crudux/Track1 effective-loop failures remain
 unchanged. Do not turn `MUSIC` into success on the strength of these auditions.

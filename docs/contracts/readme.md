@@ -198,3 +198,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [IMA ordered grid dispatch](music_grid_dispatch_contracts.md): curve filters and source-order merged note/curve messages, then due stops; no playback.
 
 - [DLS live voice controls](music_live_control_contracts.md): current-voice controller mutation, original raw bend arithmetic and checked lifetime.
+
+- [Immediate MIDI receiver](music_midi_receiver_contracts.md): checked channel controls, held notes and original repeat/stop selection; timed transport remains unavailable.

@@ -140,8 +140,8 @@ namespace OpenBlood2
             auto& sampler = game.server.audio.instruments;
             ImGui::TextWrapped("Audition creates a one-second note at the region midpoint, velocity 100, gain 20%%. "
                                "This is a sample/envelope diagnostic, not original music playback. Unsupported "
-                               "connections refuse the note. Live voice controls are explicit diagnostics; channel "
-                               "routing, exclusivity and sequence playback remain unavailable.");
+                               "connections refuse the note. Immediate MIDI/channel controls and held notes are manual "
+                               "diagnostics; timed sequence playback remains unavailable.");
             ImGui::Text("Voices %zu/%u | started %llu | completed %llu | refused %llu", sampler.voices().size(),
                         DlsSampler::max_voices, (unsigned long long)sampler.started,
                         (unsigned long long)sampler.completed, (unsigned long long)sampler.rejected);
@@ -151,6 +151,23 @@ namespace OpenBlood2
                         (unsigned long long)sampler.controls_rejected);
             if (!sampler.last_control_error.empty())
                 ImGui::TextWrapped("Last control failure: %s", sampler.last_control_error.c_str());
+            ImGui::Text("Immediate MIDI: accepted %llu / refused %llu | stops %llu / unmatched %llu / fast stops %llu",
+                        (unsigned long long)sampler.midi_received, (unsigned long long)sampler.midi_rejected,
+                        (unsigned long long)sampler.midi_released, (unsigned long long)sampler.midi_unmatched_stops,
+                        (unsigned long long)sampler.midi_choked);
+            if (!sampler.last_midi_error.empty())
+                ImGui::TextWrapped("MIDI failure: %s", sampler.last_midi_error.c_str());
+            if (ImGui::TreeNode("Current MIDI channel state (no transport)"))
+            {
+                for (unsigned slot = 0; slot < 16; ++slot)
+                {
+                    const auto& c = sampler.midi_channels()[slot];
+                    ImGui::Text("%u: bank %u:%u program %u | CC7/11/10 %u/%u/%u | bend %u%s", slot, c.bank_msb,
+                                c.bank_lsb, c.program, c.controllers.volume, c.controllers.expression,
+                                c.controllers.pan, c.controllers.pitch_bend, c.percussion ? " | percussion" : "");
+                }
+                ImGui::TreePop();
+            }
             for (const auto& v : sampler.voices())
             {
                 ImGui::PushID(int(v.id));
@@ -165,6 +182,11 @@ namespace OpenBlood2
                             v.pan, v.pan_destination, v.legacy_pan ? "yes" : "no", v.left, v.right);
                 ImGui::Text("Current CC7 %u / CC11 %u / CC10 %u", v.controllers.volume, v.controllers.expression,
                             v.controllers.pan);
+                if (v.midi_channel)
+                    ImGui::Text("Receiver channel %u | %s", *v.midi_channel,
+                                v.choke_frame          ? "fast release"
+                                : v.gate == UINT64_MAX ? "held until note-off"
+                                                       : "release");
                 if (v.channel)
                     ImGui::Text("MIDI bank %u:%u / program %u / percussion %s", v.channel->bank_msb,
                                 v.channel->bank_lsb, v.channel->program, v.channel->percussion ? "yes" : "no");
@@ -189,6 +211,15 @@ namespace OpenBlood2
                 }
                 if (ImGui::SmallButton("Release note"))
                     sampler.release(v.id);
+                if (v.midi_channel)
+                {
+                    ImGui::SameLine();
+                    if (ImGui::SmallButton("Send MIDI note-off"))
+                    {
+                        std::string error;
+                        sampler.receive({}, std::uint8_t(0x80 | *v.midi_channel), std::uint8_t(v.key), 0, .2, error);
+                    }
+                }
                 ImGui::PopID();
             }
             auto settings = [](const DlsSampleSettings& sample)
@@ -650,6 +681,25 @@ namespace OpenBlood2
                                             std::clamp(100U, unsigned(region.velocity_low),
                                                        unsigned(region.velocity_high)),
                                             1, .2, error);
+                                    }
+                                    if (!regions.empty() && ImGui::SmallButton("Hold channel note (manual MIDI)"))
+                                    {
+                                        auto& receiver = game.server.audio.instruments;
+                                        bool ready = true;
+                                        for (unsigned j = 0; j < 5 && ready; ++j)
+                                        {
+                                            const auto& m = asset.band_setup[ch * 5 + j];
+                                            ready = receiver.receive({}, m.status, m.data1, m.data2, .2, error);
+                                        }
+                                        if (ready)
+                                        {
+                                            const auto& r = regions.front();
+                                            receiver.receive(asset.band_bank, std::uint8_t(0x90 | ((ch + 4) & 15)),
+                                                             std::uint8_t((r.key_low + r.key_high) / 2),
+                                                             std::uint8_t(std::clamp(100U, unsigned(r.velocity_low),
+                                                                                     unsigned(r.velocity_high))),
+                                                             .2, error);
+                                        }
                                     }
                                 }
                                 ImGui::PopID();

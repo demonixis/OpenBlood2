@@ -2,8 +2,8 @@
 
 M2 and MUSIC remain incomplete. Prepared grid events can now be decoded into
 supported controller values, and those values can be applied to an explicit live
-DLS voice. This is a prerequisite for the channel dispatcher and timed transport;
-manual diagnostic control is not a running original soundtrack.
+DLS voice. The [immediate receiver](music_midi_receiver_contracts.md) now supplies
+channel dispatch. Timed transport remains separate; manual diagnostic control is not a running original soundtrack.
 
 ## Original behavior and replacement synthesis
 
@@ -52,9 +52,9 @@ Control counters/errors reset with the sampler on world unload.
 
 Updates take effect for subsequent samples at the current AudioMixer boundary.
 They do not modify already queued SDL PCM. Rendering/hidden advances share the
-same state; UI drawing never advances time. Future transport must apply events at
-their deadlines and map channels to checked voice identities, rather than apply
-future grid events immediately or infer a channel from matching instrument values.
+same state; UI drawing never advances time. The immediate receiver now maps channels
+to owned voice identities. Future transport must apply events at their deadlines, rather than apply future grid events immediately
+or infer a channel from matching instrument values.
 
 ## Inspection and tests
 
@@ -72,5 +72,6 @@ all 38 Cabal regions and compare rendered/hidden clocks. This is not an authored
 song timing test or a listening comparison. See the
 [evidence](../../../Documentation/Implementation/m2_music_live_controls.md) and
 [source ledger](../implementation/sources/m2_music_live_controls_sources.json).
-Channel-to-voice dispatch, same-key/exclusive behavior, timed delivery, playlists
-and actual MUSIC acceptance remain open.
+Immediate channel dispatch and same-key selection are extended in the receiver
+contracts. Nonzero key groups, timed delivery, playlists and actual MUSIC acceptance
+remain open.
