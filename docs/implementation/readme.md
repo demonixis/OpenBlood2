@@ -52,3 +52,5 @@ the original log or patch.
 - [IMA band channels and DLS note routing](../../../Documentation/Implementation/m2_music_routing.md): original packed/key lookup, percussion fallback and controller-aware diagnostic PCM; MUSIC and M2 remain incomplete.
 
 - [Connected IMA grid notes](../../../Documentation/Implementation/m2_music_grid_notes.md): atomic normal-mode pitch/event preparation and executable comparison; MUSIC remains unavailable.
+
+- [IMA active notes and due stops](../../../Documentation/Implementation/m2_music_active_notes.md): original lifetime/dispatch-order comparison and inspected pending tails; M2 remains incomplete.

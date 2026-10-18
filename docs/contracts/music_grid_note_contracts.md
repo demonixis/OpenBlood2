@@ -68,3 +68,8 @@ is not invoked by this method. The original comparison intercepts MIDI output,
 note allocation/registration, notifications and playlists, and discards active
 notes after observing their prepared values. It is not a full tick/audio proof.
 Required MUSIC remains unsupported and M2 remains incomplete.
+
+The [active-note continuation](music_active_note_contracts.md) now carries pending
+off values, applies original chord/serial rules and prepares due stops. This
+supersedes the active-lifetime omission above; that paragraph describes the earlier
+probe. Live transport, external MIDI delivery and MUSIC remain unavailable.

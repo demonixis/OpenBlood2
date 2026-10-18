@@ -80,11 +80,17 @@ namespace OpenBlood2
                 music.cursor_file = asset.filename;
                 for (unsigned step = 0; step < 8 && music.cursor.active(); ++step)
                 {
+                    const auto active_before = music.cursor.active_notes().size();
                     const std::array<std::uint16_t, 4096> cursor_draws{};
                     if (!music.step_cursor_notes(cursor_draws) || !music.cursor.last_notes() ||
                         !music.cursor.last_step() ||
                         music.cursor.last_notes()->rows.size() != music.cursor.last_step()->admitted ||
                         music.cursor.last_step()->interval <= 0 || music.cursor.state().steps != step + 1)
+                        return false;
+                    const auto& notes = *music.cursor.last_notes();
+                    if (music.cursor.active_notes().size() + notes.note_offs.size() !=
+                            active_before + notes.rows.size() - notes.suppressed ||
+                        notes.shortened > active_before)
                         return false;
                 }
                 music.cursor_file = asset.filename;

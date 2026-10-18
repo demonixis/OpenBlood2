@@ -1324,3 +1324,13 @@ tick. No commercial code, samples, executable bytes or binary ABI structures are
 imported. See [source ledger](sources/m2_music_grid_notes_sources.json),
 [contracts](../contracts/music_grid_note_contracts.md) and
 [evidence](../../../Documentation/Implementation/m2_music_grid_notes.md).
+
+## Original IMA active-note lifetime
+
+Independent portable active-note values and ordered partitions follow read-only
+analysis and isolated execution of the installed IMUSIC25 normal tick. The probe
+executes original registration and keeps its active lists across grids, while
+external MIDI/synth and transport side effects remain intercepted. No commercial
+code, binary bytes or samples are imported. See [source ledger](sources/m2_music_active_notes_sources.json),
+[contracts](../contracts/music_active_note_contracts.md) and
+[evidence](../../../Documentation/Implementation/m2_music_active_notes.md).

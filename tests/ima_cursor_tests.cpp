@@ -305,6 +305,113 @@ namespace
         CHECK(catalog.cursor_error.empty() && !catalog.cursor.last_notes());
         return true;
     }
+    bool active_behavior()
+    {
+        std::string error;
+        auto f = fixture();
+        f.section->measures = 1;
+        f.style->patterns.resize(1);
+        auto& p = f.style->patterns.front();
+        for (auto& g : p.grids)
+            g.notes.clear();
+        auto note = [](unsigned key, int duration)
+        {
+            ImaNote n;
+            n.type = 9;
+            n.variations = 0xffff;
+            n.midi_note = std::uint8_t(key);
+            n.duration = std::int16_t(duration);
+            n.velocity = 90;
+            return n;
+        };
+        p.grids[0].notes = {note(60, 500), note(61, 1000), note(62, 192), note(63, 193)};
+        p.grids[1].notes = {note(65, 1000)};
+        auto chord = f.section->chords[0];
+        chord.beat = 1;
+        chord.chord_pattern = 1;
+        f.section->chords.push_back(chord);
+        f.seed.random_channels = f.seed.cycle_channels = 0;
+        f.seed.variations.fill(0xffff);
+        CHECK(f.prepare(error));
+        ImaSectionCursor c;
+        CHECK(f.start(c, error) && c.step_notes({}, 0, f.band, {}, error));
+        CHECK(c.last_notes()->note_offs.size() == 1 && c.last_notes()->note_offs[0].key == 62);
+        CHECK(c.active_notes().size() == 3 && c.active_notes()[0].off.key == 60 && c.active_notes()[1].off.key == 61 &&
+              c.active_notes()[2].off.key == 63);
+        auto copied = c; // Independent state, shared immutable inputs.
+        CHECK(c.step_notes({}, 192, f.band, {}, error));
+        CHECK(c.last_notes()->shortened == 2 && c.last_notes()->note_offs.size() == 2);
+        CHECK(c.last_notes()->note_offs[0].key == 63 && c.last_notes()->note_offs[1].key == 61);
+        CHECK(c.last_notes()->note_offs[0].time == 193 && c.last_notes()->note_offs[1].time == 193);
+        CHECK(c.active_notes().size() == 2 && c.active_notes()[0].off.key == 60 && c.active_notes()[1].off.key == 65 &&
+              c.active_notes()[1].serial == 1);
+        // A caller clock jump retains assignment, not min(deadline,tick+1), and original unsorted off order.
+        CHECK(copied.step_notes({}, 1000, f.band, {}, error));
+        CHECK(copied.last_notes()->note_offs.size() == 3 && copied.last_notes()->note_offs[0].time == 1001 &&
+              copied.last_notes()->note_offs[1].time == 1001 && copied.last_notes()->note_offs[2].time == 500);
+        const auto before = c.state();
+        const auto held = c.active_notes();
+        CHECK(!c.start({}, f.style, f.timeline, f.harmony, {}, error) && c.state() == before &&
+              c.active_notes() == held && c.last_notes()->grid_time == 192);
+        CHECK(!c.step_notes({}, 2147483647, f.band, {}, error) && c.state() == before && c.active_notes() == held);
+        CHECK(c.step_notes({}, 384, f.band, {}, error) && c.last_notes()->note_offs.size() == 1 &&
+              c.last_notes()->note_offs[0].key == 60 && c.last_notes()->shortened == 0);
+        CHECK(c.step_notes({}, 576, f.band, {}, error) && c.state().ended && c.active_notes().size() == 1);
+        CHECK(c.active_notes()[0].off.time == 1192); // No invented note flush at section end.
+        CHECK(!c.step_notes({}, 768, f.band, {}, error) && c.active_notes().size() == 1);
+        const auto tail = c.active_notes();
+        c.stop();
+        CHECK(c.active_notes().empty() && tail[0].off.key == 65);
+        // Bounded capacity failure preserves old active notes, reports and clocks after candidate note preparation.
+        f = fixture();
+        f.style->patterns.resize(1);
+        for (auto& g : f.style->patterns[0].grids)
+            g.notes.clear();
+        f.style->patterns[0].grids[0].notes.assign(ImaSectionCursor::active_note_limit, note(60, 2000));
+        f.style->patterns[0].grids[1].notes = {note(61, 2000)};
+        f.seed.random_channels = f.seed.cycle_channels = 0;
+        f.seed.variations.fill(0xffff);
+        CHECK(f.prepare(error) && f.start(c, error) && c.step_notes({}, 0, f.band, {}, error));
+        CHECK(c.active_notes().size() == ImaSectionCursor::active_note_limit);
+        const auto full = c.state();
+        CHECK(!c.step_notes({}, 192, f.band, {}, error) && c.state() == full &&
+              c.active_notes().size() == ImaSectionCursor::active_note_limit && c.last_notes()->grid_time == 0);
+        CHECK(c.step({}, error) && c.active_notes().empty() && !c.last_notes());
+        c.stop();
+        // Original low-word equality exempts an old note after serial wrap as well as a newly created note.
+        // Hold the explicit output clock still to isolate this boundary; this is not live transport timing.
+        f = fixture();
+        f.section->measures = 257;
+        f.style->patterns.resize(1);
+        auto& long_pattern = f.style->patterns[0];
+        long_pattern.timing[0] = 3;
+        long_pattern.length = 3 * 32767;
+        long_pattern.grids.resize(1);
+        long_pattern.grids[0].notes = {note(61, 1000)};
+        chord = f.section->chords[0];
+        chord.measure = 256;
+        chord.chord_pattern = 1;
+        f.section->chords.push_back(chord);
+        f.seed.random_channels = f.seed.cycle_channels = 0;
+        f.seed.variations.fill(0xffff);
+        CHECK(f.prepare(error) && f.start(c, error));
+        for (unsigned i = 0; i < 65536; ++i)
+            CHECK(c.step_notes({}, 0, f.band, {}, error));
+        CHECK(c.state().serial == 0 && c.active_notes().size() == 3);
+        CHECK(c.step_notes({}, 0, f.band, {}, error) && c.last_notes()->shortened == 2 &&
+              c.last_notes()->note_offs.size() == 2 && c.active_notes().size() == 1 &&
+              c.active_notes()[0].serial == 0 && c.active_notes()[0].off.time == 1000);
+        MusicCatalog catalog;
+        catalog.cursor = std::move(c);
+        std::weak_ptr<const ImaStyle> retained = f.style;
+        const auto saved = catalog.cursor.active_notes();
+        f = {};
+        CHECK(!retained.expired());
+        catalog.inspect({}, {}); // Failed replacement still unloads the prior world-owned cursor.
+        CHECK(retained.expired() && !catalog.cursor.active() && catalog.cursor.active_notes().empty() &&
+              !catalog.cursor.last_notes() && saved[0].off.key == 61);
+        return true;
+    }
     void word(std::vector<std::uint8_t>& out, std::uint32_t value)
     {
         for (int i = 0; i < 4; ++i)
@@ -444,7 +551,7 @@ namespace
         output.write(reinterpret_cast<const char*>(b.data()), b.size());
     }
     bool walk(const Fixture& f, std::uint64_t& hash, std::size_t& steps, std::ostream* output, std::string& error,
-              bool notes = false)
+              bool notes = false, bool active = false)
     {
         ImaSectionCursor c;
         CHECK(f.start(c, error));
@@ -479,6 +586,28 @@ namespace
                     }
                 }
             }
+            if (active)
+            {
+                const auto& n = *c.last_notes();
+                word(b, std::uint32_t(n.shortened));
+                word(b, std::uint32_t(n.note_offs.size()));
+                for (auto m : n.note_offs)
+                {
+                    word(b, std::uint32_t(m.time));
+                    word(b, m.status);
+                    word(b, m.key);
+                    word(b, m.velocity);
+                }
+                word(b, std::uint32_t(c.active_notes().size()));
+                for (auto n : c.active_notes())
+                {
+                    word(b, std::uint32_t(n.off.time));
+                    word(b, n.off.status);
+                    word(b, n.off.key);
+                    word(b, n.off.velocity);
+                    word(b, n.serial);
+                }
+            }
             for (auto x : b)
             {
                 hash ^= x;
@@ -497,7 +626,7 @@ namespace
         }
         return true;
     }
-    bool generated(std::ostream* output = nullptr, bool notes = false)
+    bool generated(std::ostream* output = nullptr, bool notes = false, bool active = false)
     {
         std::string error;
         std::uint64_t hash = 14695981039346656037ull;
@@ -511,13 +640,27 @@ namespace
             command(f, 2304, 0x400);
             if (i % 3 == 0)
                 command(f, 1536, 0x200); // Deliberately unsorted tail.
+            if (active)
+            {
+                f.section->chords.front().root = std::int8_t(int(i * 2) - 128);
+                constexpr std::array<std::uint32_t, 8> masks{0,           1,           0x91,        0x889,
+                                                             0x80000000u, 0xffffffffu, 0x80100001u, 0xabcdefu};
+                f.section->chords.front().chord_pattern = masks[i % masks.size()];
+                for (auto& p : f.style->patterns)
+                    for (auto& g : p.grids)
+                        for (auto& n : g.notes)
+                        {
+                            n.music_value = 0; // Isolate active-note membership across every signed root.
+                            n.duration = std::int16_t(400 + (i % 7) * 192);
+                        }
+            }
             auto ch = f.section->chords.front();
             ch.beat = std::int8_t(i % 3 + 1);
             ch.chord_pattern = i % 2 ? 0x89 : 0x91;
             f.section->chords.push_back(ch);
             ch.measure = 1;
             ch.beat = 1;
-            ch.root = 2;
+            ch.root = active ? std::int8_t(int(i * 2) - 127) : 2;
             f.section->chords.push_back(ch);
             f.section->mutes = {{192, std::uint16_t(i * 511), 0}, {1152, std::uint16_t(~(i * 511)), 0}};
             f.seed.random_channels = std::uint16_t(i * 997);
@@ -528,10 +671,12 @@ namespace
                 f.style->patterns[0].timing[0] = i % 10 == 0 ? 130 : 128;
             if (i % 7 == 0)
                 f.style->patterns[2].grids.clear();
-            CHECK(f.prepare(error) && walk(f, hash, steps, output, error, notes));
+            CHECK(f.prepare(error) && walk(f, hash, steps, output, error, notes, active));
         }
         std::cout << "Generated cursor steps " << steps << "; FNV64 " << hash << '\n';
-        CHECK(steps == 2799 && hash == (notes ? 937667046537544111ull : 10075978454587385952ull));
+        CHECK(steps == 2799 && hash == (active  ? 4553459640914638122ull
+                                        : notes ? 937667046537544111ull
+                                                : 10075978454587385952ull));
         return true;
     }
     std::vector<std::uint8_t> read(const std::filesystem::path& path)
@@ -545,7 +690,8 @@ namespace
             c = char(std::tolower(static_cast<unsigned char>(c)));
         return s;
     }
-    bool private_data(const std::filesystem::path& root, std::ostream* output = nullptr, bool notes = false)
+    bool private_data(const std::filesystem::path& root, std::ostream* output = nullptr, bool notes = false,
+                      bool active = false)
     {
         std::string error;
         std::vector<std::filesystem::path> files;
@@ -584,13 +730,15 @@ namespace
             CHECK(read_ima_personality(read(path.parent_path() / "SILENCE.PER"), personality, error));
             CHECK(prepare_ima_timeline(*f.section, *f.style, *f.timeline, error) &&
                   prepare_ima_harmony(*f.section, *f.timeline, personality, *f.harmony, error) &&
-                  walk(f, hash, steps, output, error, notes));
+                  walk(f, hash, steps, output, error, notes, active));
             ++bound;
         }
         std::cout << "Private cursor steps " << steps << "; bound/missing " << bound << '/' << missing << "; FNV64 "
                   << hash << '\n';
         CHECK(bound == 132 && missing == 24 && steps == 8174 &&
-              hash == (notes ? 5880823308775508798ull : 14793402716944126194ull));
+              hash == (active  ? 182961564129265722ull
+                       : notes ? 5880823308775508798ull
+                               : 14793402716944126194ull));
         return true;
     }
 } // namespace
@@ -599,13 +747,21 @@ int main(int argc, char** argv)
     if (argc < 2)
         return 2;
     std::string_view mode = argv[1];
-    if ((mode == "export" || mode == "notes_export") && argc == 4)
+    if ((mode == "export" || mode == "notes_export" || mode == "active_export") && argc == 4)
     {
         // Optional transient emulator input: contains external data, never commit this output.
         std::ofstream out(argv[2], std::ios::binary);
-        const bool notes = mode == "notes_export";
-        return out && generated(&out, notes) && private_data(argv[3], &out, notes) && out.good() ? 0 : 1;
+        const bool active = mode == "active_export";
+        const bool notes = mode != "export";
+        return out && generated(&out, notes, active) && private_data(argv[3], &out, notes, active) && out.good() ? 0
+                                                                                                                 : 1;
     }
+    if (mode == "active_generated")
+        return generated(nullptr, true, true) ? 0 : 1;
+    if (mode == "active_private" && argc == 3)
+        return private_data(argv[2], nullptr, true, true) ? 0 : 1;
+    if (mode == "active_behavior")
+        return active_behavior() ? 0 : 1;
     if (mode == "notes_behavior")
         return notes_behavior() ? 0 : 1;
     if (mode == "notes_generated")

@@ -48,6 +48,14 @@ namespace OpenBlood2
         std::int32_t grid_time = 0; // Caller-supplied output clock, independent of section tick.
         std::size_t draws_used = 0, suppressed = 0, opaque_curve_chunks = 0;
         std::vector<ImaCursorNote> rows; // Admitted rows in source order; paired events are not sorted.
+        std::size_t shortened = 0;       // Chord deadline assignments, including extension under explicit clock jumps.
+        std::vector<ImaTimedMidiMessage> note_offs; // Due through grid_time + interval, original dispatch order.
+    };
+    struct ImaActiveNote
+    {
+        ImaTimedMidiMessage off;
+        std::uint16_t serial = 0; // Original low-word creation grid, including its wrap behavior.
+        bool operator==(const ImaActiveNote&) const = default;
     };
     // Explicit single-section traversal of original normal-mode grid rules, NOT an audio player.
     // Immutable bindings are retained until stop/replacement. No callbacks, I/O or implicit RNG.
@@ -81,6 +89,11 @@ namespace OpenBlood2
         {
             return notes_;
         }
+        const std::vector<ImaActiveNote>& active_notes() const
+        {
+            return active_notes_;
+        }
+        static constexpr std::size_t active_note_limit = 65536;
 
       private:
         std::shared_ptr<const ImaSection> section_;
@@ -90,5 +103,6 @@ namespace OpenBlood2
         ImaCursorState state_;
         std::optional<ImaCursorStep> last_;
         std::optional<ImaCursorNotes> notes_;
+        std::vector<ImaActiveNote> active_notes_;
     };
 } // namespace OpenBlood2

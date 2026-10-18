@@ -1,5 +1,7 @@
 #include "engine/ima_cursor.h"
+#include <algorithm>
 #include <bit>
+#include <limits>
 
 namespace OpenBlood2
 {
@@ -8,6 +10,19 @@ namespace OpenBlood2
         std::int16_t grid_count(const ImaPattern& p)
         {
             return std::bit_cast<std::int16_t>(static_cast<std::uint16_t>(p.length / p.timing[0]));
+        }
+        bool chord_contains(std::uint8_t key, const ImaHarmonicContext& chord)
+        {
+            // IMUSIC25 145ab: unsigned word comparison, then low-word subtraction and x86 shift masking.
+            // Do not normalize signed roots modulo 12: malformed/negative roots have distinct source results.
+            auto degree = std::uint16_t(key % 12);
+            const auto root = static_cast<std::uint16_t>(chord.chord_root);
+            if (root > degree)
+                degree += 12;
+            degree = static_cast<std::uint16_t>(degree - root);
+            auto mask = chord.chord_mask | (chord.chord_mask << 12);
+            mask |= mask << 12;
+            return (mask & (std::uint32_t(1) << (degree & 31))) != 0;
         }
     } // namespace
     bool ImaSectionCursor::start(std::shared_ptr<const ImaSection> section, std::shared_ptr<const ImaStyle> style,
@@ -69,6 +84,7 @@ namespace OpenBlood2
         state_.channels = seed;
         last_.reset();
         notes_.reset();
+        active_notes_.clear();
         return true;
     }
     bool ImaSectionCursor::step(std::span<const std::uint16_t> draws, std::string& error)
@@ -161,6 +177,7 @@ namespace OpenBlood2
         state_ = next;
         last_ = report;
         notes_.reset();
+        active_notes_.clear(); // Admission-only traversal explicitly discards tracked note lifetime.
         return true;
     }
     bool ImaSectionCursor::step_notes(std::span<const std::uint16_t> draws, std::int32_t grid_time, const ImaBand& band,
@@ -223,6 +240,37 @@ namespace OpenBlood2
             }
         }
         notes.draws_used = used - report.draws_used;
+        const auto introduced = notes.rows.size() - notes.suppressed;
+        const std::int64_t horizon = std::int64_t(grid_time) + report.interval;
+        if (introduced > active_note_limit - active_notes_.size() || horizon > std::numeric_limits<std::int32_t>::max())
+        {
+            error = "IMA cursor notes: active-note budget or output horizon exceeded";
+            return false;
+        }
+        // Source note allocation prepends each new off record before inspecting chord changes.
+        std::vector<ImaActiveNote> pending;
+        pending.reserve(active_notes_.size() + introduced);
+        for (auto i = notes.rows.rbegin(); i != notes.rows.rend(); ++i)
+            if (i->events.emitted)
+                pending.push_back({i->events.messages[1], state_.serial});
+        pending.insert(pending.end(), active_notes_.begin(), active_notes_.end());
+        const auto& chord = harmony_->chords[report.section.chord].harmony;
+        for (auto note : pending)
+        {
+            if (report.chord_changed && note.serial != state_.serial && !chord_contains(note.off.key, chord))
+            {
+                // The source assigns, rather than taking min(old deadline, tick+1).
+                note.off.time = grid_time + 1;
+                ++notes.shortened;
+            }
+            if (note.off.time <= horizon)
+                notes.note_offs.push_back(note.off);
+            else
+                next.active_notes_.push_back(note);
+        }
+        // Both partitions are built by head insertion in the original. Pending order reverses every step.
+        std::reverse(notes.note_offs.begin(), notes.note_offs.end());
+        std::reverse(next.active_notes_.begin(), next.active_notes_.end());
         next.notes_ = std::move(notes);
         *this = std::move(next);
         return true;

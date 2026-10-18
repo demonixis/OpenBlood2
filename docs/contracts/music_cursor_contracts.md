@@ -88,3 +88,7 @@ The [connected note operation](music_grid_note_contracts.md) additionally prepar
 normal-mode harmonic/event values atomically. Admission-only `step` remains
 available and clears previous note inspection. This supersedes the earlier blanket
 absence of prepared events only; audio transport and MUSIC remain unavailable.
+
+The [active-note continuation](music_active_note_contracts.md) adds original pending
+and due-off state to `step_notes`. Admission-only `step` deliberately clears that
+state. This remains a manually driven diagnostic without MUSIC playback.

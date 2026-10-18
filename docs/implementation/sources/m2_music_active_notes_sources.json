@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "b5c3ee55d2dcf5084470f308747f31163a632bdf",
+  "status": "M2 incomplete; original active-note lifetime and due-stop preparation, no live MUSIC",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/IMUSIC25.DLL",
+      "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+      "image_base": "0x35440000",
+      "rvas": {
+        "normal_tick": "0x16908",
+        "serial_registration": "0x166a5..0x166d7",
+        "new_note_prepend": "0x17555..0x17592",
+        "chord_deadline_assignment": "0x1759f..0x175ff",
+        "chord_membership": "0x145ab..0x145ec",
+        "due_retained_partition": "0x1760b..0x17654",
+        "off_sink": "0x4e49..0x4f0f"
+      },
+      "use": "Read-only inspection and bounded isolated original instruction execution, including original serial registration and retained active lists; external MIDI/synth, allocation and transport side effects intercepted"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/Music.cpp",
+      "use": "Preserved original client plan/commands; MUSIC remains explicitly unsupported"
+    }
+  ],
+  "replacement_code": [
+    "src/engine/ima_cursor.cpp: typed value-owned active list, atomic chord/deadline update and ordered due partition",
+    "src/app/inspector_world_sounds.cpp: pending/due values and chord-assignment inspection"
+  ],
+  "deliberate_limits": [
+    "65,536 pre-partition pending-plus-new bound and checked signed output horizon; fail atomically",
+    "One explicitly owned cursor replaces active-player identity for this diagnostic; transport epoch/global registration not integrated",
+    "Admission-only step discards tracked lifetime; stop/unload clears without MIDI flush",
+    "Terminal section tails retained for inspection; repeat/playlist integration pending",
+    "No MIDI/audio dispatch, section events/curves, dynamic controllers or MUSIC success",
+    "Original isolated oracle excludes native synth, external callbacks and transport; not full tick/audio parity",
+    "No commercial code, executable bytes, samples, disassembly or build/runtime dependency imported"
+  ],
+  "original_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "rva": "0x16908",
+    "generated": {
+      "sections": 128,
+      "steps": 2799,
+      "admitted_notes": 7057,
+      "emitted_pairs": 5532,
+      "note_draws": 9938,
+      "due_offs": 4061,
+      "chord_adjustments": 812,
+      "peak_active": 37,
+      "end_tails": 1471,
+      "sha256": "d826b0e0ef6518b35be54816ce95fc2e5789d39df2cbe3c43fa0b072bd78e4a3",
+      "fnv64": 4553459640914638122
+    },
+    "private": {
+      "sections": 132,
+      "steps": 8174,
+      "admitted_notes": 6290,
+      "emitted_pairs": 6290,
+      "note_draws": 12580,
+      "due_offs": 6112,
+      "chord_adjustments": 0,
+      "peak_active": 17,
+      "end_tails": 178,
+      "sha256": "18ffca0fec679d19152037645ccb8ae78ff0156a37ff6b1a0c44b40f6ec65f46",
+      "fnv64": 182961564129265722
+    },
+    "scope": "Original normal-mode grid/chord/mute/pattern/variation, note pitch/events, serial registration, chord-dependent active-note adjustment and off/pending partition order. Prepared inputs come from previously verified readers/helpers. Section event list empty; notifications, metronome, MIDI sink, note allocation and due-off delivery sink, playlist lookahead/repeats/transitions intercepted. Original active lists persist across grid calls and are observed in exact order; MIDI sink and synth timing remain outside the comparison. This is not a full tick/audio equivalence claim."
+  },
+  "target_sha256": {
+    "src/engine/ima_cursor.h": "ba5020010803523791a75506ccafd26a310f1bd7fe2d6b0c43b8edca028165f8",
+    "src/engine/ima_cursor.cpp": "68dfde774c2ae2f36a3701b79bc990058c66ebf76b138fd4a07e636cb7e57956",
+    "src/app/inspector_world_sounds.cpp": "53315f22d480fb63644b585cc720f37503ef947840a1551cb14db4e67c5ac07e",
+    "src/app/world_sound_smoke.cpp": "9b7acd7b2474c222b032440669eb9254c81c3c86e223056d34362857c61f1854",
+    "tests/ima_cursor_tests.cpp": "e59ac7a83ebaf71fd1578c8816390301dc1d8646b163d595d0f8adb061a141af",
+    "tests/CMakeLists.txt": "e3ab83480ee09091b7578e700d458db2d34be6853baade44ce38cedb3e2addd1"
+  }
+}

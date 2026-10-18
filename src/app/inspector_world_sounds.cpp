@@ -280,7 +280,7 @@ namespace OpenBlood2
             {
                 ImGui::TextWrapped("Start from an IMA section below. Explicit zero seed/draws, all channels random. "
                                    "Note preparation uses normal-mode harmony and the selected band. No wall clock, "
-                                   "MIDI submission, curves, active notes or playlists.");
+                                   "MIDI submission, curves or playlists. Step grid discards active-note tracking.");
                 ImGui::Text("Section: %s", music.cursor_file.c_str());
                 if (ImGui::Button("Step grid"))
                 {
@@ -326,7 +326,28 @@ namespace OpenBlood2
                     ImGui::Text("Prepared clock %d | rows %zu / suppressed %zu | note draws %zu", notes->grid_time,
                                 notes->rows.size(), notes->suppressed, notes->draws_used);
                     ImGui::Text("Opaque grid curves: %zu (not prepared)", notes->opaque_curve_chunks);
-                    ImGui::TextUnformatted("Paired note-on/off values only; no queued or audible sequence.");
+                    ImGui::Text("Active notes %zu / %zu | chord-adjusted %zu | due stops %zu",
+                                music.cursor.active_notes().size(), ImaSectionCursor::active_note_limit,
+                                notes->shortened, notes->note_offs.size());
+                    ImGui::TextUnformatted(
+                        "Note lifetime is tracked; no MIDI/audio submission. End-of-section tails remain pending.");
+                    if (ImGui::TreeNode("Active notes and due stops"))
+                    {
+                        ImGuiListClipper clipper;
+                        const auto& active = music.cursor.active_notes();
+                        clipper.Begin(static_cast<int>(active.size() + notes->note_offs.size()));
+                        while (clipper.Step())
+                            for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
+                            {
+                                const auto index = static_cast<std::size_t>(i);
+                                const bool pending = index < active.size();
+                                const auto& off = pending ? active[index].off : notes->note_offs[index - active.size()];
+                                ImGui::Text("%s | tick %d | MIDI %u key %u velocity %u | grid serial %d",
+                                            pending ? "pending" : "due", off.time, off.status & 15u, off.key,
+                                            off.velocity, pending ? int(active[index].serial) : -1);
+                            }
+                        ImGui::TreePop();
+                    }
                     if (ImGui::TreeNode("Prepared note events"))
                     {
                         ImGuiListClipper clipper;

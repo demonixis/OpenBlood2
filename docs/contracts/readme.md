@@ -188,3 +188,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [IMA prepared harmony](music_harmony_contracts.md): bounded personality metadata, original chord flags and explicit live-selection limits.
 
 - [IMA grid cursor](music_cursor_contracts.md): original stateful section progression, explicit draws and world-owned diagnostic lifetime.
+
+- [IMA active note lifetime](music_active_note_contracts.md): original chord deadlines, serial exemption and ordered due/retained lists; live MUSIC remains unavailable.
