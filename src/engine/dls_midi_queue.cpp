@@ -20,6 +20,33 @@ namespace OpenBlood2
             return m.first == 7 ? 2 : m.first == 10 ? 3 : 4;
         }
     } // namespace
+    bool DlsSampler::enqueue_ima(std::shared_ptr<const DlsBank> bank, const ImaClock& clock,
+                                 std::span<const ImaTimedMidiMessage> messages, double gain, std::string& error)
+    {
+        static_assert(rate == ImaClock::sample_rate);
+        error.clear();
+        std::vector<DlsTimedMidi> converted;
+        if (messages.size() > max_pending_midi || clock.boundaries().empty())
+            error = "IMA MIDI batch exceeds the budget or has no prepared clock";
+        else
+        {
+            converted.reserve(messages.size());
+            for (const auto& m : messages)
+            {
+                std::uint64_t frame = 0;
+                if (!clock.sample(m.time, frame, error))
+                    break;
+                converted.push_back({frame, m.status, m.key, m.velocity});
+            }
+        }
+        if (!error.empty())
+        {
+            last_queue_error = error;
+            ++queue_rejected;
+            return false;
+        }
+        return enqueue(std::move(bank), converted, gain, error);
+    }
     bool DlsSampler::enqueue(std::shared_ptr<const DlsBank> bank, std::span<const DlsTimedMidi> messages, double gain,
                              std::string& error)
     {

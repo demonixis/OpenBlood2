@@ -2,8 +2,9 @@
 
 M2 and `MUSIC` remain incomplete. `DlsSampler::enqueue` accepts explicit absolute
 48 kHz sample boundaries and `advance` delivers through the existing AudioMixer
-clock/output. These are not IMA ticks. No tempo conversion, running section cursor,
-playlist, seek or game MUSIC activation is implemented by this API.
+clock/output. These are not IMA ticks. The later [IMA clock adapter](music_clock_contracts.md)
+converts explicit musical ticks before queue admission. Neither API implements a
+running section cursor, playlist, seek or game MUSIC activation.
 Read [receiver contracts](music_midi_receiver_contracts.md),
 [grid dispatch](music_grid_dispatch_contracts.md), [sampler](music_sampler_contracts.md),
 [evidence](../../../Documentation/Implementation/m2_music_timing.md) and
@@ -71,8 +72,8 @@ through inspector-owned state.
 World sounds shows the current sample boundary, pending count, submission/refusal,
 delivery/coalescing/failure counts, durable failed boundary, raw pending messages,
 retained-bank presence and submission bank latches alongside current channel state.
-The selected-band diagnostic can schedule a midpoint note half a second later and
-stop it after another half second. Drawing never advances this queue. The gain is
+The selected-section band diagnostic now uses its actual IMA tempo for a one-quarter
+delay and one-quarter note duration. Drawing never advances this queue. The gain is
 an explicitly labelled 20% audition value, not the game's music volume.
 
 Tests cover out-of-order input, equal-time controls/programs, cross-batch note
@@ -83,4 +84,4 @@ sizes and hidden clocks. The NVIDIA smoke schedules a synthetic phrase after the
 actual selected-band setup; a far-future note remains queued for unload and must
 be absent after reload. These are transport diagnostics, not original soundtrack
 or listening-parity evidence. Unsupported receiver controllers, dynamic residency,
-voice stealing, tempo/section/playlist transport and MUSIC remain open.
+voice stealing, running section/playlist transport and MUSIC remain open.

@@ -99,3 +99,7 @@ See [evidence](../../../Documentation/Implementation/m2_music_sections.md),
 The [timeline continuation](music_timeline_contracts.md) now reconciles decoded
 style meter and record times separately. The authored data/timing contract above
 remains unchanged; pitch harmonization and playback are still unavailable.
+
+The later [runtime clock](music_clock_contracts.md) independently implements live
+tempo quantization and event dates. Inspector runtime duration uses the reconciled
+style timeline; the exporter timing above remains explicitly separate.

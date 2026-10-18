@@ -359,14 +359,14 @@ namespace OpenBlood2
                                music.bytes_read);
             ImGui::TextWrapped(
                 "Decoded IMA sections/bands/pattern notes and DLS sample/region data. Live pattern "
-                "activation, curves, personality "
+                "activation, personality "
                 "graphs and playlist playback are not implemented. MUSIC commands "
                 "still report unsupported. Explicit DLS diagnostic notes above use the existing audio output.");
             if (ImGui::TreeNode("Grid cursor (manual steps; no playback)"))
             {
                 ImGui::TextWrapped("Start from an IMA section below. Explicit zero seed/draws, all channels random. "
                                    "Note preparation uses normal-mode harmony and the selected band. No wall clock, "
-                                   "MIDI submission, curves or playlists. Step grid discards active-note tracking.");
+                                   "MIDI submission or playlists. Step grid discards active-note tracking.");
                 ImGui::Text("Section: %s", music.cursor_file.c_str());
                 if (ImGui::Button("Step grid"))
                 {
@@ -561,6 +561,16 @@ namespace OpenBlood2
                                 timing.microseconds_per_quarter);
                 else
                     ImGui::TextWrapped("Timing unavailable: %s", error.c_str());
+                ImaClock clock;
+                const ImaTempo tempo{0, section.tempo, section.tempo_fraction};
+                std::uint64_t duration_frame = 0;
+                if (asset.timeline && clock.prepare(std::span(&tempo, 1), 0, error) &&
+                    clock.sample(asset.timeline->duration, duration_frame, error))
+                    ImGui::Text("IMA runtime tempo %.4f BPM | section duration %.3f s / %llu frames at 48 kHz",
+                                clock.boundaries().front().tempo16 / 16.0, duration_frame / 48000.0,
+                                (unsigned long long)duration_frame);
+                else
+                    ImGui::TextWrapped("Runtime clock unavailable: %s", error.c_str());
                 ImGui::Text("Raw word0 %08x / word38 %d / word48 %08x / default chord %02x", section.word0,
                             section.word38, section.word48, section.default_chord);
                 ImGui::Text("%zu commands / %zu mutes / %zu chords | opaque notes %zu / curves %zu",
@@ -713,25 +723,28 @@ namespace OpenBlood2
                                                        unsigned(region.velocity_high)),
                                             1, .2, error);
                                     }
-                                    if (!regions.empty() && ImGui::SmallButton("Schedule channel note (+0.5 s)"))
+                                    if (asset.section && !regions.empty() &&
+                                        ImGui::SmallButton("Schedule quarter note (section tempo)"))
                                     {
                                         auto& receiver = game.server.audio.instruments;
-                                        const auto now = receiver.sample_clock();
-                                        std::array<DlsTimedMidi, 7> messages;
+                                        ImaClock clock;
+                                        const ImaTempo tempo{0, asset.section->tempo, asset.section->tempo_fraction};
+                                        std::array<ImaTimedMidiMessage, 7> messages;
                                         for (unsigned j = 0; j < 5; ++j)
                                         {
                                             const auto& m = asset.band_setup[ch * 5 + j];
-                                            messages[j] = {now, m.status, m.data1, m.data2};
+                                            messages[j] = {0, m.status, m.data1, m.data2};
                                         }
                                         const auto& r = regions.front();
                                         const auto key = std::uint8_t((r.key_low + r.key_high) / 2);
-                                        messages[5] = {now + DlsSampler::rate / 2, std::uint8_t(0x90 | ((ch + 4) & 15)),
-                                                       key,
+                                        messages[5] = {192, std::uint8_t(0x90 | ((ch + 4) & 15)), key,
                                                        std::uint8_t(std::clamp(100U, unsigned(r.velocity_low),
                                                                                unsigned(r.velocity_high)))};
-                                        messages[6] = {now + DlsSampler::rate, std::uint8_t(0x80 | ((ch + 4) & 15)),
-                                                       key, 0};
-                                        receiver.enqueue(asset.band_bank, messages, .2, error);
+                                        messages[6] = {384, std::uint8_t(0x80 | ((ch + 4) & 15)), key, 0};
+                                        if (clock.prepare(std::span(&tempo, 1), receiver.sample_clock(), error))
+                                            receiver.enqueue_ima(asset.band_bank, clock, messages, .2, error);
+                                        else
+                                            receiver.last_queue_error = error;
                                     }
                                     if (!regions.empty() && ImGui::SmallButton("Hold channel note (manual MIDI)"))
                                     {

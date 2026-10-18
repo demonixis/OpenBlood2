@@ -231,23 +231,34 @@ namespace OpenBlood2
             !sampler.voices().empty() || sampler.midi_rejected || sampler.midi_received != 86 ||
             sampler.midi_released != 2 || sampler.midi_unmatched_stops)
             return false;
-        // Explicit sample scheduling through the actual audio update, also hidden and after reload.
-        // Source band setup is real; this short test phrase is synthetic, not a MUSIC playlist.
+        // Original tempo conversion reaches actual audio output, also hidden and after reload.
+        // Source band/tempo are real; this short phrase is synthetic, not a MUSIC playlist.
         const auto origin = sampler.sample_clock();
-        std::vector<DlsTimedMidi> scheduled;
+        if (!routed->section)
+            return false;
+        const ImaTempo tempo{0, routed->section->tempo, routed->section->tempo_fraction};
+        ImaClock clock;
+        std::array<std::uint64_t, 4> boundaries;
+        if (!clock.prepare(std::span(&tempo, 1), origin, note_error))
+            return false;
+        for (unsigned i = 0; i < 4; ++i)
+            if (!clock.sample(2 * (i + 1), boundaries[i], note_error))
+                return false;
+        std::vector<ImaTimedMidiMessage> scheduled;
         for (const auto& m : routed->band_setup)
-            scheduled.push_back({origin, m.status, m.data1, m.data2});
-        scheduled.push_back({origin + 960, 0x84, midi_key, 100}); // Deliberately submitted before its note-on.
-        scheduled.push_back({origin + 240, 0x94, midi_key, 100});
-        scheduled.push_back({origin + 480, 0xb4, 7, 0});
-        scheduled.push_back({origin + 720, 0xb4, 7, std::uint8_t(channel.controllers.volume)});
-        if (!sampler.enqueue(routed->band_bank, scheduled, .2, note_error) || !sampler.voices().empty() ||
-            !g.server.advance_audio(.004, {}, {}) || !sampler.voices().empty() ||
-            !g.server.advance_audio(.003, {}, {}) || sampler.voices().size() != 1 || sampler.voices()[0].frames != 96 ||
-            !g.server.advance_audio(.004, {}, {}) || sampler.voices()[0].gain != 0 ||
-            !g.server.advance_audio(.004, {}, {}) || sampler.voices()[0].gain <= 0 ||
-            !g.server.advance_audio(.006, {}, {}) || !sampler.voices().empty() || !sampler.pending_midi().empty() ||
-            sampler.sample_clock() != origin + 1008 || sampler.queued_messages != 84 ||
+            scheduled.push_back({0, m.status, m.data1, m.data2});
+        scheduled.push_back({8, 0x84, midi_key, 100}); // Deliberately submitted before its note-on.
+        scheduled.push_back({2, 0x94, midi_key, 100});
+        scheduled.push_back({4, 0xb4, 7, 0});
+        scheduled.push_back({6, 0xb4, 7, std::uint8_t(channel.controllers.volume)});
+        auto advance_to = [&](std::uint64_t frame)
+        { return g.server.advance_audio(double(frame - sampler.sample_clock()) / DlsSampler::rate, {}, {}); };
+        if (!sampler.enqueue_ima(routed->band_bank, clock, scheduled, .2, note_error) || !sampler.voices().empty() ||
+            !advance_to(boundaries[0] - 1) || !sampler.voices().empty() || !advance_to(boundaries[0] + 1) ||
+            sampler.voices().size() != 1 || sampler.voices()[0].frames != 1 || !advance_to(boundaries[1]) ||
+            sampler.voices()[0].gain != 0 || !advance_to(boundaries[2]) || sampler.voices()[0].gain <= 0 ||
+            !advance_to(boundaries[3] + 48) || !sampler.voices().empty() || !sampler.pending_midi().empty() ||
+            sampler.sample_clock() != boundaries[3] + 48 || sampler.queued_messages != 84 ||
             sampler.dispatched_messages != 52 || sampler.dispatch_failures || sampler.queue_rejected ||
             sampler.coalesced_messages)
             return false;

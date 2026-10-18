@@ -1378,3 +1378,7 @@ Independent typed integration of the installed MSynth25 note/channel selection i
 ## Original timed MIDI queue (2026-10-18)
 
 Independent bounded scheduling using original MSynth25 insertion, due-value lookup and program bank-capture rules, checked by isolated execution. No commercial bytes imported. See [source ledger](sources/m2_music_timing_sources.json), [contracts](../contracts/music_timing_contracts.md) and [evidence](../../../Documentation/Implementation/m2_music_timing.md). Explicit sample times are a portable interface; original IMA musical time/playlist activation remains separate.
+
+## Original IMA runtime tempo clock (2026-10-18)
+
+Independent bounded value arithmetic and queue integration derived from read-only IMRT25 routine execution. No commercial bytes imported. See [source ledger](sources/m2_music_clock_sources.json), [contracts](../contracts/music_clock_contracts.md) and [evidence](../../../Documentation/Implementation/m2_music_clock.md). Native timer behavior and selectable old sample rates are replaced by the existing 48 kHz audio clock.

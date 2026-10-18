@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "603ac0c8c5036a8803a2092beaaeb3e9b7e81178",
+  "approach": "Independent portable tick mapping and queue integration; original installed runtime checked in isolated emulation, no commercial bytes imported",
+  "sources": [
+    {
+      "path": "IMRT25.DLL (external original install)",
+      "sha256": "2dc50ca832084601d1f10ac9d5f5fc67fd153154cd244db1a55a3147c70d7bd2",
+      "rva_ranges": [
+        "0x29b2..0x2a3d normal-speed tempo node constructor and clamp",
+        "0x2a3e..0x2ae7 chained 100ns boundary accumulation",
+        "0x1c12..0x1cc0 tempo lookup and event tick-to-millisecond conversion",
+        "0x1fa9..0x1fcf original MIDI delivery uses converted milliseconds"
+      ],
+      "use": "Clamp, quantization, original boundary fraction carry and last-due selection; MulDiv import modelled, not natively executed"
+    },
+    {
+      "path": "MSynth25.dll (external original install)",
+      "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+      "rva_ranges": [
+        "0x3e58..0x3e8f input-millisecond to sample conversion",
+        "0x25c0..0x25f0 rate divisors"
+      ],
+      "use": "Verified receiver unit; replaced selectable old output rates with existing 48 kHz rate"
+    },
+    {
+      "path": "src/engine/ima_section.cpp, dls_midi_queue.cpp and audio.cpp",
+      "use": "Existing authored tempo fields, atomic sample scheduler and shared audio lifetime"
+    }
+  ],
+  "limits": [
+    "At most 4096 ordered tempo points starting at tick zero; positive authored tempo, nonnegative ticks, signed-32 milliseconds and checked uint64 sample origins",
+    "Normal speed only; no tempo multiplier, negative jitter scheduling, seek or re-timing queued events",
+    "Clock conversion and diagnostic audition only; running sections, playlist/MUSIC activation and actual M2 gate remain incomplete",
+    "Emulated clock does not establish original PCM or listening/native platform equivalence"
+  ],
+  "frozen_sources": {
+    "CMakeLists.txt": "d2fac91241d27d7b0e35046a96a644a281cc0ad1e0720a2d6b7b9f83149f1532",
+    "src/engine/ima_clock.h": "ad19c156633f669d104ed28c55e49e36fb63d6396b3874d066d66d4c94d55d1f",
+    "src/engine/ima_clock.cpp": "b19be332fec6b671eb0894b628880646e77d2bc5a5c5dfddd43748b87632131f",
+    "src/engine/dls_sampler.h": "6dc6adf9bd15f884200667794d85bd128d7ad81a8b46f63329bd530b7301c0b4",
+    "src/engine/dls_midi_queue.cpp": "cc91b2eb4e4f70d78bc1385151cc3d1f8ddf376c03f502c897a79e917922badb",
+    "src/app/inspector_world_sounds.cpp": "071d9c7341d26eb65eca246f869c57331d5d1cf64b68fa8d533a42f4def1d012",
+    "src/app/world_sound_smoke.cpp": "cf5ca52bac55ec478d947ffb56231d20c1a997aa9610b6c9629c9d13ca4ea693",
+    "tests/ima_clock_tests.cpp": "8c4cd617aff6ddfea7509c0e10d5de6b8e2aaed2ac4bd02773385f71ce6942a0",
+    "tests/CMakeLists.txt": "8ee969934d5081c6492775d7e1935e5be13900ac2a1890901d277aad136a8752"
+  }
+}

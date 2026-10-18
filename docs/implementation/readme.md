@@ -66,3 +66,5 @@ the original log or patch.
 - [Immediate MIDI channel delivery](../../../Documentation/Implementation/m2_music_midi_receiver.md): real voice mutation and original lifetime selection, with explicit transport limits.
 
 - [Timed MIDI delivery](../../../Documentation/Implementation/m2_music_timing.md): queued notes/controllers on the existing audio clock; IMA transport and MUSIC remain incomplete.
+
+- [IMA runtime clock](../../../Documentation/Implementation/m2_music_clock.md): checked original tempo conversion; running sections/playlists and MUSIC remain incomplete.

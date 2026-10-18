@@ -1,5 +1,7 @@
 #pragma once
 #include "engine/dls_bank.h"
+#include "engine/ima_clock.h"
+#include "engine/ima_note_event.h"
 #include <array>
 #include <memory>
 #include <optional>
@@ -87,6 +89,9 @@ namespace OpenBlood2
         // Atomic batch admission. Original bank selects are submission-time latches;
         // programs capture those latches, controls/programs take effect at their sample boundary.
         // Notes at equal times retain submission order and see the last due channel values.
+        // Convert original IMA event ticks before the same atomic sample-queue admission.
+        bool enqueue_ima(std::shared_ptr<const DlsBank>, const ImaClock&, std::span<const ImaTimedMidiMessage>,
+                         double gain, std::string& error);
         bool enqueue(std::shared_ptr<const DlsBank>, std::span<const DlsTimedMidi>, double gain, std::string& error);
         const auto& pending_midi() const
         {

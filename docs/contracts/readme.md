@@ -202,3 +202,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Immediate MIDI receiver](music_midi_receiver_contracts.md): checked channel controls, held notes and original repeat/stop selection; timed transport remains unavailable.
 
 - [Timed MIDI delivery](music_timing_contracts.md): sample-boundary dispatch, original queue order, bank capture and checked world lifetime.
+
+- [IMA runtime clock](music_clock_contracts.md): original tempo boundaries and tick-to-sample queue conversion.
