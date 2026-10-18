@@ -22,6 +22,7 @@ namespace OpenBlood2
         FreeFall = 8,
         Blind = 9,
         Slow = 10,
+        Electric = 13, // Laser and lightning (Tesla alternate, TeslaBall bolts).
         Acid = 14
     };
     struct Damage

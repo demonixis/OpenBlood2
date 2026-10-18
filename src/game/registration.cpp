@@ -46,6 +46,7 @@
 #include "game/original/SoundFX.h"
 #include "game/original/Spawner.h"
 #include "game/original/TripLaser.h"
+#include "game/original/TeslaProjectile.h"
 #include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
 #include "game/original/WeaponPickups.h"
@@ -127,6 +128,9 @@ namespace OpenBlood2
         const ClassInfo proximity{"CProximityBomb", &base, construct<CProximityBomb>, {}};
         const ClassInfo grenade{"CGrenade", &base, construct<CGrenade>, {}};
         const ClassInfo flare_projectile{"CFlareProjectile", &base, construct<CFlareProjectile>, {}};
+        const ClassInfo tesla_projectile{"CTeslaProjectile", &base, construct<CTeslaProjectile>, {}};
+        const ClassInfo tesla_bolt{"CTeslaBoltProjectile", &base, construct<CTeslaBoltProjectile>, {}};
+        const ClassInfo tesla_ball{"CTeslaBallProjectile", &base, construct<CTeslaBallProjectile>, {}};
         const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {}};
         const ClassInfo flare_burst{"CFlareBurstProjectile", &base, construct<CFlareBurstProjectile>, {}};
         const ClassInfo energy_projectile{"CEnergyBlastProjectile", &base, construct<CEnergyBlastProjectile>, {}};
@@ -649,6 +653,7 @@ namespace OpenBlood2
         const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
         const ClassInfo assault_pickup{"AssaultRiflePU", &weapon_pickup, construct<AssaultRiflePU>, {}};
         const ClassInfo flare_pickup{"FlareGunPU", &weapon_pickup, construct<FlareGunPU>, {}};
+        const ClassInfo tesla_pickup{"TeslaCannonPU", &weapon_pickup, construct<TeslaCannonPU>, {}};
         const ClassInfo mac10_pickup{"SubMachineGunPU", &weapon_pickup, construct<SubMachineGunPU>, {}};
         const ClassInfo sniper_pickup{"SniperRiflePU", &weapon_pickup, construct<SniperRiflePU>, {}};
         const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}};
@@ -979,6 +984,7 @@ namespace OpenBlood2
                objects.register_class(medkit_pickup) && objects.register_class(flashlight_pickup) &&
                objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
                objects.register_class(assault_pickup) && objects.register_class(flare_pickup) &&
+               objects.register_class(tesla_pickup) &&
                objects.register_class(mac10_pickup) && objects.register_class(sniper_pickup) &&
                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
                objects.register_class(health_base) && objects.register_class(armor_base) &&
@@ -998,6 +1004,8 @@ namespace OpenBlood2
                objects.register_class(gib) && objects.register_class(corpse) && objects.register_class(proximity) &&
                objects.register_class(remote) && objects.register_class(grenade) &&
                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
+               objects.register_class(tesla_projectile) && objects.register_class(tesla_bolt) &&
+               objects.register_class(tesla_ball) &&
                objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
                objects.register_class(howitzer_shell) && objects.register_class(shockwave_projectile);
     }

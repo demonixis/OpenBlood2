@@ -36,6 +36,7 @@ namespace
             case DamageType::FreeFall:
             case DamageType::Blind:
             case DamageType::Slow:
+            case DamageType::Electric:
             case DamageType::Acid:
                 break;
             default:

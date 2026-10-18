@@ -33,6 +33,11 @@ class FlareGunPU : public WeaponPickup
   public:
     FlareGunPU();
 };
+class TeslaCannonPU : public WeaponPickup
+{
+  public:
+    TeslaCannonPU();
+};
 // The sniper rifle weapon is not integrated: the player inventory refuses the
 // offer and the pickup stays in the world (see fanatic_prophet_contracts.md).
 class SniperRiflePU : public WeaponPickup

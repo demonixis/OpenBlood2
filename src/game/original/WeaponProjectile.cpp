@@ -10,7 +10,8 @@ FireResult CWeapon::FireProjectile()
     if (!server || !m_pInventoryMgr || !firing || !server->IsObjectAlive(m_hOwner))
         return last_shot.result = FireResult::Invalid;
     const bool alt = last_shot.request.alternate;
-    const auto* name = alt ? data.m_szAltProjectileClass : data.m_szProjectileClass;
+    const auto* name = alt ? (alt_projectile_class ? alt_projectile_class : data.m_szAltProjectileClass)
+                           : data.m_szProjectileClass;
     if (!name)
         return last_shot.result = FireResult::Unavailable;
     ObjectCreateStruct state;
@@ -33,4 +34,18 @@ FireResult CWeapon::FireProjectile()
     }
     projectile = instance->m_hObject;
     return last_shot.result = FireResult::Fired;
+}
+void CTeslaCannon::BeginFire(bool alternate)
+{
+    if (!alternate)
+        return;
+    ++numAltFires;
+    alt_projectile_class = numAltFires == 2 ? "CTeslaBallProjectile" : "CTeslaBoltProjectile";
+}
+FireResult CTeslaCannon::FireProjectile()
+{
+    // The alternate shot's SFX_LIGHTNING_ID beam to the first solid hit is client-only.
+    if (last_shot.request.alternate)
+        ++lightning_unavailable;
+    return CWeapon::FireProjectile();
 }

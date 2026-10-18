@@ -53,7 +53,7 @@ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original
 target_sources(blood2_game PRIVATE src/game/original/WeaponPickups.cpp src/game/server_pickups.cpp src/game/original/PickupObject.cpp
     src/game/original/ItemPickups.cpp src/game/original/GameInvItems.cpp src/game/original/Flashlight.cpp src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp
     src/game/original/Spawner.cpp src/game/original/TripLaser.cpp src/game/original/Fanatic.cpp src/game/original/Prophet.cpp
-    src/game/original/CabalAttack.cpp src/game/original/HowitzerShell.cpp)
+    src/game/original/CabalAttack.cpp src/game/original/HowitzerShell.cpp src/game/original/TeslaProjectile.cpp)
 target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp src/game/original/PlayerPowers.cpp)
 target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
     src/game/server_activation.cpp src/game/original/AIRuntime.cpp

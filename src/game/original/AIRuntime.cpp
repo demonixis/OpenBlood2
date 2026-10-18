@@ -34,7 +34,7 @@ namespace
                                              {"ORB", 0, false},
                                              {"LASER", 0, false},
                                              {"LIFEL", 0, false},
-                                             {"TESLA", 0, false},
+                                             {"TESLA", WEAP_TESLACANNON, true},
                                              {"MELEE", WEAP_MELEE, true},
                                              {"SINGULAR", 0, false},
                                              {"NONE", 0, true},

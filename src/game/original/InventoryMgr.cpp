@@ -204,6 +204,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         weapon = std::make_unique<CAssaultRifle>();
     else if (type == WEAP_FLAREGUN)
         weapon = std::make_unique<CFlareGun>();
+    else if (type == WEAP_TESLACANNON)
+        weapon = std::make_unique<CTeslaCannon>();
     else if (type == WEAP_MELEE)
         weapon = std::make_unique<CMelee>();
     else if (type == WEAP_NAGA_EYEBEAM)

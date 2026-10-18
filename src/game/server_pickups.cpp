@@ -32,7 +32,7 @@ namespace OpenBlood2
         for (auto name : {"BulletAmmoPU",  "ShellAmmoPU",     "BMGAmmoPU",      "FlareAmmoPU",  "DieBugDieAmmoPU",
                           "HowitzerAmmoPU", "FuelAmmoPU",      "BatteryAmmoPU",  "HealthPU",     "MegaHealthPU",
                           "WardPU",         "NecroWardPU",     "MedKitPU",       "FlashlightPU", "ProximitiesPU",
-                          "RemotesPU",      "BerettaPU",       "SubMachineGunPU", "FlareGunPU",  "AssaultRiflePU",
+                          "RemotesPU",      "BerettaPU",       "SubMachineGunPU", "FlareGunPU",  "AssaultRiflePU", "TeslaCannonPU",
                           "Fanatic",        "Prophet"})
             supported |= same_name(type, name);
         Properties parsed;

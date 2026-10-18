@@ -25,6 +25,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
             value = false;
         }
     } reset{firing};
+    BeginFire(request.alternate);
     auto* server = BaseClass::GetServerDE();
     if (!server || !m_pInventoryMgr || !server->IsObjectAlive(m_hOwner) || request.weapon != data.m_nType ||
         request.left != m_bLeftHand ||

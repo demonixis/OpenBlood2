@@ -125,7 +125,7 @@ namespace OpenBlood2
             (value.type != DamageType::Fire && value.type != DamageType::Normal && value.type != DamageType::Melee &&
              value.type != DamageType::Explode && value.type != DamageType::Suffocate &&
              value.type != DamageType::Death && value.type != DamageType::FreeFall && value.type != DamageType::Blind &&
-             value.type != DamageType::Slow && value.type != DamageType::Acid))
+             value.type != DamageType::Slow && value.type != DamageType::Electric && value.type != DamageType::Acid))
         {
             m->bad = true;
             return DE_INVALIDPARAMS;

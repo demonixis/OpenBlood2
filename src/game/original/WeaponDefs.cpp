@@ -241,6 +241,65 @@ namespace
             "interface\\statusbar\\weapons\\flaregun.pcx",   // Icon for status bar
             "interface\\statusbar\\weapons\\flaregun_h.pcx", // Highlighted icon for status bar
         },
+        // Tesla Cannon
+        {
+            "Models\\Weapons\\TeslaRod_pv.abc",          // Model
+            "Models\\Weapons\\lh_TeslaRod_pv.abc",       // Model
+            "Skins\\Weapons\\C_Tesla_pv_t.dtx",          // Skin
+            "Models\\Powerups\\TeslaCannon_pu.abc",      // 3rd person model
+            "Skins\\Powerups\\TeslaCannon_pu.dtx",       // 3rd person skin
+            WEAP_TESLACANNON,                              // Type
+            TYPE_AUTORIFLE,                                // Fire type
+            AMMO_BATTERY,                                  // Ammo type
+            2,                                             // Ammo Use
+            25,                                            // Alt Ammo Use
+            30.0f,                                         // Min Damage
+            50.0f,                                         // Max Damage
+            100.0f,                                        // Min Alt damage
+            150.0f,                                        // Max Alt damage
+            0.175f,                                        // Reload time
+            1.0f,                                          // Alt reload time
+            {20.0f, 20.0f},                                // Spread
+            {0.0f, 0.0f},                                  // Alt Spread
+            1000.0f,                                       // Projectile Velocity
+            1000.0f,                                       // Alt Projectile Velocity
+            3500.0f,                                       // Range
+            3500.0f,                                       // Alt Range
+            1,                                             // Shots per fire
+            1,                                             // Alt Shots per fire
+            4,                                             // Strength or Magic required
+            0,                                             // Two-handed Strength or Magic required
+            100,                                           // Damage Radius (projectiles)
+            150,                                           // Alt Damage Radius (projectiles)
+            DFALSE,                                        // Alt fire zoom
+            DFALSE,                                        // Semi-auto
+            "Sounds\\Weapons\\Tesla\\fire.wav",          // Fire sound
+            "Sounds\\Weapons\\Tesla\\alt.wav",           // Alt Fire sound
+            "",                                            // Empty weapon sound
+            "",                                            // Alt Empty weapon sound
+            "CTeslaProjectile",                            // Projectile class
+            "CTeslaBallProjectile",                        // Alt Projectile class (CTeslaCannon::Fire overrides)
+            150,                                           // Muzzle Flash radius
+            {0.2f, 0.2f, 1.0f},                            // Muzzle Flash color
+            "Tesla Cannon",                                // Name
+            IDS_WEAPON_TESLA,                              // Name ID (resource)
+            "Sprites\\teslamuzzle.spr",                    // flash sprite name
+            "Sprites\\teslaflash.spr",                     // alt flash Sprite name
+            0.25f,                                         // Flash duration
+            0.1f,                                          // Flash scale
+            {0.0f, 0.0f, 0.0f},                            // 3rd person gun offset
+            {0.5f, -0.9f, 1.4f},                           // Gun Offset
+            {0.15f, 0.3f, 5.0f},                           // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                         // Recoil
+            {5.0f, -5.0f, 30.0f},                          // Flash position
+            0.625f,                                        // Eject interval
+            0.0f,                                          // View kick
+            DFALSE,                                        // View kick is Cumulative
+            DTRUE,                                         // Animation looping
+            DFALSE,                                        // Alt anim looping
+            "interface\\statusbar\\weapons\\tesla.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\tesla_h.pcx", // Highlighted icon for status bar
+        },
         // Ingram Mac-10 Sub-machine Gun
         {
             "Models\\Weapons\\Mac10_pv.abc",              // Model

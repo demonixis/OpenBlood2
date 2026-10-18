@@ -81,9 +81,12 @@ class CWeapon
     }
     float CheckAmmo(bool alternate = false) const;
     FireResult Fire(const OpenBlood2::WeaponFire&);
+    // Subclass Fire() prologue, called on every accepted Fire request before ammo checks.
+    virtual void BeginFire(bool /*alternate*/) {}
     virtual const char* FireSound(bool alternate) const;
     virtual FireResult FireProjectile();
     HOBJECT projectile = nullptr; // Checked independent runtime child, never owning.
+    const char* alt_projectile_class = nullptr; // Source m_szAltProjectileClass override.
     std::string projectile_error;
     virtual FireResult FireVector();
     std::vector<WeaponImpact> impacts; // Latest validated shot attempt, bounded to 64 contacts.
@@ -167,6 +170,17 @@ class CFlareGun final : public CWeapon
 {
   public:
     CFlareGun() : CWeapon(WEAP_FLAREGUN) {}
+};
+// Original CTeslaCannon: only the second alternate shot since creation is a ball;
+// the source never initializes or resets numAltFires (SetSpecialData has no caller).
+class CTeslaCannon final : public CWeapon
+{
+  public:
+    CTeslaCannon() : CWeapon(WEAP_TESLACANNON) {}
+    DDWORD numAltFires = 0;
+    std::uint64_t lightning_unavailable = 0;
+    void BeginFire(bool alternate) override;
+    FireResult FireProjectile() override;
 };
 class CSubMachineGun final : public CWeapon
 {

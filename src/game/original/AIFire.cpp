@@ -124,6 +124,7 @@ bool AI_Mgr::Fire(bool alternate)
         return fail(FireResult::Unavailable, "AI has no current weapon");
     if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_SUBMACHINEGUN &&
         weapon->data.m_nType != WEAP_ASSAULTRIFLE && weapon->data.m_nType != WEAP_FLAREGUN &&
+        weapon->data.m_nType != WEAP_TESLACANNON &&
         weapon->data.m_nType != WEAP_MELEE && weapon->data.m_nType != WEAP_NAGA_EYEBEAM &&
         weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST && weapon->data.m_nType != WEAP_GIDEON_WIND &&
         weapon->data.m_nType != WEAP_GIDEON_SHIELD)
