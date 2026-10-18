@@ -119,7 +119,9 @@ class ServerDE : public CSBase
     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
     virtual float GetWorldTime() = 0;
     virtual OpenBlood2::SegmentResult CastRay(DVector, DVector, OpenBlood2::SegmentHit&, HOBJECT ignore = nullptr) = 0;
-    virtual OpenBlood2::SegmentResult CastWorldRay(DVector, DVector, OpenBlood2::SegmentHit&) = 0;
+    virtual OpenBlood2::SegmentResult CastWorldRay(DVector from, DVector direction, OpenBlood2::SegmentHit&) = 0;
+    virtual OpenBlood2::SegmentResult IntersectWorldSegment(DVector from, DVector to,
+                                                          OpenBlood2::SegmentHit&) = 0;
     virtual OpenBlood2::SegmentResult IntersectSegment(
         DVector from, DVector to, HOBJECT ignore, OpenBlood2::SegmentHit&, bool fire_through = false,
         OpenBlood2::SegmentObjects objects = OpenBlood2::SegmentObjects::SolidOnly,

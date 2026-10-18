@@ -27,7 +27,9 @@ namespace
         std::string error;
         CHECK(g.resources.mount_game(config, error));
         WorldModel floor;
-        floor.points = {{-4000, 0, -4000}, {4000, 0, -4000}, {4000, 0, 4000}, {-4000, 0, 4000}};
+        // Source gib launch speeds can carry fragments beyond 4000 units and keep
+        // them airborne for more than eight seconds. Keep their landing on this fixture.
+        floor.points = {{-20000, 0, -20000}, {20000, 0, -20000}, {20000, 0, 20000}, {-20000, 0, 20000}};
         floor.surfaces.resize(1);
         floor.surfaces[0].flags = 1;
         floor.polygons = {{0, {0, 1, 2, 3}}};
@@ -130,15 +132,27 @@ namespace
                   g.server.flesh_gibs.active.front().position.y == initial_position.y);
             CHECK(g.objects.engine_message(h, MID_UPDATE, nullptr) && g.objects.finish_frame() && !g.objects.get(h));
             CHECK(g.server.flesh_gibs.active.size() == count);
-            for (int i = 0; i < 400; ++i)
+            for (int i = 0; i < 800; ++i)
                 CHECK(step(g, .02));
             unsigned impacts = 0;
             for (const auto& f : g.server.flesh_gibs.active)
             {
-                CHECK(f.error.empty() && f.sound_error.empty());
+                if (!f.error.empty() || !f.sound_error.empty() || !f.resting)
+                    std::cerr << "Unsettled fragment " << f.id << ": position=" << f.position.x << ',' << f.position.y
+                              << ',' << f.position.z << " velocity=" << f.velocity.x << ',' << f.velocity.y << ','
+                              << f.velocity.z << " impacts=" << f.impacts << " error=" << f.error
+                              << " sound=" << f.sound_error << '\n';
+                CHECK(f.error.empty() && f.sound_error.empty() && f.resting);
                 impacts += f.impacts;
             }
             CHECK(impacts > 0);
+            CHECK(g.server.audio.voices().empty());
+            for (int i = 0; i < 100; ++i)
+                CHECK(step(g, .02));
+            unsigned settled_impacts = 0;
+            for (const auto& f : g.server.flesh_gibs.active)
+                settled_impacts += f.impacts;
+            CHECK(settled_impacts == impacts && g.server.audio.voices().empty());
             const auto id = g.server.flesh_gibs.active.back().id;
             std::string error;
             CHECK(!g.server.PublishFleshGibs(nullptr, {}, {}, {1, 1, 1}, 1, 2, error) && !error.empty());

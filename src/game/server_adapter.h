@@ -195,7 +195,8 @@ namespace OpenBlood2
                                 BodyPlacement&) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
         SegmentResult CastRay(DVector, DVector, SegmentHit&, HOBJECT ignore = nullptr) override;
-        SegmentResult CastWorldRay(DVector, DVector, SegmentHit&) override;
+        SegmentResult CastWorldRay(DVector from, DVector direction, SegmentHit&) override;
+        SegmentResult IntersectWorldSegment(DVector from, DVector to, SegmentHit&) override;
         SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false,
                                        SegmentObjects objects = SegmentObjects::SolidOnly,
                                        SegmentFilter filter = SegmentFilter::None,
