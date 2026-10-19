@@ -222,6 +222,45 @@ namespace OpenBlood2
         r->model_error.clear();
         return DE_OK;
     }
+    DRESULT ServerAdapter::ResolveInitialWorldOverlap(HOBJECT h)
+    {
+        trace_service("ResolveInitialWorldOverlap");
+        auto* r = objects_.get(h);
+        if (!r || r->life != Life::Alive || r->attachment || r->world_model || r->container() || !collision ||
+            !collision_ready || !physics_vector(r->dimensions) || r->dimensions.x <= 0 || r->dimensions.y <= 0 ||
+            r->dimensions.z <= 0 || !(r->state.m_Flags & FLAG_SOLID))
+            return DE_INVALIDPARAMS;
+        const auto half = r->dimensions;
+        const double limit = std::min(half.x, half.z);
+        auto position = r->state.m_Pos;
+        double distance = 0;
+        for (unsigned i = 0; i <= 4; ++i)
+        {
+            CollisionHit overlap;
+            const auto query = collision->sweep(position, position, half, overlap);
+            if (query == CollisionQuery::Invalid)
+                return DE_ERROR;
+            if (query == CollisionQuery::Miss || !overlap.start_solid)
+            {
+                if (distance == 0)
+                    return DE_OK;
+                const auto nudge = vector_subtract(position, r->state.m_Pos);
+                if (TeleportObject(h, &position) != DE_OK)
+                    return DE_ERROR;
+                r->placement_nudge = nudge;
+                ++r->placement_nudges;
+                return DE_OK;
+            }
+            if (i == 4 || !physics_vector(overlap.normal) || !std::isfinite(overlap.penetration))
+                break;
+            const double step = overlap.penetration + .001;
+            distance += step;
+            if (distance > limit)
+                break;
+            position = vector_add(position, vector_scale(overlap.normal, static_cast<float>(step)));
+        }
+        return DE_ERROR; // Atomic: an unresolved placement retains its authored pose.
+    }
     DRESULT ServerAdapter::MoveObjectToGround(HOBJECT h)
     {
         trace_service("MoveObjectToGround");
@@ -246,33 +285,8 @@ namespace OpenBlood2
                 CollisionQuery::Hit &&
             descent.start_solid)
         {
-            const auto half = r->dimensions;
-            const double limit = std::min(half.x, half.z);
-            auto position = r->state.m_Pos;
-            double distance = 0;
-            bool clear = false;
-            for (unsigned i = 0; i <= 4; ++i)
-            {
-                CollisionHit overlap;
-                const auto query = collision->sweep(position, position, half, overlap);
-                if (query == CollisionQuery::Invalid)
-                    return DE_ERROR;
-                clear = query == CollisionQuery::Miss || !overlap.start_solid;
-                if (clear || i == 4 || !physics_vector(overlap.normal) || !std::isfinite(overlap.penetration))
-                    break;
-                const double step = overlap.penetration + .001;
-                distance += step;
-                if (distance > limit)
-                    break;
-                position = vector_add(position, vector_scale(overlap.normal, static_cast<float>(step)));
-            }
-            if (clear && distance > 0 && distance <= limit)
-            {
-                r->placement_nudge = vector_subtract(position, r->state.m_Pos);
-                ++r->placement_nudges;
-                if (TeleportObject(h, &position) != DE_OK)
-                    return DE_ERROR;
-            }
+            // A refused nudge leaves the original MoveObject below to report the contact.
+            ResolveInitialWorldOverlap(h);
         }
         auto from = r->state.m_Pos;
         auto to = from;

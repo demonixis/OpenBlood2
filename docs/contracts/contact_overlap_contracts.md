@@ -84,3 +84,29 @@ planes let it settle, while this sweep cannot start inside a solid body. A thin 
 separates towards its nearer side. This is a bounded replacement placement policy, not
 depenetration during simulation: later moves keep the rules above. Other 06_Airship1 and
 11_Slaughter_House placement failures have different causes and remain open.
+
+## Spawned NPC placement
+
+`ResolveInitialWorldOverlap` extracts that same four-correction, smaller-horizontal-
+half-extent budget into a typed service. `MoveObjectToGround` still invokes it only
+when its original descent starts blocked. Non-world NPC initialization (except
+Gideon) now invokes it once after initial animation dimensions, before simulation.
+This handles Demo_01's `spawn101` at (-1888, 2144, -2384): its newly created
+Fanatic's raw 19-unit half extent overlaps primary polygon 9174 by 3 units.
+Separation moves Z by -3.001 and Y by about -6.135 to clear a second overlap
+with the ceiling. X and launch velocity are unchanged; there is no ground drop.
+
+The source explicitly skips the ground drop for non-world creation
+(`AI_Mgr.cpp` MID_INITIALUPDATE and InitialUpdate). That skip remains: this service
+only separates an initial box from primary-world faces. It does not lower a
+spawned actor, alter the Spawner pose/data, weaken movement collision, or implement
+dynamic-object depenetration. Clear boxes retain their pose; unresolved candidates
+return failure without committing any correction. Existing placement counters
+remain visible for hidden/inactive actors. This is replacement engine placement,
+not verified retail physics.
+
+`demo.spawned_overlap` deliberately triggers the real authored Spawner, verifies
+the original polygon/depth and ceiling overlap, corrected clear box, unchanged velocity, real
+physics at the reported delta and three seconds of subsequent session updates.
+`services.start_departure` also checks no-ground placement, idempotence and atomic
+failure beyond the correction budget. See the [retake evidence](../../../Documentation/Implementation/demo_retakes.md).

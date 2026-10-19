@@ -191,13 +191,23 @@ namespace
         menu.open(false);
         MenuCanvas canvas(resources);
         CHECK(canvas.initialize(error));
+        // Source AddLargeTextItemOption uses the edition's authored fading font.
+        // Build 108 is 41px high; the retail asset is 31px. Do not normalize either.
+        HudCanvas fonts(resources);
+        HudFont large;
+        const auto& art = menu_resources(MenuEdition::Demo);
+        CHECK(fonts.load_font(art.large_bitmaps[0], art.large_font, large, 1) && large.height == 41);
         for (auto page : {MenuPage::Main, MenuPage::Solo, MenuPage::Difficulty, MenuPage::Options, MenuPage::Display,
                           MenuPage::Audio, MenuPage::Mouse})
         {
             menu.build(page);
             CHECK(canvas.compose(menu, 0, error));
             for (const auto& item : menu.items)
+            {
                 CHECK(item.rect.bottom <= 425 && item.rect.right <= 625);
+                if (!menu.small())
+                    CHECK(item.rect.bottom - item.rect.top == int(large.height));
+            }
             auto revision = canvas.revision;
             CHECK(canvas.compose(menu, 0, error) && canvas.revision == revision);
         }

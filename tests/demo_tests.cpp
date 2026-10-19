@@ -5,6 +5,7 @@
 #include "game/original/ExitTrigger.h"
 #include "game/original/Fanatic.h"
 #include "game/original/NewStatusBar.h"
+#include "game/original/Spawner.h"
 #include "game/original/WeaponPickups.h"
 #include "game/server_adapter.h"
 #include "player_fixture.h"
@@ -154,6 +155,53 @@ namespace
                     std::cerr << message << '\n';
                 return false;
             }
+        return true;
+    }
+    bool spawned_overlap(const char* root)
+    {
+        std::string error;
+        GameSession g;
+        CHECK(load(g, root, "Demo_01"));
+        Spawner* spawner = nullptr;
+        const DVector authored{-1888, 2144, -2384};
+        for (auto id : g.objects.snapshot())
+            if (auto* r = g.objects.get(id); r && r->state.m_Pos.x == authored.x &&
+                                                  r->state.m_Pos.y == authored.y && r->state.m_Pos.z == authored.z)
+                spawner = dynamic_cast<Spawner*>(r->game.get());
+        CHECK(spawner && spawner->m_hstrSpawnObject == "Fanatic");
+        // Deliberate delivery to the real authored spawner, not a human walkthrough.
+        auto message = g.server.CreateString("TRIGGER");
+        auto write = g.server.StartMessageToObject(nullptr, spawner->m_hObject, 1000);
+        CHECK(write && g.server.WriteToMessageHString(write, message) == DE_OK);
+        g.server.FreeString(message);
+        CHECK(g.server.EndMessage(write) == DE_OK && spawner->spawned == 1 && spawner->spawn_failures == 0);
+        auto* child = g.objects.get(spawner->last_child);
+        CHECK(child && dynamic_cast<Fanatic*>(child->game.get()));
+        std::cout << "Spawn pose " << child->state.m_Pos.x << ' ' << child->state.m_Pos.y << ' '
+                  << child->state.m_Pos.z << "; nudge " << child->placement_nudge.x << ' ' << child->placement_nudge.y
+                  << ' ' << child->placement_nudge.z << '\n';
+        CHECK(child->placement_nudges == 1 && child->placement_nudge.z < -3 &&
+              std::abs(child->placement_nudge.z + 3.001f) < .001f);
+        CHECK(child->state.m_Pos.x == authored.x && child->placement_nudge.x == 0);
+        // Separating from the wall exposes a second initial overlap: the ceiling.
+        CHECK(child->placement_nudge.y < -6 && child->placement_nudge.y > -7 &&
+              child->state.m_Pos.y == authored.y + child->placement_nudge.y);
+        CHECK(child->velocity.x == 0 && child->velocity.y == 500 && child->velocity.z == 0);
+        CollisionHit hit;
+        CHECK(g.collision.sweep(authored, authored, child->dimensions, hit) == CollisionQuery::Hit &&
+              hit.start_solid && hit.polygon == 9174 && std::abs(hit.penetration - 3) < .001);
+        const DVector wall_clear{authored.x, authored.y, child->state.m_Pos.z};
+        CHECK(g.collision.sweep(wall_clear, wall_clear, child->dimensions, hit) == CollisionQuery::Hit &&
+              hit.start_solid && hit.normal.y < -.99f && hit.penetration > 6 && hit.penetration < 7);
+        CHECK(g.collision.sweep(child->state.m_Pos, child->state.m_Pos, child->dimensions, hit) == CollisionQuery::Miss);
+        // Same upward motion and frame delta as the reported failure, through real physics.
+        CHECK(g.server.advance_physics(.01379385));
+        CHECK(child->body_steps > 0 && child->placement_nudges == 1);
+        CHECK(g.collision.sweep(child->state.m_Pos, child->state.m_Pos, child->dimensions, hit) == CollisionQuery::Miss);
+        CHECK(advance(g, 180));
+        CHECK(g.objects.get(spawner->last_child) == child && child->life == Life::Alive);
+        std::cout << "Demo_01 spawn101: polygon 9174/depth 3 and ceiling overlap reproduced; bounded placement, "
+                     "no ground drop, unchanged launch velocity, real physics and 3s session passed\n";
         return true;
     }
     bool send_exit(GameSession& g)
@@ -397,6 +445,8 @@ int main(int argc, char** argv)
     if (argc < 2)
         return 2;
     const std::string mode = argv[1];
+    if (mode == "spawned_overlap" && argc == 3)
+        return spawned_overlap(argv[2]) ? 0 : 1;
     if (mode == "flow")
         return flow() ? 0 : 1;
     if (argc != 3)

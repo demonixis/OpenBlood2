@@ -329,6 +329,15 @@ namespace
         r->state.m_Pos = {-1, 5, 0};
         CHECK(g.server.MoveObjectToGround(h) == DE_ERROR && r->placement_nudges == 1 && r->state.m_Pos.x == -1 &&
               r->state.m_Pos.y == 5);
+        CHECK(g.server.ResolveInitialWorldOverlap(h) == DE_ERROR && r->placement_nudges == 1 &&
+              r->state.m_Pos.x == -1 && r->state.m_Pos.y == 5);
+        // Spawn placement uses the same bounded separation without the world-only ground drop.
+        r->dimensions = {2, 2, 2};
+        r->state.m_Pos = {.5f, 5, 0};
+        r->velocity = {0, 500, 0};
+        CHECK(g.server.ResolveInitialWorldOverlap(h) == DE_OK && r->placement_nudges == 2);
+        CHECK(std::abs(r->state.m_Pos.x - 2.001f) < .001f && r->state.m_Pos.y == 5 && r->velocity.y == 500);
+        CHECK(g.server.ResolveInitialWorldOverlap(h) == DE_OK && r->placement_nudges == 2);
         return true;
     }
     bool collision_traversal()
