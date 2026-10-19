@@ -1,8 +1,11 @@
 # OpenBlood2
 
 A preservation project rebuilding **Blood II: The Chosen** with its original game
-code and a new, small, portable C++20 engine. The stack uses CMake, pinned SDL3
-`main`, SDL_GPU, spdlog and Dear ImGui for in-game inspection.
+code and a new, small, portable C++20 engine.
+
+The project supports Windows, Linux and MacOS with plans to support Android, iOS and VR.
+
+An internal debugger can be toggled by pressing the `F10` key.
 
 ## Status
 

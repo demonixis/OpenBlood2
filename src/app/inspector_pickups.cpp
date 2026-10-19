@@ -57,6 +57,20 @@ namespace OpenBlood2
             }
             else
                 ImGui::TextUnformatted("Flashlight: not collected (L after collection)");
+            if (const auto& item = player->m_InventoryMgr.goggles)
+            {
+                ImGui::Text("Night goggles (N): %u / 100, %.3f seconds, active %d", item->count, item->remaining,
+                            item->active);
+                ImGui::TextWrapped("Item: %s", item->error.c_str());
+            }
+            if (const auto& item = player->m_InventoryMgr.eye)
+            {
+                ImGui::Text("TheEye (I): owned %d, deployed %d, active %d", item->available,
+                            game.server.IsObjectAlive(item->eye), item->active);
+                ImGui::TextWrapped("Item: %s", item->error.c_str());
+            }
+            ImGui::Text("Attached creature: %d / USE hits %u / consecutive %u", game.client_shell.creature != nullptr,
+                        game.client_shell.total_use_hits, game.client_shell.use_hits);
             if (const auto& item = player->m_InventoryMgr.binoculars)
             {
                 ImGui::Text("Binoculars (Z): active %d | server zoom %d type %u | client active %d", item->active,

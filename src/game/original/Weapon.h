@@ -147,16 +147,22 @@ class CWeapRemoteBomb final : public CWeapon
     CWeapRemoteBomb() : CWeapon(WEAP_REMOTEBOMB) {}
     FireResult FireProjectile() override;
 };
-class CWeapProximityBomb final : public CWeapon
+class CWeapProximityBomb : public CWeapon
 {
   public:
-    CWeapProximityBomb() : CWeapon(WEAP_PROXIMITYBOMB) {}
+    explicit CWeapProximityBomb(DBYTE type = WEAP_PROXIMITYBOMB) : CWeapon(type) {}
     FireResult FireProjectile() override;
 };
 class CBeretta final : public CWeapon
 {
   public:
     CBeretta() : CWeapon(WEAP_BERETTA) {}
+};
+// Original CSniperRifle uses the shared vector path; chrome remains unrendered.
+class CSniperRifle final : public CWeapon
+{
+  public:
+    CSniperRifle() : CWeapon(WEAP_SNIPERRIFLE) {}
 };
 // Original CShotgun::Fire only selects shell ejection (a client effect not ported) before
 // CWeapon::Fire, whose FireSpread casts its sixteen vectors.
@@ -265,4 +271,48 @@ class CMelee final : public CWeapon
     {
         damage_type = OpenBlood2::DamageType::Melee;
     }
+};
+
+class CSoulHook final : public CWeapon
+{
+  public:
+    CSoulHook() : CWeapon(WEAP_SOUL_HOOK)
+    {
+        damage_type = OpenBlood2::DamageType::Melee;
+    }
+    void BeginFire(bool) override;
+    const char* FireSound(bool alternate) const override
+    {
+        return !alternate && fire_sound ? fire_sound : CWeapon::FireSound(alternate);
+    }
+    const char* fire_sound = nullptr;
+};
+class CBoneleechSuck : public CWeapon
+{
+  public:
+    explicit CBoneleechSuck(DBYTE type = WEAP_BONELEECH_SUCK) : CWeapon(type)
+    {
+        damage_type = OpenBlood2::DamageType::Melee;
+    }
+    void BeginFire(bool) override;
+    const char* FireSound(bool alternate) const override
+    {
+        return !alternate && fire_sound ? fire_sound : CWeapon::FireSound(alternate);
+    }
+    const char* fire_sound = nullptr;
+};
+
+class CFireball final : public CWeapon
+{
+  public:
+    CFireball() : CWeapon(WEAP_DRUDGE_FIREBALL)
+    {
+        damage_type = OpenBlood2::DamageType::Normal;
+    }
+};
+
+class CBugSpray final : public CWeapon
+{
+  public:
+    CBugSpray() : CWeapon(WEAP_BUGSPRAY) {}
 };

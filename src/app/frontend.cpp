@@ -326,8 +326,8 @@ namespace OpenBlood2
                 neutralize_app_input(shell);
             shell.movement_input = {};
             shell.weapon_input = {};
-            shell.use_down = shell.medkit_down = shell.flashlight_down = shell.proximity_down = shell.remote_down =
-                shell.detonate_down = false;
+            shell.goggles_down = shell.eye_down = shell.binoculars_down = shell.use_down = shell.medkit_down =
+                shell.flashlight_down = shell.proximity_down = shell.remote_down = shell.detonate_down = false;
 #if BLOOD2_INSPECTOR
             inspector.apply_commands(*game, selection);
             if (std::exchange(inspector.play_request, false) && shell.m_bInWorld)
@@ -368,6 +368,8 @@ namespace OpenBlood2
                 shell.medkit_down = input.controls.sample_medkit(false);
                 shell.flashlight_down = input.controls.sample_flashlight(false);
                 shell.binoculars_down = input.controls.sample_binoculars(false);
+                shell.goggles_down = input.controls.sample_goggles(false);
+                shell.eye_down = input.controls.sample_eye(false);
                 shell.proximity_down = input.controls.sample_proximity(false);
                 shell.remote_down = input.controls.sample_remote(false);
                 shell.detonate_down = input.controls.sample_detonate(false);

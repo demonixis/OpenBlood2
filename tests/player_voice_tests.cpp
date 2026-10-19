@@ -192,7 +192,10 @@ namespace
     bool pickup(const std::filesystem::path& root)
     {
         unsigned branches = 0, replies = 0;
-        for (int offset = 0; offset < 40; ++offset)
+        // Scan the seeded stream until all three pickup outcomes are covered.
+        // A fixed short prefix need not contain two successive successful chance draws.
+        unsigned silent = 0;
+        for (int offset = 0; offset < 4096 && !(silent && replies && branches > replies); ++offset)
         {
             GameSession g;
             CHECK(setup(g, root));
@@ -206,6 +209,7 @@ namespace
             CHECK(!g.server.IsObjectAlive(pickup) && p->m_InventoryMgr.CurrentWeapon(true));
             branches += p->weapon_pickup_voice_requests;
             replies += p->voice_messages;
+            silent += p->weapon_pickup_voice_requests == 0;
             CHECK(p->weapon_pickup_voice_requests <= 1 && p->voice_messages <= p->weapon_pickup_voice_requests);
             CHECK(!p->voice_delivery_failures);
             std::string error;
@@ -219,7 +223,7 @@ namespace
             CHECK(g.unload_world());
         }
         std::cout << "accepted pickup branches=" << branches << " group replies=" << replies << '\n';
-        CHECK(branches && replies && replies < branches);
+        CHECK(silent && branches && replies && replies < branches);
         return true;
     }
     bool damage(GameSession& g, HOBJECT owner, float amount, DamageType type, HOBJECT attacker)

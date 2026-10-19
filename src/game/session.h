@@ -17,7 +17,9 @@ namespace OpenBlood2
         EditorOnly,
         Unsupported,
         Filtered,
-        MissingWorldModel, // Engine creation rejected; source row retained, no runtime instance.
+        MissingWorldModel,   // Engine creation rejected; source row retained, no runtime instance.
+        AbsentOriginalClass, // Named, source-audited retired class; never a registered class.
+        MissingResource,     // Known invalid authored references retained without a runtime instance.
         Failed
     };
     const char* entry_state_name(EntryState state);

@@ -53,8 +53,7 @@ class SingularityPU : public WeaponPickup
   public:
     SingularityPU();
 };
-// The sniper rifle weapon is not integrated: the player inventory refuses the
-// offer and the pickup stays in the world (see fanatic_prophet_contracts.md).
+// Original sniper pickup; its weapon/zoom now use the shared inventory path.
 class SniperRiflePU : public WeaponPickup
 {
   public:
@@ -62,3 +61,27 @@ class SniperRiflePU : public WeaponPickup
 };
 const char* WeaponPickupClass(DDWORD type);
 HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector, DRotation, bool include_ammo);
+
+class BugSprayPU : public WeaponPickup
+{
+  public:
+    BugSprayPU();
+};
+
+class HowitzerPU final : public WeaponPickup
+{
+  public:
+    HowitzerPU();
+};
+
+class NapalmCannonPU final : public WeaponPickup
+{
+  public:
+    NapalmCannonPU();
+};
+
+class DeathRayPU final : public WeaponPickup
+{
+  public:
+    DeathRayPU();
+};

@@ -212,7 +212,7 @@ namespace
         CHECK(!world_material_frame(mesh, animation, std::numeric_limits<double>::infinity(), frame));
         mesh.materials[animation].frames[0] = animation;
         CHECK(!world_material_frame(mesh, animation, 0, frame));
-        for (auto name : {"invalid-frame.spr", "absent-frame.spr", "truncated.spr", "unequal.spr"})
+        for (auto name : {"invalid-frame.spr", "absent-frame.spr", "truncated.spr"})
         {
             world.models[0].textures[0] = name;
             CHECK(mesh.build(world, error, &resources));
@@ -223,6 +223,15 @@ namespace
                     rejected = !entry.error.empty() && entry.frames.empty();
             CHECK(rejected);
         }
+        world.models[0].textures[0] = "unequal.spr";
+        CHECK(mesh.build(world, error, &resources));
+        const auto unequal = mesh.ranges[0].batches[0].material;
+        CHECK(unequal != 0 && mesh.materials[unequal].frames.size() == 2);
+        CHECK(world_material_frame(mesh, unequal, 0, frame));
+        CHECK(mesh.materials[frame].image.width == 4 && mesh.materials[frame].image.height == 2);
+        CHECK(world_material_frame(mesh, unequal, .125, frame));
+        CHECK(mesh.materials[frame].image.width == 1 && mesh.materials[frame].image.height == 1);
+        CHECK(mesh.vertices[0].uv[0] == 2 && mesh.vertices[0].uv[1] == -1); // first-frame texture period
         world.models[0].textures[0] = "a.dtx";
         auto& animated = world.models[0];
         animated.surfaces.push_back(animated.surfaces[0]);

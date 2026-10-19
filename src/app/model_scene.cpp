@@ -56,6 +56,8 @@ namespace OpenBlood2
             if (!record || record->life != Life::Alive || record->state.m_ObjectType != OT_MODEL)
                 continue;
             bool visible = (record->state.m_Flags & FLAG_VISIBLE) != 0;
+            if (record->handle == client.seeing_eye)
+                visible = false; // The camera is inside this model; do not draw its interior.
             bool unresolved = false;
             if (record->attachment)
             {
@@ -76,8 +78,9 @@ namespace OpenBlood2
                 }
             }
             if (!scene.add(record->model, record->animation, record->state.m_SkinName,
-                           {record->state.m_Pos, record->state.m_Rotation}, record->state.m_Scale, visible, false, id,
-                           record->state.m_Filename, game.resources, error, record->hidden_nodes, record->alpha))
+                           {record->state.m_Pos, record->state.m_Rotation}, record->state.m_Scale, visible,
+                           (record->state.m_Flags & FLAG_REALLYCLOSE) != 0, id, record->state.m_Filename,
+                           game.resources, error, record->hidden_nodes, record->alpha))
                 return false;
             if (record->alpha < 1)
                 scene.mark_translucent(scene.entries.size() - 1);

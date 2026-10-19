@@ -205,8 +205,10 @@ namespace
         CHECK(check_effects(g, audit, phase, error));
         for (const auto& row : service_coverage(g.server.service_calls))
         {
+            error = std::string(row.name);
             CHECK(row.support != ServiceSupport::Unclassified &&
                   (row.support != ServiceSupport::Unavailable || row.calls == 0));
+            error.clear();
             std::cout << "TRAIN_TRACE\t" << phase << '\t' << row.name << '\t' << service_support_name(row.support)
                       << '\t' << row.calls << '\n';
         }
@@ -366,10 +368,17 @@ namespace
             motion.motion.yrel = (pitch - g.client_shell.rotation.pitch) / .0025f;
             CHECK(input(motion));
             SDL_Event fire{};
-            fire.type = target ? SDL_EVENT_MOUSE_BUTTON_DOWN : SDL_EVENT_MOUSE_BUTTON_UP;
+            // Finish the 30 Hz dry-ammo probe through normal firing after the relay.
+            // Authored pickups may now leave bullets after the last enemy dies.
+            const bool dry_ammo_probe = hz == 30 && trigger->activations && p->m_InventoryMgr.GetWeapon(0)->shots == 0;
+            // Let an alerted, wounded Cultist answer before finishing the first fight.
+            // This exercises a real incoming impulse independently of our kill cadence.
+            const bool receive_fire = hz == 30 && target && !damaged.empty() && p->m_damage.damage_impulses == 0;
+            const bool firing = !receive_fire && (target || dry_ammo_probe);
+            fire.type = firing ? SDL_EVENT_MOUSE_BUTTON_DOWN : SDL_EVENT_MOUSE_BUTTON_UP;
             fire.button.windowID = id;
             fire.button.button = SDL_BUTTON_LEFT;
-            fire.button.down = target != nullptr;
+            fire.button.down = firing;
             CHECK(input(fire));
             const float center = position.z < 2000 ? -32.f : -80.f;
             CHECK(key(SDL_SCANCODE_W, approach));

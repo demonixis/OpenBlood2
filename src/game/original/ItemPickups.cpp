@@ -49,3 +49,26 @@ BinocularsPU::BinocularsPU()
     display_name = "Binoculars";
     resource_id = 304;
 }
+
+TheEyePU::TheEyePU()
+{
+    value = {OpenBlood2::PickupKind::Item, 4, 1};
+    file = "TheEye_pu";
+    display_name = "The Eye";
+    resource_id = 305;
+}
+NightGogglesPU::NightGogglesPU()
+{
+    value = {OpenBlood2::PickupKind::Item, 3, 1};
+    file = "NightGoggles_pu";
+    display_name = "Night Goggles";
+    resource_id = 303;
+}
+
+TimeBombPU::TimeBombPU()
+{
+    value = {OpenBlood2::PickupKind::Item, 9, 1};
+    file = "TimeBomb_pu";
+    display_name = "Time Bomb";
+    resource_id = 308;
+}

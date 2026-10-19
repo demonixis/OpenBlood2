@@ -32,10 +32,10 @@ empty-list leak, every owned name list is released.
 
 The engine owns 30 non-owning generation-checked slots: the actual original
 MAX_SKYOBJECTS is 30, so indices are **0–29**, despite the source comment saying
-0–30. Already registered objects retain their index. Invalid indices, missing or
-pending identities, unsupported object types and a different live object occupying
-the requested slot fail visibly. Duplicate slots reject rather than silently
-replacing the earlier object as the later engine did. Bound world models are the
+0–30. Already registered objects retain their membership even if their slot was replaced.
+A new registration replaces an occupied slot, following later LithTech
+si_AddObjectToSky; re-adding the old member is still a no-op until removal.
+Invalid indices, missing/pending identities and unsupported object types fail visibly. Bound world models are the
 supported subset; sprites, models and polygrids in the sky are not accepted.
 
 Definitions require finite, bounded, increasing outer bounds and nondecreasing

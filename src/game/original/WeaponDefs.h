@@ -6,13 +6,20 @@ inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_FLAREGUN =
                        WEAP_SHIKARI_SPIT = 19, WEAP_SOUL_CROWBAR = 20, WEAP_SOUL_AXE = 21, WEAP_SOUL_PIPE = 22,
                        WEAP_SOUL_HOOK = 23, WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42, WEAP_PROXIMITYBOMB = 49,
                        WEAP_REMOTEBOMB = 50;
+inline constexpr DBYTE WEAP_DRUDGE_FIREBALL = 30, WEAP_BONELEECH_SUCK = 33;
 inline constexpr DBYTE WEAP_TESLACANNON = 13, WEAP_VOODOO = 14;
-inline constexpr DBYTE WEAP_SHOTGUN = 4, WEAP_SINGULARITY = 8;
-inline constexpr DBYTE WEAP_SNIPERRIFLE = 5; // Pickup offer only; the weapon is not integrated.
+inline constexpr DBYTE WEAP_SHOTGUN = 4, WEAP_SINGULARITY = 8, WEAP_BUGSPRAY = 10;
+inline constexpr DBYTE WEAP_SNIPERRIFLE = 5;
+inline constexpr DBYTE WEAP_HOWITZER = 6, WEAP_NAPALMCANNON = 7, WEAP_DEATHRAY = 12, WEAP_ZEALOT_HEAL = 25,
+                       WEAP_ZEALOT_SHIELD = 26, WEAP_ZEALOT_GROUNDFIRE = 28, WEAP_ZEALOT_SHOCKWAVE = 29,
+                       WEAP_THIEF_SUCK = 34, WEAP_NAGA_SPIKE = 39, WEAP_NAGA_DEBRIS = 40, WEAP_TIMEBOMB = 51;
+inline constexpr DBYTE AMMO_HOWITZER = 6, AMMO_ROCKET = 6, AMMO_FUEL = 7, AMMO_TIMEBOMB = 12;
+inline constexpr int IDS_WEAPON_HOWITZER = 356, IDS_WEAPON_NAPALM = 358, IDS_WEAPON_DEATHRAY = 362,
+                     IDS_WEAPON_TIME = 367;
 inline constexpr DBYTE AMMO_PROXIMITYBOMB = 10, AMMO_REMOTEBOMB = 11;
 inline constexpr bool inventory_bomb(DBYTE type)
 {
-    return type == WEAP_PROXIMITYBOMB || type == WEAP_REMOTEBOMB;
+    return type == WEAP_PROXIMITYBOMB || type == WEAP_REMOTEBOMB || type == WEAP_TIMEBOMB;
 }
 // Original InventoryMgr.cpp IsDemoWeapon: the player weapons of the _DEMO build.
 inline constexpr bool IsDemoWeapon(DBYTE type)
@@ -26,7 +33,8 @@ inline constexpr DBYTE TYPE_RIFLE = 0, TYPE_AUTORIFLE = 1, TYPE_PISTOL = 2, TYPE
                        AMMO_BATTERY = 8, AMMO_FOCUS = 9;
 inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_MAC10 = 354, IDS_WEAPON_FLAREGUN = 355,
                      IDS_WEAPON_KNIFE = 366, IDS_WEAPON_M16 = 353, IDS_WEAPON_SNIPER = 352, IDS_WEAPON_TESLA = 364,
-                     IDS_WEAPON_SHOTGUN = 351, IDS_WEAPON_SINGULARITY = 365, IDS_WEAPON_VOODOO = 360;
+                     IDS_WEAPON_SHOTGUN = 351, IDS_WEAPON_SINGULARITY = 365, IDS_WEAPON_BUGSPRAY = 357,
+                     IDS_WEAPON_VOODOO = 360;
 // Weapon spread structure
 typedef struct Spread_t
 {

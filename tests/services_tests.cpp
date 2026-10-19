@@ -289,6 +289,20 @@ namespace
         auto up = DVector{0, 12, 0}, side = DVector{5, 9, 0};
         CHECK(g.server.MoveObject(h, &up) == DE_ERROR && r->state.m_Pos.y == 9 && r->start_departures == 0);
         CHECK(g.server.MoveObject(h, &side) == DE_ERROR && r->state.m_Pos.x == 0);
+        // Solid characters also retain sub-position gravity velocity without turning
+        // an unrepresentable displacement into a failed placement check.
+        r->state.m_Flags |= FLAG_GRAVITY;
+        r->character_body = true;
+        auto solid_still = r->state.m_Pos;
+        CHECK(g.server.advance_physics(1e-7) && r->velocity.y < 0);
+        CHECK(r->state.m_Pos.y == solid_still.y && r->start_departures == 0);
+        CHECK(g.server.MoveObject(h, &solid_still) == DE_ERROR);
+        CHECK(g.server.advance_physics(1. / 60) && r->state.m_Pos.y < solid_still.y && r->start_departures > 0);
+        r->state.m_Flags = FLAG_SOLID;
+        r->character_body = false;
+        r->state.m_Pos = start;
+        r->velocity = {};
+        r->start_departures = 0;
         // The original placement helper lowers a solid body out of the ceiling it starts through.
         CHECK(g.server.MoveObjectToGround(h) == DE_OK);
         CHECK(std::abs(r->state.m_Pos.y - 2) < .01f && r->start_departures == 2 && r->grounded);
@@ -338,6 +352,29 @@ namespace
         CHECK(g.server.ResolveInitialWorldOverlap(h) == DE_OK && r->placement_nudges == 2);
         CHECK(std::abs(r->state.m_Pos.x - 2.001f) < .001f && r->state.m_Pos.y == 5 && r->velocity.y == 500);
         CHECK(g.server.ResolveInitialWorldOverlap(h) == DE_OK && r->placement_nudges == 2);
+        // A center exactly on the wall has two equally near sides. The +x side
+        // is obstructed by a second wall: only the complete opposite solve may commit.
+        auto corridor = cabin_model(true);
+        auto add_wall = [&](float x)
+        {
+            const auto begin = static_cast<std::uint32_t>(corridor.points.size());
+            for (auto p : {DVector{x, 0, -100}, DVector{x, 0, 100}, DVector{x, 10, 100}, DVector{x, 10, -100}})
+                corridor.points.push_back(p);
+            corridor.polygons.push_back({0, {std::uint16_t(begin), std::uint16_t(begin + 1),
+                                              std::uint16_t(begin + 2), std::uint16_t(begin + 3)}});
+        };
+        add_wall(3);
+        CHECK(g.collision.build(corridor, error));
+        r->state.m_Pos = {0, 5, 0};
+        CHECK(g.server.ResolveInitialWorldOverlap(h) == DE_OK && r->placement_nudges == 3);
+        CHECK(std::abs(r->state.m_Pos.x + 2.001f) < .001f && r->state.m_Pos.y == 5 && r->velocity.y == 500);
+        CHECK(g.collision.sweep(r->state.m_Pos, r->state.m_Pos, r->dimensions, hit) == CollisionQuery::Miss);
+        // Both directions blocked: retain the authored pose and counters atomically.
+        add_wall(-3);
+        CHECK(g.collision.build(corridor, error));
+        r->state.m_Pos = {0, 5, 0};
+        CHECK(g.server.ResolveInitialWorldOverlap(h) == DE_ERROR && r->state.m_Pos.x == 0 && r->state.m_Pos.y == 5 &&
+              r->placement_nudges == 3 && r->velocity.y == 500);
         return true;
     }
     bool collision_traversal()

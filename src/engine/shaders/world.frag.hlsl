@@ -14,6 +14,7 @@ cbuffer Light : register(b0, space3)
     // scale) and three float4 per source, as the skinned vertex light.
     float4 modelAmbient, modelColor;
     float4 modelSources[12];
+    float4 sceneColor;
 };
 // Model shadows, pushed once per record. Per caster: tile (u0, v0, size, box top), footprint at
 // the top (min x, min z, 1/size x, 1/size z), (feet, bias, slope x, slope z): a point projects
@@ -108,5 +109,5 @@ float3 illumination(Input input, float shadow)
 float4 main(Input input) : SV_Target0
 {
     float shadow = shadowAmount(input.worldPosition);
-    return float4(albedo.Sample(albedoSampler, input.texCoord).rgb * illumination(input, shadow), 1.0);
+    return float4(albedo.Sample(albedoSampler, input.texCoord).rgb * illumination(input, shadow) * sceneColor.rgb, 1.0);
 }

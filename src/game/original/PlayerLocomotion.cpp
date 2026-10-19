@@ -16,7 +16,8 @@ bool CPlayerObj::UpdateAnim(const PlayerControls& controls)
     DRotation rotation;
     rotation.m_Vec.y = std::sin(m_fYaw * 0.5f);
     rotation.m_Spin = std::cos(m_fYaw * 0.5f);
-    if (server->SetObjectRotation(m_hObject, &rotation) != DE_OK)
+    if ((!m_InventoryMgr.eye || !m_InventoryMgr.eye->active) &&
+        server->SetObjectRotation(m_hObject, &rotation) != DE_OK)
         return false;
     const auto& input = controls.movement;
     command_run = input.run;

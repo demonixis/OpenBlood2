@@ -26,7 +26,13 @@ else()
     set(SDL_DIALOG OFF CACHE BOOL "" FORCE)
 endif()
 set(SDL_TRAY OFF CACHE BOOL "" FORCE)
-set(SDL_NOTIFICATION OFF CACHE BOOL "" FORCE)
+if(APPLE)
+    # This pinned SDL compiles Cocoa notifications unconditionally. Keep their
+    # UserNotifications/Security framework dependencies enabled on Apple builds.
+    set(SDL_NOTIFICATION ON CACHE BOOL "" FORCE)
+else()
+    set(SDL_NOTIFICATION OFF CACHE BOOL "" FORCE)
+endif()
 set(SDL_DISKAUDIO OFF CACHE BOOL "" FORCE)
 
 set(SPDLOG_BUILD_TESTS OFF CACHE BOOL "" FORCE)

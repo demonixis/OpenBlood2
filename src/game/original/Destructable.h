@@ -60,6 +60,7 @@ class CDestructable : public Aggregate
     OpenBlood2::Damage last_damage;
     // Production NPCs enable the original visible-node localization path after table initialization.
     bool ai_hit_localization = false;
+    bool ai_body_hits = false; // Explicit nonhumanoid replacement: no regional damage multiplier.
     struct HitReport
     {
         bool valid = false, random_fallback = false, head_kill = false;

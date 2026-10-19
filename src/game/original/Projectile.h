@@ -43,6 +43,7 @@ class CProjectile : public BaseClass
 class CEnergyBlastProjectile final : public CProjectile
 {
   public:
+    bool divine = false;
     CEnergyBlastProjectile()
     {
         filename = "Sprites\\yellowflare2.spr";
@@ -74,7 +75,7 @@ class CBehemothShockwaveProjectile final : public CProjectile
 
 // Original GameProjectiles.cpp CHowitzerShell: one update casts 3000 units along
 // the shell's forward vector (past its shooter), explodes at the hit and is removed.
-class CHowitzerShell final : public CProjectile
+class CHowitzerShell : public CProjectile
 {
   public:
     CHowitzerShell() : CProjectile(OT_NORMAL)
@@ -84,6 +85,7 @@ class CHowitzerShell final : public CProjectile
     DVector ray_from{}, ray_to{};
     OpenBlood2::SegmentResult ray_result = OpenBlood2::SegmentResult::Unavailable;
     OpenBlood2::SegmentHit ray_hit;
+    bool alternate = false;
     bool skipped_shooter = false, direct_hit = false;
     std::uint64_t orphaned = 0; // Shooter already pending removal at the shell's update.
     OpenBlood2::SceneExplosionReport effect;

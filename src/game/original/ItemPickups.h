@@ -46,7 +46,7 @@ class ItemPickupWeapon : public ItemPickup
         // item, breaks before the multiplayer/USRFLG_GLOW code.
         if (message == MID_INITIALUPDATE && IsDemoBuild())
         {
-            if (value.type == 7 || value.type == 8) // INV_PROXIMITY, INV_REMOTE (INV_TIMEBOMB is unported).
+            if (value.type == 7 || value.type == 8 || value.type == 9) // Original inventory bombs.
                 g_pServerDE->RemoveObject(m_hObject);
         }
         else if (message == MID_INITIALUPDATE)
@@ -63,4 +63,22 @@ class ProximitiesPU : public ItemPickupWeapon
 {
   public:
     ProximitiesPU();
+};
+
+class TheEyePU : public ItemPickupCharged
+{
+  public:
+    TheEyePU();
+};
+
+class NightGogglesPU : public ItemPickupCharged
+{
+  public:
+    NightGogglesPU();
+};
+
+class TimeBombPU final : public ItemPickupWeapon
+{
+  public:
+    TimeBombPU();
 };

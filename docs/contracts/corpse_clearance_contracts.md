@@ -33,8 +33,14 @@ Existing floor-side, wall-crossing, impossible-width, service-lifetime and ordin
 corpse cases stay enabled. The private mouse-combat regression approaches the first
 SubwayA Cultist from a different position, aims lower, fires the original Beretta,
 checks transfer, then kills the following Cultist and walks past both corpses. It
-runs with 30 and 60 simulation updates
-per second, including reload/cleanup. The SDL-window variant uses synthetic events,
+runs with 30 and 60 simulation updates per second, including reload/cleanup.
+Every corpse must keep the raw death-animation dimensions, a clear final box and
+a clear center path from its source anchor. At least one encounter across the two
+runs must exercise `source_sweep`; different valid clips/placements at the other
+cadence need not take that fallback. The generated doorway/lintel cases separately
+require the exact fallback and reject an obstructed swept living body. This keeps
+coverage of that policy without mistaking a valid full-source placement for failure.
+The SDL-window variant uses synthetic events,
 not physical-device or human playtest automation.
 
 This addresses the reproduced doorway case. It does not certify every later enemy

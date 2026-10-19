@@ -1,5 +1,7 @@
 # Original pushable brushes and bounded box physics
 
+The [CityHubC/SteamTunnels extension](cityhubc_steamtunnels_contracts.md) documents the later, narrowly scoped dynamic polygon boundary and authored music filename policies. Historical limits below retain their original scope.
+
 > [World-model debris](world_debris_contracts.md) now connects the selected original
 > fragment activation/lifecycle with bounded replacement motion. Earlier blanket
 > WorldModelDebris omissions below are historical; full retail physics remains open.

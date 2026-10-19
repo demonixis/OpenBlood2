@@ -248,3 +248,9 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Original demo edition](demo_contracts.md): exclusive archive mounting, direct entry, runtime `_DEMO` rules and future save hook.
 
 - [Demo menu and edition resources](demo_menu_contracts.md), [Voodoo and Focus](voodoo_contracts.md): separate demo continuation; M2 closure and GPU reservation unchanged.
+
+- [BoneLeech attachment and inventory use](inventory_use_contracts.md): BugSpray, charged night goggles, remote eye, input/camera/FX and teardown.
+
+- [Airship entry, sniper rifle and Anger](airship_contracts.md)
+
+- [Cathedral, Sewage and Slaughter House](cathedral_sewage_slaughter_contracts.md): Thief/Naga/Zealot, campaign weapons, resource omissions, sky and DLS compatibility.

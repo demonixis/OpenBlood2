@@ -68,6 +68,12 @@ guarantee for every geometry, and it is not a retail feel comparison.
 
 ## Authored placement nudge
 
+The [Airship continuation](airship_contracts.md#initial-collision-placement) extends
+the historical four-correction/shared-distance policy below to eight corrections,
+independent horizontal/vertical bounds and an equal-distance centered-face retry.
+It also adds bounded initial AI-to-character separation. Simulation sweeps retain
+their previous overlap rules.
+
 `MoveObjectToGround` keeps every existing path, including lowering a body out of a
 ceiling it starts through. Only when a solid box's descent itself starts blocked (a
 wall or floor it overlaps more than the 0.01 tolerance, under `StartOverlap::Leave`) does
@@ -82,8 +88,8 @@ shown in the NPC runtime panel.
 03_Museum's Cultist "pud" is authored 2.86 units into a wall; the original one-sided BSP
 planes let it settle, while this sweep cannot start inside a solid body. A thin polygon
 separates towards its nearer side. This is a bounded replacement placement policy, not
-depenetration during simulation: later moves keep the rules above. Other 06_Airship1 and
-11_Slaughter_House placement failures have different causes and remain open.
+depenetration during simulation: later moves keep the rules above. The Airship continuation addresses the distinct 06_Airship placement failures;
+11_Slaughter_House remains separate.
 
 ## Spawned NPC placement
 
@@ -110,3 +116,5 @@ the original polygon/depth and ceiling overlap, corrected clear box, unchanged v
 physics at the reported delta and three seconds of subsequent session updates.
 `services.start_departure` also checks no-ground placement, idempotence and atomic
 failure beyond the correction budget. See the [retake evidence](../../../Documentation/Implementation/demo_retakes.md).
+The service coverage catalog classifies this checked four-correction implementation
+as bounded; session traces still reject unknown and unavailable services.

@@ -13,6 +13,9 @@ and downloaded dependencies are ignored under `build/` and `.cache/`.
 
 The game build disables unused SDL subsystems: `SDL_RENDER`, `SDL_CAMERA`,
 `SDL_DIALOG`, `SDL_TRAY`, `SDL_NOTIFICATION` and `SDL_DISKAUDIO`.
+Apple builds retain `SDL_NOTIFICATION`: the pinned SDL compiles its Cocoa
+notification backend unconditionally, so this option must stay enabled to link
+the required UserNotifications and Security frameworks.
 Both the game and ImGui render directly through SDL_GPU;
 `SDL_RENDER` controls the separate SDL_Renderer API. GPU/OpenXR support,
 platform audio/video backends, controller support and dummy test drivers retain
@@ -142,7 +145,10 @@ The startup log reports availability; `--no-crash-capture` leaves native handlin
 | Use | E |
 | Owned weapon slots | 1..9 / 0, or keypad; initially 1 knife, 2 Beretta |
 | Medkit / flashlight | H / L after collection; release Shift for inventory use |
-| Proximity / remote bombs | P / R; B detonates owned remote charges |
+| Binoculars / night goggles | Z / N after collection |
+| TheEye | I to throw; I again to toggle the remote camera; touch the landed eye to retrieve it |
+| Attached BoneLeech | Tap E rapidly to detach (or 25 presses at any pace) |
+| Proximity / remote / time bombs | P / R / T; B detonates owned remote charges |
 | Inspector / play | F1, or Escape to release capture and inspect |
 | Mouse capture / keyboard controls | F3 / F2 |
 

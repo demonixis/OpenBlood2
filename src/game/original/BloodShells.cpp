@@ -249,13 +249,15 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     medkit_down = medkit_was_down = false;
     flashlight_down = flashlight_was_down = false;
     flashlight = {};
-    binoculars_down = binoculars_was_down = false;
+    ClearInventoryEffects();
+    binoculars_down = binoculars_was_down = alt_fire_was_down = false;
     // StartNewWorld/OnEnterWorld: zoom off, original crosshair and default FOV.
     m_bZoomView = m_bBinocularsActive = false;
     m_bShowCrosshair = m_bCrosshairOriginallyOn;
     m_nCrosshair = m_nCrosshairOriginalNum;
     m_fovX = OpenBlood2::original_fov_normal;
     zoom_messages = 0;
+    time_bomb_down = time_bomb_was_down = false;
     proximity_down = proximity_was_down = false;
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     item_actions = item_sounds = item_voice = 0;
@@ -304,13 +306,15 @@ void CBloodClientShell::OnExitWorld()
     medkit_down = medkit_was_down = false;
     flashlight_down = flashlight_was_down = false;
     flashlight = {};
-    binoculars_down = binoculars_was_down = false;
+    ClearInventoryEffects();
+    binoculars_down = binoculars_was_down = alt_fire_was_down = false;
     // StartNewWorld/OnEnterWorld: zoom off, original crosshair and default FOV.
     m_bZoomView = m_bBinocularsActive = false;
     m_bShowCrosshair = m_bCrosshairOriginallyOn;
     m_nCrosshair = m_nCrosshairOriginalNum;
     m_fovX = OpenBlood2::original_fov_normal;
     zoom_messages = 0;
+    time_bomb_down = time_bomb_was_down = false;
     proximity_down = proximity_was_down = false;
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     item_actions = item_sounds = item_voice = 0;
@@ -391,8 +395,17 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         }
         return true;
     }
+    if (std::holds_alternative<OpenBlood2::SeeingEyeView>(event) ||
+        std::holds_alternative<OpenBlood2::CreatureAttach>(event))
+        return HandleInventoryView(event, server);
     if (const auto* value = std::get_if<OpenBlood2::InventoryAction>(&event))
     {
+        if (value->type == 3)
+        {
+            night_goggles = value->active;
+            ++item_actions;
+            return UpdateInventoryEffects();
+        }
         if (value->type != 1 && value->type != 2 && value->type != 5)
             return false;
         ++item_actions;
@@ -505,7 +518,7 @@ bool CBloodClientShell::Update()
         return false;
     camera_position = position;
     camera_position.y += owner->eye_level;
-    if (!UpdateCameraSelection())
+    if (!UpdateCameraSelection() || !UpdateInventoryEffects())
         return false;
     m_bFirstUpdate = false;
     return true;
@@ -513,7 +526,7 @@ bool CBloodClientShell::Update()
 bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds, std::string& error)
 {
     auto* owner = server.Player(client_);
-    if (!owner || !UpdateCameraSelection())
+    if (!owner || !server.OnMessage(client_, rotation) || !UpdateCameraSelection())
         return false;
     if (owner->camera_movement_blocked && !owner->m_damage.IsDead() &&
         !server.OnMessage(client_, OpenBlood2::PlayerControls{{}, false, rotation.yaw}))
@@ -582,8 +595,21 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerDetona
     auto* owner = Player(client);
     return owner && owner->OnCommandDetonate();
 }
+bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerAltFire&)
+{
+    auto* owner = Player(client);
+    return owner && owner->OnCommandAltFire();
+}
 bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
 {
+    const bool goggles_pressed = goggles_down && !goggles_was_down;
+    goggles_was_down = goggles_down;
+    if (goggles_pressed)
+        server.OnMessage(client_, OpenBlood2::PlayerItemCommand{3});
+    const bool eye_pressed = eye_down && !eye_was_down;
+    eye_was_down = eye_down;
+    if (eye_pressed)
+        server.OnMessage(client_, OpenBlood2::PlayerItemCommand{4});
     const bool flashlight_pressed = flashlight_down && !flashlight_was_down;
     flashlight_was_down = flashlight_down;
     if (flashlight_pressed)
@@ -596,6 +622,10 @@ bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
     detonate_was_down = detonate_down;
     if (detonate_pressed)
         server.OnMessage(client_, OpenBlood2::PlayerDetonate{});
+    const bool time_bomb_pressed = time_bomb_down && !time_bomb_was_down;
+    time_bomb_was_down = time_bomb_down;
+    if (time_bomb_pressed)
+        server.OnMessage(client_, OpenBlood2::PlayerItemCommand{9});
     const bool proximity_pressed = proximity_down && !proximity_was_down;
     proximity_was_down = proximity_down;
     if (proximity_pressed)
@@ -610,6 +640,18 @@ bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
         server.OnMessage(client_, OpenBlood2::PlayerItemCommand{1});
     const bool pressed = use_down && !use_was_down;
     use_was_down = use_down;
+    if (pressed && creature)
+    {
+        ++total_use_hits;
+        use_hits = server_.GetTime() - last_use_hit < .5f ? use_hits + 1 : 0;
+        last_use_hit = server_.GetTime();
+        if (use_hits >= 5 || total_use_hits >= 25)
+        {
+            server.OnMessage(client_, OpenBlood2::CreatureResponse{creature, false});
+            creature = nullptr;
+            creature_light = 1;
+        }
+    }
     if (pressed)
         server.OnMessage(client_, OpenBlood2::PlayerUse{rotation});
     return true; // A blocked USE command does not terminate a valid session.
@@ -619,7 +661,12 @@ bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server, double seconds,
     const float cp = std::cos(rotation.pitch);
     const DVector forward{std::sin(rotation.yaw) * cp, -std::sin(rotation.pitch), std::cos(rotation.yaw) * cp};
     auto input = weapon_input;
-    if (const auto* owner = server.Player(client_); owner && owner->camera_movement_blocked)
+    const bool alt_pressed = input.alternate && !alt_fire_was_down;
+    alt_fire_was_down = input.alternate;
+    if (alt_pressed)
+        server.OnMessage(client_, OpenBlood2::PlayerAltFire{});
+    if (const auto* owner = server.Player(client_);
+        owner && (owner->camera_movement_blocked || (owner->m_InventoryMgr.eye && owner->m_InventoryMgr.eye->active)))
         input.primary = input.alternate = false;
     for (auto& weapon : weapons)
     {
@@ -660,6 +707,14 @@ bool CBloodClientShell::UpdateCameraSelection()
     if (!owner || server_.GetClientUserData(client_) != player)
         return false;
     view = server_.GetCameraView();
+    if (seeing_eye && server_.IsObjectAlive(seeing_eye) && !owner->m_damage.IsDead())
+    {
+        view.object = seeing_eye;
+        view.settings = {0, false, false, true};
+        server_.GetObjectPos(seeing_eye, &view.position);
+        view.rotation = OpenBlood2::rotation_from_euler({rotation.pitch, rotation.yaw, 0});
+        server_.SetObjectRotation(seeing_eye, &view.rotation);
+    }
     owner->camera_movement_blocked = view.object && !view.settings.player_movement;
     player_visible = view.object && !view.settings.hide_player && !death_camera.active;
     weapons_visible = !view.object && !death_camera.active;

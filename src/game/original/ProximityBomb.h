@@ -2,7 +2,7 @@
 #include "Projectile.h"
 // Selected original GameProjectiles.cpp CProximityBomb. Shared bounded box flight
 // is replacement engine code; arming/detection/delay/contact rules remain original.
-class CProximityBomb final : public CProjectile
+class CProximityBomb : public CProjectile
 {
   public:
     CProximityBomb();
@@ -21,6 +21,6 @@ class CProximityBomb final : public CProjectile
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
 
-  private:
-    void Sound(const char*);
+  protected:
+    virtual void Sound(const char*);
 };

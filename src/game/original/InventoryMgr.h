@@ -36,6 +36,8 @@ class CInventoryMgr : public Aggregate
     std::optional<CInvMedkit> medkit;
     std::unique_ptr<CInvFlashlight> flashlight;
     std::optional<CInvBinoculars> binoculars;
+    std::optional<CInvNightGoggles> goggles;
+    std::unique_ptr<CInvTheEye> eye;
     InventoryResult AddKey(const OpenBlood2::KeyItem&);
     InventoryResult QueryKey(std::string_view);
     std::vector<OpenBlood2::KeyItem> keys;

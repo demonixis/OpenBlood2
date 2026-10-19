@@ -186,9 +186,9 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
             }
             if (time - last_shot_time_ > (last_alt_ ? data.m_fAltReloadTime : data.m_fReloadTime))
             {
-                const int mode = primary && ammo(false) >= data.m_nAmmoUse       ? 0
-                                 : alternate && ammo(true) >= data.m_nAltAmmoUse ? 1
-                                                                                 : -1;
+                const int mode = primary && ammo(false) >= data.m_nAmmoUse                               ? 0
+                                 : alternate && !data.m_bAltFireZoom && ammo(true) >= data.m_nAltAmmoUse ? 1
+                                                                                                         : -1;
                 if (mode >= 0)
                 {
                     last_shot_time_ = time;
@@ -280,7 +280,7 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
         {
             bomb_held = time - bomb_start;
             bomb_speed = 250 + 1500 * std::min(bomb_held / .75f, 1.f);
-            if (type == WEAP_PROXIMITYBOMB && bomb_held > 1.25f)
+            if ((type == WEAP_PROXIMITYBOMB || type == WEAP_TIMEBOMB) && bomb_held > 1.25f)
             {
                 bomb_speed = 0;
                 bomb_held = 0;

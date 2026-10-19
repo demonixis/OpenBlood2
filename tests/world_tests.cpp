@@ -1007,7 +1007,7 @@ namespace
                 else
                 {
                     CHECK(d.entries.size() == 1026 && d.schema_checked == 485 && d.editor_only == 541 &&
-                          d.unknown == 0 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                          d.unknown == 0 && d.invalid == 0 && d.models == 100 && d.triangles == 39745);
                     for (const auto& e : d.entries)
                         if (e.state == DestinationEntryState::InvalidProperties)
                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail

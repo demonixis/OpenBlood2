@@ -11,6 +11,8 @@ namespace
             state.current_slot >= state.right.size() ||
             (state.current_slot >= 10 && !state.right[state.current_slot]) || !std::isfinite(state.damage_multiplier) ||
             state.damage_multiplier < 0 || state.damage_multiplier > 1000 || state.keys.size() > 256 ||
+            (state.goggles && (state.goggles->count > 100 || !std::isfinite(state.goggles->remaining) ||
+                               state.goggles->remaining < -60 || state.goggles->remaining > 30)) ||
             (state.medkit_charge && *state.medkit_charge > 100) ||
             (state.flashlight && (state.flashlight->count > 100 || !std::isfinite(state.flashlight->remaining) ||
                                   state.flashlight->remaining < -60 || state.flashlight->remaining > 120)))
@@ -27,7 +29,7 @@ namespace
         for (unsigned i = 0; i < state.right.size(); ++i)
         {
             const auto* right = weapon_definition(state.right[i]);
-            if ((i >= 10 && ((i > 11 && state.right[i]) ||
+            if ((i >= 10 && ((i > 12 && state.right[i]) ||
                              (state.right[i] && state.right[i] != WEAP_PROXIMITYBOMB + i - 10) || state.left[i])) ||
                 (i < 10 && inventory_bomb(state.right[i])) || (state.right[i] && !right) ||
                 (state.left[i] && (!right || state.left[i] != state.right[i] || !right->m_dwTwoHandStrengthReq)))
@@ -91,6 +93,9 @@ bool CInventoryMgr::Save(OpenBlood2::InventoryState& output, std::string& error)
         state.medkit_charge = medkit->count;
     if (flashlight)
         state.flashlight = OpenBlood2::FlashlightState{flashlight->count, flashlight->remaining};
+    if (goggles)
+        state.goggles = OpenBlood2::FlashlightState{goggles->count, goggles->remaining};
+    state.eye = eye && eye->available;
     state.binoculars = binoculars.has_value();
     state.current_slot = m_nCurWeaponSlot;
     state.damage_multiplier = damage_multiplier;
@@ -166,6 +171,14 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
         }
         // Original InvItem::Load clears active for both load modes; new child stays hidden.
     }
+    if (state.goggles)
+    {
+        staged.goggles.emplace(m_hOwner);
+        staged.goggles->count = state.goggles->count;
+        staged.goggles->remaining = state.goggles->remaining;
+    }
+    if (state.eye)
+        staged.eye = std::make_unique<CInvTheEye>(m_hOwner);
     if (state.binoculars)
         staged.binoculars.emplace(m_hOwner); // Inactive; player Load separately clears zoom.
     // Commit only after every fallible service. Old child removal is deferred;
@@ -177,6 +190,8 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
     medkit.swap(staged.medkit);
     flashlight.swap(staged.flashlight);
     binoculars.swap(staged.binoculars);
+    goggles.swap(staged.goggles);
+    eye.swap(staged.eye);
     m_fAmmo = staged.m_fAmmo;
     m_nAttribStrength = staged.m_nAttribStrength;
     m_nAttribMagic = staged.m_nAttribMagic;

@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-19",
+  "baseline_commit": "3a9466f",
+  "scope": "02_CityHubC and 04_SteamTunnels entry; selected NPC/pickup ports, dynamic polygon boundary policy, explicit source omissions and authored music style mapping",
+  "source_files": [
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/boneleech.cpp",
+      "sha256": "3603c50cebdf87f022da476f0c889d90cb1129ee642de2aaf523b16a72c8359e",
+      "use": "Constructor, defaults, model/scale, ComputeState, AttackClose, MC_Fire_Jump and touch/standing attachment boundary."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/boneleech.h",
+      "sha256": "358e2c145e2b477db97d13ff8770f42184101d16e2f51a39eaada984ea999622",
+      "use": "Original BoneLeech member and override declarations."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/DrudgeLord.cpp",
+      "sha256": "9257a2daa41f55fe11cc4d4ec94ed8064ceffec8cfe03a4829dd6da2a2e74bf5",
+      "use": "Registration, constructor, model, ComputeState, close/far attacks and standing hook/fireball clip selection."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "7275c3a4f9374926e0a5e7cce4d533ae59ea558027bda1448b223a283e66fb09",
+      "use": "Runtime initialization, weapon prefixes, Fire aiming branches and enemy-list selection."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/Anim_Sound.cpp",
+      "sha256": "d3509c90331d84e428067cfc106c824ad1bcb1f25ad407868135c7b7bed3cce8",
+      "use": "GenerateHitSpheres missing first-node undefined behavior; source animation lookup."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "c0d8b72b729e806a6ca8f0e44a57054aef30e20c4d75b745df29f97fb36199ca",
+      "use": "Localized damage ordering; unsupported first-node behavior replaced explicitly for BoneLeech."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/GameWeapons.cpp",
+      "sha256": "979f6e82b231714dd18209fcb8fcfce949c6e4b5235c618c5150bd5c0be332a2",
+      "use": "Soul Hook and BoneLeech slash sound draws; Fireball gravity clearing."
+    },
+    {
+      "path": "sources/lithtech/Blood2/Shared/WeaponDefs.cpp",
+      "sha256": "7693d587a88491eb5499847efcc7cc3d0a81b14bf17dcaa0f63a979f9e394a9d",
+      "use": "Complete Soul Hook, BoneLeech Suck and Fireball definition entries."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/GameProjectiles.cpp",
+      "sha256": "f0f732be5d373324ef2071690fc43317a908aad5d5bade18f59c9e9ccfbcb9fe",
+      "use": "CNapalmProjectile constructor, update, loop sound and explosion."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/ItemPickups.cpp",
+      "sha256": "1ae96d4e47ea46a709e06eacba3f2e9f206632791884af3ad421520a08ef801a",
+      "use": "TheEyePU and NightGogglesPU constructors."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/WeaponPickups.cpp",
+      "sha256": "b9565e2e9bf02dc6b656b404098de72ca950675c11a946541c6a2d955f4de209",
+      "use": "BugSprayPU constructor."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/DestructableBrush.cpp",
+      "sha256": "429fd282ca2dce073a96bac78256a84c9784a22c7c261e0da0f1b86ed359a997",
+      "use": "Pushable forces gravity independently of BoxPhysics; mass/friction."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/Gremlin.cpp",
+      "sha256": "71eeaf88bb27e0e688f3d4ad98d7ae355a366bd2c94b6c945cfcd92b9810057f",
+      "use": "_ADD_ON-only GremlinAI is not the authored base-game Gremlin class."
+    },
+    {
+      "path": "sources/lithtech/runtime/server/src/s_object.cpp",
+      "sha256": "32777bcf2a221ae7c6c8cc6890a102f33120b75f2eb3f60ec7578d54f4b65d68",
+      "use": "Later engine missing-class object-load branch continues without an instance."
+    },
+    {
+      "path": "sources/lithtech/runtime/server/src/server_extradata.cpp",
+      "sha256": "fc31aff280f38aebb61e659d450535a0149534a8668b296fabf4449f56d54ad5",
+      "use": "Later engine model/sprite resource load failure (after default-resource attempt)."
+    }
+  ],
+  "external_evidence": [
+    {
+      "path": "Music/Track1/iMusic.ini",
+      "sha256": "72ce04bf668c6e9bda5a2db1e635d50e4215f4f93f99ee37ddf47536afa95f16",
+      "use": "Installed NameN/FileN mappings, including Track1-a -> track1a.sty. File remains external."
+    }
+  ],
+  "adaptations": [
+    "BoneLeech whole-body damage replaces undefined missing-head localization; attachment remains unavailable.",
+    "Pickups offer only; unsupported inventory actions are refused.",
+    "Conservative dynamic bounds and opted-in open triangle boundary collision are replacement engine policies.",
+    "Only known absent class names and missing-resource cases are omitted; no aliases or general failure suppression.",
+    "Bounded installed INI index parser; section/style identity validation remains required."
+  ]
+}

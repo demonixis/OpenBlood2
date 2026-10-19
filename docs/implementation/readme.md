@@ -1,5 +1,7 @@
 # Implementation records
 
+- [Main synchronization and local pull policy](../../../Documentation/Implementation/git_main_sync.md)
+
 - [Default launcher build, sibling executable and window names](../../../Documentation/Implementation/launcher_default_build.md)
 
 - [Compact launcher, demo delivery and data mods](../../../Documentation/Implementation/launcher_redesign.md)

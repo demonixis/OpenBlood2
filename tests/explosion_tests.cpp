@@ -127,7 +127,11 @@ namespace
         CHECK(!runtime);
         CHECK(!brush(g, {}, {{"Scale", std::numeric_limits<float>::infinity()}}));
         CHECK(!brush(g, {}, {{"Scale", 1e7f}}));
-        CHECK(!brush(g, {}, {{"Pushable", true}, {"BoxPhysics", false}, {"Exploding", true}}));
+        auto* polygon = brush(g, {}, {{"Pushable", true}, {"BoxPhysics", false}, {"Exploding", true}});
+        CHECK(polygon && polygon->debris.exploding);
+        const auto* body = g.objects.get(polygon->m_hObject);
+        CHECK(body && body->world_body && body->body_properties.polygon_bounds &&
+              !(body->state.m_Flags & FLAG_BOXPHYSICS));
         CHECK(!brush(g, {}, {{"SpawnObject", std::string("Enemy")}, {"Exploding", true}}));
         CHECK(g.unload_world() && CDestructable::m_dwNumDestructables == 0 && g.server.string_count() == 0);
         return true;

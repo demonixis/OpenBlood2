@@ -102,8 +102,9 @@ namespace
         CHECK(a->MC_Fire_Stand() && a->fire_calls == 0 && a->shield_grants == 1);
         CHECK(g.server.advance_models(.2) && a->MC_Fire_Stand());
         CHECK(!a->m_bAnimating && a->Metacmd == 2 && a->animation_finishes == 1 && a->fire_calls == 0);
-        CHECK(a->m_InventoryMgr.CurrentWeapon()->data.m_nType == 41 &&
-              a->completion_selection == InventoryResult::Invalid);
+        // Soul Hook is defined for SoulDrudge, but this Gideon fixture does not own one.
+        CHECK(weapon_definition(WEAP_SOUL_HOOK) && a->m_InventoryMgr.CurrentWeapon()->data.m_nType == 41 &&
+              a->completion_selection == InventoryResult::NotAvailable);
         CHECK(a->Fire() && a->m_damage.m_fArmorPoints == 125 && g.server.object_particles.active.size() == 1);
         a->m_damage.SetArmorPoints(25.001f);
         a->m_fLastShield = -100;

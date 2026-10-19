@@ -68,6 +68,12 @@ const char* WeaponPickupClass(DDWORD type)
 {
     switch (type)
     {
+        case WEAP_HOWITZER:
+            return "HowitzerPU";
+        case WEAP_NAPALMCANNON:
+            return "NapalmCannonPU";
+        case WEAP_DEATHRAY:
+            return "DeathRayPU";
         case WEAP_BERETTA:
             return "BerettaPU";
         case WEAP_SUBMACHINEGUN:
@@ -84,6 +90,8 @@ const char* WeaponPickupClass(DDWORD type)
             return "ShotgunPU";
         case WEAP_SINGULARITY:
             return "SingularityPU";
+        case WEAP_BUGSPRAY:
+            return "BugSprayPU";
         case WEAP_SNIPERRIFLE:
             return "SniperRiflePU";
         default:
@@ -125,4 +133,36 @@ HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector position, DRotati
     if (!include_ammo)
         pickup->value.amount = 0;
     return pickup->m_hObject;
+}
+
+BugSprayPU::BugSprayPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, 10, 20};
+    file = "BugSpray_pu";
+    display_name = "Bug Spray Canister";
+    resource_id = 357;
+}
+
+HowitzerPU::HowitzerPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_HOWITZER, 5};
+    file = "Howitzer_pu";
+    display_name = "Howitzer";
+    resource_id = IDS_WEAPON_HOWITZER;
+}
+
+NapalmCannonPU::NapalmCannonPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_NAPALMCANNON, 5};
+    file = "NapalmCannon_pu";
+    display_name = "Napalm Cannon";
+    resource_id = IDS_WEAPON_NAPALM;
+}
+
+DeathRayPU::DeathRayPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_DEATHRAY, 50};
+    file = "DeathRay_pu";
+    display_name = "Cabalco Death Ray";
+    resource_id = IDS_WEAPON_DEATHRAY;
 }

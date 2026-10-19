@@ -56,7 +56,7 @@ bool CHowitzerShell::Update()
             error = "Projectile damage traversal interrupted or unavailable";
         // A character shooter also damages the object it hit directly (no world HOBJECT here).
         const auto shooter = responsible ? s->GetObjectClass(responsible) : nullptr;
-        if (shooter && s->IsKindOf(shooter, s->GetClass("CBaseCharacter")) && ray_hit.object &&
+        if (!alternate && shooter && s->IsKindOf(shooter, s->GetClass("CBaseCharacter")) && ray_hit.object &&
             s->IsObjectAlive(ray_hit.object) && s->IsObjectAlive(m_hObject))
         {
             if (const auto message = s->StartMessageToObject(this, ray_hit.object, damage_message))

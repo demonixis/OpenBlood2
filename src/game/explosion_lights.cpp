@@ -25,6 +25,23 @@ namespace OpenBlood2
             out.push_back(s);
             return true;
         }
+        if (type == 27)
+        {
+            ExplosionLightSettings s;
+            s.position = vector_add(position, vector_scale(normal, 10 / std::sqrt(vector_dot(normal, normal))));
+            s.color1 = {1, .5f, 0};
+            s.color2 = {1, 1, 1};
+            s.duration = .75f;
+            s.radius1 = 50;
+            s.radius2 = 0;
+            out.push_back(s);
+            s.color1 = {.2f, .2f, .2f};
+            s.color2 = {.5f, .5f, .5f};
+            s.duration = 15;
+            s.radius1 = 25; // Source writes Radius1 twice; Radius2 stays zero.
+            out.push_back(s);
+            return true;
+        }
         if (type > 3 && type != 6 && type != 8)
         {
             error = "Explosion light recipe is unavailable";

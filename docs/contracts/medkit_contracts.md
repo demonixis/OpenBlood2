@@ -15,7 +15,8 @@ ID 1 and quantity 1. The existing checked request/acknowledgement prevents doubl
 consumption, rejects dead players and defers removal until callbacks finish.
 Full medkits refuse collection. Both first acquisition and subsequent recharge
 set 100 charges, regardless of the incoming byte quantity. Zero-charge inventory
-items remain present and rechargeable. Other item IDs fail explicitly.
+items remain present and rechargeable. Additional implemented item IDs are covered by
+the [inventory-use contracts](inventory_use_contracts.md); unsupported IDs fail explicitly.
 
 Activation uses `min(100 - health, charges)`, calls original Heal for positive
 values, queues the player action and subtracts the **integer requested gain**.
@@ -37,7 +38,9 @@ never heals or consumes inventory.
 
 ## Audio and inspection
 
-The owned InventoryAction message accepts only implemented type 1. The existing
+Medkit activation sends InventoryAction type 1. The shared transport also accepts
+the implemented flashlight, night-goggle and binocular actions; TheEye uses its
+separate view message. The existing
 256-event client queue remains bounded. Queue failure is visible and does not
 undo original healing. The client handles the action using the original
 `sounds/powerups/medikit.wav`, local volume 100, priority PLAYER_LOW (4), no loop,

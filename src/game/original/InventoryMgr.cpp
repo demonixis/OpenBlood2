@@ -1,5 +1,6 @@
 #include "InventoryMgr.h"
 #include "AI_Mgr.h"
+#include "CampaignWeapons.h"
 #include "PlayerObj.h"
 #include "game/game_settings.h"
 #include <algorithm>
@@ -52,6 +53,14 @@ CInventoryMgr::~CInventoryMgr()
 }
 DDWORD CInventoryMgr::EngineMessageFn(LPBASECLASS object, DDWORD message, void* data, DFLOAT fData)
 {
+    if (message == MID_UPDATE && goggles)
+    {
+        const auto before = goggles->count;
+        const bool active = goggles->active;
+        goggles->Update();
+        if (before != goggles->count || active != goggles->active)
+            ++revision;
+    }
     if (message == MID_UPDATE)
         if (const auto* character = dynamic_cast<CBaseCharacter*>(object); character && !character->m_damage.IsDead())
         {
@@ -206,7 +215,27 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         return InventoryResult::NotAvailable;
     // Original strength gate was commented out; do not introduce a new one.
     std::unique_ptr<CWeapon> weapon;
-    if (type == WEAP_REMOTEBOMB)
+    if (type == WEAP_HOWITZER)
+        weapon = std::make_unique<CHowitzer>();
+    else if (type == WEAP_NAPALMCANNON)
+        weapon = std::make_unique<CNapalmCannon>();
+    else if (type == WEAP_DEATHRAY)
+        weapon = std::make_unique<CDeathRay>();
+    else if (type == WEAP_NAGA_SPIKE)
+        weapon = std::make_unique<CNagaSpike>();
+    else if (type == WEAP_NAGA_DEBRIS)
+        weapon = std::make_unique<CNagaDebris>();
+    else if (type == WEAP_ZEALOT_GROUNDFIRE)
+        weapon = std::make_unique<CGroundStrike>();
+    else if (type == WEAP_ZEALOT_SHOCKWAVE)
+        weapon = std::make_unique<CShockwave>();
+    else if (type == WEAP_THIEF_SUCK)
+        weapon = std::make_unique<CThiefSuck>();
+    else if (type == WEAP_TIMEBOMB)
+        weapon = std::make_unique<CWeapTimeBomb>();
+    else if (type == WEAP_ZEALOT_HEAL || type == WEAP_ZEALOT_SHIELD)
+        weapon = std::make_unique<CZealotSpell>(type);
+    else if (type == WEAP_REMOTEBOMB)
         weapon = std::make_unique<CWeapRemoteBomb>();
     else if (type == WEAP_PROXIMITYBOMB)
         weapon = std::make_unique<CWeapProximityBomb>();
@@ -214,6 +243,10 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         weapon = std::make_unique<CBeretta>();
     else if (type == WEAP_SUBMACHINEGUN)
         weapon = std::make_unique<CSubMachineGun>();
+    else if (type == WEAP_BUGSPRAY)
+        weapon = std::make_unique<CBugSpray>();
+    else if (type == WEAP_SNIPERRIFLE)
+        weapon = std::make_unique<CSniperRifle>();
     else if (type == WEAP_SHOTGUN)
         weapon = std::make_unique<CShotgun>();
     else if (type == WEAP_SINGULARITY)
@@ -232,6 +265,12 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         weapon = std::make_unique<CShikariSpit>();
     else if (type == WEAP_SOUL_CROWBAR || type == WEAP_SOUL_AXE || type == WEAP_SOUL_PIPE)
         weapon = std::make_unique<CSoulWeapon>(type);
+    else if (type == WEAP_SOUL_HOOK)
+        weapon = std::make_unique<CSoulHook>();
+    else if (type == WEAP_DRUDGE_FIREBALL)
+        weapon = std::make_unique<CFireball>();
+    else if (type == WEAP_BONELEECH_SUCK)
+        weapon = std::make_unique<CBoneleechSuck>();
     else if (type == WEAP_MELEE)
         weapon = std::make_unique<CMelee>();
     else if (type == WEAP_NAGA_EYEBEAM)
@@ -420,8 +459,25 @@ InventoryResult CInventoryMgr::DropCurrentWeapon()
 // Selected original AddItem/SetActiveItem branches; other items remain unsupported.
 InventoryResult CInventoryMgr::AddItem(DBYTE type, DBYTE value)
 {
-    if ((type != 1 && type != 2 && type != 5) || !BaseClass::GetServerDE()->IsObjectAlive(m_hOwner))
+    if ((type < 1 || type > 5) || !BaseClass::GetServerDE()->IsObjectAlive(m_hOwner))
         return InventoryResult::Invalid;
+    if (type == 3)
+    {
+        if (!goggles)
+            goggles.emplace(m_hOwner);
+        else if (!goggles->AddItem(value))
+            return InventoryResult::AlreadyHave;
+        ++revision;
+        return InventoryResult::Ok;
+    }
+    if (type == 4)
+    {
+        if (eye && eye->available)
+            return InventoryResult::AlreadyHave;
+        eye = std::make_unique<CInvTheEye>(m_hOwner);
+        ++revision;
+        return InventoryResult::Ok;
+    }
     if (type == 5)
     {
         if (binoculars)
@@ -448,7 +504,15 @@ InventoryResult CInventoryMgr::AddItem(DBYTE type, DBYTE value)
 }
 InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
 {
-    if (type == 7 || type == 8)
+    if (type == 3 || type == 4)
+    {
+        const bool activated = type == 3 ? goggles && goggles->ActivateItem() : eye && eye->ActivateItem();
+        if (!activated)
+            return InventoryResult::NotAvailable;
+        ++revision;
+        return InventoryResult::Ok;
+    }
+    if (type == 7 || type == 8 || type == 9)
         return SelectInventoryWeapon(WEAP_PROXIMITYBOMB + type - 7);
     if (type == 2)
     {
@@ -480,6 +544,10 @@ InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
 // gates disable our slot-backed selectors; restoring a live checkpoint rebuilds them.
 void CInventoryMgr::RemoveDeathItems()
 {
+    if (goggles && goggles->active)
+        goggles->SetActive(false);
+    goggles.reset();
+    eye.reset();
     medkit.reset();
     if (flashlight && flashlight->active)
         flashlight->SetActive(false); // Original active-item removal sends its off action.
@@ -500,7 +568,7 @@ InventoryResult CInventoryMgr::AddInventoryWeapon(DBYTE type, DBYTE count)
     auto* server = BaseClass::GetServerDE();
     if (!server || !server->IsObjectAlive(m_hOwner))
         return InventoryResult::Invalid;
-    if (type != 7 && type != 8)
+    if (type != 7 && type != 8 && type != 9)
         return InventoryResult::NotAvailable;
     const DBYTE ammo = AMMO_PROXIMITYBOMB + type - 7;
     if (GetWeapon(ammo))

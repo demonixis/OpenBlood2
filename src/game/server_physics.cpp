@@ -1,6 +1,7 @@
 #include "engine/world_model.h"
 #include "game/original/PolyGrid.h"
 #include "game/original/Projectile.h"
+#include "game/original/SeeingEye.h"
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
@@ -23,6 +24,9 @@ namespace OpenBlood2
             if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
                 other->handle == ignore_extra || !(other->state.m_Flags & FLAG_SOLID))
                 continue;
+            if (const auto* eye = dynamic_cast<const SeeingEye*>(other->game.get());
+                eye && !eye->dropped && eye->m_hFiredFrom == ignore)
+                continue; // Let the owner move while its freshly thrown eye exits the body.
             CollisionHit hit;
             auto query = sweep_object(*other, from, to, dims, hit, allowed_penetration, start);
             if (query == CollisionQuery::Invalid)
@@ -598,13 +602,12 @@ namespace OpenBlood2
                     displacement = vector_scale(r->velocity, dt);
                 }
                 auto destination = vector_add(r->state.m_Pos, displacement);
-                // A very short real-clock frame can round a passive pickup's
+                // A very short real-clock frame can round an integrated body's
                 // destination back to its current float position. Keep its
                 // integrated velocity, but do not turn that lack of motion into
-                // a placement query (authored pickups may overlap a wall).
-                // Explicit MoveObject queries and solid/body checks stay strict.
-                if (!(r->state.m_Flags & FLAG_SOLID) && !r->world_body && !r->character_body && !r->model_body &&
-                    destination.x == r->state.m_Pos.x && destination.y == r->state.m_Pos.y &&
+                // a placement query (authored bodies may still be leaving a face).
+                // Explicit MoveObject queries and every representable move stay strict.
+                if (destination.x == r->state.m_Pos.x && destination.y == r->state.m_Pos.y &&
                     destination.z == r->state.m_Pos.z)
                     continue;
                 if (MoveObject(r->handle, &destination) != DE_OK)

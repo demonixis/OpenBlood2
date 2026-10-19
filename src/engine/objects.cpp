@@ -6,8 +6,8 @@
 #include <cmath>
 #include <limits>
 #include <locale>
-#include <utility>
 #include <sstream>
+#include <utility>
 
 namespace OpenBlood2
 {
@@ -412,7 +412,9 @@ namespace OpenBlood2
                         ++object->world_model_candidates;
                     }
             auto shape = std::make_shared<ContainerShape>();
-            if (!model || !error.empty() || !shape->build(*model, state.m_Rotation, error))
+            const bool polygon_body = state.m_ObjectType == OT_WORLDMODEL && (state.m_Flags & FLAG_GRAVITY) &&
+                                      !(state.m_Flags & FLAG_BOXPHYSICS);
+            if (!model || !error.empty() || !shape->build(*model, state.m_Rotation, error, polygon_body))
             {
                 contexts_.pop_back();
                 remove(handle);

@@ -48,8 +48,9 @@ namespace OpenBlood2
     {
         std::array<float, 4> modulation{}, position_radius{}, light_color{}, model_ambient{}, model_color{};
         std::array<std::array<float, 4>, 12> model_sources{};
+        std::array<float, 4> scene_color{1, 1, 1, 1};
     };
-    static_assert(sizeof(FragmentLightUniform) == 272);
+    static_assert(sizeof(FragmentLightUniform) == 288);
     // Fragment uniform slot 1 of both world fragment shaders (std140), pushed once per record.
     struct ShadowUniform
     {
@@ -114,6 +115,7 @@ namespace OpenBlood2
         // Vertical model shadow tiles and their uniform; receivers ignore them when null.
         SDL_GPUTexture* shadow_atlas = nullptr;
         const ShadowUniform* shadows = nullptr;
+        DVector scene_color{1, 1, 1}; // Original SetGlobalLightScale, scene only.
     };
     class WorldRenderer
     {

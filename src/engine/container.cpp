@@ -52,7 +52,7 @@ namespace OpenBlood2
         origin = destination;
         return true;
     }
-    bool ContainerShape::build(const WorldModel& source, DRotation rotation, std::string& error)
+    bool ContainerShape::build(const WorldModel& source, DRotation rotation, std::string& error, bool triangulated)
     {
         *this = {};
         error.clear();
@@ -136,9 +136,20 @@ namespace OpenBlood2
             for (auto p : mesh.points)
                 if (vector_dot(n, p) - d > 0.05f)
                     convex = false;
+            bool off_plane = false;
             for (auto index : polygon.points)
-                if (index >= mesh.points.size() || std::abs(vector_dot(n, mesh.points[index]) - d) > 0.1f)
+            {
+                if (index >= mesh.points.size())
+                    return fail("Invalid container vertex index");
+                off_plane |= std::abs(vector_dot(n, mesh.points[index]) - d) > 0.1f;
+            }
+            if (off_plane)
+            {
+                if (!triangulated)
                     return fail("Container face is not on its plane");
+                ++off_plane_faces;
+                convex = false; // Contents must use the actual closed triangles, not stale BSP planes.
+            }
             const auto a = mesh.points[polygon.points[0]];
             DVector face_normal{};
             for (std::size_t j = 1; j + 1 < polygon.points.size(); ++j)
@@ -228,6 +239,12 @@ namespace OpenBlood2
                     balance += uses[end++].direction;
                 if (end - first != 2 || balance != 0 || uses[first].face == uses[first + 1].face)
                 {
+                    if (triangulated)
+                    {
+                        ++open_edges;
+                        first = end;
+                        continue;
+                    }
                     const auto a = mesh.points[key.first], b = mesh.points[key.second];
                     const auto detail = std::string("Open or non-manifold container shell: ") +
                                         std::to_string(end - first) + " edges / balance " + std::to_string(balance) +
@@ -239,8 +256,12 @@ namespace OpenBlood2
             }
             shared_edges += uses.size() > 2;
         }
-        for (unsigned i = 0; i < parent.size(); ++i)
-            closed_components += root(i) == i;
+        boundary_only = open_edges != 0;
+        if (boundary_only)
+            convex = false;
+        if (!boundary_only)
+            for (unsigned i = 0; i < parent.size(); ++i)
+                closed_components += root(i) == i;
         for (auto& surface : mesh.surfaces)
             surface.flags |= 1;
         // Faces were rewound to the rotated plane normals above; keep planes consistent.
@@ -255,8 +276,9 @@ namespace OpenBlood2
     }
     bool ContainerShape::contains(DVector point) const
     {
-        if (triangles.empty() || !physics_vector(point) || point.x < min.x - .001f || point.x > max.x + .001f ||
-            point.y < min.y - .001f || point.y > max.y + .001f || point.z < min.z - .001f || point.z > max.z + .001f)
+        if (boundary_only || triangles.empty() || !physics_vector(point) || point.x < min.x - .001f ||
+            point.x > max.x + .001f || point.y < min.y - .001f || point.y > max.y + .001f || point.z < min.z - .001f ||
+            point.z > max.z + .001f)
             return false;
         if (convex)
         {

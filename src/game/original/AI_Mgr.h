@@ -107,12 +107,17 @@ class AI_Mgr : public CBaseCharacter
         Prophet,
         SoulDrudge,
         Shikari,
-        MadScientist
+        MadScientist,
+        BoneLeech,
+        DrudgeLord,
+        Thief,
+        Naga,
+        Zealot
     };
     static void ResetRuntimeTables();
     // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet, SoulDrudge, Shikari,
-    // MadScientist.
-    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 10>;
+    // MadScientist, BoneLeech, DrudgeLord.
+    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 15>;
     // Original WeaponStrToInt prefixes; false for a matched family not integrated here.
     static bool WeaponStrToInt(std::string_view, DBYTE&);
     static void ExchangeRuntimeTables(RuntimeTables&);
@@ -124,6 +129,7 @@ class AI_Mgr : public CBaseCharacter
     }
     NPCType npc_type = NPCType::Diagnostic;
     bool runtime_initialized = false, runtime_failed = false, m_bSetShutdown = false, m_bRemoveMe = false;
+    bool npc_divine = false;
     bool npc_male = true, npc_labtech = false, npc_clown = false, npc_robe = false, npc_sorority = false;
     float m_fLastUpdate = 0, npc_hp = 30, npc_random_hp = 0, npc_armor = 0;
     std::string configure_error; // A constructor RNG draw failed; RuntimePrecreate reports it.
@@ -193,7 +199,7 @@ class AI_Mgr : public CBaseCharacter
         StateInactive = 999
     };
     static bool StateStrToInt(std::string_view, int&);
-    bool SetNewState(int);
+    virtual bool SetNewState(int);
     bool StopVelocity();
     bool SetAnimation(DDWORD);
     bool MC_Taunt_Beg();
@@ -259,6 +265,7 @@ class AI_Mgr : public CBaseCharacter
     bool MC_Roll_Backward();
     int m_nDodgeFlags = 0;
     std::uint64_t dodge_updates = 0, dodge_queries = 0;
+    virtual bool AI_STATE_EnemyAttach();
     virtual bool AI_STATE_AttackClose();
     virtual bool AI_STATE_AttackFar();
     struct ObstacleRay
@@ -282,7 +289,7 @@ class AI_Mgr : public CBaseCharacter
     std::uint64_t crouch_attack_updates = 0;
     bool HandleDamage();
     bool MC_Recoil();
-    bool MC_Dead();
+    virtual bool MC_Dead();
     virtual bool AI_STATE_Dying();
     bool CreateCorpse();
     bool StartBurnDeath();
@@ -306,7 +313,7 @@ class AI_Mgr : public CBaseCharacter
     std::uint64_t damage_reactions = 0, recoil_starts = 0;
     int recoil_node = -1, recoil_slot = -1;
     std::string damage_reaction_error;
-    bool MC_Idle();
+    virtual bool MC_Idle();
     bool MC_BestWeapon();
     virtual bool MC_Fire_Stand();
     bool MC_Fire_Crouch();

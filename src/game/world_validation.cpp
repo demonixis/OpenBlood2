@@ -27,7 +27,8 @@ namespace OpenBlood2
                     row.name = *name;
             report.unknown += row.state == EntryState::Unsupported;
             report.failed += row.state == EntryState::Failed;
-            report.omitted += row.state == EntryState::MissingWorldModel;
+            report.omitted += row.state == EntryState::MissingWorldModel ||
+                              row.state == EntryState::AbsentOriginalClass || row.state == EntryState::MissingResource;
             report.entries.push_back(std::move(row));
         }
         report.unavailable_services.clear();

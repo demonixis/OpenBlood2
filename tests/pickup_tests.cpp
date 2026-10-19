@@ -221,7 +221,7 @@ namespace
     {
         GameSession g;
         CHECK(setup(g, root));
-        for (auto text : {"Spawner", "SniperRiflePU", "AmmoPickup", "  ", "BulletAmmoPU Unknown 1",
+        for (auto text : {"Spawner", "WeaponPickup", "AmmoPickup", "  ", "BulletAmmoPU Unknown 1",
                           "BulletAmmoPU Name \"bad", "BulletAmmoPU Name a; Name b"})
             CHECK(!g.server.ValidateSpawnObject(text) && !brush(g, text));
         CHECK(!brush(g, "BulletAmmoPU", {{"SpawnObjectVel", DVector{1e8f, 0, 0}}}));
@@ -240,7 +240,7 @@ namespace
         // Authored container contents: original SpawnItem raises bouncing item/weapon leaves by 10
         // units and keeps them flagged, with no update scheduled for the source spring.
         for (auto text : {"MedKitPU", "FlashLightPU", "ProximitiesPU", "RemotesPU", "BerettaPU", "SubMachineGunPU",
-                          "FlareGunPU", "AssaultRiflePU"})
+                          "FlareGunPU", "AssaultRiflePU", "SniperRiflePU"})
         {
             CHECK(g.server.ValidateSpawnObject(text));
             h = SpawnObject(text, {100, 100, 100}, {}, {});
@@ -251,7 +251,6 @@ namespace
                   p->bounce_acceleration == 500);
             CHECK(near(p->rest_position.y, 100) && near(r->state.m_Pos.y, 110) && near(r->state.m_Pos.x, 100));
         }
-        CHECK(!g.server.ValidateSpawnObject("SniperRiflePU"));
         // Classes no original ObjectDLL defines: GetClass returns null, so the destroyed
         // container spawns nothing (03_Museum RocketAmmoPU, authoring typos).
         for (auto text : {"RocketAmmoPU", "rocketammopu Name x", "DieBugDieAmmo", "FareAmmoPU", "LifeEssencePU"})
@@ -488,12 +487,16 @@ namespace
               counts["RemotesPU"] == 107 && counts["FlashlightPU"] == 10 && counts["SniperRiflePU"] == 4 &&
               counts["BinocularsPU"] == 4 && counts["ShotgunPU"] == 3 && counts["SingularityPU"] == 1);
         CHECK(failures.empty()); // Retired TypeAction rows are created.
-        // 1785 includes the four SniperRiflePU offers (their weapon is not integrated), 14 StealthPU,
+        CHECK(counts["HowitzerPU"] == 1 && counts["NapalmCannonPU"] == 1 && counts["DeathRayPU"] == 1 &&
+              counts["TimeBombPU"] == 34);
+        // 1785 includes the four SniperRiflePU pickups, 14 StealthPU,
         // 13 InvulnerabilityPU, 4 BinocularsPU, 3 ShotgunPU and 1 SingularityPU. 70 container spawns include the
         // bouncing item/weapon leaves.
         CHECK(counts["StealthPU"] == 14 && counts["InvulnerabilityPU"] == 13);
-        CHECK(worlds == 57 && created == 1789 && counts["VoodooDollPU"] == 4 && missing == 0 && rejected == 0 &&
-              spawns == 70);
+        // BugSpray, NightGoggles and TheEye add 25 authored pickups; Voodoo adds four.
+        CHECK(counts["BugSprayPU"] == 3 && counts["NightGogglesPU"] == 10 && counts["TheEyePU"] == 12);
+        CHECK(worlds == 57 && created == 1876 && counts["AngerPU"] == 25 && counts["VoodooDollPU"] == 4 &&
+              missing == 0 && rejected == 0 && spawns == 70);
         return true;
     }
 } // namespace

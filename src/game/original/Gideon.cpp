@@ -181,8 +181,8 @@ bool Gideon::MC_Fire_Stand()
         {
             if (Metacmd == std::numeric_limits<int>::max())
                 return StateFailure("Gideon Metacmd overflow");
-            // Source always tries the absent Soul Hook and ignores the result.
-            // Retain this failed request, not an invented weapon or fallback.
+            // Source always tries Soul Hook and ignores the result. Its definition
+            // is shared with SoulDrudge; Gideon still needs to own it to switch.
             completion_selection = m_InventoryMgr.ChangeWeapon(WEAP_SOUL_HOOK);
             m_bAnimating = false;
             ++Metacmd;

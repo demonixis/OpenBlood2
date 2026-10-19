@@ -22,6 +22,27 @@ path): 01_SubwayA, 02_CityHub, 05_CDM, 05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon
 BB_Drain. `bb_midgard` and `bb_area15` still fail at startup (L14). The tables below are regenerated from
 the latest run.
 
+The 2026-10-19 [CityHubC/SteamTunnels continuation](../contracts/cityhubc_steamtunnels_contracts.md)
+updates those two rows only: both start through the Levels-tab path, with zero
+unsupported or failed entries. CityHubC retains two explicit omissions (one
+missing BSP and one empty model); SteamTunnels retains thirteen (eight class names
+absent from the original base game, three absent sprite files and two missing
+BSPs). These are accounted source rows, not newly implemented objects. The subsequent [inventory-use continuation](../contracts/inventory_use_contracts.md)
+implements TheEye, NightGoggles, BugSpray and BoneLeech attachment. The rest of this backlog retains its earlier measurement dates.
+
+The 2026-10-19 [Airship continuation](../contracts/airship_contracts.md) updates the
+06_airship1/06_airship2 rows: both start with zero unsupported classes or failed
+entries. Airship1 retains the pre-existing explicit omission of the absent girder1
+BSP. Sniper rifles, Anger pickups and bounded initial actor placement now execute;
+entry validation does not certify full traversal. Other rows retain their earlier
+measurement dates.
+
+The 2026-10-19 [Cathedral/Sewage/Slaughter House continuation](../contracts/cathedral_sewage_slaughter_contracts.md)
+updates those three rows: all start through the Levels-tab path in every difficulty.
+Cathedral omits two absent decorative resources, Sewage one missing Container BSP,
+and Slaughter House none. Counts below use source entries, excluding generated children.
+The other worlds have not been re-audited by this continuation.
+
 ## How to refresh
 
 ```bash
@@ -35,25 +56,25 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 ## Status by world
 
 `starts` means the world passes entry validation and starts (01_SubwayA,
-02_CityHub, 03_Museum, 05_CDM, 05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon, BB_Drain). Batches are defined in the next section.
+02_CityHub, 02_CityHubC, 03_Museum, 04_SteamTunnels, 05_CDM, 05_CDMB, 06_Airship1, 06_Airship2, 07_Cathedral, 08_SubwayB, 10_SewageTreatmentPlant, 11_Slaughter_House, Drop, BB_DeathCanyon, BB_Drain). Batches are defined in the next section.
 
 | World | Created | Unported (classes) | Failed | Batches needed |
 |---|---:|---:|---:|---|
 | 01_subwaya | 204 | 0 (0) | 0 | **starts** |
 | 02_cityhub | 453 | 0 (0) | 0 | **starts** |
 | 02_cityhubb | 404 | 7 (1) | 0 | L7 |
-| 02_cityhubc | 386 | 18 (2) | 2 | L2, L7, L10 |
+| 02_cityhubc | 405 | 0 (0) | 0 | **starts** |
 | 03_museum | 651 | 0 (0) | 0 | **starts** |
-| 04_steamtunnels | 494 | 10 (4) | 6 | L2, L5, L6, L7, L10 |
+| 04_steamtunnels | 499 | 0 (0) | 0 | **starts** |
 | 05_cdm | 550 | 0 (0) | 0 | **starts** |
 | 05_cdmb | 129 | 0 (0) | 0 | **starts** |
-| 06_airship1 | 191 | 0 (0) | 5 | L6, L12 |
-| 06_airship2 | 243 | 2 (2) | 17 | L6, L10 |
-| 07_cathedral | 218 | 7 (6) | 4 | L2, L6, L7, L8, L10 |
+| 06_airship1 | 196 | 0 (0) | 0 | **starts** |
+| 06_airship2 | 262 | 0 (0) | 0 | **starts** |
+| 07_cathedral | 227 | 0 (0) | 0 | **starts** |
 | 08_subwayb | 175 | 0 (0) | 0 | **starts** |
 | 09_abandoned_buildings | 657 | 22 (9) | 32 | L2, L4, L5, L6, L7, L8, L10, L11 |
-| 10_sewagetreatmentplant | 110 | 13 (2) | 1 | L6, L7 |
-| 11_slaughter_house | 472 | 21 (7) | 14 | L6, L7, L8, L10, L12 |
+| 10_sewagetreatmentplant | 124 | 0 (0) | 0 | **starts** |
+| 11_slaughter_house | 507 | 0 (0) | 0 | **starts** |
 | 21_laboratory | 303 | 17 (7) | 7 | L6, L7, L8, L11 |
 | 22_office | 494 | 4 (2) | 7 | L2, L6, L7, L8, L10 |
 | 23_rooftop | 136 | 6 (5) | 0 | L8, L9, L10 |
@@ -90,7 +111,7 @@ Closest to starting:
 - **L9 only:** `credits`, `end` (the Chosen as scripted actors).
 - **L10 only:** `multi/bb_bloodarena`, `multi/bb_area15`, `bb_brownstar`, `bb_cabana`, `bb_chosenarena`, `bb_drain`, `bb_power`.
 - **L11 only:** `multi/bb_fields`.
-- **L7 only (BoneLeech):** `02_cityhubb`. **L6 + L10:** `06_airship2`.
+- **L7 only (BoneLeech):** `02_cityhubb`.
 
 ## Batches
 
@@ -350,30 +371,14 @@ DLS contracts).
 | Fanatic | authored AI weapon unavailable: SHOTGU | 1 | L6 |
 
 ### 06_airship1
-191 created instances · 0 unported entries (0 classes) · 5 failed entries
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| CultistAI | NPC world ground placement failed | 3 | L12 |
-| Fanatic | authored AI weapon unavailable: SNIPE | 2 | L6 |
+196 created source instances · 0 unported · 0 failed · 1 omitted missing BSP (`girder1`).
+Starts. The two SNIPE Fanatics now have the original sniper rifle. Three authored
+Cultists are fitted locally out of overlapping ceiling/wall faces at initialization.
 
 ### 06_airship2
-243 created instances · 2 unported entries (2 classes) · 17 failed entries
-
-**Unported classes**
-
-| Class | Entries | Batch |
-|---|---:|---|
-| AngerPU | 1 | L10 |
-| BugSprayPU | 1 | L10 |
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| Fanatic | authored AI weapon unavailable: SHOTGUN | 17 | L6 |
+262 created source instances · 0 unported · 0 failed · 0 omitted.
+Starts. AngerPU now provides the original triple-damage power. Three authored
+Fanatic placements are resolved, including the two overlapping Fanatic3 entries.
 
 ### 07_cathedral
 218 created instances · 7 unported entries (6 classes) · 4 failed entries

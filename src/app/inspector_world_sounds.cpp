@@ -622,6 +622,8 @@ namespace OpenBlood2
                                     asset.bank->waves.size());
                     ImGui::TableNextColumn();
                     ImGui::TextWrapped("%s", asset.error.empty() ? asset.style_reference.c_str() : asset.error.c_str());
+                    if (!asset.style_filename.empty())
+                        ImGui::TextWrapped("Style file: %s", asset.style_filename.c_str());
                     if (!asset.style_error.empty())
                         ImGui::TextWrapped("IMA note decoding failed: %s", asset.style_error.c_str());
                     if (!asset.section_error.empty())

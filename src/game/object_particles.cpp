@@ -17,7 +17,8 @@ namespace OpenBlood2
             if (!resources || server.GetObjectPos(owner, &pose.position) != DE_OK ||
                 server.GetObjectRotation(owner, &pose.rotation) != DE_OK)
                 error = "Object particle resources/pose unavailable";
-            else if (recipe != 19 && recipe != 36 && recipe != 21 && recipe != 24 && (recipe < 12 || recipe > 17))
+            else if (recipe != 19 && recipe != 36 && recipe != 21 && recipe != 24 && recipe != 31 && recipe != 32 &&
+                     (recipe < 12 || recipe > 17))
                 error = "Object-bound particle recipe unavailable";
             else if (active.size() >= 128 || next_id_ == UINT64_MAX)
                 error = "Object particle system capacity exhausted";

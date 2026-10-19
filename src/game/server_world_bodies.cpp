@@ -9,7 +9,7 @@ namespace OpenBlood2
         trace_service("ConfigureWorldBody");
         auto* r = objects_.get(handle);
         if (!r || r->life != Life::Alive || !r->world_model || r->container() || r->world_body ||
-            (!properties.rotating_debris && !(r->state.m_Flags & FLAG_BOXPHYSICS)) ||
+            (!properties.rotating_debris && !properties.polygon_bounds && !(r->state.m_Flags & FLAG_BOXPHYSICS)) ||
             (r->state.m_Flags & FLAG_GOTHRUWORLD) || !std::isfinite(properties.mass) || properties.mass < 0 ||
             properties.mass > 1e6f || !std::isfinite(properties.friction) || properties.friction < 0 ||
             properties.friction > 20005)
@@ -24,10 +24,11 @@ namespace OpenBlood2
         auto* r = objects_.get(handle);
         if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL || !r->model || r->attachment ||
             r->client_movement || r->world_model || r->container() || r->world_body || r->character_body ||
-            r->model_body || properties.rotating_debris || (r->state.m_Flags & FLAG_GOTHRUWORLD) ||
-            !physics_vector(r->dimensions) || r->dimensions.x < 0 || r->dimensions.y < 0 || r->dimensions.z < 0 ||
-            !std::isfinite(properties.mass) || properties.mass < 0 || properties.mass > 1e6f ||
-            !std::isfinite(properties.friction) || properties.friction < 0 || properties.friction > 20005)
+            r->model_body || properties.rotating_debris || properties.polygon_bounds ||
+            (r->state.m_Flags & FLAG_GOTHRUWORLD) || !physics_vector(r->dimensions) || r->dimensions.x < 0 ||
+            r->dimensions.y < 0 || r->dimensions.z < 0 || !std::isfinite(properties.mass) || properties.mass < 0 ||
+            properties.mass > 1e6f || !std::isfinite(properties.friction) || properties.friction < 0 ||
+            properties.friction > 20005)
             return objects_.fail(ObjectError::Unsupported, "Invalid model-body configuration");
         r->model_body = true;
         r->body_properties = properties;

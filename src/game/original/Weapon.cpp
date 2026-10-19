@@ -36,6 +36,8 @@ FireResult CWeapon::Fire(const WeaponFire& request)
         !std::isfinite(m_pInventoryMgr->damage_multiplier) || m_pInventoryMgr->damage_multiplier < 0 ||
         m_pInventoryMgr->damage_multiplier > 1000)
         return FireResult::Invalid;
+    if (request.alternate && data.m_bAltFireZoom)
+        return FireResult::Blocked; // COMMAND_ALTFIRE handles zoom, without a shot or ammo use.
     const auto length = std::sqrt(vector_dot(request.direction, request.direction));
     if (!std::isfinite(length) || length < 1e-6f)
         return FireResult::Invalid;
@@ -150,7 +152,8 @@ FireResult CWeapon::Fire(const WeaponFire& request)
         }
         last_shot.direction = aim_direction;
         last_shot.end = vector_add(last_shot.request.position, vector_scale(aim_direction, range));
-        if (data.m_nType == WEAP_GIDEON_SHIELD)
+        if (data.m_nType == WEAP_GIDEON_SHIELD || data.m_nType == WEAP_ZEALOT_HEAL ||
+            data.m_nType == WEAP_ZEALOT_SHIELD)
         {
             last_shot.collision = SegmentResult::Unavailable; // Visual-only source branch: no damage ray.
             return true;

@@ -202,6 +202,17 @@ namespace OpenBlood2
             const auto& instance = scene.instances[entry.range];
             const ObjectRecord* record = entry.object ? game.objects.get(entry.object) : nullptr;
             ++stats.models;
+            if (record && game.client_shell.night_goggles && (record->user_flags & (1u << 10)))
+            {
+                ++stats.unlit;
+                auto& instance = scene.instances[entry.range];
+                instance.material = 0; // DefaultModelHook: MHF_USETEXTURE off.
+                instance.color = {1, 1, 1};
+                ModelLight glow;
+                glow.ambient = {0, 1, 0}; // Original green light add (0,255,0).
+                instance.light = glow;
+                continue;
+            }
             if (record && (record->state.m_Flags & FLAG_NOLIGHT))
             {
                 ++stats.unlit;

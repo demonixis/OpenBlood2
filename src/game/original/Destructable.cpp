@@ -164,6 +164,11 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
                 m_fDeathHitPoints = 0;
                 amount = m_fHitPoints;
             }
+            else if (ai_body_hits)
+            {
+                node_hit = 2; // Torso reaction, without claiming a successful humanoid hit query.
+                side_hit = 0;
+            }
             else if (ai_hit_localization)
             {
                 auto* ai = dynamic_cast<AI_Mgr*>(owner);

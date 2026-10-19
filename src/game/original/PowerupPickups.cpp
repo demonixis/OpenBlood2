@@ -45,3 +45,11 @@ InvulnerabilityPU::InvulnerabilityPU()
     display_name = "Willpower";
     resource_id = 313; // IDS_POWERUP_WILLPOWER; default powerup4.wav pickup sound.
 }
+
+AngerPU::AngerPU()
+{
+    value = {OpenBlood2::PickupKind::Powerup, 7, 30}; // POWERUP_ANGER.
+    file = "Anger_pu";
+    display_name = "The Anger";
+    resource_id = 315; // IDS_POWERUP_ANGER.
+}

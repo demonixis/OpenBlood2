@@ -1,7 +1,7 @@
 set(expected 0)
 if(CASE STREQUAL "help")
     set(args --help)
-    set(pattern "Blood II reconstruction")
+    set(pattern "Open Blood II")
 elseif(CASE STREQUAL "unknown")
     set(args --not-an-option)
     set(expected 2)

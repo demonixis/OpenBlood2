@@ -95,7 +95,12 @@ namespace OpenBlood2
                     return value.character >= 0 && value.character < 4 && value.event >= 0 &&
                            value.event < (value.group ? 12 : 9);
                 else if constexpr (std::is_same_v<T, InventoryAction>)
-                    return value.type == 1 || value.type == 2 || value.type == 5;
+                    return value.type == 1 || value.type == 2 || value.type == 3 || value.type == 5;
+                else if constexpr (std::is_same_v<T, SeeingEyeView>)
+                    return (!value.active || value.eye) && std::isfinite(value.blind_seconds) &&
+                           value.blind_seconds >= 0 && value.blind_seconds <= 10;
+                else if constexpr (std::is_same_v<T, CreatureAttach>)
+                    return value.creature && value.enemy;
                 else if constexpr (std::is_same_v<T, BossHealth>)
                     return std::isfinite(value.fraction);
                 else if constexpr (std::is_same_v<T, WorldExit>)
@@ -226,36 +231,59 @@ namespace OpenBlood2
             r->dimensions.z <= 0 || !(r->state.m_Flags & FLAG_SOLID))
             return DE_INVALIDPARAMS;
         const auto half = r->dimensions;
-        const double limit = std::min(half.x, half.z);
-        auto position = r->state.m_Pos;
-        double distance = 0;
-        for (unsigned i = 0; i <= 4; ++i)
+        // Separate horizontal/vertical budgets admit a ceiling plus its sloped trim.
+        // The small margin includes the existing 0.001 separation on each of eight steps.
+        const double horizontal_limit = std::min(half.x, half.z) + .01;
+        const double vertical_limit = half.y + .01;
+        const auto origin = r->state.m_Pos;
+        bool centered = false;
+        for (unsigned branch = 0; branch < 2; ++branch)
         {
-            CollisionHit overlap;
-            const auto query = collision->sweep(position, position, half, overlap);
-            if (query == CollisionQuery::Invalid)
-                return DE_ERROR;
-            if (query == CollisionQuery::Miss || !overlap.start_solid)
+            if (branch && !centered)
+                break;
+            auto position = origin;
+            double horizontal = 0, vertical = 0;
+            for (unsigned i = 0; i <= 8; ++i)
             {
-                if (distance == 0)
-                    return DE_OK;
-                const auto nudge = vector_subtract(position, r->state.m_Pos);
-                if (TeleportObject(h, &position) != DE_OK)
+                CollisionHit overlap;
+                const auto query = collision->sweep(position, position, half, overlap);
+                if (query == CollisionQuery::Invalid)
                     return DE_ERROR;
-                r->placement_nudge = nudge;
-                ++r->placement_nudges;
-                return DE_OK;
+                if (query == CollisionQuery::Miss || !overlap.start_solid)
+                {
+                    if (i == 0)
+                        return DE_OK;
+                    const auto nudge = vector_subtract(position, origin);
+                    if (TeleportObject(h, &position) != DE_OK)
+                        return DE_ERROR;
+                    r->placement_nudge = nudge;
+                    ++r->placement_nudges;
+                    return DE_OK;
+                }
+                if (i == 8 || !physics_vector(overlap.normal) || !std::isfinite(overlap.penetration))
+                    break;
+                auto normal = overlap.normal;
+                if (i == 0)
+                {
+                    const double radius =
+                        std::abs(normal.x) * half.x + std::abs(normal.y) * half.y + std::abs(normal.z) * half.z;
+                    centered = std::abs(overlap.penetration - radius) < .001;
+                    // A center exactly on a thin face has two equal separating directions.
+                    // Retry the other side only if the first bounded, atomic solve fails.
+                    if (branch)
+                        normal = vector_scale(normal, -1);
+                }
+                const auto correction = vector_scale(normal, static_cast<float>(overlap.penetration + .001));
+                horizontal += std::hypot(correction.x, correction.z);
+                vertical += std::abs(correction.y);
+                if (horizontal > horizontal_limit || vertical > vertical_limit)
+                    break;
+                position = vector_add(position, correction);
             }
-            if (i == 4 || !physics_vector(overlap.normal) || !std::isfinite(overlap.penetration))
-                break;
-            const double step = overlap.penetration + .001;
-            distance += step;
-            if (distance > limit)
-                break;
-            position = vector_add(position, vector_scale(overlap.normal, static_cast<float>(step)));
         }
-        return DE_ERROR; // Atomic: an unresolved placement retains its authored pose.
+        return DE_ERROR; // Neither attempt commits a partial correction.
     }
+
     DRESULT ServerAdapter::MoveObjectToGround(HOBJECT h)
     {
         trace_service("MoveObjectToGround");
@@ -265,12 +293,8 @@ namespace OpenBlood2
         // Original ObjectUtilities::MoveObjectToGround: downward ray, animation-0
         // user dimensions for characters, then collision-aware MoveObject. The
         // otherwise unbounded CastRay is limited to the supported coordinate range.
-        // Replacement policy for authored overlaps: a solid box may start inside primary-world
-        // faces (03_Museum's Cultist "pud" sits 2.86 units into a wall). The original one-sided
-        // BSP planes let such a body settle; this sweep cannot start inside it. Nudge the box
-        // out along the overlapped faces' normals: at most four corrections, never further
-        // than its smaller horizontal half extent, and only to a position whose box is clear.
-        // Otherwise nothing moves and the MoveObject below reports the overlap explicitly.
+        // Separate authored wall/floor overlaps only at initial placement. Ceilings
+        // that a normal descent leaves retain their original ground-drop path.
         CollisionHit descent;
         const auto below = DVector{r->state.m_Pos.x, r->state.m_Pos.y - 1, r->state.m_Pos.z};
         // Only when the descent itself starts blocked: overlaps it leaves (a ceiling) keep the
@@ -282,6 +306,62 @@ namespace OpenBlood2
         {
             // A refused nudge leaves the original MoveObject below to report the contact.
             ResolveInitialWorldOverlap(h);
+        }
+        // Two authored Airship2 Fanatic3 entries share a spawn center. Separate only
+        // initially overlapping characters, without moving the older actor or changing
+        // their bodies. Four face-adjacent candidates, shortest first, are bounded by
+        // the two bodies' horizontal diameter; all geometry and the swept route must fit.
+        if (Objects::is_kind_of(r->type, objects_.find_class("AI_Mgr")))
+        {
+            const auto ids = objects_.snapshot();
+            CollisionHit contact;
+            const auto origin = r->state.m_Pos;
+            if (sweep_scene(h, origin, origin, r->dimensions, contact, ids) == CollisionQuery::Hit &&
+                contact.start_solid && contact.object)
+            {
+                const auto* other = objects_.get(contact.object);
+                if (other && (other->character_body || other->state.m_ObjectType == OT_MODEL) && !other->world_model)
+                {
+                    const auto combined = vector_add(r->dimensions, other->dimensions);
+                    const auto center = other->state.m_Pos;
+                    std::vector<DVector> candidates{{center.x - combined.x - .001f, origin.y, origin.z},
+                                                    {center.x + combined.x + .001f, origin.y, origin.z},
+                                                    {origin.x, origin.y, center.z - combined.z - .001f},
+                                                    {origin.x, origin.y, center.z + combined.z + .001f}};
+                    if (!other->character_body)
+                    {
+                        candidates.push_back({origin.x, center.y + combined.y + .001f, origin.z});
+                        candidates.push_back({origin.x, center.y - combined.y - .001f, origin.z});
+                    }
+                    auto distance = [&](DVector p)
+                    {
+                        const auto delta = vector_subtract(p, origin);
+                        return vector_dot(delta, delta);
+                    };
+                    std::stable_sort(candidates.begin(), candidates.end(),
+                                     [&](DVector a, DVector b) { return distance(a) < distance(b); });
+                    const float limit =
+                        std::max({combined.x, combined.z, other->character_body ? 0.f : combined.y}) + .01f;
+                    bool placed = false;
+                    for (auto candidate : candidates)
+                    {
+                        CollisionHit hit;
+                        if (distance(candidate) > limit * limit ||
+                            sweep_scene(h, candidate, candidate, r->dimensions, hit, ids) != CollisionQuery::Miss ||
+                            sweep_scene(h, origin, candidate, r->dimensions, hit, ids, other->handle, .01,
+                                        StartOverlap::Leave) != CollisionQuery::Miss)
+                            continue;
+                        if (TeleportObject(h, &candidate) != DE_OK)
+                            return DE_ERROR;
+                        r->placement_nudge = vector_add(r->placement_nudge, vector_subtract(candidate, origin));
+                        ++r->placement_nudges;
+                        placed = true;
+                        break;
+                    }
+                    if (!placed)
+                        return DE_ERROR;
+                }
+            }
         }
         auto from = r->state.m_Pos;
         auto to = from;
@@ -301,14 +381,16 @@ namespace OpenBlood2
             const auto query = sweep_object(*other, from, to, {}, hit);
             if (query == CollisionQuery::Invalid)
                 return DE_ERROR;
-            if (query == CollisionQuery::Hit && (!found || hit.fraction < nearest.fraction))
+            if (query == CollisionQuery::Hit && !hit.start_solid && (!found || hit.fraction < nearest.fraction))
             {
                 nearest = hit;
                 found = true;
             }
         }
-        if (!found || nearest.start_solid)
+        if (!found)
             return DE_NOTFOUND;
+        if (nearest.start_solid)
+            return DE_ERROR;
         DVector dims = r->dimensions;
         if (Objects::is_kind_of(r->type, objects_.find_class("CBaseCharacter")) &&
             GetModelAnimUserDims(h, &dims, 0) != DE_OK)

@@ -123,7 +123,7 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
             if (message == OpenBlood2::add_ammo_message)
                 accepted = m_InventoryMgr.AddAmmo(pickup.type, pickup.amount) == InventoryResult::Ok;
             else if (message == OpenBlood2::add_item_message)
-                accepted = ((pickup.type == 7 || pickup.type == 8)
+                accepted = ((pickup.type == 7 || pickup.type == 8 || pickup.type == 9)
                                 ? m_InventoryMgr.AddInventoryWeapon(pickup.type, static_cast<DBYTE>(pickup.amount))
                                 : m_InventoryMgr.AddItem(pickup.type, static_cast<DBYTE>(pickup.amount))) ==
                            InventoryResult::Ok;
@@ -165,6 +165,7 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
                         accepted = m_damage.AddNecroWard(pickup.amount);
                         break;
                     case 5: // POWERUP_INVULNERABILITY
+                    case 7: // POWERUP_ANGER
                     case 6: // POWERUP_STEALTH
                         accepted = AddPowerup(static_cast<DBYTE>(pickup.type), pickup.amount);
                         break;

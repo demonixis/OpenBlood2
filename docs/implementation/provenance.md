@@ -1478,6 +1478,16 @@ Selected `_DEMO` branches of original `InventoryMgr.cpp` (IsDemoWeapon, bomb con
 
 The engine `Sprite` callback and the `FastApproxArea` CF_NORUNTIME registration come from original `AppHeaders/engineobjects.c`; the `Spawner` class comes from `ObjectDLL/Spawner.cpp`, reusing the earlier `SpawnObject` helper and `PlaySoundFromPos` rules. `Fanatic`, `Prophet`, `CHowitzerShell`, `SniperRiflePU`, AI_Mgr FindHealth, MC_Fire_Crouch, MC_Roll_Forward/Backward and CreateGibs are selected from `ObjectDLL` (Fanatic.cpp, prophet.cpp, AI_Mgr.cpp, GameProjectiles.cpp, WeaponPickups.cpp). The retail `object.lto` string pools were inspected as data (never executed) to establish that `WeaponStrToInt` lacks the `_ADD_ON` COMBAT branch. The MoveObject departure-from-overlap rule is replacement engine policy corroborated by later LithTech `moveplayer.cpp`; no engine code is imported. See [source ledger](sources/cdmb_world_sources.json), [Sprite](../contracts/builtin_sprite_contracts.md), [Spawner](../contracts/spawner_contracts.md), [Fanatic/Prophet](../contracts/fanatic_prophet_contracts.md) and [collision traversal](../contracts/collision_traversal_contracts.md) contracts.
 
+
+## CityHubC and SteamTunnels entry (2026-10-19)
+
+Selective original BoneLeech and DrudgeLord constructors, state decisions and attacks; Soul Hook, BoneLeech Suck and Drudge Fireball weapon definitions and slash sounds; CNapalmProjectile; BugSprayPU, TheEyePU and NightGogglesPU constructors. The installed `Music/Track1/iMusic.ini` supplies exact style-label/filename mappings. The base source registrations and mounted OBJECT.LTO distinguish absent Gremlin/RocketAmmoPU names from unported classes; later LithTech loader code corroborates continuing past absent classes/resources. BoneLeech body damage, conservative polygon-body motion and explicit triangle-boundary collision are documented replacement policies. See [contracts](../contracts/cityhubc_steamtunnels_contracts.md) and [source hashes](sources/cityhubc_steamtunnels_sources.json). Pickup inventory actions and BoneLeech's client attachment remain unavailable; source omissions stay inspectable.
+
+
+## BoneLeech attachment and inventory use (2026-10-19)
+
+Original BoneLeech EnemyAttach/ViewCreature handshake and USE release, CBugSpray definition/projectiles and client particle/impact recipes, CInvNightGoggles and CInvTheEye/SeeingEye are selectively ported. Checked owner messages, scene light scale, camera/input/audio lifetime and owned inventory restoration replace the previously refused interactions. Nonsolid close creatures, collision-checked detach placement, shared eye flight and handle-free cross-world eye restoration are explicit engine adaptations. See [contracts](../contracts/inventory_use_contracts.md) and [source hashes](sources/inventory_use_sources.json). This supersedes the preceding paragraph's inventory/attachment omission only; M2 and full-campaign acceptance are unchanged.
+
 ## Menu-free playable demo continuation (2026-10-19)
 
 The old fixed-offset demo-menu experiment above is removed. Runtime edition, exclusive
@@ -1532,3 +1542,26 @@ existing ImGui pin (Apache 2.0, `licenses/`). Launcher-only curl/miniz pins and
 archive hashes are in `cmake/LauncherDependencies.cmake`; system OpenSSL provides
 TLS and SHA-256. The earlier launcher source/hash ledger is historical L0-L2
 evidence; config/resources now have the explicitly documented overlay extension.
+
+## Airship sniper, Anger and placement
+
+The [Airship contracts](../contracts/airship_contracts.md) selectively import the
+full Shared/WeaponDefs.cpp Barrett definition, ObjectDLL/GameWeapons.h CSniperRifle
+wrapper, AI_Mgr.cpp SNIPE mapping/default aiming, PlayerObj.cpp COMMAND_ALTFIRE
+and Anger Add/Check/ResetPowerups branches, PowerupPickups.cpp AngerPU, and
+ClientShellDLL/ViewWeapon.cpp's alternate-zoom exclusion. Local typed commands,
+checked lifetimes and bounded placement are explicit adaptations. Later
+runtime/world/src/fullintersectline.cpp corroborates the ground ray's opt-in
+interior-box semantics; it does not prove 1998 collision parity. Original source
+hashes are in [airship_sources.json](sources/airship_sources.json). Reference trees
+and commercial resources are unchanged.
+
+## Cathedral, Sewage and Slaughter House (2026-10-19)
+
+The [contracts](../contracts/cathedral_sewage_slaughter_contracts.md) cover selective
+Thief/Naga/Zealot imports, their weapons/projectiles, Howitzer/Napalm/DeathRay/TimeBomb
+and pickups. Shared checked transport, bounded physics and effect diagnostics are
+explicit adaptations. Later engine references support sky replacement and native-sized
+SPR frames; DLS1's explicitly authored default velocity edge selects existing gain
+once. The [ledger](sources/cathedral_sewage_slaughter_sources.json) records source
+hashes and compatibility boundaries. No reference source or commercial asset is changed.

@@ -45,13 +45,33 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
         return Init(type, owner, failure);
     failure.clear();
     *this = {};
-    if ((type != 19 && type != 36 && type != 21 && type != 24 && (type < 12 || type > 17)) || !owner)
+    if ((type != 19 && type != 36 && type != 21 && type != 24 && type != 31 && type != 32 &&
+         (type < 12 || type > 17)) ||
+        !owner)
     {
         failure = "Unsupported object particle recipe or absent parent";
         return false;
     }
     recipe = type;
     parent = owner;
+    if (type == 31 || type == 32)
+    {
+        radius = type == 31 ? 400.f : 1500.f;
+        position_radius = 3;
+        gravity = type == 31 ? -75.f : 100.f;
+        add_delay = type == 31 ? .025f : .01f;
+        authored_count = type == 31 ? 3 : 1;
+        density = 7.5f;
+        requested_alpha = type == 31 ? 1.f : .5f;
+        min_life = type == 31 ? .25f : .35f;
+        max_life = type == 31 ? .35f : .5f;
+        min_color = type == 31 ? DVector{0, 32, 0} : DVector{192, 192, 0};
+        max_color = type == 31 ? DVector{128, 196, 0} : DVector{255, 255, 255};
+        flags = 0x0f;
+        texture = type == 31 ? "SpriteTextures\\Lensflare32_1.dtx" : "SpriteTextures\\flames1_09.dtx";
+        initialized_ = true;
+        return true;
+    }
     if (type >= 12 && type <= 17)
     {
         // CObjectGeneralFX OBJFX_VOODOO_1..6, original high-detail recipes.
@@ -234,7 +254,7 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
 {
     const auto delta = vector_subtract(last_position, position);
     const float distance = std::sqrt(vector_dot(delta, delta));
-    const float samples = recipe == 21 ? distance / (density * radius / 1000.f) : 1.f;
+    const float samples = (recipe == 21 || recipe == 31 || recipe == 32) ? distance / (density * radius / 1000.f) : 1.f;
     if (!std::isfinite(samples) || samples > 2048)
     {
         error = "Object particle stream capacity exceeded";
@@ -258,14 +278,17 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
         auto right = rotate_vector(basis, {1, 0, 0});
         const auto forward = rotate_vector(basis, {0, 0, 1});
         around(basis, forward, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
-        if (recipe == 19 || recipe == 21 || recipe == 24)
+        if (recipe == 19 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32)
             around(basis, right, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
         right = vector_scale(right, 1 / std::sqrt(vector_dot(right, right)));
-        const float speed =
-            draw(random, 0, recipe == 21 || recipe == 24 ? 25.f : 0.f); // Original zero-speed draw still consumes RNG.
-        auto start =
-            vector_scale(right, recipe == 21 || recipe == 24 ? draw(random, 0, position_radius) : position_radius);
-        if (recipe == 21 || recipe == 24)
+        const float speed = draw(random, recipe == 31 ? -5.f : 0.f,
+                                 recipe == 31                   ? 5.f
+                                 : recipe == 21 || recipe == 24 ? 25.f
+                                                                : 0.f); // Original zero-speed draw still consumes RNG.
+        auto start = vector_scale(right, recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32
+                                             ? draw(random, 0, position_radius)
+                                             : position_radius);
+        if (recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32)
             start = vector_add(
                 start, vector_add(vector_subtract(position, origin), vector_scale(step, float(i / authored_count))));
         const auto color = vector_scale(
@@ -309,7 +332,7 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         if (duration < elapsed)
             return false;
     }
-    else if (recipe == 1)
+    else if (recipe == 1 || recipe == 31 || recipe == 32)
     {
         const auto difference = vector_subtract(owner->position, last_object_position);
         if (difference.x == 0 && difference.y == 0 && difference.z == 0)
@@ -326,9 +349,10 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         // ALIGNROTATION affects emission, not the fixed smoke system transform.
         source_rotation = owner->rotation;
     }
-    else if (recipe == 21 || recipe == 24)
+    else if (recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32)
     {
-        position = owner->position;
+        if (moving)
+            position = owner->position;
         // Both recipes use MOVINGSOURCE; smoke also streams backward between samples.
         // Neither recipe enables alpha ramp flags: authored alpha remains unused.
     }
