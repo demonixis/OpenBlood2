@@ -11,6 +11,69 @@ are in [Dependencies.cmake](../cmake/Dependencies.cmake). No prototype repositor
 is a build dependency. The first configure needs network access; build products
 and downloaded dependencies are ignored under `build/` and `.cache/`.
 
+## Windows build
+
+Install these tools, or check that they are already available:
+
+- Visual Studio or Build Tools with **Desktop development with C++**, an MSVC
+  C++20 toolset for x64, and a Windows 10/11 SDK.
+- CMake 3.28 or newer, Ninja and Git, available on `PATH`.
+- Network access for the initial dependency downloads. CMake fetches and builds
+  pinned SDL3, spdlog and Dear ImGui; do not install separate copies.
+
+Open the **x64 Native Tools Command Prompt** for Visual Studio, or initialize an
+x64 Developer PowerShell. A normal terminal does not automatically load MSVC's
+compiler, headers and libraries. For an existing PowerShell session, discover
+the installed C++ tools and initialize them with:
+
+```powershell
+$vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+$vsPath = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+& "$vsPath\Common7\Tools\Launch-VsDevShell.ps1" -Arch amd64 -HostArch amd64 -SkipAutomaticLocation
+```
+
+If no installation is returned, add the C++ workload through Visual Studio
+Installer. From the repository directory in that developer shell, run:
+
+```powershell
+cmake --preset dev
+cmake --build --preset dev --parallel
+ctest --preset dev -L headless
+.\build\dev\blood2.exe --data-dir "D:\Games\Blood II"
+```
+
+Use your own game installation path. Commercial data is required to play, but
+not to compile or run synthetic tests. The `dev` preset enables optimization and
+inspection; `release` disables inspection and `debug` disables optimization.
+Keep GPU tests opt-in as described under [Tests](#tests).
+
+If configuration previously reported `No CMAKE_C_COMPILER could be found`, enter
+the developer shell and run `cmake --preset dev --fresh` before building. Use the
+same shell for configuration and compilation. Do not pass `-A x64` to the Ninja
+presets; the developer shell selects the compiler architecture.
+
+The SDL property patch writes LF bytes explicitly on every platform and retains
+its exact input/output SHA-256 checks. If an older Windows configure left
+`SDL property fixes did not produce the expected source`, configure into a new
+build directory so FetchContent extracts a clean copy:
+
+```powershell
+cmake --preset dev -B build/windows-clean
+cmake --build build/windows-clean --parallel
+ctest --test-dir build/windows-clean -L headless --output-on-failure
+```
+
+Here the executable is `build/windows-clean/blood2.exe`; the ordinary `dev` build
+and test presets still refer to `build/dev`. `--fresh` clears the CMake cache but
+does not remove an already modified dependency source tree. Do not disable hash
+checks to recover a failed patch.
+
+For graphical execution, install the GPU vendor's driver with Vulkan support.
+The bundled game shaders support Vulkan on Windows; Direct3D 12 shader artifacts
+are not supplied. The Vulkan SDK is optional for an ordinary build, and provides
+validation layers and tools for GPU development. Shader regeneration uses the
+separate [offline toolchain](contracts/metal_shader_contracts.md).
+
 ## Content and launch
 
 Provide a legally obtained Blood II installation externally. Pass `--data-dir`,
@@ -80,8 +143,9 @@ The ICD path is machine-specific and is not a production requirement. On macOS,
 use Apple Clang and the same CMake/Ninja presets. Bundled MSL shaders enable Metal;
 ordinary builds do not require SDL_shadercross. Native execution is user-confirmed,
 but automated Apple validation remains pending. See [Metal contracts](contracts/metal_shader_contracts.md)
-for regeneration. Windows, mobile and VR are unverified; D3D12 shader artifacts
-are not bundled. SDL's OpenXR code is pinned, but the app does not start an XR session.
+for regeneration. Windows setup is described [above](#windows-build); graphical
+Windows execution, mobile and VR remain unverified. D3D12 shader artifacts are not
+bundled. SDL's OpenXR code is pinned, but the app does not start an XR session.
 
 ## Tests
 

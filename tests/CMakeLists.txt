@@ -4,6 +4,13 @@ blood2_project_options(sdl_properties_tests)
 add_test(NAME platform.destroyed_properties COMMAND sdl_properties_tests)
 set_tests_properties(platform.destroyed_properties PROPERTIES LABELS "headless;platform" TIMEOUT 10)
 
+add_test(NAME platform.sdl_properties_patch COMMAND "${CMAKE_COMMAND}"
+    "-DSDL_SOURCE_DIR=${sdl3_SOURCE_DIR}"
+    "-DPATCH=${PROJECT_SOURCE_DIR}/cmake/PatchSdlProperties.cmake"
+    "-DROOT=${CMAKE_CURRENT_BINARY_DIR}/sdl-patch-fixtures"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/sdl_properties_patch_test.cmake")
+set_tests_properties(platform.sdl_properties_patch PROPERTIES LABELS "headless;platform" TIMEOUT 20)
+
 add_executable(platform_lifetime_tests platform_lifetime_tests.cpp)
 target_link_libraries(platform_lifetime_tests PRIVATE SDL3::SDL3)
 blood2_project_options(platform_lifetime_tests)

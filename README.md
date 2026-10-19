@@ -32,6 +32,8 @@ See the [workspace roadmap](../Documentation/Roadmap/readme.md) and
 ## Build
 
 Install CMake 3.28+, Ninja, a C++20 compiler and SDL's platform development dependencies.
+On Windows, install MSVC and the Windows SDK, and run the Ninja presets from an
+x64 Visual Studio developer shell; see [Windows setup](docs/getting_started.md#windows-build).
 The first configure downloads pinned dependencies. Supply your own Blood II installation.
 Run from this repository:
 

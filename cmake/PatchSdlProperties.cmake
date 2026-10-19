@@ -26,7 +26,9 @@ string(REPLACE
     "(const void **)properties);\n    CHECK_PARAM(!properties) {\n        return false;\n    }\n\n    SDL_LockMutex((*properties)->lock);\n    return true;"
     "(const void **)properties);\n    CHECK_PARAM(!*properties) {\n        return false;\n    }\n\n    SDL_LockMutex((*properties)->lock);\n    return true;"
     source "${source}")
-file(WRITE "${path}" "${source}")
+# Keep the pinned bytes identical on Windows, Linux and macOS. file(WRITE)
+# uses native newlines on Windows; the exact output hash remains checked below.
+file(CONFIGURE OUTPUT "${path}" CONTENT "${source}" @ONLY NEWLINE_STYLE LF)
 file(SHA256 "${path}" hash)
 if(NOT hash STREQUAL patched)
     message(FATAL_ERROR "SDL property fixes did not produce the expected source")
