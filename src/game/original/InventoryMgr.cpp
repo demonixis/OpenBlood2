@@ -52,6 +52,14 @@ CInventoryMgr::~CInventoryMgr()
 }
 DDWORD CInventoryMgr::EngineMessageFn(LPBASECLASS object, DDWORD message, void* data, DFLOAT fData)
 {
+    if (message == MID_UPDATE && goggles)
+    {
+        const auto before = goggles->count;
+        const bool active = goggles->active;
+        goggles->Update();
+        if (before != goggles->count || active != goggles->active)
+            ++revision;
+    }
     if (message == MID_UPDATE && flashlight)
     {
         const auto count = flashlight->count;
@@ -200,6 +208,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         weapon = std::make_unique<CBeretta>();
     else if (type == WEAP_SUBMACHINEGUN)
         weapon = std::make_unique<CSubMachineGun>();
+    else if (type == WEAP_BUGSPRAY)
+        weapon = std::make_unique<CBugSpray>();
     else if (type == WEAP_SHOTGUN)
         weapon = std::make_unique<CShotgun>();
     else if (type == WEAP_SINGULARITY)
@@ -410,8 +420,25 @@ InventoryResult CInventoryMgr::DropCurrentWeapon()
 // Selected original AddItem/SetActiveItem branches; other items remain unsupported.
 InventoryResult CInventoryMgr::AddItem(DBYTE type, DBYTE value)
 {
-    if ((type != 1 && type != 2 && type != 5) || !BaseClass::GetServerDE()->IsObjectAlive(m_hOwner))
+    if ((type < 1 || type > 5) || !BaseClass::GetServerDE()->IsObjectAlive(m_hOwner))
         return InventoryResult::Invalid;
+    if (type == 3)
+    {
+        if (!goggles)
+            goggles.emplace(m_hOwner);
+        else if (!goggles->AddItem(value))
+            return InventoryResult::AlreadyHave;
+        ++revision;
+        return InventoryResult::Ok;
+    }
+    if (type == 4)
+    {
+        if (eye && eye->available)
+            return InventoryResult::AlreadyHave;
+        eye = std::make_unique<CInvTheEye>(m_hOwner);
+        ++revision;
+        return InventoryResult::Ok;
+    }
     if (type == 5)
     {
         if (binoculars)
@@ -438,6 +465,14 @@ InventoryResult CInventoryMgr::AddItem(DBYTE type, DBYTE value)
 }
 InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
 {
+    if (type == 3 || type == 4)
+    {
+        const bool activated = type == 3 ? goggles && goggles->ActivateItem() : eye && eye->ActivateItem();
+        if (!activated)
+            return InventoryResult::NotAvailable;
+        ++revision;
+        return InventoryResult::Ok;
+    }
     if (type == 7 || type == 8)
         return SelectInventoryWeapon(WEAP_PROXIMITYBOMB + type - 7);
     if (type == 2)
@@ -470,6 +505,10 @@ InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
 // gates disable our slot-backed selectors; restoring a live checkpoint rebuilds them.
 void CInventoryMgr::RemoveDeathItems()
 {
+    if (goggles && goggles->active)
+        goggles->SetActive(false);
+    goggles.reset();
+    eye.reset();
     medkit.reset();
     if (flashlight && flashlight->active)
         flashlight->SetActive(false); // Original active-item removal sends its off action.

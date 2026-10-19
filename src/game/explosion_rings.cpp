@@ -16,6 +16,28 @@ namespace OpenBlood2
         }
         if (type == 6 || type == 8)
             return true; // No ring branch in these high-detail recipes.
+        if (type == 27)
+        {
+            const auto n = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+            ExplosionRingSettings s;
+            s.position = vector_add(pos, vector_scale(n, 15));
+            s.normal = n;
+            s.color = {1, 1, .5f};
+            s.radius = 4500;
+            s.position_radius = 1;
+            s.velocity = 75;
+            s.count = 16;
+            s.duration = .5f;
+            s.alpha = .75f;
+            s.fade = 1;
+            s.align = 1;
+            s.texture = "SpriteTextures\\flames1_09.dtx";
+            s.delay = .1f;
+            out.push_back(s);
+            s.delay = .2f;
+            out.push_back(s);
+            return true;
+        }
         if (type > 3)
         {
             error = "Explosion ring recipe unavailable";

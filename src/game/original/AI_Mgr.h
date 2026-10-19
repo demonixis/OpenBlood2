@@ -261,6 +261,7 @@ class AI_Mgr : public CBaseCharacter
     bool MC_Roll_Backward();
     int m_nDodgeFlags = 0;
     std::uint64_t dodge_updates = 0, dodge_queries = 0;
+    virtual bool AI_STATE_EnemyAttach();
     virtual bool AI_STATE_AttackClose();
     virtual bool AI_STATE_AttackFar();
     struct ObstacleRay

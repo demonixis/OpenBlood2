@@ -75,6 +75,8 @@ const char* WeaponPickupClass(DDWORD type)
             return "ShotgunPU";
         case WEAP_SINGULARITY:
             return "SingularityPU";
+        case WEAP_BUGSPRAY:
+            return "BugSprayPU";
         case WEAP_SNIPERRIFLE:
             return "SniperRiflePU";
         default:

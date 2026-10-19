@@ -1,6 +1,7 @@
 #include "engine/world_model.h"
 #include "game/original/PolyGrid.h"
 #include "game/original/Projectile.h"
+#include "game/original/SeeingEye.h"
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
@@ -23,6 +24,9 @@ namespace OpenBlood2
             if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
                 other->handle == ignore_extra || !(other->state.m_Flags & FLAG_SOLID))
                 continue;
+            if (const auto* eye = dynamic_cast<const SeeingEye*>(other->game.get());
+                eye && !eye->dropped && eye->m_hFiredFrom == ignore)
+                continue; // Let the owner move while its freshly thrown eye exits the body.
             CollisionHit hit;
             auto query = sweep_object(*other, from, to, dims, hit, allowed_penetration, start);
             if (query == CollisionQuery::Invalid)

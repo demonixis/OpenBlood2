@@ -99,3 +99,39 @@ bool CInvBinoculars::ActivateItem()
     Deactivate(); // Source ignores the deactivation result and reports success.
     return true;
 }
+
+bool CInvNightGoggles::AddItem(DBYTE)
+{
+    if (count >= 100)
+        return false;
+    count = 100;
+    remaining = 30;
+    return true;
+}
+bool CInvNightGoggles::SetActive(bool on)
+{
+    error.clear();
+    auto* s = BaseClass::GetServerDE();
+    if (!s->IsObjectAlive(owner) || (on && remaining <= 0))
+        return false;
+    if (auto* p = dynamic_cast<CPlayerObj*>(s->HandleToObject(owner)))
+        if (s->SendToClient(p->GetClient(), OpenBlood2::InventoryAction{3, on}) != DE_OK)
+        {
+            error = "Night goggles action could not reach its client";
+            return false;
+        }
+    active = on;
+    return true;
+}
+bool CInvNightGoggles::ActivateItem()
+{
+    return SetActive(!active);
+}
+bool CInvNightGoggles::Update()
+{
+    if (!active)
+        return true;
+    remaining -= BaseClass::GetServerDE()->GetFrameTime();
+    count = remaining <= 0 ? 0 : static_cast<DBYTE>(100 * remaining / 30 + .5f);
+    return remaining > 0 || SetActive(false);
+}

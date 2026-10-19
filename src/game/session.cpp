@@ -627,6 +627,8 @@ namespace OpenBlood2
         auto* flash_owner = server_shell.Player(local_client);
         const auto* flash_item = flash_owner ? flash_owner->m_InventoryMgr.flashlight.get() : nullptr;
         ok = (!flash_item || flash_item->update_ok) && ok;
+        if (flash_owner && flash_owner->m_InventoryMgr.goggles)
+            ok = flash_owner->m_InventoryMgr.goggles->error.empty() && ok;
         ok = client_shell.flashlight.Update(server, flash_item ? flash_item->light : nullptr,
                                             flash_owner ? flash_owner->m_hObject : nullptr) &&
              ok;
@@ -680,6 +682,8 @@ namespace OpenBlood2
         if (const auto* player = server_shell.Player(local_client))
             if (const auto* item = player->m_InventoryMgr.flashlight.get(); item && !item->update_ok)
                 add("Flashlight item", item->error.empty() ? std::string("update failed") : item->error);
+        if (const auto* player = server_shell.Player(local_client); player && player->m_InventoryMgr.goggles)
+            add("Night goggles item", player->m_InventoryMgr.goggles->error);
         return out;
     }
 } // namespace OpenBlood2

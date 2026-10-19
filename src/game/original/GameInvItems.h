@@ -42,3 +42,29 @@ class CInvBinoculars
     void SendActionMessage();
     HOBJECT owner_ = nullptr; // Checked non-owning identity; never serialized.
 };
+
+class CInvNightGoggles
+{
+  public:
+    explicit CInvNightGoggles(HOBJECT owner) : owner(owner) {}
+    bool AddItem(DBYTE);
+    bool ActivateItem();
+    bool SetActive(bool);
+    bool Update();
+    HOBJECT owner = nullptr;
+    bool active = false;
+    DBYTE count = 100;
+    float remaining = 30;
+    std::string error;
+};
+class CInvTheEye
+{
+  public:
+    explicit CInvTheEye(HOBJECT owner) : owner(owner) {}
+    ~CInvTheEye();
+    bool ActivateItem();
+    bool SetActive(bool);
+    HOBJECT owner = nullptr, eye = nullptr;
+    bool active = false, available = true;
+    std::string error;
+};

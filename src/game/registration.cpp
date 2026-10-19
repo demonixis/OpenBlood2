@@ -1,6 +1,7 @@
 #include "game/original/AmmoPickups.h"
 #include "game/original/B2BaseClass.h"
 #include "game/original/BoneLeech.h"
+#include "game/original/BugSprayProjectile.h"
 #include "game/original/BuiltinModel.h"
 #include "game/original/BuiltinSprite.h"
 #include "game/original/CameraObj.h"
@@ -44,6 +45,7 @@
 #include "game/original/RemoteBomb.h"
 #include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
+#include "game/original/SeeingEye.h"
 #include "game/original/ShikariAI.h"
 #include "game/original/SingularityProjectile.h"
 #include "game/original/SkyObjects.h"
@@ -139,6 +141,9 @@ namespace OpenBlood2
         const ClassInfo tesla_projectile{"CTeslaProjectile", &base, construct<CTeslaProjectile>, {}};
         const ClassInfo tesla_bolt{"CTeslaBoltProjectile", &base, construct<CTeslaBoltProjectile>, {}};
         const ClassInfo tesla_ball{"CTeslaBallProjectile", &base, construct<CTeslaBallProjectile>, {}};
+        const ClassInfo seeing_eye{"SeeingEye", &base, construct<SeeingEye>, {}};
+        const ClassInfo bugspray_projectile{"CBugSprayProjectile", &base, construct<CBugSprayProjectile>, {}};
+        const ClassInfo bugspray_alt_projectile{"CBugSprayAltProjectile", &base, construct<CBugSprayAltProjectile>, {}};
         const ClassInfo napalm_projectile{"CNapalmProjectile", &base, construct<CNapalmProjectile>, {}};
         const ClassInfo loogie{"CShikariLoogieProjectile", &base, construct<CShikariLoogieProjectile>, {}};
         const ClassInfo singularity_projectile{"CSingularityProjectile", &base, construct<CSingularityProjectile>, {}};
@@ -1012,9 +1017,9 @@ namespace OpenBlood2
     bool register_original_classes(Objects& objects)
     {
         return objects.register_class(base) && objects.register_class(sky_model) &&
-               objects.register_class(sky_pointer) && objects.register_class(builtin_model) && objects.register_class(builtin_container) &&
-               objects.register_class(builtin_sprite) && objects.register_class(b2base) &&
-               objects.register_class(camera) && objects.register_class(client_sfx) &&
+               objects.register_class(sky_pointer) && objects.register_class(builtin_model) &&
+               objects.register_class(builtin_container) && objects.register_class(builtin_sprite) &&
+               objects.register_class(b2base) && objects.register_class(camera) && objects.register_class(client_sfx) &&
                objects.register_class(client_splat) && objects.register_class(particle_stream) &&
                objects.register_class(scene_explosion) && objects.register_class(client_light) &&
                objects.register_class(light_SquareWaveLightFX) && objects.register_class(light_SawWaveLightFX) &&
@@ -1060,22 +1065,23 @@ namespace OpenBlood2
                objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
                objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
                objects.register_class(enhancement_base) && objects.register_class(stealth_pickup) &&
-               objects.register_class(willpower_pickup) &&
-               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
-               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
-               objects.register_class(conversation_trigger) && objects.register_class(big_trigger) &&
-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
-               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
-               objects.register_class(world_debris) && objects.register_class(hand_model) &&
-               objects.register_class(gib) && objects.register_class(corpse) && objects.register_class(proximity) &&
-               objects.register_class(remote) && objects.register_class(grenade) &&
+               objects.register_class(willpower_pickup) && objects.register_class(ward_pickup) &&
+               objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
+               objects.register_class(objectives_trigger) && objects.register_class(conversation_trigger) &&
+               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+               objects.register_class(door) && objects.register_class(rotating_door) &&
+               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
+               objects.register_class(rotating_brush) && objects.register_class(world_debris) &&
+               objects.register_class(hand_model) && objects.register_class(gib) && objects.register_class(corpse) &&
+               objects.register_class(proximity) && objects.register_class(remote) && objects.register_class(grenade) &&
                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
                objects.register_class(tesla_projectile) && objects.register_class(tesla_bolt) &&
                objects.register_class(tesla_ball) && objects.register_class(napalm_projectile) &&
-               objects.register_class(loogie) && objects.register_class(singularity_projectile) &&
-               objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
-               objects.register_class(howitzer_shell) && objects.register_class(shockwave_projectile);
+               objects.register_class(seeing_eye) && objects.register_class(bugspray_projectile) &&
+               objects.register_class(bugspray_alt_projectile) && objects.register_class(loogie) &&
+               objects.register_class(singularity_projectile) && objects.register_class(flare_burst) &&
+               objects.register_class(energy_projectile) && objects.register_class(howitzer_shell) &&
+               objects.register_class(shockwave_projectile);
     }
     HOBJECT GameSession::create_example(std::string_view name)
     {

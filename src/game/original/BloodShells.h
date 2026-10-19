@@ -26,6 +26,8 @@ class CBloodServerShell
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerMove&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerControls&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerUse&);
+    bool OnMessage(HCLIENT, const OpenBlood2::CreatureResponse&);
+    bool OnMessage(HCLIENT, const OpenBlood2::PlayerRotation&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerItemCommand&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerDetonate&);
     void Update(float);
@@ -90,6 +92,17 @@ class CBloodClientShell
     bool flashlight_down = false, flashlight_was_down = false;
     CFlashlightFX flashlight;
     bool binoculars_down = false, binoculars_was_down = false;
+    bool goggles_down = false, goggles_was_down = false, eye_down = false, eye_was_down = false;
+    bool night_goggles = false;
+    HOBJECT seeing_eye = nullptr, creature = nullptr;
+    OpenBlood2::SoundId goggles_loop = 0, eye_loop = 0;
+    float blind_until = 0, creature_light = 1, creature_damage_time = 0, last_use_hit = 0;
+    unsigned use_hits = 0, total_use_hits = 0;
+    bool UpdateInventoryEffects();
+    void ClearInventoryEffects();
+    DVector SceneLightScale() const;
+    bool HandleInventoryView(const OpenBlood2::PlayerEvent&, CBloodServerShell&);
+
     // Original SMSG_ZOOMVIEW/INVITEMACTION client state and UpdateCamera FOV (radians; 0 before entry).
     bool UpdateZoom(double seconds);
     float ViewFovX() const; // Effective first-person horizontal FOV for presentation.

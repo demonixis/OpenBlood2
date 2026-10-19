@@ -1,5 +1,8 @@
 # CityHubC and SteamTunnels entry
 
+> The [inventory-use continuation](inventory_use_contracts.md) supersedes this increment's
+> offer-only pickups and BoneLeech attachment refusal. The other boundaries below remain.
+
 This extends [AI runtime](ai_runtime_contracts.md), [pickups](pickup_contracts.md),
 [pushable bodies](pushable_contracts.md), [compound shells](compound_shell_contracts.md)
 and [music assets](music_asset_contracts.md). It covers level entry through

@@ -27,9 +27,8 @@ updates those two rows only: both start through the Levels-tab path, with zero
 unsupported or failed entries. CityHubC retains two explicit omissions (one
 missing BSP and one empty model); SteamTunnels retains thirteen (eight class names
 absent from the original base game, three absent sprite files and two missing
-BSPs). These are accounted source rows, not newly implemented objects. TheEye,
-NightGoggles and BugSpray pickups remain offer-only; BoneLeech attachment remains
-unavailable. The rest of this backlog retains its earlier measurement dates.
+BSPs). These are accounted source rows, not newly implemented objects. The subsequent [inventory-use continuation](../contracts/inventory_use_contracts.md)
+implements TheEye, NightGoggles, BugSpray and BoneLeech attachment. The rest of this backlog retains its earlier measurement dates.
 
 ## How to refresh
 

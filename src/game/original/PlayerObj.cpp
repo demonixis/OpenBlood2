@@ -24,7 +24,7 @@ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
         g_pServerDE->SetObjectFlags(m_hObject, flags | FLAG_MODELGOURAUDSHADE | FLAG_ANIMTRANSITION);
         // Original: surface type, USRFLG_SAVEABLE and USRFLG_SINGULARITY_ATTRACT on every character.
         g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (m_dwSurfType << 24) |
-                                                       (1u << 3) | (1u << 5));
+                                                       (1u << 3) | (1u << 5) | (1u << 10));
     }
     if (message == MID_MODELSTRINGKEY && data && !OnStringKey(static_cast<ArgList*>(data)) &&
         pending_model_commands.size() < 32)
@@ -526,7 +526,7 @@ FireResult CPlayerObj::HandleWeaponFireMessage(const OpenBlood2::WeaponFire& req
     if (!m_hClient || !attributes_received || m_damage.IsDead() ||
         GetServerDE()->GetClientUserData(m_hClient) != m_hObject)
         return FireResult::Invalid;
-    if (movement_blocked || camera_movement_blocked)
+    if (movement_blocked || camera_movement_blocked || (m_InventoryMgr.eye && m_InventoryMgr.eye->active))
         return FireResult::Blocked;
     const auto result = m_InventoryMgr.FireCurrentWeapon(request);
     if (result == FireResult::Fired || result == FireResult::DeliveryFailed)

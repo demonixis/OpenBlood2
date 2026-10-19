@@ -251,6 +251,7 @@ namespace OpenBlood2
             }
             SDL_PushGPUVertexUniformData(target.commands, 0, &skinned, sizeof(skinned));
             FragmentLightUniform fragment;
+            fragment.scene_color = {target.scene_color.x, target.scene_color.y, target.scene_color.z, 1};
             fragment.modulation = {d.alpha, 0, 0, per_pixel_lighting ? 1.f : 0.f};
             fragment.position_radius = {light.position.x, light.position.y, light.position.z,
                                         illuminate ? light.radius : 0};

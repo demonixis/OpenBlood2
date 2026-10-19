@@ -294,3 +294,9 @@ class CFireball final : public CWeapon
         damage_type = OpenBlood2::DamageType::Normal;
     }
 };
+
+class CBugSpray final : public CWeapon
+{
+  public:
+    CBugSpray() : CWeapon(WEAP_BUGSPRAY) {}
+};

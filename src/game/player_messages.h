@@ -40,6 +40,22 @@ namespace OpenBlood2
         bool on = false;
         DBYTE type = 0;
     };
+    struct SeeingEyeView
+    {
+        HOBJECT eye = nullptr;
+        bool active = false;
+        float blind_seconds = 0;
+    };
+    struct CreatureAttach
+    {
+        HOBJECT creature = nullptr, enemy = nullptr;
+        bool active = true;
+    };
+    struct CreatureResponse
+    {
+        HOBJECT creature = nullptr;
+        bool proceed = false;
+    };
     struct PlayerUse
     {
         PlayerRotation rotation;
@@ -154,7 +170,8 @@ namespace OpenBlood2
         std::string next_world; // Empty represents the source null HSTRING.
         WorldExitType type = WorldExitType::World;
     };
-    using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
-                                     MissionObjectives, WorldExit, BossHealth, Conversation, InventoryAction,
-                                     ScreenFade, VoiceEvent, VoiceStop, PlayerDead, MusicCommand, ZoomView>;
+    using PlayerEvent =
+        std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats, MissionObjectives,
+                     WorldExit, BossHealth, Conversation, InventoryAction, ScreenFade, VoiceEvent, VoiceStop,
+                     PlayerDead, MusicCommand, ZoomView, SeeingEyeView, CreatureAttach>;
 } // namespace OpenBlood2

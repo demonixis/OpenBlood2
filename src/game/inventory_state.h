@@ -20,6 +20,8 @@ namespace OpenBlood2
         std::vector<KeyItem> keys;
         std::optional<DBYTE> medkit_charge;
         std::optional<FlashlightState> flashlight;
+        std::optional<FlashlightState> goggles; // Same charge representation, 30-second maximum.
+        bool eye = false;                       // No cross-world object identity; restored in hand, inactive.
         bool binoculars = false; // Owned item; InvItem::Load always clears its active flag.
         DBYTE strength = 1, magic = 1, current_slot = 0;
         bool infinite_ammo = false;

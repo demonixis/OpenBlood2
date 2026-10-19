@@ -298,6 +298,8 @@ bool AI_Mgr::DispatchState()
         default:
             break;
     }
+    if (m_nState == StateEnemyAttach)
+        return AI_STATE_EnemyAttach();
     if (m_nState == StateAttackClose)
         return AI_STATE_AttackClose();
     if (m_nState == StateAttackFar)
@@ -329,4 +331,9 @@ bool AI_Mgr::AI_STATE_AttackFar()
 bool AI_Mgr::AI_STATE_Dodge()
 {
     return StateFailure("Subclass dodge action is not integrated");
+}
+
+bool AI_Mgr::AI_STATE_EnemyAttach()
+{
+    return StateFailure("Subclass enemy attachment is not integrated");
 }

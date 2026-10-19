@@ -16,6 +16,29 @@ namespace OpenBlood2
         }
         if (type <= 3 || type == 6)
             return true;
+        if (type == 26)
+        {
+            const auto n = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+            ExplosionFlameSettings s;
+            s.position = vector_add(pos, vector_scale(n, 20));
+            s.normal = n;
+            s.colors = {{{128.f / 255, 128.f / 255, 128.f / 255}, {192.f / 255, 192.f / 255, 192.f / 255}, {1, 1, 1}}};
+            s.lifetimes = {.7f, .85f, 1};
+            s.life_offsets = {.15f, .25f, .35f};
+            s.ramp_up = 0;
+            s.duration = 1.25f;
+            s.ramp_down = .25f;
+            s.count = 3;
+            s.radius = 2500;
+            s.position_radius = 7.5f;
+            s.gravity = 200;
+            s.delay = .1f;
+            s.alpha = .25f;
+            s.fade = 1;
+            s.texture = "SpriteTextures\\smoke64_2.dtx";
+            out.push_back(s);
+            return true;
+        }
         if (type != 8)
         {
             error = "Explosion flame recipe unavailable";

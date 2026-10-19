@@ -217,6 +217,10 @@ namespace OpenBlood2
                     if (inventory.flashlight)
                         ImGui::Text("Saved flashlight: %u / %.3f seconds; restores inactive",
                                     inventory.flashlight->count, inventory.flashlight->remaining);
+                    if (inventory.goggles)
+                        ImGui::Text("Saved goggles: %u / %.3f seconds; restores inactive", inventory.goggles->count,
+                                    inventory.goggles->remaining);
+                    ImGui::Text("Saved TheEye: %s", inventory.eye ? "present; restores in hand" : "absent");
                     ImGui::Text("Saved binoculars: %s", inventory.binoculars ? "present; restores inactive" : "absent");
                     for (const auto& key : inventory.keys)
                         ImGui::Text("Key %s: %u uses", key.name.c_str(), key.uses);

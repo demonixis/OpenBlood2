@@ -370,6 +370,13 @@ namespace OpenBlood2
         }
         ++stats.passes;
         WorldRecordTarget scene{commands, pass, letterbox, view_model_depth, 1};
+        scene.scene_color = game.client_shell.SceneLightScale();
+        auto close = scene;
+        close.letterbox = false;
+        close.min_depth = 0;
+        close.max_depth = view_model_depth;
+        close.shadow_atlas = nullptr;
+        close.shadows = nullptr;
         scene.view_scale = original_fov_scale(game.client_shell.ViewFovX());
         if (!shadow_casters.empty())
         {
@@ -408,9 +415,8 @@ namespace OpenBlood2
                                          view.rotation, error))
             stage = "Sprite viewport";
         else if (!model_scene.close_draws.empty() &&
-                 !model_renderer.record({commands, pass, false, 0, view_model_depth}, model_scene,
-                                        model_scene.close_draws, view.position, view.rotation, error, WorldPass::Opaque,
-                                        {}, true))
+                 !model_renderer.record(close, model_scene, model_scene.close_draws, view.position, view.rotation,
+                                        error, WorldPass::Opaque, {}, true))
             stage = "Model viewport";
         SDL_EndGPURenderPass(pass);
         if (stage)

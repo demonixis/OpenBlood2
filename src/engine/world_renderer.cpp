@@ -470,6 +470,7 @@ namespace OpenBlood2
                 }
                 const bool illuminate = !sky && style_ == DrawStyle::Opaque && !close_view;
                 FragmentLightUniform fragment;
+                fragment.scene_color = {target.scene_color.x, target.scene_color.y, target.scene_color.z, 1};
                 fragment.modulation = {d.alpha, world_saturate_scale, receive ? 1.f : 0.f, 0};
                 fragment.position_radius = {light.position.x, light.position.y, light.position.z,
                                             illuminate ? light.radius : 0};

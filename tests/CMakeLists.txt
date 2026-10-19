@@ -2615,3 +2615,24 @@ if(BLOOD2_TEST_DATA_DIR)
         set_tests_properties(campaign_entry.${case} PROPERTIES LABELS "headless;private-data;campaign_entry" TIMEOUT 120)
     endforeach()
 endif()
+
+add_executable(inventory_use_tests inventory_use_tests.cpp)
+target_link_libraries(inventory_use_tests PRIVATE blood2_game)
+blood2_project_options(inventory_use_tests)
+if(BLOOD2_TEST_DATA_DIR)
+    foreach(case IN ITEMS goggles eye leech bugspray)
+        add_test(NAME inventory_use.${case} COMMAND inventory_use_tests ${case} "${BLOOD2_TEST_DATA_DIR}")
+        set_tests_properties(inventory_use.${case} PROPERTIES LABELS "headless;private-data;inventory_use" TIMEOUT 120)
+    endforeach()
+endif()
+
+if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+    add_executable(inventory_use_gpu_tests inventory_use_gpu_tests.cpp ../src/app/scene_presenter.cpp
+        ../src/app/model_lighting.cpp ../src/app/model_scene.cpp ../src/app/polygrid_scene.cpp ../src/app/sprite_scene.cpp)
+    target_link_libraries(inventory_use_gpu_tests PRIVATE blood2_game)
+    blood2_project_options(inventory_use_gpu_tests)
+    add_test(NAME gpu.inventory_use COMMAND inventory_use_gpu_tests "${BLOOD2_TEST_DATA_DIR}"
+        "${CMAKE_CURRENT_BINARY_DIR}/inventory-use-gpu")
+    set_tests_properties(gpu.inventory_use PROPERTIES LABELS "gpu;private-data;inventory_use" TIMEOUT 120 RUN_SERIAL TRUE
+        ENVIRONMENT "SDL_AUDIODRIVER=dummy" FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+endif()

@@ -564,7 +564,7 @@ bool AI_Mgr::RuntimeUpdateStep()
         s->SetObjectState(m_hObject, OBJSTATE_AUTODEACTIVATE_NOW);
         m_bSetShutdown = true;
     }
-    if (m_hTarget)
+    if (m_hTarget && m_nState != StateEnemyAttach)
     {
         if (!s->IsObjectAlive(m_hTarget))
         {

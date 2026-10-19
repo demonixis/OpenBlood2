@@ -178,7 +178,7 @@ namespace
         CHECK(!g.server.IsObjectAlive(projectile) && g.server.scene_explosions.back().type == 4);
         CHECK(!sound || !g.server.audio.get(sound));
         CHECK(g.objects.finish_frame());
-        // Registered offers remain visible when the corresponding inventory action is unavailable.
+        // These offers now enter inventory and acknowledge their pickup.
         CHECK(g.request_world("02_cityhubc", error) && g.enter_player(error));
         for (const char* name : {"TheEyePU", "NightGogglesPU", "BugSprayPU"})
         {
@@ -190,7 +190,7 @@ namespace
                 std::cerr << name << ": " << pickup->error << '\n';
             CHECK(pickup && pickup->error.empty());
             CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player));
-            CHECK(g.server.IsObjectAlive(h));
+            CHECK(!g.server.IsObjectAlive(h));
         }
         CHECK(g.unload_world());
         return true;

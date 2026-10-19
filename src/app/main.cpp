@@ -667,6 +667,8 @@ namespace
             game->client_shell.use_down = controls.sample_use(text_editing);
             game->client_shell.flashlight_down = controls.sample_flashlight(text_editing);
             game->client_shell.binoculars_down = controls.sample_binoculars(text_editing);
+            game->client_shell.goggles_down = controls.sample_goggles(text_editing);
+            game->client_shell.eye_down = controls.sample_eye(text_editing);
             game->client_shell.medkit_down = controls.sample_medkit(text_editing);
             game->client_shell.proximity_down = controls.sample_proximity(text_editing);
             game->client_shell.remote_down = controls.sample_remote(text_editing);

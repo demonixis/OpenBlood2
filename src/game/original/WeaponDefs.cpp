@@ -2,6 +2,66 @@
 namespace
 {
     constexpr WeaponData definitions[] = {
+        // Bug Spray Canister
+        {
+            "Models\\Weapons\\BugSpray_pv.abc",              // Model
+            "Models\\Weapons\\BugSpray_pv.abc",              // Model
+            "Skins\\Weapons\\C_BugSpray_pv_t.dtx",           // Skin
+            "Models\\Powerups\\BugSpray_pu.abc",             // 3rd person model
+            "Skins\\Powerups\\BugSpray_pu.dtx",              // 3rd person skin
+            WEAP_BUGSPRAY,                                   // Type
+            TYPE_AUTORIFLE,                                  // Fire type
+            AMMO_DIEBUGDIE,                                  // Ammo type
+            1,                                               // Ammo Use
+            1,                                               // Alt Ammo Use
+            40.0f,                                           // Min Damage
+            60.0f,                                           // Max Damage
+            60.0f,                                           // Min Alt damage
+            80.0f,                                           // Max Alt damage
+            0.25f,                                           // Reload time
+            1.0f,                                            // Alt reload time
+            {0.0f, 0.0f},                                    // Spread
+            {0.0f, 0.0f},                                    // Alt Spread
+            1500.0f,                                         // Projectile Velocity
+            1500.0f,                                         // Alt Projectile Velocity
+            500.0f,                                          // Range
+            500.0f,                                          // Alt Range
+            1,                                               // Shots per fire
+            1,                                               // Alt Shots per fire
+            2,                                               // Strength or Magic required
+            0,                                               // Two-handed Strength or Magic required
+            0,                                               // Damage Radius (projectiles)
+            0,                                               // Alt Damage Radius (projectiles)
+            DFALSE,                                          // Alt fire zoom
+            DFALSE,                                          // Semi-auto
+            "Sounds\\Weapons\\bugbuster\\fire.wav",          // Fire sound
+            "Sounds\\Weapons\\bugbuster\\alt.wav",           // Alt Fire sound
+            "",                                              // Empty weapon sound
+            "",                                              // Alt Empty weapon sound
+            "CBugSprayProjectile",                           // Projectile class
+            "CBugSprayAltProjectile",                        // Alt Projectile class
+            0,                                               // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                              // Muzzle Flash color
+            "Bug Spray Canister",                            // Name
+            IDS_WEAPON_BUGSPRAY,                             // Name ID (resource)
+            "",                                              // flash sprite name
+            "",                                              // alt flash Sprite name
+            0.25f,                                           // Flash duration
+            0.10f,                                           // Flash scale
+            {0.0f, 0.0f, 0.0f},                              // 3rd person gun offset
+            {1.5f, -2.1f, 4.0f},                             // Gun Offset
+            {0.0f, 0.275f, 1.0f},                            // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                           // Recoil
+            {4.5f, -3.5f, 20.0f},                            // Flash position
+            0.625f,                                          // Eject interval
+            0.0f,                                            // View kick
+            DFALSE,                                          // View kick is Cumulative
+            DFALSE,                                          // Animation looping
+            DTRUE,                                           // Alt anim looping
+            "interface\\statusbar\\weapons\\bugspray.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\bugspray_h.pcx", // Highlighted icon for status bar
+        },
+
         // RemoteBomb
         {
             "Models\\Weapons\\C4remote_pv.abc",    // Model

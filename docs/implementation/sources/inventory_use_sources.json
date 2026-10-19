@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-19",
+  "baseline_commit": "83e22d1",
+  "scope": "BoneLeech attachment; BugSpray, NightGoggles and TheEye use and cleanup",
+  "source_files": [
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/boneleech.cpp",
+      "sha256": "3603c50cebdf87f022da476f0c889d90cb1129ee642de2aaf523b16a72c8359e",
+      "use": "EnemyAttach, damage immunity, touch/standing entry and detach states."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/boneleech.h",
+      "sha256": "358e2c145e2b477db97d13ff8770f42184101d16e2f51a39eaada984ea999622",
+      "use": "Damage constant and member declarations."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ClientShellDLL/viewcreature.cpp",
+      "sha256": "08886c18aef0752e0ae84a7850903a1d2064419a1a5cd6d50c4f54b00a509bb4",
+      "use": "Attachment transform, USE counters and light scale."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ClientShellDLL/viewcreature.h",
+      "sha256": "644751823c122cc342aa4e3dc737d52ccb8bc36c667ca9a7df0b2e9888f930cd",
+      "use": "Offsets and USE thresholds."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/GameInvItems.cpp",
+      "sha256": "883af352df59bf3159651940039e4eb4a8ba4bb9531dacfab089150edb36cff9",
+      "use": "NightGoggles and TheEye inventory actions and charge."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/SeeingEye.cpp",
+      "sha256": "166430ee7683e151d1288f3fda0605e1e1f887b6c0e2df39a6a8776ce909c20e",
+      "use": "Eye model, toss, damage, contact, host following, ping, retrieval and destruction."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "aab29291e988ac7c3e1424f41076b5c0adc6243cd60198ea2cc6381d402d0e53",
+      "use": "Inventory constructors and Save/Load item selection."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/InvItem.cpp",
+      "sha256": "1df9bd4d0520cf95c7ba513901f151682d8a89a5b9ef03fe8dd435c3b035d8f8",
+      "use": "Action messages, toggles and inactive Load."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "93056622f9f083f11447a471ecae6f115b7dc3937daf7d251d2396724f3d2003",
+      "use": "Eye rotation, movement and command gates."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/BaseCharacter.cpp",
+      "sha256": "6dcf0d6f2bf3c9ee4caec8ee906d191869eece9bc1f69ebb88ae80ed25875172",
+      "use": "Night-goggle glow user flag."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/BloodServerShell.cpp",
+      "sha256": "c431dfea17da8c3100ac3921e03d9bfe88c2d639cf7cba0f7763834de5681e1a",
+      "use": "Attach acknowledgement/detach message dispatch."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006",
+      "use": "Camera, light scale, model hook, sounds, blindness and creature message handling."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/GameWeapons.h",
+      "sha256": "d8533873a2f4130cb9f6e4cc230ab33ce1ae033ee54b8bcc1d5f124efe60a8cf",
+      "use": "CBugSpray constructor."
+    },
+    {
+      "path": "sources/lithtech/Blood2/Shared/WeaponDefs.cpp",
+      "sha256": "7693d587a88491eb5499847efcc7cc3d0a81b14bf17dcaa0f63a979f9e394a9d",
+      "use": "Complete Bug Spray weapon definition."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ObjectDLL/GameProjectiles.cpp",
+      "sha256": "f0f732be5d373324ef2071690fc43317a908aad5d5bade18f59c9e9ccfbcb9fe",
+      "use": "BugSpray projectile constructors and explosions."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ClientShellDLL/ObjectFX.cpp",
+      "sha256": "8890db6c5125ca1716685f8e1dff34da686a9c773d7dea1f91450137ecec800b",
+      "use": "Particle stream recipes and filled-sphere emission."
+    },
+    {
+      "path": "sources/lithtech/Blood2/ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "f96624581765705810ebe60a9c58ffa796ff5a751c6713d5219ddd139fc487c0",
+      "use": "BugSpray high-detail impact recipes."
+    },
+    {
+      "path": "sources/lithtech/Blood2/AppHeaders/basetypes_de.h",
+      "sha256": "9447597d4d3d893572d0e74929352e9ffd742a7520aaf2d3f3c37ff4598fe4cb",
+      "use": "REALLYCLOSE flag value."
+    }
+  ]
+}

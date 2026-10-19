@@ -244,3 +244,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Platform lifetime diagnostics](gpu_lifetime_contracts.md): isolated SDL controls, explicit sanitizer failures and NVIDIA module attribution.
 
 - [Original demo edition](demo_contracts.md): `--demo` archive layout, first level, runtime `_DEMO` weapon/pickup rules and the remaining demo blockers.
+
+- [BoneLeech attachment and inventory use](inventory_use_contracts.md): BugSpray, charged night goggles, remote eye, input/camera/FX and teardown.
