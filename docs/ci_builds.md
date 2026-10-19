@@ -18,6 +18,9 @@ child tree disables. Missing tests are an error. GPU and private-data tests are
 excluded explicitly; these jobs do not certify graphical execution, campaign
 traversal or the outstanding M2 GPU reservation.
 
+Launcher fixture files use binary streams to preserve explicit UTF-8/LF bytes on
+Windows as well as Unix; subprocess and persistence checks compare those bytes.
+
 Failures remain failures, and the other platforms continue independently. Test
 reports (JUnit), CTest logs and CMake diagnostics are uploaded even after failure.
 Build archives are uploaded only after successful builds and tests. Artifacts
