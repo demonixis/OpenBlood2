@@ -53,8 +53,7 @@ class SingularityPU : public WeaponPickup
   public:
     SingularityPU();
 };
-// The sniper rifle weapon is not integrated: the player inventory refuses the
-// offer and the pickup stays in the world (see fanatic_prophet_contracts.md).
+// Original sniper pickup; its weapon/zoom now use the shared inventory path.
 class SniperRiflePU : public WeaponPickup
 {
   public:

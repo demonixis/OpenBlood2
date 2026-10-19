@@ -747,3 +747,13 @@ The 03_Museum series ports BinocularsPU with camera zoom (Z), MadScientistAI, Tc
 The [CityHubC/SteamTunnels continuation](docs/contracts/cityhubc_steamtunnels_contracts.md) ports selected BoneLeech/DrudgeLord states and weapons, CNapalmProjectile, and offer-only BugSpray/TheEye/NightGoggles pickups. Preserve explicit refusal of unsupported inventory actions and the BoneLeech attachment boundary; its missing-head skeleton uses documented body damage, not fabricated hit spheres. Non-box gravity world models may use authored triangle boundaries with no solid-interior claim for open/non-manifold meshes; static shells and containers retain strict validation. Gremlin/RocketAmmoPU and the narrowly identified missing-resource rows are separately accounted omissions, never broad failure suppression. Music style labels resolve through the installed directory-local iMusic.ini; preserve bounds, exact resource paths and section/style identity checks. M2 scope is unchanged.
 
 The [inventory-use continuation](docs/contracts/inventory_use_contracts.md) supersedes the CityHubC/SteamTunnels offer-only and attachment boundaries: BoneLeech now attaches, damages and detaches through checked client messages; BugSpray, NightGoggles and TheEye have working use paths. Preserve source USE counters, battery rounding, eye destruction/ten-second blindness, late fire gating, deferred cleanup and handle-free inventory transfer. Attached creatures remain awake/nonsolid; detach uses bounded checked placement for the replacement box solver. The scene light-scale uniform is 288 bytes and every fragment push must remain full-size. This does not reopen M2 or accept campaign traversal.
+
+
+The [Airship continuation](docs/contracts/airship_contracts.md) integrates the original
+sniper rifle (including AI, pickup and alternate zoom) and Anger triple damage.
+Preserve press-edge zoom, binocular gates, source power refresh/expiry rules
+and explicit failure accounting. Initial placement now has eight bounded face
+corrections, independent horizontal/vertical budgets, one centered-face retry and
+checked separation of initially overlapping characters. Ordinary collision is
+unchanged. Active Anger snapshots stay refused until original power flag/timer
+serialization is implemented. Airship entry tests do not certify campaign traversal or reopen M2.

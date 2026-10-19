@@ -18,6 +18,11 @@ class ArmorBase : public PowerupPickup
 class EnhancementBase : public PowerupPickup
 {
 };
+class AngerPU : public EnhancementBase
+{
+  public:
+    AngerPU();
+};
 class StealthPU : public EnhancementBase
 {
   public:

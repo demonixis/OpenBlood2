@@ -2,6 +2,66 @@
 namespace
 {
     constexpr WeaponData definitions[] = {
+        // Barrett .50 BMG Sniper Rifle
+        {
+            "Models\\Weapons\\SniperRifle_pv.abc",         // Model
+            "Models\\Weapons\\SniperRifle_pv.abc",         // Model
+            "Skins\\Weapons\\C_Sniper_pv_t.dtx",           // Skin
+            "Models\\Powerups\\SniperRifle_pu.abc",        // 3rd person model
+            "Skins\\Powerups\\SniperRifle_pu.dtx",         // 3rd person skin
+            WEAP_SNIPERRIFLE,                              // Type
+            TYPE_RIFLE,                                    // Fire type
+            AMMO_BMG,                                      // Ammo type
+            1,                                             // Ammo Use
+            0,                                             // Alt Ammo Use
+            100.0f,                                        // Min Damage
+            125.0f,                                        // Max Damage
+            0.0f,                                          // Min Alt damage
+            0.0f,                                          // Max Alt damage
+            1.0f,                                          // Reload time
+            1.0f,                                          // Alt reload time
+            {0.0f, 0.0f},                                  // Spread
+            {0.0f, 0.0f},                                  // Alt Spread
+            0.0f,                                          // Projectile Velocity
+            0.0f,                                          // Alt Projectile Velocity
+            10000.0f,                                      // Range
+            10000.0f,                                      // Alt Range
+            1,                                             // Shots per fire
+            0,                                             // Alt Shots per fire
+            4,                                             // Strength or Magic required
+            0,                                             // Two-handed Strength or Magic required
+            0,                                             // Damage Radius (projectiles)
+            0,                                             // Alt Damage Radius (projectiles)
+            DTRUE,                                         // Alt fire zoom
+            DFALSE,                                        // Semi-auto
+            "Sounds\\Weapons\\sniper\\fire.wav",           // Fire sound
+            "Sounds\\Weapons\\sniper\\zoom.wav",           // Alt Fire sound
+            "",                                            // Empty weapon sound
+            "",                                            // Alt Empty weapon sound
+            nullptr,                                       // Projectile class
+            nullptr,                                       // Alt Projectile class
+            75,                                            // Muzzle Flash radius
+            {1.0f, 0.68f, 0.35f},                          // Muzzle Flash color
+            "BMG Sniper Rifle",                            // Name
+            IDS_WEAPON_SNIPER,                             // Name ID (resource)
+            "Sprites\\sniperflare.spr",                    // flash sprite name
+            "Sprites\\sniperflare.spr",                    // alt flash Sprite name
+            0.01f,                                         // Flash duration
+            0.25f,                                         // Flash scale
+            {0.0f, 0.0f, 0.0f},                            // 3rd person gun offset
+            {0.6f, -0.8f, 1.9f},                           // Gun Offset
+            {-0.25f, 0.260f, 3.0f},                        // Muzzle Offset
+            {1.0f, 1.0f, 0.5f},                            // Recoil
+            {1.5f, -2.5f, 25.0f},                          // Flash Offset
+            0.6333f,                                       // Eject interval
+            2.0f,                                          // View kick
+            DFALSE,                                        // View kick is Cumulative
+            DFALSE,                                        // Animation looping
+            DFALSE,                                        // Alt anim looping
+            "interface\\statusbar\\weapons\\sniper.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\sniper_h.pcx", // Highlighted icon for status bar
+        },
+
         // Bug Spray Canister
         {
             "Models\\Weapons\\BugSpray_pv.abc",              // Model

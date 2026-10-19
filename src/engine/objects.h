@@ -127,7 +127,7 @@ namespace OpenBlood2
         std::uint64_t stair_attempts = 0, stair_steps = 0, overlap_contacts = 0;
         // Initially overlapped faces a MoveObject did not go deeper into.
         std::uint64_t start_departures = 0;
-        // MoveObjectToGround's bounded nudge out of an authored primary-world overlap.
+        // Bounded initial placement corrections (world faces or overlapping characters).
         DVector placement_nudge{};
         std::uint32_t placement_nudges = 0;
         float last_step_height = 0, last_overlap_depth = 0;

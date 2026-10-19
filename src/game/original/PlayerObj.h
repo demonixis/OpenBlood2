@@ -62,11 +62,10 @@ class CPlayerObj : public CBaseCharacter
     ObjectList* remote_bombs = nullptr;
     std::uint64_t remote_commands = 0, remote_signals = 0;
     std::string remote_error;
-    // Original activation storage/query. Willpower (PU_INVULNERABLE) and Stealth
-    // (PU_INVISIBLE) are collected and timed (PlayerPowers.cpp); the source never saves
-    // these fields.
+    // Original activation storage/query. Willpower, Stealth and Anger are collected
+    // and timed (PlayerPowers.cpp). Their original Save block remains unported.
     std::array<bool, PU_MAXTYPES> m_bPowerupActivated{};
-    float m_fInvisibleTime = 0, m_fNighInvulnerableTime = 0;
+    float m_fInvisibleTime = 0, m_fNighInvulnerableTime = 0, m_fTripleDamageTime = 0;
     std::array<PowerupType, 15> m_ePowerupSoundStack{PU_NONE}; // Source PU_MAXSTACK.
     int m_nPowerupSoundStackPos = 0;
     OpenBlood2::SoundId m_hPowerupStartSound = 0, m_hPowerupEndSound = 0, m_hPowerupLoopSound = 0;
@@ -178,6 +177,7 @@ class CPlayerObj : public CBaseCharacter
     bool locomotion_clip_retained = false;
     std::uint64_t animation_changes = 0, blocked_resizes = 0, retained_clip_requests = 0;
     bool OnCommandUse();
+    bool OnCommandAltFire();
     bool OnCommandItem(DBYTE);
     bool command_run = false;
     bool movement_blocked = false, camera_movement_blocked = false;
@@ -230,6 +230,7 @@ class CPlayerObj : public CBaseCharacter
     }
     bool m_bZoomView = false;
     DBYTE m_nZoomType = 0, m_CurGun = 0; // m_CurGun: last current weapon type seen by Update.
+    std::string zoom_sound_error;
     std::uint64_t zoom_messages = 0, zoom_message_failures = 0, zoom_messages_coalesced = 0;
 
   protected:

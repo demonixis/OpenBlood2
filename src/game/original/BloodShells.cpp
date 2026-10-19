@@ -250,7 +250,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     flashlight_down = flashlight_was_down = false;
     flashlight = {};
     ClearInventoryEffects();
-    binoculars_down = binoculars_was_down = false;
+    binoculars_down = binoculars_was_down = alt_fire_was_down = false;
     // StartNewWorld/OnEnterWorld: zoom off, original crosshair and default FOV.
     m_bZoomView = m_bBinocularsActive = false;
     m_bShowCrosshair = m_bCrosshairOriginallyOn;
@@ -306,7 +306,7 @@ void CBloodClientShell::OnExitWorld()
     flashlight_down = flashlight_was_down = false;
     flashlight = {};
     ClearInventoryEffects();
-    binoculars_down = binoculars_was_down = false;
+    binoculars_down = binoculars_was_down = alt_fire_was_down = false;
     // StartNewWorld/OnEnterWorld: zoom off, original crosshair and default FOV.
     m_bZoomView = m_bBinocularsActive = false;
     m_bShowCrosshair = m_bCrosshairOriginallyOn;
@@ -593,6 +593,11 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerDetona
     auto* owner = Player(client);
     return owner && owner->OnCommandDetonate();
 }
+bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerAltFire&)
+{
+    auto* owner = Player(client);
+    return owner && owner->OnCommandAltFire();
+}
 bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
 {
     const bool goggles_pressed = goggles_down && !goggles_was_down;
@@ -650,6 +655,10 @@ bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server, double seconds,
     const float cp = std::cos(rotation.pitch);
     const DVector forward{std::sin(rotation.yaw) * cp, -std::sin(rotation.pitch), std::cos(rotation.yaw) * cp};
     auto input = weapon_input;
+    const bool alt_pressed = input.alternate && !alt_fire_was_down;
+    alt_fire_was_down = input.alternate;
+    if (alt_pressed)
+        server.OnMessage(client_, OpenBlood2::PlayerAltFire{});
     if (const auto* owner = server.Player(client_);
         owner && (owner->camera_movement_blocked || (owner->m_InventoryMgr.eye && owner->m_InventoryMgr.eye->active)))
         input.primary = input.alternate = false;

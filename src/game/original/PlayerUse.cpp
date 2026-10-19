@@ -79,3 +79,26 @@ bool CPlayerObj::OnCommandItem(DBYTE type)
         return false;
     return m_InventoryMgr.SetActiveItem(type) == InventoryResult::Ok;
 }
+
+bool CPlayerObj::OnCommandAltFire()
+{
+    auto* s = GetServerDE();
+    if (!s->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() || movement_blocked || camera_movement_blocked ||
+        (m_InventoryMgr.eye && m_InventoryMgr.eye->active))
+        return false;
+    const auto* weapon = m_InventoryMgr.CurrentWeapon();
+    if (!weapon || !weapon->data.m_bAltFireZoom ||
+        (m_bZoomView && m_InventoryMgr.binoculars && m_InventoryMgr.binoculars->active))
+        return false;
+    OpenBlood2::SoundRequest sound;
+    sound.resource = "Sounds\\Weapons\\sniper\\Zoom.wav";
+    sound.speaker = m_hObject;
+    sound.inner_radius = 100;
+    sound.outer_radius = 1000;
+    sound.priority = 1; // SOUNDPRIORITY_MISC_MEDIUM, unretained attached one-shot.
+    sound.reverb_requested = true;
+    zoom_sound_error.clear();
+    s->PlayCharacterSound(m_hObject, sound, false, zoom_sound_error);
+    SetZoomMode(!m_bZoomView, 99);
+    return true;
+}

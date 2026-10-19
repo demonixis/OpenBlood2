@@ -248,3 +248,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Demo menu and edition resources](demo_menu_contracts.md), [Voodoo and Focus](voodoo_contracts.md): separate demo continuation; M2 closure and GPU reservation unchanged.
 
 - [BoneLeech attachment and inventory use](inventory_use_contracts.md): BugSpray, charged night goggles, remote eye, input/camera/FX and teardown.
+
+- [Airship entry, sniper rifle and Anger](airship_contracts.md)

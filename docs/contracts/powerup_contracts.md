@@ -1,9 +1,10 @@
-# Original timed powers (Willpower, Stealth)
+# Original timed powers (Willpower, Stealth, Anger)
 
 Selected original `PowerupPickups.cpp` StealthPU and `CPlayerObj`
 AddPowerup/CheckPowerups/ResetPowerups/Start/EndPowerupSound
 (PlayerObj.cpp:3670–4046). Willpower (POWERUP_INVULNERABILITY, PU_INVULNERABLE)
-and Stealth (POWERUP_STEALTH, PU_INVISIBLE) are collected and timed; Anger,
+and Stealth (POWERUP_STEALTH, PU_INVISIBLE) are collected and timed.
+[Anger](airship_contracts.md#anger) now adds the original triple-damage lifecycle;
 Revenant, incorporeal and silence remain unported and keep refusing death, capture
 and restore.
 
@@ -19,7 +20,7 @@ nigh invulnerability and the glow, ends the sound and plays the VME_POWERUP voic
 group (single player); IDS_GENERAL_WILLPOWER_EXP is not delivered (counted).
 ResetPowerups (death) clears it first. Capture drops the power, but the source
 CDestructable Save keeps `m_bNighInvulnerable`, so a transferred player stays
-nigh invulnerable with no timer — a source behavior kept as such.
+nigh invulnerable with no timer — a limitation of the current partial snapshot.
 
 ## Pickup
 
@@ -53,8 +54,11 @@ three handles.
 
 ## Save, KeepAlive and restore
 
-The source Save writes no power state or timer. Capture therefore drops an active
+The original Save writes power flags, expiry offsets and sound-stack entries
+(PlayerObj.cpp:6588–6601). The partial typed snapshot omits this block and drops an active
 invisibility; the engine snapshot keeps the translucent color, so a restored or
 transferred player stays translucent with PU_INVISIBLE inactive (AI sees it) until
-something resets its color — a source behavior, not a repair target. Later
+something resets its color — a partial-port limitation. Later
 LithTech serializes object color (game_serialize.cpp), corroborating this.
+Active Anger capture remains explicitly refused so its damage factor cannot become
+permanent. Full timed-power serialization is outside the Airship entry continuation.

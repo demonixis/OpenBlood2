@@ -725,6 +725,7 @@ namespace OpenBlood2
         const ClassInfo health_base{"HealthBase", &powerup_pickup, construct<HealthBase>, {}};
         const ClassInfo armor_base{"ArmorBase", &powerup_pickup, construct<ArmorBase>, {}};
         const ClassInfo enhancement_base{"EnhancementBase", &powerup_pickup, construct<EnhancementBase>, {}};
+        const ClassInfo anger_pickup{"AngerPU", &enhancement_base, construct<AngerPU>, {}};
         const ClassInfo stealth_pickup{"StealthPU", &enhancement_base, construct<StealthPU>, {}};
         const ClassInfo willpower_pickup{"InvulnerabilityPU", &enhancement_base, construct<InvulnerabilityPU>, {}};
         const ClassInfo bullet_ammo{"BulletAmmoPU", &ammo_pickup, construct<BulletAmmoPU>, {}};
@@ -1057,16 +1058,16 @@ namespace OpenBlood2
                objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
                objects.register_class(flare_pickup) && objects.register_class(tesla_pickup) &&
                objects.register_class(voodoo_pickup) && objects.register_class(shotgun_pickup) &&
-               objects.register_class(singularity_pickup) &&
-               objects.register_class(mac10_pickup) && objects.register_class(sniper_pickup) &&
-               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
-               objects.register_class(health_base) && objects.register_class(armor_base) &&
-               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
-               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
-               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
-               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
-               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
-               objects.register_class(enhancement_base) && objects.register_class(stealth_pickup) &&
+               objects.register_class(singularity_pickup) && objects.register_class(mac10_pickup) &&
+               objects.register_class(sniper_pickup) && objects.register_class(ammo_pickup) &&
+               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
+               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
+               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
+               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
+               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
+               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
+               objects.register_class(megahealth_pickup) && objects.register_class(enhancement_base) &&
+               objects.register_class(anger_pickup) && objects.register_class(stealth_pickup) &&
                objects.register_class(willpower_pickup) && objects.register_class(ward_pickup) &&
                objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
                objects.register_class(objectives_trigger) && objects.register_class(conversation_trigger) &&

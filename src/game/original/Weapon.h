@@ -158,6 +158,12 @@ class CBeretta final : public CWeapon
   public:
     CBeretta() : CWeapon(WEAP_BERETTA) {}
 };
+// Original CSniperRifle uses the shared vector path; chrome remains unrendered.
+class CSniperRifle final : public CWeapon
+{
+  public:
+    CSniperRifle() : CWeapon(WEAP_SNIPERRIFLE) {}
+};
 // Original CShotgun::Fire only selects shell ejection (a client effect not ported) before
 // CWeapon::Fire, whose FireSpread casts its sixteen vectors.
 class CShotgun final : public CWeapon

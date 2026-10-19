@@ -26,6 +26,7 @@ class CBloodServerShell
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerMove&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerControls&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerUse&);
+    bool OnMessage(HCLIENT, const OpenBlood2::PlayerAltFire&);
     bool OnMessage(HCLIENT, const OpenBlood2::CreatureResponse&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerRotation&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerItemCommand&);
@@ -87,7 +88,7 @@ class CBloodClientShell
     bool Update();
     bool UpdateMovement(CBloodServerShell&, double, std::string&);
     bool UpdateUse(CBloodServerShell&);
-    bool use_down = false, use_was_down = false;
+    bool use_down = false, use_was_down = false, alt_fire_was_down = false;
     bool medkit_down = false, medkit_was_down = false;
     bool flashlight_down = false, flashlight_was_down = false;
     CFlashlightFX flashlight;

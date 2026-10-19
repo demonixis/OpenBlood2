@@ -382,8 +382,9 @@ namespace
         CHECK(g.capture_player(s, e) && std::abs(s.alpha - .08f) < 1e-6f);
         CHECK(g.leave_player() && g.restore_player(s, e));
         auto& restored = player(g);
-        CHECK(!restored.IsPowerupActive(PU_INVISIBLE) && std::abs(g.objects.get(restored.m_hObject)->alpha - .08f) < 1e-6f);
-        CHECK(!p.AddPowerup(7, 30)); // Other powers stay unported.
+        CHECK(!restored.IsPowerupActive(PU_INVISIBLE) &&
+              std::abs(g.objects.get(restored.m_hObject)->alpha - .08f) < 1e-6f);
+        CHECK(!restored.AddPowerup(8, 30)); // Other powers stay unported.
         return true;
     }
     // Original InvulnerabilityPU: Willpower nigh invulnerability, glow flag, expiry voice.

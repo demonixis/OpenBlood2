@@ -22,7 +22,7 @@ namespace
     // object.lto contains no FLAYER literal (only BLOOD2NM does).
     constexpr WeaponPrefix weapon_prefixes[]{{"BERET", WEAP_BERETTA, true},
                                              {"SHOTG", WEAP_SHOTGUN, true}, // "SHOTGU" compared on 5 bytes.
-                                             {"SNIPE", 0, false},
+                                             {"SNIPE", WEAP_SNIPERRIFLE, true},
                                              {"ASSAULTR", WEAP_ASSAULTRIFLE, true},
                                              {"SUBMA", WEAP_SUBMACHINEGUN, true},
                                              {"FLARE", WEAP_FLAREGUN, true},

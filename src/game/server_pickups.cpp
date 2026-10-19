@@ -28,14 +28,18 @@ namespace OpenBlood2
             return false;
         bool supported = false;
         // Fanatic/Prophet: original Spawner requests (fanatic_prophet_contracts.md). Item and weapon
-        // leaves bounce on string creation; SniperRiflePU's weapon is not integrated.
-        for (auto name : {"BulletAmmoPU",   "ShellAmmoPU",    "BMGAmmoPU",         "FlareAmmoPU",   "DieBugDieAmmoPU",
-                          "HowitzerAmmoPU", "FuelAmmoPU",     "BatteryAmmoPU",     "HealthPU",      "MegaHealthPU",
-                          "WardPU",         "NecroWardPU",    "InvulnerabilityPU", "MedKitPU",      "FlashlightPU",
-                          "TheEyePU",       "NightGogglesPU", "BugSprayPU",        "BinocularsPU",  "ProximitiesPU",
-                          "RemotesPU",      "BerettaPU",      "SubMachineGunPU",   "FlareGunPU",    "AssaultRiflePU",
-                          "TeslaCannonPU",  "VoodooDollPU",   "ShotgunPU",         "SingularityPU", "Fanatic",
-                          "Prophet"})
+        // leaves bounce on string creation.
+        for (auto name : {"BulletAmmoPU",      "ShellAmmoPU",     "BMGAmmoPU",
+                          "FlareAmmoPU",       "DieBugDieAmmoPU", "HowitzerAmmoPU",
+                          "FuelAmmoPU",        "BatteryAmmoPU",   "HealthPU",
+                          "MegaHealthPU",      "WardPU",          "NecroWardPU",
+                          "InvulnerabilityPU", "MedKitPU",        "FlashlightPU",
+                          "TheEyePU",          "NightGogglesPU",  "BugSprayPU",
+                          "BinocularsPU",      "ProximitiesPU",   "RemotesPU",
+                          "BerettaPU",         "SubMachineGunPU", "FlareGunPU",
+                          "AssaultRiflePU",    "AngerPU",         "SniperRiflePU",
+                          "TeslaCannonPU",     "VoodooDollPU",    "ShotgunPU",
+                          "SingularityPU",     "Fanatic",         "Prophet"})
             supported |= same_name(type, name);
         Properties parsed;
         return supported && objects_.parse_properties(objects_.find_class(type), props, parsed);

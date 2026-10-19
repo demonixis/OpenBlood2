@@ -30,6 +30,13 @@ absent from the original base game, three absent sprite files and two missing
 BSPs). These are accounted source rows, not newly implemented objects. The subsequent [inventory-use continuation](../contracts/inventory_use_contracts.md)
 implements TheEye, NightGoggles, BugSpray and BoneLeech attachment. The rest of this backlog retains its earlier measurement dates.
 
+The 2026-10-19 [Airship continuation](../contracts/airship_contracts.md) updates the
+06_airship1/06_airship2 rows: both start with zero unsupported classes or failed
+entries. Airship1 retains the pre-existing explicit omission of the absent girder1
+BSP. Sniper rifles, Anger pickups and bounded initial actor placement now execute;
+entry validation does not certify full traversal. Other rows retain their earlier
+measurement dates.
+
 ## How to refresh
 
 ```bash
@@ -43,7 +50,7 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 ## Status by world
 
 `starts` means the world passes entry validation and starts (01_SubwayA,
-02_CityHub, 02_CityHubC, 03_Museum, 04_SteamTunnels, 05_CDM, 05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon, BB_Drain). Batches are defined in the next section.
+02_CityHub, 02_CityHubC, 03_Museum, 04_SteamTunnels, 05_CDM, 05_CDMB, 06_Airship1, 06_Airship2, 08_SubwayB, Drop, BB_DeathCanyon, BB_Drain). Batches are defined in the next section.
 
 | World | Created | Unported (classes) | Failed | Batches needed |
 |---|---:|---:|---:|---|
@@ -55,8 +62,8 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 | 04_steamtunnels | 499 | 0 (0) | 0 | **starts** |
 | 05_cdm | 550 | 0 (0) | 0 | **starts** |
 | 05_cdmb | 129 | 0 (0) | 0 | **starts** |
-| 06_airship1 | 191 | 0 (0) | 5 | L6, L12 |
-| 06_airship2 | 243 | 2 (2) | 17 | L6, L10 |
+| 06_airship1 | 196 | 0 (0) | 0 | **starts** |
+| 06_airship2 | 262 | 0 (0) | 0 | **starts** |
 | 07_cathedral | 218 | 7 (6) | 4 | L2, L6, L7, L8, L10 |
 | 08_subwayb | 175 | 0 (0) | 0 | **starts** |
 | 09_abandoned_buildings | 657 | 22 (9) | 32 | L2, L4, L5, L6, L7, L8, L10, L11 |
@@ -98,7 +105,7 @@ Closest to starting:
 - **L9 only:** `credits`, `end` (the Chosen as scripted actors).
 - **L10 only:** `multi/bb_bloodarena`, `multi/bb_area15`, `bb_brownstar`, `bb_cabana`, `bb_chosenarena`, `bb_drain`, `bb_power`.
 - **L11 only:** `multi/bb_fields`.
-- **L7 only (BoneLeech):** `02_cityhubb`. **L6 + L10:** `06_airship2`.
+- **L7 only (BoneLeech):** `02_cityhubb`.
 
 ## Batches
 
@@ -358,30 +365,14 @@ DLS contracts).
 | Fanatic | authored AI weapon unavailable: SHOTGU | 1 | L6 |
 
 ### 06_airship1
-191 created instances · 0 unported entries (0 classes) · 5 failed entries
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| CultistAI | NPC world ground placement failed | 3 | L12 |
-| Fanatic | authored AI weapon unavailable: SNIPE | 2 | L6 |
+196 created source instances · 0 unported · 0 failed · 1 omitted missing BSP (`girder1`).
+Starts. The two SNIPE Fanatics now have the original sniper rifle. Three authored
+Cultists are fitted locally out of overlapping ceiling/wall faces at initialization.
 
 ### 06_airship2
-243 created instances · 2 unported entries (2 classes) · 17 failed entries
-
-**Unported classes**
-
-| Class | Entries | Batch |
-|---|---:|---|
-| AngerPU | 1 | L10 |
-| BugSprayPU | 1 | L10 |
-
-**Failed entries**
-
-| Class | Cause | Entries | Batch |
-|---|---|---:|---|
-| Fanatic | authored AI weapon unavailable: SHOTGUN | 17 | L6 |
+262 created source instances · 0 unported · 0 failed · 0 omitted.
+Starts. AngerPU now provides the original triple-damage power. Three authored
+Fanatic placements are resolved, including the two overlapping Fanatic3 entries.
 
 ### 07_cathedral
 218 created instances · 7 unported entries (6 classes) · 4 failed entries

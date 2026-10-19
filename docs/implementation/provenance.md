@@ -1515,3 +1515,16 @@ source, commercial asset or graphics stack changes are imported. See
 [source hashes](sources/demo_retakes_sources.json),
 [placement contract](../contracts/contact_overlap_contracts.md#spawned-npc-placement)
 and [validation](../../../Documentation/Implementation/demo_retakes.md).
+
+## Airship sniper, Anger and placement
+
+The [Airship contracts](../contracts/airship_contracts.md) selectively import the
+full Shared/WeaponDefs.cpp Barrett definition, ObjectDLL/GameWeapons.h CSniperRifle
+wrapper, AI_Mgr.cpp SNIPE mapping/default aiming, PlayerObj.cpp COMMAND_ALTFIRE
+and Anger Add/Check/ResetPowerups branches, PowerupPickups.cpp AngerPU, and
+ClientShellDLL/ViewWeapon.cpp's alternate-zoom exclusion. Local typed commands,
+checked lifetimes and bounded placement are explicit adaptations. Later
+runtime/world/src/fullintersectline.cpp corroborates the ground ray's opt-in
+interior-box semantics; it does not prove 1998 collision parity. Original source
+hashes are in [airship_sources.json](sources/airship_sources.json). Reference trees
+and commercial resources are unchanged.

@@ -22,6 +22,9 @@ namespace OpenBlood2
     {
         float pitch = 0, yaw = 0;
     };
+    struct PlayerAltFire
+    {
+    };
     struct PlayerDetonate
     {
     };

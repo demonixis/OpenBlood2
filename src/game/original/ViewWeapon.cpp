@@ -186,9 +186,9 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
             }
             if (time - last_shot_time_ > (last_alt_ ? data.m_fAltReloadTime : data.m_fReloadTime))
             {
-                const int mode = primary && ammo(false) >= data.m_nAmmoUse       ? 0
-                                 : alternate && ammo(true) >= data.m_nAltAmmoUse ? 1
-                                                                                 : -1;
+                const int mode = primary && ammo(false) >= data.m_nAmmoUse                             ? 0
+                                 : alternate && !data.m_bAltFireZoom && ammo(true) >= data.m_nAltAmmoUse ? 1
+                                                                                                      : -1;
                 if (mode >= 0)
                 {
                     last_shot_time_ = time;

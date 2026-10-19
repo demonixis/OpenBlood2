@@ -36,6 +36,8 @@ FireResult CWeapon::Fire(const WeaponFire& request)
         !std::isfinite(m_pInventoryMgr->damage_multiplier) || m_pInventoryMgr->damage_multiplier < 0 ||
         m_pInventoryMgr->damage_multiplier > 1000)
         return FireResult::Invalid;
+    if (request.alternate && data.m_bAltFireZoom)
+        return FireResult::Blocked; // COMMAND_ALTFIRE handles zoom, without a shot or ammo use.
     const auto length = std::sqrt(vector_dot(request.direction, request.direction));
     if (!std::isfinite(length) || length < 1e-6f)
         return FireResult::Invalid;

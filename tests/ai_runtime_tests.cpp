@@ -711,11 +711,14 @@ namespace
             CHECK(a->AI_Update() && !a->runtime_failed && a->m_nState == AI_Mgr::StateEscapeRun);
             auto pos = g.objects.get(a->m_hObject)->state.m_Pos;
             pos.z += 5; // Deliberate overlapping placement for actual contact dispatch.
+            auto initial = pos;
+            initial.z += 100; // Ground placement must not collect it before tracking is established.
             auto ammo = g.objects.create(g.objects.find_class("BulletAmmoPU"), {}, Creation::World,
-                                         {{"Pos", pos}, {"Name", std::string("NPC ammo contact fixture")}});
+                                         {{"Pos", initial}, {"Name", std::string("NPC ammo contact fixture")}});
             auto* r = g.objects.get(ammo);
             CHECK(r && r->model && r->model_error.empty());
             CHECK(a->SetTrackedObject(ammo) && a->SetNewState(AI_Mgr::StateFindAmmo));
+            CHECK(g.server.TeleportObject(ammo, &pos) == DE_OK);
             a->searched_ammo_target = ammo; // Labelled completed-route fixture, not autonomous retail pursuit.
             a->Metacmd = 4;                 // Preserve completed route semantics after a contact removes its pickup.
             CHECK(g.server.advance_physics(.02));

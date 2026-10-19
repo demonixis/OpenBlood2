@@ -1,5 +1,5 @@
 // Selected original CPlayerObj AddPowerup/CheckPowerups/ResetPowerups and the
-// powerup sound stack (PlayerObj.cpp:3670-4046), Willpower and Stealth. See
+// powerup sound stack (PlayerObj.cpp:3670-4046), Willpower, Stealth and Anger. See
 // powerup_contracts.md.
 #include "PlayerObj.h"
 #include <cmath>
@@ -7,6 +7,7 @@ using namespace OpenBlood2;
 namespace
 {
     constexpr float alpha_normal = 1, alpha_invisible = .08f;
+    constexpr DDWORD anger_glow = 1u << 8;     // USRFLG_ANGERGLOW
     constexpr DDWORD willpower_glow = 1u << 9; // USRFLG_WILLPOWERGLOW
     constexpr const char* start_sound = "sounds\\powerups\\specialpowerupstart1.wav";
     constexpr const char* end_sound = "sounds\\powerups\\specialpowerupend1.wav";
@@ -33,8 +34,23 @@ namespace
 bool CPlayerObj::AddPowerup(DBYTE type, float value)
 {
     auto* s = GetServerDE();
-    if ((type != 5 /* POWERUP_INVULNERABILITY */ && type != 6 /* POWERUP_STEALTH */) || !std::isfinite(value))
+    if ((type != 5 /* POWERUP_INVULNERABILITY */ && type != 6 /* POWERUP_STEALTH */ && type != 7 /* POWERUP_ANGER */) ||
+        !std::isfinite(value))
         return false;
+    if (type == 7)
+    {
+        if (!m_bPowerupActivated[PU_TRIPLEDAMAGE])
+        {
+            m_InventoryMgr.damage_multiplier *= 3;
+            m_bPowerupActivated[PU_TRIPLEDAMAGE] = true;
+        }
+        StartPowerupSound(PU_TRIPLEDAMAGE);
+        m_fTripleDamageTime = s->GetTime() + value;
+        ++powerup_pickups;
+        PlayVoiceGroupEventOnClient(6 /* VME_POWERUP */, true);
+        s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) | anger_glow);
+        return true;
+    }
     if (type == 5)
     {
         m_fNighInvulnerableTime = s->GetTime() + value;
@@ -99,6 +115,16 @@ bool CPlayerObj::CheckPowerups()
             s->SetObjectColor(m_hObject, {}, alpha_normal);
         }
     }
+    // Keep the source shared-time quirk: Stealth blinking has modified time above.
+    if (m_bPowerupActivated[PU_TRIPLEDAMAGE] && time > m_fTripleDamageTime)
+    {
+        m_InventoryMgr.damage_multiplier /= 3;
+        m_bPowerupActivated[PU_TRIPLEDAMAGE] = false;
+        ++powerup_expiries;
+        ++powerup_console_unavailable; // IDS_GENERAL_TRIPLEDAMAGE_EXP.
+        EndPowerupSound(PU_TRIPLEDAMAGE);
+        s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) & ~anger_glow);
+    }
     bool new_loop = false, done = false;
     if (m_hPowerupStartSound && s->IsSoundDone(m_hPowerupStartSound, done) && done)
     {
@@ -149,6 +175,13 @@ void CPlayerObj::ResetPowerups()
         EndPowerupSound(PU_INVISIBLE);
         s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) | FLAG_SHADOW);
         s->SetObjectColor(m_hObject, {}, alpha_normal);
+    }
+    if (m_bPowerupActivated[PU_TRIPLEDAMAGE])
+    {
+        m_InventoryMgr.damage_multiplier /= 3;
+        m_bPowerupActivated[PU_TRIPLEDAMAGE] = false;
+        EndPowerupSound(PU_TRIPLEDAMAGE);
+        s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) & ~anger_glow);
     }
 }
 void CPlayerObj::StartPowerupSound(PowerupType power)

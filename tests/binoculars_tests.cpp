@@ -207,8 +207,10 @@ namespace
         g.server.audio.inspect_pcm = true;
         CHECK(g.request_world("01_subwaya", e) && g.enter_player(e) && g.pump_player_messages(e));
         auto& p = player(g);
+        auto pickup_pos = g.client_shell.position;
+        pickup_pos.x += 100; // Keep ground-placement contacts separate from the explicit touch below.
         auto h = g.objects.create(g.objects.find_class("BinocularsPU"), {}, Creation::World,
-                                  {{"Pos", g.client_shell.position}});
+                                  {{"Pos", pickup_pos}});
         CHECK(h && g.objects.get(h)->model && g.objects.get(h)->model_error.empty());
         CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p.m_hObject) && p.m_InventoryMgr.binoculars);
         // The SubwayA intro camera blocks item commands; activate the inventory item directly.

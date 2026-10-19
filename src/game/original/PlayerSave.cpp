@@ -55,13 +55,13 @@ namespace
             error = "Player fields require a live initialized owner outside damage callbacks";
             return false;
         }
-        // The source Save writes no power state or timer: invisibility and Willpower are
-        // dropped (the engine keeps the translucent color, CDestructable keeps the nigh
-        // invulnerability). Other powers stay refused.
+        // This partial snapshot omits power flags/timers (the original Save writes them).
+        // Keep the existing Stealth/Willpower transfer boundary; Anger stays refused
+        // so its inventory multiplier cannot become permanent without an expiry.
         for (int i = 0; i < PU_MAXTYPES; ++i)
             if (player.m_bPowerupActivated[i] && i != PU_INVISIBLE && i != PU_INVULNERABLE)
             {
-                error = "Active unported player powers require unported saved expiration timers";
+                error = "Active player power requires unported saved expiration timers";
                 return false;
             }
         for (unsigned slot = 0; slot < inventory_weapon_slots; ++slot)

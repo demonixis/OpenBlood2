@@ -165,6 +165,7 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
                         accepted = m_damage.AddNecroWard(pickup.amount);
                         break;
                     case 5: // POWERUP_INVULNERABILITY
+                    case 7: // POWERUP_ANGER
                     case 6: // POWERUP_STEALTH
                         accepted = AddPowerup(static_cast<DBYTE>(pickup.type), pickup.amount);
                         break;

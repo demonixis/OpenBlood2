@@ -9,7 +9,7 @@ inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_FLAREGUN =
 inline constexpr DBYTE WEAP_DRUDGE_FIREBALL = 30, WEAP_BONELEECH_SUCK = 33;
 inline constexpr DBYTE WEAP_TESLACANNON = 13, WEAP_VOODOO = 14;
 inline constexpr DBYTE WEAP_SHOTGUN = 4, WEAP_SINGULARITY = 8, WEAP_BUGSPRAY = 10;
-inline constexpr DBYTE WEAP_SNIPERRIFLE = 5; // Pickup offer only; the weapon is not integrated.
+inline constexpr DBYTE WEAP_SNIPERRIFLE = 5;
 inline constexpr DBYTE AMMO_PROXIMITYBOMB = 10, AMMO_REMOTEBOMB = 11;
 inline constexpr bool inventory_bomb(DBYTE type)
 {

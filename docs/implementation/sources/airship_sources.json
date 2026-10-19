@@ -1,0 +1,41 @@
+{
+  "sources": [
+    {
+      "path": "Blood2/Shared/WeaponDefs.cpp",
+      "sha256": "7693d587a88491eb5499847efcc7cc3d0a81b14bf17dcaa0f63a979f9e394a9d"
+    },
+    {
+      "path": "Blood2/ObjectDLL/GameWeapons.h",
+      "sha256": "d8533873a2f4130cb9f6e4cc230ab33ce1ae033ee54b8bcc1d5f124efe60a8cf"
+    },
+    {
+      "path": "Blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "7275c3a4f9374926e0a5e7cce4d533ae59ea558027bda1448b223a283e66fb09"
+    },
+    {
+      "path": "Blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "93056622f9f083f11447a471ecae6f115b7dc3937daf7d251d2396724f3d2003"
+    },
+    {
+      "path": "Blood2/ObjectDLL/PowerupPickups.cpp",
+      "sha256": "5f80930713a75f48a3f6b1eb8a6a2a5dc42b6ae57289d8e955e372d11cca35a9"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "8dc314214889f387a89baf44a0689c0a4be9f466e5c9b33a7453db5a547cb529"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "b1b6bf1bb639781dff7bca72c85bb727abf96be2fc26b2ee53146640ef693fe5"
+    },
+    {
+      "path": "runtime/world/src/fullintersectline.cpp",
+      "sha256": "f199f999a63986325675d9cb1bf2bdede98942e03cf0725dab937f506f6f3409"
+    }
+  ],
+  "adaptations": [
+    "Typed press-edge zoom command and checked local transport",
+    "Bounded atomic initial placement, separate from original game rules",
+    "Original shared-time expiry quirk retained; active Anger snapshots remain unavailable"
+  ]
+}
