@@ -103,6 +103,8 @@ namespace OpenBlood2
                 options.menu_smoke = true;
             else if (arg == "--demo")
                 options.demo = true;
+            else if (arg == "--demo-smoke")
+                options.demo_smoke = true;
             else if (arg == "--help" || arg == "-h")
                 options.help = true;
             else if (arg == "--inspect-world")
@@ -318,6 +320,13 @@ namespace OpenBlood2
         {
             error = "--demo supports normal launch, --view-world, --check-data, --inspect-world, --inspect-player, "
                     "--start-game and --bench; smoke diagnostics need the full game";
+            return false;
+        }
+        if (options.demo_smoke &&
+            (!options.demo || content_smoke || options.view_world || options.inspect_world || options.start_game ||
+             options.check_data || options.bench || options.frame_limit || explicit_world))
+        {
+            error = "--demo-smoke requires --demo and its default first world; it owns its diagnostic frames";
             return false;
         }
         if (options.demo && !explicit_world)

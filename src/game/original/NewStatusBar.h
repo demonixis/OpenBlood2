@@ -67,7 +67,7 @@ struct StatTab
 class CNewStatusBar
 {
   public:
-    explicit CNewStatusBar(const OpenBlood2::Resources& resources) : canvas(resources) {}
+    explicit CNewStatusBar(const OpenBlood2::Resources& resources) : canvas(resources), demo_(resources.demo()) {}
     bool Init();
     bool Update(const OpenBlood2::PlayerStats&, unsigned width, unsigned height);
     std::array<const StatTab*, 4> tabs() const
@@ -91,5 +91,6 @@ class CNewStatusBar
     unsigned m_nScreenWidth = 0, m_nScreenHeight = 0, m_nStatLevel = STATTAB_HIGH;
     OpenBlood2::PlayerStats previous{};
     bool initialized = false, have_previous = false;
+    bool demo_ = false;
     static constexpr auto m_hTransColor = OpenBlood2::hud_magenta;
 };

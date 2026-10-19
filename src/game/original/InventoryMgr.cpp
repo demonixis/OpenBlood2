@@ -52,6 +52,20 @@ CInventoryMgr::~CInventoryMgr()
 }
 DDWORD CInventoryMgr::EngineMessageFn(LPBASECLASS object, DDWORD message, void* data, DFLOAT fData)
 {
+    if (message == MID_UPDATE)
+        if (const auto* character = dynamic_cast<CBaseCharacter*>(object); character && !character->m_damage.IsDead())
+        {
+            // Original Update: no supported inventory spell continuously burns Focus.
+            constexpr float regeneration[]{2, 4, 6, 8, 10, 12};
+            const auto magic = std::clamp<int>(m_nAttribMagic, 1, 6) - 1;
+            const float cap = MaxAmmo(AMMO_FOCUS);
+            if (m_fAmmo[AMMO_FOCUS] < cap)
+            {
+                m_fAmmo[AMMO_FOCUS] = std::clamp(
+                    m_fAmmo[AMMO_FOCUS] + regeneration[magic] * BaseClass::GetServerDE()->GetFrameTime(), 0.f, cap);
+                ++revision;
+            }
+        }
     if (message == MID_UPDATE && flashlight)
     {
         const auto count = flashlight->count;
@@ -210,6 +224,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         weapon = std::make_unique<CFlareGun>();
     else if (type == WEAP_TESLACANNON)
         weapon = std::make_unique<CTeslaCannon>();
+    else if (type == WEAP_VOODOO)
+        weapon = std::make_unique<CVoodooDoll>();
     else if (type == WEAP_SHIKARI_CLAW)
         weapon = std::make_unique<CShikariClaw>();
     else if (type == WEAP_SHIKARI_SPIT)

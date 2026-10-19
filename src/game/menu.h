@@ -77,13 +77,8 @@ namespace OpenBlood2
         {
             pressed_ = -1;
         }
-        // Original Splash_OnKeyDown (ESC/SPACE/RETURN): back to the menu, or quit.
-        void dismiss_splash();
         MenuCommand take_command();
         bool active = false, in_world = false, alive = true;
-        bool demo = false;            // Original _DEMO menus (--demo).
-        const char* splash = nullptr; // Full-screen Splash_SetState PCX; menu items are inert.
-        bool splash_exit = false;
         bool audio_failed = false; // Nonmodal application-owned audio status.
         MenuPage page = MenuPage::Main;
         std::vector<MenuItem> items;
@@ -105,7 +100,6 @@ namespace OpenBlood2
         void AddLargeTextItemOption(unsigned string_id, int command);
         void setting(unsigned string_id, int id);
         void cue(MenuCue);
-        void show_splash(const char* screen, bool exit);
         int pressed_ = -1;
         MenuCommand pending_;
     };
@@ -132,7 +126,7 @@ namespace OpenBlood2
         const HudSurface* background_ = nullptr;
         const HudSurface* slider_ = nullptr;
         const HudSurface* thumb_ = nullptr;
-        std::map<std::string, const HudSurface*> titles_, splashes_;
+        std::map<std::string, const HudSurface*> titles_;
         std::uint64_t composed_ = UINT64_MAX;
     };
 } // namespace OpenBlood2

@@ -2,6 +2,7 @@
 #include "SingularityProjectile.h"
 #include "engine/collision.h"
 #include "game/weapon_messages.h"
+#include <cmath>
 using namespace OpenBlood2;
 CSingularityProjectile::CSingularityProjectile() : CProjectile(OT_MODEL)
 {

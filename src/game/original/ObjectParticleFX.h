@@ -33,4 +33,5 @@ class CObjectParticleFX
     bool initialized_ = false, created_ = false;
     bool AddParticles(std::minstd_rand&, std::size_t);
     bool AddShellParticles(std::minstd_rand&, std::size_t);
+    bool AddCylinderParticles(std::minstd_rand&, std::size_t);
 };

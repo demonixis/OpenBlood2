@@ -10,6 +10,7 @@ namespace OpenBlood2
         DBYTE seed = 2, weapon = 1;
         bool alternate = false, left = false;
         float projectile_speed = 1000; // Original FIREMSG_SPECIAL_FLOAT for inventory bombs only.
+        DBYTE voodoo_hit = 0;          // Original FIREMSG_SPECIAL_DWORD, bounded to the five primary animations.
     };
     enum class DamageType : DBYTE
     {
@@ -23,6 +24,8 @@ namespace OpenBlood2
         FreeFall = 8,
         Blind = 9,
         Slow = 10,
+        DropWeapon = 11,
+        Vision = 12,
         Electric = 13, // Laser and lightning (Tesla alternate, TeslaBall bolts).
         Acid = 14
     };

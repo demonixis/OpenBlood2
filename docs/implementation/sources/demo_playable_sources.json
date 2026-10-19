@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-19",
+  "scope": "Menu-free demo startup/pause/retry/transfer/end, original Voodoo and Focus, historical menu removal, phase-2 audit only",
+  "references": [
+    {
+      "source": "sources/blood2/ObjectDLL/GameWeapons.cpp",
+      "sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd",
+      "selection": "CVoodooDoll FireVector, DamageClosestInFOV, WonkyThemAll and SendDamageMsg solo branches"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/WeaponPickups.cpp",
+      "sha256": "116eac417209ee2cc523044e02ff615406b597164df9df5d5f2e0be80cfbc1d4",
+      "selection": "VoodooDollPU assets and zero ammunition"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
+      "selection": "Focus regeneration and original demo inventory-weapon refusal"
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "selection": "Inventory setup calls; ordinary demo bomb refusal"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/GameWeapons.cpp",
+      "sha256": "292753e7a91be363aa955731d552f967845c6a783dd6aeec954db59e2d2128d7",
+      "selection": "Rest-animation variant and special fire data"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/ObjectFX.cpp",
+      "sha256": "1af815cdb07c8e0fcd56bebb723e78b539cd3398221a78e3b3fcf977bf109c48",
+      "selection": "CObjectGeneralFX Voodoo recipes and CObjectParticleFX EMITCYLINDER emission"
+    },
+    {
+      "source": "sources/blood2/Shared/WeaponDefs.cpp",
+      "sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
+      "selection": "Complete Voodoo WeaponData record"
+    },
+    {
+      "source": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
+      "selection": "Weapon/ammo numbering and damage identifiers"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "selection": "Demo first world and EndGame after dead guard"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.h",
+      "sha256": "00c217428619071a260d2b1e9b44c5b828ee2ef5e4a860c7ea3cdd9964b34649",
+      "selection": "Build 109 source version"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/NewStatusBar.cpp",
+      "sha256": "c4dee3b2502db56a1a85b94a55c64fca9ddab0a1e69421858b27aeac02e324f5",
+      "selection": "Source raidcanister icon request absent from Build 108"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MenuMain.cpp",
+      "sha256": "5333fe0cc6a98782b9c1695d075556fd9f23f3ba8edfe8b279ab2c9aef3a0f5a",
+      "selection": "Demo main-menu actions (audit only)"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MenuSinglePlayer.cpp",
+      "sha256": "a9fa9fa9c0fdbcc0372ee76a64662bc9892c0df2a840c969e72472c96e861cd3",
+      "selection": "Demo solo omissions and modes splash (audit only)"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MenuOptions.cpp",
+      "sha256": "4338c381cce6f2b835be51549c92428b482fe7c00f16104910990265f9fdeab1",
+      "selection": "Six options destinations (audit only)"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MenuMouse.cpp",
+      "sha256": "25fb721cc12f5fa788972ef4e071040e89dd667091ad37a2cc099afe2458a4f9",
+      "selection": "Source mouse controls (audit only)"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MainMenus.cpp",
+      "sha256": "8ee76af4b06a037093e04df5e3be33cdab6d03f49018884d5385a429b270db07",
+      "selection": "Demo ambience/pause rules (audit only)"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/Splash.cpp",
+      "sha256": "d713f44bbe3adbe39c12c497b596937e9e10b01b489a90b81ce247663b039a51",
+      "selection": "Promotion input/return/quit (audit only)"
+    },
+    {
+      "source": "sources/blood2/ClientRes/ClientRes.rc",
+      "sha256": "cc635e26e01b93e83e6202a336e7dda6af70bf681dbe731eedd82b450bcedfbd",
+      "selection": "Source UI strings for the recommended manifest (audit only)"
+    }
+  ],
+  "external_evidence": {
+    "B2Demo.rez": {
+      "sha256": "e410ce2944210c776c7407a79e01cfa031c782132f68407cd0871379c5e7218c",
+      "entries": 1364,
+      "worlds": [
+        "Demo_01",
+        "Demo_02"
+      ],
+      "binary_client": "DEMO v1.0 (Build 108)",
+      "execution": "Resource readers execute no DLL code; original client not interactively audited in this run."
+    }
+  },
+  "adaptations": [
+    "Runtime edition and typed owned fire/end requests replace compile-time/ABI boundaries.",
+    "Stable handles and deferred callbacks protect reentrant damage/effect ownership.",
+    "Primary self-miss direction explicitly zero; reject zero-distance normalization; owned portable RNG is not CRT-identical.",
+    "EMITCYLINDER uses bounded particle services and a stable alignment basis.",
+    "Demo HUD draws the secondary count without absent raidcanister artwork; other required assets remain strict.",
+    "Menu-free Esc pause; EndGame unloads to info.pcx then quits.",
+    "User-confirmed Enter retry starts the current world fresh; future checkpoint restoration attaches to that application handler.",
+    "SingularityProjectile cmath inclusion fixes the preexisting build failure.",
+    "Passive non-solid integration retains velocity but skips MoveObject when a tiny real-clock displacement rounds to the same float position; explicit collision queries and body policies remain unchanged."
+  ],
+  "history": "demo_sources.json and prior commits remain unchanged historical evidence; fixed-offset reader and experiment-only menu tests are removed."
+}

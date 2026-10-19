@@ -34,6 +34,7 @@ namespace OpenBlood2
         bool view_world = false, viewport_smoke = false;
         bool start_game = false;
         bool menu_smoke = false;
+        bool demo_smoke = false; // Dedicated two-level SDL traversal, never changes normal play.
         bool explicit_config = false;
         bool help = false;
         bool check_data = false;

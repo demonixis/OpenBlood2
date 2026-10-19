@@ -424,6 +424,14 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         }
         world_exit.request = *value;
         world_exit.error.clear();
+        if (resources_.demo() && OpenBlood2::same_name(value->next_world, "EndGame"))
+        {
+            world_exit.pending = false;
+            world_exit.demo_end_pending = true;
+            return true; // The application ends the session at its frame boundary.
+        }
+        if (world_exit.demo_end_pending)
+            return true;
         // StartNewWorld's default difficulty is EASY (0); NEW_LEVEL does not
         // replace the server's difficulty/game settings. Audio/menu teardown and
         // loaded-state mutation wait for an accepted transfer in this port.

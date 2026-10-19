@@ -429,6 +429,12 @@ namespace
                               gun->value.amount == 50 && gun->resource_id == IDS_WEAPON_M16);
                         std::cout << "Authored AssaultRiflePU: " << path << '\n';
                     }
+                    if (source.class_name == "VoodooDollPU")
+                    {
+                        const auto* doll = dynamic_cast<PickupObject*>(g.objects.get(h)->game.get());
+                        CHECK(doll && doll->value.kind == PickupKind::Weapon && doll->value.type == WEAP_VOODOO &&
+                              doll->value.amount == 0 && doll->resource_id == IDS_WEAPON_VOODOO);
+                    }
                     if (source.class_name == "ProximitiesPU")
                     {
                         auto* bomb = dynamic_cast<PickupObject*>(g.objects.get(h)->game.get());
@@ -486,7 +492,8 @@ namespace
         // 13 InvulnerabilityPU, 4 BinocularsPU, 3 ShotgunPU and 1 SingularityPU. 70 container spawns include the
         // bouncing item/weapon leaves.
         CHECK(counts["StealthPU"] == 14 && counts["InvulnerabilityPU"] == 13);
-        CHECK(worlds == 57 && created == 1785 && missing == 0 && rejected == 0 && spawns == 70);
+        CHECK(worlds == 57 && created == 1789 && counts["VoodooDollPU"] == 4 && missing == 0 && rejected == 0 &&
+              spawns == 70);
         return true;
     }
 } // namespace

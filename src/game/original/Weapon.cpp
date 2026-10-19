@@ -29,7 +29,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     BeginFire(request.alternate);
     auto* server = BaseClass::GetServerDE();
     if (!server || !m_pInventoryMgr || !server->IsObjectAlive(m_hOwner) || request.weapon != data.m_nType ||
-        request.left != m_bLeftHand ||
+        request.left != m_bLeftHand || (data.m_nType == WEAP_VOODOO && request.voodoo_hit > 4) ||
         (inventory_bomb(data.m_nType) && (!std::isfinite(request.projectile_speed) || request.projectile_speed < 0 ||
                                           request.projectile_speed > 1750)) ||
         !physics_vector(request.position) || !physics_vector(request.direction) ||
@@ -91,6 +91,12 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     const auto range = request.alternate ? data.m_fAltRange : data.m_fRange;
     const auto trace = [&](DVector direction)
     {
+        if (data.m_nType == WEAP_VOODOO)
+        {
+            // Original FireVector uses the owner's body position/forward and its own FOV queries.
+            last_shot.direction = direction;
+            return true;
+        }
         auto aim_direction = direction;
         if (inventory_bomb(data.m_nType) && request.alternate)
         {

@@ -1,4 +1,5 @@
 #pragma once
+#include "app/demo_flow.h"
 #include "app/movement_controls.h"
 #include "game/menu.h"
 namespace OpenBlood2
@@ -8,8 +9,19 @@ namespace OpenBlood2
     {
         MovementControls controls;
         bool inspector = false;
+        bool demo_mode = false;
+        DemoFlow demo;
+        bool paused(const Menu& menu) const
+        {
+            return demo_mode ? demo.paused() : menu.active;
+        }
         void reset(Menu& menu, bool player)
         {
+            if (demo_mode)
+            {
+                demo.reset(controls, inspector, player);
+                return;
+            }
             menu.cancel_pointer();
             controls.player_changed(player && !menu.active && !inspector);
         }
@@ -17,6 +29,8 @@ namespace OpenBlood2
         bool event(const SDL_Event& e, SDL_WindowID window, Menu& menu, bool player, bool alive,
                    bool inspector_available, float width, float height)
         {
+            if (demo_mode)
+                return demo.event(e, window, controls, inspector, inspector_available, player, alive);
             if ((e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP) && e.key.windowID != window)
                 return false;
             if ((e.type == SDL_EVENT_MOUSE_BUTTON_DOWN || e.type == SDL_EVENT_MOUSE_BUTTON_UP) &&
@@ -89,10 +103,6 @@ namespace OpenBlood2
                         case SDL_SCANCODE_KP_ENTER:
                             if (!e.key.repeat)
                                 menu.activate();
-                            break;
-                        case SDL_SCANCODE_SPACE: // Original Splash_OnKeyDown also accepts VK_SPACE.
-                            if (!e.key.repeat)
-                                menu.dismiss_splash();
                             break;
                         default:
                             break;

@@ -244,3 +244,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Platform lifetime diagnostics](gpu_lifetime_contracts.md): isolated SDL controls, explicit sanitizer failures and NVIDIA module attribution.
 
 - [Original demo edition](demo_contracts.md): `--demo` archive layout, first level, runtime `_DEMO` weapon/pickup rules and the remaining demo blockers.
+
+- [Menu-free demo and retry](demo_contracts.md), [Voodoo and Focus](voodoo_contracts.md): separate demo continuation; M2 closure and GPU reservation unchanged.

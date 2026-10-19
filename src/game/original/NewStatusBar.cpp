@@ -170,7 +170,10 @@ bool CNewStatusBar::InitStatTabs()
 
     m_stAltAmmo.hTab = canvas.CreateSurface(m_stAmmo.sizeX, m_stAmmo.sizeY);
     m_stAltAmmo.hBorder = 0;
-    m_stAltAmmo.hIcon = canvas.CreateSurfaceFromBitmap("interface/statusbar/weapons/raidcanister.pcx");
+    // Build 108's demo has no raidcanister artwork. Keep its secondary count without
+    // importing a retail image; all other requested HUD resources remain required.
+    m_stAltAmmo.hIcon =
+        demo_ ? nullptr : canvas.CreateSurfaceFromBitmap("interface/statusbar/weapons/raidcanister.pcx");
     m_stAltAmmo.hBar = 0;
 
     m_stAltAmmo.borderX = 0;

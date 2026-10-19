@@ -88,14 +88,17 @@ ctest --preset debug -L headless
 ```
 
 The 1998 two-level demo (`B2Demo.rez`) needs `--demo`; its first world is `Demo_01`.
-Its worlds still use unported classes and its menu has no string table, so it does
-not start yet. See [demo contracts](contracts/demo_contracts.md).
+It starts directly in game without a menu. Esc pauses/resumes; Enter after death
+restarts the current level with initial equipment. The authored exit continues to
+Demo_02; the end image accepts Esc/Enter/Space to quit. See [demo contracts](contracts/demo_contracts.md)
+for validation limits and the future save-system integration point.
 
 ```sh
-./build/debug/blood2 --demo --data-dir "/path/to/Blood2 Demo" --inspect-world
+./build/debug/blood2 --demo --data-dir "/path/to/Blood2 Demo"
+./build/debug/blood2 --demo --data-dir "/path/to/Blood2 Demo" --world Demo_02
 ```
 
-The default world is SubwayA. `--view-world` enters the original player and
+The retail default world is SubwayA. `--view-world` enters the original player and
 requests mouse capture. The inspector can also **Enter player and play**.
 The authored intro restricts movement/fire for roughly twelve simulation seconds.
 `--inspect-world` and `--inspect-player` provide diagnostic CLI output;

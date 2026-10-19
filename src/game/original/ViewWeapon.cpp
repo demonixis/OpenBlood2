@@ -126,8 +126,8 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
             return true;
         }
         next_seed_ = static_cast<DBYTE>(2 + random_() % 254);
-        auto result =
-            server.OnMessage(client, WeaponFire{position, direction, next_seed_, type, alternate, left, bomb_speed});
+        auto result = server.OnMessage(
+            client, WeaponFire{position, direction, next_seed_, type, alternate, left, bomb_speed, voodoo_hit});
         last_result = result;
         if (result == FireResult::Fired)
         {
@@ -157,6 +157,12 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
     // Client CMelee::UpdateFiringState chooses fire/fire2 while resting.
     if (type == WEAP_MELEE && state == WS_REST)
         fire_[0] = animation_index(*model, random_() % 2 ? "fire" : "fire2");
+    if (type == WEAP_VOODOO && state == WS_REST)
+    {
+        constexpr const char* names[]{"fire", "fire_lleg", "fire_larm", "fire_rarm", "fire_rleg"};
+        voodoo_hit = static_cast<DBYTE>(random_() % 5);
+        fire_[0] = animation_index(*model, names[voodoo_hit]);
+    }
     // Original CViewWeapon::UpdateFiringState branches, same transition order.
     switch (state)
     {

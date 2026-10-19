@@ -1757,6 +1757,7 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --pixel-lighting    Light models per pixel (menu: Options > Display)\n"
                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled (bench: last frame)\n"
                      "  --menu-smoke        Original-menu SDL traversal, isolated preferences and pause checks\n"
+                     "  --demo-smoke        Menu-free demo SDL pause, authored exits and ending diagnostic\n"
                      "  --gpu-smoke         Exercise GPU presentation, inspector toggle, resize and quit\n"
                      "  --world-smoke       GPU lifecycle with real world unload/reload assertions\n"
                      "  --keepalive-smoke   GPU SubwayA capture / CityHub named entry, hidden updates and reload\n"

@@ -133,6 +133,7 @@ class CBloodClientShell
         std::string error;
         std::uint64_t received = 0, ignored_dead = 0, blocked = 0, queued = 0, completed = 0;
         bool pending = false;
+        bool demo_end_pending = false; // Owned terminal intent; never a DAT load request.
     } world_exit;
     OpenBlood2::BossHealth boss_health;
     std::uint64_t boss_health_messages = 0;

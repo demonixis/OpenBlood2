@@ -2451,6 +2451,20 @@ namespace OpenBlood2
         if (view.model && view.model->invalid_key_bounds)
             ImGui::Text("ABC warning: %u unused key bounds have inverted ordering", view.model->invalid_key_bounds);
         draw_weapon_sound(*weapon, game);
+        if (const auto* voodoo = dynamic_cast<const CVoodooDoll*>(weapon))
+        {
+            ImGui::Text("Voodoo: next variant %u | last effect %u | damage type %u | deliveries %u",
+                        unsigned(view.voodoo_hit), voodoo->hit_effect, unsigned(voodoo->damage_type),
+                        voodoo->deliveries);
+            ImGui::TextUnformatted("Last-shot targets (historical handles; self damage is counted separately):");
+            for (auto handle : voodoo->targets)
+            {
+                const auto* target = game.objects.get(handle);
+                ImGui::Text("%s", target ? target->state.m_Name : "removed object");
+            }
+            if (!voodoo->voodoo_error.empty())
+                ImGui::TextWrapped("Voodoo failed: %s", voodoo->voodoo_error.c_str());
+        }
         if (view.model && view.animation.animation < view.model->animations.size())
         {
             const auto& model = *view.model;

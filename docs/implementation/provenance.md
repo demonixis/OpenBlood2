@@ -1457,10 +1457,25 @@ The original light term is established by fitting light objects against retail b
 The original flag usage and the shipped detail configuration (`MaxModelShadows`) select casters and the default; later LithTech's projected silhouette technique is consulted. No code is imported. Tile shadows along the strongest static light are a replacement policy. See [source ledger](sources/model_shadow_sources.json) and [contracts](../contracts/model_shadow_contracts.md).
 
 
-## Original demo edition (2026-10-18)
+## Original demo edition experiment (2026-10-18; historical menu path)
 
 Selected `_DEMO` branches of original `InventoryMgr.cpp` (IsDemoWeapon, bomb construction, AddInventoryWeapon), `ItemPickups.cpp` and `PlayerObj.cpp` (COMMAND_DETONATE) are ported as a runtime edition, together with the `Demo_01` first level. The single-archive layout comes from the installed demo. The compile-time define becomes a session constant. The `_DEMO` menu branches (MenuMain, MenuSinglePlayer, Splash, MainMenus ambience) are ported too. Their labels are read at verified offsets from the user's demo `cshell.dll`, which is never executed; no menu text is embedded. See [source ledger](sources/demo_sources.json) and [contracts](../contracts/demo_contracts.md).
 
 ## 05_CDMB world objects (2026-10-18)
 
 The engine `Sprite` callback and the `FastApproxArea` CF_NORUNTIME registration come from original `AppHeaders/engineobjects.c`; the `Spawner` class comes from `ObjectDLL/Spawner.cpp`, reusing the earlier `SpawnObject` helper and `PlaySoundFromPos` rules. `Fanatic`, `Prophet`, `CHowitzerShell`, `SniperRiflePU`, AI_Mgr FindHealth, MC_Fire_Crouch, MC_Roll_Forward/Backward and CreateGibs are selected from `ObjectDLL` (Fanatic.cpp, prophet.cpp, AI_Mgr.cpp, GameProjectiles.cpp, WeaponPickups.cpp). The retail `object.lto` string pools were inspected as data (never executed) to establish that `WeaponStrToInt` lacks the `_ADD_ON` COMBAT branch. The MoveObject departure-from-overlap rule is replacement engine policy corroborated by later LithTech `moveplayer.cpp`; no engine code is imported. See [source ledger](sources/cdmb_world_sources.json), [Sprite](../contracts/builtin_sprite_contracts.md), [Spawner](../contracts/spawner_contracts.md), [Fanatic/Prophet](../contracts/fanatic_prophet_contracts.md) and [collision traversal](../contracts/collision_traversal_contracts.md) contracts.
+
+## Menu-free playable demo continuation (2026-10-19)
+
+The old fixed-offset demo-menu experiment above is removed. Runtime edition, exclusive
+archive mounting and original demo weapon/bomb rules remain. Original Voodoo pickup,
+server/client firing, object particles and Focus regeneration are integrated from
+`sources/blood2`, with checked typed ownership. Demo pause/end and Enter death retry
+are application adaptations; the latter is explicitly replaceable by a future
+checkpoint restore handler. The only HUD edition substitution omits the absent
+raidcanister decoration while preserving its count. [Contracts](../contracts/demo_contracts.md),
+[Voodoo](../contracts/voodoo_contracts.md), [new source ledger](sources/demo_playable_sources.json),
+and [evidence](../../../Documentation/Implementation/demo_playable.md) delimit the result.
+The original demo source/hash ledger stays unchanged. The menu study adds no menu code.
+
+The demo continuation also corrects generic passive integration at sub-position-precision deltas: retain container/velocity updates, skip only an unchanged non-solid passive position. Explicit sweeps, solid/body collision and diagnostic clocks are unchanged; see [collision traversal](../contracts/collision_traversal_contracts.md#passive-integration-below-position-precision). This is replacement engine policy, not an imported gameplay rule.

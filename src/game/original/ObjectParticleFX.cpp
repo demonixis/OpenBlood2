@@ -45,13 +45,37 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
         return Init(type, owner, failure);
     failure.clear();
     *this = {};
-    if ((type != 19 && type != 36 && type != 21 && type != 24) || !owner)
+    if ((type != 19 && type != 36 && type != 21 && type != 24 && (type < 12 || type > 17)) || !owner)
     {
         failure = "Unsupported object particle recipe or absent parent";
         return false;
     }
     recipe = type;
     parent = owner;
+    if (type >= 12 && type <= 17)
+    {
+        // CObjectGeneralFX OBJFX_VOODOO_1..6, original high-detail recipes.
+        offset = {type == 12 ? 5.f : 20.f, 0, 0};
+        ramp_down = .25f;
+        duration = .75f;
+        add_delay = .1f;
+        radius = 1000;
+        position_radius = 20;
+        gravity = -150;
+        rotations = {0, .025f, 0};
+        authored_count = type == 12 ? 12 : 8;
+        density = 10;
+        requested_alpha = 1;
+        min_life = .5f;
+        max_life = 1.5f;
+        flags = 0;
+        constexpr DVector colors[]{{1, 0, 0}, {1, 0, 0}, {0, 0, 1}, {1, 1, 1}, {0, 1, 0}, {1, 0, 1}};
+        min_color = vector_scale(colors[type - 12], 192);
+        max_color = vector_scale(colors[type - 12], 255);
+        texture = "SpriteTextures\\Lensflare_1.dtx";
+        initialized_ = true;
+        return true;
+    }
     if (type == 21 || type == 24)
     {
         // CCorpse requests scale=3, SCALENUMPARTICLES only. Other fields stay unscaled.
@@ -117,6 +141,8 @@ bool CObjectParticleFX::CreateObject(const Resources& resources, NodePose pose, 
 }
 bool CObjectParticleFX::AddParticles(std::minstd_rand& random, std::size_t budget)
 {
+    if (recipe >= 12 && recipe <= 17)
+        return AddCylinderParticles(random, budget);
     if (recipe != 1)
         return AddShellParticles(random, budget);
     const auto delta = vector_subtract(last_position, position);
@@ -153,6 +179,53 @@ bool CObjectParticleFX::AddParticles(std::minstd_rand& random, std::size_t budge
         const float life = draw(random, min_life, max_life);
         particles.push_back({start, vector_scale(forward, speed), life, {color, color, color}});
         start = vector_add(start, step);
+    }
+    emitted += count;
+    return true;
+}
+bool CObjectParticleFX::AddCylinderParticles(std::minstd_rand& random, std::size_t budget)
+{
+    // Original EMITCYLINDER spans twice the owner-to-system offset, not owner travel.
+    const auto delta = vector_subtract(last_object_position, position);
+    const float length = std::sqrt(vector_dot(delta, delta)), magnitude = length * 2;
+    const float samples = magnitude / (density * radius / 1000.f);
+    if (!std::isfinite(samples) || samples > 2048)
+    {
+        error = "Voodoo cylinder capacity exceeded";
+        return false;
+    }
+    const auto copies = std::max(1u, static_cast<unsigned>(samples));
+    const auto count = copies * authored_count;
+    if (particles.size() > budget || count > budget - particles.size() || particles.size() + count > 2048)
+    {
+        error = "Voodoo particle burst capacity exceeded";
+        return false;
+    }
+    const auto forward = length > 1e-6f ? vector_scale(delta, 1 / length) : DVector{0, 0, 1};
+    // Stable AlignRotation basis, including the vertical offset used by these recipes.
+    DVector right{forward.z, 0, -forward.x};
+    const float right_length = std::sqrt(vector_dot(right, right));
+    right = right_length > 1e-6f ? vector_scale(right, 1 / right_length) : DVector{1, 0, 0};
+    DVector offset{};
+    const auto step = vector_scale(forward, magnitude / copies);
+    particles.reserve(particles.size() + count);
+    for (unsigned c = 0; c < copies; ++c)
+    {
+        for (unsigned i = 0; i < authored_count; ++i)
+        {
+            const auto previous_right = right;
+            const float angle = draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+            const DVector cross{forward.y * right.z - forward.z * right.y, forward.z * right.x - forward.x * right.z,
+                                forward.x * right.y - forward.y * right.x};
+            right = vector_add(vector_scale(right, std::cos(angle)), vector_scale(cross, std::sin(angle)));
+            const float speed = draw(random, 25, 25); // Original constant-speed draw still advances RNG.
+            const auto color = vector_scale(
+                vector_add(min_color, vector_scale(vector_subtract(max_color, min_color), draw(random, 0, 1))),
+                1 / 255.f);
+            particles.push_back({vector_add(vector_scale(previous_right, position_radius), offset),
+                                 vector_scale(previous_right, speed), draw(random, min_life, max_life), color});
+        }
+        offset = vector_add(offset, step);
     }
     emitted += count;
     return true;
@@ -261,6 +334,7 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
     }
     else
     {
+        last_object_position = owner->position;
         position = vector_add(owner->position, rotate_vector(owner->rotation, {offset.y, offset.x, offset.z}));
         if (!physics_vector(position))
         {
