@@ -6,15 +6,14 @@ namespace OpenBlood2
 
     bool Runtime::initialize(bool gpu_debug, std::string& error)
     {
-        SDL_SetAppMetadata("Blood II Reconstruction", "0.1.0", "org.blood2.reconstruction");
+        SDL_SetAppMetadata("OpenBlood 2", "0.1.0", "org.blood2.reconstruction");
         if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD))
         {
             error = SDL_GetError();
             return false;
         }
         sdl_initialized = true;
-        window = SDL_CreateWindow("Blood II - Reconstruction", 1200, 780,
-                                  SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+        window = SDL_CreateWindow("OpenBlood 2", 1200, 780, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
         if (!window)
         {
             error = SDL_GetError();

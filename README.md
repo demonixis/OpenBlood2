@@ -1,7 +1,7 @@
 # OpenBlood2
 
 A preservation project rebuilding **Blood II: The Chosen** with its original game
-code and a new, small, portable C++20 engine. 
+code and a new, small, portable C++20 engine.
 
 The project supports Windows, Linux and MacOS with plans to support Android, iOS and VR.
 
@@ -34,7 +34,8 @@ See the [workspace roadmap](../Documentation/Roadmap/readme.md) and
 
 ## Build
 
-Install CMake 3.28+, Ninja, a C++20 compiler and SDL's platform development dependencies.
+Install CMake 3.28+, Ninja, a C++20 compiler, SDL's platform development dependencies
+and OpenSSL development headers/libraries for the launcher.
 On Windows, install MSVC and the Windows SDK, and run the Ninja presets from an
 x64 Visual Studio developer shell; see [Windows setup](docs/getting_started.md#windows-build).
 The first configure downloads pinned dependencies. Supply your own Blood II installation.
@@ -45,6 +46,11 @@ cmake --preset debug
 cmake --build --preset debug --parallel
 ./build/debug/blood2 --data-dir "/path/to/Blood II"
 ```
+
+The default build also produces `build/debug/blood2-launcher` beside the game.
+Run it to select your game folder or install the demo. Use
+`-DBLOOD2_BUILD_LAUNCHER=OFF` at configure time for a game-only build.
+The launcher uses an isolated SDL build; see [launcher setup](docs/launcher.md).
 
 Normal retail launch opens the original main menu. F10 toggles the development inspector;
 Esc opens the pause menu. Use `--view-world` for direct entry. Four default Chosen

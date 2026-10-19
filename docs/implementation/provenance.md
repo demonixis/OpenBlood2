@@ -10,6 +10,19 @@ from byte-alpha conversion, nonhumanoid damage and geometry adaptations;
 Known malformed resource references remain exact-path omissions. Commercial
 archives, dependency pins and reference trees are unchanged; M2 is not reopened.
 
+## Desktop launcher L0 through L2
+
+New project-owned SDL3/SDL_GPU/ImGui UI and process/state code reuse the existing
+config and bounded REZ sources byte-for-byte through `blood2_startup`. No original
+launcher project is available and no historical DLL ABI or game object code is
+imported. The standalone capability branch precedes game configuration, logging
+and SDL initialization. Dependency revisions/archive hashes, the SDL patch and
+game renderer/shaders are preserved. Native dialogs are enabled only in separate
+launcher build trees. See [contracts](../contracts/launcher_contracts.md),
+[source baseline](sources/launcher_sources.json) and
+[validation](../../../Documentation/Implementation/launcher.md). Nightmares,
+preference editing, mods and demo installation remain outside this increment.
+
 ## Original crosshair
 
 Selected `CBloodClientShell::PostUpdate` gates, bitmap path and integer centering
@@ -1525,6 +1538,20 @@ source, commercial asset or graphics stack changes are imported. See
 [source hashes](sources/demo_retakes_sources.json),
 [placement contract](../contracts/contact_overlap_contracts.md#spawned-npc-placement)
 and [validation](../../../Documentation/Implementation/demo_retakes.md).
+
+## Compact desktop launcher (2026-10-19)
+
+The [launcher continuation](../../../Documentation/Implementation/launcher_redesign.md)
+adds project-owned compact panels, qualified Archive.org ZIP installation and
+ordered REZ data mods. The bounded PE/DIB artwork reader follows the section/RVA
+validation approach already used by `engine/string_resources.cpp`, while adding
+named RT_BITMAP lookup and exact indexed DIB decode. No source-game code or
+commercial artwork was imported. External original launcher bitmaps are decoded
+only from the selected installation. Droid Sans is embedded unchanged from the
+existing ImGui pin (Apache 2.0, `licenses/`). Launcher-only curl/miniz pins and
+archive hashes are in `cmake/LauncherDependencies.cmake`; system OpenSSL provides
+TLS and SHA-256. The earlier launcher source/hash ledger is historical L0-L2
+evidence; config/resources now have the explicitly documented overlay extension.
 
 ## Airship sniper, Anger and placement
 

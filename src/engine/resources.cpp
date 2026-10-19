@@ -239,6 +239,62 @@ namespace OpenBlood2
             else if (!next.mount(found->second, error))
                 return false;
         }
+        if (config.overlays.size() > 24)
+        {
+            error = "Too many mod archives";
+            return false;
+        }
+        std::vector<std::filesystem::path> mounted;
+        for (const auto& mount : next.mounts())
+        {
+            auto path = std::filesystem::canonical(mount.path, ec);
+            if (ec)
+            {
+                error = "Cannot resolve base archive";
+                return false;
+            }
+            mounted.push_back(std::move(path));
+        }
+        for (const auto& overlay : config.overlays)
+        {
+            std::string name;
+            auto canonical = std::filesystem::canonical(overlay, ec);
+            if (ec || !overlay.is_absolute() || !resource_path(path_text(canonical.filename()), name) ||
+                !name.ends_with(".rez") || name == "blood2nm.rez")
+            {
+                error = "Mod must be a data-only REZ archive; Nightmares is unsupported";
+                return false;
+            }
+            for (const auto& previous : mounted)
+            {
+                const bool same = std::filesystem::equivalent(previous, canonical, ec);
+                if (ec || same)
+                {
+                    error = "Duplicate/base mod archive";
+                    return false;
+                }
+            }
+            Resources check;
+            if (!check.mount(canonical, error))
+                return false;
+            if (check.index().empty())
+            {
+                error = "Empty mod archive";
+                return false;
+            }
+            for (const auto& [key, resource] : check.index())
+            {
+                (void)resource;
+                if (key.ends_with(".dll") || key.ends_with(".exe"))
+                {
+                    error = "Mods with game code are unsupported: " + key;
+                    return false;
+                }
+            }
+            if (!next.mount(canonical, error))
+                return false;
+            mounted.push_back(std::move(canonical));
+        }
         next.content_root_ = config.data_dir;
         next.demo_ = config.demo;
         *this = std::move(next);

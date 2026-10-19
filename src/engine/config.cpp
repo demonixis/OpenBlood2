@@ -237,14 +237,24 @@ namespace OpenBlood2
                 options.bench_height = h;
             }
             else if (arg == "--data-dir" || arg == "--config" || arg == "--frames" || arg == "--capture" ||
-                     arg == "--world" || arg == "--log-dir" || arg == "--log-level")
+                     arg == "--world" || arg == "--log-dir" || arg == "--log-level" || arg == "--rez")
             {
                 if (++i == args.size() || args[i].empty() || args[i].starts_with("--"))
                 {
                     error = "Missing value for " + std::string(arg);
                     return false;
                 }
-                if (arg == "--world")
+                if (arg == "--rez")
+                {
+                    const auto path = path_from_utf8(args[i]);
+                    if (!path.is_absolute() || options.overlays.size() >= 24)
+                    {
+                        error = "--rez requires an absolute archive path (maximum 24)";
+                        return false;
+                    }
+                    options.overlays.push_back(path);
+                }
+                else if (arg == "--world")
                 {
                     options.world = args[i];
                     explicit_world = true;
@@ -388,6 +398,7 @@ namespace OpenBlood2
         config = {};
         error.clear();
         config.demo = options.demo;
+        config.overlays = options.overlays;
         std::error_code ec;
         const bool exists = fs::exists(options.config_file, ec);
         if (ec || (options.explicit_config && !exists))

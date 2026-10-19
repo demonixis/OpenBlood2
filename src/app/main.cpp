@@ -13,6 +13,7 @@
 #include "cinematic_smoke.h"
 #include "engine/capture.h"
 #include "engine/config.h"
+#include "startup/protocol.h"
 #include "engine/crash_capture.h"
 #include "engine/logging.h"
 #include "engine/runtime.h"
@@ -1740,6 +1741,7 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --log-dir DIR       Log root (default: SDL user directory / logs)\n"
                      "  --log-level LEVEL   trace, debug, info (default), warn or error\n"
                      "  --no-crash-capture  Leave crash handling entirely to the OS/debugger\n"
+                     "  --rez ABS_FILE      Add a data-only REZ mod; repeat in load order (max 24)\n"
                      "  --data-dir DIR      External Blood II directory; overrides BLOOD2_DATA_DIR and config\n"
                      "  --demo              The data directory is the original 1998 demo (B2Demo.rez); "
                      "normal launch opens its menu, first world Demo_01\n"
@@ -1784,6 +1786,7 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
                      "  --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload\n"
                      "  --skeleton-smoke    Same lifecycle with original animation/node inspection\n"
+                     "  --launcher-info     Headless launcher capabilities (standalone, no config/logging)\n"
                      "  --help              Show this help\n";
         return 0;
     }
@@ -1882,6 +1885,19 @@ static int application_main(const OpenBlood2::Options& options)
 
 int main(int argc, char** argv)
 {
+    for (int i = 1; i < argc; ++i)
+    {
+        if (std::string_view(argv[i]) == "--launcher-info")
+        {
+            if (argc != 2)
+            {
+                std::cerr << "--launcher-info must be used alone\n";
+                return 2;
+            }
+            std::cout << OpenBlood2::launcher_info();
+            return std::cout ? 0 : 2;
+        }
+    }
     if (const int helper = OpenBlood2::dispatch_crash_helper(argc, argv); helper >= 0)
         return helper;
     std::vector<std::string_view> args;

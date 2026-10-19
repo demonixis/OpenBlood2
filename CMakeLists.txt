@@ -5,12 +5,16 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+option(BLOOD2_BUILD_GAME "Build the existing game targets" ON)
+option(BLOOD2_BUILD_LAUNCHER "Build the launcher (with its own SDL configuration)" ON)
+
 option(BLOOD2_INSPECTOR "Build the in-game inspection UI" ON)
 option(BLOOD2_GPU_TESTS "Register tests that open a real GPU window" OFF)
 option(BLOOD2_SANITIZERS "Enable ASan/UBSan on project code (Clang/GCC)" OFF)
 set(BLOOD2_TEST_DATA_DIR "" CACHE PATH "Optional private Blood II installation for tests")
 set(BLOOD2_DEMO_DATA_DIR "" CACHE PATH "Optional private 1998 Blood II demo directory (B2Demo.rez) for tests")
 
+include(cmake/ProjectOptions.cmake)
 include(CTest)
 include(cmake/Dependencies.cmake)
 execute_process(COMMAND git describe --always --dirty
@@ -21,13 +25,19 @@ if(NOT BLOOD2_BUILD_REVISION)
 endif()
 configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
 
-add_library(engine STATIC src/engine/world_lights.cpp src/engine/world_shade.cpp src/engine/gpu_registry.cpp src/engine/model_renderer.cpp src/engine/hud_surface.cpp src/engine/polygrid_view.cpp src/engine/sky.cpp src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/world_shaders.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+add_library(blood2_startup STATIC src/engine/config.cpp src/engine/resources.cpp src/startup/protocol.cpp)
+target_include_directories(blood2_startup PUBLIC src)
+target_include_directories(blood2_startup PRIVATE "${PROJECT_BINARY_DIR}/generated")
+blood2_project_options(blood2_startup)
+
+if(BLOOD2_BUILD_GAME)
+add_library(engine STATIC src/engine/world_lights.cpp src/engine/world_shade.cpp src/engine/gpu_registry.cpp src/engine/model_renderer.cpp src/engine/hud_surface.cpp src/engine/polygrid_view.cpp src/engine/sky.cpp src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/world_shaders.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/world.cpp)
 target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/audio_stream.cpp src/engine/music_asset.cpp src/engine/ima_style.cpp src/engine/ima_curve.cpp src/engine/ima_curve_event.cpp src/engine/ima_variation.cpp src/engine/ima_note_event.cpp src/engine/ima_note_pitch.cpp src/engine/ima_harmony.cpp src/engine/ima_selection.cpp src/engine/ima_cursor.cpp src/engine/ima_band.cpp src/engine/ima_section.cpp src/engine/ima_clock.cpp src/engine/ima_program.cpp src/engine/ima_playlist.cpp src/engine/ima_transport.cpp src/engine/ima_timeline.cpp src/engine/dls_bank.cpp src/engine/dls_sampler.cpp src/engine/dls_midi_queue.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
 target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp src/engine/logging.cpp src/engine/crash_capture.cpp)
 set_source_files_properties(src/engine/crash_capture.cpp PROPERTIES
     COMPILE_DEFINITIONS "BLOOD2_CRASH_SANITIZED=$<BOOL:${BLOOD2_SANITIZERS}>")
 target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
-target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+target_link_libraries(engine PUBLIC SDL3::SDL3 blood2_startup PRIVATE spdlog::spdlog)
 
 add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/ScreenFade.cpp src/game/original/PolyGrid.cpp src/game/original/PolyGridFX.cpp src/game/sparks.cpp src/game/original/SparksFX.cpp src/game/blood_spurts.cpp src/game/original/ParticleExplosionFX.cpp src/game/blood_splats.cpp src/game/original/BloodSplatFX.cpp src/game/original/ClientSplatFX.cpp src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
     src/game/original/engineobjects.cpp
@@ -82,21 +92,7 @@ if(BLOOD2_INSPECTOR)
     target_sources(blood2_app PRIVATE src/app/inspector_paths.cpp src/app/inspector_skeleton.cpp src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_cinematics.cpp src/app/inspector_random_sounds.cpp src/app/inspector_scene_explosions.cpp src/app/inspector_sprites.cpp src/app/inspector_world_sounds.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
 endif()
 
-function(blood2_project_options target)
-    if(MSVC)
-        target_compile_options(${target} PRIVATE /W4 /permissive- /utf-8)
-        target_compile_options(${target} PRIVATE "$<$<CONFIG:Release>:/Zi>")
-        target_link_options(${target} PRIVATE "$<$<CONFIG:Release>:/DEBUG>")
-    else()
-        target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic)
-        # Retain source locations for post-mortem diagnosis without changing Release optimization.
-        target_compile_options(${target} PRIVATE "$<$<CONFIG:Release>:-g1>")
-        if(BLOOD2_SANITIZERS)
-            target_compile_options(${target} PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
-            target_link_options(${target} PRIVATE -fsanitize=address,undefined)
-        endif()
-    endif()
-endfunction()
+
 blood2_project_options(engine)
 blood2_project_options(blood2_game)
 blood2_project_options(blood2_app)
@@ -104,4 +100,12 @@ blood2_project_options(blood2_app)
 if(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
+endif() # BLOOD2_BUILD_GAME
 
+if(BLOOD2_BUILD_LAUNCHER)
+    if(BLOOD2_BUILD_GAME)
+        include(cmake/LauncherBuild.cmake)
+    else()
+        add_subdirectory(src/launcher)
+    endif()
+endif()

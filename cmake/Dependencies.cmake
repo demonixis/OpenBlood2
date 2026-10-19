@@ -19,7 +19,12 @@ set(SDL_INSTALL OFF CACHE BOOL "" FORCE)
 set(SDL_RENDER OFF CACHE BOOL "" FORCE)
 # Unused capture, desktop integration and file-output audio services.
 set(SDL_CAMERA OFF CACHE BOOL "" FORCE)
-set(SDL_DIALOG OFF CACHE BOOL "" FORCE)
+# Native dialogs are isolated to launcher-only build trees.
+if(BLOOD2_BUILD_LAUNCHER AND NOT BLOOD2_BUILD_GAME)
+    set(SDL_DIALOG ON CACHE BOOL "" FORCE)
+else()
+    set(SDL_DIALOG OFF CACHE BOOL "" FORCE)
+endif()
 set(SDL_TRAY OFF CACHE BOOL "" FORCE)
 if(APPLE)
     # This pinned SDL compiles Cocoa notifications unconditionally. Keep their

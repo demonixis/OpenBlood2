@@ -14,6 +14,7 @@ namespace OpenBlood2
     {
         std::filesystem::path config_file = "blood2.local.ini";
         std::filesystem::path data_dir;
+        std::vector<std::filesystem::path> overlays{}; // Explicit, ordered data-only REZ mods.
         std::filesystem::path capture_file;
         std::filesystem::path log_dir;
         std::string log_level = "info";
@@ -53,6 +54,7 @@ namespace OpenBlood2
         std::filesystem::path data_dir;
         std::string source;
         bool demo = false; // Selects the demo archive set; never inferred from directory contents.
+        std::vector<std::filesystem::path> overlays{};
     };
     // Original first single-player level: ClientShellDLL sFirstLevel (_DEMO "Demo_01").
     inline const char* first_level(bool demo)

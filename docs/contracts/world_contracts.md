@@ -1,5 +1,11 @@
 # Resource, World and Session Contracts
 
+The [launcher data-mod continuation](launcher_contracts.md#data-mods) extends
+`mount_game` with explicitly ordered `--rez` overlays after the unchanged stock
+archive order. Whole-mount rollback and resource ownership are preserved;
+Nightmares and code mods remain excluded.
+
+
 Historical unconditional RunWorld refusal below is superseded by [checked session startup](session_start_contracts.md).
 The M2 acceptance gate remains separate.
 
