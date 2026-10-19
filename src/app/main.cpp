@@ -1738,6 +1738,7 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --log-dir DIR       Log root (default: SDL user directory / logs)\n"
                      "  --log-level LEVEL   trace, debug, info (default), warn or error\n"
                      "  --no-crash-capture  Leave crash handling entirely to the OS/debugger\n"
+                     "  --rez ABS_FILE      Add a data-only REZ mod; repeat in load order (max 24)\n"
                      "  --data-dir DIR      External Blood II directory; overrides BLOOD2_DATA_DIR and config\n"
                      "  --demo              The data directory is the original 1998 demo (B2Demo.rez); "
                      "normal launch opens its menu, first world Demo_01\n"

@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-19",
+  "baseline": "5c097c7",
+  "scope": "Compact launcher, qualified demo delivery, local REZ data overlays; graphical settings cancelled; Nightmares excluded",
+  "references": [
+    {
+      "path": "src/engine/string_resources.cpp",
+      "sha256": "15e6be8f5a503b956f717bf7c7e9d638833f581d2a91ee91b8c13f619b296f7a"
+    },
+    {
+      "path": "cmake/Dependencies.cmake",
+      "sha256": "90c4f8609cf1cbc94b75106a3ab30c97f3840cf4dd033ef1cc5383c4895d898a"
+    },
+    {
+      "path": "build/launcher-release/_deps/imgui_source-src/misc/fonts/DroidSans.ttf",
+      "sha256": "4e2371bc0e4cf6983342e150412f140da79d674c9be0b56458401f581072ecd3"
+    }
+  ],
+  "new_owned_code": [
+    "src/launcher/artwork.cpp",
+    "src/launcher/demo_install.cpp",
+    "src/launcher/mods.cpp"
+  ],
+  "dependencies": {
+    "curl": {
+      "revision": "6e3f8dc1f173b47de9a68516ce4b95bf25598c2f",
+      "archive_sha256": "1bbcbe03719ffd2293b8c71903ef977efcd1f7133255264e4c42171e50ccae68"
+    },
+    "miniz": {
+      "revision": "d10b03cc73475af673df40f06e5cefd1d5f940d9",
+      "archive_sha256": "f7a9a89e63300e66c8fa324f8e849e0f348153007a5033f53302632d229e6c80"
+    },
+    "OpenSSL": "System development package; TLS/SHA-256; Linux validation only"
+  },
+  "demo": {
+    "url": "https://archive.org/download/B2demo/B2Demo.zip",
+    "bytes": 37695395,
+    "sha256": "2f22bed184ed2a9c39b448041603ee7199310f83cfa791e1a26cd4bdc67b9bc1",
+    "rez_sha256": "e410ce2944210c776c7407a79e01cfa031c782132f68407cd0871379c5e7218c",
+    "recipe": "Preserve complete Game/ tree; retain original ZIP; never execute supplied code"
+  },
+  "commercial_assets": "External only; no artwork or ZIP added to the repository",
+  "game_adaptation": "Repeated absolute --rez arguments, ordered transactional mounts, profiles=rez1 capability; no renderer/shader/gameplay modification"
+}

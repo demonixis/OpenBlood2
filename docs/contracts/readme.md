@@ -1,6 +1,6 @@
 # Service contracts
 
-- [Desktop launcher L0 through L2](launcher_contracts.md)
+- [Desktop launcher, data mods and demo installation](launcher_contracts.md)
 
 - [Original menu frontend](menu_contracts.md)
 

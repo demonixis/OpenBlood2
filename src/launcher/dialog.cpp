@@ -3,7 +3,7 @@
 
 namespace OpenBlood2::Launcher
 {
-    bool Dialog::open(SDL_Window* parent, bool executable)
+    bool Dialog::open(SDL_Window* parent, bool executable, const SDL_DialogFileFilter* filters, int count)
     {
         if (pending_)
             return false;
@@ -13,7 +13,7 @@ namespace OpenBlood2::Launcher
         if (show_)
             show_(completed, token, parent, executable);
         else if (executable)
-            SDL_ShowOpenFileDialog(completed, token, parent, nullptr, 0, nullptr, false);
+            SDL_ShowOpenFileDialog(completed, token, parent, filters, count, nullptr, false);
         else
             SDL_ShowOpenFolderDialog(completed, token, parent, nullptr, false);
         return true;

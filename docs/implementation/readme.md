@@ -1,5 +1,7 @@
 # Implementation records
 
+- [Compact launcher, demo delivery and data mods](../../../Documentation/Implementation/launcher_redesign.md)
+
 - [SDL3 launcher baseline and validation](../../../Documentation/Implementation/launcher.md)
 
 - [Demo font metrics and spawned-Fanatic placement retakes](../../../Documentation/Implementation/demo_retakes.md)

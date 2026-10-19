@@ -1518,3 +1518,17 @@ source, commercial asset or graphics stack changes are imported. See
 [source hashes](sources/demo_retakes_sources.json),
 [placement contract](../contracts/contact_overlap_contracts.md#spawned-npc-placement)
 and [validation](../../../Documentation/Implementation/demo_retakes.md).
+
+## Compact desktop launcher (2026-10-19)
+
+The [launcher continuation](../../../Documentation/Implementation/launcher_redesign.md)
+adds project-owned compact panels, qualified Archive.org ZIP installation and
+ordered REZ data mods. The bounded PE/DIB artwork reader follows the section/RVA
+validation approach already used by `engine/string_resources.cpp`, while adding
+named RT_BITMAP lookup and exact indexed DIB decode. No source-game code or
+commercial artwork was imported. External original launcher bitmaps are decoded
+only from the selected installation. Droid Sans is embedded unchanged from the
+existing ImGui pin (Apache 2.0, `licenses/`). Launcher-only curl/miniz pins and
+archive hashes are in `cmake/LauncherDependencies.cmake`; system OpenSSL provides
+TLS and SHA-256. The earlier launcher source/hash ledger is historical L0-L2
+evidence; config/resources now have the explicitly documented overlay extension.

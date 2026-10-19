@@ -16,7 +16,7 @@ namespace OpenBlood2::Launcher
       public:
         using Show = void (*)(SDL_DialogFileCallback, void*, SDL_Window*, bool);
         explicit Dialog(Show show = nullptr) : show_(show) {}
-        bool open(SDL_Window* parent, bool executable);
+        bool open(SDL_Window* parent, bool executable, const SDL_DialogFileFilter* filters = nullptr, int count = 0);
         bool poll(DialogResult& result);
         void abandon()
         {

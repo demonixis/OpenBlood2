@@ -17,7 +17,8 @@ namespace OpenBlood2::Launcher
             Finished,
             Failed
         };
-        bool prepare(const Installation& item, const std::filesystem::path& executable);
+        bool prepare(const Installation& item, const std::filesystem::path& executable,
+                     const std::vector<std::filesystem::path>& overlays = {});
         bool play(const std::filesystem::path& directory);
         void update();
         void cancel();
@@ -58,6 +59,7 @@ namespace OpenBlood2::Launcher
         ContentJob validation_;
         GameProcess game_;
         Installation item_;
+        std::vector<std::filesystem::path> overlays_;
         ContentSummary summary_;
         std::filesystem::path executable_, directory_, logs_;
         std::filesystem::file_time_type executable_time_{};

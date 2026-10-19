@@ -7,7 +7,7 @@ execute_process(COMMAND "${CMAKE_COMMAND}" -E env "DISPLAY=" "WAYLAND_DISPLAY="
 string(REPLACE "\r\n" "\n" output "${output}")
 if(NOT result EQUAL 0 OR NOT errors STREQUAL "" OR
         NOT output MATCHES "^protocol=1\ngame=OpenBlood2\n" OR
-        NOT output MATCHES "profiles=0\neditions=retail,demo\n$")
+        NOT output MATCHES "profiles=(0|rez1)\neditions=retail,demo\n$")
     message(FATAL_ERROR "Capability query failed: ${result}\n${output}\n${errors}")
 endif()
 execute_process(COMMAND "${GAME}" --launcher-info --log-dir "${ROOT}/must-not-exist"

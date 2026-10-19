@@ -13,7 +13,8 @@ namespace OpenBlood2::Launcher
         DataStatus metadata;
         std::size_t resources = 0, mounts = 0;
     };
-    bool validate_content(const Installation&, ContentSummary&, std::string&);
+    bool validate_content(const Installation&, ContentSummary&, std::string&,
+                          const std::vector<std::filesystem::path>& overlays = {});
     struct ContentResult
     {
         ContentSummary summary;
@@ -24,7 +25,7 @@ namespace OpenBlood2::Launcher
     {
       public:
         ~ContentJob();
-        bool start(const Installation& item);
+        bool start(const Installation& item, const std::vector<std::filesystem::path>& overlays = {});
         bool poll(ContentResult& result);
         void cancel();
         bool pending() const
@@ -38,6 +39,7 @@ namespace OpenBlood2::Launcher
         static int SDLCALL execute(void* userdata);
         SDL_Thread* thread_ = nullptr;
         Installation item_;
+        std::vector<std::filesystem::path> overlays_;
         std::atomic<bool> cancelled_ = false;
     };
 } // namespace OpenBlood2::Launcher

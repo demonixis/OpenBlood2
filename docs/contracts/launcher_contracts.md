@@ -1,16 +1,22 @@
 # Desktop launcher contracts
 
-Scope: L0 through L2 of the [launcher plan](../../../Documentation/Roadmap/06_launcher.md).
-The launcher uses the existing pinned SDL3, SDL_GPU and Dear ImGui. Native dialogs
-are enabled only in dedicated launcher builds; existing game SDL options, shaders
-and rendering stay unchanged. Nightmares, mods, preference editing and demo
-installation are not executable features of L0 through L2. M2/M2-GPU-001 and M3
-status are unchanged.
+The 2026-10-19 [compact launcher continuation](../../../Documentation/Implementation/launcher_redesign.md)
+supersedes the initial L0-L2 interface and the future graphics/profile/installer
+sections below. The main menu and separate Game Settings/Mods panels are now
+implemented. The requested graphical settings panel is cancelled. Nightmares,
+M3 and the M2 GPU reservation remain separate.
 
-Implementation and Linux test coverage are recorded in the linked evidence.
-Launcher window geometry is not persisted in L1/L2; version-1 state stores only
-the executable and installation records. Native Windows/macOS and interactive
-portal qualification remain pending.
+
+Current scope extends L0-L2 with the user-requested compact panels, local data
+mods and qualified demo installation. The launcher uses the existing pinned
+SDL3, SDL_GPU and Dear ImGui. Native dialogs and HTTP/ZIP dependencies are
+isolated in launcher builds. Game SDL options, shaders and rendering remain
+unchanged. Nightmares, graphical preference editing, M2/M2-GPU-001 and M3 stay
+outside this continuation.
+
+Window geometry is not persisted; version-1 launcher state retains executable
+and installation records. Native Windows/macOS and interactive portal
+qualification remain pending.
 
 ## L0 baseline and shared boundary
 
@@ -24,7 +30,7 @@ remain in `cmake/Dependencies.cmake`.
 `blood2_startup` shares the current config and REZ implementation, with existing
 `engine/config.h` and `engine/resources.h` interfaces retained. Game targets link
 it through `engine`. The launcher does not link `blood2_game` or scene code.
-Preference serialization stays in the game until L3. No original launcher code
+Preference serialization stays in the game; the launcher editor was cancelled. No original launcher code
 was supplied in the reference tree; this frontend is new project-owned code.
 
 ## Capability protocol version 1
@@ -40,13 +46,14 @@ game=OpenBlood2
 version=0.3.0
 revision=BUILD_REVISION
 preferences=2
-profiles=0
+profiles=rez1
 editions=retail,demo
 ```
 
 Output is limited to 4096 bytes; unknown/duplicate/missing fields, invalid values,
 nonzero exit and output overflow fail. `preferences=2` describes the game's codec,
-not an available launcher editor. `profiles=0` means no mod launch support.
+not an available launcher editor. `profiles=rez1` means ordered data-only REZ overlays via repeated `--rez`.
+The parser still accepts `profiles=0`; enabled mods require `rez1`.
 The query has a five-second deadline and bounded per-update reads. Cancellation
 or timeout stops only the query process. Its pipes are drained before waiting;
 the playable game's output is inherited, never piped into an unserviced buffer.
@@ -94,22 +101,80 @@ cooperative cancellation after the bounded archive operation finishes.
 SDL dialog callbacks own shared completion state, publish under a mutex, and
 never reference UI objects or mutate ImGui. Late results after closure are ignored.
 
-## Frozen future interfaces
+## Data mods
 
-L3 will reuse version-1/2 `preferences.cfg`, preserving all audio/mouse fields.
-An ownership guard must cover externally started games and recover after crashes.
-No graphics keys are added to the current bootstrap INI.
+`mods.cfg` is a separate version-1 UTF-8 literal key/value file (64 KiB maximum,
+24 records). Fixed key `version=1`; contiguous `mod.N` records contain exactly
+`edition=retail|demo`, `root=ABSOLUTE_GAME_DIRECTORY`, `path=ABSOLUTE_REZ` and
+`enabled=0|1`. Unknown/duplicate/noncontiguous fields, invalid paths and duplicate
+canonical archives within one root/edition reject the whole state. Saves use the
+existing exclusive temporary/atomic replacement helper and refuse malformed or
+future existing files. Changing installations never activates another one's mods.
 
-L4's profile grammar will use the same literal key/value rules, a 64 KiB limit
-and at most 32 overlays. Required keys: `version=1`, `edition=retail|demo`,
-`root=PATH`; optional `name`, `start_world`, `requires_engine` and contiguous
-`overlay.N=REZ_PATH`. Resolve paths relative to the manifest. Reject duplicate
-canonical archives, unknown requirements, expansion/code requests and conflicting
-CLI edition/root. This freezes the planned format, not a working parser or mod
-compatibility claim. Nightmares remains separate.
+New archives start disabled. The UI persists toggles and passes only enabled
+archives to both content validation and playable process arguments. Every game
+startup mounts them after base/sound/patch archives in list order, with the same
+last-exact-path-wins semantics. Maximum 24 overlays (within the reader's 32 mounts).
+Canonical/equivalent duplicate base/mod files, empty archives, `BLOOD2NM.REZ` and
+archives containing executable/DLL resources fail. No dynamic code is loaded;
+renamed data cannot be certified as compatible from its filename. Nightmares
+support and original mod-specific game rules have not been implemented.
 
-L5/L6 require independent ZIP/provider qualification; no downloader or installer
-is included in L0 through L2. Existing tested demo content is v1.0 Build 108.
+All mount changes remain transactional. The launcher revalidates immediately
+before spawning, and the game independently validates at startup. Existing
+Resources copies/menu/world transfers retain the selected index. The game's
+configuration struct adds only ordered overlays, not display/preference fields.
+The earlier proposed profile-manifest format remains unimplemented and is not
+advertised by `rez1`.
+
+## Qualified demo delivery
+
+Provider: `https://archive.org/download/B2demo/B2Demo.zip`, 37,695,395 bytes,
+SHA-256 `2f22bed184ed2a9c39b448041603ee7199310f83cfa791e1a26cd4bdc67b9bc1`.
+Extracted `Game/B2Demo.rez`: 55,041,396 bytes, SHA-256
+`e410ce2944210c776c7407a79e01cfa031c782132f68407cd0871379c5e7218c`.
+This is the already tested v1.0 Build 108 data. ModDB lists a different v1.0a
+package; it has no qualified extraction recipe here.
+
+Download only after user action; use TLS peer/host verification, HTTPS only,
+maximum five redirects, and only `archive.org` or its subdomains (no credentials
+or nonstandard port). Stream to owned staging with an exact byte ceiling,
+15-second connect/600-second overall timeout and a 30-second low-speed limit.
+Reject non-200 final responses, wrong length, SHA mismatch and partial files.
+A dedicated owned SDL thread publishes progress/results without touching ImGui.
+Cancel is atomic; shutdown waits for bounded work and releases the worker.
+
+The miniz reader limits compressed data to 64 MiB, expanded data to 128 MiB,
+256 entries and 1024-byte UTF-8 paths. Before extracting anything, validate all
+entry paths, including skipped setup entries: no absolute/traversal paths,
+links/special files, duplicate/case-colliding entries, file/directory collisions,
+Windows device names or trailing-dot/space components. Reject encryption and
+unsupported compression. Stream extracted regular files with exclusive creation,
+per-entry bounds and CRC validation. Only the qualified `Game/` prefix is removed;
+all its files, music and notices are kept. PE/Windows setup code is never executed.
+The original ZIP is retained outside Game for provenance/notices.
+
+Extraction targets a fresh staging directory below the SDL user storage, then
+checks the REZ SHA and shared content index before same-filesystem rename to a
+unique published directory. Existing directories are never intentionally replaced.
+Failed/cancelled operations clean only their own staging. The UI saves/selects
+the published demo, validates the game and returns to Main. Persistence failure
+reports the installed path but preserves the previous saved selection. A process
+crash can leave an unreferenced staging directory; it cannot become a selected
+installation. No resume or automatic abandoned-staging deletion is implemented.
+
+## Presentation
+
+Compact main menu with Play disabled without validated content. Game Settings
+owns the folder/edition, download/import and an Advanced executable selector;
+Mods owns local overlay toggles. No graphical preference editor. Default title
+art is project-owned; optional external RT_BITMAP `GAME1` (retail) or `BLOOD2`
+(demo) uses a bounded data-only PE32 reader, single-language resource selection
+and exact 320x240 8-bit uncompressed DIB decode. Bad/missing artwork falls back
+without blocking Play. GPU textures belong to the launcher view and are released
+before device shutdown. Droid Sans is embedded from the pinned ImGui archive,
+with its Apache license shipped. The game renderer and SDL dependency pins stay
+unchanged.
 
 ## Verification
 

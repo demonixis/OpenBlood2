@@ -11,7 +11,7 @@ The targets are defined in [CMakeLists.txt](../CMakeLists.txt).
 | Target / directory | Responsibility |
 | --- | --- |
 | `blood2_startup` | Shared config/REZ readers and the headless launcher capability protocol; no simulation or GPU lifetime |
-| `blood2_launcher` / [src/launcher](../src/launcher) | Separate SDL3/ImGui desktop frontend, installation records, validation jobs and child tracking |
+| `blood2_launcher` / [src/launcher](../src/launcher) | Compact SDL3/ImGui frontend, installation/download jobs, local REZ mod selection and child tracking |
 | `engine` / [src/engine](../src/engine) | Resources and format readers, object storage, collision, animation, audio and SDL_GPU rendering |
 | `blood2_game` / [src/game](../src/game) | Session ownership, typed messages and engine service adapters |
 | [src/game/original](../src/game/original) | Selected original shells, objects, AI, weapons and effects with documented adaptations |

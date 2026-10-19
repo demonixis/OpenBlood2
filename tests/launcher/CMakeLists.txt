@@ -57,3 +57,30 @@ if(BLOOD2_GPU_TESTS)
             FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
     endforeach()
 endif()
+
+add_executable(launcher_delivery_tests delivery_tests.cpp)
+target_link_libraries(launcher_delivery_tests PRIVATE blood2_launcher_core miniz)
+blood2_project_options(launcher_delivery_tests)
+foreach(case IN ITEMS installer mods artwork)
+    add_test(NAME launcher.${case} COMMAND launcher_delivery_tests ${case}
+        "${CMAKE_CURRENT_BINARY_DIR}/delivery-${case}" "$<TARGET_FILE:launcher_game_fixture>")
+    set_tests_properties(launcher.${case} PROPERTIES LABELS "headless;launcher" TIMEOUT 30)
+endforeach()
+if(BLOOD2_GPU_TESTS)
+    foreach(panel IN ITEMS settings mods)
+        file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/panel-${panel}")
+        add_test(NAME gpu.launcher_${panel} COMMAND blood2_launcher --smoke --frames 16 --panel ${panel}
+            --state-dir "${CMAKE_CURRENT_BINARY_DIR}/panel-${panel}"
+            --capture "${CMAKE_CURRENT_BINARY_DIR}/panel-${panel}/launcher.png")
+        set_tests_properties(gpu.launcher_${panel} PROPERTIES LABELS "gpu;launcher" TIMEOUT 30 RUN_SERIAL TRUE
+            FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+    endforeach()
+endif()
+if(BLOOD2_GPU_TESTS)
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/navigation")
+    add_test(NAME gpu.launcher_navigation COMMAND blood2_launcher --smoke --navigation-smoke --frames 24
+        --state-dir "${CMAKE_CURRENT_BINARY_DIR}/navigation"
+        --capture "${CMAKE_CURRENT_BINARY_DIR}/navigation/launcher.png")
+    set_tests_properties(gpu.launcher_navigation PROPERTIES LABELS "gpu;launcher" TIMEOUT 30 RUN_SERIAL TRUE
+        FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+endif()

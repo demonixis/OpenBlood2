@@ -139,7 +139,8 @@ namespace OpenBlood2::Launcher
             SDL_DestroyProcess(process_);
     }
     bool GameProcess::start(const std::filesystem::path& executable, const std::filesystem::path& config,
-                            const Installation& item, const std::filesystem::path& logs, std::string& error)
+                            const Installation& item, const std::filesystem::path& logs, std::string& error,
+                            const std::vector<std::filesystem::path>& overlays)
     {
         error.clear();
         if (process_)
@@ -160,6 +161,16 @@ namespace OpenBlood2::Launcher
         {
             error = "Unsupported edition";
             return false;
+        }
+        for (const auto& overlay : overlays)
+        {
+            if (!overlay.is_absolute())
+            {
+                error = "Mod path must be absolute";
+                return false;
+            }
+            values.push_back("--rez");
+            values.push_back(path_text(overlay));
         }
         std::vector<const char*> args;
         for (auto& value : values)

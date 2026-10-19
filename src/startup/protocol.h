@@ -8,6 +8,7 @@ namespace OpenBlood2
     {
         std::string version, revision;
         unsigned preferences = 0;
+        bool overlays = false;
     };
     std::string launcher_info();
     bool parse_launcher_info(std::string_view text, LauncherInfo& output, std::string& error);

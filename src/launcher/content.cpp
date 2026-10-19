@@ -3,7 +3,9 @@
 
 namespace OpenBlood2::Launcher
 {
-    bool validate_content(const Installation& item, ContentSummary& output, std::string& error)
+    namespace fs = std::filesystem;
+    bool validate_content(const Installation& item, ContentSummary& output, std::string& error,
+                          const std::vector<fs::path>& overlays)
     {
         error.clear();
         if (!item.directory.is_absolute() || !valid_text(path_text(item.directory), 4096) ||
@@ -14,7 +16,7 @@ namespace OpenBlood2::Launcher
         }
         ContentSummary next;
         next.installation = item;
-        Config config{item.directory, "launcher", item.edition == Edition::Demo};
+        Config config{item.directory, "launcher", item.edition == Edition::Demo, overlays};
         Resources resources;
         if (!inspect_data(config, next.metadata, error) || !resources.mount_game(config, error))
             return false;
@@ -43,11 +45,12 @@ namespace OpenBlood2::Launcher
         std::lock_guard lock(mutex_);
         result_.reset();
     }
-    bool ContentJob::start(const Installation& item)
+    bool ContentJob::start(const Installation& item, const std::vector<fs::path>& overlays)
     {
         if (pending())
             return false;
         item_ = item;
+        overlays_ = overlays;
         cancelled_ = false;
         thread_ = SDL_CreateThread(execute, "Launcher content validation", this);
         return thread_ != nullptr;
@@ -56,7 +59,7 @@ namespace OpenBlood2::Launcher
     {
         auto& owner = *static_cast<ContentJob*>(userdata);
         ContentResult result;
-        result.valid = validate_content(owner.item_, result.summary, result.error);
+        result.valid = validate_content(owner.item_, result.summary, result.error, owner.overlays_);
         if (!owner.cancelled_)
         {
             std::lock_guard lock(owner.mutex_);

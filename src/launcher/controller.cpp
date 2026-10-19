@@ -23,12 +23,14 @@ namespace OpenBlood2::Launcher
         launching_ = false;
         error_.clear();
     }
-    bool Controller::prepare(const Installation& item, const fs::path& executable)
+    bool Controller::prepare(const Installation& item, const fs::path& executable,
+                             const std::vector<fs::path>& overlays)
     {
         if (busy())
             return false;
         cancel();
         item_ = item;
+        overlays_ = overlays;
         executable_ = executable;
         summary_ = {};
         if (!item.directory.is_absolute() || path_text(item.directory).find('"') != std::string::npos)
@@ -85,7 +87,7 @@ namespace OpenBlood2::Launcher
         }
         directory_ = directory;
         launching_ = true;
-        if (!validation_.start(item_))
+        if (!validation_.start(item_, overlays_))
         {
             fail("Cannot start content validation: " + std::string(SDL_GetError()));
             return false;
@@ -105,7 +107,12 @@ namespace OpenBlood2::Launcher
             }
             if (probe_.status() == Probe::Status::Compatible)
             {
-                if (!validation_.start(item_))
+                if (!overlays_.empty() && !probe_.info().overlays)
+                {
+                    fail("This game build does not support mods. Update it or disable mods.");
+                    return;
+                }
+                if (!validation_.start(item_, overlays_))
                 {
                     fail("Cannot start content validation: " + std::string(SDL_GetError()));
                     return;
@@ -168,7 +175,7 @@ namespace OpenBlood2::Launcher
                 fail(error);
                 return;
             }
-            if (!game_.start(executable_, config, item_, logs_, error))
+            if (!game_.start(executable_, config, item_, logs_, error, overlays_))
             {
                 fail(error);
                 return;

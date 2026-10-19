@@ -7,7 +7,7 @@ namespace OpenBlood2
     std::string launcher_info()
     {
         return "protocol=1\ngame=OpenBlood2\nversion=" + std::string(build::version) + "\nrevision=" + build::revision +
-               "\npreferences=2\nprofiles=0\neditions=retail,demo\n";
+               "\npreferences=2\nprofiles=rez1\neditions=retail,demo\n";
     }
     bool parse_launcher_info(std::string_view text, LauncherInfo& output, std::string& error)
     {
@@ -44,7 +44,7 @@ namespace OpenBlood2
             }
         }
         if (fields.size() != 7 || fields["protocol"] != "1" || fields["game"] != "OpenBlood2" ||
-            fields["profiles"] != "0" || fields["editions"] != "retail,demo" ||
+            (fields["profiles"] != "0" && fields["profiles"] != "rez1") || fields["editions"] != "retail,demo" ||
             (fields["preferences"] != "1" && fields["preferences"] != "2") || !fields.contains("version") ||
             fields["version"].empty() || !fields.contains("revision") || fields["revision"].empty() ||
             fields.size() != 7)
@@ -53,6 +53,7 @@ namespace OpenBlood2
             return false;
         }
         LauncherInfo next;
+        next.overlays = fields["profiles"] == "rez1";
         next.version = fields["version"];
         next.revision = fields["revision"];
         next.preferences = fields["preferences"] == "2" ? 2 : 1;

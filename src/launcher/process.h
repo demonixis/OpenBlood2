@@ -54,7 +54,8 @@ namespace OpenBlood2::Launcher
         GameProcess& operator=(const GameProcess&) = delete;
         ~GameProcess();
         bool start(const std::filesystem::path& executable, const std::filesystem::path& config,
-                   const Installation& item, const std::filesystem::path& logs, std::string& error);
+                   const Installation& item, const std::filesystem::path& logs, std::string& error,
+                   const std::vector<std::filesystem::path>& overlays = {});
         bool update(int& exit_code);
         bool running() const
         {

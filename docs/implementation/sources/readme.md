@@ -1,5 +1,7 @@
 # Source ledgers
 
+- [Compact launcher continuation](launcher_redesign_sources.json): qualified demo, optional external artwork, data overlays and launcher-only dependencies.
+
 - [Launcher L0 through L2](launcher_sources.json): existing project config/REZ
   reuse, pinned SDL/ImGui, no original launcher-code import.
 
