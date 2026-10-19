@@ -132,9 +132,9 @@ namespace OpenBlood2::Launcher
             error = "--install-smoke requires a test --game";
             return false;
         }
-        if (result.launch_smoke && (!result.smoke || result.data.empty() || result.game.empty()))
+        if (result.launch_smoke && (!result.smoke || result.data.empty()))
         {
-            error = "--launch-smoke requires --smoke, --game and --data-dir";
+            error = "--launch-smoke requires --smoke and --data-dir (use a test game)";
             return false;
         }
         return true;
@@ -196,14 +196,14 @@ namespace OpenBlood2::Launcher
         }
         bool initialize(float requested)
         {
-            SDL_SetAppMetadata("OpenBlood2 Launcher", build::version, "org.openblood2.launcher");
+            SDL_SetAppMetadata("OpenBlood 2 Launcher", build::version, "org.openblood2.launcher");
             if (!SDL_Init(SDL_INIT_VIDEO))
                 return false;
             sdl = true;
             scale = requested > 0 ? requested : SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
             if (!(scale > 0))
                 scale = 1;
-            window = SDL_CreateWindow("Blood II - Launcher", int(580 * scale), int(356 * scale),
+            window = SDL_CreateWindow("OpenBlood 2 Launcher", int(580 * scale), int(356 * scale),
                                       SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
             if (!window)
                 return false;
@@ -428,8 +428,7 @@ namespace OpenBlood2::Launcher
             error = mod_error;
         if (!options.game.empty())
             state.game = options.game;
-        const bool discover_game = state.game.empty();
-        if (discover_game)
+        if (state.game.empty())
         {
             const char* base = SDL_GetBasePath();
             if (base)
@@ -439,25 +438,6 @@ namespace OpenBlood2::Launcher
 #else
                              "blood2";
 #endif
-        }
-        if (discover_game && state.game.filename() ==
-#ifdef _WIN32
-                                 "blood2.exe"
-#else
-                                 "blood2"
-#endif
-        )
-        {
-            std::error_code ec;
-            const auto base = path_from_utf8(SDL_GetBasePath() ? SDL_GetBasePath() : "").lexically_normal();
-            const auto folder = base.filename().empty() ? base.parent_path() : base;
-            const auto preset = path_text(folder.filename());
-            if (!fs::exists(state.game, ec) && preset.starts_with("launcher-"))
-            {
-                const auto candidate = folder.parent_path() / preset.substr(9) / state.game.filename();
-                if (fs::is_regular_file(candidate, ec))
-                    state.game = candidate;
-            }
         }
         std::array<char, 4097> game{}, data{};
         assign(game, state.game);
@@ -751,7 +731,7 @@ namespace OpenBlood2::Launcher
                                   ImVec2(at.x + 265 * scale, at.y + 174 * scale), IM_COL32(104, 51, 42, 255));
                     ImGui::Dummy(art_size);
                 }
-                ImGui::TextDisabled("OpenBlood2 %s", build::version);
+                ImGui::TextDisabled("OpenBlood 2 %s", build::version);
                 ImGui::EndGroup();
                 ImGui::SameLine(0, 20 * scale);
                 ImGui::BeginGroup();
@@ -841,7 +821,7 @@ namespace OpenBlood2::Launcher
                 if (ImGui::CollapsingHeader("Advanced"))
                 {
                     ImGui::BeginDisabled(locked || controller.busy());
-                    ImGui::TextUnformatted("OpenBlood2 executable");
+                    ImGui::TextUnformatted("OpenBlood 2 executable");
                     ImGui::SetNextItemWidth(-100 * scale);
                     if (ImGui::InputText("##game", game.data(), game.size()))
                         controller.cancel();
@@ -1010,7 +990,7 @@ int main(int argc, char** argv)
     }
     if (options.help)
     {
-        std::cout << "OpenBlood2 Launcher\n  --state-dir ABS_PATH  Isolated launcher state\n"
+        std::cout << "OpenBlood 2 Launcher\n  --state-dir ABS_PATH  Isolated launcher state\n"
                      "  --game ABS_PATH       Development game executable\n"
                      "  --data-dir ABS_PATH   Initial data directory\n  --demo                Initial demo edition\n"
                      "  --frames N            Quit after 3..10000 frames\n  --capture ABS_FILE    Capture settled UI\n"
@@ -1019,7 +999,7 @@ int main(int argc, char** argv)
                      "  --navigation-smoke    Drive menu/settings/mods navigation in isolated state\n"
                      "  --install-smoke ZIP   Drive local ZIP installation with an injected chooser reply\n"
                      "  --smoke               Isolated UI/resize smoke (requires --state-dir, --frames >= 12)\n"
-                     "  --launch-smoke        Drive Play and return (requires --smoke, --game, --data-dir)\n";
+                     "  --launch-smoke        Drive test-game Play and return (requires --smoke, --data-dir)\n";
         return 0;
     }
     return OpenBlood2::Launcher::run(options);

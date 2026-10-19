@@ -24,8 +24,10 @@ The targets are defined in [CMakeLists.txt](../CMakeLists.txt).
 `engine`. The engine shares the small legacy type declarations; these directories
 are not independent replacements for the full historical SDK.
 
-The launcher and game use separate build presets to preserve the game's SDL
-options. `engine` links `blood2_startup`; the launcher links that same small
+The default game build invokes an isolated launcher CMake tree, then installs
+`blood2-launcher` and its notices beside `blood2`. Explicit game-target builds
+also include it; `BLOOD2_BUILD_LAUNCHER=OFF` opts out. Separate launcher presets
+remain available for development. This preserves the game's SDL options. `engine` links `blood2_startup`; the launcher links that same small
 library with its own SDL UI, without game objects or scene rendering. Existing
 config/REZ source paths are retained. See [launcher setup](launcher.md).
 

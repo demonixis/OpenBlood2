@@ -22,6 +22,11 @@ Reconfigure existing build directories to apply these settings.
 Dependency revisions are unchanged. See the
 [validation record](../../Documentation/Implementation/sdl_build_options.md).
 
+The default build includes **OpenBlood 2 Launcher**, beside `blood2`, and needs
+OpenSSL development headers/libraries. Its separate child build enables native
+dialogs without changing any game SDL options. Use `-DBLOOD2_BUILD_LAUNCHER=OFF`
+when configuring a game-only build. See [launcher setup](launcher.md).
+
 ## Windows build
 
 Install these tools, or check that they are already available:
@@ -29,6 +34,8 @@ Install these tools, or check that they are already available:
 - Visual Studio or Build Tools with **Desktop development with C++**, an MSVC
   C++20 toolset for x64, and a Windows 10/11 SDK.
 - CMake 3.28 or newer, Ninja and Git, available on `PATH`.
+- OpenSSL development headers/libraries for the default launcher build; supply
+  `-DOPENSSL_ROOT_DIR=/path/to/openssl` if it is outside normal search paths.
 - Network access for the initial dependency downloads. CMake fetches and builds
   pinned SDL3, spdlog and Dear ImGui; do not install separate copies.
 

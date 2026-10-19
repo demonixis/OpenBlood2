@@ -48,6 +48,12 @@ if(BLOOD2_GPU_TESTS)
         --capture "${CMAKE_CURRENT_BINARY_DIR}/ui-process/finished.png")
     set_tests_properties(gpu.launcher_process PROPERTIES FIXTURES_REQUIRED launcher_ui_data
         LABELS "gpu;launcher" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+    add_test(NAME gpu.launcher_sibling COMMAND "${CMAKE_COMMAND}"
+        "-DLAUNCHER=$<TARGET_FILE:blood2_launcher>" "-DGAME=$<TARGET_FILE:launcher_game_fixture>"
+        "-DPREPARE=$<TARGET_FILE:launcher_process_tests>" "-DSUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+        "-DROOT=${CMAKE_CURRENT_BINARY_DIR}/sibling" -P "${CMAKE_CURRENT_SOURCE_DIR}/sibling_test.cmake")
+    set_tests_properties(gpu.launcher_sibling PROPERTIES LABELS "gpu;launcher" TIMEOUT 60 RUN_SERIAL TRUE
+        FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
     foreach(scale IN ITEMS 1 1.5 2)
         file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/gpu-${scale}")
         add_test(NAME gpu.launcher_${scale} COMMAND blood2_launcher --smoke --frames 16 --ui-scale ${scale}

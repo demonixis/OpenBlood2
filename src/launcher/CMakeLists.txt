@@ -36,3 +36,7 @@ foreach(pair IN ITEMS "${launcher_curl_SOURCE_DIR}/COPYING|curl.txt" "${launcher
     list(GET parts 1 name)
     configure_file("${source}" "${PROJECT_BINARY_DIR}/licenses/${name}" COPYONLY)
 endforeach()
+
+# The parent game build installs this component beside its own executable.
+install(TARGETS blood2_launcher RUNTIME DESTINATION . COMPONENT Launcher)
+install(DIRECTORY "${PROJECT_BINARY_DIR}/licenses" DESTINATION . COMPONENT Launcher)

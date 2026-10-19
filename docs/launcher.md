@@ -1,4 +1,4 @@
-# Desktop launcher
+# OpenBlood 2 Launcher
 
 A compact SDL3/SDL_GPU + Dear ImGui desktop launcher. The main window has Play,
 Game Settings, Mods and Quit. Play is unavailable until a configured game and
@@ -12,7 +12,7 @@ In **Game Settings**, browse to the folder containing `BLOOD2.REZ` or
 `B2Demo.rez`. Demo is selected automatically when only its base archive is
 present; an explicit edition selector handles mixed folders. OK remembers the
 path and returns to the main window. Clear the path and press OK to unconfigure
-it. Manual entry remains available. Advanced contains the OpenBlood2 executable
+it. Manual entry remains available. Advanced contains the OpenBlood 2 executable
 path for unusual development layouts.
 
 **Download Demo** retrieves the qualified 36 MB [Archive.org package](https://archive.org/details/B2demo),
@@ -41,25 +41,46 @@ stack, shader artifacts and original gameplay rules are unchanged by the launche
 
 Install OpenSSL development headers/libraries in addition to the game's build
 requirements. curl and miniz are fetched at pinned revisions, only in launcher
-builds; Droid Sans comes from the already pinned ImGui archive. Licenses for the
-embedded dependencies are copied to `build/launcher-*/licenses`. OpenSSL is
+builds; Droid Sans comes from the already pinned ImGui archive. OpenSSL is
 provided by the platform/development installation and retains its own notices.
 
 ```sh
 cmake --preset release
-cmake --build --preset release --target blood2_app --parallel
-cmake --preset launcher-release
-cmake --build --preset launcher-release --parallel
-./build/launcher-release/blood2-launcher
+cmake --build --preset release --parallel
+./build/release/blood2-launcher
 ```
 
-The game executable is resolved beside the launcher in a distribution, or in the
-matching neighboring preset directory (`build/release` for `launcher-release`).
-`--game ABS_PATH` overrides discovery. Native dialogs stay isolated in the
-launcher SDL build; game and launcher still use separate build directories.
+The `debug`, `dev` and `release` presets build both executables by default:
+`blood2-launcher` beside `blood2`, with dependency notices in `licenses/`.
+Explicitly building `--target blood2_app` also builds the launcher. Native dialogs
+and HTTP/ZIP dependencies remain isolated in the `build/<preset>/launcher/`
+child CMake tree; the game's SDL options and graphics stack are unchanged.
+The child uses the parent compiler, build configuration and sanitizer setting;
+its incremental build uses at most two jobs alongside the parent build.
+Reconfigure an existing preset to enable this default. To build only the game,
+configure with `-DBLOOD2_BUILD_LAUNCHER=OFF`.
+
+By default the game executable is `blood2` (`blood2.exe` on Windows) in the
+launcher's own directory, independent of the current working directory. A saved
+Advanced path or `--game ABS_PATH` overrides that default. There is no search in
+neighboring build/preset folders. Window titles are **OpenBlood 2 Launcher** and
+**OpenBlood 2**; internal protocol and preference-directory identifiers remain
+compatible with existing state.
+
+The `launcher-debug`, `launcher-release` and `launcher-sanitize` presets remain
+available for independent launcher development and tests. With those layouts,
+pass `--game /absolute/path/to/blood2` or configure the Advanced path. For example:
+
+```sh
+cmake --preset launcher-release
+cmake --build --preset launcher-release --parallel
+./build/launcher-release/blood2-launcher --game "$PWD/build/release/blood2"
+```
+
 Windows uses `.exe` paths and an x64 developer shell. Windows/macOS launcher
 execution and native chooser qualification remain pending. The tested platform
-is Linux/NVIDIA; see the [validation record](../../Documentation/Implementation/launcher_redesign.md).
+is Linux/NVIDIA; see the [default build validation](../../Documentation/Implementation/launcher_default_build.md)
+and [feature validation](../../Documentation/Implementation/launcher_redesign.md).
 
 ## Storage and startup
 
@@ -103,7 +124,7 @@ Headless tests do not download anything. For an explicit, isolated delivery test
 
 UI diagnostics: `--state-dir`, `--game`, `--data-dir`, `--demo`, `--frames`,
 `--capture`, `--ui-scale`, `--panel main|settings|mods`. `--smoke` requires isolated
-state and at least 12 frames. `--launch-smoke` drives Play with a test executable;
+state and at least 12 frames. `--launch-smoke` drives Play with a test executable (explicit or beside the launcher);
 `--navigation-smoke` drives the menu and both panels (use at least 24 frames).
 `--install-smoke ABS_ZIP` drives Install from ZIP with an injected native-chooser
 reply (use a test executable and at least 160 frames). These checks use the real

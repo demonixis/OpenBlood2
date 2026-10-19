@@ -1,5 +1,7 @@
 # Implementation records
 
+- [Default launcher build, sibling executable and window names](../../../Documentation/Implementation/launcher_default_build.md)
+
 - [Compact launcher, demo delivery and data mods](../../../Documentation/Implementation/launcher_redesign.md)
 
 - [SDL3 launcher baseline and validation](../../../Documentation/Implementation/launcher.md)

@@ -18,6 +18,24 @@ Window geometry is not persisted; version-1 launcher state retains executable
 and installation records. Native Windows/macOS and interactive portal
 qualification remain pending.
 
+## Default build and executable
+
+Game presets enable the launcher by default. `cmake/LauncherBuild.cmake` invokes
+an independent child configure/build and installs only its Launcher component
+beside the game. Both default builds and explicit `blood2_app` builds include it;
+`BLOOD2_BUILD_LAUNCHER=OFF` disables orchestration. Standalone launcher presets
+continue to build directly. The child disables tests and inspector; dedicated
+launcher presets own their test suites. SDL native dialogs are ON only in the
+launcher-only tree and OFF in the game tree. SDL/ImGui pins, other game SDL
+options, GPU backends and shader artifacts are unchanged.
+
+Without a saved executable override or `--game`, resolve `blood2[.exe]` only
+against `SDL_GetBasePath()`. Never infer a neighboring preset or use the working
+directory to locate the executable. A missing/incompatible executable leaves
+Play unavailable. Display names are OpenBlood 2 Launcher and OpenBlood 2; the
+protocol's `game=OpenBlood2` and existing preference paths do not change.
+See [build validation](../../../Documentation/Implementation/launcher_default_build.md).
+
 ## L0 baseline and shared boundary
 
 Baseline: Blood2 `8fcbf35`, with gameplay/code unchanged from `d149d325`.

@@ -6,10 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(BLOOD2_BUILD_GAME "Build the existing game targets" ON)
-option(BLOOD2_BUILD_LAUNCHER "Build the standalone launcher (separate SDL configuration)" OFF)
-if(BLOOD2_BUILD_GAME AND BLOOD2_BUILD_LAUNCHER)
-    message(FATAL_ERROR "Build launcher and game with separate presets to preserve game SDL options")
-endif()
+option(BLOOD2_BUILD_LAUNCHER "Build the launcher (with its own SDL configuration)" ON)
 
 option(BLOOD2_INSPECTOR "Build the in-game inspection UI" ON)
 option(BLOOD2_GPU_TESTS "Register tests that open a real GPU window" OFF)
@@ -106,5 +103,9 @@ endif()
 endif() # BLOOD2_BUILD_GAME
 
 if(BLOOD2_BUILD_LAUNCHER)
-    add_subdirectory(src/launcher)
+    if(BLOOD2_BUILD_GAME)
+        include(cmake/LauncherBuild.cmake)
+    else()
+        add_subdirectory(src/launcher)
+    endif()
 endif()
