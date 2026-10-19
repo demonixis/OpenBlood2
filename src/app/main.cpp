@@ -1731,7 +1731,7 @@ static int application_main(const OpenBlood2::Options& options)
     std::string error;
     if (options.help)
     {
-        std::cout << "Blood II reconstruction " << OpenBlood2::build::version
+        std::cout << "Open Blood II " << OpenBlood2::build::version
                   << " (M2 in progress)\n"
                      "  --config FILE       Configuration file (default: blood2.local.ini in working directory)\n"
                      "  --log-dir DIR       Log root (default: SDL user directory / logs)\n"
