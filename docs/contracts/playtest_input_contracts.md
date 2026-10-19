@@ -74,6 +74,21 @@ FIRE_KEY/ammo/audio, and cleanup across reload. The secondary run must execute
 Dodge. A real SDL-window variant checks native relative-mode state; input events
 are synthetic SDL events, not physical-device automation or a human walkthrough.
 
+The combat driver also checks the current line of sight before each simulation
+step. If an authored, non-FireThrough door obstructs the target, it releases fire,
+approaches with W and pulses E until the route opens, then resumes the same firing
+mode. It never sends a direct door trigger or changes the authored close timer.
+Releasing input may still complete an already committed FIRE_KEY. The retained
+diagnostics distinguish door obstruction, exhausted ammunition and an incomplete
+death transfer; a blocked encounter must reopen its route before succeeding.
+
+This corrects the harness's former assumption that a door opened during approach
+stays open throughout combat. The original door timing, damage, ammunition,
+NPC actions and collision policies remain unchanged. Corpse checks retain raw
+death-animation dimensions, a clear final box and a clear source-center path.
+The [clearance suite](corpse_clearance_contracts.md) covers the additional swept-source
+placement without requiring the same solution at every simulation cadence.
+
 This proves the selected encounter, not the whole level/campaign. Other missing
 AI actions, fire/gib deaths, required world services and safe NEW_LEVEL remain open.
 
