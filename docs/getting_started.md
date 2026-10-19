@@ -11,6 +11,17 @@ are in [Dependencies.cmake](../cmake/Dependencies.cmake). No prototype repositor
 is a build dependency. The first configure needs network access; build products
 and downloaded dependencies are ignored under `build/` and `.cache/`.
 
+The build disables unused SDL subsystems: `SDL_RENDER`, `SDL_CAMERA`,
+`SDL_DIALOG`, `SDL_TRAY`, `SDL_NOTIFICATION` and `SDL_DISKAUDIO`.
+Both the game and ImGui render directly through SDL_GPU;
+`SDL_RENDER` controls the separate SDL_Renderer API. GPU/OpenXR support,
+platform audio/video backends, controller support and dummy test drivers retain
+their existing configuration. OpenGL/OpenGL ES remain at their defaults because
+SDL's KMSDRM video backend depends on EGL support enabled by those options.
+Reconfigure existing build directories to apply these settings.
+Dependency revisions are unchanged. See the
+[validation record](../../Documentation/Implementation/sdl_build_options.md).
+
 ## Windows build
 
 Install these tools, or check that they are already available:

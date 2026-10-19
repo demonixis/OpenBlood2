@@ -1,5 +1,7 @@
 # Implementation records
 
+- [Unused SDL subsystem configuration and validation](../../../Documentation/Implementation/sdl_build_options.md)
+
 - [CityHub museum jump diagnosis; production defect remains open](../../../Documentation/Implementation/cityhub_jump.md)
 
 - [Crash stacks and core-dump validation](../../../Documentation/Implementation/crash_capture.md)
