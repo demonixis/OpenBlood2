@@ -25,6 +25,11 @@ matching skin. Initial update uses one shared animation/sound table per class
 times the difficulty factor and the original HP/armor formulas. The Prophet then
 obtains the melee weapon after base initialization, as its source does.
 
+Spawned NPCs retain the source's no-ground-drop rule. A bounded initial
+[primary-world overlap separation](contact_overlap_contracts.md#spawned-npc-placement)
+now covers authored Spawner boxes straddling a wall; velocity is still applied
+after initialization. This replacement placement policy is shared by editions.
+
 `AI_Mgr::RuntimeTables` now holds seven shared owners: Cultist male/female,
 Civilian male/female, Gideon, Fanatic and Prophet. The existing exchange swaps the
 whole array, so [destination rehearsal](destination_trial_contracts.md) and

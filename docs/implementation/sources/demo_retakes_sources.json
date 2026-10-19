@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-19",
+  "baseline_commit": "9e8a02d",
+  "scope": "User-reported demo menu font difference and Demo_01 spawned Fanatic penetration; no reference-source/commercial-data changes.",
+  "source_files": [
+    {
+      "path": "sources/blood2/ClientShellDLL/MainMenus.cpp",
+      "sha256": "8ee76af4b06a037093e04df5e3be33cdab6d03f49018884d5385a429b270db07",
+      "use": "InitFonts: MenuFont1 small fonts and mm_font fading font paths, without edition size normalization."
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/MenuBase.cpp",
+      "sha256": "00a49bcd0c386cfbe031ddd4bd6ecea0c17d71c3468326bd22bc17951448b955",
+      "use": "AddLargeTextItemOption selects fading bitmap fonts except the source low-resolution/engine-font paths."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
+      "use": "MID_INITIALUPDATE disables m_bMoveToGround for non-world creation; InitialUpdate randomizes scale, selects animation and only conditionally drops to ground."
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Spawner.cpp",
+      "sha256": "648cbcc568316ae9a99817afba1a9dd89fd15838ab61a377dc6e1d53881e77cb",
+      "use": "SpawnObject uses the authored pose and assigns launch velocity after CreateObjectProps returns."
+    }
+  ],
+  "adaptations": [
+    "Preserve authored edition-specific mm_font heights: demo 41, retail 31 pixels; no rescaling.",
+    "Reuse the existing bounded primary-world initial-placement correction for non-world NPCs except Gideon; no ground drop or velocity change.",
+    "Retain strict later MoveObject penetration checks, missing-BSP accounting and M2-GPU-001."
+  ]
+}

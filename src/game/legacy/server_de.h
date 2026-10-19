@@ -116,6 +116,7 @@ class ServerDE : public CSBase
     virtual bool GetPointContainerCode(DVector, ContainerCode&, bool visible_only = false) = 0;
     virtual bool GetContainers(HOBJECT, DVector head, OpenBlood2::ContainerState&) = 0;
     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
+    virtual DRESULT ResolveInitialWorldOverlap(HOBJECT) = 0;
     virtual bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
                                     OpenBlood2::BodyPlacement&) = 0;
     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;

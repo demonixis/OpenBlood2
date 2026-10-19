@@ -374,6 +374,10 @@ namespace
         MenuCanvas canvas(resources);
         CHECK(canvas.initialize(error));
         Runtime runtime;
+        HudCanvas fonts(resources);
+        HudFont large;
+        const auto& art = menu_resources(MenuEdition::Retail);
+        CHECK(fonts.load_font(art.large_bitmaps[0], art.large_font, large, 1) && large.height == 31);
         if (gpu)
             CHECK(runtime.initialize(true, error));
         std::unique_ptr<UiRuntime> ui;

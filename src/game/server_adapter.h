@@ -197,6 +197,7 @@ namespace OpenBlood2
             client_strings_attempted = false;
         }
         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
+        DRESULT ResolveInitialWorldOverlap(HOBJECT) override;
         bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
                                 BodyPlacement&) override;
         bool GetMovementState(HOBJECT, MovementState&) override;

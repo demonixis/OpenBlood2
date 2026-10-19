@@ -46,6 +46,15 @@ The Build 108 provider selects `mainmenu_title.pcx`, `singlepla_title.pcx` and
 source 640x480 composition and bitmap-font rules. The current aspect-preserving
 display policy is retained, rather than the original splash's full-window stretch.
 
+The two editions intentionally retain their different external font metrics:
+the supplied demo `mm_font.fnt`/PCXs are 41 pixels high, retail's are 31. Original
+`CMainMenus::InitFonts` chooses that path and `CMenuBase::AddLargeTextItemOption`
+uses its fading fonts; no edition-specific size normalization exists there.
+The shared renderer advances rows and sizes pointer rectangles from those metrics.
+`demo_menu.assets` and `menus.artwork` check the real edition heights; demo large
+rows also check their hit rectangles. Equal 640x480 composition does not imply
+equal glyph dimensions. See the [retake evidence](../../../Documentation/Implementation/demo_retakes.md).
+
 ## Source menu behavior and capabilities
 
 | Page/action | Implemented behavior | Boundary |

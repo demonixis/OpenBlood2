@@ -266,7 +266,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     objective_messages = 0;
     objectives_resolved = false;
     messages = updates = 0;
-    blocker = "M2 acceptance remains open: see Services for bounded implementation/trace coverage. "
+    blocker = "M2 is closed for the selected SubwayA-to-CityHub session with reservation M2-GPU-001. "
               "Whole-world saves and unexercised gameplay paths are not validated.";
     return true;
 }

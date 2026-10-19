@@ -1494,3 +1494,14 @@ and unchanged; historical experiment/audit ledgers above retain their scope.
 See [contracts](../contracts/demo_menu_contracts.md),
 [source hashes and adaptations](sources/demo_menu_sources.json) and
 [validation](../../../Documentation/Implementation/demo_menu.md).
+
+## Demo retakes (2026-10-19)
+
+Source review confirms edition-authored fading font metrics and the non-world
+NPC ground-drop exclusion. The existing primary-world placement nudge is shared
+with initial spawned-NPC placement; it remains a bounded replacement solver,
+without ground snapping or changing Spawner velocity assignment. No reference
+source, commercial asset or graphics stack changes are imported. See
+[source hashes](sources/demo_retakes_sources.json),
+[placement contract](../contracts/contact_overlap_contracts.md#spawned-npc-placement)
+and [validation](../../../Documentation/Implementation/demo_retakes.md).

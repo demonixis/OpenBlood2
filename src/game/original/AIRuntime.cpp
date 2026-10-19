@@ -466,6 +466,12 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     m_bSetShutdown = false;
     if (reason == INITIALUPDATE_WORLDFILE && npc_type != NPCType::Gideon && s->MoveObjectToGround(m_hObject) != DE_OK)
         return RuntimeFailure("NPC world ground placement failed");
+    // Replacement placement policy, not the source world-only ground drop:
+    // spawned boxes can straddle authored walls too (Demo_01 spawn101). Separate
+    // them once before simulation, without ground dropping or changing launch velocity.
+    if (reason != INITIALUPDATE_WORLDFILE && npc_type != NPCType::Gideon &&
+        s->ResolveInitialWorldOverlap(m_hObject) != DE_OK)
+        return RuntimeFailure("NPC spawned world-overlap placement failed");
     m_fLastUpdate = s->GetTime();
     m_damage.ai_hit_localization = true;
     runtime_initialized = true;
