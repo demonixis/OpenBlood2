@@ -70,6 +70,11 @@ in large worlds.
 [Setup, controls and tests](docs/getting_started.md) cover configuration,
 NVIDIA selection, Metal and validation commands.
 
+[GitHub Actions](https://github.com/demonixis/OpenBlood2/actions/workflows/ci.yml)
+builds and tests Release versions for Windows x64, Linux x64 and macOS Apple
+Silicon. Each successful job provides a game + launcher archive; see
+[CI builds](docs/ci_builds.md) for downloads, test scope and pushing to both remotes.
+
 ## Contributing
 
 - Read [AGENTS.md](AGENTS.md) and the [developer documentation](docs/readme.md) before changing code.

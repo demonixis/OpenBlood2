@@ -80,6 +80,31 @@
         "CMAKE_CXX_COMPILER": "clang++",
         "BLOOD2_SANITIZERS": true
       }
+    },
+    {
+      "name": "ci-release",
+      "displayName": "CI Release game",
+      "inherits": "release",
+      "binaryDir": "${sourceDir}/build/ci/game",
+      "cacheVariables": {
+        "BLOOD2_GPU_TESTS": false,
+        "BLOOD2_TEST_DATA_DIR": "",
+        "BLOOD2_DEMO_DATA_DIR": "",
+        "BLOOD2_BUILD_LAUNCHER": false
+      }
+    },
+    {
+      "name": "ci-launcher-release",
+      "displayName": "CI Release launcher",
+      "inherits": "launcher-release",
+      "binaryDir": "${sourceDir}/build/ci/launcher",
+      "cacheVariables": {
+        "BLOOD2_GPU_TESTS": false,
+        "BLOOD2_TEST_DATA_DIR": "",
+        "BLOOD2_DEMO_DATA_DIR": "",
+        "OPENSSL_USE_STATIC_LIBS": true,
+        "BLOOD2_LAUNCHER_TEST_GAME": ""
+      }
     }
   ],
   "buildPresets": [
@@ -106,6 +131,14 @@
     {
       "name": "launcher-sanitize",
       "configurePreset": "launcher-sanitize"
+    },
+    {
+      "name": "ci-release",
+      "configurePreset": "ci-release"
+    },
+    {
+      "name": "ci-launcher-release",
+      "configurePreset": "ci-launcher-release"
     }
   ],
   "testPresets": [
@@ -149,6 +182,44 @@
       "configurePreset": "launcher-sanitize",
       "output": {
         "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ci-release",
+      "configurePreset": "ci-release",
+      "output": {
+        "outputOnFailure": true
+      },
+      "filter": {
+        "include": {
+          "label": "headless"
+        },
+        "exclude": {
+          "label": "gpu|private"
+        }
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "timeout": 120
+      }
+    },
+    {
+      "name": "ci-launcher-release",
+      "configurePreset": "ci-launcher-release",
+      "output": {
+        "outputOnFailure": true
+      },
+      "filter": {
+        "include": {
+          "label": "headless"
+        },
+        "exclude": {
+          "label": "gpu|private"
+        }
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "timeout": 120
       }
     }
   ]

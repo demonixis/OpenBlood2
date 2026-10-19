@@ -1,0 +1,147 @@
+name: Desktop CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.platform }} / Release
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            platform: linux-x64
+            suffix: ''
+          - os: windows-2025
+            platform: windows-x64
+            suffix: .exe
+          - os: macos-15
+            platform: macos-arm64
+            suffix: ''
+    defaults:
+      run:
+        shell: bash
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 3
+      CTEST_PARALLEL_LEVEL: 2
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up MSVC x64
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
+        with:
+          arch: x64
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ninja-build pkg-config libssl-dev libasound2-dev libpulse-dev \
+            libpipewire-0.3-dev libx11-dev libxext-dev libxrandr-dev \
+            libxcursor-dev libxfixes-dev libxi-dev libxss-dev libxtst-dev \
+            libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev \
+            libgles2-mesa-dev libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev \
+            libudev-dev libusb-1.0-0-dev libwayland-dev libdecor-0-dev
+          echo 'OPENSSL_LICENSE=/usr/share/doc/libssl-dev/copyright' >> "$GITHUB_ENV"
+
+      - name: Set up macOS dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install ninja openssl@3
+          echo "OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)" >> "$GITHUB_ENV"
+          echo "OPENSSL_LICENSE=$(brew --prefix openssl@3)/LICENSE.txt" >> "$GITHUB_ENV"
+
+      - name: Locate Windows OpenSSL
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $root = "$env:ProgramFiles/OpenSSL"
+          if (!(Test-Path "$root/include/openssl/ssl.h")) { throw "OpenSSL development files are missing" }
+          "OPENSSL_ROOT_DIR=$root" >> $env:GITHUB_ENV
+          $license = Get-ChildItem $root -File | Where-Object Name -Match '^licen[cs]e(\.txt)?$' | Select-Object -First 1
+          if (!$license) { throw "OpenSSL license is missing" }
+          "OPENSSL_LICENSE=$($license.FullName)" >> $env:GITHUB_ENV
+
+      - name: Cache pinned dependency archives
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .cache/downloads
+          key: sources-${{ runner.os }}-${{ hashFiles('cmake/Dependencies.cmake', 'cmake/LauncherDependencies.cmake') }}
+          restore-keys: sources-${{ runner.os }}-
+
+      - name: Configure game
+        run: cmake --preset ci-release
+
+      - name: Build game and tests
+        run: cmake --build --preset ci-release
+
+      - name: Test game (headless, synthetic data)
+        id: game-tests
+        run: ctest --preset ci-release --output-junit game-tests.xml
+
+      # The default parent build disables launcher tests in its child tree.
+      # An independent preset exercises them and keeps SDL configurations isolated.
+      - name: Configure launcher
+        if: ${{ !cancelled() && steps.game-tests.outcome != 'skipped' }}
+        run: |
+          args=()
+          if [[ -n "${OPENSSL_ROOT_DIR:-}" ]]; then
+            args+=("-DOPENSSL_ROOT_DIR=$OPENSSL_ROOT_DIR")
+          fi
+          if [[ "$RUNNER_OS" == macOS ]]; then
+            args+=(-DCURL_CA_BUNDLE=/etc/ssl/cert.pem -DCURL_CA_PATH=none)
+          fi
+          cmake --preset ci-launcher-release \
+            "-DBLOOD2_LAUNCHER_TEST_GAME=$GITHUB_WORKSPACE/build/ci/game/blood2${{ matrix.suffix }}" \
+            "${args[@]}"
+
+      - name: Build launcher and tests
+        if: ${{ !cancelled() && steps.game-tests.outcome != 'skipped' }}
+        run: cmake --build --preset ci-launcher-release
+
+      - name: Test launcher (headless, synthetic data)
+        if: ${{ !cancelled() && steps.game-tests.outcome != 'skipped' }}
+        run: ctest --preset ci-launcher-release --output-junit launcher-tests.xml
+
+      - name: Package executables and notices
+        env:
+          PACKAGE_PLATFORM: ${{ matrix.platform }}
+        run: cmake -DPLATFORM="$PACKAGE_PLATFORM" -P cmake/PackageCi.cmake
+
+      - name: Upload build
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: OpenBlood2-${{ matrix.platform }}-${{ github.sha }}
+          path: build/ci/dist/OpenBlood2-*.*
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+      - name: Upload test reports and build diagnostics
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-results-${{ matrix.platform }}-${{ github.sha }}
+          path: |
+            build/ci/**/Testing/Temporary/*.log
+            build/ci/**/*tests.xml
+            build/ci/**/CMakeFiles/CMakeConfigureLog.yaml
+          if-no-files-found: warn
+          retention-days: 14
