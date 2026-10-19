@@ -46,9 +46,9 @@ MELEE. The other far branch selects Naga/RIFLE. Other states select Wind/RIFLE f
 The animation is nonlooping. Continuing this command never fires on a reload
 clock: Gideon's original override fires exclusively through model keys. Completion
 tries Soul Hook (base-game ID23), clears animating and increments Metacmd once.
-The original ignores the missing weapon; the typed inventory reports Invalid for
-this unsupported definition, retains the current weapon and exposes the actual
-result. No Soul Hook implementation or fallback weapon is fabricated.
+The original ignores the missing weapon. Soul Hook's definition is now shared with
+SoulDrudge; a Gideon without that weapon reports NotAvailable, retains the current
+weapon and exposes the actual result. An unknown definition still reports Invalid.
 
 Missing inventory/table/animation services fail explicitly. Selection and shield
 armor changes precede SetAnimation in the original; they remain committed if its

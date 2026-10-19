@@ -57,7 +57,11 @@ the actual exit relay, and preserve player state into CityHub. The driver uses
 visible model heads for synthetic mouse aiming and fixed aisle navigation; it is
 not a human playtest or retail behavior comparison. It changes no NPC, player stats,
 trigger, damage rule or position directly. It switches to the original knife if
-bullets run out. The route explicitly requires combat deaths and health pickups, ammunition
+bullets run out. The 30 Hz driver lets a wounded, alerted Cultist retaliate before
+finishing combat, ensuring a real incoming damage impulse. After the exit relay
+activates, it continues normal firing until it has exhausted any remaining bullets
+and fired the knife, so dropped ammunition cannot skip that check. The route
+explicitly requires combat deaths and health pickups, ammunition
 collection at 60 Hz and real dry-ammo knife firing at 30 Hz,
 all ten relay sends, received fade, no message refusals, real NEW_LEVEL and cleanup.
 

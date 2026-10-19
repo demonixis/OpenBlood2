@@ -250,7 +250,7 @@ namespace
         struct Count
         {
             unsigned created = 0, rejected = 0, filtered = 0, moved = 0, explosive = 0, detonated = 0, dynamic = 0,
-                     blocked = 0, spawned = 0, compound = 0, absent_spawns = 0;
+                     blocked = 0, spawned = 0, compound = 0, absent_spawns = 0, polygon = 0, boundary = 0;
         };
         std::map<std::string, Count> counts;
         std::map<std::string, unsigned> failures, spawns;
@@ -329,7 +329,13 @@ namespace
                 {
                     ++count.created;
                     CHECK(r->world_model && dynamic_cast<CDestructableBrush*>(r->game.get()));
-                    if (r->world_model->shared_edges)
+                    if (r->world_model->boundary_only)
+                    {
+                        ++count.boundary;
+                        CHECK(r->body_properties.polygon_bounds &&
+                              (r->world_model->open_edges || r->world_model->shared_edges));
+                    }
+                    else if (r->world_model->shared_edges)
                     {
                         ++count.compound;
                         CHECK(r->world_model->closed_components > 1);
@@ -343,7 +349,11 @@ namespace
                     count.dynamic += r->world_body;
                     count.blocked += r->world_body && r->mover_blocks > 0;
                     if (r->world_body)
-                        CHECK(r->body_steps > 0 && (r->state.m_Flags & FLAG_BOXPHYSICS));
+                    {
+                        CHECK(r->body_steps > 0 &&
+                              r->body_properties.polygon_bounds == !(r->state.m_Flags & FLAG_BOXPHYSICS));
+                        count.polygon += r->body_properties.polygon_bounds;
+                    }
                     auto& brush = destruct(g, h);
                     if (brush.debris.exploding)
                     {
@@ -397,20 +407,22 @@ namespace
         for (const auto& [name, c] : counts)
             std::cout << name << " created=" << c.created << " rejected=" << c.rejected << " filtered=" << c.filtered
                       << " moved=" << c.moved << " explosive=" << c.explosive << " detonated=" << c.detonated
-                      << " dynamic=" << c.dynamic << " blocked=" << c.blocked << " spawned=" << c.spawned << '\n';
+                      << " dynamic=" << c.dynamic << " polygon=" << c.polygon << " boundary=" << c.boundary
+                      << " blocked=" << c.blocked << " spawned=" << c.spawned << '\n';
         for (const auto& [name, n] : spawns)
             std::cout << "SpawnObject " << name << "=" << n << '\n';
         for (const auto& [name, n] : failures)
             std::cout << name << "=" << n << '\n';
         CHECK(unreadable == 1 && counts["RotatingBrush"].created == 136 && counts["RotatingBrush"].rejected == 0 &&
               counts["RotatingBrush"].moved == 136 && counts["RotatingBrush"].filtered == 0 &&
-              counts["CDestructableBrush"].created == 2392 && counts["CDestructableBrush"].rejected == 63 &&
+              counts["CDestructableBrush"].created == 2420 && counts["CDestructableBrush"].rejected == 35 &&
               counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 50 &&
               counts["CDestructableBrush"].detonated == 50 && counts["CDestructableBrush"].spawned == 69 &&
-              counts["CDestructableBrush"].compound == 3);
+              counts["CDestructableBrush"].compound == 3 && counts["CDestructableBrush"].dynamic == 137 &&
+              counts["CDestructableBrush"].polygon == 28 && counts["CDestructableBrush"].boundary == 1);
         CHECK(failures["CDestructableBrush/shell"] == 2 && !failures.contains("CDestructableBrush/schema") &&
               !failures.contains("CDestructableBrush/ambiguous") && failures["CDestructableBrush/missing"] == 32 &&
-              failures["CDestructableBrush/polygon dynamics"] == 28 && failures["CDestructableBrush/spawn"] == 1 &&
+              !failures.contains("CDestructableBrush/polygon dynamics") && failures["CDestructableBrush/spawn"] == 1 &&
               counts["CDestructableBrush"].absent_spawns == 1 && !failures.contains("RotatingBrush/ambiguous"));
         CHECK(g.request_world("01_SubwayA", error));
         std::map<EntryState, unsigned> entries;

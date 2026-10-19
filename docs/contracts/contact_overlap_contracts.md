@@ -110,3 +110,5 @@ the original polygon/depth and ceiling overlap, corrected clear box, unchanged v
 physics at the reported delta and three seconds of subsequent session updates.
 `services.start_departure` also checks no-ground placement, idempotence and atomic
 failure beyond the correction budget. See the [retake evidence](../../../Documentation/Implementation/demo_retakes.md).
+The service coverage catalog classifies this checked four-correction implementation
+as bounded; session traces still reject unknown and unavailable services.
