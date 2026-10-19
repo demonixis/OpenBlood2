@@ -108,7 +108,7 @@ namespace
         CHECK(a->MC_Taunt_Bold() && a->m_nCurMetacmd == 18 && a->requested_animation == 1);
         return true;
     }
-    bool close(const char* root)
+    bool attack_close(const char* root)
     {
         GameSession g;
         CHECK(setup(g, root));
@@ -301,7 +301,7 @@ int main(int argc, char** argv)
     if (argc != 3)
         return 2;
     const std::map<std::string, std::function<bool(const char*)>> cases{
-        {"dodge", dodge}, {"cached", cached},     {"taunt", taunt},       {"close", close},
+        {"dodge", dodge}, {"cached", cached},     {"taunt", taunt},       {"close", attack_close},
         {"far", far},     {"failures", failures}, {"lifetime", lifetime}, {"private", private_actions}};
     auto test = cases.find(argv[1]);
     return test != cases.end() && test->second(argv[2]) ? 0 : 1;
