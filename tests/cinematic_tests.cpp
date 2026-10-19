@@ -470,7 +470,7 @@ namespace
                   << " invalid=" << invalid << '\n';
         for (auto [type, count] : encodings)
             std::cout << "encoding=" << type << " cues=" << count << '\n';
-        CHECK(worlds == 57 && controllers == 79 && cues == 201 && missing == 3 && !invalid && encodings[1] == 198);
+        CHECK(worlds == 58 && controllers == 81 && cues == 203 && missing == 3 && !invalid && encodings[1] == 200);
         return true;
     }
 } // namespace

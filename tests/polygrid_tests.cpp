@@ -75,7 +75,7 @@ namespace
             switch (bad)
             {
                 case 0:
-                    invalid.dims.x = 0;
+                    invalid.dims.x = -1;
                     break;
                 case 1:
                     invalid.alpha = 2;
@@ -260,6 +260,16 @@ namespace
                         error) &&
               !scene.entries.back().error.empty() && scene.draws.empty());
         CHECK(!scene.add(2, true, {}, s.dims, 129, fx.heights, fx.palette, {2, 3}, {}, .7f, "", resources, error));
+        s.dims = {};
+        s.sprite = "missing.spr";
+        CHECK(fx.Init(s, store, 0, error) && !fx.sprite && !fx.texture_error.empty());
+        std::array<float, 4> phases{0, 1, 4, 3};
+        CHECK(fx.Update(.1, true, phases) && fx.updates > 0);
+        scene.begin_frame();
+        CHECK(scene.add(3, true, {}, {}, fx.width, fx.heights, fx.palette, {1, 1}, {}, .7f, "", resources, error));
+        CHECK(scene.mesh.vertices.empty() && scene.draws.empty());
+        s.dims = {1, 0, 1};
+        CHECK(!fx.Init(s, store, 0, error)); // A visible missing texture is still required.
         scene.clear();
         CHECK(scene.mesh.materials.size() == 1 && scene.entries.empty());
         return true;

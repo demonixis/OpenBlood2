@@ -112,12 +112,16 @@ class AI_Mgr : public CBaseCharacter
         DrudgeLord,
         Thief,
         Naga,
-        Zealot
+        Zealot,
+        Behemoth,
+        DrudgePriest,
+        DeathShroud,
+        TheHand
     };
     static void ResetRuntimeTables();
     // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet, SoulDrudge, Shikari,
-    // MadScientist, BoneLeech, DrudgeLord.
-    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 15>;
+    // MadScientist, BoneLeech, DrudgeLord, Thief, Naga, Zealot, Behemoth, Priest, Shroud, Hand.
+    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 19>;
     // Original WeaponStrToInt prefixes; false for a matched family not integrated here.
     static bool WeaponStrToInt(std::string_view, DBYTE&);
     static void ExchangeRuntimeTables(RuntimeTables&);
@@ -203,7 +207,7 @@ class AI_Mgr : public CBaseCharacter
     bool StopVelocity();
     bool SetAnimation(DDWORD);
     bool MC_Taunt_Beg();
-    bool MC_Taunt_Bold();
+    virtual bool MC_Taunt_Bold();
     virtual bool AI_STATE_Escape_RunAway();
     virtual bool AI_STATE_Escape_Hide();
     virtual bool AI_STATE_GuardLocation();

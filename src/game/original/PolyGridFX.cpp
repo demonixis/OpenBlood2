@@ -32,7 +32,7 @@ namespace
 } // namespace
 bool OpenBlood2::valid_polygrid(const PolyGridSettings& s)
 {
-    if (!physics_vector(s.dims) || s.dims.x <= 0 || s.dims.z <= 0 || s.dims.y < 0 || !color(s.color1) ||
+    if (!physics_vector(s.dims) || s.dims.x < 0 || s.dims.z < 0 || s.dims.y < 0 || !color(s.color1) ||
         !color(s.color2) || !std::isfinite(s.alpha) || s.alpha < 0 || s.alpha > 1 || s.polies < 4 || s.plasma > 1 ||
         s.sprite.size() > 499 || s.sprite.find('\0') != std::string::npos)
         return false;
@@ -58,8 +58,16 @@ bool CPolyGridFX::Init(const PolyGridSettings& s, SpriteStore& store, double now
     settings.polies = std::min(s.polies, 32767u);
     settings.color1 = packed(s.color1);
     settings.color2 = packed(s.color2);
+    texture_error.clear();
     if (!s.sprite.empty() && !store.load(s.sprite, sprite, failure))
-        return false;
+    {
+        // A zero-area authored grid cannot draw. Keep its failed texture lookup
+        // inspectable and its wave state alive; no substitute image is needed.
+        if (s.dims.x != 0 && s.dims.z != 0)
+            return false;
+        texture_error = failure;
+        failure.clear();
+    }
     width = settings.polies <= 4 ? 2 : unsigned(std::sqrt(float(settings.polies / 2))) + 1;
     if (settings.plasma == 1 && settings.polies > 4)
         width = width < 4 ? 2 : width <= 6 ? 4 : width <= 12 ? 8 : 16;

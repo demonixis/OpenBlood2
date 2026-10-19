@@ -797,8 +797,8 @@ namespace
         std::cout << "Skipped DATs " << skipped << "; ambiguous models " << ambiguous << "; missing models " << missing
                   << "\n";
         // Duplicate names bind the first model in file order: four former ambiguities are created.
-        CHECK(skipped == 1 && ambiguous == 0 && missing == 1);
-        CHECK(counts["Conveyor"] == 40 && counts["Damage"] == 49 && counts["FreeFall"] == 18);
+        CHECK(skipped == 0 && ambiguous == 0 && missing == 1);
+        CHECK(counts["Conveyor"] == 40 && counts["Damage"] == 49 && counts["FreeFall"] == 19);
         for (const auto& [name, count] : counts)
             std::cout << name << ": " << count << " original instances created and removed\n";
         // Enter a real level after time has already elapsed, then reload it.

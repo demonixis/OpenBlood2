@@ -8,7 +8,7 @@ namespace OpenBlood2
     class ContainerShape
     {
       public:
-        // Dynamic polygon bodies may opt into authored triangle boundaries,
+        // Polygon bodies may opt into authored triangle boundaries,
         // including open/non-manifold meshes. Volumes retain strict closed/planar validation.
         bool build(const WorldModel&, DRotation, std::string& error, bool triangulated = false);
         bool transform(DRotation, DVector destination);

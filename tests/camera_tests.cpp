@@ -288,7 +288,7 @@ namespace
             std::cout << count << " rejected: " << reason << '\n';
         std::cout << "worlds=" << worlds << " CameraObj=" << entries << " created=" << created
                   << " rejected=" << rejected << '\n';
-        CHECK(worlds == 57 && entries == 61 && created == 61 && rejected == 0);
+        CHECK(worlds == 58 && entries == 62 && created == 62 && rejected == 0);
         CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
         CHECK(CameraObj::m_dwNumCameras == 2 && g.server.camera_effects.size() == 2 &&
               g.objects.snapshot().size() == 230);

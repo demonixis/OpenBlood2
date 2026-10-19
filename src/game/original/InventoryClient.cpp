@@ -132,9 +132,10 @@ bool CBloodClientShell::UpdateInventoryEffects()
         else
         {
             const auto pose = rotation_from_euler({rotation.pitch, rotation.yaw, 0});
-            auto pos = vector_add(camera_position,
-                                  rotate_vector(pose, b->npc_type == AI_Mgr::NPCType::Thief ? DVector{0, -.4f, 2}
-                                                                                            : DVector{0, -2.5f, .6f}));
+            auto pos = vector_add(
+                camera_position, rotate_vector(pose, b->npc_type == AI_Mgr::NPCType::TheHand ? DVector{0, -1, 1.1f}
+                                                     : b->npc_type == AI_Mgr::NPCType::Thief ? DVector{0, -.4f, 2}
+                                                                                             : DVector{0, -2.5f, .6f}));
             if (server_.SetObjectRotation(creature, &pose) != DE_OK || server_.TeleportObject(creature, &pos) != DE_OK)
                 return false;
             if (b->npc_type != AI_Mgr::NPCType::Thief && server_.GetTime() - creature_damage_time >= 1)

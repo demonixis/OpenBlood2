@@ -33,10 +33,12 @@
 #include "game/original/Key.h"
 #include "game/original/KeyFramer.h"
 #include "game/original/KeyPickup.h"
+#include "game/original/LaterEnemies.h"
 #include "game/original/MadScientistAI.h"
 #include "game/original/Naga.h"
 #include "game/original/NapalmProjectile.h"
 #include "game/original/ObjectivesTrigger.h"
+#include "game/original/ParticleSystem.h"
 #include "game/original/PathPoint.h"
 #include "game/original/PolyGrid.h"
 #include "game/original/PowerupPickups.h"
@@ -499,6 +501,27 @@ namespace OpenBlood2
                     p.push_back({"AIWeapon" + std::to_string(i), std::string{}, false, 31});
                 return p;
             }()};
+        const ClassInfo later_Behemoth{
+            "Behemoth",
+            &ai_manager,
+            construct_npc<Behemoth, AI_Mgr::NPCType::Behemoth>,
+            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{37, 52, 31}}}};
+        const ClassInfo later_DrudgePriest{
+            "DrudgePriest",
+            &ai_manager,
+            construct_npc<DrudgePriest, AI_Mgr::NPCType::DrudgePriest>,
+            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{40, 30, 37}}}};
+        const ClassInfo later_DeathShroud{
+            "DeathShroud",
+            &ai_manager,
+            construct_npc<DeathShroud, AI_Mgr::NPCType::DeathShroud>,
+            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{20, 48, 20}}}};
+        const ClassInfo later_TheHandAI{
+            "TheHandAI",
+            &ai_manager,
+            construct_npc<TheHandAI, AI_Mgr::NPCType::TheHand>,
+            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{4, 4, 5}}}};
+        const ClassInfo skull_projectile{"CSkullProjectile", &base, construct<CSkullProjectile>, {}};
         const ClassInfo campaign_Thief{
             "Thief",
             &ai_manager,
@@ -648,6 +671,24 @@ namespace OpenBlood2
              {"PanSkyScaleZ", 10.0f},
              {"Gravity", DVector{0, -2000, 0}},
              {"SoftSky", std::string("textures\\environmentmaps\\clouds\\clouds"), true, 499}}};
+        const ClassInfo particle_system{"ParticleSystem",
+                                        &client_sfx,
+                                        construct<ParticleSystem>,
+                                        {{"Static", true},
+                                         {"ParticleFlags", std::int32_t(0)},
+                                         {"BurstWait", 0.f},
+                                         {"ParticlesPerSecond", 0.f},
+                                         {"EmissionRadius", 0.f},
+                                         {"MinimumVelocity", 0.f},
+                                         {"MaximumVelocity", 0.f},
+                                         {"VelocityOffset", 0.f},
+                                         {"ParticleLifetime", 5.f},
+                                         {"ParticleRadius", 1000.f},
+                                         {"Gravity", -500.f},
+                                         {"RotationVelocity", 0.f},
+                                         {"TextureName", std::string("SpecialFX\\ParticleTextures\\particle.dtx")},
+                                         {"Color1", DVector{255, 255, 255}},
+                                         {"Color2", DVector{255, 0, 0}}}};
         const ClassInfo polygrid{"PolyGrid",
                                  &client_sfx,
                                  construct<PolyGrid>,
@@ -665,6 +706,7 @@ namespace OpenBlood2
                                   {"YPan", 10.f},
                                   {"Alpha", .7f},
                                   {"NumPolies", std::int32_t(160)},
+                                  {"PlasmaInfo", std::int32_t(0), false}, // Original editor group, not read.
                                   {"PlasmaType", std::int32_t(1)},
                                   {"Ring1Rate", std::int32_t(50)},
                                   {"Ring2Rate", std::int32_t(10)},
@@ -758,6 +800,7 @@ namespace OpenBlood2
         const ClassInfo campaign_NapalmCannonPU{"NapalmCannonPU", &weapon_pickup, construct<NapalmCannonPU>, {}};
         const ClassInfo campaign_DeathRayPU{"DeathRayPU", &weapon_pickup, construct<DeathRayPU>, {}};
         const ClassInfo campaign_TimeBombPU{"TimeBombPU", &item_weapon, construct<TimeBombPU>, {}};
+        const ClassInfo minigun_pickup{"MiniGunPU", &weapon_pickup, construct<MiniGunPU>, {}};
         const ClassInfo sniper_pickup{"SniperRiflePU", &weapon_pickup, construct<SniperRiflePU>, {}};
         const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}};
         const ClassInfo powerup_pickup{"PowerupPickup", &pickup, construct<PowerupPickup>, {}};
@@ -1078,13 +1121,16 @@ namespace OpenBlood2
                objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(exit_hint) && objects.register_class(character) &&
-               objects.register_class(ai_manager) && objects.register_class(campaign_Thief) &&
-               objects.register_class(campaign_Naga) && objects.register_class(campaign_ZealotAI) &&
-               objects.register_class(cultist) && objects.register_class(civilian) && objects.register_class(gideon) &&
-               objects.register_class(fanatic) && objects.register_class(prophet) &&
-               objects.register_class(bone_leech) && objects.register_class(drudge_lord) &&
-               objects.register_class(soul_drudge) && objects.register_class(shikari) &&
-               objects.register_class(mad_scientist) && objects.register_class(player) &&
+               objects.register_class(ai_manager) && objects.register_class(later_Behemoth) &&
+               objects.register_class(later_DrudgePriest) && objects.register_class(later_DeathShroud) &&
+               objects.register_class(later_TheHandAI) && objects.register_class(skull_projectile) &&
+               objects.register_class(campaign_Thief) && objects.register_class(campaign_Naga) &&
+               objects.register_class(campaign_ZealotAI) && objects.register_class(cultist) &&
+               objects.register_class(civilian) && objects.register_class(gideon) && objects.register_class(fanatic) &&
+               objects.register_class(prophet) && objects.register_class(bone_leech) &&
+               objects.register_class(drudge_lord) && objects.register_class(soul_drudge) &&
+               objects.register_class(shikari) && objects.register_class(mad_scientist) &&
+               objects.register_class(player) && objects.register_class(particle_system) &&
                objects.register_class(polygrid) && objects.register_class(volume) && objects.register_class(water) &&
                objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
                objects.register_class(conveyor) && objects.register_class(damage) && objects.register_class(freefall) &&
@@ -1102,24 +1148,24 @@ namespace OpenBlood2
                objects.register_class(mac10_pickup) && objects.register_class(campaign_HowitzerPU) &&
                objects.register_class(campaign_NapalmCannonPU) && objects.register_class(campaign_DeathRayPU) &&
                objects.register_class(campaign_TimeBombPU) && objects.register_class(sniper_pickup) &&
-               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
-               objects.register_class(health_base) && objects.register_class(armor_base) &&
-               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
-               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
-               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
-               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
-               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
-               objects.register_class(enhancement_base) && objects.register_class(anger_pickup) &&
-               objects.register_class(stealth_pickup) && objects.register_class(willpower_pickup) &&
-               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
-               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
-               objects.register_class(conversation_trigger) && objects.register_class(big_trigger) &&
-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
-               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
-               objects.register_class(world_debris) && objects.register_class(hand_model) &&
-               objects.register_class(gib) && objects.register_class(corpse) && objects.register_class(proximity) &&
-               objects.register_class(remote) && objects.register_class(grenade) &&
+               objects.register_class(minigun_pickup) && objects.register_class(ammo_pickup) &&
+               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
+               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
+               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
+               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
+               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
+               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
+               objects.register_class(megahealth_pickup) && objects.register_class(enhancement_base) &&
+               objects.register_class(anger_pickup) && objects.register_class(stealth_pickup) &&
+               objects.register_class(willpower_pickup) && objects.register_class(ward_pickup) &&
+               objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
+               objects.register_class(objectives_trigger) && objects.register_class(conversation_trigger) &&
+               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+               objects.register_class(door) && objects.register_class(rotating_door) &&
+               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
+               objects.register_class(rotating_brush) && objects.register_class(world_debris) &&
+               objects.register_class(hand_model) && objects.register_class(gib) && objects.register_class(corpse) &&
+               objects.register_class(proximity) && objects.register_class(remote) && objects.register_class(grenade) &&
                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
                objects.register_class(tesla_projectile) && objects.register_class(tesla_bolt) &&
                objects.register_class(tesla_ball) && objects.register_class(napalm_projectile) &&

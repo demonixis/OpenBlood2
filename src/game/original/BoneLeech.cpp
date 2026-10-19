@@ -164,10 +164,12 @@ bool BoneLeech::AI_STATE_EnemyAttach()
         case 1:
         {
             if (s->SetModelFilenames(m_hObject,
-                                     npc_type == NPCType::Thief ? "models\\enemies\\Thief_pv.abc"
-                                                                : "models\\enemies\\boneleech_pv.abc",
-                                     npc_type == NPCType::Thief ? "skins\\enemies\\Thief_pv.dtx"
-                                                                : "skins\\enemies\\boneleech_pv.dtx") != DE_OK)
+                                     npc_type == NPCType::TheHand ? "models\\enemies\\TheHand_pv.abc"
+                                     : npc_type == NPCType::Thief ? "models\\enemies\\Thief_pv.abc"
+                                                                  : "models\\enemies\\boneleech_pv.abc",
+                                     npc_type == NPCType::TheHand ? "skins\\enemies\\TheHand_pv.dtx"
+                                     : npc_type == NPCType::Thief ? "skins\\enemies\\Thief_pv.dtx"
+                                                                  : "skins\\enemies\\boneleech_pv.dtx") != DE_OK)
                 return RuntimeFailure("BoneLeech view model unavailable");
             s->SetObjectFlags(m_hObject,
                               (world_flags | FLAG_REALLYCLOSE) & ~(FLAG_GRAVITY | FLAG_SOLID | FLAG_TOUCH_NOTIFY));
@@ -200,12 +202,14 @@ bool BoneLeech::AI_STATE_EnemyAttach()
                 const auto sent = s->EndMessage(msg);
                 if (written != DE_OK || sent != DE_OK)
                     return RuntimeFailure("BoneLeech damage delivery failed");
-                if (!s->RandomInt(1, npc_type == NPCType::Thief ? 3 : 6, sound))
+                if (npc_type != NPCType::TheHand && !s->RandomInt(1, npc_type == NPCType::Thief ? 3 : 6, sound))
                     return RuntimeFailure("BoneLeech sound random service unavailable");
                 if (s->IsObjectAlive(attached))
                     AnimSound()->PlaySound(attached,
-                                           std::string(npc_type == NPCType::Thief ? "th_bite_" : "bl_burrow_") +
-                                               std::to_string(sound) + ".wav",
+                                           npc_type == NPCType::TheHand
+                                               ? std::string("choke.wav")
+                                               : std::string(npc_type == NPCType::Thief ? "th_bite_" : "bl_burrow_") +
+                                                     std::to_string(sound) + ".wav",
                                            200, 100);
                 last_damage = s->GetTime();
                 ++damage_ticks;
@@ -215,10 +219,12 @@ bool BoneLeech::AI_STATE_EnemyAttach()
         {
             // Restore the original model before resuming any cached world-animation indices.
             if (s->SetModelFilenames(m_hObject,
-                                     npc_type == NPCType::Thief ? "models\\enemies\\Thief.abc"
-                                                                : "models\\enemies\\boneleech.abc",
-                                     npc_type == NPCType::Thief ? "skins\\enemies\\Thief.dtx"
-                                                                : "skins\\enemies\\boneleech.dtx") != DE_OK)
+                                     npc_type == NPCType::TheHand ? "models\\enemies\\TheHand.abc"
+                                     : npc_type == NPCType::Thief ? "models\\enemies\\Thief.abc"
+                                                                  : "models\\enemies\\boneleech.abc",
+                                     npc_type == NPCType::TheHand ? "skins\\enemies\\TheHand.dtx"
+                                     : npc_type == NPCType::Thief ? "skins\\enemies\\Thief.dtx"
+                                                                  : "skins\\enemies\\boneleech.dtx") != DE_OK)
                 return RuntimeFailure("BoneLeech world model restore failed");
             s->SetObjectFlags(m_hObject, world_flags & ~(FLAG_REALLYCLOSE | FLAG_SOLID | FLAG_GRAVITY));
             if (world_dims.x > 0)

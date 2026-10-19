@@ -133,3 +133,20 @@ class CNapalmFireball final : public CProjectile
     void AddExplosion(DVector, DVector) override;
 };
 void PublishCampaignExplosion(HOBJECT, DVector, DVector, unsigned, const char* = nullptr, float = 1000);
+
+class CSkullProjectile final : public CProjectile
+{
+  public:
+    CSkullProjectile();
+    ~CSkullProjectile() override;
+    void HandleContact(const OpenBlood2::SegmentHit&) override;
+    HOBJECT tracked = nullptr; // Reacquired from checked destructible identities on every update.
+    OpenBlood2::SoundId loop = 0;
+    std::string sound_error;
+    unsigned contact_damage = 0;
+
+  protected:
+    bool InitialUpdate() override;
+    bool Update() override;
+    void AddExplosion(DVector, DVector) override;
+};

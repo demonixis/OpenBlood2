@@ -4,6 +4,7 @@
 #include "game/original/ClientParticleStreamSFX.h"
 #include "game/original/DestructableModel.h"
 #include "game/original/DetailSprite.h"
+#include "game/original/ParticleSystem.h"
 #include "game/original/SkyObjects.h"
 #include "game/original/Sound.h"
 #include "game/server_adapter.h"
@@ -90,7 +91,9 @@ namespace OpenBlood2
             if (editor_only_world_class(source.class_name))
             {
                 entry.state = EntryState::EditorOnly;
-                entry.detail = "Original CF_NORUNTIME; source properties retained";
+                entry.detail = source.invalid_editor_position ? "Original CF_NORUNTIME; invalid editor light position "
+                                                                "retained, excluded from runtime lighting"
+                                                              : "Original CF_NORUNTIME; source properties retained";
             }
             else if (absent_original_world_class(source.class_name))
             {
@@ -166,6 +169,12 @@ namespace OpenBlood2
                     entry.state = EntryState::Failed;
                     entry.detail = sprite->error;
                 }
+                else if (const auto* system = r ? dynamic_cast<const ParticleSystem*>(r->game.get()) : nullptr;
+                         system && !system->error.empty())
+                {
+                    entry.state = EntryState::Failed;
+                    entry.detail = system->error;
+                }
                 else if (const auto* stream =
                              r ? dynamic_cast<const CClientParticleStreamSFX*>(r->game.get()) : nullptr;
                          stream && !stream->error.empty())
@@ -223,6 +232,51 @@ namespace OpenBlood2
             else
             {
                 entry.detail = "Required original class is not registered";
+            }
+            if (entry.state == EntryState::Failed)
+            {
+                struct MissingAsset
+                {
+                    const char* type;
+                    const char* property;
+                    const char* path;
+                    const char* failure;
+                };
+                // Authored retail typos, checked by exact path and failure category. Other missing assets fail.
+                static constexpr MissingAsset missing[] = {
+                    {"CDestructableModel", "InitFilename", "models\\worldobjects\\coffeemachine.abc\r\n",
+                     "Model clip-zero dimensions unavailable"},
+                    {"CDestructableModel", "InitFilename", "models\\worldobects\\ceilingfan1.abc",
+                     "Model clip-zero dimensions unavailable"},
+                    {"CDestructableModel", "InitFilename", "models\\worldobjects\\chairexec.abcm",
+                     "Model clip-zero dimensions unavailable"},
+                    {"CClientParticleStreamSFX", "ParticleFile", "SpriteTextures\\singlemus02.dtxr",
+                     "Missing exact-path resource"},
+                    {"Sound", "Filename", "sounds\\hum.wav", "Missing or oversized sound resource"},
+                    {"ParticleSystem", "TextureName", "Sprite Textures\\lightn32.dtx", "Missing exact-path resource"},
+                    {"CDestructableModel", "InitFilename", "models\\worldobjects\\woodcratesmalll.abc",
+                     "Model clip-zero dimensions unavailable"},
+                    {"CDestructableModel", "InitFilename", "models\\worldobjects\\noparking.abc\r\n",
+                     "Model clip-zero dimensions unavailable"},
+                    {"CDestructableModel", "InitFilename", "models\\worldobjects\\antennabig.abc\r\n",
+                     "Model clip-zero dimensions unavailable"},
+                    {"CDestructableModel", "InitFilename", "models\\worldobjects\\garbagebag.abc\r\n\r\n",
+                     "Model clip-zero dimensions unavailable"},
+                    {"CDestructableModel", "InitFilename", "models\\worldobjects\\garbagebag.abc\r\n",
+                     "Model clip-zero dimensions unavailable"},
+                    {"Sound", "Filename", "sounds\\ambient\\sewage1", "Missing or oversized sound resource"},
+                    {"CClientParticleStreamSFX", "ParticleFile", "", "Missing exact-path resource"},
+                    {"CClientParticleStreamSFX", "ParticleFile", "spritetextures\\particlesmoke.spr",
+                     "Missing exact-path resource"}};
+                for (const auto& row : missing)
+                    if (source.class_name == row.type && entry.detail.starts_with(row.failure))
+                        if (const auto* prop = source.find(row.property))
+                            if (const auto* path = std::get_if<std::string>(prop);
+                                path && *path == row.path && !resources.find(*path))
+                            {
+                                entry.state = EntryState::MissingResource;
+                                entry.detail = "Missing exact authored resource: " + *path + "; no path alias";
+                            }
             }
             entries.push_back(std::move(entry));
         }

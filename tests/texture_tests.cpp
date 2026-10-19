@@ -192,6 +192,15 @@ namespace
         CHECK(mesh.vertices[0].uv[0] == 2 && mesh.vertices[0].uv[1] == -1);
         CHECK(mesh.vertices[3].uv == mesh.vertices[0].uv && mesh.vertices[3].position.x == -492);
         CHECK(mesh.ranges[0].batches.size() == 1 && mesh.ranges[1].batches[0].material == 1);
+        world.models[0].textures[0] = "Default";
+        world.models[0].surfaces[0].flags = 1u << 4;
+        CHECK(mesh.build(world, error, &resources) && mesh.sky == 1 && mesh.materials.size() == 2);
+        CHECK(mesh.ranges[0].batches[0].sky_portal && mesh.ranges[0].batches[0].material == 0);
+        for (const auto& material : mesh.materials)
+            CHECK(material.error.empty());
+        world.models[0].surfaces[0].flags = 0;
+        CHECK(mesh.build(world, error, &resources) &&
+              !mesh.materials[1].error.empty()); // Same path on an ordinary face still fails.
         world.models[0].textures[0] = "ANIMATED.SPR";
         CHECK(mesh.build(world, error, &resources));
         const auto animation = mesh.ranges[0].batches[0].material;

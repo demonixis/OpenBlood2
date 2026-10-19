@@ -115,11 +115,14 @@ namespace OpenBlood2
             if (!game.objects.get(instance.owner) || game.objects.get(instance.owner)->life != Life::Alive)
                 continue;
             const auto& fx = instance.effect;
+            if (fx.settings.system && !fx.system_visible)
+                continue;
             for (unsigned i = 0; i < fx.particles.size(); ++i)
             {
                 const auto& p = fx.particles[i];
-                if (!scene.add_particle(fx.texture, vector_add(fx.position, p.position), fx.settings.radius / 640.f,
-                                        p.color, fx.settings.alpha, fx.id, i, game.resources, error))
+                if (!scene.add_particle(fx.texture,
+                                        vector_add(fx.position, rotate_vector(fx.system_rotation, p.position)),
+                                        fx.settings.radius / 640.f, p.color, fx.alpha, fx.id, i, game.resources, error))
                     return false;
                 scene.entries.back().particle_system = 0;
                 scene.entries.back().stream_system = fx.id;

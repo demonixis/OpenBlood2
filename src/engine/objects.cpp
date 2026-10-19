@@ -401,8 +401,8 @@ namespace OpenBlood2
             // case-insensitive); the others stay unbound. Keep the candidate count inspectable.
             if (world)
                 for (std::size_t i = 0; i < world->models.size(); ++i)
-                    if (const auto& candidate = world->models[i]; !CaseLess{}(candidate.name, state.m_Filename) &&
-                                                                  !CaseLess{}(state.m_Filename, candidate.name))
+                    if (const auto& candidate = world->models[i];
+                        !CaseLess{}(candidate.name, state.m_Filename) && !CaseLess{}(state.m_Filename, candidate.name))
                     {
                         if (!model)
                         {
@@ -412,8 +412,7 @@ namespace OpenBlood2
                         ++object->world_model_candidates;
                     }
             auto shape = std::make_shared<ContainerShape>();
-            const bool polygon_body = state.m_ObjectType == OT_WORLDMODEL && (state.m_Flags & FLAG_GRAVITY) &&
-                                      !(state.m_Flags & FLAG_BOXPHYSICS);
+            const bool polygon_body = state.m_ObjectType == OT_WORLDMODEL && !(state.m_Flags & FLAG_BOXPHYSICS);
             if (!model || !error.empty() || !shape->build(*model, state.m_Rotation, error, polygon_body))
             {
                 contexts_.pop_back();

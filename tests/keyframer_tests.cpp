@@ -359,7 +359,7 @@ namespace
         std::cout << "worlds=" << worlds << " controllers=" << controllers << " source_keys=" << key_count
                   << " copied=" << copied << " empty_paths=" << empty << " missing_targets=" << missing
                   << " malformed=" << failed << '\n';
-        CHECK(worlds == 57 && controllers == 94 && key_count == 383 && copied == 375 && !empty && missing == 44 &&
+        CHECK(worlds == 58 && controllers == 95 && key_count == 386 && copied == 378 && !empty && missing == 45 &&
               !failed);
         for (int cycle = 0; cycle < 2; ++cycle)
         {

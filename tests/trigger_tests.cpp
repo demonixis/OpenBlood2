@@ -112,6 +112,11 @@ namespace
         CHECK(g.step(.2) && !t->active && send(g, h, "RESET") && !t->active); // ResetTime=0 is one-shot.
         CHECK(!trigger(g, {{"Dims", DVector{-1, 1, 1}}}));
         CHECK(!trigger(g, {{"MessageDelay", std::numeric_limits<float>::infinity()}}));
+        auto distant = trigger(g, {{"ResetTime", 1e14f}});
+        CHECK(distant && send(g, distant, "TRIGGER", sender));
+        CHECK(g.objects.get(distant)->scheduled && g.objects.get(distant)->due > 1e13);
+        CHECK(g.step(.2) && !object<Trigger>(g, distant)->active);
+        CHECK(!trigger(g, {{"ResetTime", std::numeric_limits<float>::infinity()}}));
         auto negative = trigger(g, {{"ResetTime", -1.0f}});
         CHECK(negative && send(g, negative, "TRIGGER", sender) && !g.objects.get(negative)->scheduled);
         CHECK(g.step(.1) && !object<Trigger>(g, negative)->active);
@@ -524,8 +529,8 @@ namespace
                       << " filtered\n";
         for (const auto& [reason, count] : failures)
             std::cout << count << " rejected: " << reason << '\n';
-        CHECK(worlds == 57 && unreadable == 1 && found["Trigger"] == 603 && created["Trigger"] == 601 &&
-              found["BigTrigger"] == 89 && created["BigTrigger"] == 88 && created["ToggleTrigger"] == 3 &&
+        CHECK(worlds == 58 && unreadable == 0 && found["Trigger"] == 623 && created["Trigger"] == 621 &&
+              found["BigTrigger"] == 91 && created["BigTrigger"] == 90 && created["ToggleTrigger"] == 4 &&
               created["KeyPickup"] == 13 && filtered["Trigger"] == 2 && filtered["BigTrigger"] == 1);
         CHECK(failures.empty()); // Retired TypeAction rows are created.
         CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);

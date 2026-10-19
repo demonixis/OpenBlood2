@@ -35,5 +35,5 @@ class CPolyGridFX
     double last_time = 0;
     bool visible = false;
     std::uint64_t id = 0, updates = 0;
-    std::string error;
+    std::string error, texture_error;
 };

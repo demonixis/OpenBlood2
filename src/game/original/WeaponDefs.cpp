@@ -2,6 +2,374 @@
 namespace
 {
     constexpr WeaponData definitions[] = {
+        // Original Shared/WeaponDefs.cpp: MINIGUN
+
+        {
+            "Models\\Weapons\\Minigun_pv.abc",              // Model
+            "Models\\Weapons\\Minigun_pv.abc",              // Model
+            "Skins\\Weapons\\C_Minigun_pv_t.dtx",           // Skin
+            "Models\\Powerups\\Minigun_pu.abc",             // 3rd person model
+            "Skins\\Powerups\\Minigun_pu.dtx",              // 3rd person skin
+            WEAP_MINIGUN,                                   // Type
+            TYPE_AUTORIFLE,                                 // Fire type
+            AMMO_BULLET,                                    // Ammo type
+            1,                                              // Ammo Use
+            1,                                              // Alt Ammo Use
+            8.0f,                                           // Min Damage
+            16.0f,                                          // Max Damage
+            8.0f,                                           // Min Alt damage
+            16.0f,                                          // Max Alt damage
+            0.0666667f,                                     // Reload time
+            0.0666667f,                                     // Alt Reload time
+            {150.0f, 75.0f},                                // Spread
+            {150.0f, 75.0f},                                // Alt Spread
+            0.0f,                                           // Projectile Velocity
+            0.0f,                                           // Alt Projectile Velocity
+            3500.0f,                                        // Range
+            3500.0f,                                        // Alt Range
+            4,                                              // Shots per fire
+            4,                                              // Alt Shots per fire
+            5,                                              // Strength or Magic required
+            0,                                              // Two-handed Strength or Magic required
+            0,                                              // Damage Radius (projectiles)
+            0,                                              // Alt Damage Radius (projectiles)
+            DFALSE,                                         // Alt fire zoom
+            DFALSE,                                         // Semi-auto
+            "",                                             // Fire sound
+            "",                                             // Fire sound
+            "",                                             // Empty weapon sound
+            "",                                             // Alt Empty weapon sound
+            nullptr,                                        // Projectile class
+            nullptr,                                        // Alt Projectile class
+            125,                                            // Muzzle Flash radius
+            {1.0f, 0.68f, 0.35f},                           // Muzzle Flash color
+            "Vulcan Cannon",                                // Name
+            IDS_WEAPON_MINIGUN,                             // Name ID (resource)
+            "Sprites\\minigun.spr",                         // flash sprite name
+            "Sprites\\minigun.spr",                         // alt flash Sprite name
+            0.05f,                                          // Flash duration
+            0.225f,                                         // Flash scale
+            {0.0f, 0.0f, 0.0f},                             // 3rd person gun offset
+            {0.6f, -1.3f, 2.0f},                            // Gun Offset
+            {0.0f, 0.275f, 1.0f},                           // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                          // Recoil
+            {0.0f, 0.0f, 0.1f},                             // Flash position
+            0.625f,                                         // Eject interval
+            0.0f,                                           // View kick
+            DFALSE,                                         // View kick is Cumulative
+            DTRUE,                                          // Animation looping
+            DTRUE,                                          // Alt anim looping
+            "interface\\statusbar\\weapons\\minigun.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\minigun_h.pcx", // Highlighted icon for status bar
+        },
+
+        // Original Shared/WeaponDefs.cpp: BEHEMOTH_CLAW
+
+        {
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",  // Skin
+            nullptr,                            // Model
+            nullptr,                            // Skin
+            WEAP_BEHEMOTH_CLAW,                 // Type
+            TYPE_MELEE,                         // Fire type
+            AMMO_NONE,                          // Ammo type
+            1,                                  // Ammo Use
+            1,                                  // Alt Ammo Use
+            100.0f,                             // Min Damage
+            120.0f,                             // Max Damage
+            100.0f,                             // Min Alt damage
+            120.0f,                             // Max Alt damage
+            1.00f,                              // Reload time
+            0.0f,                               // Alt reload time
+            {0.0f, 0.0f},                       // Spread
+            {0.0f, 0.0f},                       // Alt Spread
+            0.0f,                               // Projectile Velocity
+            0.0f,                               // Alt Projectile Velocity
+            100.0f,                             // Range
+            100.0f,                             // Alt Range
+            1,                                  // Shots per fire
+            1,                                  // Alt Shots per fire
+            1,                                  // Strength or Magic required
+            0,                                  // Two-handed Strength or Magic required
+            0,                                  // Damage Radius (projectiles)
+            0,                                  // Alt Damage Radius (projectiles)
+            DFALSE,                             // Alt fire zoom
+            DFALSE,                             // Semi-auto
+            "Sounds\\Weapons\\Knife\\fire.wav", // Fire sound
+            "Sounds\\Weapons\\Knife\\alt.wav",  // Alt Fire sound
+            "",                                 // Empty weapon sound
+            "",                                 // Alt Empty weapon sound
+            nullptr,                            // Projectile class
+            nullptr,                            // Alt Projectile class
+            0,                                  // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Flash color
+            "Behemoth_Claw",                    // Name
+            0,                                  // Name ID (resource)
+            "",                                 // flash sprite name
+            "",                                 // alt flash Sprite name
+            0.25f,                              // Flash duration
+            0.10f,                              // Flash scale
+            {0.0f, 0.0f, 0.0f},                 // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},              // Recoil
+            {0.0f, 0.0f, 0.1f},                 // Flash position
+            0.625f,                             // Eject interval
+            0.0f,                               // View kick
+            DFALSE,                             // View kick is Cumulative
+            DFALSE,                             // Animation looping
+            DFALSE,                             // Alt anim looping
+            nullptr,                            // Icon for status bar
+            nullptr,                            // Highlighted icon for status bar
+        },
+
+        // Original Shared/WeaponDefs.cpp: DRUDGE_LIGHTNING
+
+        {
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",  // Skin
+            nullptr,                            // Model
+            nullptr,                            // Skin
+            WEAP_DRUDGE_LIGHTNING,              // Type
+            TYPE_RIFLE,                         // Fire type
+            AMMO_NONE,                          // Ammo type
+            1,                                  // Ammo Use
+            1,                                  // Alt Ammo Use
+            20.0f,                              // Min Damage
+            40.0f,                              // Max Damage
+            20.0f,                              // Min Alt damage
+            40.0f,                              // Max Alt damage
+            0.50f,                              // Reload time
+            0.50f,                              // Alt reload time
+            {0.0f, 0.0f},                       // Spread
+            {0.0f, 0.0f},                       // Alt Spread
+            500.0f,                             // Projectile Velocity
+            500.0f,                             // Alt Projectile Velocity
+            3000.0f,                            // Range
+            3000.0f,                            // Alt Range
+            1,                                  // Shots per fire
+            1,                                  // Alt Shots per fire
+            1,                                  // Strength or Magic required
+            0,                                  // Two-handed Strength or Magic required
+            200,                                // Damage Radius (projectiles)
+            200,                                // Alt Damage Radius (projectiles)
+            DFALSE,                             // Alt fire zoom
+            DFALSE,                             // Semi-auto
+            "Sounds\\Weapons\\Tesla\\fire.wav", // Fire sound
+            "Sounds\\Weapons\\Tesla\\fire.wav", // Alt Fire sound
+            "",                                 // Empty weapon sound
+            "",                                 // Alt Empty weapon sound
+            nullptr,                            // Projectile class
+            nullptr,                            // Alt Projectile class
+            20,                                 // Muzzle Flash radius
+            {0.8f, 0.3f, 0.0f},                 // Muzzle Flash color
+            "Lightning",                        // Name
+            0,                                  // Name ID (resource)
+            "",                                 // flash sprite name
+            "",                                 // alt flash Sprite name
+            0.25f,                              // Flash duration
+            0.40f,                              // Flash scale
+            {0.0f, 0.0f, 0.0f},                 // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},              // Recoil
+            {0.0f, 0.0f, 0.1f},                 // Flash position
+            0.625f,                             // Eject interval
+            0.0f,                               // View kick
+            DFALSE,                             // View kick is Cumulative
+            DFALSE,                             // Animation looping
+            DFALSE,                             // Alt anim looping
+            nullptr,                            // Icon for status bar
+            nullptr,                            // Highlighted icon for status bar
+        },
+
+        // Original Shared/WeaponDefs.cpp: HAND_SQUEEZE
+
+        {
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",  // Skin
+            nullptr,                            // Model
+            nullptr,                            // Skin
+            WEAP_HAND_SQUEEZE,                  // Type
+            TYPE_MELEE,                         // Fire type
+            AMMO_NONE,                          // Ammo type
+            0,                                  // Ammo Use
+            0,                                  // Alt Ammo Use
+            4.0f,                               // Min Damage
+            8.0f,                               // Max Damage
+            4.0f,                               // Min Alt damage
+            8.0f,                               // Max Alt damage
+            1.00f,                              // Reload time
+            0.0f,                               // Alt reload time
+            {0.0f, 0.0f},                       // Spread
+            {0.0f, 0.0f},                       // Alt Spread
+            0.0f,                               // Projectile Velocity
+            0.0f,                               // Alt Projectile Velocity
+            100.0f,                             // Range
+            100.0f,                             // Alt Range
+            1,                                  // Shots per fire
+            1,                                  // Alt Shots per fire
+            1,                                  // Strength or Magic required
+            0,                                  // Two-handed Strength or Magic required
+            0,                                  // Damage Radius (projectiles)
+            0,                                  // Alt Damage Radius (projectiles)
+            DFALSE,                             // Alt fire zoom
+            DFALSE,                             // Semi-auto
+            "Sounds\\Weapons\\Knife\\fire.wav", // Fire sound
+            "Sounds\\Weapons\\Knife\\alt.wav",  // Alt Fire sound
+            "",                                 // Empty weapon sound
+            "",                                 // Alt Empty weapon sound
+            nullptr,                            // Projectile class
+            nullptr,                            // Alt Projectile class
+            0,                                  // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Flash color
+            "Hand_Squeeze",                     // Name
+            0,                                  // Name ID (resource)
+            "",                                 // flash sprite name
+            "",                                 // alt flash Sprite name
+            0.25f,                              // Flash duration
+            0.10f,                              // Flash scale
+            {0.0f, 0.0f, 0.0f},                 // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},              // Recoil
+            {0.0f, 0.0f, 0.1f},                 // Flash position
+            0.625f,                             // Eject interval
+            0.0f,                               // View kick
+            DFALSE,                             // View kick is Cumulative
+            DFALSE,                             // Animation looping
+            DFALSE,                             // Alt anim looping
+            nullptr,                            // Icon for status bar
+            nullptr,                            // Highlighted icon for status bar
+        },
+
+        // Original Shared/WeaponDefs.cpp: BEHEMOTH_SHOCKWAVE
+
+        {
+            "Models\\Weapons\\knifec_pv.abc",  // Model
+            "Models\\Weapons\\knifec_pv.abc",  // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx", // Skin
+            nullptr,                           // Model
+            nullptr,                           // Skin
+            WEAP_BEHEMOTH_SHOCKWAVE,           // Type
+            TYPE_MELEE,                        // Fire type
+            AMMO_NONE,                         // Ammo type
+            1,                                 // Ammo Use
+            1,                                 // Alt Ammo Use
+            20.0f,                             // Min Damage
+            40.0f,                             // Max Damage
+            20.0f,                             // Min Alt damage
+            40.0f,                             // Max Alt damage
+            0.50f,                             // Reload time
+            0.50f,                             // Alt reload time
+            {0.0f, 0.0f},                      // Spread
+            {0.0f, 0.0f},                      // Alt Spread
+            0.0f,                              // Projectile Velocity
+            0.0f,                              // Alt Projectile Velocity
+            800.0f,                            // Range
+            800.0f,                            // Alt Range
+            1,                                 // Shots per fire
+            1,                                 // Alt Shots per fire
+            1,                                 // Strength or Magic required
+            0,                                 // Two-handed Strength or Magic required
+            0,                                 // Damage Radius (projectiles)
+            0,                                 // Alt Damage Radius (projectiles)
+            DFALSE,                            // Alt fire zoom
+            DFALSE,                            // Semi-auto
+            "",                                // Fire sound
+            "",                                // Alt Fire sound
+            "",                                // Empty weapon sound
+            "",                                // Alt Empty weapon sound
+            "CBehemothShockwaveProjectile",    // Projectile class
+            "CBehemothShockwaveProjectile",    // Alt Projectile class
+            0,                                 // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                // Muzzle Flash color
+            "Behemoth_Shockwave",              // Name
+            0,                                 // Name ID (resource)
+            "",                                // flash sprite name
+            "",                                // alt flash Sprite name
+            0.25f,                             // Flash duration
+            0.10f,                             // Flash scale
+            {0.0f, 0.0f, 0.0f},                // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},               // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},             // Recoil
+            {0.0f, 0.0f, 0.1f},                // Flash position
+            0.625f,                            // Eject interval
+            0.0f,                              // View kick
+            DFALSE,                            // View kick is Cumulative
+            DFALSE,                            // Animation looping
+            DFALSE,                            // Alt anim looping
+            nullptr,                           // Icon for status bar
+            nullptr,                           // Highlighted icon for status bar
+        },
+
+        // Original Shared/WeaponDefs.cpp: SKULL
+
+        {
+            "Models\\Weapons\\knifec_pv.abc",  // Model
+            "Models\\Weapons\\knifec_pv.abc",  // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx", // Skin
+            nullptr,                           // Model
+            nullptr,                           // Skin
+            WEAP_SKULL,                        // Type
+            TYPE_MELEE,                        // Fire type
+            AMMO_NONE,                         // Ammo type
+            1,                                 // Ammo Use
+            1,                                 // Alt Ammo Use
+            20.0f,                             // Min Damage
+            25.0f,                             // Max Damage
+            10.0f,                             // Min Alt damage
+            15.0f,                             // Max Alt damage
+            1.0f,                              // Reload time
+            5.0f,                              // Alt reload time
+            {0.0f, 0.0f},                      // Spread
+            {0.0f, 0.0f},                      // Alt Spread
+            500.0f,                            // Projectile Velocity
+            500.0f,                            // Alt Projectile Velocity
+            3500.0f,                           // Range
+            3500.0f,                           // Alt Range
+            1,                                 // Shots per fire
+            1,                                 // Alt Shots per fire
+            1,                                 // Strength or Magic required
+            0,                                 // Two-handed Strength or Magic required
+            0,                                 // Damage Radius (projectiles)
+            0,                                 // Alt Damage Radius (projectiles)
+            DFALSE,                            // Alt fire zoom
+            DFALSE,                            // Semi-auto
+            "",                                // Fire sound
+            "",                                // Alt Fire sound
+                                               //		"Sounds\\Weapons\\orb\\fire.wav",	// Fire sound
+                                               //		"Sounds\\Weapons\\orb\\alt.wav",	// Alt Fire sound
+            "",                                // Empty weapon sound
+            "",                                // Alt Empty weapon sound
+            "CSkullProjectile",                // Projectile class
+            "CSkullProjectile",                // Alt Projectile class
+            0,                                 // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                // Muzzle Flash color
+            "The Skull",                       // Name
+            0,                                 // Name ID (resource)
+            "",                                // flash sprite name
+            "",                                // alt flash Sprite name
+            0.0f,                              // Flash duration
+            0.0f,                              // Flash scale
+            {0.0f, 0.0f, 0.0f},                // 3rd person gun offset
+            {0.0f, -0.5f, 2.4f},               // Gun Offset
+            {0.0f, 0.0f, 0.0f},                // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},             // Recoil
+            {0.0f, -5.0f, 20.0f},              // Flash position
+            0.625f,                            // Eject interval
+            0.0f,                              // View kick
+            DFALSE,                            // View kick is Cumulative
+            DFALSE,                            // Animation looping
+            DFALSE,                            // Alt anim looping
+            nullptr,                           // Icon for status bar
+            nullptr,                           // Highlighted icon for status bar
+        },
+
         // Original Shared/WeaponDefs.cpp: HOWITZER
         {
             "Models\\Weapons\\Howitzer_pv.abc",              // Model

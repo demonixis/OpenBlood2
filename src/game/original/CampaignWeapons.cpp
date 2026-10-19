@@ -106,3 +106,19 @@ void CDeathRay::BeginFire(bool alternate)
             s->PublishObjectParticles(h, 39, effect_error);
     }
 }
+
+FireResult CDrudgeLightning::FireVector()
+{
+    auto* s = g_pServerDE;
+    SegmentHit hit;
+    const auto q = s->IntersectSegment(last_shot.request.position, last_shot.end, nullptr, hit, false,
+                                       SegmentObjects::SolidOnly, SegmentFilter::None, SegmentStart::SkipInterior);
+    if (q == SegmentResult::Hit || q == SegmentResult::Miss)
+    {
+        lightning_end = q == SegmentResult::Hit ? hit.point : last_shot.end;
+        effect_error = "SFX_LIGHTNING boxed/thin/high-segment renderer unavailable";
+    }
+    else
+        effect_error = "Drudge lightning visual ray unavailable";
+    return CWeapon::FireVector(); // The source's separate damage ray keeps the ordinary filters.
+}

@@ -285,8 +285,8 @@ namespace
                   << " decoded=" << sounds << " missing=" << missing << '\n';
         for (const auto& [id, n] : types)
             std::cout << "type=" << id << " count=" << n << '\n';
-        CHECK(worlds == 57 && count == 43 && accepted == 43 && rejected == 0 && sounds == 19 && missing == 24);
-        const std::map<DDWORD, unsigned> expected{{1, 3}, {2, 10}, {3, 19}, {6, 7}, {8, 3}, {24, 1}};
+        CHECK(worlds == 58 && count == 46 && accepted == 46 && rejected == 0 && sounds == 19 && missing == 27);
+        const std::map<DDWORD, unsigned> expected{{1, 3}, {2, 10}, {3, 21}, {6, 7}, {8, 3}, {10, 1}, {24, 1}};
         CHECK(types == expected);
         return true;
     }

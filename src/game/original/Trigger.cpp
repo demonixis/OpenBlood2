@@ -43,7 +43,7 @@ bool Trigger::ReadProp()
     if (g_pServerDE->GetPropGeneric("ActivationCount", &prop) == DE_OK)
         activation_count = static_cast<std::uint32_t>(prop.m_Long);
     if (!physics_vector(dims) || dims.x < 0 || dims.y < 0 || dims.z < 0 || !std::isfinite(reset_time) ||
-        std::abs(reset_time) > 1e6f || !std::isfinite(sound_radius) || sound_radius < 0 || sound_radius > 1e6f)
+        !std::isfinite(sound_radius) || sound_radius < 0 || sound_radius > 1e6f)
         return false;
     for (unsigned i = 0; i < slots.size(); ++i)
     {
