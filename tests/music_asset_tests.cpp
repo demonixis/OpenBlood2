@@ -59,6 +59,22 @@ namespace
     {
         std::string error;
         MusicAssetInfo info;
+        std::map<std::string, std::string> index;
+        CHECK(
+            read_music_style_index("[Styles]\r\nNbrStyles=1\r\nName1=Track1-a\r\nFile1=track1a.sty\r\n", index, error));
+        CHECK(index.size() == 1 && index.at("track1-a") == "track1a.sty");
+        for (const auto* bad :
+             {"", "[Styles]\nNbrStyles=257", "[Styles]\nNbrStyles=1\nName1=A",
+              "[Styles]\nNbrStyles=1\nName1=A\nFile1=../outside.sty",
+              "[Styles]\nNbrStyles=1\nName1=A\nFile1=/outside.sty", "[Styles]\nNbrStyles=1\nName1=A\nFile1=a.sec",
+              "[Styles]\nNbrStyles=2\nName1=A\nFile1=a.sty\nName2=a\nFile2=b.sty",
+              "[Styles]\nNbrStyles=1\nName1=A\nName1=B\nFile1=a.sty", "[Styles]\nNbrStyles=0\n[Styles]\nNbrStyles=0"})
+        {
+            CHECK(!read_music_style_index(bad, index, error));
+            CHECK(index.empty() && !error.empty());
+        }
+        CHECK(!read_music_style_index(std::string(65537, 'a'), index, error));
+        error.clear();
         auto bytes = section();
         CHECK(read_music_asset(bytes, MusicAssetKind::Section, info, error));
         CHECK(info.chunks.size() == 2 && info.chunks[1].offset == 12 && info.chunks[1].depth == 1 &&
@@ -192,6 +208,16 @@ namespace
         CHECK(!catalog.assets.front().bank && !catalog.assets.front().bank_error.empty());
         CHECK(!catalog.assets[1].style && !catalog.assets[1].style_error.empty()); // Structural-only fake style.
 
+        const std::string ini = "[Styles]\nNbrStyles=1\nName1=Shared\nFile1=renamed.sty\n";
+        CHECK(write(root / "Music/Test/iMusic.ini", Bytes(ini.begin(), ini.end())));
+        CHECK(write(root / "Music/Test/renamed.sty", container("AASY", {})));
+        catalog.inspect(root, props);
+        CHECK(catalog.error.empty() && catalog.assets.back().filename == "renamed.sty");
+        CHECK(catalog.assets[2].style_reference == "Shared" && catalog.assets[2].style_filename == "renamed.sty");
+        fs::remove(root / "Music/Test/iMusic.ini", ec);
+        CHECK(!ec);
+        catalog.inspect(root, props);
+        CHECK(catalog.assets.back().filename == "Shared.sty");
         CHECK(catalog.assets[1].bands && catalog.assets[1].bands->bands.empty() &&
               catalog.assets[1].bands_error.empty());
         const auto init_file = root / "Music/Test" / catalog.assets[1].filename;
@@ -359,7 +385,11 @@ namespace
         CHECK(write(root / "Music/Test/a1.sec", complete_section()));
         CHECK(write(root / "Music/Test/silence.per", per));
         catalog.inspect(root, props);
-        CHECK(!find_section()->harmony && catalog.personalities.front().error.find("Ambiguous") != std::string::npos);
+        if (!same_file)
+            CHECK(!find_section()->harmony &&
+                  catalog.personalities.front().error.find("Ambiguous") != std::string::npos);
+        else
+            CHECK(find_section()->harmony); // Both spellings identify the same file on this filesystem.
         fs::remove(root / "Music/Test/silence.per", ec);
         CHECK(!ec);
         // An opaque child length escaping its envelope rejects metadata, even with valid header strings.

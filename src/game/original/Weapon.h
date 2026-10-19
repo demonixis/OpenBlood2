@@ -256,3 +256,41 @@ class CMelee final : public CWeapon
         damage_type = OpenBlood2::DamageType::Melee;
     }
 };
+
+class CSoulHook final : public CWeapon
+{
+  public:
+    CSoulHook() : CWeapon(WEAP_SOUL_HOOK)
+    {
+        damage_type = OpenBlood2::DamageType::Melee;
+    }
+    void BeginFire(bool) override;
+    const char* FireSound(bool alternate) const override
+    {
+        return !alternate && fire_sound ? fire_sound : CWeapon::FireSound(alternate);
+    }
+    const char* fire_sound = nullptr;
+};
+class CBoneleechSuck final : public CWeapon
+{
+  public:
+    CBoneleechSuck() : CWeapon(WEAP_BONELEECH_SUCK)
+    {
+        damage_type = OpenBlood2::DamageType::Melee;
+    }
+    void BeginFire(bool) override;
+    const char* FireSound(bool alternate) const override
+    {
+        return !alternate && fire_sound ? fire_sound : CWeapon::FireSound(alternate);
+    }
+    const char* fire_sound = nullptr;
+};
+
+class CFireball final : public CWeapon
+{
+  public:
+    CFireball() : CWeapon(WEAP_DRUDGE_FIREBALL)
+    {
+        damage_type = OpenBlood2::DamageType::Normal;
+    }
+};

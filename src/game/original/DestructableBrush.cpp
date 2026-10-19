@@ -70,12 +70,10 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
             allow_marks = false;
             create.m_Flags |= FLAG_GRAVITY;
         }
-        if ((create.m_Flags & FLAG_GRAVITY) &&
-            ((!dynamic_debris && !(create.m_Flags & FLAG_BOXPHYSICS)) || (create.m_Flags & FLAG_GOTHRUWORLD)))
+        if ((create.m_Flags & FLAG_GRAVITY) && (create.m_Flags & FLAG_GOTHRUWORLD))
         {
-            // Polygon dynamics / world bypass are not this body solver.
-            server->RejectPrecreate(create.m_Flags & FLAG_GOTHRUWORLD ? "gravity with GOTHRUWORLD"
-                                                                      : "gravity without BoxPhysics (polygon dynamics)");
+            // World bypass remains outside the bounded body solver.
+            server->RejectPrecreate("gravity with GOTHRUWORLD");
             return 0;
         }
         return 1;
@@ -92,7 +90,8 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
         {
             // Source SetMass clamps its local parameter, but uses the unclamped
             // member in this formula. Preserve friction above mass 500 too.
-            if (!server->ConfigureWorldBody(m_hObject, {mass, 5 + mass * 10 / 500, pushable, dynamic_debris}))
+            if (!server->ConfigureWorldBody(
+                    m_hObject, {mass, 5 + mass * 10 / 500, pushable, dynamic_debris, !box_physics && !dynamic_debris}))
             {
                 server->RemoveObject(m_hObject);
                 return 0;

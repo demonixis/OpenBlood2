@@ -29,6 +29,10 @@ namespace OpenBlood2
                 return "Original filter";
             case EntryState::MissingWorldModel:
                 return "Omitted: missing world model";
+            case EntryState::AbsentOriginalClass:
+                return "Omitted: absent original class";
+            case EntryState::MissingResource:
+                return "Omitted: missing authored resource";
             case EntryState::Failed:
                 return "Creation failed";
         }
@@ -88,11 +92,30 @@ namespace OpenBlood2
                 entry.state = EntryState::EditorOnly;
                 entry.detail = "Original CF_NORUNTIME; source properties retained";
             }
+            else if (absent_original_world_class(source.class_name))
+            {
+                entry.state = EntryState::AbsentOriginalClass;
+                entry.detail = "No original base-game class registration; loader skips this source row";
+            }
             else if (auto type = objects.find_class(source.class_name))
             {
                 Properties props;
                 for (const auto& p : source.properties)
                     props.emplace(p.name, p.value);
+                auto text = [&](const char* key) -> std::string_view
+                {
+                    const auto* p = source.find(key);
+                    const auto* value = p ? std::get_if<std::string>(p) : nullptr;
+                    return value ? *value : std::string_view{};
+                };
+                const bool empty_model = source.class_name == "CDestructableModel" && text("InitFilename").empty() &&
+                                         text("Filename").empty();
+                std::string sprite_path;
+                const bool missing_splat =
+                    source.class_name == "DetailSprite" && resource_path(text("Filename"), sprite_path) &&
+                    (sprite_path == "sprites/bloodsplat1.dtx" || sprite_path == "sprites/bloodsplat2.dtx" ||
+                     sprite_path == "sprites/bloodsplat3.dtx") &&
+                    !resources.find(sprite_path);
                 auto h = objects.create(type, {}, Creation::World, props);
                 if (const auto* r = objects.get(h); r && r->life == Life::Alive)
                 {
@@ -142,6 +165,11 @@ namespace OpenBlood2
                 {
                     entry.state = EntryState::Failed;
                     entry.detail = model->error;
+                    if (empty_model && model->error == "Model clip-zero dimensions unavailable")
+                    {
+                        entry.state = EntryState::MissingResource;
+                        entry.detail = "Empty authored model filename; no replacement model";
+                    }
                     if (!r->model_error.empty())
                         entry.detail += ": " + r->model_error;
                 }
@@ -150,6 +178,14 @@ namespace OpenBlood2
                 {
                     entry.state = EntryState::Filtered;
                     entry.detail = "Removed by original initial-update difficulty/game-type rules";
+                }
+                else if (!h && missing_splat && objects.error() == ObjectError::Unsupported &&
+                         !objects.diagnostics().empty() &&
+                         objects.diagnostics().back().find("Missing, oversized or non-SPR sprite resource:") !=
+                             std::string::npos)
+                {
+                    entry.state = EntryState::MissingResource;
+                    entry.detail = "Missing authored sprite: " + sprite_path + "; no path alias";
                 }
                 else if (!h && objects.error() == ObjectError::MissingWorldModel)
                 {

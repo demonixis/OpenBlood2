@@ -827,6 +827,10 @@ namespace OpenBlood2
                         {
                             ImGui::Text("Geometry: %zu closed components | %zu shared edges | %zu triangles",
                                         shape->closed_components, shape->shared_edges, shape->triangles.size());
+                            if (shape->off_plane_faces || shape->boundary_only)
+                                ImGui::Text("Authored triangle boundary: %zu off-plane faces / %zu open edges%s",
+                                            shape->off_plane_faces, shape->open_edges,
+                                            shape->boundary_only ? " (no solid interior)" : "");
                             ImGui::Text("BSP model #%u of %u same-named%s", object->world_model_index,
                                         object->world_model_candidates,
                                         object->world_model_candidates > 1 ? " (first in file order bound)" : "");
@@ -3155,7 +3159,9 @@ namespace OpenBlood2
             {
                 constexpr const char* results[] = {"moved", "blocked", "invalid", "unavailable"};
                 ImGui::Text("%s | pushable %s | priority %u",
-                            r->body_properties.rotating_debris ? "Dynamic debris bounds" : "Dynamic box",
+                            r->body_properties.rotating_debris  ? "Dynamic debris bounds"
+                            : r->body_properties.polygon_bounds ? "Dynamic polygon (conservative bounds)"
+                                                                : "Dynamic box",
                             b->pushable ? "yes" : "no", unsigned(r->blocking_priority));
                 ImGui::Text("Mass %.1f | friction %.3f | gravity %s", r->body_properties.mass,
                             r->body_properties.friction, r->state.m_Flags & FLAG_GRAVITY ? "yes" : "no");

@@ -1,5 +1,7 @@
 # Original music asset inspection
 
+The [CityHubC/SteamTunnels extension](cityhubc_steamtunnels_contracts.md) documents the later, narrowly scoped dynamic polygon boundary and authored music filename policies. Historical limits below retain their original scope.
+
 This is a prerequisite for the original interactive music service, not a player
 or synthesizer. `MUSIC LEVEL 3`, reached by the continuous train route, remains an
 explicitly unsupported command. A valid container never implies successful

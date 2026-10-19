@@ -7,6 +7,7 @@ namespace OpenBlood2
         float mass = 100, friction = 7;
         bool pushable = false;
         bool rotating_debris = false; // Conservative moving AABB; polygon queries remain authored.
+        bool polygon_bounds = false;  // Conservative translation bounds; never changes authored BoxPhysics.
     };
     struct RotationMove
     {

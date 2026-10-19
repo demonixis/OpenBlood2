@@ -77,7 +77,15 @@ namespace
         CHECK(!g.server.ConfigureWorldBody(h, {100, 7, true}));
         CHECK(g.server.RotateWorldModel(h, {}) == MoverResult::Invalid);
         CHECK(g.server.MoveWorldModel(h, {0, 101, 0}) == MoverResult::Unavailable);
-        CHECK(!brush(g, {200, 100, 0}, {{"BoxPhysics", false}}));
+        auto polygon = brush(g, {200, 100, 0}, {{"BoxPhysics", false}});
+        CHECK(polygon);
+        auto* poly = g.objects.get(polygon);
+        CHECK(poly->world_body && poly->body_properties.polygon_bounds && !(poly->state.m_Flags & FLAG_BOXPHYSICS) &&
+              !poly->body_properties.rotating_debris);
+        CHECK(g.server.RotateWorldModel(polygon, {}) == MoverResult::Invalid);
+        const auto poly_flags = poly->state.m_Flags;
+        g.server.SetObjectFlags(polygon, poly_flags | FLAG_GOTHRUWORLD);
+        CHECK(poly->state.m_Flags == poly_flags);
         CHECK(!brush(g, {200, 100, 0}, {{"SpawnObject", std::string("Enemy")}}));
         CHECK(!brush(g, {200, 100, 0}, {{"ObjectMass", -1.0f}}));
         return true;
@@ -86,7 +94,7 @@ namespace
     {
         GameSession g;
         CHECK(test_player::setup(g, root, false));
-        auto h = brush(g, {0, 100, 0}, {}, {10, 10, 10}, {30, 40, -20});
+        auto h = brush(g, {0, 100, 0}, {{"BoxPhysics", false}}, {10, 10, 10}, {30, 40, -20});
         CHECK(h);
         auto* r = g.objects.get(h);
         const auto initial = r->state.m_Pos;

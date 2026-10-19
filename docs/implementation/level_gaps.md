@@ -22,6 +22,15 @@ path): 01_SubwayA, 02_CityHub, 05_CDM, 05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon
 BB_Drain. `bb_midgard` and `bb_area15` still fail at startup (L14). The tables below are regenerated from
 the latest run.
 
+The 2026-10-19 [CityHubC/SteamTunnels continuation](../contracts/cityhubc_steamtunnels_contracts.md)
+updates those two rows only: both start through the Levels-tab path, with zero
+unsupported or failed entries. CityHubC retains two explicit omissions (one
+missing BSP and one empty model); SteamTunnels retains thirteen (eight class names
+absent from the original base game, three absent sprite files and two missing
+BSPs). These are accounted source rows, not newly implemented objects. TheEye,
+NightGoggles and BugSpray pickups remain offer-only; BoneLeech attachment remains
+unavailable. The rest of this backlog retains its earlier measurement dates.
+
 ## How to refresh
 
 ```bash
@@ -35,16 +44,16 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 ## Status by world
 
 `starts` means the world passes entry validation and starts (01_SubwayA,
-02_CityHub, 03_Museum, 05_CDM, 05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon, BB_Drain). Batches are defined in the next section.
+02_CityHub, 02_CityHubC, 03_Museum, 04_SteamTunnels, 05_CDM, 05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon, BB_Drain). Batches are defined in the next section.
 
 | World | Created | Unported (classes) | Failed | Batches needed |
 |---|---:|---:|---:|---|
 | 01_subwaya | 204 | 0 (0) | 0 | **starts** |
 | 02_cityhub | 453 | 0 (0) | 0 | **starts** |
 | 02_cityhubb | 404 | 7 (1) | 0 | L7 |
-| 02_cityhubc | 386 | 18 (2) | 2 | L2, L7, L10 |
+| 02_cityhubc | 405 | 0 (0) | 0 | **starts** |
 | 03_museum | 651 | 0 (0) | 0 | **starts** |
-| 04_steamtunnels | 494 | 10 (4) | 6 | L2, L5, L6, L7, L10 |
+| 04_steamtunnels | 499 | 0 (0) | 0 | **starts** |
 | 05_cdm | 550 | 0 (0) | 0 | **starts** |
 | 05_cdmb | 129 | 0 (0) | 0 | **starts** |
 | 06_airship1 | 191 | 0 (0) | 5 | L6, L12 |

@@ -10,8 +10,10 @@ namespace OpenBlood2
     namespace
     {
         bool resolve(const std::filesystem::path& root, const std::string& relative, std::filesystem::path& out,
-                     std::string& error)
+                     std::string& error, bool* missing = nullptr)
         {
+            if (missing)
+                *missing = false;
             std::string normalized;
             if (root.empty() || !resource_path(relative, normalized))
             {
@@ -60,6 +62,8 @@ namespace OpenBlood2
                 }
                 if (ec || matched.empty())
                 {
+                    if (missing && !ec)
+                        *missing = true;
                     error = "Missing/unreadable music path: " + normalized;
                     return false;
                 }
@@ -305,6 +309,43 @@ namespace OpenBlood2
             return;
         if (!CMusic::BuildAssetPlan(properties, plan, error))
             return;
+        // iMusic.ini maps style labels to filenames (Track1-a -> track1a.sty).
+        // Use only this authored directory-local mapping; never guess aliases.
+        std::map<std::string, std::string> style_files;
+        std::filesystem::path index_path;
+        std::string index_error;
+        bool missing_index = false;
+        if (resolve(root, plan.directory + "/imusic.ini", index_path, index_error, &missing_index))
+        {
+            std::error_code ec;
+            const auto size = std::filesystem::file_size(index_path, ec);
+            if (ec || size > 65536)
+            {
+                error = "Music style index exceeds 64 KiB or is unreadable";
+                return;
+            }
+            std::string text(static_cast<std::size_t>(size), '\0');
+            std::ifstream stream(index_path, std::ios::binary);
+            if (!stream.read(text.data(), text.size()) || stream.peek() != std::char_traits<char>::eof())
+            {
+                error = "Music style index changed or failed during read";
+                return;
+            }
+            if (!read_music_style_index(text, style_files, error))
+                return;
+        }
+        else if (!missing_index)
+        {
+            error = index_error;
+            return;
+        }
+        auto style_filename = [&](const std::string& reference)
+        {
+            std::string key;
+            resource_path(reference, key);
+            const auto found = style_files.find(key);
+            return found == style_files.end() ? reference + ".sty" : found->second;
+        };
         // Own all names. Never retain directory iterators, resource spans or game objects.
         auto requests = plan.requests;
         std::set<std::string> seen;
@@ -390,6 +431,8 @@ namespace OpenBlood2
                         }
                         record.chunks = info.chunks.size();
                         record.style_reference = info.style_reference;
+                        if (!info.style_reference.empty())
+                            record.style_filename = style_filename(info.style_reference);
                         for (const auto& chunk : info.chunks)
                         {
                             record.patterns += chunk.id == "RIFF" && chunk.form == "AAPT";
@@ -397,7 +440,7 @@ namespace OpenBlood2
                         }
                         if (!info.style_reference.empty())
                             requests.push_back(
-                                {"Section style reference", info.style_reference + ".sty", MusicAssetKind::Style});
+                                {"Section style reference", record.style_filename, MusicAssetKind::Style});
                     }
                 }
             }
@@ -410,7 +453,7 @@ namespace OpenBlood2
             if (!asset.section)
                 continue;
             std::string key;
-            if (!resource_path(asset.style_reference + ".sty", key))
+            if (!resource_path(asset.style_filename, key))
             {
                 asset.timeline_error = "IMA timeline: invalid style reference";
                 continue;

@@ -1129,6 +1129,184 @@ namespace
             nullptr,                                 // Icon for status bar
             nullptr,                                 // Highlighted icon for status bar
         },
+
+        // DrudgeLord Hook
+        {
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",  // Skin
+            nullptr,                            // Model
+            nullptr,                            // Skin
+            WEAP_SOUL_HOOK,                     // Type
+            TYPE_MELEE,                         // Fire type
+            AMMO_NONE,                          // Ammo type
+            1,                                  // Ammo Use
+            1,                                  // Alt Ammo Use
+            50.0f,                              // Min Damage
+            80.0f,                              // Max Damage
+            50.0f,                              // Min Alt damage
+            80.0f,                              // Max Alt damage
+            1.00f,                              // Reload time
+            0.0f,                               // Alt reload time
+            {0.0f, 0.0f},                       // Spread
+            {0.0f, 0.0f},                       // Alt Spread
+            0.0f,                               // Projectile Velocity
+            0.0f,                               // Alt Projectile Velocity
+            100.0f,                             // Range
+            100.0f,                             // Alt Range
+            1,                                  // Shots per fire
+            1,                                  // Alt Shots per fire
+            1,                                  // Strength or Magic required
+            0,                                  // Two-handed Strength or Magic required
+            0,                                  // Damage Radius (projectiles)
+            0,                                  // Alt Damage Radius (projectiles)
+            DFALSE,                             // Alt fire zoom
+            DFALSE,                             // Semi-auto
+            "Sounds\\Weapons\\Knife\\fire.wav", // Fire sound
+            "Sounds\\Weapons\\Knife\\alt.wav",  // Alt Fire sound
+            "",                                 // Empty weapon sound
+            "",                                 // Alt Empty weapon sound
+            nullptr,                            // Projectile class
+            nullptr,                            // Alt Projectile class
+            0,                                  // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Flash color
+            "Soul_Hook",                        // Name
+            0,                                  // Name ID (resource)
+            "",                                 // flash sprite name
+            "",                                 // alt flash Sprite name
+            0.25f,                              // Flash duration
+            0.10f,                              // Flash scale
+            {0.0f, 0.0f, 0.0f},                 // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},              // Recoil
+            {0.0f, 0.0f, 0.1f},                 // Flash position
+            0.625f,                             // Eject interval
+            0.0f,                               // View kick
+            DFALSE,                             // View kick is Cumulative
+            DFALSE,                             // Animation looping
+            DFALSE,                             // Alt anim looping
+            nullptr,                            // Icon for status bar
+            nullptr,                            // Highlighted icon for status bar
+        },
+        // Drudge Fireball
+        {
+            "Models\\Weapons\\knifec_pv.abc",    // Model
+            "Models\\Weapons\\knifec_pv.abc",    // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",   // Skin
+            nullptr,                             // Model
+            nullptr,                             // Skin
+            WEAP_DRUDGE_FIREBALL,                // Type
+            TYPE_RIFLE,                          // Fire type
+            AMMO_NONE,                           // Ammo type
+            1,                                   // Ammo Use
+            1,                                   // Alt Ammo Use
+            40.0f,                               // Min Damage
+            60.0f,                               // Max Damage
+            40.0f,                               // Min Alt damage
+            60.0f,                               // Max Alt damage
+            0.50f,                               // Reload time
+            0.50f,                               // Alt reload time
+            {0.0f, 0.0f},                        // Spread
+            {0.0f, 0.0f},                        // Alt Spread
+            750.0f,                              // Projectile Velocity
+            750.0f,                              // Alt Projectile Velocity
+            1000.0f,                             // Range
+            1000.0f,                             // Alt Range
+            1,                                   // Shots per fire
+            1,                                   // Alt Shots per fire
+            1,                                   // Strength or Magic required
+            0,                                   // Two-handed Strength or Magic required
+            300,                                 // Damage Radius (projectiles)
+            300,                                 // Alt Damage Radius (projectiles)
+            DFALSE,                              // Alt fire zoom
+            DFALSE,                              // Semi-auto
+            "Sounds\\Weapons\\Napalm\\fire.wav", // Fire sound
+            "Sounds\\Weapons\\Napalm\\fire.wav", // Alt Fire sound
+            "",                                  // Empty weapon sound
+            "",                                  // Alt Empty weapon sound
+            "CNapalmProjectile",                 // Projectile class
+            "CNapalmProjectile",                 // Alt Projectile class
+            20,                                  // Muzzle Flash radius
+            {0.8f, 0.3f, 0.0f},                  // Muzzle Flash color
+            "Fireball",                          // Name
+            0,                                   // Name ID (resource)
+            "",                                  // flash sprite name
+            "",                                  // alt flash Sprite name
+            0.25f,                               // Flash duration
+            0.40f,                               // Flash scale
+            {0.0f, 0.0f, 0.0f},                  // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                 // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                  // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},               // Recoil
+            {0.0f, 0.0f, 0.1f},                  // Flash position
+            0.625f,                              // Eject interval
+            0.0f,                                // View kick
+            DFALSE,                              // View kick is Cumulative
+            DFALSE,                              // Animation looping
+            DFALSE,                              // Alt anim looping
+            nullptr,                             // Icon for status bar
+            nullptr,                             // Highlighted icon for status bar
+        },
+        // Bone Leech Suck
+        {
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",  // Skin
+            nullptr,                            // Model
+            nullptr,                            // Skin
+            WEAP_BONELEECH_SUCK,                // Type
+            TYPE_MELEE,                         // Fire type
+            AMMO_NONE,                          // Ammo type
+            0,                                  // Ammo Use
+            0,                                  // Alt Ammo Use
+            4.0f,                               // Min Damage
+            8.0f,                               // Max Damage
+            4.0f,                               // Min Alt damage
+            8.0f,                               // Max Alt damage
+            1.00f,                              // Reload time
+            0.0f,                               // Alt reload time
+            {0.0f, 0.0f},                       // Spread
+            {0.0f, 0.0f},                       // Alt Spread
+            0.0f,                               // Projectile Velocity
+            0.0f,                               // Alt Projectile Velocity
+            100.0f,                             // Range
+            100.0f,                             // Alt Range
+            1,                                  // Shots per fire
+            1,                                  // Alt Shots per fire
+            1,                                  // Strength or Magic required
+            0,                                  // Two-handed Strength or Magic required
+            0,                                  // Damage Radius (projectiles)
+            0,                                  // Alt Damage Radius (projectiles)
+            DFALSE,                             // Alt fire zoom
+            DFALSE,                             // Semi-auto
+            "Sounds\\Weapons\\Knife\\fire.wav", // Fire sound
+            "Sounds\\Weapons\\Knife\\alt.wav",  // Alt Fire sound
+            "",                                 // Empty weapon sound
+            "",                                 // Alt Empty weapon sound
+            nullptr,                            // Projectile class
+            nullptr,                            // Alt Projectile class
+            0,                                  // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Flash color
+            "Boneleech_Suck",                   // Name
+            0,                                  // Name ID (resource)
+            "",                                 // flash sprite name
+            "",                                 // alt flash Sprite name
+            0.25f,                              // Flash duration
+            0.10f,                              // Flash scale
+            {0.0f, 0.0f, 0.0f},                 // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},              // Recoil
+            {0.0f, 0.0f, 0.1f},                 // Flash position
+            0.625f,                             // Eject interval
+            0.0f,                               // View kick
+            DFALSE,                             // View kick is Cumulative
+            DFALSE,                             // Animation looping
+            DFALSE,                             // Alt anim looping
+            nullptr,                            // Icon for status bar
+            nullptr,                            // Highlighted icon for status bar
+        },
     };
 }
 const WeaponData* weapon_definition(DBYTE type)

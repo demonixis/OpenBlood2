@@ -1,5 +1,7 @@
 # Compound DAT shell validation
 
+The [CityHubC/SteamTunnels extension](cityhubc_steamtunnels_contracts.md) documents the later, narrowly scoped dynamic polygon boundary and authored music filename policies. Historical limits below retain their original scope.
+
 This extends [container geometry](container_contracts.md) and
 [world-model binding](door_contracts.md). Evidence is retained in
 [m2_compound_shells.md](../../../Documentation/Implementation/m2_compound_shells.md).

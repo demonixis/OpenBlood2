@@ -6,6 +6,12 @@ namespace OpenBlood2
         return name == "DirLight" || name == "Light" || name == "OutsideDef" || name == "ObjectLight" ||
                name == "LightAnimator" || name == "GlobalDirLight" || name == "FastApproxArea";
     }
+    bool absent_original_world_class(std::string_view name)
+    {
+        // No BEGIN_CLASS in the base-game donor or mounted OBJECT.LTO. GremlinAI
+        // is a separate add-on class; RocketAmmoPU is an original AI lookup typo.
+        return name == "Gremlin" || name == "RocketAmmoPU";
+    }
     bool prepare_world(const WorldRequest& request, const Resources& resources, PreparedWorld& output,
                        std::string& error)
     {
@@ -42,6 +48,8 @@ namespace OpenBlood2
                 return "Schema checked; runtime unverified";
             case DestinationEntryState::EditorOnly:
                 return "Preprocessor only";
+            case DestinationEntryState::AbsentOriginalClass:
+                return "Omitted: class absent from original game";
             case DestinationEntryState::UnknownClass:
                 return "Class not registered";
             case DestinationEntryState::InvalidProperties:
@@ -102,6 +110,12 @@ namespace OpenBlood2
             {
                 entry.state = DestinationEntryState::EditorOnly;
                 ++next.editor_only;
+            }
+            else if (absent_original_world_class(source.class_name))
+            {
+                entry.state = DestinationEntryState::AbsentOriginalClass;
+                entry.detail = "No original base-game class registration; loader skips this source row";
+                ++next.omitted;
             }
             else if (const auto type = objects.find_class(source.class_name))
             {

@@ -216,6 +216,12 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         weapon = std::make_unique<CShikariSpit>();
     else if (type == WEAP_SOUL_CROWBAR || type == WEAP_SOUL_AXE || type == WEAP_SOUL_PIPE)
         weapon = std::make_unique<CSoulWeapon>(type);
+    else if (type == WEAP_SOUL_HOOK)
+        weapon = std::make_unique<CSoulHook>();
+    else if (type == WEAP_DRUDGE_FIREBALL)
+        weapon = std::make_unique<CFireball>();
+    else if (type == WEAP_BONELEECH_SUCK)
+        weapon = std::make_unique<CBoneleechSuck>();
     else if (type == WEAP_MELEE)
         weapon = std::make_unique<CMelee>();
     else if (type == WEAP_NAGA_EYEBEAM)

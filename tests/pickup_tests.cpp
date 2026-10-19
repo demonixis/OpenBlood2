@@ -486,7 +486,9 @@ namespace
         // 13 InvulnerabilityPU, 4 BinocularsPU, 3 ShotgunPU and 1 SingularityPU. 70 container spawns include the
         // bouncing item/weapon leaves.
         CHECK(counts["StealthPU"] == 14 && counts["InvulnerabilityPU"] == 13);
-        CHECK(worlds == 57 && created == 1785 && missing == 0 && rejected == 0 && spawns == 70);
+        // The three new offer-only leaves add 25 authored pickups across the catalog.
+        CHECK(counts["BugSprayPU"] == 3 && counts["NightGogglesPU"] == 10 && counts["TheEyePU"] == 12);
+        CHECK(worlds == 57 && created == 1810 && missing == 0 && rejected == 0 && spawns == 70);
         return true;
     }
 } // namespace

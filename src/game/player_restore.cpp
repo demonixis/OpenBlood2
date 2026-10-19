@@ -69,8 +69,8 @@ namespace OpenBlood2
             record->attachment || record->world_body || !record->character_body || record->model_body ||
             record->body_properties.mass != player->m_damage.m_fMass || record->body_properties.friction != 0 ||
             record->body_properties.pushable || record->body_properties.rotating_debris ||
-            record->activity != OBJSTATE_ACTIVE || record->auto_deactivate || !record->scheduled ||
-            !std::isfinite(record->due) || player->door_push_pending)
+            record->body_properties.polygon_bounds || record->activity != OBJSTATE_ACTIVE || record->auto_deactivate ||
+            !record->scheduled || !std::isfinite(record->due) || player->door_push_pending)
         {
             error = "Player capture requires an active associated player outside callbacks/pending pushes";
             return false;

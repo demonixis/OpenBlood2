@@ -1,5 +1,6 @@
 #include "game/original/AmmoPickups.h"
 #include "game/original/B2BaseClass.h"
+#include "game/original/BoneLeech.h"
 #include "game/original/BuiltinModel.h"
 #include "game/original/BuiltinSprite.h"
 #include "game/original/CameraObj.h"
@@ -16,14 +17,10 @@
 #include "game/original/DestructableModel.h"
 #include "game/original/DetailSprite.h"
 #include "game/original/Door.h"
+#include "game/original/DrudgeLord.h"
 #include "game/original/ExitHint.h"
 #include "game/original/ExitTrigger.h"
 #include "game/original/Fanatic.h"
-#include "game/original/SoulDrudge.h"
-#include "game/original/ShikariAI.h"
-#include "game/original/MadScientistAI.h"
-#include "game/original/Tchernotronic.h"
-#include "game/original/SingularityProjectile.h"
 #include "game/original/FlareProjectile.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Gib.h"
@@ -34,6 +31,8 @@
 #include "game/original/Key.h"
 #include "game/original/KeyFramer.h"
 #include "game/original/KeyPickup.h"
+#include "game/original/MadScientistAI.h"
+#include "game/original/NapalmProjectile.h"
 #include "game/original/ObjectivesTrigger.h"
 #include "game/original/PathPoint.h"
 #include "game/original/PolyGrid.h"
@@ -45,14 +44,18 @@
 #include "game/original/RemoteBomb.h"
 #include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
+#include "game/original/ShikariAI.h"
+#include "game/original/SingularityProjectile.h"
 #include "game/original/SkyObjects.h"
 #include "game/original/SmellHint.h"
+#include "game/original/SoulDrudge.h"
 #include "game/original/Sound.h"
 #include "game/original/SoundFX.h"
 #include "game/original/Spawner.h"
-#include "game/original/TripLaser.h"
+#include "game/original/Tchernotronic.h"
 #include "game/original/TeslaProjectile.h"
 #include "game/original/Trigger.h"
+#include "game/original/TripLaser.h"
 #include "game/original/VolumeBrush.h"
 #include "game/original/WeaponPickups.h"
 #include "game/original/WorldModelDebris.h"
@@ -136,6 +139,7 @@ namespace OpenBlood2
         const ClassInfo tesla_projectile{"CTeslaProjectile", &base, construct<CTeslaProjectile>, {}};
         const ClassInfo tesla_bolt{"CTeslaBoltProjectile", &base, construct<CTeslaBoltProjectile>, {}};
         const ClassInfo tesla_ball{"CTeslaBallProjectile", &base, construct<CTeslaBallProjectile>, {}};
+        const ClassInfo napalm_projectile{"CNapalmProjectile", &base, construct<CNapalmProjectile>, {}};
         const ClassInfo loogie{"CShikariLoogieProjectile", &base, construct<CShikariLoogieProjectile>, {}};
         const ClassInfo singularity_projectile{"CSingularityProjectile", &base, construct<CSingularityProjectile>, {}};
         const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {}};
@@ -512,13 +516,22 @@ namespace OpenBlood2
                                  {"Fuel", 100.0f},
                                  {"Proximity_Bombs", 25.0f},
                                  {"Dims", DVector{21, 38, 19}}}};
-        // Original BEGIN_CLASS(SoulDrudge): RandomHitPoints, AIState and hidden Dims only.
-        const ClassInfo soul_drudge{"SoulDrudge",
-                                    &ai_manager,
-                                    construct_npc<SoulDrudge, AI_Mgr::NPCType::SoulDrudge>,
-                                    {{"RandomHitPoints", 50.0f},
-                                     {"AIState", std::string("IDLE"), true, 31},
-                                     {"Dims", DVector{21, 36, 18}}}};
+        // Original class registrations: RandomHitPoints, AIState and hidden Dims.
+        const ClassInfo bone_leech{
+            "BoneLeech",
+            &ai_manager,
+            construct_npc<BoneLeech, AI_Mgr::NPCType::BoneLeech>,
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{2, 1.5f, 11}}}};
+        const ClassInfo drudge_lord{
+            "DrudgeLord",
+            &ai_manager,
+            construct_npc<DrudgeLord, AI_Mgr::NPCType::DrudgeLord>,
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{31, 51, 25}}}};
+        const ClassInfo soul_drudge{
+            "SoulDrudge",
+            &ai_manager,
+            construct_npc<SoulDrudge, AI_Mgr::NPCType::SoulDrudge>,
+            {{"RandomHitPoints", 50.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{21, 36, 18}}}};
         // Original BEGIN_CLASS(ShikariAI): RandomHitPoints, AIState and hidden Dims only.
         const ClassInfo shikari{"ShikariAI",
                                 &ai_manager,
@@ -689,7 +702,10 @@ namespace OpenBlood2
         const ClassInfo flashlight_pickup{"FlashlightPU", &charged_pickup, construct<FlashlightPU>, {}};
         const ClassInfo medkit_pickup{"MedKitPU", &charged_pickup, construct<MedKitPU>, {}};
         const ClassInfo binoculars_pickup{"BinocularsPU", &charged_pickup, construct<BinocularsPU>, {}};
+        const ClassInfo eye_pickup{"TheEyePU", &charged_pickup, construct<TheEyePU>, {}};
+        const ClassInfo goggles_pickup{"NightGogglesPU", &charged_pickup, construct<NightGogglesPU>, {}};
         const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}};
+        const ClassInfo bugspray_pickup{"BugSprayPU", &weapon_pickup, construct<BugSprayPU>, {}};
         const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
         const ClassInfo assault_pickup{"AssaultRiflePU", &weapon_pickup, construct<AssaultRiflePU>, {}};
         const ClassInfo flare_pickup{"FlareGunPU", &weapon_pickup, construct<FlareGunPU>, {}};
@@ -1011,28 +1027,30 @@ namespace OpenBlood2
                objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
                objects.register_class(sound_fx) && objects.register_class(detail_sprite) &&
                objects.register_class(spawner) && objects.register_class(trip_laser) &&
-               objects.register_class(tchernotronic) && objects.register_class(sound) && objects.register_class(keyframer) &&
-               objects.register_class(key) && objects.register_class(start) && objects.register_class(game_start) &&
-               objects.register_class(path) && objects.register_class(world_properties) &&
-               objects.register_class(smell) && objects.register_class(exit_hint) &&
-               objects.register_class(character) && objects.register_class(ai_manager) &&
-               objects.register_class(cultist) && objects.register_class(civilian) && objects.register_class(gideon) &&
-               objects.register_class(fanatic) && objects.register_class(prophet) && objects.register_class(soul_drudge) && objects.register_class(shikari) &&
-               objects.register_class(mad_scientist) &&
-               objects.register_class(player) &&
-               objects.register_class(polygrid) && objects.register_class(volume) && objects.register_class(water) &&
-               objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
-               objects.register_class(conveyor) && objects.register_class(damage) && objects.register_class(freefall) &&
-               objects.register_class(trigger) && objects.register_class(key_pickup) &&
-               objects.register_class(pickup) && objects.register_class(item_pickup) &&
-               objects.register_class(item_weapon) && objects.register_class(proximity_pickup) &&
-               objects.register_class(remote_pickup) && objects.register_class(charged_pickup) &&
-               objects.register_class(medkit_pickup) && objects.register_class(flashlight_pickup) &&
-               objects.register_class(binoculars_pickup) &&
-               objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
-               objects.register_class(assault_pickup) && objects.register_class(flare_pickup) &&
-               objects.register_class(tesla_pickup) && objects.register_class(shotgun_pickup) &&
-               objects.register_class(singularity_pickup) &&
+               objects.register_class(tchernotronic) && objects.register_class(sound) &&
+               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
+               objects.register_class(game_start) && objects.register_class(path) &&
+               objects.register_class(world_properties) && objects.register_class(smell) &&
+               objects.register_class(exit_hint) && objects.register_class(character) &&
+               objects.register_class(ai_manager) && objects.register_class(cultist) &&
+               objects.register_class(civilian) && objects.register_class(gideon) && objects.register_class(fanatic) &&
+               objects.register_class(prophet) && objects.register_class(bone_leech) &&
+               objects.register_class(drudge_lord) && objects.register_class(soul_drudge) &&
+               objects.register_class(shikari) && objects.register_class(mad_scientist) &&
+               objects.register_class(player) && objects.register_class(polygrid) && objects.register_class(volume) &&
+               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
+               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
+               objects.register_class(freefall) && objects.register_class(trigger) &&
+               objects.register_class(key_pickup) && objects.register_class(pickup) &&
+               objects.register_class(item_pickup) && objects.register_class(item_weapon) &&
+               objects.register_class(proximity_pickup) && objects.register_class(remote_pickup) &&
+               objects.register_class(charged_pickup) && objects.register_class(medkit_pickup) &&
+               objects.register_class(flashlight_pickup) && objects.register_class(eye_pickup) &&
+               objects.register_class(goggles_pickup) && objects.register_class(binoculars_pickup) &&
+               objects.register_class(weapon_pickup) && objects.register_class(bugspray_pickup) &&
+               objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
+               objects.register_class(flare_pickup) && objects.register_class(tesla_pickup) &&
+               objects.register_class(shotgun_pickup) && objects.register_class(singularity_pickup) &&
                objects.register_class(mac10_pickup) && objects.register_class(sniper_pickup) &&
                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
                objects.register_class(health_base) && objects.register_class(armor_base) &&
@@ -1054,8 +1072,8 @@ namespace OpenBlood2
                objects.register_class(remote) && objects.register_class(grenade) &&
                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
                objects.register_class(tesla_projectile) && objects.register_class(tesla_bolt) &&
-               objects.register_class(tesla_ball) && objects.register_class(loogie) &&
-               objects.register_class(singularity_projectile) &&
+               objects.register_class(tesla_ball) && objects.register_class(napalm_projectile) &&
+               objects.register_class(loogie) && objects.register_class(singularity_projectile) &&
                objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
                objects.register_class(howitzer_shell) && objects.register_class(shockwave_projectile);
     }

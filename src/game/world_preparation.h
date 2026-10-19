@@ -11,10 +11,12 @@ namespace OpenBlood2
     };
     bool prepare_world(const WorldRequest&, const Resources&, PreparedWorld&, std::string&);
     bool editor_only_world_class(std::string_view);
+    bool absent_original_world_class(std::string_view);
     enum class DestinationEntryState
     {
         SchemaChecked,
         EditorOnly,
+        AbsentOriginalClass,
         UnknownClass,
         InvalidProperties
     };
@@ -32,7 +34,7 @@ namespace OpenBlood2
         std::string source_world, destination, requested_start, error;
         bool scan_complete = false;
         std::size_t models = 0, triangles = 0, collision_nodes = 0, schema_checked = 0, editor_only = 0, unknown = 0,
-                    invalid = 0;
+                    invalid = 0, omitted = 0;
         std::vector<DestinationEntry> entries;
     };
     struct DestinationTrialEntry

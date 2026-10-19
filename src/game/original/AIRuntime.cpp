@@ -44,18 +44,18 @@ namespace
                                              {"SOUL_CROWBAR", WEAP_SOUL_CROWBAR, true},
                                              {"SOUL_AXE", WEAP_SOUL_AXE, true},
                                              {"SOUL_PIPE", WEAP_SOUL_PIPE, true},
-                                             {"SOUL_HOOK", 0, false},
+                                             {"SOUL_HOOK", WEAP_SOUL_HOOK, true},
                                              {"BEHEMOTH_CLAW", 0, false},
                                              {"HEAL", 0, false},
                                              {"SHIELD", 0, false},
                                              {"ENERGY_BLAST", WEAP_ZEALOT_ENERGYBLAST, true},
                                              {"GROUND_FIRE", 0, false},
                                              {"SHOCKWAVE", 0, false},
-                                             {"FIREBALL", 0, false},
+                                             {"FIREBALL", WEAP_DRUDGE_FIREBALL, true},
                                              {"LIGHTNING", 0, false},
                                              {"HAND_SQUEEZE", 0, false},
                                              {"THIEF_SUCK", 0, false},
-                                             {"BONELEECH_SUCK", 0, false},
+                                             {"BONELEECH_SUCK", WEAP_BONELEECH_SUCK, true},
                                              {"NIGHTMARE_BITE", 0, false},
                                              {"BEHEMOTH_SHOCKWAVE", 0, false},
                                              {"DEATHSHROUD_ZAP", 0, false},
@@ -155,6 +155,24 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         npc_armor = 50;
         npc_weapons[0] = "SHIKARI_CLAW";
         npc_weapons[1] = "SHIKARI_SPIT";
+    }
+    if (type == NPCType::BoneLeech || type == NPCType::DrudgeLord)
+    {
+        const bool leech = type == NPCType::BoneLeech;
+        m_fHearingDist = leech ? 0 : 2000;
+        m_fSensingDist = leech ? 300 : 200;
+        m_fSmellingDist = leech ? 1000 : 0;
+        m_fSeeingDist = leech ? 500 : 1200;
+        m_fWalkSpeed = leech ? 75 : 70;
+        m_fRunSpeed = leech ? 80 : 180;
+        m_fRollSpeed = 3.5f;
+        m_fJumpSpeed = leech ? 600 : 500;
+        m_dwFlags = leech ? 0x40 : 0; // FLAG_ALWAYSGIB.
+        m_bCabal = false;
+        npc_hp = leech ? 10 : 500;
+        npc_armor = leech ? 0 : 100;
+        npc_weapons[0] = leech ? "BONELEECH_SUCK" : "SOUL_HOOK";
+        npc_weapons[1] = leech ? "NONE" : "FIREBALL";
     }
     if (type == NPCType::MadScientist)
     {
@@ -279,6 +297,12 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         model = "Models/Enemies/madscientist.abc";
         skin = "Skins/Enemies/madscientist.dtx";
     }
+    else if (npc_type == NPCType::BoneLeech || npc_type == NPCType::DrudgeLord)
+    {
+        const std::string name = npc_type == NPCType::BoneLeech ? "boneleech" : "drudge_lord";
+        model = "Models/Enemies/" + name + ".abc";
+        skin = "Skins/Enemies/" + name + ".dtx";
+    }
     else if (npc_type == NPCType::Shikari)
     {
         model = "Models/Enemies/Shikari.abc";
@@ -342,7 +366,9 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
         return RuntimeFailure("Invalid or repeated NPC initialization");
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
-    const auto group = npc_type == NPCType::Gideon       ? 4
+    const auto group = npc_type == NPCType::BoneLeech    ? 10
+                       : npc_type == NPCType::DrudgeLord ? 11
+                       : npc_type == NPCType::Gideon     ? 4
                        : npc_type == NPCType::Fanatic    ? 5
                        : npc_type == NPCType::Prophet    ? 6
                        : npc_type == NPCType::SoulDrudge ? 7
@@ -355,8 +381,22 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         if (!refresh)
             return true;
         auto candidate = std::make_shared<CAnim_Sound>();
-        if (!candidate->SetAnimationIndexes(m_hObject) || !candidate->GenerateHitSpheres(m_hObject) ||
-            !candidate->SetSoundRoot(root))
+        auto prepare = [&](CAnim_Sound& value)
+        {
+            if (!value.SetAnimationIndexes(m_hObject))
+                return false;
+            if (npc_type == NPCType::BoneLeech)
+            {
+                // The shipped leech has no head/neck. The donor reads uninitialized
+                // head coordinates here. Keep localization unavailable; use the
+                // explicit body-damage policy below instead of fabricated spheres.
+                value.hit_sphere_error = "BoneLeech uses body damage; humanoid hit spheres unavailable";
+            }
+            else if (!value.GenerateHitSpheres(m_hObject))
+                return false;
+            return value.SetSoundRoot(root);
+        };
+        if (!prepare(*candidate))
             return false; // Failed creation must not poison a shared table.
         if (!tables[slot])
         {
@@ -365,8 +405,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         }
         // Preflight above is read-only. Rebuild existing shared indexes without
         // copying/killing its independently owned voice (no callbacks in these queries).
-        return tables[slot]->SetAnimationIndexes(m_hObject) && tables[slot]->GenerateHitSpheres(m_hObject) &&
-               tables[slot]->SetSoundRoot(root);
+        return prepare(*tables[slot]);
     };
     if (npc_type == NPCType::Civilian)
     {
@@ -377,7 +416,9 @@ bool AI_Mgr::RuntimeInitialize(int reason)
             return RuntimeFailure("NPC female animation table initialization failed");
     }
     else if (!initialize_table(group, !tables[group],
-                               npc_type == NPCType::Gideon         ? "sounds/enemies/Gideon"
+                               npc_type == NPCType::BoneLeech      ? "sounds/enemies/boneleech"
+                               : npc_type == NPCType::DrudgeLord   ? "sounds/enemies/drudgelord"
+                               : npc_type == NPCType::Gideon       ? "sounds/enemies/Gideon"
                                : npc_type == NPCType::Fanatic      ? "sounds/enemies/fanatic"
                                : npc_type == NPCType::Prophet      ? "sounds/enemies/Prophet"
                                : npc_type == NPCType::SoulDrudge   ? "sounds/enemies/souldrudge"
@@ -441,8 +482,9 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = hp;
     m_damage.SetArmorPoints(npc_armor * difficulty);
     m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = npc_armor * difficulty;
-    m_damage.m_fMass = 250;
-    if (!s->ConfigureCharacterBody(m_hObject, 250, 10))
+    m_fAIMass = npc_type == NPCType::BoneLeech ? 125 : 250;
+    m_damage.m_fMass = m_fAIMass;
+    if (!s->ConfigureCharacterBody(m_hObject, m_damage.m_fMass, 5 + m_damage.m_fMass * 10 / 500))
         return RuntimeFailure("NPC mass/friction configuration failed");
     if (!s->SetBlockingPriority(m_hObject, 50) || !m_MoveObj.Init(m_hObject) || !StateStrToInt(m_szAIState, m_nState))
         return RuntimeFailure("NPC movement/state initialization failed");
@@ -456,7 +498,8 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     float scale;
     if (!s->RandomFloat(-.05f, .1f, scale))
         return RuntimeFailure("NPC scale RNG failed");
-    m_vScale = {1 - scale, 1 + scale, 1 - scale};
+    const float base_scale = npc_type == NPCType::BoneLeech ? 2 : 1;
+    m_vScale = {base_scale - scale, base_scale + scale, base_scale - scale};
     // Supply the model's initial centered bounds before the later foot-anchored clip resize.
     DVector dims;
     if (s->GetModelAnimUserDims(m_hObject, &dims, 0) != DE_OK || s->SetObjectDims(m_hObject, &dims) != DE_OK ||
@@ -467,7 +510,8 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (reason == INITIALUPDATE_WORLDFILE && npc_type != NPCType::Gideon && s->MoveObjectToGround(m_hObject) != DE_OK)
         return RuntimeFailure("NPC world ground placement failed");
     m_fLastUpdate = s->GetTime();
-    m_damage.ai_hit_localization = true;
+    m_damage.ai_body_hits = npc_type == NPCType::BoneLeech;
+    m_damage.ai_hit_localization = !m_damage.ai_body_hits;
     runtime_initialized = true;
     return true;
 }

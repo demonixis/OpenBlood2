@@ -64,3 +64,15 @@ class ProximitiesPU : public ItemPickupWeapon
   public:
     ProximitiesPU();
 };
+
+class TheEyePU : public ItemPickupCharged
+{
+  public:
+    TheEyePU();
+};
+
+class NightGogglesPU : public ItemPickupCharged
+{
+  public:
+    NightGogglesPU();
+};

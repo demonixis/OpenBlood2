@@ -117,3 +117,11 @@ HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector position, DRotati
         pickup->value.amount = 0;
     return pickup->m_hObject;
 }
+
+BugSprayPU::BugSprayPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, 10, 20};
+    file = "BugSpray_pu";
+    display_name = "Bug Spray Canister";
+    resource_id = 357;
+}

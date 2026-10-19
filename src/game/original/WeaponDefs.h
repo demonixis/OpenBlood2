@@ -6,6 +6,7 @@ inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_FLAREGUN =
                        WEAP_SHIKARI_SPIT = 19, WEAP_SOUL_CROWBAR = 20, WEAP_SOUL_AXE = 21, WEAP_SOUL_PIPE = 22,
                        WEAP_SOUL_HOOK = 23, WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42, WEAP_PROXIMITYBOMB = 49,
                        WEAP_REMOTEBOMB = 50;
+inline constexpr DBYTE WEAP_DRUDGE_FIREBALL = 30, WEAP_BONELEECH_SUCK = 33;
 inline constexpr DBYTE WEAP_TESLACANNON = 13, WEAP_VOODOO = 14; // Voodoo: referenced by IsDemoWeapon only.
 inline constexpr DBYTE WEAP_SHOTGUN = 4, WEAP_SINGULARITY = 8;
 inline constexpr DBYTE WEAP_SNIPERRIFLE = 5; // Pickup offer only; the weapon is not integrated.

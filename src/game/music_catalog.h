@@ -19,8 +19,8 @@ namespace OpenBlood2
     class AudioMixer;
     struct MusicAssetRecord
     {
-        std::string filename, error, style_reference, bank_error, style_error, bands_error, section_error,
-            timeline_error, harmony_error, selected_band_error, band_setup_error, curves_error;
+        std::string filename, error, style_reference, style_filename, bank_error, style_error, bands_error,
+            section_error, timeline_error, harmony_error, selected_band_error, band_setup_error, curves_error;
         std::shared_ptr<const DlsBank> bank;
         std::shared_ptr<const ImaStyle> style;
         std::shared_ptr<const ImaCurves> curves;       // Independent bounded decoding; no controller playback.

@@ -57,3 +57,9 @@ class SniperRiflePU : public WeaponPickup
 };
 const char* WeaponPickupClass(DDWORD type);
 HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector, DRotation, bool include_ammo);
+
+class BugSprayPU : public WeaponPickup
+{
+  public:
+    BugSprayPU();
+};

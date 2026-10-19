@@ -130,7 +130,8 @@ bool AI_Mgr::Fire(bool alternate)
         weapon->data.m_nType != WEAP_SOUL_AXE && weapon->data.m_nType != WEAP_SOUL_PIPE &&
         weapon->data.m_nType != WEAP_MELEE && weapon->data.m_nType != WEAP_NAGA_EYEBEAM &&
         weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST && weapon->data.m_nType != WEAP_GIDEON_WIND &&
-        weapon->data.m_nType != WEAP_GIDEON_SHIELD)
+        weapon->data.m_nType != WEAP_GIDEON_SHIELD && weapon->data.m_nType != WEAP_SOUL_HOOK &&
+        weapon->data.m_nType != WEAP_DRUDGE_FIREBALL)
         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
     DRotation rotation;
     const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM;
@@ -145,16 +146,25 @@ bool AI_Mgr::Fire(bool alternate)
     if (naga && !fire_gun_node)
         return fail(FireResult::Unavailable, "Naga beam head_gun node unavailable");
     const auto type = weapon->data.m_nType;
-    if (type == WEAP_SHIKARI_SPIT)
+    if (type == WEAP_SHIKARI_SPIT || type == WEAP_DRUDGE_FIREBALL)
     {
         // Original branch: from the head node toward the cached target position.
         DRotation head_rotation;
         if (!server->GetModelNodeTransform(m_hObject, "head", &fire_origin, &head_rotation))
-            return fail(FireResult::Unavailable, "Shikari spit head node unavailable");
+            return fail(FireResult::Unavailable, type == WEAP_DRUDGE_FIREBALL ? "Fireball head node unavailable"
+                                                                          : "Shikari spit head node unavailable");
         fire_gun_node = false;
         fire_direction = vector_subtract(m_vTargetPos, fire_origin);
+        if (type == WEAP_DRUDGE_FIREBALL && npc_type == NPCType::DrudgeLord)
+        {
+            if (!normalize(fire_direction) || !m_MoveObj.initialized)
+                return fail(FireResult::Invalid, "DrudgeLord fireball direction unavailable");
+            fire_direction.x = m_MoveObj.GetForwardVector().x;
+            fire_direction.z = m_MoveObj.GetForwardVector().z;
+        }
     }
-    else if (type == WEAP_SOUL_CROWBAR || type == WEAP_SOUL_AXE || type == WEAP_SOUL_PIPE || type == WEAP_SHIKARI_CLAW)
+    else if (type == WEAP_SOUL_CROWBAR || type == WEAP_SOUL_AXE || type == WEAP_SOUL_PIPE || type == WEAP_SOUL_HOOK ||
+             type == WEAP_SHIKARI_CLAW)
     {
         // Original weapon-specific branch: body position along the cached forward vector.
         fire_gun_node = false;
@@ -173,7 +183,7 @@ bool AI_Mgr::Fire(bool alternate)
     }
     if (!normalize(fire_direction))
         return fail(FireResult::Invalid, "AI aim direction is degenerate or invalid");
-    if (!energy && !CheckClearShot(fire_origin, fire_direction, alternate))
+    if (!energy && type != WEAP_DRUDGE_FIREBALL && !CheckClearShot(fire_origin, fire_direction, alternate))
     {
         if (clear_shot.outcome == AIClearOutcome::Invalid || clear_shot.outcome == AIClearOutcome::Unavailable)
             return fail(FireResult::Unavailable, "AI clearance query failed");
