@@ -11,6 +11,7 @@ The complete game and later milestones are not yet supported.
 | [Diagnostic logs](logging.md) | File locations, rotation, interrupted sessions and crash-analysis limits |
 | [Crash capture](crash_capture.md) | Linux all-thread stacks, ELF cores, matching binaries and failure limits |
 | [Architecture](architecture.md) | Code layout, target responsibilities and service boundaries |
+| [Launcher plan](../../Documentation/Roadmap/06_launcher.md) | Planned SDL3/ImGui launcher, implementation steps and validation; Nightmares excluded |
 | [Contributing](contributing.md) | Original-source workflow, conventions and verification |
 | [Service contracts](contracts/readme.md) | Subsystem rules, ownership and explicit limitations |
 | [Implementation records](implementation/readme.md) | Import provenance, source ledgers, progress reports and measured results |
