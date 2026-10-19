@@ -69,9 +69,15 @@ namespace OpenBlood2::ScalarReference
                 {
                     const auto a = std::size_t(v.cursor);
                     auto b = std::min(a + 1, wave.samples.size() - 1);
-                    if (r.settings.loop && a + 1 >= std::size_t(r.settings.loop->start) + r.settings.loop->length)
-                        b = r.settings.loop->start;
-                    const double pcm = wave.samples[a] + (wave.samples[b] - wave.samples[a]) * (v.cursor - a);
+                    if (r.settings.loop)
+                    {
+                        b = a + 1;
+                        if (b >= std::size_t(r.settings.loop->start) + r.settings.loop->length)
+                            b = r.settings.loop->start;
+                    }
+                    const auto at = [&](std::size_t i)
+                    { return i < wave.samples.size() ? wave.samples[i] : wave.samples[r.settings.loop->start]; };
+                    const double pcm = at(a) + (at(b) - at(a)) * (v.cursor - a);
                     // LFO gain is unipolar; its delayed phase has no attenuation.
                     const double lfo_gain =
                         time >= v.lfo_delay ? std::pow(10.0, v.lfo_gain * (lfo + 1) *

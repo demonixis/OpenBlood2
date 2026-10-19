@@ -262,8 +262,23 @@ namespace
         out.assign(12, 0);
         CHECK(sampler.advance(6, out));
         CHECK(near(out[6], .5 * gain) && out[8] == 0 && sampler.voices().empty() && sampler.completed == 1);
-        std::cout << "PCM interpolation, loop seam/tail exclusion, tuning, velocity, gain, pan and one-shot completion "
-                     "verified\n";
+        // An MSynth25 effective loop may end on the guard frame past the wave: it plays the
+        // loop start sample, then wraps after frames + 1 positions (Crudux program 2).
+        auto guard = fixture();
+        guard->instruments[0].regions[0].settings.loop = DlsLoop{0, 5};
+        CHECK(sampler.play(guard, 0, 60, 127, 1, 1, error));
+        out.assign(22, 0);
+        auto reference = out;
+        CHECK(compare_scalar(sampler, 11, out));
+        const double guarded[] = {0, 1, -1, .5, 0, 0, 1, -1, .5, 0, 0};
+        for (unsigned f = 0; f < 11; ++f)
+            CHECK(near(out[2 * f], guarded[f] * gain));
+        CHECK(sampler.voices()[0].loops == 2 && near(sampler.voices()[0].cursor, 1));
+        sampler.clear();
+        guard->instruments[0].regions[0].settings.loop = DlsLoop{0, 6};
+        CHECK(!sampler.play(guard, 0, 60, 127, 1, 1, error)); // Nothing past the guard frame.
+        std::cout << "PCM interpolation, loop seam/tail exclusion, guard-frame loops, tuning, velocity, gain, pan and "
+                     "one-shot completion verified\n";
         return true;
     }
     bool envelopes()

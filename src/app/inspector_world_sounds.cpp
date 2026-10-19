@@ -149,13 +149,12 @@ namespace OpenBlood2
                 unsigned(live.logical_level), unsigned(current.level()), current.active() ? "active" : "stopped",
                 (unsigned long long)live.requests, (unsigned long long)live.accepted,
                 (unsigned long long)live.failures);
-            ImGui::Text(
-                "Messages %llu | source no-ops %llu | refused %llu | no authored music %llu | committed switches %llu | "
-                "cancelled MIDI %llu",
-                (unsigned long long)live.received, (unsigned long long)live.source_noops,
-                (unsigned long long)live.refused, (unsigned long long)live.unauthored,
-                (unsigned long long)current.switches(),
-                (unsigned long long)sampler.cancelled_messages);
+            ImGui::Text("Messages %llu | source no-ops %llu | refused %llu | no authored music %llu | committed "
+                        "switches %llu | "
+                        "cancelled MIDI %llu",
+                        (unsigned long long)live.received, (unsigned long long)live.source_noops,
+                        (unsigned long long)live.refused, (unsigned long long)live.unauthored,
+                        (unsigned long long)current.switches(), (unsigned long long)sampler.cancelled_messages);
             if (!music.audition_file.empty())
                 ImGui::TextWrapped("Diagnostic audition overrides the stream; the game-level counters are historical.");
             if (current.pending())
@@ -360,10 +359,21 @@ namespace OpenBlood2
             {
                 ImGui::Text("Unity note %u | fine tune %d | raw attenuation %d | options 0x%x",
                             unsigned(sample.unity_note), int(sample.fine_tune), sample.attenuation, sample.options);
-                if (sample.loop)
+                if (sample.authored_loop)
+                {
+                    // Region settings: authored record, then the installed MSynth25 effective loop.
+                    ImGui::Text("Authored loop: start %u / length %u frames%s", sample.authored_loop->start,
+                                sample.authored_loop->length, sample.loop_in_bounds ? "" : " (past the wave)");
+                    if (sample.loop)
+                        ImGui::Text("MSynth25 effective loop: start %u / length %u frames", sample.loop->start,
+                                    sample.loop->length);
+                    else
+                        ImGui::TextUnformatted("MSynth25 effective: one shot (loop under six frames)");
+                }
+                else if (sample.loop)
                     ImGui::Text("Forward loop: start %u / length %u frames | %s", sample.loop->start,
                                 sample.loop->length,
-                                sample.loop_in_bounds ? "in bounds" : "INVALID default (region override required)");
+                                sample.loop_in_bounds ? "in bounds" : "past the wave (synth clamps when inherited)");
                 else
                     ImGui::TextUnformatted("One shot (no sample loop)");
             };

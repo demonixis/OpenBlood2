@@ -96,3 +96,36 @@ SubwayA and CityHub retain Cabal's 14 instruments, 38 regions, 35 samples and
 synthesis, musical events, personalities, scheduling, original playlist/state
 transitions and the complete M2 gate remain open. NVIDIA tests do not establish
 native macOS/Windows/mobile execution or audible fidelity.
+
+## Installed synth loop rules
+
+The installed Blood II DLS synthesizer is `MSynth25.dll` (sha256 b30b8be7…; `AM18.dll` is
+AudioMan 1.8, the wave mixer, and plays no DLS loops). Read-only static inspection of its
+loader and voice code establishes how it treats authored loops; the decoder now applies the
+same rules through `msynth_effective_loop` and keeps the authored record in
+`authored_loop`. This supersedes the earlier Crudux/Track1 refusal; the observed file
+values above stay as recorded.
+
+- Parsing a `wsmp` (wave 0x7ea4, region 0x88a4 RVA) stores start and end = start + length
+  as unsigned 32-bit values with no range check. The wave object keeps frames + 1 samples:
+  the extra one is a guard.
+- At the end of each wave chunk, wave verification (0x62f0) clamps the end to [1, frames + 1],
+  moves a start past the end onto it, and marks the wave one-shot when the loop is under five
+  frames.
+- Linking a region to its wave (0x6190) copies the wave settings when the region has no
+  `wsmp`; for a looping sample it restarts a start at or past frames + 1 at zero and writes
+  the guard as a copy of the loop start sample (zero for a one-shot, whose length excludes it).
+- Region verification (0x60f0) repeats the clamp and marks the region one-shot when the loop
+  is under six frames. Voice start (0xc880) converts start/end to 20.12 fixed point and the mix
+  loop (0xce8b) moves the position back by end − start whenever it reaches the end.
+
+Every installed loop but two covers its whole wave (start 0, length = frames) and is
+unchanged. Crudux program 2 (664,633 for 64,633 frames) and Track1 program 4 (32,025 for
+23,025 frames) now loop over frames + 1 positions, the last one the guard copy of frame 0.
+All five banks decode: 54 instruments, 211 regions, 156 waves. The inspector shows authored
+and effective loops. The sampler reads a guard position as the loop start sample. Two
+original details are not reproduced: interpolation at the guard position reads one sample
+past the original buffer (the port uses the loop start), and a loop the short-loop rule turns
+into a one-shot does not play the original's trailing guard frame. 03_Museum's Crudux music therefore
+prepares, and the level starts. Structural refusals (sizes, loop type, zero length, counts)
+are unchanged.

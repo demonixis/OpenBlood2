@@ -136,7 +136,9 @@ namespace
         CHECK(inst.program == 1 && inst.bank == 0 && inst.regions.size() == 2);
         CHECK(a.wave == 1 && a.cue == 0 && !a.settings_override && a.settings.unity_note == 72);
         CHECK(a.settings.fine_tune == -58 && a.settings.attenuation == -655360);
-        CHECK(a.settings.loop && a.settings.loop->start == 1 && a.settings.loop->length == 2);
+        // The inherited two-frame loop is authored; MSynth25 plays a loop under five/six frames once.
+        CHECK(a.settings.authored_loop && a.settings.authored_loop->start == 1 &&
+              a.settings.authored_loop->length == 2 && !a.settings.loop);
         CHECK(b.wave == 0 && b.cue == 1 && b.settings_override && b.settings.unity_note == 35);
         CHECK(b.settings.fine_tune == 27 && !b.settings.loop);
         CHECK(a.key_low == 10 && a.key_high == 100 && a.velocity_low == 20 && a.velocity_high == 127);
@@ -145,7 +147,7 @@ namespace
         const auto& c = inst.articulation.connections[0];
         CHECK(c.source == 0x81 && c.control == 2 && c.destination == 0x209 && c.transform == 1 && c.scale == -65536);
         bytes.assign(bytes.size(), 0);
-        CHECK(bank.waves[0].samples[3] == .5f && a.settings.loop->length == 2);
+        CHECK(bank.waves[0].samples[3] == .5f && a.settings.authored_loop->length == 2);
         // The retail Cabal profile has an invalid wave default that all users override.
         auto overridden = fixture();
         patch(overridden, find(overridden, "wsmp", 1) + 28, 7000);
@@ -204,7 +206,7 @@ namespace
             CHECK(rejected(bad));
         }
         // Wave loop, distinct from the one-shot region override (the first wsmp).
-        for (const auto [offset, value] : {std::pair{20U, 20U}, {24U, 1U}, {28U, 4U}, {32U, 0U}, {32U, 0xffffffffU}})
+        for (const auto [offset, value] : {std::pair{20U, 20U}, {24U, 1U}, {32U, 0U}})
         {
             auto bad = valid;
             patch(bad, find(valid, "wsmp", 2) + offset, value);
@@ -229,7 +231,7 @@ namespace
     bool private_data(const std::filesystem::path& root)
     {
         std::string error;
-        std::size_t files = 0, refused = 0, waves = 0, instruments = 0, regions = 0, frames = 0, connections = 0,
+        std::size_t files = 0, clamped = 0, waves = 0, instruments = 0, regions = 0, frames = 0, connections = 0,
                     overrides = 0;
         for (const auto& file : std::filesystem::recursive_directory_iterator(root / "Music"))
         {
@@ -239,15 +241,21 @@ namespace
             Bytes bytes{std::istreambuf_iterator<char>(in), {}};
             DlsBank bank;
             const bool decoded = read_dls_bank(bytes, bank, error);
-            if (file.path().filename() == "crudux.dls" || file.path().filename() == "track1.dls")
-            {
-                CHECK(!decoded && error.starts_with("DLS: Effective region loop exceeds linked wave frames:"));
-                CHECK(bank.waves.empty() && bank.instruments.empty());
-                ++refused;
-                std::cout << file.path().filename().string() << ": explicitly refused: " << error << '\n';
-                continue;
-            }
             CHECK(decoded);
+            // Crudux program 2 (664633 for 64633 frames) and Track1 program 4 (32025 for 23025)
+            // author loops past their waves; MSynth25 ends them on the guard frame.
+            for (const auto& i : bank.instruments)
+                for (const auto& r : i.regions)
+                    if (r.settings.authored_loop && !r.settings.loop_in_bounds)
+                    {
+                        const auto frames = bank.waves[r.wave].samples.size();
+                        CHECK(r.settings.loop && r.settings.loop->start == 0 && r.settings.loop->length == frames + 1);
+                        CHECK((file.path().filename() == "crudux.dls" && i.program == 2 && frames == 64633 &&
+                               r.settings.authored_loop->length == 664633) ||
+                              (file.path().filename() == "track1.dls" && i.program == 4 && frames == 23025 &&
+                               r.settings.authored_loop->length == 32025));
+                        ++clamped;
+                    }
             MusicAssetInfo info;
             CHECK(read_music_asset(bytes, MusicAssetKind::Instruments, info, error));
             std::size_t wi = 0, bank_frames = 0;
@@ -281,7 +289,7 @@ namespace
                     bc += r.articulation.connections.size();
                     if (r.settings.loop)
                         CHECK(std::uint64_t(r.settings.loop->start) + r.settings.loop->length <=
-                              bank.waves[r.wave].samples.size());
+                              bank.waves[r.wave].samples.size() + 1);
                 }
             }
             std::cout << file.path().filename().string() << ": " << bank.instruments.size() << " instruments / " << br
@@ -294,10 +302,46 @@ namespace
             frames += bank_frames;
             connections += bc;
         }
-        CHECK(files == 3 && refused == 2 && instruments == 34 && waves == 118 && regions == 174 && overrides == 174);
-        std::cout << "Private totals: " << files << " decoded banks / " << refused << " refused banks / " << instruments
-                  << " instruments / " << regions << " regions / " << waves << " waves / " << frames << " frames / "
-                  << connections << " raw connections; all PCM samples independently checked\n";
+        CHECK(files == 5 && clamped == 2 && instruments == 54 && waves == 156 && regions == 211 && overrides == 211);
+        std::cout << "Private totals: " << files << " decoded banks / " << clamped << " guard-ended loops / "
+                  << instruments << " instruments / " << regions << " regions / " << waves << " waves / " << frames
+                  << " frames / " << connections << " raw connections; all PCM samples independently checked\n";
+        return true;
+    }
+    // Installed MSynth25.dll wave verification (0x354962f0), region link (0x35496190) and
+    // region verification (0x354960f0), observed by static inspection.
+    bool msynth_loops()
+    {
+        std::string error; // Reported by CHECK.
+        const auto same = [](std::optional<DlsLoop> l, std::uint32_t start, std::uint32_t length)
+        { return l && l->start == start && l->length == length; };
+        for (bool inherited : {false, true})
+        {
+            // In range: unchanged, including a loop ending on the last real frame.
+            CHECK(same(msynth_effective_loop({10, 50}, 100, inherited), 10, 50));
+            CHECK(same(msynth_effective_loop({0, 100}, 100, inherited), 0, 100));
+            // Past the wave: the end stops on the guard frame (frames + 1).
+            CHECK(same(msynth_effective_loop({0, 664633}, 64633, inherited), 0, 64634));
+            CHECK(same(msynth_effective_loop({90, 50}, 100, inherited), 90, 11));
+            // Under six frames after clamping: played once.
+            CHECK(!msynth_effective_loop({96, 50}, 100, inherited));
+            CHECK(!msynth_effective_loop({1, 2}, 4, inherited));
+        }
+        // A region start at or past the guard restarts at zero; the stored end still clamps.
+        CHECK(same(msynth_effective_loop({101, 10}, 100, false), 0, 101));
+        CHECK(same(msynth_effective_loop({500, 10}, 100, false), 0, 101));
+        // Inherited from the wave: its own verification first moves the start onto the end,
+        // so the wave is already marked one-shot before the link could restart it.
+        CHECK(!msynth_effective_loop({500, 10}, 100, true));
+        // A 32-bit end wrapping to zero becomes 1: played once.
+        CHECK(!msynth_effective_loop({200, 0xffffff38U}, 100, false));
+        CHECK(!msynth_effective_loop({200, 0xffffff38U}, 100, true));
+        // An end wrapping to 50 below a start past the guard: the region restarts its start at
+        // zero (a 50-frame loop); the wave's own verification already pinned it on the end.
+        CHECK(same(msynth_effective_loop({500, 0xfffffe3eU}, 100, false), 0, 50));
+        CHECK(!msynth_effective_loop({500, 0xfffffe3eU}, 100, true));
+        std::cout
+            << "MSynth25 effective loops: guard-frame end, start restart, wrapped ends and short loops verified\n";
         return true;
     }
 } // namespace
@@ -308,6 +352,7 @@ int main(int argc, char** argv)
     const std::string_view test = argv[1];
     return (test == "decode"                 ? decode()
             : test == "malformed"            ? malformed()
+            : test == "msynth_loops"         ? msynth_loops()
             : test == "private" && argc == 3 ? private_data(argv[2])
                                              : false)
                ? 0

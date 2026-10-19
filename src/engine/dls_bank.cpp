@@ -8,6 +8,33 @@
 
 namespace OpenBlood2
 {
+    std::optional<DlsLoop> msynth_effective_loop(DlsLoop authored, std::size_t frames, bool inherited)
+    {
+        // MSynth25.dll (sha256 b30b8be7...): the wave object stores frames + 1 samples, the last
+        // one a guard. 0x354962f0 verifies a wave's own loop when its chunk ends; 0x35496190
+        // copies it into a region without wsmp, restarts a start at or past the stored count at
+        // zero and writes the guard; 0x354960f0 then verifies the region loop.
+        const auto stored = static_cast<std::uint32_t>(frames + 1);
+        std::uint32_t start = authored.start;
+        std::uint32_t end = authored.start + authored.length; // Unsigned 32-bit, as stored at parse.
+        const auto verify = [&](std::uint32_t minimum)
+        {
+            if (end < 1)
+                end = 1;
+            else if (end > stored)
+                end = stored;
+            if (start > end)
+                start = end;
+            return end - start >= minimum;
+        };
+        if (inherited && !verify(5))
+            return std::nullopt;
+        if (start >= stored)
+            start = 0;
+        if (!verify(6))
+            return std::nullopt;
+        return DlsLoop{start, end - start};
+    }
     namespace
     {
         class BankReader
@@ -181,11 +208,11 @@ namespace OpenBlood2
                     out.settings = *w.settings;
                 else
                     return fail("Neither region nor linked wave supplies sample settings");
-                if (!out.settings.loop_in_bounds)
-                    return fail("Effective region loop exceeds linked wave frames: wave " + std::to_string(out.wave) +
-                                ", start " + std::to_string(out.settings.loop->start) + ", length " +
-                                std::to_string(out.settings.loop->length) + ", frames " +
-                                std::to_string(w.samples.size()));
+                // Effective loop of the installed synth: Crudux/Track1 regions end past their
+                // waves (664633/32025 for 64633/23025 frames) and play up to the guard frame.
+                out.settings.authored_loop = out.settings.loop;
+                if (out.settings.loop)
+                    out.settings.loop = msynth_effective_loop(*out.settings.loop, w.samples.size(), !wsmp);
                 return articulation(n, out.articulation);
             }
             bool read()

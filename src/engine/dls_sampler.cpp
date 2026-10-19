@@ -341,11 +341,12 @@ namespace OpenBlood2
             return fail("Invalid DLS region wave");
         const auto& wave = bank->waves[region.wave];
         const auto& sample = region.settings;
-        if (wave.samples.empty() || wave.rate < 8000 || wave.rate > 96000 || !sample.loop_in_bounds ||
-            sample.unity_note > 127 || region.channel != 1 || region.wave_options || region.phase_group ||
-            region.key_group || (region.options & ~1U) ||
-            (sample.loop &&
-             (!sample.loop->length || std::uint64_t(sample.loop->start) + sample.loop->length > wave.samples.size())))
+        // A loop may end on the guard frame past the wave (MSynth25 effective loops).
+        if (wave.samples.empty() || wave.rate < 8000 || wave.rate > 96000 || sample.unity_note > 127 ||
+            region.channel != 1 || region.wave_options || region.phase_group || region.key_group ||
+            (region.options & ~1U) ||
+            (sample.loop && (!sample.loop->length ||
+                             std::uint64_t(sample.loop->start) + sample.loop->length > wave.samples.size() + 1)))
             return fail("Unsupported DLS sample, phase link or exclusive key group");
         DlsVoice v;
         v.instrument = instrument;
@@ -514,9 +515,16 @@ namespace OpenBlood2
                 {
                     const auto a = std::size_t(v.cursor);
                     auto b = std::min(a + 1, wave.samples.size() - 1);
-                    if (r.settings.loop && a + 1 >= std::size_t(r.settings.loop->start) + r.settings.loop->length)
-                        b = r.settings.loop->start;
-                    const double pcm = wave.samples[a] + (wave.samples[b] - wave.samples[a]) * (v.cursor - a);
+                    if (r.settings.loop)
+                    {
+                        b = a + 1;
+                        if (b >= std::size_t(r.settings.loop->start) + r.settings.loop->length)
+                            b = r.settings.loop->start;
+                    }
+                    // The frame past the wave is MSynth25's guard copy of the loop start sample.
+                    const auto at = [&](std::size_t i)
+                    { return i < wave.samples.size() ? wave.samples[i] : wave.samples[r.settings.loop->start]; };
+                    const double pcm = at(a) + (at(b) - at(a)) * (v.cursor - a);
                     // LFO gain is unipolar; its delayed phase has no attenuation.
                     const double lfo_gain =
                         v.lfo_gain != 0 && time >= v.lfo_delay

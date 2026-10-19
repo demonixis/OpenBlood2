@@ -105,7 +105,9 @@ All 38 Cabal regions now produce finite nonzero PCM at midpoint key/velocity 100
 five use the legacy pan alias. This supersedes the earlier 33 accepted/five refused
 sampler evidence, not its historical results. Full MIDI state/key-group exclusivity, timed authored note events,
 styles/personality semantics, original playlists/transitions, reverb and retail
-listening comparisons remain absent. Crudux/Track1 effective-loop failures remain
-unchanged. Do not turn `MUSIC` into success on the strength of these auditions.
+listening comparisons remain absent. Do not turn `MUSIC` into success on the strength of these auditions.
+The [MSynth25 loop rules](music_dls_contracts.md#installed-synth-loop-rules) supersede the
+Crudux/Track1 effective-loop refusal: a region loop may now end on the guard frame one past
+its wave, which plays the loop start sample before wrapping; loops may not end further out.
 
 The [session-cost continuation](session_cost_contracts.md) removes redundant work while preserving these ownership, timing and inspection rules.

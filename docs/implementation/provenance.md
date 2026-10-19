@@ -1221,6 +1221,15 @@ No original music command is marked successful. See
 [source ledger](sources/m2_music_sampler_sources.json) and
 [evidence](../../../Documentation/Implementation/m2_music_sampler.md).
 
+## Installed-synth DLS loop rules
+
+Read-only static inspection of the installed MSynth25.dll loader, link, verification and
+voice code establishes its clamping of authored sample loops (end at most one guard frame
+past the wave, start restart, five/six-frame one-shot rule). The independent decoder applies
+these rules to effective region loops; no binary, disassembly or SDK code is imported.
+AM18.dll is AudioMan, not the DLS synth. See [source ledger](sources/m2_music_loop_sources.json)
+and [contracts](../contracts/music_dls_contracts.md#installed-synth-loop-rules).
+
 ## Legacy DLS constant pan (M2)
 
 Read-only inspection and bounded isolated emulation of the installed MSynth25

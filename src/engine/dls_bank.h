@@ -17,8 +17,12 @@ namespace OpenBlood2
         std::int16_t fine_tune = 0;
         std::int32_t attenuation = 0; // Raw signed DLS fixed-point value, not applied gain.
         std::uint32_t options = 0;
+        // Wave defaults keep the authored loop. Region settings hold the effective loop of the
+        // installed MSynth25 synth (msynth_effective_loop), which may end one frame past the
+        // wave: that guard frame repeats the loop start sample.
         std::optional<DlsLoop> loop;
-        bool loop_in_bounds = true; // An unused wave default may be invalid; effective region settings must be valid.
+        std::optional<DlsLoop> authored_loop; // Region settings: the region's or inherited wave's record.
+        bool loop_in_bounds = true;           // The authored loop fits its wave's frames.
     };
     struct DlsConnection
     {
@@ -61,6 +65,12 @@ namespace OpenBlood2
     inline constexpr std::size_t max_dls_decoded_bytes = 32 * 1024 * 1024;
     // Bounded DLS1 data decoding, not a synthesizer. Output is empty on failure.
     // Callers can lower the PCM budget when loading several banks.
+    // Installed MSynth25.dll loop rules (wave verification at parse, region link, region
+    // verification): the stored end is start + length in 32 bits; it is at least 1 and at most
+    // frames + 1 (a guard copy of the loop start sample); a start at or past frames + 1 restarts
+    // at zero; the start never passes the end; a loop shorter than 5 (wave) or 6 (region)
+    // frames plays once (nullopt).
+    std::optional<DlsLoop> msynth_effective_loop(DlsLoop authored, std::size_t frames, bool inherited_from_wave);
     bool read_dls_bank(std::span<const std::uint8_t> bytes, DlsBank& out, std::string& error,
                        std::size_t pcm_budget = max_dls_decoded_bytes);
 } // namespace OpenBlood2

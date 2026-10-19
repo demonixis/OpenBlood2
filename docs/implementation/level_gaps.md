@@ -35,7 +35,7 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 ## Status by world
 
 `starts` means the world passes entry validation and starts (01_SubwayA,
-02_CityHub, 05_CDM, 05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon, BB_Drain). Batches are defined in the next section.
+02_CityHub, 03_Museum, 05_CDM, 05_CDMB, 08_SubwayB, Drop, BB_DeathCanyon, BB_Drain). Batches are defined in the next section.
 
 | World | Created | Unported (classes) | Failed | Batches needed |
 |---|---:|---:|---:|---|
@@ -43,7 +43,7 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 | 02_cityhub | 453 | 0 (0) | 0 | **starts** |
 | 02_cityhubb | 404 | 7 (1) | 0 | L7 |
 | 02_cityhubc | 386 | 18 (2) | 2 | L2, L7, L10 |
-| 03_museum | 651 | 0 (0) | 0 | entry validated; music (Crudux DLS bank) blocks start |
+| 03_museum | 651 | 0 (0) | 0 | **starts** |
 | 04_steamtunnels | 494 | 10 (4) | 6 | L2, L5, L6, L7, L10 |
 | 05_cdm | 550 | 0 (0) | 0 | **starts** |
 | 05_cdmb | 129 | 0 (0) | 0 | **starts** |
@@ -323,11 +323,9 @@ shortcut.
 All classes and entries are ported (BinocularsPU, MadScientistAI, Tchernotronic,
 ShotgunPU, the Fanatic shotgun, the Prophet singularity, InvulnerabilityPU and the
 authored-overlap Cultist; the absent RocketAmmoPU spawn creates nothing, as in the
-source). World entry validates. Startup is still refused by the music check: the
-level's Crudux instrument bank is refused by the DLS decoder (program 2 has a
-664,633-frame loop in a 64,633-frame sample; music DLS contracts), so its playlist
-sections have no bank. With that check bypassed the session starts and runs its
-first update.
+source). The level starts: its Crudux bank (program 2 authors a 664,633-frame loop
+in a 64,633-frame sample) now decodes with the installed MSynth25 loop rules (music
+DLS contracts).
 
 ### 04_steamtunnels
 494 created instances · 10 unported entries (4 classes) · 6 failed entries

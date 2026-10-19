@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-19",
+  "status": "Installed-synth DLS loop rules applied to decoded effective region loops",
+  "imports": [],
+  "references": [
+    {
+      "source": "External installed Blood II/MSynth25.dll",
+      "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+      "image_base": "0x35490000",
+      "wave_wsmp_rva": "0x7ea4",
+      "region_wsmp_rva": "0x88a4",
+      "wave_verify_rva": "0x62f0",
+      "region_link_rva": "0x6190",
+      "region_verify_rva": "0x60f0",
+      "voice_start_rva": "0xc880",
+      "mix_wrap_rva": "0xce8b",
+      "use": "Read-only static inspection (Apple llvm-objdump); no code, binary or PCM imported",
+      "observations": [
+        "wsmp loops store start and start+length as unsigned 32-bit values without range checks",
+        "A wave keeps frames+1 samples; the link writes the guard as a copy of the loop start (zero for one-shots, whose length then excludes it)",
+        "Wave verification clamps end to [1, frames+1], start to <= end, one-shot under five frames",
+        "The link copies wave settings into regions without wsmp and restarts a start >= frames+1 at zero",
+        "Region verification repeats the clamp, one-shot under six frames",
+        "Voices use 20.12 fixed-point start/end and subtract end-start on reaching the end"
+      ]
+    },
+    {
+      "source": "External installed Blood II/AM18.dll",
+      "sha256": "da46f8c1d179de5a0e30ea931ab912838bb704acb659b45e90a4a455cdb07923",
+      "use": "Identified by its strings as AudioMan 1.8 (wave mixer); not the DLS synthesizer"
+    }
+  ],
+  "replacement_code": [
+    "src/engine/dls_bank.cpp: msynth_effective_loop and authored/effective region loops",
+    "src/engine/dls_sampler.cpp: guard-position reads equal the loop start sample",
+    "src/app/inspector_world_sounds.cpp: authored and effective loop inspection"
+  ],
+  "deliberate_limits": [
+    "Interpolation at the guard position uses the loop start instead of the original one-past-buffer read",
+    "A short-loop one-shot does not play the original's trailing guard frame",
+    "Other MSynth25 clamps (unity note, fine tune, attenuation, rate) are not adopted; the decoder's structural refusals remain"
+  ]
+}
