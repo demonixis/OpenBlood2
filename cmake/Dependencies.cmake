@@ -19,7 +19,8 @@ set(SDL_INSTALL OFF CACHE BOOL "" FORCE)
 set(SDL_RENDER OFF CACHE BOOL "" FORCE)
 # Unused capture, desktop integration and file-output audio services.
 set(SDL_CAMERA OFF CACHE BOOL "" FORCE)
-set(SDL_DIALOG OFF CACHE BOOL "" FORCE)
+# Native dialogs are isolated to launcher-only build trees.
+set(SDL_DIALOG ${BLOOD2_BUILD_LAUNCHER} CACHE BOOL "" FORCE)
 set(SDL_TRAY OFF CACHE BOOL "" FORCE)
 set(SDL_NOTIFICATION OFF CACHE BOOL "" FORCE)
 set(SDL_DISKAUDIO OFF CACHE BOOL "" FORCE)

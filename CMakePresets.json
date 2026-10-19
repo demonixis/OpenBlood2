@@ -1,6 +1,10 @@
 {
   "version": 6,
-  "cmakeMinimumRequired": { "major": 3, "minor": 28, "patch": 0 },
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 28,
+    "patch": 0
+  },
   "configurePresets": [
     {
       "name": "debug",
@@ -19,25 +23,131 @@
       "displayName": "Optimized development with inspector",
       "inherits": "debug",
       "binaryDir": "${sourceDir}/build/dev",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
     },
     {
       "name": "release",
       "displayName": "Release without inspector",
       "inherits": "debug",
       "binaryDir": "${sourceDir}/build/release",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release", "BLOOD2_INSPECTOR": false }
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BLOOD2_INSPECTOR": false
+      }
+    },
+    {
+      "name": "launcher-debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/launcher-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+        "BUILD_TESTING": true,
+        "BLOOD2_BUILD_GAME": false,
+        "BLOOD2_BUILD_LAUNCHER": true,
+        "BLOOD2_INSPECTOR": false
+      }
+    },
+    {
+      "name": "launcher-release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/launcher-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+        "BUILD_TESTING": true,
+        "BLOOD2_BUILD_GAME": false,
+        "BLOOD2_BUILD_LAUNCHER": true,
+        "BLOOD2_INSPECTOR": false
+      }
+    },
+    {
+      "name": "launcher-sanitize",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/launcher-sanitize",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+        "BUILD_TESTING": true,
+        "BLOOD2_BUILD_GAME": false,
+        "BLOOD2_BUILD_LAUNCHER": true,
+        "BLOOD2_INSPECTOR": false,
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "BLOOD2_SANITIZERS": true
+      }
     }
   ],
   "buildPresets": [
-    { "name": "debug", "configurePreset": "debug" },
-    { "name": "dev", "configurePreset": "dev" },
-    { "name": "release", "configurePreset": "release" }
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "dev",
+      "configurePreset": "dev"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "launcher-debug",
+      "configurePreset": "launcher-debug"
+    },
+    {
+      "name": "launcher-release",
+      "configurePreset": "launcher-release"
+    },
+    {
+      "name": "launcher-sanitize",
+      "configurePreset": "launcher-sanitize"
+    }
   ],
   "testPresets": [
-    { "name": "debug", "configurePreset": "debug", "output": { "outputOnFailure": true } },
-    { "name": "dev", "configurePreset": "dev", "output": { "outputOnFailure": true } },
-    { "name": "release", "configurePreset": "release", "output": { "outputOnFailure": true } }
+    {
+      "name": "debug",
+      "configurePreset": "debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "dev",
+      "configurePreset": "dev",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "launcher-debug",
+      "configurePreset": "launcher-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "launcher-release",
+      "configurePreset": "launcher-release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "launcher-sanitize",
+      "configurePreset": "launcher-sanitize",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
   ]
 }
-
