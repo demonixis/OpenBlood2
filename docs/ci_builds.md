@@ -9,7 +9,7 @@ runner, personal access token or repository secret is needed by this workflow.
 | --- | --- | --- | --- |
 | `OpenBlood2-windows-x64` | Windows Server 2025 | MSVC | x86-64 |
 | `OpenBlood2-linux-x64` | Ubuntu 24.04 | GCC | x86-64 |
-| `OpenBlood2-macos-arm64` | macOS 15 | Apple Clang | Apple Silicon |
+| `OpenBlood2-macos-arm64` | macOS 26 | Apple Clang (Xcode 26.6) | Apple Silicon |
 
 Every job builds the inspector-free Release game and launcher, then runs their
 synthetic headless CTest suites, including the launcher/game information protocol.
@@ -40,8 +40,11 @@ It contains no commercial game data or demo; supply your own installation or
 use the launcher's demo installer. OpenSSL is linked statically; Windows archives
 also carry the MSVC runtime DLLs. Linux needs an Ubuntu 24.04-compatible glibc and
 system graphics/audio drivers. Windows needs a Vulkan-capable graphics driver.
-The macOS build targets Apple Silicon and uses Metal; it is not an Intel or
+The macOS build requires macOS 26 or newer, targets Apple Silicon and uses Metal; it is not an Intel or
 universal binary. These are unsigned development builds, without macOS notarization.
+The current floating-point `std::from_chars` calls require macOS 26's libc++;
+selecting a newer Xcode on a macOS 15 runner is not sufficient. CI explicitly
+selects Xcode 26.6 and a macOS 26.0 deployment target.
 The CI launcher disables optional libidn2 discovery to avoid linking a developer
 machine's shared library. Packaging rejects non-system macOS dylibs and smoke-tests
 the staged Windows executables without the developer tool directories on `PATH`.
