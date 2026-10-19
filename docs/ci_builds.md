@@ -42,6 +42,9 @@ also carry the MSVC runtime DLLs. Linux needs an Ubuntu 24.04-compatible glibc a
 system graphics/audio drivers. Windows needs a Vulkan-capable graphics driver.
 The macOS build targets Apple Silicon and uses Metal; it is not an Intel or
 universal binary. These are unsigned development builds, without macOS notarization.
+The CI launcher disables optional libidn2 discovery to avoid linking a developer
+machine's shared library. Packaging rejects non-system macOS dylibs and smoke-tests
+the staged Windows executables without the developer tool directories on `PATH`.
 
 ## Push and reproduce
 

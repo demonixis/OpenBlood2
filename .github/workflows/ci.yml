@@ -94,7 +94,7 @@ jobs:
 
       - name: Test game (headless, synthetic data)
         id: game-tests
-        run: ctest --preset ci-release --output-junit game-tests.xml
+        run: ctest --preset ci-release --output-junit "$GITHUB_WORKSPACE/build/ci/game/game-tests.xml"
 
       # The default parent build disables launcher tests in its child tree.
       # An independent preset exercises them and keeps SDL configurations isolated.
@@ -118,7 +118,7 @@ jobs:
 
       - name: Test launcher (headless, synthetic data)
         if: ${{ !cancelled() && steps.game-tests.outcome != 'skipped' }}
-        run: ctest --preset ci-launcher-release --output-junit launcher-tests.xml
+        run: ctest --preset ci-launcher-release --output-junit "$GITHUB_WORKSPACE/build/ci/launcher/launcher-tests.xml"
 
       - name: Package executables and notices
         env:

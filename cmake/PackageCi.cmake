@@ -38,15 +38,30 @@ if(CMAKE_HOST_WIN32)
     message(FATAL_ERROR "No x64 MSVC runtime found under VCToolsRedistDir")
   endif()
   file(COPY ${runtime} DESTINATION "${package}")
+  # Do not accidentally satisfy missing package DLLs from a developer PATH.
+  set(run_environment "${CMAKE_COMMAND}" -E env "PATH=$ENV{SystemRoot}/System32")
+endif()
+if(CMAKE_HOST_APPLE)
+  foreach(executable IN ITEMS blood2 blood2-launcher)
+    execute_process(COMMAND otool -L "${package}/${executable}"
+      OUTPUT_VARIABLE linked COMMAND_ERROR_IS_FATAL ANY)
+    string(REGEX MATCHALL "\n[ \t]+[^\n]+" dependencies "${linked}")
+    foreach(dependency IN LISTS dependencies)
+      string(STRIP "${dependency}" dependency)
+      if(NOT dependency MATCHES "^(/usr/lib/|/System/Library/)")
+        message(FATAL_ERROR "Non-system dependency in ${executable}: ${dependency}")
+      endif()
+    endforeach()
+  endforeach()
 endif()
 execute_process(COMMAND git rev-parse HEAD WORKING_DIRECTORY "${source}"
   OUTPUT_VARIABLE revision OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
 file(WRITE "${package}/BUILD.txt" "OpenBlood2\nPlatform: ${PLATFORM}\nConfiguration: Release\nCommit: ${revision}\n")
 
 # Check the staged executables as well as the build-tree binaries.
-execute_process(COMMAND "${package}/blood2${suffix}" --launcher-info
+execute_process(COMMAND ${run_environment} "${package}/blood2${suffix}" --launcher-info
   WORKING_DIRECTORY "${package}" COMMAND_ERROR_IS_FATAL ANY)
-execute_process(COMMAND "${package}/blood2-launcher${suffix}" --help
+execute_process(COMMAND ${run_environment} "${package}/blood2-launcher${suffix}" --help
   WORKING_DIRECTORY "${package}" COMMAND_ERROR_IS_FATAL ANY)
 if(CMAKE_HOST_WIN32)
   execute_process(COMMAND "${CMAKE_COMMAND}" -E tar cf "${name}.zip" --format=zip "${name}"

@@ -103,6 +103,7 @@
         "BLOOD2_TEST_DATA_DIR": "",
         "BLOOD2_DEMO_DATA_DIR": "",
         "OPENSSL_USE_STATIC_LIBS": true,
+        "USE_LIBIDN2": false,
         "BLOOD2_LAUNCHER_TEST_GAME": ""
       }
     }
