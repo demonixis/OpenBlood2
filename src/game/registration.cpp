@@ -715,6 +715,7 @@ namespace OpenBlood2
         const ClassInfo assault_pickup{"AssaultRiflePU", &weapon_pickup, construct<AssaultRiflePU>, {}};
         const ClassInfo flare_pickup{"FlareGunPU", &weapon_pickup, construct<FlareGunPU>, {}};
         const ClassInfo tesla_pickup{"TeslaCannonPU", &weapon_pickup, construct<TeslaCannonPU>, {}};
+        const ClassInfo voodoo_pickup{"VoodooDollPU", &weapon_pickup, construct<VoodooDollPU>, {}};
         const ClassInfo shotgun_pickup{"ShotgunPU", &weapon_pickup, construct<ShotgunPU>, {}};
         const ClassInfo singularity_pickup{"SingularityPU", &weapon_pickup, construct<SingularityPU>, {}};
         const ClassInfo mac10_pickup{"SubMachineGunPU", &weapon_pickup, construct<SubMachineGunPU>, {}};
@@ -1055,7 +1056,8 @@ namespace OpenBlood2
                objects.register_class(weapon_pickup) && objects.register_class(bugspray_pickup) &&
                objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
                objects.register_class(flare_pickup) && objects.register_class(tesla_pickup) &&
-               objects.register_class(shotgun_pickup) && objects.register_class(singularity_pickup) &&
+               objects.register_class(voodoo_pickup) && objects.register_class(shotgun_pickup) &&
+               objects.register_class(singularity_pickup) &&
                objects.register_class(mac10_pickup) && objects.register_class(sniper_pickup) &&
                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
                objects.register_class(health_base) && objects.register_class(armor_base) &&

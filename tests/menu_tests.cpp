@@ -4,7 +4,6 @@
 #include "app/ui_runtime.h"
 #include "camera_fixture.h"
 #include "engine/capture.h"
-#include "game/demo_menu_strings.h"
 #include "game/menu_audio.h"
 #include "game/original/CharacterProfiles.h"
 #include "game/original/MenuIds.h"
@@ -363,149 +362,6 @@ namespace
         return true;
     }
     // Original _DEMO CMenuMain/CMenuSinglePlayer branches and Splash_OnKeyDown.
-    bool demo_state()
-    {
-        std::string error;
-        Menu menu;
-        menu.demo = true;
-        menu.open(false);
-        CHECK(menu.items.size() == 5 && menu.items[3].string_id == IDS_MENU_MAIN_PRIMEGIBS);
-        for (const auto& item : menu.items)
-            CHECK(menu.enabled(item)); // Bloodbath and Prime Gibs show splash screens.
-        const auto splash = [&](int item, std::string_view screen, bool exit)
-        {
-            menu.selected = item;
-            menu.activate();
-            return menu.splash && menu.splash == screen && menu.splash_exit == exit;
-        };
-        CHECK(splash(1, "screens/bloodbath.pcx", false));
-        const auto items = menu.items.size();
-        menu.select(1);
-        menu.items[0].rect = {0, 0, 640, 480};
-        menu.pointer(10, 10, true, false, false);
-        menu.pointer(10, 10, false, true, false); // Splash screens ignore the mouse.
-        CHECK(menu.splash && menu.page == MenuPage::Main && menu.selected == 1);
-        menu.back(); // ESC returns to the unchanged menu page.
-        CHECK(!menu.splash && menu.active && menu.page == MenuPage::Main && menu.items.size() == items);
-        CHECK(menu.take_command().action == MenuAction::None);
-        CHECK(splash(3, "screens/info.pcx", false));
-        menu.dismiss_splash(); // SPACE
-        CHECK(!menu.splash && menu.take_command().action == MenuAction::None);
-        CHECK(splash(4, "screens/info.pcx", true));
-        menu.activate(); // RETURN on the quit splash shuts down, without a confirmation box.
-        CHECK(!menu.splash && menu.page == MenuPage::Main && menu.take_command().action == MenuAction::Quit);
-        menu.selected = 0;
-        menu.activate();
-        CHECK(menu.page == MenuPage::Solo && menu.items.size() == 2);
-        CHECK(splash(1, "screens/modes.pcx", false) && menu.page == MenuPage::Solo);
-        menu.back();
-        menu.selected = 0;
-        menu.activate();
-        CHECK(menu.page == MenuPage::Difficulty);
-        menu.activate();
-        auto start = menu.take_command();
-        CHECK(start.action == MenuAction::NewGame && start.story && start.character == 0 && start.difficulty == 1);
-        menu.build(MenuPage::Options);
-        CHECK(menu.items[3].command == int(MENU_CMD_MOUSE) && !menu.enabled(menu.items[3]));
-        CHECK(menu.enabled(menu.items[0]) && menu.enabled(menu.items[1]));
-        menu.open(true);
-        CHECK(splash(1, "screens/bloodbath.pcx", false));
-        menu.close();
-        CHECK(!menu.splash && !menu.active);
-        // Retail menus are unchanged.
-        Menu retail;
-        retail.open(false);
-        CHECK(retail.items[3].string_id == IDS_MENU_MAIN_CREDITS && !retail.enabled(retail.items[1]));
-        retail.selected = 4;
-        retail.activate();
-        CHECK(retail.page == MenuPage::Quit && !retail.splash);
-        return true;
-    }
-    // Synthetic Build 108 layout: version and labels at the mapped file offsets.
-    bool demo_strings()
-    {
-        std::string error;
-        StringResources strings;
-        std::vector<std::uint8_t> dll(719872, 0);
-        const auto put = [&](std::size_t offset, std::string_view text)
-        { std::copy(text.begin(), text.end(), dll.begin() + std::ptrdiff_t(offset)); };
-        CHECK(!read_demo_menu_strings(dll, strings, error) && error.find("Build 108") != std::string::npos);
-        put(0x932d4, "DEMO v1.0 (Build 108)");
-        CHECK(!read_demo_menu_strings(dll, strings, error) && strings.strings.empty()); // Empty labels.
-        const std::pair<std::size_t, unsigned> offsets[] = {
-            {0x94408, IDS_MENU_MAIN_SINGLEPLAYER},   {0x94418, IDS_MENU_MAIN_BLOODBATH},
-            {0x94424, IDS_MENU_MAIN_OPTIONS},        {0x9442c, IDS_MENU_MAIN_PRIMEGIBS},
-            {0x94438, IDS_MENU_MAIN_QUIT},           {0x944a8, IDS_MENU_OPTIONS_DISPLAY},
-            {0x944b0, IDS_MENU_OPTIONS_AUDIO},       {0x944b8, IDS_MENU_OPTIONS_CONTROLS},
-            {0x944c4, IDS_MENU_OPTIONS_MOUSE},       {0x944cc, IDS_MENU_OPTIONS_JOYSTICK},
-            {0x944d8, IDS_MENU_OPTIONS_KEYBOARD},    {0x94530, IDS_MENU_SINGLEPLAYER_CALEB},
-            {0x94538, IDS_MENU_SINGLEPLAYER_CHOSEN}, {0x94104, IDS_MENU_DIFFICULTY_GENOCIDE},
-            {0x94110, IDS_MENU_DIFFICULTY_HOMICIDE}, {0x9411c, IDS_MENU_DIFFICULTY_SUICIDE},
-            {0x94170, IDS_MENU_DISPLAY_DETAIL_LOW},  {0x94184, IDS_MENU_DISPLAY_DETAIL_MEDIUM},
-            {0x9419c, IDS_MENU_DISPLAY_DETAIL_HIGH}, {0x9457c, IDS_MENU_AUDIO_SOUND},
-            {0x94584, IDS_MENU_AUDIO_SOUND_VOLUME},  {0x94594, IDS_MENU_AUDIO_16BIT_SOUND},
-            {0x945a4, IDS_MENU_AUDIO_MUSIC},         {0x945ac, IDS_MENU_AUDIO_MUSIC_VOLUME}};
-        for (const auto& [offset, id] : offsets)
-            put(offset, "L" + std::to_string(id));
-        CHECK(read_demo_menu_strings(dll, strings, error) && strings.strings.size() == 24);
-        CHECK(strings.strings.at(IDS_MENU_MAIN_PRIMEGIBS) == "L503" && !strings.strings.contains(600));
-        dll[0x94407] = 'x'; // A label must start a literal, not continue a neighbour.
-        CHECK(!read_demo_menu_strings(dll, strings, error) && strings.strings.empty());
-        dll[0x94407] = 0;
-        dll[0x9440a] = 0x80; // Printable ASCII only.
-        CHECK(!read_demo_menu_strings(dll, strings, error) && error.find("500") != std::string::npos);
-        dll[0x9440a] = 'A';
-        dll.push_back(0);
-        CHECK(!read_demo_menu_strings(dll, strings, error)); // Another build size.
-        return true;
-    }
-    // The real demo: its own labels, every reachable page and the original splash screens.
-    bool demo_artwork(const std::filesystem::path& content)
-    {
-        std::string error;
-        Resources resources;
-        Config config;
-        config.data_dir = content;
-        config.demo = true;
-        CHECK(resources.mount_game(config, error));
-        Menu menu;
-        menu.demo = true;
-        menu.open(false);
-        MenuCanvas canvas(resources);
-        CHECK(canvas.initialize(error) && canvas.strings.strings.size() == 24);
-        CHECK(canvas.strings.strings.at(IDS_MENU_MAIN_PRIMEGIBS) == "PRIME GIBS");
-        for (auto page : {MenuPage::Main, MenuPage::Solo, MenuPage::Difficulty, MenuPage::Options, MenuPage::Audio,
-                          MenuPage::Display})
-        {
-            menu.build(page);
-            CHECK(canvas.compose(menu, 0, error));
-            for (const auto& item : menu.items)
-                CHECK(!item.string_id || !item.literal.empty());
-        }
-        for (const auto* screen : {"screens/bloodbath.pcx", "screens/info.pcx", "screens/modes.pcx"})
-        {
-            menu.build(MenuPage::Main);
-            menu.selected = std::string_view(screen) == "screens/bloodbath.pcx" ? 1 : 3;
-            if (std::string_view(screen) == "screens/modes.pcx")
-            {
-                menu.build(MenuPage::Solo);
-                menu.selected = 1;
-            }
-            menu.activate();
-            CHECK(menu.splash == std::string_view(screen) && canvas.compose(menu, 0, error));
-            CHECK(canvas.surface->rgba != std::vector<std::uint8_t>(canvas.surface->rgba.size(), 0));
-        }
-        MenuAudio audio(resources);
-        for (std::uint32_t seed : {0u, 0x40000000u, 0x80000000u, 0xc0000000u})
-        {
-            audio.random_state = seed;
-            audio.focus(true);
-            CHECK(audio.ambient && audio.failures == 0); // Remapped to the shipped ambient02/04.
-            audio.focus(false);
-        }
-        std::cout << "Demo menu: 24 cshell.dll labels, splash screens and ambient02/04\n";
-        return true;
-    }
     bool artwork(const std::filesystem::path& content, bool gpu, const std::filesystem::path& output)
     {
         std::string error;
@@ -588,14 +444,8 @@ int main(int argc, char** argv)
         return test_menu_preferences(argc - 1, argv + 1);
     if (mode == "state")
         return state() ? 0 : 1;
-    if (mode == "demo_state")
-        return demo_state() ? 0 : 1;
-    if (mode == "demo_strings")
-        return demo_strings() ? 0 : 1;
     if (argc < 3)
         return 2;
-    if (mode == "demo")
-        return demo_artwork(path_from_utf8(argv[2])) ? 0 : 1;
     if (mode == "profiles")
         return profiles(path_from_utf8(argv[2])) ? 0 : 1;
     if (mode == "session")

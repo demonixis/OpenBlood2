@@ -1733,7 +1733,7 @@ static int application_main(const OpenBlood2::Options& options)
     std::string error;
     if (options.help)
     {
-        std::cout << "Blood II reconstruction " << OpenBlood2::build::version
+        std::cout << "Open Blood II " << OpenBlood2::build::version
                   << " (M2 in progress)\n"
                      "  --config FILE       Configuration file (default: blood2.local.ini in working directory)\n"
                      "  --log-dir DIR       Log root (default: SDL user directory / logs)\n"
@@ -1741,7 +1741,7 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --no-crash-capture  Leave crash handling entirely to the OS/debugger\n"
                      "  --data-dir DIR      External Blood II directory; overrides BLOOD2_DATA_DIR and config\n"
                      "  --demo              The data directory is the original 1998 demo (B2Demo.rez); "
-                     "first world Demo_01\n"
+                     "normal launch opens its menu, first world Demo_01\n"
                      "  --check-data        Check file metadata without opening a window or parsing archives\n"
                      "  --world NAME        World resource (default: 01_SubwayA, Demo_01 with --demo)\n"
                      "  --inspect-world     Parse/mount/create original subset headlessly; does not run a game\n"
@@ -1758,7 +1758,8 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --no-model-shadows  Disable FLAG_SHADOW model shadows (original low/medium detail)\n"
                      "  --pixel-lighting    Light models per pixel (menu: Options > Display)\n"
                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled (bench: last frame)\n"
-                     "  --menu-smoke        Original-menu SDL traversal, isolated preferences and pause checks\n"
+                     "  --menu-smoke        Selected-edition menu SDL traversal, isolated preferences/pause checks\n"
+                     "  --demo-smoke        Menu-free demo SDL pause, authored exits and ending diagnostic\n"
                      "  --gpu-smoke         Exercise GPU presentation, inspector toggle, resize and quit\n"
                      "  --world-smoke       GPU lifecycle with real world unload/reload assertions\n"
                      "  --keepalive-smoke   GPU SubwayA capture / CityHub named entry, hidden updates and reload\n"

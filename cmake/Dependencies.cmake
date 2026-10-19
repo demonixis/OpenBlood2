@@ -12,6 +12,24 @@ set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
 set(SDL_TESTS OFF CACHE BOOL "" FORCE)
 set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(SDL_INSTALL OFF CACHE BOOL "" FORCE)
+
+# The game and ImGui use SDL_GPU directly, not SDL_Renderer.
+# Keep GPU/OpenXR, platform audio/video (including KMSDRM's EGL dependency),
+# controllers and dummy test drivers at their existing defaults.
+set(SDL_RENDER OFF CACHE BOOL "" FORCE)
+# Unused capture, desktop integration and file-output audio services.
+set(SDL_CAMERA OFF CACHE BOOL "" FORCE)
+set(SDL_DIALOG OFF CACHE BOOL "" FORCE)
+set(SDL_TRAY OFF CACHE BOOL "" FORCE)
+if(APPLE)
+    # This pinned SDL compiles Cocoa notifications unconditionally. Keep their
+    # UserNotifications/Security framework dependencies enabled on Apple builds.
+    set(SDL_NOTIFICATION ON CACHE BOOL "" FORCE)
+else()
+    set(SDL_NOTIFICATION OFF CACHE BOOL "" FORCE)
+endif()
+set(SDL_DISKAUDIO OFF CACHE BOOL "" FORCE)
+
 set(SPDLOG_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(SPDLOG_BUILD_EXAMPLE OFF CACHE BOOL "" FORCE)
 set(SPDLOG_INSTALL OFF CACHE BOOL "" FORCE)

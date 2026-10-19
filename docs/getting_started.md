@@ -11,6 +11,20 @@ are in [Dependencies.cmake](../cmake/Dependencies.cmake). No prototype repositor
 is a build dependency. The first configure needs network access; build products
 and downloaded dependencies are ignored under `build/` and `.cache/`.
 
+The build disables unused SDL subsystems: `SDL_RENDER`, `SDL_CAMERA`,
+`SDL_DIALOG`, `SDL_TRAY`, `SDL_NOTIFICATION` and `SDL_DISKAUDIO`.
+Apple builds retain `SDL_NOTIFICATION`: the pinned SDL compiles its Cocoa
+notification backend unconditionally, so this option must stay enabled to link
+the required UserNotifications and Security frameworks.
+Both the game and ImGui render directly through SDL_GPU;
+`SDL_RENDER` controls the separate SDL_Renderer API. GPU/OpenXR support,
+platform audio/video backends, controller support and dummy test drivers retain
+their existing configuration. OpenGL/OpenGL ES remain at their defaults because
+SDL's KMSDRM video backend depends on EGL support enabled by those options.
+Reconfigure existing build directories to apply these settings.
+Dependency revisions are unchanged. See the
+[validation record](../../Documentation/Implementation/sdl_build_options.md).
+
 ## Windows build
 
 Install these tools, or check that they are already available:
@@ -88,14 +102,20 @@ ctest --preset debug -L headless
 ```
 
 The 1998 two-level demo (`B2Demo.rez`) needs `--demo`; its first world is `Demo_01`.
-Its worlds still use unported classes and its menu has no string table, so it does
-not start yet. See [demo contracts](contracts/demo_contracts.md).
+Normal launch opens the [demo menu](contracts/demo_menu_contracts.md). Choose
+Caleb and difficulty to start; the authored exit continues to Demo_02. EndGame
+shows Info, then Esc/Enter/Space returns to Main. Quit shows Info before exiting.
+`--view-world` retains menu-free direct entry and its end-image-to-exit behavior.
+Esc pauses/resumes; Enter after death restarts the current level with initial
+equipment. See [demo contracts](contracts/demo_contracts.md) for validation limits
+and the future save-system integration point.
 
 ```sh
-./build/debug/blood2 --demo --data-dir "/path/to/Blood2 Demo" --inspect-world
+./build/debug/blood2 --demo --data-dir "/path/to/Blood2 Demo"
+./build/debug/blood2 --demo --data-dir "/path/to/Blood2 Demo" --view-world --world Demo_02
 ```
 
-The default world is SubwayA. `--view-world` enters the original player and
+The retail default world is SubwayA. `--view-world` enters the original player and
 requests mouse capture. The inspector can also **Enter player and play**.
 The authored intro restricts movement/fire for roughly twelve simulation seconds.
 `--inspect-world` and `--inspect-player` provide diagnostic CLI output;

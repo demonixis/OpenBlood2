@@ -1,4 +1,6 @@
 #include "app/frontend.h"
+#include "app/demo_menu_smoke.h"
+#include "app/demo_smoke.h"
 #include "app/hud.h"
 #include "app/menu_input.h"
 #include "app/menu_renderer.h"
@@ -44,23 +46,34 @@ namespace OpenBlood2
         Resources artwork;
         if (!artwork.mount_game(config, error))
             return failed(5);
-        Menu menu;
+        // Keep the accepted menu-free diagnostic/direct route available independently.
+        const bool menu_enabled = !config.demo || (!options.view_world && !options.demo_smoke);
+        Menu menu(config.demo ? MenuEdition::Demo : MenuEdition::Retail);
         std::filesystem::path preferences;
         std::string preference_error;
-        if (!options.menu_smoke && (!menu_preferences_path(preferences, preference_error) ||
-                                    !load_menu_preferences(preferences, menu.settings, preference_error)))
+        if (!options.menu_smoke && !options.demo_smoke &&
+            (!menu_preferences_path(preferences, preference_error) ||
+             !load_menu_preferences(preferences, menu.settings, preference_error)))
             spdlog::warn("Preferences: {}", preference_error);
-        menu.demo = config.demo;
-        MenuCanvas canvas(artwork);
-        if (!canvas.initialize(error))
-            return failed(5);
+        std::unique_ptr<MenuCanvas> canvas;
+        std::unique_ptr<MenuAudio> menu_audio;
         MenuRenderer menu_renderer(runtime.gpu);
-        MenuAudio menu_audio(artwork);
-        menu_audio.random_state = std::uint32_t(SDL_GetTicksNS());
-        if (!menu_audio.mixer.open_output(error))
+        HudCanvas end_canvas(artwork);
+        const HudSurface* end_screen = nullptr;
+        if (menu_enabled)
         {
-            menu_audio.error = error;
-            spdlog::warn("Menu audio output: {}", error);
+            canvas = std::make_unique<MenuCanvas>(artwork);
+            if (!canvas->initialize(error))
+                return failed(5);
+            menu_audio = std::make_unique<MenuAudio>(artwork);
+            if (config.demo && !menu_audio->validate_resources(error))
+                return failed(5);
+            menu_audio->random_state = std::uint32_t(SDL_GetTicksNS());
+            if (!menu_audio->mixer.open_output(error))
+            {
+                menu_audio->error = error;
+                spdlog::warn("Menu audio output: {}", error);
+            }
         }
         auto game = std::make_unique<GameSession>();
         game->resources = artwork;
@@ -71,7 +84,7 @@ namespace OpenBlood2
         }
         if (!game->server.audio.open_output(error))
             spdlog::warn("Game audio output: {}", error);
-        if (options.view_world)
+        if (options.view_world || options.demo_smoke)
         {
             spdlog::info("Loading world: {} (direct entry)", options.world);
             if (!game->request_world(options.world, error) || !game->run_world(error))
@@ -80,11 +93,12 @@ namespace OpenBlood2
         }
         else
             menu.open(false);
-        if (!preference_error.empty())
+        if (menu_enabled && !preference_error.empty())
             menu.open(game->client_shell.m_bInWorld);
-        menu.error = preference_error;
+        menu.error = menu_enabled ? preference_error : std::string{};
         auto stored_settings = menu.settings;
         MenuInput input;
+        input.demo_mode = config.demo && !menu_enabled;
         input.controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
         input.reset(menu, game->client_shell.m_bInWorld);
         ObjectSelection selection;
@@ -109,6 +123,8 @@ namespace OpenBlood2
         (void)data;
 #endif
         MenuSmoke smoke;
+        DemoSmoke demo_smoke;
+        DemoMenuSmoke demo_menu_smoke;
         bool done = false, captured = false, dismiss_error = false;
         std::uint64_t frames = 0;
         auto previous = SDL_GetTicksNS();
@@ -116,20 +132,33 @@ namespace OpenBlood2
         std::string reported_audio;
         while (!done && (!options.frame_limit || frames < options.frame_limit))
         {
-            const bool paused_at_start = menu.active;
+            const bool paused_at_start = input.paused(menu);
             const auto tick = SDL_GetTicksNS();
-            const double delta = options.menu_smoke ? 1. / 60 : app_frame_delta(double(tick - previous) / 1e9);
+            const double delta =
+                options.menu_smoke || options.demo_smoke ? 1. / 60 : app_frame_delta(double(tick - previous) / 1e9);
             previous = tick;
-            if (menu.active && !canvas.compose(menu, 0, error))
+            if (menu.active && !canvas->compose(menu, 0, error))
                 return failed(4);
-            if (options.menu_smoke && !smoke.before(frames, runtime.window, *game, menu, input, menu_audio, error))
+            if (options.menu_smoke &&
+                !(config.demo ? demo_menu_smoke.before(frames, runtime.window, *game, menu, input, *menu_audio, error)
+                              : smoke.before(frames, runtime.window, *game, menu, input, *menu_audio, error)))
                 return failed(4);
+            if (options.demo_smoke)
+            {
+                if (canvas || menu_audio || menu.active)
+                {
+                    error = "Demo unexpectedly initialized a menu or menu mixer";
+                    return failed(4);
+                }
+                if (!demo_smoke.before(frames, runtime.window, *game, input, error))
+                    return failed(4);
+            }
             SDL_Event event;
             int width = 0, height = 0;
             SDL_GetWindowSize(runtime.window, &width, &height);
             while (SDL_PollEvent(&event))
             {
-                if (options.menu_smoke && MenuSmoke::unrelated(event))
+                if ((options.menu_smoke || options.demo_smoke) && MenuSmoke::unrelated(event))
                     continue;
                 if (event.type == SDL_EVENT_QUIT || (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED &&
                                                      event.window.windowID == SDL_GetWindowID(runtime.window)))
@@ -149,11 +178,11 @@ namespace OpenBlood2
                     continue;
                 }
                 auto* player = game->server_shell.Player(game->local_client);
-                const bool old_inspector = input.inspector, old_menu = menu.active;
+                const bool old_inspector = input.inspector, old_menu = input.paused(menu);
                 const bool forward = input.event(event, SDL_GetWindowID(runtime.window), menu,
                                                  game->client_shell.m_bInWorld, player && !player->m_damage.IsDead(),
                                                  BLOOD2_INSPECTOR && options.inspector, float(width), float(height));
-                if (old_inspector != input.inspector || old_menu != menu.active)
+                if (old_inspector != input.inspector || old_menu != input.paused(menu))
                 {
                     neutralize_app_input(game->client_shell);
                     ImGui::GetIO().ClearEventsQueue();
@@ -169,11 +198,31 @@ namespace OpenBlood2
                 if (forward || !device_input)
                     ImGui_ImplSDL3_ProcessEvent(&event);
             }
-            if (done)
+            if (done || input.demo.quit)
                 break;
             // Freeze queued game output before any potentially slow preparation.
-            if (!game->server.audio.pause_output(menu.active, error))
+            if (!game->server.audio.pause_output(input.paused(menu), error))
                 return failed(4);
+            if (std::exchange(input.demo.restart, false))
+            {
+                const auto world = game->world_path;
+                const auto difficulty =
+                    DBYTE(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_DIFFICULTY")));
+                if (!GameSession::start_new_game(game, world, difficulty, 0, error))
+                    spdlog::error("Demo restart retained current session: {}", error);
+                else
+                {
+                    spdlog::info("Demo restarted with initial Caleb equipment: {}", game->world_path);
+                    input.demo.state = DemoFlow::State::Playing;
+                    selection.id = {};
+                    controlled = {};
+                    input.reset(menu, true);
+#if BLOOD2_INSPECTOR
+                    inspector.forget_world();
+#endif
+                }
+                previous = SDL_GetTicksNS();
+            }
             auto command = menu.take_command();
             if (command.action == MenuAction::Quit)
                 break;
@@ -229,7 +278,8 @@ namespace OpenBlood2
             if (stored_settings != menu.settings)
             {
                 stored_settings = menu.settings;
-                if (!options.menu_smoke && !save_menu_preferences(preferences, menu.settings, error))
+                if (!options.menu_smoke && !options.demo_smoke &&
+                    !save_menu_preferences(preferences, menu.settings, error))
                 {
                     menu.error = error;
                     spdlog::error("Save preferences failed: {}", error);
@@ -240,7 +290,7 @@ namespace OpenBlood2
             // Original SetMusicVolume takes 0..100 (100 = full); the original menu slider stops at 50.
             const float music_gain = settings.music ? settings.music_volume / 100.f : 0;
             if (!game->server.audio.set_gains(sound_gain, music_gain) ||
-                !menu_audio.mixer.set_gains(sound_gain, music_gain))
+                (menu_audio && !menu_audio->mixer.set_gains(sound_gain, music_gain)))
             {
                 error = "Cannot apply audio preferences";
                 return failed(4);
@@ -251,25 +301,28 @@ namespace OpenBlood2
             presenter.lightmaps = settings.detail >= 1;
             presenter.model_shadows = options.model_shadows && settings.detail >= 2;
             presenter.per_pixel_lighting = settings.pixel_lighting;
-            menu_audio.focus(menu.active);
-            for (auto cue : menu.cues)
-                menu_audio.play(cue);
-            menu.cues.clear();
-            menu_audio.advance(delta);
-            if (menu_audio.error != reported_audio)
+            if (menu_audio)
             {
-                reported_audio = menu_audio.error;
-                if (!reported_audio.empty())
+                menu_audio->focus(menu.active && menu.promotion == MenuPromotion::None);
+                for (auto cue : menu.cues)
+                    menu_audio->play(cue);
+                menu.cues.clear();
+                menu_audio->advance(delta);
+                if (menu_audio->error != reported_audio)
                 {
-                    spdlog::warn("Menu audio: {}", reported_audio);
-                    menu.audio_failed = true;
-                    ++menu.revision;
+                    reported_audio = menu_audio->error;
+                    if (!reported_audio.empty())
+                    {
+                        spdlog::warn("Menu audio: {}", reported_audio);
+                        menu.audio_failed = true;
+                        ++menu.revision;
+                    }
                 }
             }
-            if (!game->server.audio.pause_output(menu.active, error))
+            if (!game->server.audio.pause_output(input.paused(menu), error))
                 return failed(4);
             auto& shell = game->client_shell;
-            if (menu.active || input.inspector)
+            if (input.paused(menu) || input.inspector)
                 neutralize_app_input(shell);
             shell.movement_input = {};
             shell.weapon_input = {};
@@ -279,6 +332,8 @@ namespace OpenBlood2
             inspector.apply_commands(*game, selection);
             if (std::exchange(inspector.play_request, false) && shell.m_bInWorld)
             {
+                if (config.demo)
+                    input.demo.state = DemoFlow::State::Playing;
                 menu.close();
                 input.inspector = false;
                 input.reset(menu, true);
@@ -293,10 +348,12 @@ namespace OpenBlood2
                 controlled = id;
                 input.reset(menu, bool(id));
             }
-            const bool blocked = menu.active || input.inspector;
+            const bool blocked = input.paused(menu) || input.inspector;
             input.controls.enabled = !blocked;
             if (!input.controls.sync_mouse(runtime.window, shell.m_bInWorld, blocked, error))
             {
+                if (!menu_enabled)
+                    return failed(4);
                 menu.open(shell.m_bInWorld);
                 menu.error = "Cannot capture mouse: " + error;
                 input.reset(menu, shell.m_bInWorld);
@@ -321,7 +378,7 @@ namespace OpenBlood2
                         spdlog::info("Weapon selection: {}", error);
                 input.controls.look(shell.rotation, delta, false, shell.m_bZoomView);
             }
-            if (!menu.active && !paused_at_start)
+            if (!input.paused(menu) && !paused_at_start)
             {
                 if (!step_app_session(*game, delta))
                 {
@@ -335,6 +392,34 @@ namespace OpenBlood2
                         spdlog::error("{}", diagnostic);
                     error = "Simulation step failed";
                     return failed(4);
+                }
+                if (std::exchange(game->client_shell.world_exit.demo_end_pending, false))
+                {
+                    if (!menu_enabled)
+                    {
+                        end_screen = end_canvas.CreateSurfaceFromBitmap("screens/info.pcx");
+                        if (!end_screen)
+                        {
+                            error = end_canvas.error;
+                            return failed(5);
+                        }
+                    }
+                    if (!game->unload_world())
+                    {
+                        error = "Cannot end the demo during object callbacks";
+                        return failed(4);
+                    }
+                    if (menu_enabled)
+                        menu.end_demo();
+                    else
+                        input.demo.state = DemoFlow::State::Finished;
+                    input.inspector = false;
+                    input.reset(menu, false);
+                    neutralize_app_input(game->client_shell);
+                    if (!game->server.audio.pause_output(true, error))
+                        return failed(4);
+                    spdlog::info("Demo completed: original EndGame / screens/info.pcx / {}",
+                                 menu_enabled ? "return to menu" : "direct exit");
                 }
                 const auto change = GameSession::process_level_change(game, error);
                 if (change == LevelChangeResult::Committed)
@@ -353,7 +438,7 @@ namespace OpenBlood2
                     spdlog::warn("Level change retained world: {}", error);
             }
             selection.refresh(game->objects);
-            if (!menu.active && !presenter.update(*game, error))
+            if (!menu.active && !input.demo.finished() && !presenter.update(*game, error))
                 return failed(5);
             ImGui_ImplSDLGPU3_NewFrame();
             ImGui_ImplSDL3_NewFrame();
@@ -361,9 +446,14 @@ namespace OpenBlood2
             if (input.inspector)
                 ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
             ImGui::NewFrame();
-            if (menu.active)
+            if (input.demo.finished())
             {
-                if (!canvas.compose(menu, 0, error) || !menu_renderer.draw(canvas, error))
+                if (!end_screen || !menu_renderer.draw_surface(*end_screen, 1, error))
+                    return failed(4);
+            }
+            else if (menu.active)
+            {
+                if (!canvas->compose(menu, 0, error) || !menu_renderer.draw(*canvas, error))
                     return failed(4);
             }
             else
@@ -416,8 +506,11 @@ namespace OpenBlood2
                 return failed(3);
             }
             Capture capture;
-            const bool phase_capture = options.menu_smoke && (frames == 8 || frames == 17 || frames == 23 ||
-                                                              frames == 120 || frames == 208 || frames == 214);
+            const bool phase_capture =
+                (options.menu_smoke && config.demo && DemoMenuSmoke::capture(frames)) ||
+                (options.menu_smoke && !config.demo &&
+                 (frames == 8 || frames == 17 || frames == 23 || frames == 120 || frames == 208 || frames == 214)) ||
+                (options.demo_smoke && (frames == 4 || frames == 14 || frames == 45 || frames == 62));
             const bool save = target && ((frames >= 2 && !captured) || phase_capture) && !options.capture_file.empty();
             if (save &&
                 !capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), w, h))
@@ -429,7 +522,7 @@ namespace OpenBlood2
             if (target)
             {
                 auto* color_target = save ? capture.texture : target;
-                const bool world = !menu.active && presenter.render_world;
+                const bool world = !menu.active && !input.demo.finished() && presenter.render_world;
                 if (world &&
                     !presenter.record(*game, commands, color_target,
                                       SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), w, h, error))
@@ -480,16 +573,27 @@ namespace OpenBlood2
             if (!target)
                 SDL_Delay(10);
         }
-        if (options.menu_smoke && !smoke.confirmed)
+        if (options.demo_smoke && !demo_smoke.confirmed)
+        {
+            error = "Demo diagnostic did not complete both worlds and the ending";
+            return failed(4);
+        }
+        if (options.demo_smoke)
+            spdlog::info("Demo SDL traversal passed: no menu resources/mixer, pause/resume/focus, authored exits, "
+                         "info.pcx and quit");
+        if (options.menu_smoke && !(config.demo ? demo_menu_smoke.confirmed : smoke.confirmed))
         {
             error = "Menu smoke did not reach quit confirmation";
             return failed(4);
         }
-        if (options.menu_smoke)
+        if (options.menu_smoke && config.demo)
+            spdlog::info("Demo menu traversal passed: source pages/promotions, supported options, pause/audio/focus, "
+                         "death/Enter retry, transfer, EndGame return, new game after end, quit promotion");
+        if (options.menu_smoke && !config.demo)
             spdlog::info("Menu traversal passed: startup, pause snapshots, independent audio, options, resize, "
                          "inspector, resume and quit");
         spdlog::info("Frontend complete: {} frames, world {}, menu audio starts {}/failures {}", frames,
-                     game->world_path, menu_audio.starts, menu_audio.failures);
+                     game->world_path, menu_audio ? menu_audio->starts : 0, menu_audio ? menu_audio->failures : 0);
         return 0;
     }
 } // namespace OpenBlood2

@@ -37,6 +37,8 @@ namespace
             case DamageType::FreeFall:
             case DamageType::Blind:
             case DamageType::Slow:
+            case DamageType::DropWeapon:
+            case DamageType::Vision:
             case DamageType::Electric:
             case DamageType::Acid:
                 break;

@@ -83,3 +83,9 @@ and multiplayer/team displays from the remaining original UI classes are not
 connected by this continuation. The inspector's boss bar remains diagnostic.
 Menus, UI scaling preferences, original executable pixel-for-pixel comparison,
 Windows/macOS/mobile execution and full-game UI acceptance remain unverified.
+
+## Demo edition resource difference (2026-10-19)
+
+The shipped Build 108 demo lacks `weapons/raidcanister.pcx`. Its explicit HUD variant
+keeps the secondary ammunition number without that decorative icon. Other required
+art remains strict; retail composition is unchanged. See [demo contracts](demo_contracts.md).

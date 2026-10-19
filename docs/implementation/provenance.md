@@ -1457,7 +1457,7 @@ The original light term is established by fitting light objects against retail b
 The original flag usage and the shipped detail configuration (`MaxModelShadows`) select casters and the default; later LithTech's projected silhouette technique is consulted. No code is imported. Tile shadows along the strongest static light are a replacement policy. See [source ledger](sources/model_shadow_sources.json) and [contracts](../contracts/model_shadow_contracts.md).
 
 
-## Original demo edition (2026-10-18)
+## Original demo edition experiment (2026-10-18; historical menu path)
 
 Selected `_DEMO` branches of original `InventoryMgr.cpp` (IsDemoWeapon, bomb construction, AddInventoryWeapon), `ItemPickups.cpp` and `PlayerObj.cpp` (COMMAND_DETONATE) are ported as a runtime edition, together with the `Demo_01` first level. The single-archive layout comes from the installed demo. The compile-time define becomes a session constant. The `_DEMO` menu branches (MenuMain, MenuSinglePlayer, Splash, MainMenus ambience) are ported too. Their labels are read at verified offsets from the user's demo `cshell.dll`, which is never executed; no menu text is embedded. See [source ledger](sources/demo_sources.json) and [contracts](../contracts/demo_contracts.md).
 
@@ -1474,3 +1474,33 @@ Selective original BoneLeech and DrudgeLord constructors, state decisions and at
 ## BoneLeech attachment and inventory use (2026-10-19)
 
 Original BoneLeech EnemyAttach/ViewCreature handshake and USE release, CBugSpray definition/projectiles and client particle/impact recipes, CInvNightGoggles and CInvTheEye/SeeingEye are selectively ported. Checked owner messages, scene light scale, camera/input/audio lifetime and owned inventory restoration replace the previously refused interactions. Nonsolid close creatures, collision-checked detach placement, shared eye flight and handle-free cross-world eye restoration are explicit engine adaptations. See [contracts](../contracts/inventory_use_contracts.md) and [source hashes](sources/inventory_use_sources.json). This supersedes the preceding paragraph's inventory/attachment omission only; M2 and full-campaign acceptance are unchanged.
+
+## Menu-free playable demo continuation (2026-10-19)
+
+The old fixed-offset demo-menu experiment above is removed. Runtime edition, exclusive
+archive mounting and original demo weapon/bomb rules remain. Original Voodoo pickup,
+server/client firing, object particles and Focus regeneration are integrated from
+`sources/blood2`, with checked typed ownership. Demo pause/end and Enter death retry
+are application adaptations; the latter is explicitly replaceable by a future
+checkpoint restore handler. The only HUD edition substitution omits the absent
+raidcanister decoration while preserving its count. [Contracts](../contracts/demo_contracts.md),
+[Voodoo](../contracts/voodoo_contracts.md), [new source ledger](sources/demo_playable_sources.json),
+and [evidence](../../../Documentation/Implementation/demo_playable.md) delimit the result.
+The original demo source/hash ledger stays unchanged. The menu study adds no menu code.
+
+The demo continuation also corrects generic passive integration at sub-position-precision deltas: retain container/velocity updates, skip only an unchanged non-solid passive position. Explicit sweeps, solid/body collision and diagnostic clocks are unchanged; see [collision traversal](../contracts/collision_traversal_contracts.md#passive-integration-below-position-precision). This is replacement engine policy, not an imported gameplay rule.
+
+## Demo menu with explicit edition resources (2026-10-19)
+
+The separately requested implementation now follows the phase-2 recommendation.
+Limited `_DEMO` branches from MenuMain/MenuSinglePlayer/MainMenus and Splash/
+GameStates use the existing typed controller; `menu_resources.cpp` owns a finite
+English source-label manifest and Build 108 title/audio/promotion selection.
+There is no runtime DLL-offset reader or game-wide text fallback. The shipped
+mouse constructor was additionally checked: three controls, with a sensitivity
+range different from the later source/shared current preferences. The latter
+range is preserved as an explicit adaptation. Original sources/data stay external
+and unchanged; historical experiment/audit ledgers above retain their scope.
+See [contracts](../contracts/demo_menu_contracts.md),
+[source hashes and adaptations](sources/demo_menu_sources.json) and
+[validation](../../../Documentation/Implementation/demo_menu.md).

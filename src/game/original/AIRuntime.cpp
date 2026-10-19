@@ -466,7 +466,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (npc_ammo[9] != 0)
     {
         const auto result = m_InventoryMgr.AddInventoryWeapon(7, static_cast<DBYTE>(static_cast<int>(npc_ammo[9])));
-        if (result != InventoryResult::Ok)
+        if (result != InventoryResult::Ok && !(IsDemoBuild() && result == InventoryResult::NotAvailable))
             return RuntimeFailure("NPC proximity inventory initialization failed");
     }
     const float difficulty = GetGameDifficulty() == 0 ? .25f : GetGameDifficulty() == 2 ? 1.5f : 1;

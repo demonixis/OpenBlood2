@@ -36,6 +36,13 @@ TeslaCannonPU::TeslaCannonPU()
     display_name = "Tesla Cannon";
     resource_id = IDS_WEAPON_TESLA;
 }
+VoodooDollPU::VoodooDollPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_VOODOO, 0};
+    file = "Voodoo_pu";
+    display_name = "Voodoo Doll";
+    resource_id = IDS_WEAPON_VOODOO;
+}
 AssaultRiflePU::AssaultRiflePU()
 {
     value = {OpenBlood2::PickupKind::Weapon, WEAP_ASSAULTRIFLE, 50};
@@ -71,6 +78,8 @@ const char* WeaponPickupClass(DDWORD type)
             return "FlareGunPU";
         case WEAP_TESLACANNON:
             return "TeslaCannonPU";
+        case WEAP_VOODOO:
+            return "VoodooDollPU";
         case WEAP_SHOTGUN:
             return "ShotgunPU";
         case WEAP_SINGULARITY:

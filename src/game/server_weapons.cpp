@@ -126,6 +126,7 @@ namespace OpenBlood2
              value.type != DamageType::Explode && value.type != DamageType::Suffocate &&
              value.type != DamageType::Death && value.type != DamageType::FreeFall && value.type != DamageType::Blind &&
              value.type != DamageType::Slow && value.type != DamageType::Electric && value.type != DamageType::Acid &&
+             value.type != DamageType::DropWeapon && value.type != DamageType::Vision &&
              value.type != DamageType::Singularity))
         {
             m->bad = true;

@@ -1,6 +1,35 @@
 #include "game/menu_audio.h"
 namespace OpenBlood2
 {
+    bool MenuAudio::validate_resources(std::string& failure)
+    {
+        const auto& assets = menu_resources(resources_.demo() ? MenuEdition::Demo : MenuEdition::Retail);
+        // Validate through the real bounded decoder/cache, without output or retained voices.
+        const auto load = [&](const char* name, bool stream)
+        {
+            SoundRequest request;
+            request.resource = std::string("sounds/interface/mainmenus/") + name;
+            request.space = SoundSpace::Local;
+            request.streaming = request.loop = stream;
+            request.reverb_requested = false;
+            const auto id = mixer.play(resources_, nullptr, request, {}, failure);
+            if (!id)
+            {
+                failure = request.resource + ": " + failure;
+                return false;
+            }
+            mixer.kill(id); // No advance/output: only checked decoding, then cache reuse at real playback.
+            return true;
+        };
+        for (const auto* sound : assets.ambience)
+            if (!load(sound, true))
+                return false;
+        for (const auto* sound : assets.cues)
+            if (!load(sound, false))
+                return false;
+        failure.clear();
+        return true;
+    }
     void MenuAudio::prune()
     {
         std::vector<SoundId> finished;
@@ -54,10 +83,8 @@ namespace OpenBlood2
         if (active)
         {
             random_state = random_state * 1664525u + 1013904223u;
-            auto sound = 1 + (random_state >> 30);
-            if (resources_.demo() && (sound == 1 || sound == 3))
-                ++sound; // Original _DEMO CMainMenus::SetFocus: the demo ships ambient02/04 only.
-            ambient = start("ambient0" + std::to_string(sound) + ".wav", true);
+            const auto& assets = menu_resources(resources_.demo() ? MenuEdition::Demo : MenuEdition::Retail);
+            ambient = start(assets.ambience[random_state >> 30], true);
         }
         else if (ambient)
         {
@@ -67,7 +94,8 @@ namespace OpenBlood2
     }
     void MenuAudio::play(MenuCue cue)
     {
-        start(cue == MenuCue::Select ? "select01.wav" : cue == MenuCue::Enter ? "enter01.wav" : "esc01.wav", false);
+        const auto& assets = menu_resources(resources_.demo() ? MenuEdition::Demo : MenuEdition::Retail);
+        start(assets.cues[cue == MenuCue::Select ? 0 : cue == MenuCue::Enter ? 1 : 2], false);
     }
     bool MenuAudio::advance(double seconds)
     {

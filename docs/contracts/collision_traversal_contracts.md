@@ -83,3 +83,21 @@ or slid along (`start_departures`). Tests: `services.start_departure` (synthetic
 ceiling/floor/wall, solid and non-solid), `services.contact_overlap` (deep solid
 slides still fail) and `services.elevator_entry` (retail 05_CDMB player entry);
 `keyframe_audio.private` steps 12_Train_Station.
+
+## Passive integration below position precision
+
+A real-clock first frame can be about 1e-7 seconds. Gravity changes velocity, but
+adding its displacement to a float position can leave all three coordinates
+unchanged. Generic physics now skips only that zero-motion `MoveObject` call for
+non-solid passive objects, after container effects and velocity integration.
+It retains position/support state and defers any new contacts until actual motion.
+Characters, solid bodies, model/world bodies, explicit `MoveObject` calls and
+collision queries keep their strict existing overlap behavior. No timestep is
+clamped upwards, no object is removed, and nonzero motion still uses the solver.
+
+This fixes Demo_01 and retail 05_CDM HealthPU0, authored through a wall, on their
+first interactive frame. Fixed 1/60 diagnostic stepping had not exposed it.
+`services.start_departure` checks retained gravity velocity, unchanged position,
+explicit zero-sweep rejection and subsequent settling; `demo.worlds` includes a
+1e-7-second initial update. This is a float integration adaptation, not a claim
+about the original engine's timing.

@@ -1,6 +1,7 @@
 #pragma once
 #include "engine/hud_surface.h"
 #include "engine/string_resources.h"
+#include "game/menu_resources.h"
 #include <optional>
 
 namespace OpenBlood2
@@ -65,7 +66,17 @@ namespace OpenBlood2
     class Menu
     {
       public:
+        explicit Menu(MenuEdition edition = MenuEdition::Retail) : edition_(edition) {}
+        bool demo() const
+        {
+            return edition_ == MenuEdition::Demo;
+        }
         void open(bool in_world, bool alive = true);
+        void show_promotion(MenuPromotion, bool exit = false);
+        void dismiss_promotion();
+        void end_demo();
+        MenuPromotion promotion = MenuPromotion::None;
+        bool promotion_exit = false;
         void close();
         void build(MenuPage);
         void back();
@@ -77,13 +88,8 @@ namespace OpenBlood2
         {
             pressed_ = -1;
         }
-        // Original Splash_OnKeyDown (ESC/SPACE/RETURN): back to the menu, or quit.
-        void dismiss_splash();
         MenuCommand take_command();
         bool active = false, in_world = false, alive = true;
-        bool demo = false;            // Original _DEMO menus (--demo).
-        const char* splash = nullptr; // Full-screen Splash_SetState PCX; menu items are inert.
-        bool splash_exit = false;
         bool audio_failed = false; // Nonmodal application-owned audio status.
         MenuPage page = MenuPage::Main;
         std::vector<MenuItem> items;
@@ -102,10 +108,10 @@ namespace OpenBlood2
         const char* title() const;
 
       private:
+        const MenuEdition edition_;
         void AddLargeTextItemOption(unsigned string_id, int command);
         void setting(unsigned string_id, int id);
         void cue(MenuCue);
-        void show_splash(const char* screen, bool exit);
         int pressed_ = -1;
         MenuCommand pending_;
     };
@@ -132,7 +138,8 @@ namespace OpenBlood2
         const HudSurface* background_ = nullptr;
         const HudSurface* slider_ = nullptr;
         const HudSurface* thumb_ = nullptr;
-        std::map<std::string, const HudSurface*> titles_, splashes_;
+        std::map<std::string, const HudSurface*> titles_;
+        std::map<MenuPromotion, const HudSurface*> promotions_;
         std::uint64_t composed_ = UINT64_MAX;
     };
 } // namespace OpenBlood2

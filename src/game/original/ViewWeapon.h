@@ -33,6 +33,7 @@ class CViewWeapon
     std::uint64_t fire_keys = 0, shots = 0, binocular_refusals = 0;
     bool binoculars_active = false; // Client m_bBinocularsActive, set by the shell before Update.
     float bomb_start = 0, bomb_held = 0, bomb_speed = 1000;
+    DBYTE voodoo_hit = 0;
     FireResult last_result = FireResult::Invalid;
 
   private:

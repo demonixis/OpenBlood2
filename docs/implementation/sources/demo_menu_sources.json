@@ -1,0 +1,105 @@
+{
+  "date": "2026-10-19",
+  "scope": "Separately authorized demo menu implementation following the phase-2 audit; no milestone/graphics-stack change",
+  "references": [
+    {
+      "source": "sources/blood2/ClientShellDLL/MenuMain.cpp",
+      "sha256": "5333fe0cc6a98782b9c1695d075556fd9f23f3ba8edfe8b279ab2c9aef3a0f5a",
+      "selection": "_DEMO main order, Bloodbath/Prime Gibs promotions and quit exit flag"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MenuSinglePlayer.cpp",
+      "sha256": "a9fa9fa9c0fdbcc0372ee76a64662bc9892c0df2a840c969e72472c96e861cd3",
+      "selection": "Caleb difficulty, Chosen Modes promotion and omitted retail load/save/custom items"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MenuDifficulty.cpp",
+      "sha256": "ff8c3eedfedd127586b4bdc1d7c091f8cac6b31865f3ed1244e9f89ca7caa2f6",
+      "selection": "Difficulty labels/default selection and new-game commands"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MenuOptions.cpp",
+      "sha256": "4338c381cce6f2b835be51549c92428b482fe7c00f16104910990265f9fdeab1",
+      "selection": "Six original options destinations, separate from present engine capabilities"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MenuDisplay.cpp",
+      "sha256": "d25476ad0fcf53ed00c6e820d8ea2d1d70e98db2e5fed77eea3decd4e8b8eda4",
+      "selection": "Original detail row; existing shared renderer/resolution/lighting adaptations retained"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MenuSound.cpp",
+      "sha256": "b700999dc6a899bfc0f6b4c7493032b6ca2bf3b0eef659961db5e92860ab4e21",
+      "selection": "Original sound/music rows and settings; 16-bit output unavailable"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MenuMouse.cpp",
+      "sha256": "25fb721cc12f5fa788972ef4e071040e89dd667091ad37a2cc099afe2458a4f9",
+      "selection": "Later-source sensitivity settings; shipped Build 108 constructor narrows demo to three rows"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/MainMenus.cpp",
+      "sha256": "8ee76af4b06a037093e04df5e3be33cdab6d03f49018884d5385a429b270db07",
+      "selection": "_DEMO ambient 1/3 remapping to 2/4 and menu audio focus"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/GameStates.cpp",
+      "sha256": "b69a1b08051aa8ce33cc26a5bf8fb5250c940e3af1253a87e194cf7ecc23b0f8",
+      "selection": "OnEnterMenuState(GS_SPLASH) returns to root, OnExitMenuState loses focus"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/Splash.cpp",
+      "sha256": "d713f44bbe3adbe39c12c497b596937e9e10b01b489a90b81ce247663b039a51",
+      "selection": "Esc/Space/Return dismissal, owned return/exit behavior; aspect scaling adapted"
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
+      "selection": "Existing demo EndGame world-exit intent and source Info/enter cue sequence"
+    },
+    {
+      "source": "sources/blood2/ClientRes/ClientRes.rc",
+      "sha256": "cc635e26e01b93e83e6202a336e7dda6af70bf681dbe731eedd82b450bcedfbd",
+      "selection": "Menu semantic text IDs with reviewed English Build 108 wording/case overrides"
+    },
+    {
+      "source": "sources/blood2/Shared/ClientRes.h",
+      "sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
+      "selection": "Semantic string identifiers, including PRIMEGIBS 503"
+    }
+  ],
+  "implementation": [
+    "src/game/original/MainMenus.cpp",
+    "src/game/menu_resources.cpp",
+    "src/game/menu_canvas.cpp",
+    "src/game/menu_audio.cpp",
+    "src/app/menu_input.h",
+    "src/app/frontend.cpp"
+  ],
+  "external_evidence": {
+    "B2Demo.rez": {
+      "sha256": "e410ce2944210c776c7407a79e01cfa031c782132f68407cd0871379c5e7218c",
+      "client": "DEMO v1.0 (Build 108)",
+      "source_version": "DEMO v1.0a (Build 109)"
+    },
+    "cshell.dll": {
+      "sha256": "3335392691248af8b0fafbcf0bcf58a21582cc9b6a5f608249285c08fc0c3bd6",
+      "size": 719872,
+      "analysis_only": "Mouse constructor 0x1006cf07..0x1006cfe6 builds Sensitivity/Input Rate/Invert Y; sensitivity range 15..400, step 15. No runtime offsets or DLL execution by the resource provider."
+    },
+    "original_client_observation": "Isolated copy and private Wine prefix attempted. Original client displayed Unable to set the video mode (6929314); virtual desktop retry did not yield an original menu. No original-client visual parity is claimed."
+  },
+  "adaptations": [
+    "Finite source-derived English manifest (27 labels), explicit Build 108 wording/casing, selected title/font/layout/audio/promotion assets. Retail still reads external cres.dll.",
+    "Menu-only resources do not read either DLL in demo; gameplay localization remains independent and strict.",
+    "Fixed runtime edition replaces source compile-time branches and keeps commercial resources external.",
+    "Build 108 mouse page has three rows. Shared source-109 sensitivity range and preference schema are preserved, explicitly unlike the earlier binary range.",
+    "Unavailable Controls/Joystick/Keyboard, 16-bit audio and input-rate control are engine limitations, not original demo disabled states.",
+    "Existing SDL display/detail/lighting controls and aspect-preserving menu/splash presentation are retained; no renderer changes.",
+    "Gameplay and its mixer stay paused under promotions; original OnExitMenuState globally resumes game sounds.",
+    "Owned promotion/quit and EndGame requests run outside callbacks. EndGame now returns to Main and can start a new session.",
+    "Menu-free --demo --view-world and --demo-smoke preserve phase-1 pause/end behavior and resource independence.",
+    "Enter death retry shares the existing transactional handler and future save-system hook; no save implementation."
+  ],
+  "history": "demo_sources.json, demo_playable_sources.json and the root audit remain unchanged historical evidence. No copied commercial artwork or binary is included."
+}

@@ -291,6 +291,11 @@ namespace OpenBlood2
                     return false;
                 }
                 auto& exit = client_shell.world_exit;
+                if (exit.demo_end_pending)
+                {
+                    pending_level_change.reset();
+                    inspect_exit = false;
+                }
                 if (exit.pending)
                 {
                     exit.pending = false;

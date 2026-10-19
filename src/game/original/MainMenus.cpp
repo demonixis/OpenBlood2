@@ -19,28 +19,47 @@ namespace OpenBlood2
         if (cues.size() < 16)
             cues.push_back(value);
     }
-    void Menu::show_splash(const char* screen, bool exit)
+    void Menu::show_promotion(MenuPromotion screen, bool exit)
     {
-        splash = screen;
-        splash_exit = exit;
+        if (!demo() || screen == MenuPromotion::None)
+            return;
+        promotion = screen;
+        promotion_exit = exit;
         cancel_pointer();
         ++revision;
     }
-    void Menu::dismiss_splash()
+    void Menu::dismiss_promotion()
     {
-        if (!splash)
+        if (promotion == MenuPromotion::None)
             return;
-        if (splash_exit)
-            pending_.action = MenuAction::Quit; // Splash_Term shuts the client down.
-        splash = nullptr;
-        splash_exit = false;
-        ++revision;
+        if (promotion_exit)
+        {
+            pending_.action = MenuAction::Quit;
+            promotion = MenuPromotion::None;
+            promotion_exit = false;
+            cancel_pointer();
+            ++revision;
+        }
+        else
+            build(MenuPage::Main); // Original OnEnterMenuState(GS_SPLASH) always returns to the root.
+    }
+    void Menu::end_demo()
+    {
+        if (!demo())
+            return;
+        open(false);
+        cue(MenuCue::Enter); // Original EndGame: menu, enter01.wav, info splash.
+        show_promotion(MenuPromotion::Info);
     }
     void Menu::build(MenuPage next)
     {
+        // These retail pages have no demo entries or required resources.
+        if (demo() &&
+            (next == MenuPage::Character || next == MenuPage::Load || next == MenuPage::Save || next == MenuPage::Quit))
+            next = MenuPage::Main;
         page = next;
-        splash = nullptr;
-        splash_exit = false;
+        promotion = MenuPromotion::None;
+        promotion_exit = false;
         items.clear();
         selected = 0;
         pressed_ = -1;
@@ -51,14 +70,14 @@ namespace OpenBlood2
                 AddLargeTextItemOption(IDS_MENU_MAIN_SINGLEPLAYER, MENU_CMD_SINGLE_PLAYER);
                 AddLargeTextItemOption(IDS_MENU_MAIN_BLOODBATH, MENU_CMD_BLOODBATH);
                 AddLargeTextItemOption(IDS_MENU_MAIN_OPTIONS, MENU_CMD_OPTIONS);
-                AddLargeTextItemOption(demo ? IDS_MENU_MAIN_PRIMEGIBS : IDS_MENU_MAIN_CREDITS, MENU_CMD_CREDITS);
+                AddLargeTextItemOption(demo() ? IDS_MENU_MAIN_PRIMEGIBS : IDS_MENU_MAIN_CREDITS, MENU_CMD_CREDITS);
                 AddLargeTextItemOption(IDS_MENU_MAIN_QUIT, MENU_CMD_QUIT);
                 break;
             case MenuPage::Solo:
                 AddLargeTextItemOption(IDS_MENU_SINGLEPLAYER_CALEB, MENU_CMD_START_STORY);
                 AddLargeTextItemOption(IDS_MENU_SINGLEPLAYER_CHOSEN, MENU_CMD_START_ACTION);
-                if (demo)
-                    break; // Original _DEMO CMenuSinglePlayer::Build omits load/save/custom level.
+                if (demo())
+                    break; // Original _DEMO omits load/save/custom, not disabled retail rows.
                 AddLargeTextItemOption(IDS_MENU_SINGLEPLAYER_LOADGAME, MENU_CMD_LOAD_GAME_MENU);
                 AddLargeTextItemOption(IDS_MENU_SINGLEPLAYER_SAVEGAME, MENU_CMD_SAVE_GAME_MENU);
                 AddLargeTextItemOption(IDS_MENU_SINGLEPLAYER_CUSTOMLEVEL, MENU_CMD_CUSTOM_LEVEL);
@@ -100,6 +119,8 @@ namespace OpenBlood2
                 setting(IDS_MENU_MOUSE_SENSITIVITY, 4);
                 AddLargeTextItemOption(IDS_MENU_MOUSE_INPUTRATE, -1);
                 setting(IDS_MENU_MOUSE_INVERT_YAXIS, 5);
+                if (demo())
+                    break; // Build 108 constructs three mouse rows; later source adds more.
                 AddLargeTextItemOption(IDS_MENU_MOUSE_MOUSELOOK, -1);
                 AddLargeTextItemOption(IDS_MENU_MOUSE_LOOKSPRING, -1);
                 AddLargeTextItemOption(IDS_MENU_MOUSE_USEWHEEL, -1);
@@ -126,10 +147,7 @@ namespace OpenBlood2
             {
                 case MENU_CMD_BLOODBATH:
                 case MENU_CMD_CREDITS:
-                    item.enabled = demo; // The demo shows its original splash screens.
-                    break;
-                case MENU_CMD_MOUSE:
-                    item.enabled = !demo; // The demo build has no mouse-page labels to show.
+                    item.enabled = demo();
                     break;
                 case -1:
                 case MENU_CMD_CUSTOM_LEVEL:
@@ -155,7 +173,6 @@ namespace OpenBlood2
     }
     void Menu::open(bool world, bool living)
     {
-        // build() below also clears any splash.
         in_world = world;
         alive = living;
         active = true;
@@ -166,8 +183,8 @@ namespace OpenBlood2
     void Menu::close()
     {
         active = false;
-        splash = nullptr;
-        splash_exit = false;
+        promotion = MenuPromotion::None;
+        promotion_exit = false;
         cancel_pointer();
         ++revision;
     }
@@ -179,9 +196,9 @@ namespace OpenBlood2
     {
         if (!active)
             return;
-        if (splash)
+        if (promotion != MenuPromotion::None)
         {
-            dismiss_splash();
+            dismiss_promotion();
             return;
         }
         cue(MenuCue::Back);
@@ -214,7 +231,7 @@ namespace OpenBlood2
     }
     void Menu::select(int direction)
     {
-        if (!active || splash || items.empty())
+        if (!active || promotion != MenuPromotion::None || items.empty())
             return;
         int next = selected;
         for (std::size_t i = 0; i < items.size(); ++i)
@@ -234,13 +251,13 @@ namespace OpenBlood2
     }
     void Menu::activate()
     {
-        if (active && splash)
+        if (active && promotion != MenuPromotion::None)
         {
-            dismiss_splash();
+            dismiss_promotion();
             return;
         }
-        if (!active || selected < 0 || selected >= int(items.size()) || !enabled(items[selected]) ||
-            pending_.action == MenuAction::NewGame || pending_.action == MenuAction::Quit)
+        if (!active || promotion != MenuPromotion::None || selected < 0 || selected >= int(items.size()) ||
+            !enabled(items[selected]) || pending_.action == MenuAction::NewGame || pending_.action == MenuAction::Quit)
             return;
         if (items[selected].setting >= 0)
         {
@@ -262,22 +279,22 @@ namespace OpenBlood2
                 character = 0;
                 build(MenuPage::Difficulty);
                 break;
+            case MENU_CMD_BLOODBATH:
+                if (demo())
+                    show_promotion(MenuPromotion::Bloodbath);
+                break;
+            case MENU_CMD_CREDITS:
+                if (demo())
+                    show_promotion(MenuPromotion::Info);
+                break;
             case MENU_CMD_START_ACTION:
-                if (demo)
+                if (demo())
                 {
-                    show_splash("screens/modes.pcx", false); // Original _DEMO: no Chosen selection.
+                    show_promotion(MenuPromotion::Modes);
                     break;
                 }
                 story = false;
                 build(MenuPage::Character);
-                break;
-            case MENU_CMD_BLOODBATH:
-                if (demo)
-                    show_splash("screens/bloodbath.pcx", false);
-                break;
-            case MENU_CMD_CREDITS:
-                if (demo)
-                    show_splash("screens/info.pcx", false);
                 break;
             case MENU_CMD_START_CALEB:
                 character = 0;
@@ -316,8 +333,8 @@ namespace OpenBlood2
                 build(MenuPage::Load);
                 break;
             case MENU_CMD_QUIT:
-                if (demo)
-                    show_splash("screens/info.pcx", true); // Original _DEMO: no confirmation box.
+                if (demo())
+                    show_promotion(MenuPromotion::Info, true);
                 else
                     build(MenuPage::Quit);
                 break;
@@ -333,7 +350,8 @@ namespace OpenBlood2
     }
     void Menu::adjust(int direction)
     {
-        if (!active || splash || selected < 0 || selected >= int(items.size()) || !enabled(items[selected]))
+        if (!active || promotion != MenuPromotion::None || selected < 0 || selected >= int(items.size()) ||
+            !enabled(items[selected]))
             return;
         auto before = settings;
         switch (items[selected].setting)
@@ -378,7 +396,7 @@ namespace OpenBlood2
     }
     void Menu::pointer(float x, float y, bool press, bool release, bool motion)
     {
-        if (!active || splash) // Original splash screens only read ESC/SPACE/RETURN.
+        if (!active || promotion != MenuPromotion::None)
             return;
         int hit = -1;
         for (std::size_t i = 0; i < items.size(); ++i)

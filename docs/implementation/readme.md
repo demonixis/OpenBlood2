@@ -1,5 +1,7 @@
 # Implementation records
 
+- [Unused SDL subsystem configuration and validation](../../../Documentation/Implementation/sdl_build_options.md)
+
 - [CityHub museum jump diagnosis; production defect remains open](../../../Documentation/Implementation/cityhub_jump.md)
 
 - [Crash stacks and core-dump validation](../../../Documentation/Implementation/crash_capture.md)
@@ -100,3 +102,7 @@ The [session-cost audit](../../../Documentation/Implementation/m2_session_cost.m
 - [Checked session startup](../../../Documentation/Implementation/m2_session_start.md): actual admission/refusal checks, shared NEW_LEVEL resource validation and startup inspection; M2 remains incomplete.
 
 - [GPU lifetime attribution](../../../Documentation/Implementation/m2_gpu_lifetime.md): SDL-only and standalone Vulkan controls for the retained NVIDIA LeakSanitizer failure.
+
+- [Demo two-world implementation and validation](../../../Documentation/Implementation/demo_playable.md), [phase-2 menu audit](../../../Documentation/Implementation/demo_menu_audit.md): original Voodoo/Focus, menu-free pause/retry/end; no new milestone acceptance.
+
+- [Demo menu implementation and validation](../../../Documentation/Implementation/demo_menu.md): explicit edition provider, limited source branches, promotions and shared pause/settings; original-client visual parity remains unverified.

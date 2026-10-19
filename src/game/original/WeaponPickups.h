@@ -38,6 +38,11 @@ class TeslaCannonPU : public WeaponPickup
   public:
     TeslaCannonPU();
 };
+class VoodooDollPU : public WeaponPickup
+{
+  public:
+    VoodooDollPU();
+};
 class ShotgunPU : public WeaponPickup
 {
   public:

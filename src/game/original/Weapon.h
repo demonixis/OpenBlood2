@@ -201,6 +201,16 @@ class CTeslaCannon final : public CWeapon
     void BeginFire(bool alternate) override;
     FireResult FireProjectile() override;
 };
+// Original solo Voodoo targeting; player-only status messages belong to multiplayer.
+class CVoodooDoll final : public CWeapon
+{
+  public:
+    CVoodooDoll() : CWeapon(WEAP_VOODOO) {}
+    FireResult FireVector() override;
+    unsigned hit_effect = 0, deliveries = 0;
+    std::vector<HOBJECT> targets; // Historical checked handles, in original destructable-list order.
+    std::string voodoo_error;
+};
 class CSubMachineGun final : public CWeapon
 {
   public:

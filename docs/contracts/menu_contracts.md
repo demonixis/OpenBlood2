@@ -165,4 +165,7 @@ files still load with display defaults, and either version rejects keys of the o
 Writes always produce version 2.
 
 
-With `--demo`, the original `_DEMO` menu variant reads its labels from the demo's own `cshell.dll` and adds the source splash screens; see [demo contracts](demo_contracts.md#demo-menu).
+Normal `--demo` now uses the [demo menu and edition provider](demo_menu_contracts.md).
+The fixed-offset experiment remains removed. `--demo --view-world` retains the
+[menu-free direct route](demo_contracts.md); retail behavior stays shared and
+separately tested.

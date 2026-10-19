@@ -19,6 +19,15 @@ namespace OpenBlood2
             error = "Menu has no composed surface";
             return false;
         }
+        return draw_surface(*canvas.surface, canvas.revision, error);
+    }
+    bool MenuRenderer::draw_surface(const HudSurface& surface, std::uint64_t revision, std::string& error)
+    {
+        if (surface.width != 640 || surface.height != 480 || surface.rgba.size() != 640 * 480 * 4)
+        {
+            error = "Full-screen image must be a complete 640x480 RGBA surface";
+            return false;
+        }
         if (!texture_)
         {
             SDL_GPUTextureCreateInfo info{};
@@ -43,7 +52,7 @@ namespace OpenBlood2
             error = SDL_GetError();
             return false;
         }
-        if (uploaded_ != canvas.revision)
+        if (uploaded_ != revision)
         {
             auto* bytes = SDL_MapGPUTransferBuffer(device_, transfer_, true);
             if (!bytes)
@@ -51,7 +60,7 @@ namespace OpenBlood2
                 error = SDL_GetError();
                 return false;
             }
-            std::memcpy(bytes, canvas.surface->rgba.data(), 640 * 480 * 4);
+            std::memcpy(bytes, surface.rgba.data(), 640 * 480 * 4);
             SDL_UnmapGPUTransferBuffer(device_, transfer_);
             auto* commands = SDL_AcquireGPUCommandBuffer(device_);
             if (!commands)
@@ -82,7 +91,7 @@ namespace OpenBlood2
                 error = SDL_GetError();
                 return false;
             }
-            uploaded_ = canvas.revision;
+            uploaded_ = revision;
         }
         const auto* viewport = ImGui::GetMainViewport();
         const auto fit = MenuViewport::fit(viewport->Size.x, viewport->Size.y);

@@ -3,7 +3,7 @@
 inline constexpr unsigned IDS_MENU_MAIN_SINGLEPLAYER = 500;
 inline constexpr unsigned IDS_MENU_MAIN_BLOODBATH = 501;
 inline constexpr unsigned IDS_MENU_MAIN_OPTIONS = 502;
-inline constexpr unsigned IDS_MENU_MAIN_PRIMEGIBS = 503; // _DEMO main-menu credits label.
+inline constexpr unsigned IDS_MENU_MAIN_PRIMEGIBS = 503;
 inline constexpr unsigned IDS_MENU_MAIN_CREDITS = 504;
 inline constexpr unsigned IDS_MENU_MAIN_QUIT = 505;
 inline constexpr unsigned IDS_MENU_CHARSELECT_CALEB = 509;

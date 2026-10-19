@@ -297,6 +297,16 @@ namespace
         r->state.m_Flags = FLAG_GRAVITY;
         r->state.m_Pos = {0.5f, 5, 0};
         r->start_departures = 0;
+        // A first interactive frame may be shorter than float position precision.
+        // Passive integration retains gravity velocity without a zero-length
+        // placement sweep; explicit sweeps must still report the authored overlap.
+        auto still = r->state.m_Pos;
+        CHECK(g.server.MoveObject(h, &still) == DE_ERROR);
+        CHECK(g.server.advance_physics(1e-7));
+        CHECK(r->state.m_Pos.x == still.x && r->state.m_Pos.y == still.y && r->state.m_Pos.z == still.z &&
+              r->velocity.y < 0 && r->start_departures == 0);
+        CHECK(g.server.advance_physics(1. / 60));
+        CHECK(r->state.m_Pos.y < still.y && r->start_departures > 0);
         auto down = DVector{0.5f, 1, 0};
         CHECK(g.server.MoveObject(h, &down) == DE_OK && std::abs(r->state.m_Pos.y - 2) < .01f);
         auto along = DVector{0.5f, 2.001f, 30};
