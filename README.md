@@ -48,10 +48,12 @@ Esc opens the pause menu. Use `--view-world` for direct entry. Four default Chos
 profiles, difficulty, Audio and Mouse options are connected; save/load slots remain
 explicitly unavailable. See [menu contracts](docs/contracts/menu_contracts.md).
 
-Use `--demo --data-dir /path/to/B2Demo` for direct demo entry; `--world Demo_02`
-selects its second world. Esc pauses/resumes; Enter after death restarts the current
-world with initial equipment. See [demo contracts](docs/contracts/demo_contracts.md)
-for the temporary retry behavior, future save hook and validation limits.
+Use `--demo --data-dir /path/to/B2Demo` for the [demo menu](docs/contracts/demo_menu_contracts.md).
+Caleb starts Demo_01 with the chosen difficulty; EndGame returns through the Info
+screen to Main. Add `--view-world [--world Demo_02]` for menu-free direct entry.
+Esc pauses/resumes; Enter after death restarts the current world with initial
+equipment. See [demo contracts](docs/contracts/demo_contracts.md) for the temporary
+retry behavior, future save hook and validation limits.
 
 Use the `dev` presets (optimized, with inspector) for playtesting and the `release`
 presets for an optimized build without the inspector; Debug is several times slower

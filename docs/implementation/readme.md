@@ -102,3 +102,5 @@ The [session-cost audit](../../../Documentation/Implementation/m2_session_cost.m
 - [GPU lifetime attribution](../../../Documentation/Implementation/m2_gpu_lifetime.md): SDL-only and standalone Vulkan controls for the retained NVIDIA LeakSanitizer failure.
 
 - [Demo two-world implementation and validation](../../../Documentation/Implementation/demo_playable.md), [phase-2 menu audit](../../../Documentation/Implementation/demo_menu_audit.md): original Voodoo/Focus, menu-free pause/retry/end; no new milestone acceptance.
+
+- [Demo menu implementation and validation](../../../Documentation/Implementation/demo_menu.md): explicit edition provider, limited source branches, promotions and shared pause/settings; original-client visual parity remains unverified.

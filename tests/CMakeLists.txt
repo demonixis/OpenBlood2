@@ -2618,3 +2618,22 @@ if(BLOOD2_DEMO_DATA_DIR AND BLOOD2_GPU_TESTS)
     set_tests_properties(gpu.demo PROPERTIES LABELS "gpu;private;demo" RUN_SERIAL TRUE TIMEOUT 180
         FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
 endif()
+
+# Source demo menus with explicit edition resources; distinct from the menu-free demo diagnostic.
+add_executable(demo_menu_tests demo_menu_tests.cpp)
+target_link_libraries(demo_menu_tests PRIVATE blood2_game)
+blood2_project_options(demo_menu_tests)
+foreach(case manifest flow)
+    add_test(NAME demo_menu.${case} COMMAND demo_menu_tests ${case})
+    set_tests_properties(demo_menu.${case} PROPERTIES LABELS "headless;demo_menu" TIMEOUT 30)
+endforeach()
+if(BLOOD2_DEMO_DATA_DIR)
+    add_test(NAME demo_menu.assets COMMAND demo_menu_tests assets "${BLOOD2_DEMO_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/demo-menu-fixtures")
+    set_tests_properties(demo_menu.assets PROPERTIES LABELS "headless;private;demo_menu" TIMEOUT 60)
+endif()
+if(BLOOD2_DEMO_DATA_DIR AND BLOOD2_GPU_TESTS)
+    add_test(NAME gpu.demo_menu COMMAND blood2_app --demo --menu-smoke --data-dir "${BLOOD2_DEMO_DATA_DIR}"
+        --log-dir "${CMAKE_CURRENT_BINARY_DIR}/demo-menu-logs" --capture "${CMAKE_CURRENT_BINARY_DIR}/demo-menu.png")
+    set_tests_properties(gpu.demo_menu PROPERTIES LABELS "gpu;private;demo_menu" RUN_SERIAL TRUE TIMEOUT 180
+        FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+endif()

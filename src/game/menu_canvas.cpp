@@ -50,28 +50,34 @@ namespace OpenBlood2
     {
         if (surface)
             return true;
-        std::vector<std::uint8_t> bytes;
-        const auto* dll = resources_.find("cres.dll");
-        if (!dll || dll->size > 32 * 1024 * 1024 || !resources_.read("cres.dll", bytes, error) ||
-            !read_string_resources(bytes, strings, error))
-        {
-            if (error.empty())
-                error = "Missing/oversized menu strings: cres.dll";
+        const auto& assets = menu_resources(resources_.demo() ? MenuEdition::Demo : MenuEdition::Retail);
+        if (!load_menu_strings(resources_, strings, error))
             return false;
-        }
-        if (!canvas.load_font("interface/fonts/MenuFont1.pcx", "interface/fonts/MenuFont1.fnt", small_) ||
-            !canvas.load_font("interface/mainmenus/mm_font_01.pcx", "interface/mainmenus/mm_font.fnt", selected_, 1) ||
-            !canvas.load_font("interface/mainmenus/mm_font_05.pcx", "interface/mainmenus/mm_font.fnt", normal_, 1) ||
-            !canvas.load_font("interface/mainmenus/mm_font_dis.pcx", "interface/mainmenus/mm_font.fnt", disabled_, 1))
+        if (!canvas.load_font(assets.small_bitmap, assets.small_font, small_) ||
+            !canvas.load_font(assets.large_bitmaps[0], assets.large_font, selected_, 1) ||
+            !canvas.load_font(assets.large_bitmaps[1], assets.large_font, normal_, 1) ||
+            !canvas.load_font(assets.large_bitmaps[2], assets.large_font, disabled_, 1))
         {
             error = canvas.error;
             return false;
         }
-        background_ = canvas.CreateSurfaceFromBitmap("interface/mainmenus/background.pcx");
-        slider_ = canvas.CreateSurfaceFromBitmap("interface/mainmenus/SliderBar.pcx");
-        thumb_ = canvas.CreateSurfaceFromBitmap("interface/mainmenus/SliderTab.pcx");
-        for (const auto* name : {"mainmenu.pcx", "singleplayer.pcx", "options.pcx", "loadgame.pcx", "savegame.pcx"})
-            titles_[name] = canvas.CreateSurfaceFromBitmap((std::string("interface/mainmenus/") + name).c_str());
+        background_ = canvas.CreateSurfaceFromBitmap(assets.background);
+        slider_ = canvas.CreateSurfaceFromBitmap(assets.slider);
+        thumb_ = canvas.CreateSurfaceFromBitmap(assets.thumb);
+        for (const auto* key : {"mainmenu.pcx", "singleplayer.pcx", "options.pcx", "loadgame.pcx", "savegame.pcx"})
+            if (const auto* path = assets.title(key))
+                titles_[key] = canvas.CreateSurfaceFromBitmap(path);
+        for (auto promotion : {MenuPromotion::Bloodbath, MenuPromotion::Info, MenuPromotion::Modes})
+            if (const auto* path = assets.promotion(promotion))
+            {
+                const auto* image = canvas.CreateSurfaceFromBitmap(path);
+                if (image && (image->width != 640 || image->height != 480))
+                {
+                    error = std::string("Invalid 640x480 menu promotion: ") + path;
+                    return false;
+                }
+                promotions_[promotion] = image;
+            }
         if (!canvas.error.empty())
         {
             error = canvas.error;
@@ -82,14 +88,40 @@ namespace OpenBlood2
     }
     bool MenuCanvas::compose(Menu& menu, double, std::string& error)
     {
+        if (menu.demo() != resources_.demo())
+        {
+            error = "Menu/controller resource edition mismatch";
+            return false;
+        }
         if (!initialize(error))
             return false;
         if (composed_ == menu.revision)
             return true;
         canvas.FillRect(surface, nullptr, 0);
+        if (menu.promotion != MenuPromotion::None)
+        {
+            const auto it = promotions_.find(menu.promotion);
+            if (it == promotions_.end() || !it->second)
+            {
+                error = "Missing menu promotion resource";
+                return false;
+            }
+            canvas.DrawSurfaceToSurface(surface, it->second, nullptr, 0, 0);
+            ++revision;
+            composed_ = menu.revision;
+            return true;
+        }
+        const auto& assets = menu_resources(resources_.demo() ? MenuEdition::Demo : MenuEdition::Retail);
         canvas.DrawSurfaceToSurface(surface, background_, nullptr, 0, 0);
-        canvas.DrawSurfaceToSurfaceTransparent(surface, titles_.at(menu.title()), nullptr, 82, 52, hud_magenta);
-        int y = 140;
+        const auto title = titles_.find(menu.title());
+        if (title == titles_.end() || !title->second)
+        {
+            error = std::string("Unavailable menu title: ") + menu.title();
+            return false;
+        }
+        canvas.DrawSurfaceToSurfaceTransparent(surface, title->second, nullptr, assets.title_x, assets.title_y,
+                                               hud_magenta);
+        int y = assets.list_y;
         if (menu.page == MenuPage::Quit)
         {
             const auto it = strings.strings.find(IDS_MENU_MESSAGE_QUIT);
@@ -182,6 +214,9 @@ namespace OpenBlood2
         }
         if (menu.page == MenuPage::Save || menu.page == MenuPage::Load)
             text(*surface, small_, "Saving and loading are not available yet.", 180, 440);
+        if (menu.demo() &&
+            (menu.page == MenuPage::Options || menu.page == MenuPage::Audio || menu.page == MenuPage::Mouse))
+            text(*surface, small_, "Grey options are unavailable in OpenBlood2.", 180, 440);
         if (menu.audio_failed)
             text(*surface, small_, "Menu audio unavailable - see log.", 180, 460);
         ++revision;

@@ -54,6 +54,17 @@ namespace OpenBlood2
             }
             if (!controls.focused)
                 return false;
+            if (menu.promotion != MenuPromotion::None)
+            {
+                if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat &&
+                    (e.key.scancode == SDL_SCANCODE_ESCAPE || e.key.scancode == SDL_SCANCODE_SPACE ||
+                     e.key.scancode == SDL_SCANCODE_RETURN || e.key.scancode == SDL_SCANCODE_KP_ENTER))
+                {
+                    menu.dismiss_promotion();
+                    reset(menu, player);
+                }
+                return false; // Promotions accept source keys only; never leak to the underlying menu/game.
+            }
             if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.scancode == SDL_SCANCODE_F10)
             {
                 if (inspector_available)
@@ -72,6 +83,12 @@ namespace OpenBlood2
                 else
                     menu.open(player, alive);
                 reset(menu, player);
+                return false;
+            }
+            if (menu.demo() && !menu.active && player && !alive && e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat &&
+                (e.key.scancode == SDL_SCANCODE_RETURN || e.key.scancode == SDL_SCANCODE_KP_ENTER))
+            {
+                demo.restart = true; // Shared owned retry hook; future checkpoint restore replaces the app handler.
                 return false;
             }
             if (menu.active)

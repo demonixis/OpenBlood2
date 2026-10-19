@@ -309,13 +309,13 @@ namespace OpenBlood2
         }
         // The scripted smokes assert full-game SubwayA/CityHub content.
         const bool content_smoke =
-            options.menu_smoke || options.gpu_smoke || options.world_smoke || options.player_smoke ||
-            options.restore_smoke || options.keepalive_smoke || options.weapons_smoke || options.skeleton_smoke ||
-            options.movement_smoke || options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
-            options.interaction_smoke || options.brushes_smoke || options.pickups_smoke || options.objectives_smoke ||
-            options.cameras_smoke || options.keyframes_smoke || options.worldpaths_smoke || options.lights_smoke ||
-            options.cinematics_smoke || options.random_sounds_smoke || options.world_sounds_smoke ||
-            options.sprites_smoke || options.scene_explosions_smoke;
+            options.gpu_smoke || options.world_smoke || options.player_smoke || options.restore_smoke ||
+            options.keepalive_smoke || options.weapons_smoke || options.skeleton_smoke || options.movement_smoke ||
+            options.containers_smoke || options.doors_smoke || options.triggers_smoke || options.interaction_smoke ||
+            options.brushes_smoke || options.pickups_smoke || options.objectives_smoke || options.cameras_smoke ||
+            options.keyframes_smoke || options.worldpaths_smoke || options.lights_smoke || options.cinematics_smoke ||
+            options.random_sounds_smoke || options.world_sounds_smoke || options.sprites_smoke ||
+            options.scene_explosions_smoke;
         if (options.demo && content_smoke)
         {
             error = "--demo supports normal launch, --view-world, --check-data, --inspect-world, --inspect-player, "
@@ -323,10 +323,15 @@ namespace OpenBlood2
             return false;
         }
         if (options.demo_smoke &&
-            (!options.demo || content_smoke || options.view_world || options.inspect_world || options.start_game ||
-             options.check_data || options.bench || options.frame_limit || explicit_world))
+            (!options.demo || options.menu_smoke || content_smoke || options.view_world || options.inspect_world ||
+             options.start_game || options.check_data || options.bench || options.frame_limit || explicit_world))
         {
             error = "--demo-smoke requires --demo and its default first world; it owns its diagnostic frames";
+            return false;
+        }
+        if (options.demo && options.menu_smoke && (options.frame_limit || explicit_world))
+        {
+            error = "Demo menu smoke owns its world and frame count";
             return false;
         }
         if (options.demo && !explicit_world)

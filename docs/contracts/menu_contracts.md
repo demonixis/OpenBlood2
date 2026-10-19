@@ -165,6 +165,7 @@ files still load with display defaults, and either version rejects keys of the o
 Writes always produce version 2.
 
 
-`--demo` now uses a [menu-free application flow](demo_contracts.md). The former fixed-offset
-reader and demo navigation experiment were removed. The [menu audit](../../../Documentation/Implementation/demo_menu_audit.md)
-recommends a future edition resource provider with limited source-menu adaptation; it does not implement that menu.
+Normal `--demo` now uses the [demo menu and edition provider](demo_menu_contracts.md).
+The fixed-offset experiment remains removed. `--demo --view-world` retains the
+[menu-free direct route](demo_contracts.md); retail behavior stays shared and
+separately tested.

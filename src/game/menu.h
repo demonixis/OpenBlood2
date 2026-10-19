@@ -1,6 +1,7 @@
 #pragma once
 #include "engine/hud_surface.h"
 #include "engine/string_resources.h"
+#include "game/menu_resources.h"
 #include <optional>
 
 namespace OpenBlood2
@@ -65,7 +66,17 @@ namespace OpenBlood2
     class Menu
     {
       public:
+        explicit Menu(MenuEdition edition = MenuEdition::Retail) : edition_(edition) {}
+        bool demo() const
+        {
+            return edition_ == MenuEdition::Demo;
+        }
         void open(bool in_world, bool alive = true);
+        void show_promotion(MenuPromotion, bool exit = false);
+        void dismiss_promotion();
+        void end_demo();
+        MenuPromotion promotion = MenuPromotion::None;
+        bool promotion_exit = false;
         void close();
         void build(MenuPage);
         void back();
@@ -97,6 +108,7 @@ namespace OpenBlood2
         const char* title() const;
 
       private:
+        const MenuEdition edition_;
         void AddLargeTextItemOption(unsigned string_id, int command);
         void setting(unsigned string_id, int id);
         void cue(MenuCue);
@@ -127,6 +139,7 @@ namespace OpenBlood2
         const HudSurface* slider_ = nullptr;
         const HudSurface* thumb_ = nullptr;
         std::map<std::string, const HudSurface*> titles_;
+        std::map<MenuPromotion, const HudSurface*> promotions_;
         std::uint64_t composed_ = UINT64_MAX;
     };
 } // namespace OpenBlood2

@@ -1479,3 +1479,18 @@ and [evidence](../../../Documentation/Implementation/demo_playable.md) delimit t
 The original demo source/hash ledger stays unchanged. The menu study adds no menu code.
 
 The demo continuation also corrects generic passive integration at sub-position-precision deltas: retain container/velocity updates, skip only an unchanged non-solid passive position. Explicit sweeps, solid/body collision and diagnostic clocks are unchanged; see [collision traversal](../contracts/collision_traversal_contracts.md#passive-integration-below-position-precision). This is replacement engine policy, not an imported gameplay rule.
+
+## Demo menu with explicit edition resources (2026-10-19)
+
+The separately requested implementation now follows the phase-2 recommendation.
+Limited `_DEMO` branches from MenuMain/MenuSinglePlayer/MainMenus and Splash/
+GameStates use the existing typed controller; `menu_resources.cpp` owns a finite
+English source-label manifest and Build 108 title/audio/promotion selection.
+There is no runtime DLL-offset reader or game-wide text fallback. The shipped
+mouse constructor was additionally checked: three controls, with a sensitivity
+range different from the later source/shared current preferences. The latter
+range is preserved as an explicit adaptation. Original sources/data stay external
+and unchanged; historical experiment/audit ledgers above retain their scope.
+See [contracts](../contracts/demo_menu_contracts.md),
+[source hashes and adaptations](sources/demo_menu_sources.json) and
+[validation](../../../Documentation/Implementation/demo_menu.md).

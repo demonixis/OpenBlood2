@@ -88,14 +88,17 @@ ctest --preset debug -L headless
 ```
 
 The 1998 two-level demo (`B2Demo.rez`) needs `--demo`; its first world is `Demo_01`.
-It starts directly in game without a menu. Esc pauses/resumes; Enter after death
-restarts the current level with initial equipment. The authored exit continues to
-Demo_02; the end image accepts Esc/Enter/Space to quit. See [demo contracts](contracts/demo_contracts.md)
-for validation limits and the future save-system integration point.
+Normal launch opens the [demo menu](contracts/demo_menu_contracts.md). Choose
+Caleb and difficulty to start; the authored exit continues to Demo_02. EndGame
+shows Info, then Esc/Enter/Space returns to Main. Quit shows Info before exiting.
+`--view-world` retains menu-free direct entry and its end-image-to-exit behavior.
+Esc pauses/resumes; Enter after death restarts the current level with initial
+equipment. See [demo contracts](contracts/demo_contracts.md) for validation limits
+and the future save-system integration point.
 
 ```sh
 ./build/debug/blood2 --demo --data-dir "/path/to/Blood2 Demo"
-./build/debug/blood2 --demo --data-dir "/path/to/Blood2 Demo" --world Demo_02
+./build/debug/blood2 --demo --data-dir "/path/to/Blood2 Demo" --view-world --world Demo_02
 ```
 
 The retail default world is SubwayA. `--view-world` enters the original player and

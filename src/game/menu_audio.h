@@ -7,6 +7,7 @@ namespace OpenBlood2
     {
       public:
         explicit MenuAudio(const Resources& resources) : resources_(resources) {}
+        bool validate_resources(std::string& error);
         void focus(bool active);
         void play(MenuCue);
         bool advance(double seconds);

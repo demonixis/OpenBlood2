@@ -1,18 +1,21 @@
 # Original demo edition (`--demo`)
 
 This separately authorized continuation makes the two shipped demo worlds usable
-through a temporary menu-free frontend. It does not reopen M2, resolve M2-GPU-001,
+through the shared source menu or the preserved menu-free direct frontend. It does
+not reopen M2, resolve M2-GPU-001,
 accept M3 or certify a complete campaign. See the [implementation and evidence](../../../Documentation/Implementation/demo_playable.md),
-[Voodoo contracts](voodoo_contracts.md), and [menu audit](../../../Documentation/Implementation/demo_menu_audit.md).
+[Voodoo contracts](voodoo_contracts.md), and the implemented [demo menu](demo_menu_contracts.md).
 
 ## Edition and startup
 
 `--demo --data-dir DIR` explicitly selects the demo and mounts only `B2Demo.rez`
-(case-insensitive filename). It starts `Demo_01` with the existing Caleb/medium
-profile. `--world Demo_02` overrides the world. Diagnostics keep their own dispatch:
+(case-insensitive filename). Normal launch opens the [demo menu](demo_menu_contracts.md);
+Caleb and the selected difficulty start Demo_01. `--demo --view-world` starts
+Demo_01 directly with Caleb/medium, and `--world Demo_02` overrides that direct
+world. Diagnostics keep their own dispatch:
 `--check-data`, `--inspect-world`, `--inspect-player`, `--start-game`, `--view-world`
-and `--bench` still work. Retail-specific scripted smokes reject the demo;
-`--demo-smoke` is the separate labelled frontend diagnostic.
+and `--bench` still work. Retail-content scripted smokes reject the demo; `--demo-smoke` is the separate
+menu-free diagnostic and `--demo --menu-smoke` exercises the edition menu.
 
 `Resources::demo()` survives new-game and NEW_LEVEL preparation and exposes
 `ServerDE::IsDemoBuild()`. Mounting never combines demo and retail REZs. Loose music
@@ -26,17 +29,21 @@ there is no new demo-specific object omission or placeholder pickup.
 
 ## Removal of the old experiment
 
-The fixed-offset `demo_menu_strings` reader, build entry, menu edition switch,
-splash navigation/cache, ambience remapping and three experiment-only tests are
-removed. The historical source ledger and Git history remain evidence of that
+Phase 1 removed the fixed-offset `demo_menu_strings` reader, its build entry,
+experimental menu branches and three experiment-only tests. The new provider and
+limited source menu implementation are documented separately; they do not restore
+that reader or its binary-layout dependency. The historical source ledger and
+Git history remain evidence of that
 experiment, not acceptance of its behavior. Retail menus and shared PCX/FNT,
 preferences, input, GPU transport and audio services remain.
 
-Demo startup constructs neither `MenuCanvas` nor `MenuAudio`: it does not open a
+Menu-free direct startup constructs neither `MenuCanvas` nor `MenuAudio`: it does
+not open a
 menu, read menu strings/fonts/artwork, or create its independent mixer. A plain
 settings holder supplies the shared Audio/Mouse preferences, loaded from the
 existing SDL user directory. Invalid preferences are reported in the log. Demo
-play has no settings editor. The generic 640x480 surface drawing entrypoint is
+direct play has no settings editor; normal menu launch exposes shared settings.
+The generic 640x480 surface drawing entrypoint is
 shared with the retail renderer, without initializing a menu canvas.
 
 The shipped Build 108 archive lacks the source Build 109 HUD's
@@ -61,7 +68,9 @@ available in retail where authored. Focus regeneration is shared source behavior
 
 ## Application ownership, pause and end
 
-`DemoFlow` owns Playing, Paused and Finished, plus pending quit/restart requests.
+In the preserved direct route, `DemoFlow` owns Playing, Paused and Finished,
+plus pending quit/restart requests. Normal menu launch instead uses shared menu
+ownership and the [promotion/end contract](demo_menu_contracts.md#pause-promotions-and-lifetime).
 Esc toggles Playing/Paused outside inspection. Pausing skips simulation updates
 and pauses the game mixer; no zero-delta update or catch-up update is used. Held
 movement/fire and action edges are cleared, and mouse capture follows ownership.
@@ -76,11 +85,13 @@ original Door rules and the existing atomic rider solver.
 After the original dead-player exit guard, case-insensitive `EndGame` is a terminal
 intent **only in demo**. The client records it, and the message pump cancels queued
 level changes without inspecting `endgame.dat`. The application consumes the intent
-outside callbacks, decodes `screens/info.pcx` with the bounded PCX reader, unloads
-the world, pauses audio and releases gameplay input. Missing/corrupt artwork fails
+outside callbacks, unloads the world, pauses audio and releases gameplay input.
+Normal menu launch uses its prevalidated Info promotion and returns to Main on
+dismissal. Direct entry decodes `screens/info.pcx` with the bounded PCX reader.
+Missing/corrupt artwork fails
 explicitly. Finished draws the 640x480 image with aspect-preserving black bars;
-Esc, Enter/keypad Enter or Space quits. The source returned to its menu under this
-splash; quitting here is the authorized phase-1 adaptation.
+Esc, Enter/keypad Enter or Space quits in this direct route. This is the retained
+phase-1 adaptation; normal menu launch now follows the source return to Main.
 
 ## Temporary death retry and future saves
 
@@ -90,7 +101,8 @@ Focus and world progress; it is neither a save restore nor a dead-player revival
 The actual source death, corpse, camera and command guards remain active until
 replacement. Esc still pauses/resumes a dead session. No save UI is introduced.
 
-`DemoFlow::restart` is an owned application request. `frontend.cpp` consumes it
+`MenuInput::demo.restart` (`DemoFlow::restart`) is an owned application request
+shared by menu and direct demo play. `frontend.cpp` consumes it
 outside SDL/object callbacks and calls transactional `GameSession::start_new_game`.
 Only successful preparation replaces the owner; a failed retry logs its error and
 retains the dead session. This is the deliberate future save-system integration

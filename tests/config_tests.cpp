@@ -175,19 +175,23 @@ namespace
         CHECK(parse_options(view, options, error) && options.view_world);
         const std::array<std::string_view, 2> demo_smoke{"--demo", "--demo-smoke"};
         CHECK(parse_options(demo_smoke, options, error) && options.demo_smoke);
-        for (const auto mode :
-             {"--view-world", "--inspect-world", "--inspect-player", "--start-game", "--check-data", "--bench"})
+        for (const auto mode : {"--view-world", "--inspect-world", "--inspect-player", "--start-game", "--check-data",
+                                "--bench", "--menu-smoke"})
         {
             const std::array<std::string_view, 3> args{"--demo", "--demo-smoke", mode};
             CHECK(!parse_options(args, options, error));
         }
         const std::array<std::string_view, 1> no_edition{"--demo-smoke"};
         CHECK(!parse_options(no_edition, options, error));
-        for (const auto smoke : {"--weapons-smoke", "--menu-smoke", "--gpu-smoke", "--player-smoke"})
+        for (const auto smoke : {"--weapons-smoke", "--gpu-smoke", "--player-smoke"})
         {
             const std::array<std::string_view, 2> args{"--demo", smoke};
             CHECK(!parse_options(args, options, error) && error.find("--demo") != std::string::npos);
         }
+        const std::array<std::string_view, 2> demo_menu{"--demo", "--menu-smoke"};
+        CHECK(parse_options(demo_menu, options, error) && options.menu_smoke && options.demo);
+        const std::array<std::string_view, 4> demo_menu_world{"--demo", "--menu-smoke", "--world", "Demo_02"};
+        CHECK(!parse_options(demo_menu_world, options, error));
         const std::array<std::string_view, 0> none{};
         CHECK(parse_options(none, options, error) && !options.demo && options.world == first_level(false));
 
