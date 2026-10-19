@@ -1,5 +1,18 @@
 # Source and Dependency Provenance
 
+## Desktop launcher L0 through L2
+
+New project-owned SDL3/SDL_GPU/ImGui UI and process/state code reuse the existing
+config and bounded REZ sources byte-for-byte through `blood2_startup`. No original
+launcher project is available and no historical DLL ABI or game object code is
+imported. The standalone capability branch precedes game configuration, logging
+and SDL initialization. Dependency revisions/archive hashes, the SDL patch and
+game renderer/shaders are preserved. Native dialogs are enabled only in separate
+launcher build trees. See [contracts](../contracts/launcher_contracts.md),
+[source baseline](sources/launcher_sources.json) and
+[validation](../../../Documentation/Implementation/launcher.md). Nightmares,
+preference editing, mods and demo installation remain outside this increment.
+
 ## Original crosshair
 
 Selected `CBloodClientShell::PostUpdate` gates, bitmap path and integer centering

@@ -10,6 +10,8 @@ The targets are defined in [CMakeLists.txt](../CMakeLists.txt).
 
 | Target / directory | Responsibility |
 | --- | --- |
+| `blood2_startup` | Shared config/REZ readers and the headless launcher capability protocol; no simulation or GPU lifetime |
+| `blood2_launcher` / [src/launcher](../src/launcher) | Separate SDL3/ImGui desktop frontend, installation records, validation jobs and child tracking |
 | `engine` / [src/engine](../src/engine) | Resources and format readers, object storage, collision, animation, audio and SDL_GPU rendering |
 | `blood2_game` / [src/game](../src/game) | Session ownership, typed messages and engine service adapters |
 | [src/game/original](../src/game/original) | Selected original shells, objects, AI, weapons and effects with documented adaptations |
@@ -21,6 +23,11 @@ The targets are defined in [CMakeLists.txt](../CMakeLists.txt).
 `blood2_app` produces the `blood2` executable and links `blood2_game`, which links
 `engine`. The engine shares the small legacy type declarations; these directories
 are not independent replacements for the full historical SDK.
+
+The launcher and game use separate build presets to preserve the game's SDL
+options. `engine` links `blood2_startup`; the launcher links that same small
+library with its own SDL UI, without game objects or scene rendering. Existing
+config/REZ source paths are retained. See [launcher setup](launcher.md).
 
 ## Boundaries to preserve
 

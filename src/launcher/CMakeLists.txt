@@ -1,5 +1,7 @@
-add_library(blood2_launcher_core STATIC state.cpp dialog.cpp)
+find_package(Threads REQUIRED)
+add_library(blood2_launcher_core STATIC state.cpp dialog.cpp content.cpp process.cpp controller.cpp)
 target_link_libraries(blood2_launcher_core PUBLIC blood2_startup SDL3::SDL3)
+target_link_libraries(blood2_launcher_core PRIVATE Threads::Threads)
 blood2_project_options(blood2_launcher_core)
 
 add_executable(blood2_launcher main.cpp ../engine/capture.cpp)

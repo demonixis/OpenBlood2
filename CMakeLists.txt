@@ -28,8 +28,9 @@ if(NOT BLOOD2_BUILD_REVISION)
 endif()
 configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
 
-add_library(blood2_startup STATIC src/engine/config.cpp src/engine/resources.cpp)
+add_library(blood2_startup STATIC src/engine/config.cpp src/engine/resources.cpp src/startup/protocol.cpp)
 target_include_directories(blood2_startup PUBLIC src)
+target_include_directories(blood2_startup PRIVATE "${PROJECT_BINARY_DIR}/generated")
 blood2_project_options(blood2_startup)
 
 if(BLOOD2_BUILD_GAME)

@@ -39,6 +39,9 @@ foreach(case IN ITEMS membership callbacks churn)
 endforeach()
 
 add_executable(config_tests config_tests.cpp)
+add_test(NAME cli.launcher_info COMMAND "${CMAKE_COMMAND}" "-DGAME=$<TARGET_FILE:blood2_app>"
+    "-DROOT=${CMAKE_CURRENT_BINARY_DIR}/launcher-info" -P "${CMAKE_CURRENT_SOURCE_DIR}/launcher/info_test.cmake")
+set_tests_properties(cli.launcher_info PROPERTIES LABELS "headless;cli;launcher" TIMEOUT 20)
 target_link_libraries(config_tests PRIVATE engine)
 blood2_project_options(config_tests)
 foreach(case IN ITEMS arguments precedence relative_paths invalid_config content_validation case_lookup demo)

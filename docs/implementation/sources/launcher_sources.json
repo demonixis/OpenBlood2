@@ -32,5 +32,26 @@
     "preference editor",
     "mods",
     "demo installer/downloader"
-  ]
+  ],
+  "implementation": {
+    "shared_target": "blood2_startup",
+    "preserved_source_bytes": [
+      "src/engine/config.cpp",
+      "src/engine/config.h",
+      "src/engine/resources.cpp",
+      "src/engine/resources.h"
+    ],
+    "new_code": [
+      "src/startup/protocol.cpp",
+      "src/launcher/state.cpp",
+      "src/launcher/dialog.cpp",
+      "src/launcher/content.cpp",
+      "src/launcher/process.cpp",
+      "src/launcher/controller.cpp",
+      "src/launcher/main.cpp"
+    ],
+    "game_adaptation": "Standalone --launcher-info before any startup/logging/SDL side effects; ordinary game dispatch and renderer unchanged",
+    "build_adaptation": "SDL_DIALOG enabled only in launcher-only presets; revisions and archive hashes unchanged",
+    "artwork": "Plain project title panel; optional commercial PE/DIB artwork reader deferred"
+  }
 }

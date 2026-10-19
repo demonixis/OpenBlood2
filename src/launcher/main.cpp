@@ -1,5 +1,6 @@
 #include "build_info.h"
 #include "engine/capture.h"
+#include "launcher/controller.h"
 #include "launcher/dialog.h"
 #include "launcher/state.h"
 #include <SDL3/SDL_main.h>
@@ -18,7 +19,7 @@ namespace OpenBlood2::Launcher
     struct Options
     {
         fs::path directory, game, data, capture;
-        bool demo = false, smoke = false, help = false;
+        bool demo = false, smoke = false, launch_smoke = false, help = false;
         unsigned frames = 0;
         float scale = 0;
     };
@@ -33,6 +34,8 @@ namespace OpenBlood2::Launcher
                 result.demo = true;
             else if (arg == "--smoke")
                 result.smoke = true;
+            else if (arg == "--launch-smoke")
+                result.launch_smoke = true;
             else if (arg == "--state-dir" || arg == "--game" || arg == "--data-dir" || arg == "--capture" ||
                      arg == "--frames" || arg == "--ui-scale")
             {
@@ -99,6 +102,11 @@ namespace OpenBlood2::Launcher
         if (result.smoke && (result.directory.empty() || result.frames < 12))
         {
             error = "--smoke requires an isolated --state-dir and --frames >= 12";
+            return false;
+        }
+        if (result.launch_smoke && (!result.smoke || result.data.empty() || result.game.empty()))
+        {
+            error = "--launch-smoke requires --smoke, --game and --data-dir";
             return false;
         }
         return true;
@@ -245,11 +253,51 @@ namespace OpenBlood2::Launcher
             }
             return true;
         }
+        bool suspend()
+        {
+            // Retire presentation before unmapping the native window. Keep the
+            // device/ImGui resources, but never reuse an old native swapchain.
+            if (!SDL_WaitForGPUIdle(gpu))
+                return false;
+            SDL_ReleaseWindowFromGPUDevice(gpu, window);
+            claimed = false;
+            return SDL_HideWindow(window);
+        }
+        bool resume()
+        {
+            if (!SDL_ShowWindow(window))
+                return false;
+            if (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED)
+                SDL_RestoreWindow(window);
+            SDL_RaiseWindow(window);
+            claimed = SDL_ClaimWindowForGPUDevice(gpu, window);
+            return claimed && SDL_SetGPUSwapchainParameters(gpu, window, SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
+                                                            SDL_GPU_PRESENTMODE_VSYNC);
+        }
     };
     void assign(std::array<char, 4097>& buffer, const fs::path& path)
     {
         const auto value = path_text(path);
         SDL_strlcpy(buffer.data(), value.c_str(), buffer.size());
+    }
+    std::string file_url(const fs::path& path)
+    {
+        const auto text = path_text(path);
+        std::string url = text.starts_with('/') ? "file://" : "file:///";
+        constexpr char hex[] = "0123456789ABCDEF";
+        for (const unsigned char c : text)
+        {
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '/' || c == ':' ||
+                c == '-' || c == '_' || c == '.' || c == '~')
+                url += char(c);
+            else
+            {
+                url += '%';
+                url += hex[c >> 4];
+                url += hex[c & 15];
+            }
+        }
+        return url;
     }
     int run(const Options& options)
     {
@@ -301,7 +349,39 @@ namespace OpenBlood2::Launcher
             assign(data, options.data);
             demo = options.demo;
         }
+        if (options.demo)
+            demo = true;
         Dialog dialog;
+        Controller controller;
+        auto remember = [&]() -> bool
+        {
+            State next = state;
+            next.game = path_from_utf8(game.data());
+            Installation item{demo ? Edition::Demo : Edition::Retail, path_from_utf8(data.data())};
+            auto found = std::find(next.installations.begin(), next.installations.end(), item);
+            next.selected = int(found - next.installations.begin());
+            if (found == next.installations.end())
+                next.installations.push_back(item);
+            if (!save_state(state_file, next, error))
+                return false;
+            state = std::move(next);
+            notice = "Installation remembered";
+            return true;
+        };
+        auto prepare = [&]()
+        {
+            error.clear();
+            notice.clear();
+            controller.prepare({demo ? Edition::Demo : Edition::Retail, path_from_utf8(data.data())},
+                               path_from_utf8(game.data()));
+        };
+        if (data[0])
+            prepare();
+        bool hidden_for_game = false;
+        bool help = false;
+        bool captured = false, smoke_started = false, smoke_finished = false;
+        unsigned click_stage = 0;
+        ImVec2 play_center{};
         bool quit = false;
         unsigned frame = 0;
         while (!quit && (!options.frames || frame < options.frames))
@@ -327,12 +407,49 @@ namespace OpenBlood2::Launcher
                 if (!result.error.empty())
                     error = result.error;
                 else if (!result.path.empty())
+                {
                     assign(result.executable ? game : data, path_from_utf8(result.path));
+                    controller.cancel();
+                }
+            }
+            controller.update();
+            if (controller.status() == Controller::Status::Running)
+            {
+                smoke_started = true;
+                if (!hidden_for_game)
+                {
+                    if (!view.suspend())
+                    {
+                        spdlog::error("Suspend launcher: {}", SDL_GetError());
+                        return 3;
+                    }
+                    hidden_for_game = true;
+                }
+                continue;
+            }
+            if (hidden_for_game)
+            {
+                smoke_finished = controller.status() == Controller::Status::Finished;
+                if (!view.resume())
+                {
+                    spdlog::error("Resume launcher: {}", SDL_GetError());
+                    return 3;
+                }
+                hidden_for_game = false;
             }
             if (SDL_GetWindowFlags(view.window) & SDL_WINDOW_MINIMIZED)
                 continue;
             ImGui_ImplSDLGPU3_NewFrame();
             ImGui_ImplSDL3_NewFrame();
+            if (options.launch_smoke && controller.playable() && frame >= 6 && click_stage < 2)
+            {
+                // Diagnostic-only input uses the real Play widget and normal controller path.
+                auto& io = ImGui::GetIO();
+                io.AddFocusEvent(true);
+                io.AddMousePosEvent(play_center.x, play_center.y);
+                io.AddMouseButtonEvent(0, click_stage == 0);
+                ++click_stage;
+            }
             ImGui::NewFrame();
             const auto* viewport = ImGui::GetMainViewport();
             ImGui::SetNextWindowPos(viewport->WorkPos);
@@ -342,6 +459,7 @@ namespace OpenBlood2::Launcher
             ImGui::TextColored(ImVec4(.85f, .19f, .21f, 1), "BLOOD II: THE CHOSEN");
             ImGui::TextDisabled("OpenBlood2 launcher");
             ImGui::Separator();
+            ImGui::BeginDisabled(controller.busy());
             ImGui::SetNextItemWidth(-1);
             if (ImGui::BeginCombo("##installation",
                                   state.selected < 0
@@ -358,18 +476,26 @@ namespace OpenBlood2::Launcher
                         state.selected = int(i);
                         demo = item.edition == Edition::Demo;
                         assign(data, item.directory);
+                        controller.cancel();
                     }
                 }
                 ImGui::EndCombo();
             }
             ImGui::SeparatorText("Game data");
             if (ImGui::RadioButton("Blood II", !demo))
+            {
                 demo = false;
+                controller.cancel();
+            }
             ImGui::SameLine();
             if (ImGui::RadioButton("Demo", demo))
+            {
                 demo = true;
+                controller.cancel();
+            }
             ImGui::SetNextItemWidth(-115 * view.scale);
-            ImGui::InputText("##data", data.data(), data.size());
+            if (ImGui::InputText("##data", data.data(), data.size()))
+                controller.cancel();
             ImGui::SameLine();
             ImGui::BeginDisabled(dialog.pending());
             if (ImGui::Button("Browse...##data"))
@@ -378,49 +504,81 @@ namespace OpenBlood2::Launcher
             ImGui::TextWrapped(
                 "Select the directory containing BLOOD2.REZ or B2Demo.rez. Keep your original files in place.");
             if (ImGui::Button("Remember installation"))
-            {
-                std::error_code ec;
-                const auto path = fs::absolute(path_from_utf8(data.data()), ec).lexically_normal();
-                if (data[0] == 0 || ec)
-                    error = "Choose an installation directory first";
-                else
-                {
-                    State next = state;
-                    next.game = path_from_utf8(game.data());
-                    Installation item{demo ? Edition::Demo : Edition::Retail, path};
-                    auto found = std::find(next.installations.begin(), next.installations.end(), item);
-                    next.selected = int(found - next.installations.begin());
-                    if (found == next.installations.end())
-                        next.installations.push_back(item);
-                    if (save_state(state_file, next, error))
-                    {
-                        state = std::move(next);
-                        notice = "Installation remembered";
-                    }
-                }
-            }
-            ImGui::Separator();
-            ImGui::BeginDisabled();
-            ImGui::Button("Play", ImVec2(190 * view.scale, 46 * view.scale));
+                remember();
             ImGui::SameLine();
+            ImGui::BeginDisabled(dialog.pending() || !data[0]);
+            if (ImGui::Button("Check installation"))
+                prepare();
+            ImGui::EndDisabled();
+            ImGui::EndDisabled();
+            ImGui::Separator();
+            ImGui::BeginDisabled(!controller.playable() || dialog.pending());
+            if (ImGui::Button("Play", ImVec2(190 * view.scale, 46 * view.scale)))
+            {
+                if (remember())
+                    controller.play(directory);
+            }
+            play_center = ImVec2((ImGui::GetItemRectMin().x + ImGui::GetItemRectMax().x) * .5f,
+                                 (ImGui::GetItemRectMin().y + ImGui::GetItemRectMax().y) * .5f);
+            ImGui::EndDisabled();
+            ImGui::SameLine();
+            ImGui::BeginDisabled();
             ImGui::Button("Graphics");
             ImGui::SameLine();
             ImGui::Button("Mods");
             ImGui::SameLine();
             ImGui::Button("Install demo");
             ImGui::EndDisabled();
-            ImGui::TextDisabled("Game launch is not connected in this foundation build.");
+            switch (controller.status())
+            {
+                case Controller::Status::Querying:
+                    ImGui::TextUnformatted("Checking game executable...");
+                    break;
+                case Controller::Status::Validating:
+                    ImGui::TextUnformatted("Checking archives...");
+                    break;
+                case Controller::Status::Ready:
+                case Controller::Status::Finished:
+                    ImGui::TextColored(ImVec4(.4f, .8f, .5f, 1), "Ready to launch");
+                    if (controller.status() == Controller::Status::Finished)
+                        ImGui::TextUnformatted("The game exited normally.");
+                    break;
+                default:
+                    ImGui::TextUnformatted("Check your installation before playing.");
+                    break;
+            }
             if (ImGui::CollapsingHeader("Game executable / diagnostics"))
             {
+                ImGui::BeginDisabled(controller.busy());
                 ImGui::SetNextItemWidth(-130 * view.scale);
-                ImGui::InputText("##game", game.data(), game.size());
+                if (ImGui::InputText("##game", game.data(), game.size()))
+                    controller.cancel();
                 ImGui::SameLine();
                 ImGui::BeginDisabled(dialog.pending());
                 if (ImGui::Button("Browse...##game"))
                     dialog.open(view.window, true);
                 ImGui::EndDisabled();
+                ImGui::EndDisabled();
                 ImGui::TextWrapped("Launcher state: %s", path_text(state_file).c_str());
+                ImGui::TextWrapped("Choose the OpenBlood2 executable supplied with this launcher.");
+                ImGui::Text("Game: %s / %s", controller.info().version.c_str(), controller.info().revision.c_str());
+                ImGui::Text("Indexed resources: %zu in %zu archives", controller.content().resources,
+                            controller.content().mounts);
+                ImGui::TextWrapped("Index checks do not certify all game resources or campaign support.");
+                for (const auto& archive : controller.content().metadata.archives)
+                    ImGui::Text("%s: %s", archive.name.c_str(),
+                                archive.name == "BLOOD2NM.REZ" ? "excluded"
+                                : archive.present              ? "present"
+                                                               : "absent (optional)");
+                if (!controller.logs().empty())
+                {
+                    ImGui::TextWrapped("Game logs: %s", path_text(controller.logs()).c_str());
+                    if (ImGui::Button("Open log folder") && !SDL_OpenURL(file_url(controller.logs()).c_str()))
+                        error = SDL_GetError();
+                }
             }
+            if (!controller.error().empty())
+                ImGui::TextWrapped("%s", controller.error().c_str());
             if (!error.empty())
                 ImGui::TextWrapped("%s", error.c_str());
             if (!notice.empty())
@@ -428,15 +586,27 @@ namespace OpenBlood2::Launcher
             ImGui::Separator();
             ImGui::TextDisabled("%s | %s", build::version, build::revision);
             ImGui::SameLine();
+            if (ImGui::Button("Help"))
+                help = !help;
+            ImGui::SameLine();
             if (ImGui::Button("Quit"))
                 quit = true;
+            if (help)
+                ImGui::TextWrapped(
+                    "Choose your original installation or demo folder, select the matching edition, then Check "
+                    "installation and Play. For development builds, select the game executable under diagnostics. "
+                    "Graphics, mods and demo installation are not available in this release.");
             ImGui::End();
             ++frame;
-            if (!view.present(frame == 3 ? options.capture : fs::path{}))
+            const bool take_capture =
+                !captured && frame >= 3 && !controller.busy() && (!options.launch_smoke || smoke_finished);
+            if (!view.present(take_capture ? options.capture : fs::path{}))
             {
                 spdlog::error("Presentation: {}", SDL_GetError());
                 return 3;
             }
+            if (take_capture)
+                captured = true;
             if (options.smoke && frame == 5)
             {
                 if (!SDL_SetWindowSize(view.window, int(1010 * view.scale), int(670 * view.scale)))
@@ -459,6 +629,12 @@ namespace OpenBlood2::Launcher
             SDL_GetWindowSize(view.window, &w, &h);
             if (frame < 12 || w != int(1010 * view.scale) || h != int(670 * view.scale))
                 return 4;
+            if (options.launch_smoke && (!smoke_started || !smoke_finished))
+            {
+                spdlog::error("Play smoke did not complete: started={} finished={} status={} error={}", smoke_started,
+                              smoke_finished, int(controller.status()), controller.error());
+                return 4;
+            }
             spdlog::info("Launcher UI smoke passed: frames={} scale={} resized={}x{}", frame, view.scale, w, h);
         }
         return 0;
@@ -478,9 +654,10 @@ int main(int argc, char** argv)
         std::cout << "OpenBlood2 Launcher\n  --state-dir ABS_PATH  Isolated launcher state\n"
                      "  --game ABS_PATH       Development game executable\n"
                      "  --data-dir ABS_PATH   Initial data directory\n  --demo                Initial demo edition\n"
-                     "  --frames N            Quit after 3..10000 frames\n  --capture ABS_FILE    Capture third frame\n"
+                     "  --frames N            Quit after 3..10000 frames\n  --capture ABS_FILE    Capture settled UI\n"
                      "  --ui-scale SCALE      0.75..3 diagnostic scale\n"
-                     "  --smoke               Isolated UI/resize smoke (requires --state-dir, --frames >= 12)\n";
+                     "  --smoke               Isolated UI/resize smoke (requires --state-dir, --frames >= 12)\n"
+                     "  --launch-smoke        Drive Play and return (requires --smoke, --game, --data-dir)\n";
         return 0;
     }
     return OpenBlood2::Launcher::run(options);

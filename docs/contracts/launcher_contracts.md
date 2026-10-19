@@ -7,6 +7,11 @@ and rendering stay unchanged. Nightmares, mods, preference editing and demo
 installation are not executable features of L0 through L2. M2/M2-GPU-001 and M3
 status are unchanged.
 
+Implementation and Linux test coverage are recorded in the linked evidence.
+Launcher window geometry is not persisted in L1/L2; version-1 state stores only
+the executable and installation records. Native Windows/macOS and interactive
+portal qualification remain pending.
+
 ## L0 baseline and shared boundary
 
 Baseline: Blood2 `8fcbf35`, with gameplay/code unchanged from `d149d325`.
@@ -82,6 +87,10 @@ Only one playable child is tracked per launcher. Repeated Play cannot spawn
 another while querying, validating or playing. Hide the launcher while playing,
 suspend rendering, then restore it on exit. Preserve nonzero exit status and log
 location. Closing the launcher releases tracking without killing the game.
+Retire and release the swapchain before hiding, then reclaim the window on
+return; a hidden native surface must not retain pending presentation work.
+Validation uses an owned SDL thread, with explicit creation failure and
+cooperative cancellation after the bounded archive operation finishes.
 SDL dialog callbacks own shared completion state, publish under a mutex, and
 never reference UI objects or mutate ImGui. Late results after closure are ignored.
 
