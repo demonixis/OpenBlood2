@@ -22,7 +22,7 @@ bool BoneLeech::AI_STATE_AttackClose()
     if (!m_MoveObj.initialized || !m_MoveObj.sampled || !physics_vector(m_vTargetPos))
         return StateFailure("BoneLeech movement cache unavailable");
     if (!GetTarget() && m_nCurMetacmd != 10 /* MC_FIRE_JUMP */)
-        return SetNewState(StateSearchVisual);
+        return npc_type == NPCType::Thief ? ComputeState() : SetNewState(StateSearchVisual);
     switch (Metacmd)
     {
         case 1:
@@ -163,8 +163,11 @@ bool BoneLeech::AI_STATE_EnemyAttach()
     {
         case 1:
         {
-            if (s->SetModelFilenames(m_hObject, "models\\enemies\\boneleech_pv.abc",
-                                     "skins\\enemies\\boneleech_pv.dtx") != DE_OK)
+            if (s->SetModelFilenames(m_hObject,
+                                     npc_type == NPCType::Thief ? "models\\enemies\\Thief_pv.abc"
+                                                                : "models\\enemies\\boneleech_pv.abc",
+                                     npc_type == NPCType::Thief ? "skins\\enemies\\Thief_pv.dtx"
+                                                                : "skins\\enemies\\boneleech_pv.dtx") != DE_OK)
                 return RuntimeFailure("BoneLeech view model unavailable");
             s->SetObjectFlags(m_hObject,
                               (world_flags | FLAG_REALLYCLOSE) & ~(FLAG_GRAVITY | FLAG_SOLID | FLAG_TOUCH_NOTIFY));
@@ -184,7 +187,7 @@ bool BoneLeech::AI_STATE_EnemyAttach()
             if (s->GetTime() - last_damage >= 1)
             {
                 int amount = 5, sound = 1;
-                if (!s->RandomInt(5, 10, amount))
+                if (!s->RandomInt(npc_type == NPCType::Thief ? 7 : 5, npc_type == NPCType::Thief ? 15 : 10, amount))
                     return RuntimeFailure("BoneLeech damage random service unavailable");
                 DVector position;
                 s->GetObjectPos(m_hObject, &position);
@@ -197,10 +200,13 @@ bool BoneLeech::AI_STATE_EnemyAttach()
                 const auto sent = s->EndMessage(msg);
                 if (written != DE_OK || sent != DE_OK)
                     return RuntimeFailure("BoneLeech damage delivery failed");
-                if (!s->RandomInt(1, 6, sound))
+                if (!s->RandomInt(1, npc_type == NPCType::Thief ? 3 : 6, sound))
                     return RuntimeFailure("BoneLeech sound random service unavailable");
                 if (s->IsObjectAlive(attached))
-                    AnimSound()->PlaySound(attached, "bl_burrow_" + std::to_string(sound) + ".wav", 200, 100);
+                    AnimSound()->PlaySound(attached,
+                                           std::string(npc_type == NPCType::Thief ? "th_bite_" : "bl_burrow_") +
+                                               std::to_string(sound) + ".wav",
+                                           200, 100);
                 last_damage = s->GetTime();
                 ++damage_ticks;
             }
@@ -208,8 +214,11 @@ bool BoneLeech::AI_STATE_EnemyAttach()
         case 4:
         {
             // Restore the original model before resuming any cached world-animation indices.
-            if (s->SetModelFilenames(m_hObject, "models\\enemies\\boneleech.abc", "skins\\enemies\\boneleech.dtx") !=
-                DE_OK)
+            if (s->SetModelFilenames(m_hObject,
+                                     npc_type == NPCType::Thief ? "models\\enemies\\Thief.abc"
+                                                                : "models\\enemies\\boneleech.abc",
+                                     npc_type == NPCType::Thief ? "skins\\enemies\\Thief.dtx"
+                                                                : "skins\\enemies\\boneleech.dtx") != DE_OK)
                 return RuntimeFailure("BoneLeech world model restore failed");
             s->SetObjectFlags(m_hObject, world_flags & ~(FLAG_REALLYCLOSE | FLAG_SOLID | FLAG_GRAVITY));
             if (world_dims.x > 0)

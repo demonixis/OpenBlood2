@@ -94,11 +94,16 @@ namespace
                                                         {"SNIPERRIFLE", WEAP_SNIPERRIFLE},
                                                         {"SHOTGUN", WEAP_SHOTGUN},
                                                         {"SHOTGXX", WEAP_SHOTGUN},
-                                                        {"SINGULARITY", WEAP_SINGULARITY}};
+                                                        {"SINGULARITY", WEAP_SINGULARITY},
+                                                        {"HOWITZER", WEAP_HOWITZER},
+                                                        {"HEAL", WEAP_ZEALOT_HEAL},
+                                                        {"SHIELD", WEAP_ZEALOT_SHIELD},
+                                                        {"GROUND_FIRE", WEAP_ZEALOT_GROUNDFIRE},
+                                                        {"SHOCKWAVE", WEAP_ZEALOT_SHOCKWAVE}};
         for (auto [name, expected] : supported)
             CHECK(AI_Mgr::WeaponStrToInt(name, id) && id == expected);
         // A matched branch whose weapon is not integrated is never replaced by Beretta.
-        for (auto name : {"HOWITZER", "PROX_BOMB", "HEAL", "SHIELD", "SKULL", "GIDEON_GOO", "ORB"})
+        for (auto name : {"PROX_BOMB", "SKULL", "GIDEON_GOO", "ORB"})
             CHECK(!AI_Mgr::WeaponStrToInt(name, id));
         return true;
     }

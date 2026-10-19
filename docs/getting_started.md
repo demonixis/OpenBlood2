@@ -141,7 +141,7 @@ The startup log reports availability; `--no-crash-capture` leaves native handlin
 | Binoculars / night goggles | Z / N after collection |
 | TheEye | I to throw; I again to toggle the remote camera; touch the landed eye to retrieve it |
 | Attached BoneLeech | Tap E rapidly to detach (or 25 presses at any pace) |
-| Proximity / remote bombs | P / R; B detonates owned remote charges |
+| Proximity / remote / time bombs | P / R / T; B detonates owned remote charges |
 | Inspector / play | F1, or Escape to release capture and inspect |
 | Mouse capture / keyboard controls | F3 / F2 |
 

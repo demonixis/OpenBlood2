@@ -1,5 +1,6 @@
 #include "InventoryMgr.h"
 #include "AI_Mgr.h"
+#include "CampaignWeapons.h"
 #include "PlayerObj.h"
 #include "game/game_settings.h"
 #include <algorithm>
@@ -214,7 +215,27 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         return InventoryResult::NotAvailable;
     // Original strength gate was commented out; do not introduce a new one.
     std::unique_ptr<CWeapon> weapon;
-    if (type == WEAP_REMOTEBOMB)
+    if (type == WEAP_HOWITZER)
+        weapon = std::make_unique<CHowitzer>();
+    else if (type == WEAP_NAPALMCANNON)
+        weapon = std::make_unique<CNapalmCannon>();
+    else if (type == WEAP_DEATHRAY)
+        weapon = std::make_unique<CDeathRay>();
+    else if (type == WEAP_NAGA_SPIKE)
+        weapon = std::make_unique<CNagaSpike>();
+    else if (type == WEAP_NAGA_DEBRIS)
+        weapon = std::make_unique<CNagaDebris>();
+    else if (type == WEAP_ZEALOT_GROUNDFIRE)
+        weapon = std::make_unique<CGroundStrike>();
+    else if (type == WEAP_ZEALOT_SHOCKWAVE)
+        weapon = std::make_unique<CShockwave>();
+    else if (type == WEAP_THIEF_SUCK)
+        weapon = std::make_unique<CThiefSuck>();
+    else if (type == WEAP_TIMEBOMB)
+        weapon = std::make_unique<CWeapTimeBomb>();
+    else if (type == WEAP_ZEALOT_HEAL || type == WEAP_ZEALOT_SHIELD)
+        weapon = std::make_unique<CZealotSpell>(type);
+    else if (type == WEAP_REMOTEBOMB)
         weapon = std::make_unique<CWeapRemoteBomb>();
     else if (type == WEAP_PROXIMITYBOMB)
         weapon = std::make_unique<CWeapProximityBomb>();
@@ -491,7 +512,7 @@ InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
         ++revision;
         return InventoryResult::Ok;
     }
-    if (type == 7 || type == 8)
+    if (type == 7 || type == 8 || type == 9)
         return SelectInventoryWeapon(WEAP_PROXIMITYBOMB + type - 7);
     if (type == 2)
     {
@@ -547,7 +568,7 @@ InventoryResult CInventoryMgr::AddInventoryWeapon(DBYTE type, DBYTE count)
     auto* server = BaseClass::GetServerDE();
     if (!server || !server->IsObjectAlive(m_hOwner))
         return InventoryResult::Invalid;
-    if (type != 7 && type != 8)
+    if (type != 7 && type != 8 && type != 9)
         return InventoryResult::NotAvailable;
     const DBYTE ammo = AMMO_PROXIMITYBOMB + type - 7;
     if (GetWeapon(ammo))

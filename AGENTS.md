@@ -757,3 +757,5 @@ corrections, independent horizontal/vertical budgets, one centered-face retry an
 checked separation of initially overlapping characters. Ordinary collision is
 unchanged. Active Anger snapshots stay refused until original power flag/timer
 serialization is implemented. Airship entry tests do not certify campaign traversal or reopen M2.
+
+The [Cathedral/Sewage/Slaughter House continuation](docs/contracts/cathedral_sewage_slaughter_contracts.md) adds Thief, Naga, Zealot and their combat, Howitzer/Napalm/DeathRay/TimeBomb, bounded actor placement beside models, native-sized SPR frames and source-style sky slot replacement. Preserve explicit missing-resource rows, persistent INSKY membership, source projectile quirks and effect diagnostics. Track1's exact explicit default velocity connection applies existing gain once; its authored release uses a finite 60-second bound. These three worlds start in every difficulty; full traversal, unrelated missing NPC clips and complete FX remain unverified. M2 closure is unchanged.

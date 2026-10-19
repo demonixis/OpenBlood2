@@ -10,10 +10,16 @@ inline constexpr DBYTE WEAP_DRUDGE_FIREBALL = 30, WEAP_BONELEECH_SUCK = 33;
 inline constexpr DBYTE WEAP_TESLACANNON = 13, WEAP_VOODOO = 14;
 inline constexpr DBYTE WEAP_SHOTGUN = 4, WEAP_SINGULARITY = 8, WEAP_BUGSPRAY = 10;
 inline constexpr DBYTE WEAP_SNIPERRIFLE = 5;
+inline constexpr DBYTE WEAP_HOWITZER = 6, WEAP_NAPALMCANNON = 7, WEAP_DEATHRAY = 12, WEAP_ZEALOT_HEAL = 25,
+                       WEAP_ZEALOT_SHIELD = 26, WEAP_ZEALOT_GROUNDFIRE = 28, WEAP_ZEALOT_SHOCKWAVE = 29,
+                       WEAP_THIEF_SUCK = 34, WEAP_NAGA_SPIKE = 39, WEAP_NAGA_DEBRIS = 40, WEAP_TIMEBOMB = 51;
+inline constexpr DBYTE AMMO_HOWITZER = 6, AMMO_ROCKET = 6, AMMO_FUEL = 7, AMMO_TIMEBOMB = 12;
+inline constexpr int IDS_WEAPON_HOWITZER = 356, IDS_WEAPON_NAPALM = 358, IDS_WEAPON_DEATHRAY = 362,
+                     IDS_WEAPON_TIME = 367;
 inline constexpr DBYTE AMMO_PROXIMITYBOMB = 10, AMMO_REMOTEBOMB = 11;
 inline constexpr bool inventory_bomb(DBYTE type)
 {
-    return type == WEAP_PROXIMITYBOMB || type == WEAP_REMOTEBOMB;
+    return type == WEAP_PROXIMITYBOMB || type == WEAP_REMOTEBOMB || type == WEAP_TIMEBOMB;
 }
 // Original InventoryMgr.cpp IsDemoWeapon: the player weapons of the _DEMO build.
 inline constexpr bool IsDemoWeapon(DBYTE type)

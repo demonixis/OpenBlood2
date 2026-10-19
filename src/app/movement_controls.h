@@ -32,9 +32,9 @@ namespace OpenBlood2
         }
         bool focused = false, enabled = true, use_suppressed = false;
         bool flashlight_suppressed = false;
-        bool medkit_suppressed = false, proximity_suppressed = false, remote_suppressed = false,
-             detonate_suppressed = false, binoculars_suppressed = false, goggles_suppressed = false,
-             eye_suppressed = false;
+        bool medkit_suppressed = false, proximity_suppressed = false, time_bomb_suppressed = false,
+             remote_suppressed = false, detonate_suppressed = false, binoculars_suppressed = false,
+             goggles_suppressed = false, eye_suppressed = false;
         bool mouse_requested = false, mouse_captured = false;
         std::array<bool, 2> mouse_buttons{}, fire_suppressed{};
         float mouse_x = 0, mouse_y = 0;
@@ -61,8 +61,8 @@ namespace OpenBlood2
             pending_weapon_slot = -1;
             keys = {};
             flashlight_suppressed = false;
-            use_suppressed = medkit_suppressed = proximity_suppressed = remote_suppressed = detonate_suppressed =
-                binoculars_suppressed = goggles_suppressed = eye_suppressed = false;
+            use_suppressed = medkit_suppressed = proximity_suppressed = time_bomb_suppressed = remote_suppressed =
+                detonate_suppressed = binoculars_suppressed = goggles_suppressed = eye_suppressed = false;
             release_mouse();
             if (play)
                 request_play();
@@ -113,6 +113,7 @@ namespace OpenBlood2
                 case SDL_SCANCODE_G:
                 case SDL_SCANCODE_R:
                 case SDL_SCANCODE_B:
+                case SDL_SCANCODE_T:
                 case SDL_SCANCODE_P:
                 case SDL_SCANCODE_L:
                 case SDL_SCANCODE_H:
@@ -165,9 +166,9 @@ namespace OpenBlood2
                     return;
                 const int code = event.key.scancode;
                 if ((code == SDL_SCANCODE_L || code == SDL_SCANCODE_R || code == SDL_SCANCODE_B ||
-                     code == SDL_SCANCODE_P || code == SDL_SCANCODE_H || code == SDL_SCANCODE_E ||
-                     code == SDL_SCANCODE_F || code == SDL_SCANCODE_G || code == SDL_SCANCODE_Z ||
-                     code == SDL_SCANCODE_N || code == SDL_SCANCODE_I) &&
+                     code == SDL_SCANCODE_T || code == SDL_SCANCODE_P || code == SDL_SCANCODE_H ||
+                     code == SDL_SCANCODE_E || code == SDL_SCANCODE_F || code == SDL_SCANCODE_G ||
+                     code == SDL_SCANCODE_Z || code == SDL_SCANCODE_N || code == SDL_SCANCODE_I) &&
                     event.type == SDL_EVENT_KEY_DOWN && event.key.repeat && !keys[static_cast<unsigned>(code)])
                     return; // A held key after focus loss is not a fresh USE press.
                 if (code > SDL_SCANCODE_UNKNOWN && code < SDL_SCANCODE_COUNT)
@@ -234,6 +235,17 @@ namespace OpenBlood2
                 return false;
             }
             return keys[SDL_SCANCODE_P] && !proximity_suppressed;
+        }
+        bool sample_time_bomb(bool text_editing)
+        {
+            if (!keys[SDL_SCANCODE_T])
+                time_bomb_suppressed = false;
+            if (!focused || !enabled || text_editing)
+            {
+                time_bomb_suppressed = keys[SDL_SCANCODE_T];
+                return false;
+            }
+            return keys[SDL_SCANCODE_T] && !time_bomb_suppressed;
         }
         bool sample_flashlight(bool text_editing)
         {

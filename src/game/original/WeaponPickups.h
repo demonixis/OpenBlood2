@@ -67,3 +67,21 @@ class BugSprayPU : public WeaponPickup
   public:
     BugSprayPU();
 };
+
+class HowitzerPU final : public WeaponPickup
+{
+  public:
+    HowitzerPU();
+};
+
+class NapalmCannonPU final : public WeaponPickup
+{
+  public:
+    NapalmCannonPU();
+};
+
+class DeathRayPU final : public WeaponPickup
+{
+  public:
+    DeathRayPU();
+};

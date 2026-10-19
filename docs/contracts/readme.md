@@ -250,3 +250,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [BoneLeech attachment and inventory use](inventory_use_contracts.md): BugSpray, charged night goggles, remote eye, input/camera/FX and teardown.
 
 - [Airship entry, sniper rifle and Anger](airship_contracts.md)
+
+- [Cathedral, Sewage and Slaughter House](cathedral_sewage_slaughter_contracts.md): Thief/Naga/Zealot, campaign weapons, resource omissions, sky and DLS compatibility.

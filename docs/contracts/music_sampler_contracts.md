@@ -27,7 +27,9 @@ source/control/transform zero. They overwrite the same parameter in authored
 connection order; they are not added or unconditionally given standard precedence.
 Every individual pan value must lie in -500..500 before assignment, including a
 value subsequently overwritten. Identical-edge duplicates still refuse the note.
-Other connections, transforms and control sources refuse the complete note.
+The explicit DLS1 default velocity edge (2,0,1,1,-960*65536), used by Track1,
+selects the existing squared velocity curve exactly once. Other connections,
+transforms, scales on that edge and control sources refuse the complete note.
 The bank reader preserves raw records, including both pan forms.
 
 The legacy interpretation is supported by a bounded isolated execution of the
@@ -76,7 +78,7 @@ only shortens the gate; stale IDs fail. The immediate receiver owns 16 fixed cha
 and held note gates, but there is no voice stealing or dynamic channel allocator.
 
 Diagnostic gate duration is at most 10 seconds; receiver notes remain held until
-stop or natural completion. Release is at most 20 seconds, attack at most
+stop or natural completion. Release is at most 60 seconds (Track1 authors a roughly 40-second release), attack at most
 20 seconds and decay at most 40 seconds. Total possible pitch modulation is bounded
 to eight octaves in either direction. Phase-linked/stereo sample records, exclusive
 key groups and overlapping regions refuse playback. The selected graph's legal

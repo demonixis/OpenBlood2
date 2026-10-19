@@ -670,6 +670,7 @@ namespace
             game->client_shell.goggles_down = controls.sample_goggles(text_editing);
             game->client_shell.eye_down = controls.sample_eye(text_editing);
             game->client_shell.medkit_down = controls.sample_medkit(text_editing);
+            game->client_shell.time_bomb_down = controls.sample_time_bomb(text_editing);
             game->client_shell.proximity_down = controls.sample_proximity(text_editing);
             game->client_shell.remote_down = controls.sample_remote(text_editing);
             game->client_shell.detonate_down = controls.sample_detonate(text_editing);

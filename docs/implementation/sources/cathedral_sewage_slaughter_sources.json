@@ -1,0 +1,117 @@
+{
+  "date": "2026-10-19",
+  "baseline": "423b489",
+  "scope": "Separately requested Cathedral, Sewage Treatment Plant and Slaughter House startup/gameplay continuation; M2 closure unchanged",
+  "sources": [
+    {
+      "path": "Blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "7275c3a4f9374926e0a5e7cce4d533ae59ea558027bda1448b223a283e66fb09"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Naga.cpp",
+      "sha256": "8e78496affa4fd4a142467644bafe95454dd13dc0d8d16b635c85a230efdbe9e"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Naga.h",
+      "sha256": "f3d15a77e97991724b0c251597be29f6bf4c6f7fd273e60820c2cb943eeb4ff1"
+    },
+    {
+      "path": "Blood2/ObjectDLL/NagaCeilingDebris.cpp",
+      "sha256": "d1e99473d3ec73bc1c62efdeb1bc9d9278adbadb3b891732d4e5123d1449b781"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ZealotAI.cpp",
+      "sha256": "c0bdbc9e5d2c68835a60a9cb6df5ec6ee757428d8454cb4a3e89af4412773276"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ZealotAI.h",
+      "sha256": "f45e2e5dea110d3d2cf8c1d4341377b767cdd227cd8dd888584eb8a6eb8c0663"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Thief.cpp",
+      "sha256": "8f9a06d097004dc9fff0af6f2873febee44db78aff1b60602d4601af175b034d"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Thief.h",
+      "sha256": "a48c26d826ad744a81f0f76e752cc8c16a6f7e737853a4c8b659137dbe780ce5"
+    },
+    {
+      "path": "Blood2/ObjectDLL/GameWeapons.cpp",
+      "sha256": "979f6e82b231714dd18209fcb8fcfce949c6e4b5235c618c5150bd5c0be332a2"
+    },
+    {
+      "path": "Blood2/ObjectDLL/GameWeapons.h",
+      "sha256": "d8533873a2f4130cb9f6e4cc230ab33ce1ae033ee54b8bcc1d5f124efe60a8cf"
+    },
+    {
+      "path": "Blood2/ObjectDLL/GameProjectiles.cpp",
+      "sha256": "f0f732be5d373324ef2071690fc43317a908aad5d5bade18f59c9e9ccfbcb9fe"
+    },
+    {
+      "path": "Blood2/ObjectDLL/GameProjectiles.h",
+      "sha256": "f285b2e417c48af164bf99d2169668f5790ed72191affa5e34d329cec5b68786"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Projectile.cpp",
+      "sha256": "27bfe497aa58e263e544c3aaf70b044de9d04190d80ee1d7b5c5aaf9f54190d7"
+    },
+    {
+      "path": "Blood2/ObjectDLL/WeaponPickups.cpp",
+      "sha256": "b9565e2e9bf02dc6b656b404098de72ca950675c11a946541c6a2d955f4de209"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ItemPickups.cpp",
+      "sha256": "1ae96d4e47ea46a709e06eacba3f2e9f206632791884af3ad421520a08ef801a"
+    },
+    {
+      "path": "Blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "aab29291e988ac7c3e1424f41076b5c0adc6243cd60198ea2cc6381d402d0e53"
+    },
+    {
+      "path": "Blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "93056622f9f083f11447a471ecae6f115b7dc3937daf7d251d2396724f3d2003"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "b1b6bf1bb639781dff7bca72c85bb727abf96be2fc26b2ee53146640ef693fe5"
+    },
+    {
+      "path": "Blood2/Shared/WeaponDefs.cpp",
+      "sha256": "7693d587a88491eb5499847efcc7cc3d0a81b14bf17dcaa0f63a979f9e394a9d"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "8dc314214889f387a89baf44a0689c0a4be9f466e5c9b33a7453db5a547cb529"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006"
+    },
+    {
+      "path": "runtime/server/src/serverde_impl.cpp",
+      "sha256": "5e1973f36bea781f23f99d7e0bb32ddb474ebf83c142c6877b15c157ba2fd53f"
+    },
+    {
+      "path": "runtime/render_a/src/sys/d3d/d3d_renderblock.cpp",
+      "sha256": "19c72a58ee9792980b0ac178c2c8c7a4b3f29508634e901080c516c753264428"
+    }
+  ],
+  "adaptations": [
+    "Checked handles, typed messages, shared bounded projectile flight and deferred cleanup replace legacy services.",
+    "Thief and Naga missing-head skeletons use explicit body damage, as BoneLeech does.",
+    "Clear ground-ray misses preserve source initial positions; bounded model-overlap escape permits vertical candidates.",
+    "Zealot enables solid body checking at the teleport movement boundary before reappearance.",
+    "Shockwave ground ray initializes its previously undefined endpoint; zero-distance radial direction is finite.",
+    "DeathRay reflection work is bounded to 64 bounces; fragment direction magnitudes are converted to equivalent normalized directions and effective speed.",
+    "World SPR keeps first-frame UV periods across native-sized frames; later renderer reference, not a 1998 trace.",
+    "Sky slot replacement and persistent INSKY membership follow the later engine reference.",
+    "Absent shiklung1 model and empty built-in sprite are explicit resource omissions.",
+    "Only the exact explicit DLS1 default velocity edge is accepted; existing squared velocity gain is applied once. Release bound increases from 20 to 60 seconds for Track1 6387-timecent release."
+  ],
+  "standards": [
+    {
+      "url": "https://midi.org/dls-level-1",
+      "use": "DLS1 default velocity/attenuation edge; existing sampler source ledger and squared gain law retained."
+    }
+  ]
+}

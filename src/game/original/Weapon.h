@@ -147,10 +147,10 @@ class CWeapRemoteBomb final : public CWeapon
     CWeapRemoteBomb() : CWeapon(WEAP_REMOTEBOMB) {}
     FireResult FireProjectile() override;
 };
-class CWeapProximityBomb final : public CWeapon
+class CWeapProximityBomb : public CWeapon
 {
   public:
-    CWeapProximityBomb() : CWeapon(WEAP_PROXIMITYBOMB) {}
+    explicit CWeapProximityBomb(DBYTE type = WEAP_PROXIMITYBOMB) : CWeapon(type) {}
     FireResult FireProjectile() override;
 };
 class CBeretta final : public CWeapon
@@ -287,10 +287,10 @@ class CSoulHook final : public CWeapon
     }
     const char* fire_sound = nullptr;
 };
-class CBoneleechSuck final : public CWeapon
+class CBoneleechSuck : public CWeapon
 {
   public:
-    CBoneleechSuck() : CWeapon(WEAP_BONELEECH_SUCK)
+    explicit CBoneleechSuck(DBYTE type = WEAP_BONELEECH_SUCK) : CWeapon(type)
     {
         damage_type = OpenBlood2::DamageType::Melee;
     }

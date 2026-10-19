@@ -152,7 +152,8 @@ FireResult CWeapon::Fire(const WeaponFire& request)
         }
         last_shot.direction = aim_direction;
         last_shot.end = vector_add(last_shot.request.position, vector_scale(aim_direction, range));
-        if (data.m_nType == WEAP_GIDEON_SHIELD)
+        if (data.m_nType == WEAP_GIDEON_SHIELD || data.m_nType == WEAP_ZEALOT_HEAL ||
+            data.m_nType == WEAP_ZEALOT_SHIELD)
         {
             last_shot.collision = SegmentResult::Unavailable; // Visual-only source branch: no damage ray.
             return true;

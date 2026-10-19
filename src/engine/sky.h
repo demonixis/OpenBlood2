@@ -12,6 +12,7 @@ namespace OpenBlood2
         SkyDefinition definition;
         bool defined = false;
         std::array<ObjectId, 30> objects{};
+        std::vector<ObjectId> registered; // Original INSKY survives replacement of its slot.
         std::uint64_t definitions = 0, additions = 0;
         std::string error;
         bool set(const SkyDefinition&);

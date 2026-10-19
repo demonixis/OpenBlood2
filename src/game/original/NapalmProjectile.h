@@ -3,7 +3,7 @@
 #include "engine/audio.h"
 // Selected original GameProjectiles.cpp Napalm primary projectile. See cityhubc_steamtunnels_contracts.md.
 // Primary: a flying sprite that explodes (EXP_NAPALM_PRIMARY).
-class CNapalmProjectile final : public CProjectile
+class CNapalmProjectile : public CProjectile
 {
   public:
     CNapalmProjectile()

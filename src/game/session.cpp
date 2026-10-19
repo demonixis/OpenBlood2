@@ -116,11 +116,24 @@ namespace OpenBlood2
                     (sprite_path == "sprites/bloodsplat1.dtx" || sprite_path == "sprites/bloodsplat2.dtx" ||
                      sprite_path == "sprites/bloodsplat3.dtx") &&
                     !resources.find(sprite_path);
+                std::string model_path;
+                const bool missing_shiklung =
+                    source.class_name == "Model" && resource_path(text("Filename"), model_path) &&
+                    model_path == "models/worldobjects/shiklung1.abc" && !resources.find(model_path);
                 auto h = objects.create(type, {}, Creation::World, props);
                 if (const auto* r = objects.get(h); r && r->life == Life::Alive)
                 {
-                    entry.object = r->id;
-                    entry.state = EntryState::Created;
+                    if (missing_shiklung && !r->model_error.empty())
+                    {
+                        server.RemoveObject(h);
+                        entry.state = EntryState::MissingResource;
+                        entry.detail = "Missing authored model: " + model_path + "; no replacement model";
+                    }
+                    else
+                    {
+                        entry.object = r->id;
+                        entry.state = EntryState::Created;
+                    }
                 }
                 else if (const auto* sound = r ? dynamic_cast<const Sound*>(r->game.get()) : nullptr)
                 {
@@ -178,6 +191,14 @@ namespace OpenBlood2
                 {
                     entry.state = EntryState::Filtered;
                     entry.detail = "Removed by original initial-update difficulty/game-type rules";
+                }
+                else if (!h && source.class_name == "Sprite" && text("Filename").empty() &&
+                         objects.error() == ObjectError::Unsupported && !objects.diagnostics().empty() &&
+                         objects.diagnostics().back().find("Missing, oversized or non-SPR sprite resource:") !=
+                             std::string::npos)
+                {
+                    entry.state = EntryState::MissingResource;
+                    entry.detail = "Empty authored sprite filename; no replacement sprite";
                 }
                 else if (!h && missing_splat && objects.error() == ObjectError::Unsupported &&
                          !objects.diagnostics().empty() &&

@@ -1106,6 +1106,9 @@ namespace OpenBlood2
                             if (report.remote)
                                 ImGui::Text("Remote: armed %d / falling %d / contacts %llu", report.armed,
                                             report.falling, (unsigned long long)report.contacts);
+                            if (report.time_bomb)
+                                ImGui::Text("Time bomb: armed %d / character impact %d", report.armed,
+                                            report.hit_character);
                             if (report.proximity)
                                 ImGui::Text(
                                     "Proximity: armed %d / character impact %d / scans %llu / contacts %llu / audio %s",
@@ -2315,7 +2318,7 @@ namespace OpenBlood2
     void Inspector::draw_weapons(GameSession& game, ObjectSelection& selection)
     {
         ImGui::TextUnformatted(
-            "Original inventory / Beretta / Mac-10 / Flare / M16 / Knife / Proximity + Remote Bombs");
+            "Original inventory / Beretta / Mac-10 / Flare / M16 / Knife / Proximity + Remote + Time Bombs");
         auto* player = game.server_shell.Player(game.local_client);
         if (!player)
         {
@@ -2324,6 +2327,7 @@ namespace OpenBlood2
             return;
         }
         auto& inventory = player->m_InventoryMgr;
+        ImGui::TextWrapped("T selects collected time bombs (five-second fuse after first contact).");
         ImGui::TextWrapped("P selects collected proximity bombs. Hold primary to charge, then release; holding over "
                            "1.25 seconds explodes in hand. Secondary drops a bomb.");
         ImGui::TextWrapped(
@@ -2339,7 +2343,9 @@ namespace OpenBlood2
         if (inventory_bomb(game.client_shell.weapons[0].type))
             ImGui::Text("Bomb charge %.3f s / speed %.1f / ammo %.0f", game.client_shell.weapons[0].bomb_held,
                         game.client_shell.weapons[0].bomb_speed,
-                        inventory.GetAmmoCount(game.client_shell.weapons[0].type == WEAP_PROXIMITYBOMB ? 10 : 11));
+                        inventory.GetAmmoCount(game.client_shell.weapons[0].type == WEAP_PROXIMITYBOMB ? 10
+                                               : game.client_shell.weapons[0].type == WEAP_REMOTEBOMB  ? 11
+                                                                                                       : 12));
         ImGui::TextWrapped("Hold a fire button to drive original animation, shots, decoded fire sounds and AI hearing. "
                            "The model preview is diagnostic; remaining impact FX and audio reverb are unavailable.");
         if (!world_error.empty())

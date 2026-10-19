@@ -29,7 +29,7 @@ namespace
         for (unsigned i = 0; i < state.right.size(); ++i)
         {
             const auto* right = weapon_definition(state.right[i]);
-            if ((i >= 10 && ((i > 11 && state.right[i]) ||
+            if ((i >= 10 && ((i > 12 && state.right[i]) ||
                              (state.right[i] && state.right[i] != WEAP_PROXIMITYBOMB + i - 10) || state.left[i])) ||
                 (i < 10 && inventory_bomb(state.right[i])) || (state.right[i] && !right) ||
                 (state.left[i] && (!right || state.left[i] != state.right[i] || !right->m_dwTwoHandStrengthReq)))

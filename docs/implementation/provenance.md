@@ -1528,3 +1528,13 @@ runtime/world/src/fullintersectline.cpp corroborates the ground ray's opt-in
 interior-box semantics; it does not prove 1998 collision parity. Original source
 hashes are in [airship_sources.json](sources/airship_sources.json). Reference trees
 and commercial resources are unchanged.
+
+## Cathedral, Sewage and Slaughter House (2026-10-19)
+
+The [contracts](../contracts/cathedral_sewage_slaughter_contracts.md) cover selective
+Thief/Naga/Zealot imports, their weapons/projectiles, Howitzer/Napalm/DeathRay/TimeBomb
+and pickups. Shared checked transport, bounded physics and effect diagnostics are
+explicit adaptations. Later engine references support sky replacement and native-sized
+SPR frames; DLS1's explicitly authored default velocity edge selects existing gain
+once. The [ledger](sources/cathedral_sewage_slaughter_sources.json) records source
+hashes and compatibility boundaries. No reference source or commercial asset is changed.

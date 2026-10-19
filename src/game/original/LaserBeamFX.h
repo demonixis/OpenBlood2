@@ -3,7 +3,7 @@
 
 // Original CLaserBeamFX burst beams (LASER_* types 0..13; Naga red-small, Singularity
 // blue-large); source-owned endpoints, detached client lifetime.
-inline constexpr DBYTE LASER_RED_SMALL = 0, LASER_BLUE_LARGE = 5;
+inline constexpr DBYTE LASER_RED_SMALL = 0, LASER_GREEN_SMALL = 2, LASER_BLUE_LARGE = 5;
 class CLaserBeamFX
 {
   public:

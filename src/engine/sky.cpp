@@ -1,5 +1,6 @@
 #include "engine/sky.h"
 #include "engine/collision.h"
+#include <algorithm>
 #include <cmath>
 namespace OpenBlood2
 {
@@ -33,21 +34,8 @@ namespace OpenBlood2
             e = "Only bound world models are supported in the sky";
         else
         {
-            // The original internal INSKY guard runs before slot replacement.
-            for (auto entry : objects)
-                if (entry == r->id)
-                {
-                    e.clear();
-                    return true;
-                }
-            const auto* previous = store.get(objects[index]);
-            if (previous && previous->life == Life::Alive)
-                e = "Duplicate sky index";
-            else
-            {
-                e.clear();
-                return true;
-            }
+            e.clear();
+            return true;
         }
         return false;
     }
@@ -61,9 +49,16 @@ namespace OpenBlood2
         }
         const auto id = store.get(h)->id;
         // Original addition of an already registered object does not change its index.
-        for (auto entry : objects)
+        std::erase_if(registered,
+                      [&](auto entry)
+                      {
+                          const auto* r = store.get(entry);
+                          return !r || r->life != Life::Alive;
+                      });
+        for (auto entry : registered)
             if (entry == id)
                 return true;
+        registered.push_back(id);
         objects[index] = id;
         ++additions;
         return true;
@@ -76,6 +71,7 @@ namespace OpenBlood2
             error = "Invalid sky removal identity";
             return false;
         }
+        std::erase(registered, r->id);
         for (auto& entry : objects)
             if (entry == r->id)
                 entry = {};

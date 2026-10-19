@@ -6,6 +6,7 @@
 #include "game/original/BuiltinSprite.h"
 #include "game/original/CameraObj.h"
 #include "game/original/CameraSpot.h"
+#include "game/original/CampaignProjectiles.h"
 #include "game/original/CinematicTrigger.h"
 #include "game/original/CivilianAI.h"
 #include "game/original/ClientExplosionSFX.h"
@@ -33,6 +34,7 @@
 #include "game/original/KeyFramer.h"
 #include "game/original/KeyPickup.h"
 #include "game/original/MadScientistAI.h"
+#include "game/original/Naga.h"
 #include "game/original/NapalmProjectile.h"
 #include "game/original/ObjectivesTrigger.h"
 #include "game/original/PathPoint.h"
@@ -56,12 +58,14 @@
 #include "game/original/Spawner.h"
 #include "game/original/Tchernotronic.h"
 #include "game/original/TeslaProjectile.h"
+#include "game/original/Thief.h"
 #include "game/original/Trigger.h"
 #include "game/original/TripLaser.h"
 #include "game/original/VolumeBrush.h"
 #include "game/original/WeaponPickups.h"
 #include "game/original/WorldModelDebris.h"
 #include "game/original/WorldProperties.h"
+#include "game/original/ZealotAI.h"
 #include "game/server_adapter.h"
 
 // Names formerly provided by BloodServerShell.cpp. There is no client shell
@@ -150,6 +154,22 @@ namespace OpenBlood2
         const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {}};
         const ClassInfo flare_burst{"CFlareBurstProjectile", &base, construct<CFlareBurstProjectile>, {}};
         const ClassInfo energy_projectile{"CEnergyBlastProjectile", &base, construct<CEnergyBlastProjectile>, {}};
+        const ClassInfo campaign_CTimeBomb{"CTimeBomb", &base, construct<CTimeBomb>, {}};
+        const ClassInfo campaign_CNagaSpikeProjectile{
+            "CNagaSpikeProjectile", &base, construct<CNagaSpikeProjectile>, {}};
+        const ClassInfo campaign_CNagaDebrisProjectile{
+            "CNagaDebrisProjectile", &base, construct<CNagaDebrisProjectile>, {}};
+        const ClassInfo campaign_NagaCeilingDebris{"NagaCeilingDebris", &base, construct<NagaCeilingDebris>, {}};
+        const ClassInfo campaign_CGroundStrikeProjectile{
+            "CGroundStrikeProjectile", &base, construct<CGroundStrikeProjectile>, {}};
+        const ClassInfo campaign_CShockwaveProjectile{
+            "CShockwaveProjectile", &base, construct<CShockwaveProjectile>, {}};
+        const ClassInfo campaign_CDeathRayProjectile{"CDeathRayProjectile", &base, construct<CDeathRayProjectile>, {}};
+        const ClassInfo campaign_CHowitzerAltShell{"CHowitzerAltShell", &base, construct<CHowitzerAltShell>, {}};
+        const ClassInfo campaign_CHowitzerAltFrag{"CHowitzerAltFrag", &base, construct<CHowitzerAltFrag>, {}};
+        const ClassInfo campaign_CNapalmAltProjectile{
+            "CNapalmAltProjectile", &base, construct<CNapalmAltProjectile>, {}};
+        const ClassInfo campaign_CNapalmFireball{"CNapalmFireball", &base, construct<CNapalmFireball>, {}};
         const ClassInfo howitzer_shell{"CHowitzerShell", &base, construct<CHowitzerShell>, {}};
         const ClassInfo hand_model{"CHandWeaponModel", &base, construct<CHandWeaponModel>, {}};
         const ClassInfo b2base{
@@ -362,9 +382,9 @@ namespace OpenBlood2
                                                                      {"TriggerDestroyOnly", false},
                                                                      {"CanDamage", true},
                                                                      {"SpawnObjectVel", DVector{}}};
-                                         for (auto name : {"RampUpSound", "RampDownSound", "DamageTriggerTarget",
-                                                           "DamageTriggerMessage", "DeathTriggerTarget",
-                                                           "DeathTriggerMessage"})
+                                         for (auto name :
+                                              {"RampUpSound", "RampDownSound", "DamageTriggerTarget",
+                                               "DamageTriggerMessage", "DeathTriggerTarget", "DeathTriggerMessage"})
                                              p.push_back({name, std::string{}});
                                          p.push_back({"SpawnObject", std::string{}, true, MAX_GP_STRING_LEN});
                                          for (auto name : {"CastShadowsFlag", "SolidLightFlag", "OnlyLightWorldFlag",
@@ -458,27 +478,43 @@ namespace OpenBlood2
             actor->ConfigureRuntime(Type);
             return actor;
         }
-        const ClassInfo ai_manager{"AI_Mgr", &character, construct<AI_Mgr>, []
-                                   {
-                                       std::vector<PropertySpec> p{{"SpotTriggerTarget", std::string{}},
-                                                                   {"SpotTriggerMessage", std::string{}},
-                                                                   {"TriggerRelayTarget", std::string{}},
-                                                                   {"DamageTriggerTarget", std::string{}},
-                                                                   {"DamageTriggerMessage", std::string{}},
-                                                                   {"DeathTriggerTarget", std::string{}},
-                                                                   {"DeathTriggerMessage", std::string{}},
-                                                                   {"TriggerDestroyOnly", false},
-                                                                   {"SpawnObject", std::string{}, true, MAX_GP_STRING_LEN},
-                                                                   {"SpawnObjectVel", DVector{}},
-                                                                   {"CanDamage", true}};
-                                       for (const auto* name :
-                                            {"Bullets", "BMG", "Shells", "Grenades", "Rockets", "Flares", "Charges",
-                                             "Cells", "Fuel", "Proximity_Bombs"})
-                                           p.push_back({name, 0.0f, false});
-                                       for (int i = 1; i <= 5; ++i)
-                                           p.push_back({"AIWeapon" + std::to_string(i), std::string{}, false, 31});
-                                       return p;
-                                   }()};
+        const ClassInfo ai_manager{
+            "AI_Mgr", &character, construct<AI_Mgr>, []
+            {
+                std::vector<PropertySpec> p{{"SpotTriggerTarget", std::string{}},
+                                            {"SpotTriggerMessage", std::string{}},
+                                            {"TriggerRelayTarget", std::string{}},
+                                            {"DamageTriggerTarget", std::string{}},
+                                            {"DamageTriggerMessage", std::string{}},
+                                            {"DeathTriggerTarget", std::string{}},
+                                            {"DeathTriggerMessage", std::string{}},
+                                            {"TriggerDestroyOnly", false},
+                                            {"SpawnObject", std::string{}, true, MAX_GP_STRING_LEN},
+                                            {"SpawnObjectVel", DVector{}},
+                                            {"CanDamage", true}};
+                for (const auto* name : {"Bullets", "BMG", "Shells", "Grenades", "Rockets", "Flares", "Charges",
+                                         "Cells", "Fuel", "Proximity_Bombs"})
+                    p.push_back({name, 0.0f, false});
+                for (int i = 1; i <= 5; ++i)
+                    p.push_back({"AIWeapon" + std::to_string(i), std::string{}, false, 31});
+                return p;
+            }()};
+        const ClassInfo campaign_Thief{
+            "Thief",
+            &ai_manager,
+            construct_npc<Thief, AI_Mgr::NPCType::Thief>,
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{9, 9, 8}}}};
+        const ClassInfo campaign_Naga{"Naga",
+                                      &ai_manager,
+                                      construct_npc<Naga, AI_Mgr::NPCType::Naga>,
+                                      {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}}};
+        const ClassInfo campaign_ZealotAI{"ZealotAI",
+                                          &ai_manager,
+                                          construct_npc<ZealotAI, AI_Mgr::NPCType::Zealot>,
+                                          {{"RandomHitPoints", 50.0f},
+                                           {"AIState", std::string("IDLE"), true, 31},
+                                           {"Dims", DVector{12, 44, 12}},
+                                           {"Divine", false}}};
         const ClassInfo cultist{"CultistAI",
                                 &ai_manager,
                                 construct_npc<CultistAI, AI_Mgr::NPCType::Cultist>,
@@ -538,12 +574,11 @@ namespace OpenBlood2
             construct_npc<SoulDrudge, AI_Mgr::NPCType::SoulDrudge>,
             {{"RandomHitPoints", 50.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{21, 36, 18}}}};
         // Original BEGIN_CLASS(ShikariAI): RandomHitPoints, AIState and hidden Dims only.
-        const ClassInfo shikari{"ShikariAI",
-                                &ai_manager,
-                                construct_npc<ShikariAI, AI_Mgr::NPCType::Shikari>,
-                                {{"RandomHitPoints", 50.0f},
-                                 {"AIState", std::string("IDLE"), true, 31},
-                                 {"Dims", DVector{19, 30, 24}}}};
+        const ClassInfo shikari{
+            "ShikariAI",
+            &ai_manager,
+            construct_npc<ShikariAI, AI_Mgr::NPCType::Shikari>,
+            {{"RandomHitPoints", 50.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{19, 30, 24}}}};
         // Original BEGIN_CLASS(MadScientistAI). AI_Mgr::ReadProp never reads HitPoints,
         // ArmorPoints or the digitless AIWeapon: constructor values apply.
         const ClassInfo mad_scientist{"MadScientistAI",
@@ -719,6 +754,10 @@ namespace OpenBlood2
         const ClassInfo shotgun_pickup{"ShotgunPU", &weapon_pickup, construct<ShotgunPU>, {}};
         const ClassInfo singularity_pickup{"SingularityPU", &weapon_pickup, construct<SingularityPU>, {}};
         const ClassInfo mac10_pickup{"SubMachineGunPU", &weapon_pickup, construct<SubMachineGunPU>, {}};
+        const ClassInfo campaign_HowitzerPU{"HowitzerPU", &weapon_pickup, construct<HowitzerPU>, {}};
+        const ClassInfo campaign_NapalmCannonPU{"NapalmCannonPU", &weapon_pickup, construct<NapalmCannonPU>, {}};
+        const ClassInfo campaign_DeathRayPU{"DeathRayPU", &weapon_pickup, construct<DeathRayPU>, {}};
+        const ClassInfo campaign_TimeBombPU{"TimeBombPU", &item_weapon, construct<TimeBombPU>, {}};
         const ClassInfo sniper_pickup{"SniperRiflePU", &weapon_pickup, construct<SniperRiflePU>, {}};
         const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}};
         const ClassInfo powerup_pickup{"PowerupPickup", &pickup, construct<PowerupPickup>, {}};
@@ -862,37 +901,37 @@ namespace OpenBlood2
                               {"ObjectActivate", false},
                               {"NamedObjectActivate", false},
                               {"Locked", false}}};
-        const ClassInfo destructable_brush{
-            "CDestructableBrush", &b2base, construct<CDestructableBrush>, []
-            {
-                std::vector<PropertySpec> p{{"Visible", true},
-                                            {"Solid", true},
-                                            {"Gravity", false},
-                                            {"DebrisStuff", std::int32_t(0), false},
-                                            {"HitPoints", 0.0f},
-                                            {"ObjectMass", 100.0f},
-                                            {"Destructable", true},
-                                            {"Pushable", false},
-                                            {"BoxPhysics", true},
-                                            {"AllowMarks", true},
-                                            {"FireThrough", false},
-                                            {"SurfaceType", std::int32_t(0)},
-                                            {"TriggerDestroyOnly", false},
-                                            {"CanDamage", true},
-                                            {"SpawnObjectVel", DVector{}},
-                                            {"Amount", std::int32_t(10)},
-                                            {"Scale", 1.0f},
-                                            {"ExplodeDamage", 100.0f},
-                                            {"DamageRadius", 200.0f}};
-                for (auto name : {"DamageTriggerTarget", "DamageTriggerMessage", "DeathTriggerTarget",
-                                  "DeathTriggerMessage", "CustomTexture", "CustomSound", "CustomModel"})
-                    p.push_back({name, std::string{}});
-                p.push_back({"SpawnObject", std::string{}, true, MAX_GP_STRING_LEN});
-                for (auto name : {"Stone", "Metal", "Wood", "Energy", "Glass", "Terrain", "Plastic", "Flesh", "Liquid",
-                                  "Exploding", "Custom"})
-                    p.push_back({name, false});
-                return p;
-            }()};
+        const ClassInfo destructable_brush{"CDestructableBrush", &b2base, construct<CDestructableBrush>, []
+                                           {
+                                               std::vector<PropertySpec> p{{"Visible", true},
+                                                                           {"Solid", true},
+                                                                           {"Gravity", false},
+                                                                           {"DebrisStuff", std::int32_t(0), false},
+                                                                           {"HitPoints", 0.0f},
+                                                                           {"ObjectMass", 100.0f},
+                                                                           {"Destructable", true},
+                                                                           {"Pushable", false},
+                                                                           {"BoxPhysics", true},
+                                                                           {"AllowMarks", true},
+                                                                           {"FireThrough", false},
+                                                                           {"SurfaceType", std::int32_t(0)},
+                                                                           {"TriggerDestroyOnly", false},
+                                                                           {"CanDamage", true},
+                                                                           {"SpawnObjectVel", DVector{}},
+                                                                           {"Amount", std::int32_t(10)},
+                                                                           {"Scale", 1.0f},
+                                                                           {"ExplodeDamage", 100.0f},
+                                                                           {"DamageRadius", 200.0f}};
+                                               for (auto name : {"DamageTriggerTarget", "DamageTriggerMessage",
+                                                                 "DeathTriggerTarget", "DeathTriggerMessage",
+                                                                 "CustomTexture", "CustomSound", "CustomModel"})
+                                                   p.push_back({name, std::string{}});
+                                               p.push_back({"SpawnObject", std::string{}, true, MAX_GP_STRING_LEN});
+                                               for (auto name : {"Stone", "Metal", "Wood", "Energy", "Glass", "Terrain",
+                                                                 "Plastic", "Flesh", "Liquid", "Exploding", "Custom"})
+                                                   p.push_back({name, false});
+                                               return p;
+                                           }()};
         const ClassInfo destructable_model{
             "CDestructableModel", &b2base, construct<CDestructableModel>, []
             {
@@ -1039,51 +1078,65 @@ namespace OpenBlood2
                objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(exit_hint) && objects.register_class(character) &&
-               objects.register_class(ai_manager) && objects.register_class(cultist) &&
-               objects.register_class(civilian) && objects.register_class(gideon) && objects.register_class(fanatic) &&
-               objects.register_class(prophet) && objects.register_class(bone_leech) &&
-               objects.register_class(drudge_lord) && objects.register_class(soul_drudge) &&
-               objects.register_class(shikari) && objects.register_class(mad_scientist) &&
-               objects.register_class(player) && objects.register_class(polygrid) && objects.register_class(volume) &&
-               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
-               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
-               objects.register_class(freefall) && objects.register_class(trigger) &&
-               objects.register_class(key_pickup) && objects.register_class(pickup) &&
-               objects.register_class(item_pickup) && objects.register_class(item_weapon) &&
-               objects.register_class(proximity_pickup) && objects.register_class(remote_pickup) &&
-               objects.register_class(charged_pickup) && objects.register_class(medkit_pickup) &&
-               objects.register_class(flashlight_pickup) && objects.register_class(eye_pickup) &&
-               objects.register_class(goggles_pickup) && objects.register_class(binoculars_pickup) &&
-               objects.register_class(weapon_pickup) && objects.register_class(bugspray_pickup) &&
-               objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
-               objects.register_class(flare_pickup) && objects.register_class(tesla_pickup) &&
-               objects.register_class(voodoo_pickup) && objects.register_class(shotgun_pickup) &&
-               objects.register_class(singularity_pickup) && objects.register_class(mac10_pickup) &&
-               objects.register_class(sniper_pickup) && objects.register_class(ammo_pickup) &&
-               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
-               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
-               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
-               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
-               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
-               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
-               objects.register_class(megahealth_pickup) && objects.register_class(enhancement_base) &&
-               objects.register_class(anger_pickup) && objects.register_class(stealth_pickup) &&
-               objects.register_class(willpower_pickup) && objects.register_class(ward_pickup) &&
-               objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
-               objects.register_class(objectives_trigger) && objects.register_class(conversation_trigger) &&
-               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
-               objects.register_class(door) && objects.register_class(rotating_door) &&
-               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
-               objects.register_class(rotating_brush) && objects.register_class(world_debris) &&
-               objects.register_class(hand_model) && objects.register_class(gib) && objects.register_class(corpse) &&
-               objects.register_class(proximity) && objects.register_class(remote) && objects.register_class(grenade) &&
+               objects.register_class(ai_manager) && objects.register_class(campaign_Thief) &&
+               objects.register_class(campaign_Naga) && objects.register_class(campaign_ZealotAI) &&
+               objects.register_class(cultist) && objects.register_class(civilian) && objects.register_class(gideon) &&
+               objects.register_class(fanatic) && objects.register_class(prophet) &&
+               objects.register_class(bone_leech) && objects.register_class(drudge_lord) &&
+               objects.register_class(soul_drudge) && objects.register_class(shikari) &&
+               objects.register_class(mad_scientist) && objects.register_class(player) &&
+               objects.register_class(polygrid) && objects.register_class(volume) && objects.register_class(water) &&
+               objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
+               objects.register_class(conveyor) && objects.register_class(damage) && objects.register_class(freefall) &&
+               objects.register_class(trigger) && objects.register_class(key_pickup) &&
+               objects.register_class(pickup) && objects.register_class(item_pickup) &&
+               objects.register_class(item_weapon) && objects.register_class(proximity_pickup) &&
+               objects.register_class(remote_pickup) && objects.register_class(charged_pickup) &&
+               objects.register_class(medkit_pickup) && objects.register_class(flashlight_pickup) &&
+               objects.register_class(eye_pickup) && objects.register_class(goggles_pickup) &&
+               objects.register_class(binoculars_pickup) && objects.register_class(weapon_pickup) &&
+               objects.register_class(bugspray_pickup) && objects.register_class(beretta_pickup) &&
+               objects.register_class(assault_pickup) && objects.register_class(flare_pickup) &&
+               objects.register_class(tesla_pickup) && objects.register_class(voodoo_pickup) &&
+               objects.register_class(shotgun_pickup) && objects.register_class(singularity_pickup) &&
+               objects.register_class(mac10_pickup) && objects.register_class(campaign_HowitzerPU) &&
+               objects.register_class(campaign_NapalmCannonPU) && objects.register_class(campaign_DeathRayPU) &&
+               objects.register_class(campaign_TimeBombPU) && objects.register_class(sniper_pickup) &&
+               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+               objects.register_class(health_base) && objects.register_class(armor_base) &&
+               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
+               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
+               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
+               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
+               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
+               objects.register_class(enhancement_base) && objects.register_class(anger_pickup) &&
+               objects.register_class(stealth_pickup) && objects.register_class(willpower_pickup) &&
+               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
+               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
+               objects.register_class(conversation_trigger) && objects.register_class(big_trigger) &&
+               objects.register_class(toggle_trigger) && objects.register_class(door) &&
+               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
+               objects.register_class(world_debris) && objects.register_class(hand_model) &&
+               objects.register_class(gib) && objects.register_class(corpse) && objects.register_class(proximity) &&
+               objects.register_class(remote) && objects.register_class(grenade) &&
                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
                objects.register_class(tesla_projectile) && objects.register_class(tesla_bolt) &&
                objects.register_class(tesla_ball) && objects.register_class(napalm_projectile) &&
                objects.register_class(seeing_eye) && objects.register_class(bugspray_projectile) &&
                objects.register_class(bugspray_alt_projectile) && objects.register_class(loogie) &&
                objects.register_class(singularity_projectile) && objects.register_class(flare_burst) &&
-               objects.register_class(energy_projectile) && objects.register_class(howitzer_shell) &&
+               objects.register_class(energy_projectile) && objects.register_class(campaign_CTimeBomb) &&
+               objects.register_class(campaign_CNagaSpikeProjectile) &&
+               objects.register_class(campaign_CNagaDebrisProjectile) &&
+               objects.register_class(campaign_NagaCeilingDebris) &&
+               objects.register_class(campaign_CGroundStrikeProjectile) &&
+               objects.register_class(campaign_CShockwaveProjectile) &&
+               objects.register_class(campaign_CDeathRayProjectile) &&
+               objects.register_class(campaign_CHowitzerAltShell) &&
+               objects.register_class(campaign_CHowitzerAltFrag) &&
+               objects.register_class(campaign_CNapalmAltProjectile) &&
+               objects.register_class(campaign_CNapalmFireball) && objects.register_class(howitzer_shell) &&
                objects.register_class(shockwave_projectile);
     }
     HOBJECT GameSession::create_example(std::string_view name)

@@ -371,12 +371,8 @@ namespace OpenBlood2
                                         entry.image.width = frame.image.width;
                                         entry.image.height = frame.image.height;
                                     }
-                                    if (entry.image.width != frame.image.width ||
-                                        entry.image.height != frame.image.height)
-                                    {
-                                        entry.error = "World SPR frame dimensions differ";
-                                        break;
-                                    }
+                                    // Geometry UVs retain the first frame's authored period. Each
+                                    // later DTX is independently uploaded at its native size.
                                     entry.frames.push_back(id);
                                 }
                                 if (entry.error.empty())

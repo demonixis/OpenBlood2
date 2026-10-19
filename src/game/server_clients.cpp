@@ -320,14 +320,19 @@ namespace OpenBlood2
                 contact.start_solid && contact.object)
             {
                 const auto* other = objects_.get(contact.object);
-                if (other && other->character_body && !other->world_model)
+                if (other && (other->character_body || other->state.m_ObjectType == OT_MODEL) && !other->world_model)
                 {
                     const auto combined = vector_add(r->dimensions, other->dimensions);
                     const auto center = other->state.m_Pos;
-                    std::array<DVector, 4> candidates{{{center.x - combined.x - .001f, origin.y, origin.z},
-                                                       {center.x + combined.x + .001f, origin.y, origin.z},
-                                                       {origin.x, origin.y, center.z - combined.z - .001f},
-                                                       {origin.x, origin.y, center.z + combined.z + .001f}}};
+                    std::vector<DVector> candidates{{center.x - combined.x - .001f, origin.y, origin.z},
+                                                    {center.x + combined.x + .001f, origin.y, origin.z},
+                                                    {origin.x, origin.y, center.z - combined.z - .001f},
+                                                    {origin.x, origin.y, center.z + combined.z + .001f}};
+                    if (!other->character_body)
+                    {
+                        candidates.push_back({origin.x, center.y + combined.y + .001f, origin.z});
+                        candidates.push_back({origin.x, center.y - combined.y - .001f, origin.z});
+                    }
                     auto distance = [&](DVector p)
                     {
                         const auto delta = vector_subtract(p, origin);
@@ -335,7 +340,8 @@ namespace OpenBlood2
                     };
                     std::stable_sort(candidates.begin(), candidates.end(),
                                      [&](DVector a, DVector b) { return distance(a) < distance(b); });
-                    const float limit = std::max(combined.x, combined.z) + .01f;
+                    const float limit =
+                        std::max({combined.x, combined.z, other->character_body ? 0.f : combined.y}) + .01f;
                     bool placed = false;
                     for (auto candidate : candidates)
                     {
@@ -381,8 +387,10 @@ namespace OpenBlood2
                 found = true;
             }
         }
-        if (!found || nearest.start_solid)
+        if (!found)
             return DE_NOTFOUND;
+        if (nearest.start_solid)
+            return DE_ERROR;
         DVector dims = r->dimensions;
         if (Objects::is_kind_of(r->type, objects_.find_class("CBaseCharacter")) &&
             GetModelAnimUserDims(h, &dims, 0) != DE_OK)

@@ -26,7 +26,7 @@ namespace OpenBlood2
         {
             out = {time_seconds(s.attack, velocity / 128.0 * s.velocity_attack),
                    time_seconds(s.decay, key / 128.0 * s.key_decay), s.sustain / 1000, time_seconds(s.release)};
-            return out.attack <= 20 && out.decay <= 40 && out.release <= 20 && out.sustain >= 0 && out.sustain <= 1;
+            return out.attack <= 20 && out.decay <= 40 && out.release <= 60 && out.sustain >= 0 && out.sustain <= 1;
         }
         bool configure(const DlsArticulation& art, DlsVoice& voice, std::string& error)
         {
@@ -39,6 +39,11 @@ namespace OpenBlood2
                     error = "Duplicate DLS articulation connection";
                     return false;
                 }
+                // DLS1 default connection, explicitly present in Track1. It replaces the implicit
+                // velocity curve already applied at note-on; applying it twice would square gain again.
+                if (c.source == 2 && c.control == 0 && c.destination == 1 && c.transform == 1 &&
+                    c.scale == -960 * 65536)
+                    continue;
                 bool supported = c.control == 0 && c.transform == 0;
                 const double value = c.scale / fixed;
                 EnvelopeSettings* env = nullptr;

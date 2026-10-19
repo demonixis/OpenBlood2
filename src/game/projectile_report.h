@@ -14,7 +14,7 @@ namespace OpenBlood2
         SegmentResult query = SegmentResult::Unavailable;
         unsigned candidates = 0, in_radius = 0;
         bool remote = false, falling = false;
-        bool grenade = false, proximity = false, armed = false, hit_character = false;
+        bool grenade = false, time_bomb = false, proximity = false, armed = false, hit_character = false;
         std::uint64_t scans = 0;
         std::string audio_error;
         int bounces_left = 0;

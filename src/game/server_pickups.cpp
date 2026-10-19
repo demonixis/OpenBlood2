@@ -29,17 +29,16 @@ namespace OpenBlood2
         bool supported = false;
         // Fanatic/Prophet: original Spawner requests (fanatic_prophet_contracts.md). Item and weapon
         // leaves bounce on string creation.
-        for (auto name : {"BulletAmmoPU",      "ShellAmmoPU",     "BMGAmmoPU",
-                          "FlareAmmoPU",       "DieBugDieAmmoPU", "HowitzerAmmoPU",
-                          "FuelAmmoPU",        "BatteryAmmoPU",   "HealthPU",
-                          "MegaHealthPU",      "WardPU",          "NecroWardPU",
-                          "InvulnerabilityPU", "MedKitPU",        "FlashlightPU",
-                          "TheEyePU",          "NightGogglesPU",  "BugSprayPU",
-                          "BinocularsPU",      "ProximitiesPU",   "RemotesPU",
-                          "BerettaPU",         "SubMachineGunPU", "FlareGunPU",
-                          "AssaultRiflePU",    "AngerPU",         "SniperRiflePU",
-                          "TeslaCannonPU",     "VoodooDollPU",    "ShotgunPU",
-                          "SingularityPU",     "Fanatic",         "Prophet"})
+        for (auto name : {"BulletAmmoPU",      "ShellAmmoPU",    "BMGAmmoPU",       "FlareAmmoPU",
+                          "DieBugDieAmmoPU",   "HowitzerAmmoPU", "FuelAmmoPU",      "BatteryAmmoPU",
+                          "HealthPU",          "MegaHealthPU",   "WardPU",          "NecroWardPU",
+                          "InvulnerabilityPU", "MedKitPU",       "FlashlightPU",    "TheEyePU",
+                          "NightGogglesPU",    "BugSprayPU",     "BinocularsPU",    "ProximitiesPU",
+                          "RemotesPU",         "BerettaPU",      "SubMachineGunPU", "FlareGunPU",
+                          "AssaultRiflePU",    "AngerPU",        "SniperRiflePU",   "TeslaCannonPU",
+                          "VoodooDollPU",      "ShotgunPU",      "BoneLeech",       "HowitzerPU",
+                          "NapalmCannonPU",    "DeathRayPU",     "TimeBombPU",      "SingularityPU",
+                          "Fanatic",           "Prophet"})
             supported |= same_name(type, name);
         Properties parsed;
         return supported && objects_.parse_properties(objects_.find_class(type), props, parsed);
@@ -78,7 +77,7 @@ namespace OpenBlood2
             return DE_INVALIDPARAMS;
         const auto limit = value.kind == PickupKind::Ammo     ? 8
                            : value.kind == PickupKind::Weapon ? 255
-                           : value.kind == PickupKind::Item   ? 8
+                           : value.kind == PickupKind::Item   ? 9
                                                               : 8; // POWERUP_HEALTH..POWERUP_REVENANT
         const auto request = value.kind == PickupKind::Ammo     ? add_ammo_message
                              : value.kind == PickupKind::Weapon ? add_weapon_message
@@ -93,7 +92,7 @@ namespace OpenBlood2
             value.amount < 0 || value.amount > 1e6f ||
             (value.kind == PickupKind::Item &&
              ((value.type != 1 && value.type != 2 && value.type != 3 && value.type != 4 && value.type != 5 &&
-               value.type != 7 && value.type != 8) ||
+               value.type != 7 && value.type != 8 && value.type != 9) ||
               value.amount > 255 || std::floor(value.amount) != value.amount)))
         {
             m->bad = true;

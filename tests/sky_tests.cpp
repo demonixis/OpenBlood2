@@ -90,8 +90,12 @@ namespace
         CHECK(g.server.AddSkyObject(other, 2) &&
               g.server.sky.objects[5] == g.objects.get(other)->id); // already registered: source no-op
         CHECK(g.server.sky.remove(g.objects, other));
-        CHECK(!g.server.AddSkyObject(other, 2)); // new registration into occupied slot rejects
-        CHECK(g.server.sky.objects[2] == g.objects.get(h)->id);
+        CHECK(g.server.AddSkyObject(other, 2)); // source replaces the occupied slot
+        CHECK(g.server.sky.objects[2] == g.objects.get(other)->id);
+        CHECK(g.server.AddSkyObject(h, 9) && !g.server.sky.objects[9]); // replaced object still INSKY
+        CHECK(g.server.sky.remove(g.objects, h));
+        CHECK(g.server.AddSkyObject(h, 9) && g.server.sky.objects[9] == g.objects.get(h)->id);
+        CHECK(g.server.sky.objects[2] == g.objects.get(other)->id);
         auto plain = g.objects.create(g.objects.find_class("BaseClass"));
         CHECK(plain);
         CHECK(!g.server.AddSkyObject(plain, 6));

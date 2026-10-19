@@ -26,9 +26,9 @@ namespace
                                              {"ASSAULTR", WEAP_ASSAULTRIFLE, true},
                                              {"SUBMA", WEAP_SUBMACHINEGUN, true},
                                              {"FLARE", WEAP_FLAREGUN, true},
-                                             {"HOWITZ", 0, false},
+                                             {"HOWITZ", WEAP_HOWITZER, true},
                                              {"FLAME", 0, false},
-                                             {"NAPALM", 0, false},
+                                             {"NAPALM", WEAP_NAPALMCANNON, true},
                                              {"MINIG", 0, false},
                                              {"VOODO", 0, false},
                                              {"ORB", 0, false},
@@ -46,22 +46,22 @@ namespace
                                              {"SOUL_PIPE", WEAP_SOUL_PIPE, true},
                                              {"SOUL_HOOK", WEAP_SOUL_HOOK, true},
                                              {"BEHEMOTH_CLAW", 0, false},
-                                             {"HEAL", 0, false},
-                                             {"SHIELD", 0, false},
+                                             {"HEAL", WEAP_ZEALOT_HEAL, true},
+                                             {"SHIELD", WEAP_ZEALOT_SHIELD, true},
                                              {"ENERGY_BLAST", WEAP_ZEALOT_ENERGYBLAST, true},
-                                             {"GROUND_FIRE", 0, false},
-                                             {"SHOCKWAVE", 0, false},
+                                             {"GROUND_FIRE", WEAP_ZEALOT_GROUNDFIRE, true},
+                                             {"SHOCKWAVE", WEAP_ZEALOT_SHOCKWAVE, true},
                                              {"FIREBALL", WEAP_DRUDGE_FIREBALL, true},
                                              {"LIGHTNING", 0, false},
                                              {"HAND_SQUEEZE", 0, false},
-                                             {"THIEF_SUCK", 0, false},
+                                             {"THIEF_SUCK", WEAP_THIEF_SUCK, true},
                                              {"BONELEECH_SUCK", WEAP_BONELEECH_SUCK, true},
                                              {"NIGHTMARE_BITE", 0, false},
                                              {"BEHEMOTH_SHOCKWAVE", 0, false},
                                              {"DEATHSHROUD_ZAP", 0, false},
                                              {"NAGA_BLAST", WEAP_NAGA_EYEBEAM, true},
-                                             {"NAGA_SPIKE", 0, false},
-                                             {"NAGA_DEBRIS", 0, false},
+                                             {"NAGA_SPIKE", WEAP_NAGA_SPIKE, true},
+                                             {"NAGA_DEBRIS", WEAP_NAGA_DEBRIS, true},
                                              {"GIDEON_SHIELD", WEAP_GIDEON_SHIELD, true},
                                              {"GIDEON_WIND", WEAP_GIDEON_WIND, true},
                                              {"GIDEON_GOO", 0, false},
@@ -185,6 +185,48 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         npc_hp = 30;
         npc_armor = 0;
     }
+    if (type == NPCType::Thief)
+    {
+        m_fHearingDist = m_fSensingDist = 1000;
+        m_fSmellingDist = 1500;
+        m_fSeeingDist = 800;
+        m_fWalkSpeed = 75;
+        m_fRunSpeed = 80;
+        m_fRollSpeed = 3.5f;
+        m_fJumpSpeed = 600;
+        m_dwFlags = 0x240;
+        m_bCabal = false;
+        npc_hp = 20;
+        npc_armor = 0;
+        npc_weapons[0] = "THIEF_SUCK";
+    }
+    if (type == NPCType::Naga)
+    {
+        m_fHearingDist = m_fSensingDist = m_fSmellingDist = m_fSeeingDist = 4000;
+        m_fWalkSpeed = m_fRunSpeed = 0;
+        m_fRollSpeed = 3.5f;
+        m_dwFlags = 0x100;
+        m_bCabal = false;
+        npc_hp = 10000;
+        npc_armor = 1000;
+        npc_weapons = {"NAGA_SPIKE", "NAGA_BLAST", "NAGA_DEBRIS", "NONE", "NONE"};
+        m_damage.apply_damage_physics = false;
+    }
+    if (type == NPCType::Zealot)
+    {
+        m_fHearingDist = 2000;
+        m_fSensingDist = 3000;
+        m_fSmellingDist = 0;
+        m_fSeeingDist = 800;
+        m_fWalkSpeed = 75;
+        m_fRunSpeed = 200;
+        m_fRollSpeed = 3.5f;
+        m_dwFlags = 0x20;
+        m_bCabal = true;
+        npc_hp = 100;
+        npc_armor = 50;
+        npc_weapons = {"HEAL", "SHIELD", "ENERGY_BLAST", "GROUND_FIRE", "SHOCKWAVE"};
+    }
     if (type == NPCType::Gideon)
     {
         m_fHearingDist = 0;
@@ -264,6 +306,15 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
                 flag("Scared", c->m_bScared);
         }
     }
+    if (reason == PRECREATE_WORLDFILE && npc_type == NPCType::Zealot && s->GetPropGeneric("Divine", &prop) == DE_OK)
+    {
+        npc_divine = prop.m_Bool;
+        if (npc_divine)
+        {
+            npc_hp *= 2;
+            npc_random_hp *= 2;
+        }
+    }
     if (!std::isfinite(npc_random_hp) || npc_random_hp < 0 || npc_random_hp > 1e6f)
         return RuntimeFailure("Invalid NPC random health");
     for (float value : npc_ammo)
@@ -302,6 +353,12 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         const std::string name = npc_type == NPCType::BoneLeech ? "boneleech" : "drudge_lord";
         model = "Models/Enemies/" + name + ".abc";
         skin = "Skins/Enemies/" + name + ".dtx";
+    }
+    else if (npc_type == NPCType::Thief || npc_type == NPCType::Naga || npc_type == NPCType::Zealot)
+    {
+        const std::string name = npc_type == NPCType::Thief ? "Thief" : npc_type == NPCType::Naga ? "Naga" : "Zealot";
+        model = "Models/Enemies/" + name + ".abc";
+        skin = "Skins/Enemies/" + name + (npc_divine ? "Divine" : "") + ".dtx";
     }
     else if (npc_type == NPCType::Shikari)
     {
@@ -366,7 +423,10 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
         return RuntimeFailure("Invalid or repeated NPC initialization");
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
-    const auto group = npc_type == NPCType::BoneLeech    ? 10
+    const auto group = npc_type == NPCType::Thief        ? 12
+                       : npc_type == NPCType::Naga       ? 13
+                       : npc_type == NPCType::Zealot     ? 14
+                       : npc_type == NPCType::BoneLeech  ? 10
                        : npc_type == NPCType::DrudgeLord ? 11
                        : npc_type == NPCType::Gideon     ? 4
                        : npc_type == NPCType::Fanatic    ? 5
@@ -376,6 +436,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
                        : npc_type == NPCType::MadScientist
                            ? 9
                            : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
+    std::string table_error;
     auto initialize_table = [&](unsigned slot, bool refresh, const char* root)
     {
         if (!refresh)
@@ -385,15 +446,18 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         {
             if (!value.SetAnimationIndexes(m_hObject))
                 return false;
-            if (npc_type == NPCType::BoneLeech)
+            if (npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief || npc_type == NPCType::Naga)
             {
-                // The shipped leech has no head/neck. The donor reads uninitialized
+                // These shipped nonhumanoid models have no head/neck. The donor reads uninitialized
                 // head coordinates here. Keep localization unavailable; use the
                 // explicit body-damage policy below instead of fabricated spheres.
-                value.hit_sphere_error = "BoneLeech uses body damage; humanoid hit spheres unavailable";
+                value.hit_sphere_error = "Nonhumanoid model has no head node; body damage policy";
             }
             else if (!value.GenerateHitSpheres(m_hObject))
+            {
+                table_error = value.hit_sphere_error;
                 return false;
+            }
             return value.SetSoundRoot(root);
         };
         if (!prepare(*candidate))
@@ -416,7 +480,10 @@ bool AI_Mgr::RuntimeInitialize(int reason)
             return RuntimeFailure("NPC female animation table initialization failed");
     }
     else if (!initialize_table(group, !tables[group],
-                               npc_type == NPCType::BoneLeech      ? "sounds/enemies/boneleech"
+                               npc_type == NPCType::Thief          ? "sounds/enemies/Thief"
+                               : npc_type == NPCType::Naga         ? "sounds/enemies/Naga"
+                               : npc_type == NPCType::Zealot       ? "sounds/enemies/Zealot"
+                               : npc_type == NPCType::BoneLeech    ? "sounds/enemies/boneleech"
                                : npc_type == NPCType::DrudgeLord   ? "sounds/enemies/drudgelord"
                                : npc_type == NPCType::Gideon       ? "sounds/enemies/Gideon"
                                : npc_type == NPCType::Fanatic      ? "sounds/enemies/fanatic"
@@ -426,7 +493,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
                                : npc_type == NPCType::MadScientist ? "sounds/enemies/madscientist"
                                : male_group                        ? "sounds/enemies/m_cultist"
                                                                    : "sounds/enemies/f_cultist"))
-        return RuntimeFailure("NPC shared animation table initialization failed");
+        return RuntimeFailure("NPC shared animation table initialization failed: " + table_error);
     auto table = tables[group];
     if (!InitStatics(table) || !m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
         return RuntimeFailure("NPC aggregates unavailable");
@@ -472,7 +539,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     const float difficulty = GetGameDifficulty() == 0 ? .25f : GetGameDifficulty() == 2 ? 1.5f : 1;
     // Cultist, Fanatic and Prophet InitialUpdate add a 0.5 multiplier before the base difficulty.
     const bool halved = npc_type == NPCType::Cultist || npc_type == NPCType::Fanatic || npc_type == NPCType::Prophet;
-    m_InventoryMgr.damage_multiplier = (halved ? .5f : 1) * difficulty;
+    m_InventoryMgr.damage_multiplier = (halved ? .5f : npc_divine ? 1.5f : 1) * difficulty;
     float unit;
     if (!s->RandomFloat(0, 1, unit))
         return RuntimeFailure("NPC health RNG failed");
@@ -482,7 +549,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = hp;
     m_damage.SetArmorPoints(npc_armor * difficulty);
     m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = npc_armor * difficulty;
-    m_fAIMass = npc_type == NPCType::BoneLeech ? 125 : 250;
+    m_fAIMass = npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief ? 125 : 250;
     m_damage.m_fMass = m_fAIMass;
     if (!s->ConfigureCharacterBody(m_hObject, m_damage.m_fMass, 5 + m_damage.m_fMass * 10 / 500))
         return RuntimeFailure("NPC mass/friction configuration failed");
@@ -507,8 +574,16 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         return RuntimeFailure("NPC initial model dimensions/scale/animation failed: " + state_error);
     s->SetNextUpdate(m_hObject, .001f);
     m_bSetShutdown = false;
-    if (reason == INITIALUPDATE_WORLDFILE && npc_type != NPCType::Gideon && s->MoveObjectToGround(m_hObject) != DE_OK)
-        return RuntimeFailure("NPC world ground placement failed");
+    if (reason == INITIALUPDATE_WORLDFILE && npc_type != NPCType::Gideon)
+    {
+        const auto result = s->MoveObjectToGround(m_hObject);
+        // Original AI_Mgr ignores a ground-ray miss: retain a clear authored body
+        // and let gravity/FLAG_REMOVEIFOUTSIDE run. A collision failure is distinct.
+        if (result != DE_OK && (result != DE_NOTFOUND || s->ResizeObject(m_hObject, m_vDims) != ResizeResult::Resized))
+            return RuntimeFailure("NPC world ground placement failed: result " + std::to_string(result) + " body " +
+                                  std::to_string(m_vDims.x) + "," + std::to_string(m_vDims.y) + "," +
+                                  std::to_string(m_vDims.z));
+    }
     // Replacement placement policy, not the source world-only ground drop:
     // spawned boxes can straddle authored walls too (Demo_01 spawn101). Separate
     // them once before simulation, without ground dropping or changing launch velocity.
@@ -516,7 +591,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         s->ResolveInitialWorldOverlap(m_hObject) != DE_OK)
         return RuntimeFailure("NPC spawned world-overlap placement failed");
     m_fLastUpdate = s->GetTime();
-    m_damage.ai_body_hits = npc_type == NPCType::BoneLeech;
+    m_damage.ai_body_hits = npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief || npc_type == NPCType::Naga;
     m_damage.ai_hit_localization = !m_damage.ai_body_hits;
     runtime_initialized = true;
     return true;

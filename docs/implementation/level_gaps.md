@@ -37,6 +37,12 @@ BSP. Sniper rifles, Anger pickups and bounded initial actor placement now execut
 entry validation does not certify full traversal. Other rows retain their earlier
 measurement dates.
 
+The 2026-10-19 [Cathedral/Sewage/Slaughter House continuation](../contracts/cathedral_sewage_slaughter_contracts.md)
+updates those three rows: all start through the Levels-tab path in every difficulty.
+Cathedral omits two absent decorative resources, Sewage one missing Container BSP,
+and Slaughter House none. Counts below use source entries, excluding generated children.
+The other worlds have not been re-audited by this continuation.
+
 ## How to refresh
 
 ```bash
@@ -50,7 +56,7 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 ## Status by world
 
 `starts` means the world passes entry validation and starts (01_SubwayA,
-02_CityHub, 02_CityHubC, 03_Museum, 04_SteamTunnels, 05_CDM, 05_CDMB, 06_Airship1, 06_Airship2, 08_SubwayB, Drop, BB_DeathCanyon, BB_Drain). Batches are defined in the next section.
+02_CityHub, 02_CityHubC, 03_Museum, 04_SteamTunnels, 05_CDM, 05_CDMB, 06_Airship1, 06_Airship2, 07_Cathedral, 08_SubwayB, 10_SewageTreatmentPlant, 11_Slaughter_House, Drop, BB_DeathCanyon, BB_Drain). Batches are defined in the next section.
 
 | World | Created | Unported (classes) | Failed | Batches needed |
 |---|---:|---:|---:|---|
@@ -64,11 +70,11 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 | 05_cdmb | 129 | 0 (0) | 0 | **starts** |
 | 06_airship1 | 196 | 0 (0) | 0 | **starts** |
 | 06_airship2 | 262 | 0 (0) | 0 | **starts** |
-| 07_cathedral | 218 | 7 (6) | 4 | L2, L6, L7, L8, L10 |
+| 07_cathedral | 227 | 0 (0) | 0 | **starts** |
 | 08_subwayb | 175 | 0 (0) | 0 | **starts** |
 | 09_abandoned_buildings | 657 | 22 (9) | 32 | L2, L4, L5, L6, L7, L8, L10, L11 |
-| 10_sewagetreatmentplant | 110 | 13 (2) | 1 | L6, L7 |
-| 11_slaughter_house | 472 | 21 (7) | 14 | L6, L7, L8, L10, L12 |
+| 10_sewagetreatmentplant | 124 | 0 (0) | 0 | **starts** |
+| 11_slaughter_house | 507 | 0 (0) | 0 | **starts** |
 | 21_laboratory | 303 | 17 (7) | 7 | L6, L7, L8, L11 |
 | 22_office | 494 | 4 (2) | 7 | L2, L6, L7, L8, L10 |
 | 23_rooftop | 136 | 6 (5) | 0 | L8, L9, L10 |

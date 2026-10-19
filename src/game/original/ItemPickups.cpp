@@ -64,3 +64,11 @@ NightGogglesPU::NightGogglesPU()
     display_name = "Night Goggles";
     resource_id = 303;
 }
+
+TimeBombPU::TimeBombPU()
+{
+    value = {OpenBlood2::PickupKind::Item, 9, 1};
+    file = "TimeBomb_pu";
+    display_name = "Time Bomb";
+    resource_id = 308;
+}

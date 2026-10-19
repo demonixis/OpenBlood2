@@ -1,5 +1,6 @@
-// Original ObjectDLL/Projectile.cpp and GameProjectiles.cpp, selected non-Zealot energy path.
+// Original ObjectDLL/Projectile.cpp and GameProjectiles.cpp, selected energy path including the Zealot divine impact.
 #include "Projectile.h"
+#include "AI_Mgr.h"
 #include "FlareProjectile.h"
 #include "Grenade.h"
 #include "ProximityBomb.h"
@@ -53,7 +54,8 @@ void CProjectile::Finish(const char* outcome)
     }
     if (const auto* bomb = dynamic_cast<const CProximityBomb*>(this))
     {
-        report.proximity = true;
+        report.proximity = m_nWeaponType == WEAP_PROXIMITYBOMB;
+        report.time_bomb = m_nWeaponType == WEAP_TIMEBOMB;
         report.armed = bomb->armed;
         report.hit_character = bomb->hit_character;
         report.contacts = bomb->contacts;
@@ -136,10 +138,10 @@ bool CProjectile::Setup(DVector direction, DBYTE type, float damage, float speed
         !std::isfinite(damage) || damage < 0 || damage > 1e6f || !std::isfinite(speed) || speed < 0 || speed > 1e6f ||
         radius < 0 || radius > 1000000)
         return Fail("Invalid projectile setup");
-    // Zealot divine variants need their original class state; do not guess it.
-    for (auto type = g_pServerDE->GetObjectClass(owner); type; type = type->parent)
-        if (type->name == "ZealotAI")
-            return Fail("Zealot/divine projectile setup unavailable");
+    if (auto* energy = dynamic_cast<CEnergyBlastProjectile*>(this))
+        if (auto* ai = dynamic_cast<AI_Mgr*>(g_pServerDE->HandleToObject(owner));
+            ai && ai->npc_type == AI_Mgr::NPCType::Zealot)
+            energy->divine = ai->npc_divine;
     m_vDir = direction;
     m_fDamage = damage;
     m_fVelocity = speed;
@@ -324,14 +326,18 @@ void CEnergyBlastProjectile::AddExplosion(DVector position, DVector normal)
     report.source = g_pServerDE->GetObjectName(m_hObject);
     report.position = position;
     report.normal = normal;
-    report.type = 7; // EXP_TESLA_PRIMARY, not the supported Tesla alternate recipe (8).
-    report.model_event = g_pServerDE->PublishExplosionModels(m_hObject, 7, position, normal, report.model_error);
-    report.sprite_event = g_pServerDE->PublishExplosionSprites(m_hObject, 7, position, normal, report.sprite_error);
-    report.ring_event = g_pServerDE->PublishExplosionRings(m_hObject, 7, position, normal, report.ring_error);
+    report.type = divine ? 12 : 7; // EXP_FLAME_SMALL for a divine Zealot.
+    report.model_event =
+        g_pServerDE->PublishExplosionModels(m_hObject, report.type, position, normal, report.model_error);
+    report.sprite_event =
+        g_pServerDE->PublishExplosionSprites(m_hObject, report.type, position, normal, report.sprite_error);
+    report.ring_event = g_pServerDE->PublishExplosionRings(m_hObject, report.type, position, normal, report.ring_error);
     report.fragment_event =
-        g_pServerDE->PublishExplosionFragments(m_hObject, 7, position, normal, report.fragment_error);
-    report.flame_event = g_pServerDE->PublishExplosionFlames(m_hObject, 7, position, normal, report.flame_error);
-    report.light_event = g_pServerDE->PublishExplosionLights(m_hObject, 7, position, normal, report.light_error);
+        g_pServerDE->PublishExplosionFragments(m_hObject, report.type, position, normal, report.fragment_error);
+    report.flame_event =
+        g_pServerDE->PublishExplosionFlames(m_hObject, report.type, position, normal, report.flame_error);
+    report.light_event =
+        g_pServerDE->PublishExplosionLights(m_hObject, report.type, position, normal, report.light_error);
     SoundRequest request;
     report.sound = request.resource = "Sounds\\Weapons\\Tesla\\impact.wav";
     request.inner_radius = 75;

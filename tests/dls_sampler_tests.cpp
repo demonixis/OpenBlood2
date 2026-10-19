@@ -371,6 +371,41 @@ namespace
                      "pitch and /128 scaling verified\n";
         return true;
     }
+    bool velocity_default()
+    {
+        std::string error;
+        auto implicit = fixture(), explicit_default = fixture();
+        explicit_default->instruments[0].articulation = {true, {{2, 0, 1, 1, -960 * 65536}}};
+        for (unsigned velocity : {1, 32, 64, 100, 127})
+        {
+            DlsSampler a, b;
+            CHECK(a.play(implicit, 0, 60, velocity, 1, 1, error));
+            CHECK(b.play(explicit_default, 0, 60, velocity, 1, 1, error));
+            std::vector<float> pa(960), pb(960);
+            CHECK(a.advance(480, pa) && b.advance(480, pb) && pa == pb);
+            CHECK(near(b.voices()[0].nominal_gain, std::pow(velocity / 127.0, 2)));
+        }
+        DlsSampler sampler;
+        auto bad = fixture();
+        for (auto edge : {DlsConnection{2, 0, 1, 1, -959 * 65536}, DlsConnection{2, 1, 1, 1, -960 * 65536},
+                          DlsConnection{2, 0, 1, 2, -960 * 65536}})
+        {
+            bad->instruments[0].articulation = {true, {edge}};
+            CHECK(!sampler.play(bad, 0, 60, 100, 1, 1, error) && sampler.voices().empty());
+        }
+        bad->instruments[0].articulation = {true, {{2, 0, 1, 1, -960 * 65536}, {2, 0, 1, 1, -960 * 65536}}};
+        CHECK(!sampler.play(bad, 0, 60, 100, 1, 1, error));
+        auto long_release = fixture();
+        connection(*long_release, 0, 0x209, 6387); // Authored Track1 release, about 40 s.
+        CHECK(sampler.play(long_release, 0, 60, 127, 1, 1, error));
+        CHECK(sampler.voices()[0].amplitude.release > 39 && sampler.voices()[0].amplitude.release < 41);
+        CHECK(sampler.advance(48000 * 25, {}) && sampler.voices().size() == 1);
+        CHECK(sampler.advance(48000 * 20, {}) && sampler.voices().empty());
+        long_release->instruments[0].articulation.connections.clear();
+        connection(*long_release, 0, 0x209, 7200); // 64 s exceeds bound.
+        CHECK(!sampler.play(long_release, 0, 60, 127, 1, 1, error));
+        return true;
+    }
     bool lifetime()
     {
         std::string error;
@@ -867,6 +902,7 @@ int main(int argc, char** argv)
                     : test == "midi_private" && argc == 3 ? midi_private(argv[2])
                     : test == "midi_limits"               ? midi_limits()
                     : test == "pcm"                       ? pcm()
+                    : test == "velocity_default"          ? velocity_default()
                     : test == "envelopes"                 ? envelopes()
                     : test == "lifetime"                  ? lifetime()
                     : test == "legacy_pan"                ? legacy_pan()

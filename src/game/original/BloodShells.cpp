@@ -257,6 +257,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     m_nCrosshair = m_nCrosshairOriginalNum;
     m_fovX = OpenBlood2::original_fov_normal;
     zoom_messages = 0;
+    time_bomb_down = time_bomb_was_down = false;
     proximity_down = proximity_was_down = false;
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     item_actions = item_sounds = item_voice = 0;
@@ -313,6 +314,7 @@ void CBloodClientShell::OnExitWorld()
     m_nCrosshair = m_nCrosshairOriginalNum;
     m_fovX = OpenBlood2::original_fov_normal;
     zoom_messages = 0;
+    time_bomb_down = time_bomb_was_down = false;
     proximity_down = proximity_was_down = false;
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     item_actions = item_sounds = item_voice = 0;
@@ -620,6 +622,10 @@ bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
     detonate_was_down = detonate_down;
     if (detonate_pressed)
         server.OnMessage(client_, OpenBlood2::PlayerDetonate{});
+    const bool time_bomb_pressed = time_bomb_down && !time_bomb_was_down;
+    time_bomb_was_down = time_bomb_down;
+    if (time_bomb_pressed)
+        server.OnMessage(client_, OpenBlood2::PlayerItemCommand{9});
     const bool proximity_pressed = proximity_down && !proximity_was_down;
     proximity_was_down = proximity_down;
     if (proximity_pressed)

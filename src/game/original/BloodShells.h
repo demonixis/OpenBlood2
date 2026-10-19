@@ -112,6 +112,7 @@ class CBloodClientShell
     DBYTE m_nCrosshair = 1, m_nCrosshairOriginalNum = 1;
     float m_fovX = 0;
     std::uint64_t zoom_messages = 0;
+    bool time_bomb_down = false, time_bomb_was_down = false;
     bool proximity_down = false, proximity_was_down = false;
     bool remote_down = false, remote_was_down = false, detonate_down = false, detonate_was_down = false;
     std::uint64_t item_actions = 0, item_sounds = 0;

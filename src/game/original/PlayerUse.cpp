@@ -75,7 +75,8 @@ bool CPlayerObj::OnCommandItem(DBYTE type)
     // Original OnCommandOn COMMAND_INVITEM_1, including its run-key exclusion.
     const bool eye_off = type == 4 && m_InventoryMgr.eye && m_InventoryMgr.eye->active;
     if (!g_pServerDE->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() ||
-        (!eye_off && (movement_blocked || camera_movement_blocked || (type != 7 && type != 8 && command_run))))
+        (!eye_off &&
+         (movement_blocked || camera_movement_blocked || (type != 7 && type != 8 && type != 9 && command_run))))
         return false;
     return m_InventoryMgr.SetActiveItem(type) == InventoryResult::Ok;
 }

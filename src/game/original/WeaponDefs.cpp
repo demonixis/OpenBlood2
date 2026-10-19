@@ -2,6 +2,655 @@
 namespace
 {
     constexpr WeaponData definitions[] = {
+        // Original Shared/WeaponDefs.cpp: HOWITZER
+        {
+            "Models\\Weapons\\Howitzer_pv.abc",              // Model
+            "Models\\Weapons\\Howitzer_pv.abc",              // Model
+            "Skins\\Weapons\\C_Howitzer_pv_t.dtx",           // Skin
+            "Models\\Powerups\\Howitzer_pu.abc",             // 3rd person model
+            "Skins\\Powerups\\Howitzer_pu.dtx",              // 3rd person skin
+            WEAP_HOWITZER,                                   // Type
+            TYPE_RIFLE,                                      // Fire type
+            AMMO_HOWITZER,                                   // Ammo type
+            1,                                               // Ammo Use
+            5,                                               // Alt Ammo Use
+            30.0f,                                           // Min Damage
+            50.0f,                                           // Max Damage
+            50.0f,                                           // Min Alt damage
+            75.0f,                                           // Max Alt damage
+            1.0f,                                            // Reload time
+            1.0f,                                            // Alt reload time
+            {20.0f, 20.0f},                                  // Spread
+            {100.0f, 100.0f},                                // Alt Spread
+            1000.0f,                                         // Projectile Velocity
+            1000.0f,                                         // Alt Projectile Velocity
+            3500.0f,                                         // Range
+            3500.0f,                                         // Alt Range
+            1,                                               // Shots per fire
+            1,                                               // Alt Shots per fire
+            4,                                               // Strength or Magic required
+            0,                                               // Two-handed Strength or Magic required
+            150,                                             // Damage Radius (projectiles)
+            200,                                             // Alt Damage Radius (projectiles)
+            DFALSE,                                          // Alt fire zoom
+            DFALSE,                                          // Semi-auto
+            "Sounds\\Weapons\\howitzer\\fire.wav",           // Fire sound
+            "Sounds\\Weapons\\howitzer\\alt.wav",            // Alt Fire sound
+            "",                                              // Empty weapon sound
+            "",                                              // Alt Empty weapon sound
+            "CHowitzerShell",                                // Projectile class
+            "CHowitzerAltShell",                             // Alt Projectile class
+            200,                                             // Muzzle Flash radius
+            {1.0f, 0.68f, 0.35f},                            // Muzzle Flash color
+            "50mm Pack Howitzer",                            // Name
+            IDS_WEAPON_HOWITZER,                             // Name ID (resource)
+            "Sprites\\howitzer.spr",                         // flash sprite name
+            "Sprites\\howitzer.spr",                         // alt flash Sprite name
+            0.25f,                                           // Flash duration
+            0.25f,                                           // Flash scale
+            {0.0f, 0.0f, 0.0f},                              // 3rd person gun offset
+            {0.7f, -0.8f, 2.0f},                             // Gun Offset
+            {0.0f, 0.275f, 1.0f},                            // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                           // Recoil
+            {1.1f, -1.80f, 18.0f},                           // Flash position
+            0.625f,                                          // Eject interval
+            2.0f,                                            // View kick
+            DFALSE,                                          // View kick is Cumulative
+            DFALSE,                                          // Animation looping
+            DFALSE,                                          // Alt anim looping
+            "interface\\statusbar\\weapons\\howitzer.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\howitzer_h.pcx", // Highlighted icon for status bar
+        },
+        // Original Shared/WeaponDefs.cpp: NAPALMCANNON
+        {
+            "Models\\Weapons\\NapalmCannon_pv.abc",        // Model
+            "Models\\Weapons\\lh_NapalmCannon_pv.abc",     // Model
+            "Skins\\Weapons\\C_Napalm_pv_t.dtx",           // Skin
+            "Models\\Powerups\\NapalmCannon_pu.abc",       // 3rd person model
+            "Skins\\Powerups\\NapalmCannon_pu.dtx",        // 3rd person skin
+            WEAP_NAPALMCANNON,                             // Type
+            TYPE_RIFLE,                                    // Fire type
+            AMMO_FUEL,                                     // Ammo type
+            1,                                             // Ammo Use
+            10,                                            // Alt Ammo Use
+            60.0f,                                         // Min Damage
+            80.0f,                                         // Max Damage
+            30.0f,                                         // Min Alt damage
+            40.0f,                                         // Max Alt damage
+            0.75f,                                         // Reload time
+            1.0f,                                          // Alt reload time
+            {50.0f, 50.0f},                                // Spread
+            {50.0f, 50.0f},                                // Alt Spread
+            1250.0f,                                       // Projectile Velocity
+            900.0f,                                        // Alt Projectile Velocity
+            5000.0f,                                       // Range
+            5000.0f,                                       // Alt Range
+            1,                                             // Shots per fire
+            1,                                             // Alt Shots per fire
+            3,                                             // Strength or Magic required
+            0,                                             // Two-handed Strength or Magic required
+            300,                                           // Damage Radius (projectiles)
+            250,                                           // Alt Damage Radius (projectiles)
+            DFALSE,                                        // Alt fire zoom
+            DFALSE,                                        // Semi-auto
+            "Sounds\\Weapons\\napalm\\fire.wav",           // Fire sound
+            "Sounds\\Weapons\\napalm\\alt.wav",            // Alt Fire sound
+            "",                                            // Empty weapon sound
+            "",                                            // Alt Empty weapon sound
+            "CNapalmProjectile",                           // Projectile class
+            "CNapalmAltProjectile",                        // Alt Projectile class
+            175,                                           // Muzzle Flash radius
+            {1.0f, 0.68f, 0.35f},                          // Muzzle Flash color
+            "Napalm Cannon",                               // Name
+            IDS_WEAPON_NAPALM,                             // Name ID (resource)
+            "",                                            // flash sprite name
+            "",                                            // alt flash Sprite name
+            0.25f,                                         // Flash duration
+            0.10f,                                         // Flash scale
+            {0.0f, 0.0f, 0.0f},                            // 3rd person gun offset
+            {0.9f, -0.8f, 2.1f},                           // Gun Offset
+            {6.0f, -6.0f, 40.2f},                          // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                         // Recoil
+            {9.0f, -3.0f, 25.0f},                          // Flash Offset
+            0.625f,                                        // Eject interval
+            0.0f,                                          // View kick
+            DFALSE,                                        // View kick is Cumulative
+            DFALSE,                                        // Animation looping
+            DFALSE,                                        // Alt anim looping
+            "interface\\statusbar\\weapons\\napalm.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\napalm_h.pcx", // Highlighted icon for status bar
+        },
+        // Original Shared/WeaponDefs.cpp: DEATHRAY
+        {
+            "Models\\Weapons\\DeathRay_pv.abc",              // Model
+            "Models\\Weapons\\DeathRay_pv.abc",              // Model
+            "Skins\\Weapons\\C_DeathRay_pv_t.dtx",           // Skin
+            "Models\\Powerups\\DeathRay_pu.abc",             // 3rd person model
+            "Skins\\Powerups\\DeathRay_pu.dtx",              // 3rd person skin
+            WEAP_DEATHRAY,                                   // Type
+            TYPE_AUTORIFLE,                                  // Fire type
+            AMMO_BATTERY,                                    // Ammo type
+            1,                                               // Ammo Use
+            2,                                               // Alt Ammo Use
+            50.0f,                                           // Min Damage
+            60.0f,                                           // Max Damage
+            50.0f,                                           // Min Alt damage
+            75.0f,                                           // Max Alt damage
+            0.2f,                                            // Reload time
+            0.05f,                                           // Alt reload time
+            {0.0f, 0.0f},                                    // Spread
+            {0.0f, 0.0f},                                    // Alt Spread
+            0.0f,                                            // Projectile Velocity
+            0.0f,                                            // Alt Projectile Velocity
+            3500.0f,                                         // Range
+            1.0f,                                            // Alt Range
+            1,                                               // Shots per fire
+            1,                                               // Alt Shots per fire
+            3,                                               // Strength or Magic required
+            0,                                               // Two-handed Strength or Magic required
+            0,                                               // Damage Radius (projectiles)
+            0,                                               // Alt Damage Radius (projectiles)
+            DFALSE,                                          // Alt fire zoom
+            DFALSE,                                          // Semi-auto
+            "Sounds\\Weapons\\laser\\fire.wav",              // Fire sound
+            "Sounds\\Weapons\\laser\\alt.wav",               // Alt Fire sound
+            "",                                              // Empty weapon sound
+            "",                                              // Alt Empty weapon sound
+            "CDeathRayProjectile",                           // Projectile class
+            nullptr,                                         // Alt Projectile class
+            100,                                             // Muzzle Flash radius
+            {0.0f, 1.0f, 0.0f},                              // Muzzle Flash color
+            "Cabalco Death-Ray",                             // Name
+            IDS_WEAPON_DEATHRAY,                             // Name ID (resource)
+            "Sprites\\laser.spr",                            // flash sprite name
+            "Sprites\\laser.spr",                            // alt flash Sprite name
+            0.25f,                                           // Flash duration
+            0.175f,                                          // Flash scale
+            {0.0f, 0.0f, 0.0f},                              // 3rd person gun offset
+            {0.7f, -0.9f, 1.9f},                             // Gun Offset
+            {0.0f, 0.0f, 0.0f},                              // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                           // Recoil
+            {4.25f, -4.25f, 25.0f},                          // Flash position
+            0.625f,                                          // Eject interval
+            0.0f,                                            // View kick
+            DFALSE,                                          // View kick is Cumulative
+            DFALSE,                                          // Animation looping
+            DTRUE,                                           // Alt anim looping
+            "interface\\statusbar\\weapons\\deathray.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\deathray_h.pcx", // Highlighted icon for status bar
+        },
+        // Original Shared/WeaponDefs.cpp: ZEALOT_HEAL
+        {
+            "Models\\Weapons\\knifec_pv.abc",       // Model
+            "Models\\Weapons\\knifec_pv.abc",       // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",      // Skin
+            nullptr,                                // Model
+            nullptr,                                // Skin
+            WEAP_ZEALOT_HEAL,                       // Type
+            TYPE_MELEE,                             // Fire type
+            AMMO_NONE,                              // Ammo type
+            1,                                      // Ammo Use
+            1,                                      // Alt Ammo Use
+            20.0f,                                  // Min Damage
+            40.0f,                                  // Max Damage
+            20.0f,                                  // Min Alt damage
+            40.0f,                                  // Max Alt damage
+            1.00f,                                  // Reload time
+            0.0f,                                   // Alt reload time
+            {0.0f, 0.0f},                           // Spread
+            {0.0f, 0.0f},                           // Alt Spread
+            0.0f,                                   // Projectile Velocity
+            0.0f,                                   // Alt Projectile Velocity
+            100.0f,                                 // Range
+            100.0f,                                 // Alt Range
+            1,                                      // Shots per fire
+            1,                                      // Alt Shots per fire
+            1,                                      // Strength or Magic required
+            0,                                      // Two-handed Strength or Magic required
+            0,                                      // Damage Radius (projectiles)
+            0,                                      // Alt Damage Radius (projectiles)
+            DFALSE,                                 // Alt fire zoom
+            DFALSE,                                 // Semi-auto
+            "Sounds\\Enemies\\Zealot\\healing.wav", // Fire sound
+            "Sounds\\Enemies\\Zealot\\healing.wav", // Alt Fire sound
+            "Sounds\\Enemies\\Zealot\\healing.wav", // Empty weapon sound
+            "Sounds\\Enemies\\Zealot\\healing.wav", // Alt Empty weapon sound
+            nullptr,                                // Projectile class
+            nullptr,                                // Alt Projectile class
+            0,                                      // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                     // Muzzle Flash color
+            "Heal",                                 // Name
+            0,                                      // Name ID (resource)
+            "",                                     // flash sprite name
+            "",                                     // alt flash Sprite name
+            0.25f,                                  // Flash duration
+            0.10f,                                  // Flash scale
+            {0.0f, 0.0f, 0.0f},                     // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                    // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                     // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                  // Recoil
+            {0.0f, 0.0f, 0.1f},                     // Flash position
+            0.625f,                                 // Eject interval
+            0.0f,                                   // View kick
+            DFALSE,                                 // View kick is Cumulative
+            DFALSE,                                 // Animation looping
+            DFALSE,                                 // Alt anim looping
+            nullptr,                                // Icon for status bar
+            nullptr,                                // Highlighted icon for status bar
+        },
+        // Original Shared/WeaponDefs.cpp: ZEALOT_SHIELD
+        {
+            "Models\\Weapons\\knifec_pv.abc",      // Model
+            "Models\\Weapons\\knifec_pv.abc",      // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",     // Skin
+            nullptr,                               // Model
+            nullptr,                               // Skin
+            WEAP_ZEALOT_SHIELD,                    // Type
+            TYPE_MELEE,                            // Fire type
+            AMMO_NONE,                             // Ammo type
+            1,                                     // Ammo Use
+            1,                                     // Alt Ammo Use
+            20.0f,                                 // Min Damage
+            40.0f,                                 // Max Damage
+            20.0f,                                 // Min Alt damage
+            40.0f,                                 // Max Alt damage
+            1.00f,                                 // Reload time
+            0.0f,                                  // Alt reload time
+            {0.0f, 0.0f},                          // Spread
+            {0.0f, 0.0f},                          // Alt Spread
+            0.0f,                                  // Projectile Velocity
+            0.0f,                                  // Alt Projectile Velocity
+            1.0f,                                  // Range
+            1.0f,                                  // Alt Range
+            1,                                     // Shots per fire
+            1,                                     // Alt Shots per fire
+            1,                                     // Strength or Magic required
+            0,                                     // Two-handed Strength or Magic required
+            0,                                     // Damage Radius (projectiles)
+            0,                                     // Alt Damage Radius (projectiles)
+            DFALSE,                                // Alt fire zoom
+            DFALSE,                                // Semi-auto
+            "Sounds\\Enemies\\Zealot\\shield.wav", // Fire sound
+            "Sounds\\Enemies\\Zealot\\shield.wav", // Alt Fire sound
+            "Sounds\\Enemies\\Zealot\\shield.wav", // Empty weapon sound
+            "Sounds\\Enemies\\Zealot\\shield.wav", // Alt Empty weapon sound
+            nullptr,                               // Projectile class
+            nullptr,                               // Alt Projectile class
+            0,                                     // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                    // Muzzle Flash color
+            "Shield",                              // Name
+            0,                                     // Name ID (resource)
+            "",                                    // flash sprite name
+            "",                                    // alt flash Sprite name
+            0.25f,                                 // Flash duration
+            0.10f,                                 // Flash scale
+            {0.0f, 0.0f, 0.0f},                    // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                   // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                    // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                 // Recoil
+            {0.0f, 0.0f, 0.1f},                    // Flash position
+            0.625f,                                // Eject interval
+            0.0f,                                  // View kick
+            DFALSE,                                // View kick is Cumulative
+            DFALSE,                                // Animation looping
+            DFALSE,                                // Alt anim looping
+            nullptr,                               // Icon for status bar
+            nullptr,                               // Highlighted icon for status bar
+        },
+        // Original Shared/WeaponDefs.cpp: ZEALOT_GROUNDFIRE
+        {
+            "Models\\Weapons\\knifec_pv.abc",        // Model
+            "Models\\Weapons\\knifec_pv.abc",        // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",       // Skin
+            nullptr,                                 // Model
+            nullptr,                                 // Skin
+            WEAP_ZEALOT_GROUNDFIRE,                  // Type
+            TYPE_MELEE,                              // Fire type
+            AMMO_NONE,                               // Ammo type
+            1,                                       // Ammo Use
+            1,                                       // Alt Ammo Use
+            30.0f,                                   // Min Damage
+            60.0f,                                   // Max Damage
+            30.0f,                                   // Min Alt damage
+            60.0f,                                   // Max Alt damage
+            0.50f,                                   // Reload time
+            0.50f,                                   // Alt reload time
+            {0.0f, 0.0f},                            // Spread
+            {0.0f, 0.0f},                            // Alt Spread
+            1000.0f,                                 // Projectile Velocity
+            1000.0f,                                 // Alt Projectile Velocity
+            1000.0f,                                 // Range
+            1000.0f,                                 // Alt Range
+            1,                                       // Shots per fire
+            1,                                       // Alt Shots per fire
+            1,                                       // Strength or Magic required
+            0,                                       // Two-handed Strength or Magic required
+            20,                                      // Damage Radius (projectiles)
+            20,                                      // Alt Damage Radius (projectiles)
+            DFALSE,                                  // Alt fire zoom
+            DFALSE,                                  // Semi-auto
+            "Sounds\\Enemies\\Zealot\\fireball.wav", // Fire sound
+            "Sounds\\Enemies\\Zealot\\fireball.wav", // Alt Fire sound
+            "Sounds\\Enemies\\Zealot\\fireball.wav", // Empty weapon sound
+            "Sounds\\Enemies\\Zealot\\fireball.wav", // Alt Empty weapon sound
+            "CGroundStrikeProjectile",               // Projectile class
+            "CGroundStrikeProjectile",               // Alt Projectile class
+            20,                                      // Muzzle Flash radius
+            {0.0f, 0.0f, 1.0f},                      // Muzzle Flash color
+            "Ground_Fire",                           // Name
+            0,                                       // Name ID (resource)
+            "",                                      // flash sprite name
+            "",                                      // alt flash Sprite name
+            0.25f,                                   // Flash duration
+            0.40f,                                   // Flash scale
+            {0.0f, 0.0f, 0.0f},                      // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                     // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                      // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                   // Recoil
+            {0.0f, 0.0f, 0.1f},                      // Flash position
+            0.625f,                                  // Eject interval
+            0.0f,                                    // View kick
+            DFALSE,                                  // View kick is Cumulative
+            DFALSE,                                  // Animation looping
+            DFALSE,                                  // Alt anim looping
+            nullptr,                                 // Icon for status bar
+            nullptr,                                 // Highlighted icon for status bar
+        },
+        // Original Shared/WeaponDefs.cpp: ZEALOT_SHOCKWAVE
+        {
+            "Models\\Weapons\\knifec_pv.abc",     // Model
+            "Models\\Weapons\\knifec_pv.abc",     // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",    // Skin
+            nullptr,                              // Model
+            nullptr,                              // Skin
+            WEAP_ZEALOT_SHOCKWAVE,                // Type
+            TYPE_MELEE,                           // Fire type
+            AMMO_NONE,                            // Ammo type
+            1,                                    // Ammo Use
+            1,                                    // Alt Ammo Use
+            20.0f,                                // Min Damage
+            40.0f,                                // Max Damage
+            20.0f,                                // Min Alt damage
+            40.0f,                                // Max Alt damage
+            0.50f,                                // Reload time
+            0.50f,                                // Alt reload time
+            {0.0f, 0.0f},                         // Spread
+            {0.0f, 0.0f},                         // Alt Spread
+            0.0f,                                 // Projectile Velocity
+            0.0f,                                 // Alt Projectile Velocity
+            100.0f,                               // Range
+            100.0f,                               // Alt Range
+            1,                                    // Shots per fire
+            1,                                    // Alt Shots per fire
+            1,                                    // Strength or Magic required
+            0,                                    // Two-handed Strength or Magic required
+            0,                                    // Damage Radius (projectiles)
+            0,                                    // Alt Damage Radius (projectiles)
+            DFALSE,                               // Alt fire zoom
+            DFALSE,                               // Semi-auto
+            "Sounds\\Enemies\\Zealot\\magic.wav", // Fire sound
+            "Sounds\\Enemies\\Zealot\\magic.wav", // Alt Fire sound
+            "Sounds\\Enemies\\Zealot\\magic.wav", // Empty weapon sound
+            "Sounds\\Enemies\\Zealot\\magic.wav", // Alt Empty weapon sound
+            "CShockwaveProjectile",               // Projectile class
+            "CShockwaveProjectile",               // Alt Projectile class
+            0,                                    // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                   // Muzzle Flash color
+            "Shockwave",                          // Name
+            0,                                    // Name ID (resource)
+            "",                                   // flash sprite name
+            "",                                   // alt flash Sprite name
+            0.25f,                                // Flash duration
+            0.10f,                                // Flash scale
+            {0.0f, 0.0f, 0.0f},                   // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                  // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                   // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                // Recoil
+            {0.0f, 0.0f, 0.1f},                   // Flash position
+            0.625f,                               // Eject interval
+            0.0f,                                 // View kick
+            DFALSE,                               // View kick is Cumulative
+            DFALSE,                               // Animation looping
+            DFALSE,                               // Alt anim looping
+            nullptr,                              // Icon for status bar
+            nullptr,                              // Highlighted icon for status bar
+        },
+        // Original Shared/WeaponDefs.cpp: THIEF_SUCK
+        {
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",  // Skin
+            nullptr,                            // Model
+            nullptr,                            // Skin
+            WEAP_THIEF_SUCK,                    // Type
+            TYPE_MELEE,                         // Fire type
+            AMMO_NONE,                          // Ammo type
+            0,                                  // Ammo Use
+            0,                                  // Alt Ammo Use
+            4.0f,                               // Min Damage
+            8.0f,                               // Max Damage
+            4.0f,                               // Min Alt damage
+            8.0f,                               // Max Alt damage
+            1.00f,                              // Reload time
+            0.0f,                               // Alt reload time
+            {0.0f, 0.0f},                       // Spread
+            {0.0f, 0.0f},                       // Alt Spread
+            0.0f,                               // Projectile Velocity
+            0.0f,                               // Alt Projectile Velocity
+            100.0f,                             // Range
+            100.0f,                             // Alt Range
+            1,                                  // Shots per fire
+            1,                                  // Alt Shots per fire
+            1,                                  // Strength or Magic required
+            0,                                  // Two-handed Strength or Magic required
+            0,                                  // Damage Radius (projectiles)
+            0,                                  // Alt Damage Radius (projectiles)
+            DFALSE,                             // Alt fire zoom
+            DFALSE,                             // Semi-auto
+            "Sounds\\Weapons\\Knife\\fire.wav", // Fire sound
+            "Sounds\\Weapons\\Knife\\alt.wav",  // Alt Fire sound
+            "",                                 // Empty weapon sound
+            "",                                 // Alt Empty weapon sound
+            nullptr,                            // Projectile class
+            nullptr,                            // Alt Projectile class
+            0,                                  // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Flash color
+            "Thief_Suck",                       // Name
+            0,                                  // Name ID (resource)
+            "",                                 // flash sprite name
+            "",                                 // alt flash Sprite name
+            0.25f,                              // Flash duration
+            0.10f,                              // Flash scale
+            {0.0f, 0.0f, 0.0f},                 // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},              // Recoil
+            {0.0f, 0.0f, 0.1f},                 // Flash position
+            0.625f,                             // Eject interval
+            0.0f,                               // View kick
+            DFALSE,                             // View kick is Cumulative
+            DFALSE,                             // Animation looping
+            DFALSE,                             // Alt anim looping
+            nullptr,                            // Icon for status bar
+            nullptr,                            // Highlighted icon for status bar
+        },
+        // Original Shared/WeaponDefs.cpp: NAGA_SPIKE
+        {
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",  // Skin
+            nullptr,                            // Model
+            nullptr,                            // Skin
+            WEAP_NAGA_SPIKE,                    // Type
+            TYPE_MAGIC,                         // Fire type
+            AMMO_NONE,                          // Ammo type
+            1,                                  // Ammo Use
+            1,                                  // Alt Ammo Use
+            60.0f,                              // Min Damage
+            100.0f,                             // Max Damage
+            60.0f,                              // Min Alt damage
+            100.0f,                             // Max Alt damage
+            0.50f,                              // Reload time
+            0.50f,                              // Alt reload time
+            {0.0f, 0.0f},                       // Spread
+            {0.0f, 0.0f},                       // Alt Spread
+            2000.0f,                            // Projectile Velocity
+            2000.0f,                            // Alt Projectile Velocity
+            800.0f,                             // Range
+            800.0f,                             // Alt Range
+            1,                                  // Shots per fire
+            1,                                  // Alt Shots per fire
+            1,                                  // Strength or Magic required
+            0,                                  // Two-handed Strength or Magic required
+            200,                                // Damage Radius (projectiles)
+            200,                                // Alt Damage Radius (projectiles)
+            DFALSE,                             // Alt fire zoom
+            DFALSE,                             // Semi-auto
+            "Sounds\\Weapons\\Knife\\fire.wav", // Fire sound
+            "Sounds\\Weapons\\Knife\\alt.wav",  // Alt Fire sound
+            "",                                 // Empty weapon sound
+            "",                                 // Alt Empty weapon sound
+            "CNagaSpikeProjectile",             // Projectile class
+            "CNagaSpikeProjectile",             // Alt Projectile class
+            0,                                  // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Flash color
+            "Naga_Spike",                       // Name
+            0,                                  // Name ID (resource)
+            "",                                 // flash sprite name
+            "",                                 // alt flash Sprite name
+            0.25f,                              // Flash duration
+            0.10f,                              // Flash scale
+            {0.0f, 0.0f, 0.0f},                 // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},              // Recoil
+            {0.0f, 0.0f, 0.1f},                 // Flash position
+            0.625f,                             // Eject interval
+            0.0f,                               // View kick
+            DFALSE,                             // View kick is Cumulative
+            DFALSE,                             // Animation looping
+            DFALSE,                             // Alt anim looping
+            nullptr,                            // Icon for status bar
+            nullptr,                            // Highlighted icon for status bar
+        },
+        // Original Shared/WeaponDefs.cpp: NAGA_DEBRIS
+        {
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",  // Skin
+            nullptr,                            // Model
+            nullptr,                            // Skin
+            WEAP_NAGA_DEBRIS,                   // Type
+            TYPE_MELEE,                         // Fire type
+            AMMO_NONE,                          // Ammo type
+            1,                                  // Ammo Use
+            1,                                  // Alt Ammo Use
+            75.0f,                              // Min Damage
+            100.0f,                             // Max Damage
+            75.0f,                              // Min Alt damage
+            100.0f,                             // Max Alt damage
+            0.50f,                              // Reload time
+            0.50f,                              // Alt reload time
+            {0.0f, 0.0f},                       // Spread
+            {0.0f, 0.0f},                       // Alt Spread
+            0.0f,                               // Projectile Velocity
+            0.0f,                               // Alt Projectile Velocity
+            800.0f,                             // Range
+            800.0f,                             // Alt Range
+            1,                                  // Shots per fire
+            1,                                  // Alt Shots per fire
+            1,                                  // Strength or Magic required
+            0,                                  // Two-handed Strength or Magic required
+            0,                                  // Damage Radius (projectiles)
+            0,                                  // Alt Damage Radius (projectiles)
+            DFALSE,                             // Alt fire zoom
+            DFALSE,                             // Semi-auto
+            "Sounds\\Weapons\\Knife\\fire.wav", // Fire sound
+            "Sounds\\Weapons\\Knife\\alt.wav",  // Alt Fire sound
+            "",                                 // Empty weapon sound
+            "",                                 // Alt Empty weapon sound
+            "CNagaDebrisProjectile",            // Projectile class
+            "CNagaDebrisProjectile",            // Alt Projectile class
+            0,                                  // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Flash color
+            "Naga_Debris",                      // Name
+            0,                                  // Name ID (resource)
+            "",                                 // flash sprite name
+            "",                                 // alt flash Sprite name
+            0.25f,                              // Flash duration
+            0.10f,                              // Flash scale
+            {0.0f, 0.0f, 0.0f},                 // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},              // Recoil
+            {0.0f, 0.0f, 0.1f},                 // Flash position
+            0.625f,                             // Eject interval
+            0.0f,                               // View kick
+            DFALSE,                             // View kick is Cumulative
+            DFALSE,                             // Animation looping
+            DFALSE,                             // Alt anim looping
+            nullptr,                            // Icon for status bar
+            nullptr,                            // Highlighted icon for status bar
+        },
+        // Original Shared/WeaponDefs.cpp: TIMEBOMB
+        {
+            "Models\\Weapons\\C4time_pv.abc",       // Model
+            "Models\\Weapons\\C4time_pv.abc",       // Model
+            "Skins\\Weapons\\C_C4explode_pv_t.dtx", // Skin
+            "Models\\Powerups\\timebomb_pu.abc",    // 3rd person model
+            "Skins\\Powerups\\timebomb_pu.dtx",     // 3rd person skin
+            WEAP_TIMEBOMB,                          // Type
+            TYPE_MELEE,                             // Fire type
+            AMMO_TIMEBOMB,                          // Ammo type
+            1,                                      // Ammo Use
+            1,                                      // Alt Ammo Use
+            80.0f,                                  // Min Damage
+            120.0f,                                 // Max Damage
+            80.0f,                                  // Min Alt damage
+            120.0f,                                 // Max Alt damage
+            1.0f,                                   // Reload time
+            1.0f,                                   // Alt reload time
+            {0.0f, 0.0f},                           // Spread
+            {0.0f, 0.0f},                           // Alt Spread
+            1000.0f,                                // Projectile Velocity
+            0.0f,                                   // Alt Projectile Velocity
+            2000.0f,                                // Range
+            0.0f,                                   // Alt Range
+            1,                                      // Shots per fire
+            1,                                      // Alt Shots per fire
+            1,                                      // Strength or Magic required
+            0,                                      // Two-handed Strength or Magic required
+            250,                                    // Damage Radius (projectiles)
+            250,                                    // Alt Damage Radius (projectiles)
+            DFALSE,                                 // Alt fire zoom
+            DFALSE,                                 // Semi-auto
+            "Sounds\\Weapons\\time\\fire.wav",      // Fire sound
+            "Sounds\\Weapons\\time\\alt.wav",       // Alt Fire sound
+            "",                                     // Empty weapon sound
+            "",                                     // Alt Empty weapon sound
+            "CTimeBomb",                            // Projectile class
+            "CTimeBomb",                            // Alt Projectile class
+            0,                                      // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                     // Muzzle Flash color
+            "Time Bomb",                            // Name
+            IDS_WEAPON_TIME,                        // Muzzle Flash radius
+            "",                                     // flash sprite name
+            "",                                     // alt flash Sprite name
+            0.25f,                                  // Flash duration
+            0.0f,                                   // Flash scale
+            {0.0f, 0.0f, 0.0f},                     // 3rd person gun offset
+            {-0.7f, 0.0f, 2.4f},                    // Gun Offset
+            {0.0f, 0.375f, 12.0f},                  // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                  // Recoil
+            {3.0f, -7.5f, 5.0f},                    // Flash position
+            0.0f,                                   // Eject interval
+            0.0f,                                   // View kick
+            DFALSE,                                 // View kick is Cumulative
+            DTRUE,                                  // Animation looping
+            DFALSE,                                 // Alt anim looping
+            nullptr,                                // Icon for status bar
+            nullptr,                                // Highlighted icon for status bar
+        },
         // Barrett .50 BMG Sniper Rifle
         {
             "Models\\Weapons\\SniperRifle_pv.abc",         // Model
