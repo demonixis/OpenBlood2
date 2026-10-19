@@ -1,5 +1,7 @@
 # Service contracts
 
+- [Desktop launcher L0 through L2](launcher_contracts.md)
+
 - [Original menu frontend](menu_contracts.md)
 
 - [Original default crosshair](crosshair_contracts.md)

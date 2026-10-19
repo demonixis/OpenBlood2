@@ -1,5 +1,7 @@
 # Implementation records
 
+- [SDL3 launcher baseline and validation](../../../Documentation/Implementation/launcher.md)
+
 - [Demo font metrics and spawned-Fanatic placement retakes](../../../Documentation/Implementation/demo_retakes.md)
 
 - [Unused SDL subsystem configuration and validation](../../../Documentation/Implementation/sdl_build_options.md)

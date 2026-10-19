@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-19",
+  "baseline": "8fcbf3594d0a24a0cde998b917728cbd6d115e93",
+  "scope": "Launcher L0-L2; existing project config and REZ reader reused; no original-game code import",
+  "sources": [
+    {
+      "path": "src/engine/config.cpp",
+      "sha256": "89b381a71c80927589d9a4e33868238fc59d7596ab55412bc99e7c35b7dce4fb"
+    },
+    {
+      "path": "src/engine/config.h",
+      "sha256": "8ac4df6519e92116b6b6f63e690f340b80f4a7ed160be73e9d2bc52b6db3995e"
+    },
+    {
+      "path": "src/engine/resources.cpp",
+      "sha256": "237c2275e82f8939dff4202597976452f8316e1179836cc1ddd85cfba6bad8c2"
+    },
+    {
+      "path": "src/engine/resources.h",
+      "sha256": "9af6c64c0590f73f1af65b9017f527b56ba9554c1d38542036daf931e9a24793"
+    },
+    {
+      "path": "cmake/Dependencies.cmake",
+      "sha256": "9be05e81ab066a0820f11f0518fc33bf6e02292ba6d6c5de50f37479c38b7e2a"
+    }
+  ],
+  "reference": "sources/blood2 launcher project absent; installed readme section 5 and BLOOD2.EXE dialogs studied read-only",
+  "commercial_assets": "External only; optional original artwork not required for L1/L2",
+  "excluded": [
+    "Nightmares",
+    "graphics stack changes",
+    "preference editor",
+    "mods",
+    "demo installer/downloader"
+  ]
+}

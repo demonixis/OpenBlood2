@@ -1,5 +1,8 @@
 # Source ledgers
 
+- [Launcher L0 through L2](launcher_sources.json): existing project config/REZ
+  reuse, pinned SDL/ImGui, no original launcher-code import.
+
 These JSON files record selected donor code, revisions, source ranges, hashes and
 adaptations for implementation increments. [Provenance](../provenance.md) links
 them to the corresponding feature; [contracts](../../contracts/readme.md) describe
