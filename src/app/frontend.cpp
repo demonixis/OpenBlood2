@@ -237,7 +237,8 @@ namespace OpenBlood2
             }
             const auto& settings = menu.settings;
             const float sound_gain = settings.sound ? settings.sound_volume / 50.f : 0;
-            const float music_gain = settings.music ? settings.music_volume / 50.f : 0;
+            // Original SetMusicVolume takes 0..100 (100 = full); the original menu slider stops at 50.
+            const float music_gain = settings.music ? settings.music_volume / 100.f : 0;
             if (!game->server.audio.set_gains(sound_gain, music_gain) ||
                 !menu_audio.mixer.set_gains(sound_gain, music_gain))
             {

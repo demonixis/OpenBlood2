@@ -42,7 +42,8 @@ namespace OpenBlood2
     struct MenuSettings
     {
         bool sound = true, music = true, invert_y = false;
-        int sound_volume = 50, music_volume = 50, sensitivity = 150;
+        // Original defaults.cfg: SoundVolume 50, MusicVolume 35 (BloodClientShell's fallback is also 35).
+        int sound_volume = 50, music_volume = 35, sensitivity = 150;
         // Original Display DETAIL LEVEL (0 low, 1 medium, 2 high; detail*.cfg LightMap and
         // MaxModelShadows) and the replacement per-pixel model lighting option.
         int detail = 2;

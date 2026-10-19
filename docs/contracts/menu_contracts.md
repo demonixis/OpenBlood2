@@ -82,8 +82,12 @@ skins and full Action rules remain outside scope; Chosen uses the existing solo 
 
 ## UI-M4 preferences and audio
 
-Audio sliders retain 0..50 with step 5; mouse sensitivity retains 100..1500 with
-step 20. Default 150 maps exactly to the previous 0.0025 radians per SDL relative
+Audio sliders retain the original MenuSound 0..50 with step 5; defaults follow the
+shipped defaults.cfg (SoundVolume 50, MusicVolume 35). SFX gain is volume/50. Music
+gain is volume/100, the original SetMusicVolume scale where 100 is full, so the
+menu maximum is half of the full synth level (measured installed-soundtrack peaks
+0.33..0.89 there, one Cabal cruising transient 1.15 clipped). Mouse sensitivity
+retains 100..1500 with step 20. Default 150 maps exactly to the previous 0.0025 radians per SDL relative
 unit; inversion affects mouse pitch only. Mouse slider release maps through the
 same drawn thumb travel as hit testing. Unsupported controls remain disabled.
 

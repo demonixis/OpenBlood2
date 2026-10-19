@@ -281,7 +281,8 @@ namespace OpenBlood2
         {
             return false;
         }
-        if (!audio.music_loop.request(sections, request.transition.empty() ? 0 : 1, bank, audio.instruments, .2,
+        // Live MUSIC renders at full synth gain; the mixer applies the player's music volume.
+        if (!audio.music_loop.request(sections, request.transition.empty() ? 0 : 1, bank, audio.instruments, 1,
                                       request.immediate, request.to, error))
             return false;
         audio.music_error.clear();

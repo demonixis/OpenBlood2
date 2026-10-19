@@ -72,7 +72,9 @@ PlayList boundary interface. Latest-request replacement, hard tail cancellation
 and placement of the new preparation's preroll are not verified retail IMUSIC
 activation semantics. The first new event starts at the boundary; its musical
 zero follows the prepared global preroll. Sections still use seed 1 and mask
-0xffff, repeats reuse prepared variations, and gain remains explicitly 20%.
+0xffff and repeats reuse prepared variations. Live requests render at full synth
+gain; only inspector auditions keep the labelled 20%. The player's music volume is
+applied by the mixer (see the menu contracts).
 No retail PCM/listening or cross-section variation-continuity claim is made.
 
 A scheduling or receiver failure stops the active and pending transport, releases
