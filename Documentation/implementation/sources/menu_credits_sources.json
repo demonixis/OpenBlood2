@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-20",
+  "scope": "Main menu Credits entry: original MenuCredits world request, custom game type and the END/CREDITS roll flag; no renderer, font or text-overlay code imported",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006",
+      "purpose": "MenuCredits: outside a world StartNewGame(\"Credits\", STARTGAME_NORMAL, GAMETYPE_CUSTOM, LOADTYPE_NEW_GAME, DIFFICULTY_MEDIUM) without SetCharacterInfo; inside a world the text-only GS_CREDITS screen. PreLoadWorld sets m_bRollCredits for END/CREDITS (with or without the Worlds prefix); OnExitWorld clears it; GS_PLAYING Esc opens the in-world menu."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/Credits.cpp",
+      "source_sha256": "27f63afe0d3e4f7adda770a33b2a464a6288f942254f9c500f0000188e8e1cf7",
+      "purpose": "CCredits/CCredit roll: TEXT resource parsing (## separators, >TIME:, >END), fade/hold timers, speed keys and endless wrap in CM_CREDITS mode. Not ported; recorded as the remaining overlay."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/CreditsWin.cpp",
+      "source_sha256": "fe18d927ea113a65a1bc87b978d846089497b3ec4b98700c502820e3b7e59dfd",
+      "purpose": "Credits text comes from a cres.dll resource of type TEXT named CREDITS (CREDITS_AO for the add-on). Not read yet."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MainMenus.cpp",
+      "source_sha256": "4e52be34bfd90c547c1e9c26ab7d77711aa873b91b67bb99112621d3f0172091",
+      "purpose": "MENU_CMD_CREDITS dispatches to MenuCredits."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/B2BaseClass.cpp",
+      "source_sha256": "0ba57de82459b0d7de97c93e53d55cb32ac05b6743efa271d8fc3c2b5944aa13",
+      "purpose": "TypeCustom/OPT_FLAG_CUSTOM filtering applies to GAMETYPE_CUSTOM worlds; the existing port is unchanged."
+    }
+  ],
+  "adaptations": [
+    "The world name test runs at player entry on the normalized world path instead of in PreLoadWorld; it has no consumer other than diagnostics yet.",
+    "GAMETYPE_CUSTOM is accepted only for fresh NEW_GAME requests; NEW_LEVEL, saves and multiplayer types still refuse explicitly.",
+    "The in-world Credits row stays disabled because the text-only GS_CREDITS screen is not ported."
+  ]
+}

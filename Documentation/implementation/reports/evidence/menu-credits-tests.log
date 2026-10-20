@@ -1,0 +1,47 @@
+# Dev (RelWithDebInfo, inspector) and Release (inspector-free), macOS Apple M5, 2026-10-20
+## dev
+1/9 Test #1065: menus.state ......................   Passed    0.01 sec
+2/9 Test #1066: menus.artwork ....................   Passed    0.02 sec
+3/9 Test #1067: menus.session ....................   Passed    0.17 sec
+4/9 Test #1068: menus.credits ....................   Passed    0.09 sec
+5/9 Test #1069: menus.profiles ...................   Passed    1.02 sec
+6/9 Test #1070: menus.preferences ................   Passed    0.01 sec
+7/9 Test #1105: demo_menu.manifest ...............   Passed    0.01 sec
+8/9 Test #1106: demo_menu.flow ...................   Passed    0.00 sec
+9/9 Test #1107: demo_menu.assets .................   Passed    0.03 sec
+100% tests passed out of 9
+## release
+1/8 Test #1065: menus.state ......................   Passed    0.01 sec
+2/8 Test #1066: menus.artwork ....................   Passed    0.02 sec
+3/8 Test #1067: menus.session ....................   Passed    0.15 sec
+4/8 Test #1068: menus.credits ....................   Passed    0.09 sec
+5/8 Test #1069: menus.profiles ...................   Passed    0.97 sec
+6/8 Test #1070: menus.preferences ................   Passed    0.01 sec
+7/8 Test #1102: demo_menu.manifest ...............   Passed    0.01 sec
+8/8 Test #1103: demo_menu.flow ...................   Passed    0.00 sec
+100% tests passed out of 8
+## Full headless suite: failures (identical at unmodified HEAD 2936c87 and with this change, Dev and Release)
+world.level_change
+weapons.inventory
+locomotion.contacts
+doors.catalog
+pickups.catalog
+ai_recovery.crouch
+ai_recovery.catalog
+ai_escape.failures
+ai_escape.catalog
+weapon_drops.protocol
+inventory_state.malformed
+player_restore.failures
+shield.failures
+assault.collect
+assault.ai
+mad_scientist.wounds
+coverage.catalog
+HEAD dev: 99% tests passed, 17 tests failed out of 1180
+change dev: 99% tests passed, 17 tests failed out of 1181
+change release: 99% tests passed, 17 tests failed out of 1177
+## --menu-smoke (Dev, Metal)
+GPU device: Apple M5
+Frontend complete: 216 frames, world worlds/01_subwaya.dat, menu audio starts 26/failures 0
+Session finished: exit_code=0

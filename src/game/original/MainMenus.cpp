@@ -146,8 +146,11 @@ namespace OpenBlood2
             switch (item.command)
             {
                 case MENU_CMD_BLOODBATH:
-                case MENU_CMD_CREDITS:
                     item.enabled = demo();
+                    break;
+                case MENU_CMD_CREDITS:
+                    // Retail in-world MenuCredits shows the text-only "lame" credits, which are not ported.
+                    item.enabled = demo() || !in_world;
                     break;
                 case -1:
                 case MENU_CMD_CUSTOM_LEVEL:
@@ -257,7 +260,8 @@ namespace OpenBlood2
             return;
         }
         if (!active || promotion != MenuPromotion::None || selected < 0 || selected >= int(items.size()) ||
-            !enabled(items[selected]) || pending_.action == MenuAction::NewGame || pending_.action == MenuAction::Quit)
+            !enabled(items[selected]) || pending_.action == MenuAction::NewGame ||
+            pending_.action == MenuAction::Credits || pending_.action == MenuAction::Quit)
             return;
         if (items[selected].setting >= 0)
         {
@@ -286,6 +290,8 @@ namespace OpenBlood2
             case MENU_CMD_CREDITS:
                 if (demo())
                     show_promotion(MenuPromotion::Info);
+                else if (!in_world)
+                    pending_.action = MenuAction::Credits; // The owner starts the credits world.
                 break;
             case MENU_CMD_START_ACTION:
                 if (demo())

@@ -229,21 +229,25 @@ namespace OpenBlood2
             auto command = menu.take_command();
             if (command.action == MenuAction::Quit)
                 break;
-            if (command.action == MenuAction::NewGame)
+            if (command.action == MenuAction::NewGame || command.action == MenuAction::Credits)
             {
-                const char* world = first_level(config.demo);
-                spdlog::info("New game requested: world={}; character={}; difficulty={}", world,
-                             command.story ? 0 : int(command.character), int(command.difficulty));
+                const bool credits = command.action == MenuAction::Credits;
+                const auto start = menu_world_start(*game, command, first_level(config.demo));
+                spdlog::info("{} requested: world={}; character={}; difficulty={}; type={}",
+                             credits ? "Credits" : "New game", start.world, int(start.character),
+                             int(start.difficulty), int(start.game_type));
                 // Execute the owned profile request outside SDL event dispatch.
-                if (!GameSession::start_new_game(game, world, DBYTE(command.difficulty),
-                                                 DBYTE(command.story ? 0 : command.character), error))
+                if (!start_menu_world(game, start, error))
                 {
                     menu.error = error;
-                    spdlog::error("New game failed: {}", error);
+                    spdlog::error("{} failed: {}", credits ? "Credits" : "New game", error);
                 }
                 else
                 {
                     spdlog::info("World ready: {}", game->world_path);
+                    if (game->client_shell.m_bRollCredits)
+                        spdlog::warn("Original CCredits text overlay is not ported; {} runs without it",
+                                     game->world_path);
                     menu.error.clear();
                     menu.close();
                     selection.id = {};

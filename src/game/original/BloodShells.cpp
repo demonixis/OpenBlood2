@@ -5,6 +5,7 @@
 #include "ClientCrosshair.h"
 #include "game/game_settings.h"
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 
 void CBloodServerShell::PreStartWorld()
@@ -228,6 +229,20 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     client_ = client;
     player = object;
     m_bInWorld = true;
+    m_bRollCredits = false;
+    if (const auto var = server_.GetGameConVar("GAME_WORLDNAME"))
+        if (const auto* value = server_.GetVarValueString(var))
+        {
+            // Original accepts "END"/"CREDITS" with or without the Worlds prefix (case-insensitive).
+            std::string world = value;
+            std::transform(world.begin(), world.end(), world.begin(),
+                           [](unsigned char c) { return c == '\\' ? '/' : char(std::tolower(c)); });
+            if (world.starts_with("worlds/"))
+                world.erase(0, 7);
+            if (world.ends_with(".dat"))
+                world.resize(world.size() - 4);
+            m_bRollCredits = world == "end" || world == "credits";
+        }
     m_bFirstUpdate = true;
     restored_entry = restored;
     m_bFirstWorld = !restored;
@@ -285,6 +300,7 @@ void CBloodClientShell::OnExitWorld()
     player = nullptr;
     client_ = nullptr;
     m_bInWorld = false;
+    m_bRollCredits = false;
     restored_entry = false;
     m_bFirstWorld = true;
     m_bFirstUpdate = true;

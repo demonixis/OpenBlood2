@@ -110,7 +110,8 @@ Save contains eight source slots; Load adds source Restart and Quickload rows.
 Every row is disabled and the screen explicitly says saving/loading is unavailable.
 No file snapshot or invented successful save is produced. Quit uses the original
 localized prompt with keyboard/mouse Yes/No controls (No selected initially); Y/N
-also confirm/cancel. Credits, BloodBath and custom levels remain disabled.
+also confirm/cancel. BloodBath and custom levels remain disabled; Credits is covered
+by the [Credits entry](#credits-entry) section.
 
 `--menu-smoke` injects explicit SDL events into the real frontend with its own
 1/60 clock. It checks original entry, repeated confirmation, menu/inspector
@@ -169,3 +170,37 @@ Normal `--demo` now uses the [demo menu and edition provider](demo_menu_contract
 The fixed-offset experiment remains removed. `--demo --view-world` retains the
 [menu-free direct route](demo_contracts.md); retail behavior stays shared and
 separately tested.
+
+## Credits entry
+
+Outside a world, the retail main menu's Credits row emits `MenuAction::Credits`.
+The frontend performs the original `MenuCredits` request outside SDL dispatch:
+`StartNewGame("Credits", GAMETYPE_CUSTOM, LOADTYPE_NEW_GAME, DIFFICULTY_MEDIUM)`.
+The original does not call `SetCharacterInfo` here, so the character is the one of
+the last entered game (Caleb before any game). `menu_world_start` and
+`start_menu_world` in `app/session_playback.h` hold this mapping for the frontend
+and the headless test.
+
+- `GAMETYPE_CUSTOM` is the original single-player custom-level type. It is accepted
+  only for a fresh NEW_GAME request, through request parsing, world preparation and
+  player entry. The existing `!= GAMETYPE_SINGLE` branches of ported original code
+  now see it as the original did. NEW_LEVEL, saves and multiplayer types still
+  refuse explicitly. Guards that refuse non-single modes (player death, NPC weapon
+  drops, player restoration) remain explicit failures in this mode.
+- The same transactional `start_new_game` is used: a refused request keeps the
+  current session, and the error is shown on the menu.
+- `CBloodClientShell::m_bRollCredits` follows the original PreLoadWorld test (END or
+  CREDITS, with or without the Worlds prefix, case-insensitive), evaluated at player
+  entry from the normalized world path and cleared on exit.
+- Return to the menu matches the original: the `credits` world has no exit and
+  the roll never ends by itself. Esc opens the in-world main menu; Resume returns to
+  the world, and Single Player or Quit leave it.
+- The in-world Credits row stays disabled. The original shows the text-only
+  "lame" GS_CREDITS screen there, which is not ported.
+- The CCredits text overlay is not ported: no TEXT resource read from cres.dll,
+  no font and no fade/hold timers. The frontend logs a warning when a roll-credits
+  world starts. The world itself (camera, key framer, scripted Caleb, sounds) runs.
+- The demo edition keeps its Prime Gibs promotion unchanged.
+
+See the [implementation report](../implementation/reports/menu_credits.md) and the
+[source ledger](../implementation/sources/menu_credits_sources.json).

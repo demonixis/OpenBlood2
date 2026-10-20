@@ -4,6 +4,7 @@
 // shell methods are not imported or replaced with successful no-op services.
 // The original field order and IDs are retained through a typed local transport.
 #include "engine/formats/reader.h"
+#include "game/game_settings.h"
 #include "game/session.h"
 
 namespace OpenBlood2
@@ -49,10 +50,14 @@ namespace OpenBlood2
             error = "Malformed CMSG_LOADWORLD";
             return false;
         }
-        if (next.game_type != 0 || (next.load_type != LOADTYPE_NEW_GAME && next.load_type != LOADTYPE_NEW_LEVEL) ||
-            next.difficulty > 3)
+        // GAMETYPE_CUSTOM is the original single-player custom-level type (MenuCredits,
+        // custom levels); only its fresh NEW_GAME entry is supported.
+        const bool custom = next.game_type == GAMETYPE_CUSTOM && next.load_type == LOADTYPE_NEW_GAME;
+        if ((next.game_type != GAMETYPE_SINGLE && !custom) ||
+            (next.load_type != LOADTYPE_NEW_GAME && next.load_type != LOADTYPE_NEW_LEVEL) || next.difficulty > 3)
         {
-            error = "Only single-player NEW_GAME/NEW_LEVEL syntax is supported; saves/multiplayer are unimplemented";
+            error = "Only single-player NEW_GAME/NEW_LEVEL and custom NEW_GAME syntax is supported; "
+                    "saves/multiplayer are unimplemented";
             return false;
         }
         // Keep the original Worlds prefix, but reject traversal instead of stripping

@@ -1,3 +1,4 @@
+#include "game/game_settings.h"
 #include "game/original/AI_Mgr.h"
 #include "game/original/BuiltinSprite.h"
 #include "game/original/CharacterProfiles.h"
@@ -428,9 +429,10 @@ namespace OpenBlood2
             error = "A local client is already connected";
             return false;
         }
-        if (server.GetVarValueFloat(server.GetGameConVar("GAME_GAMETYPE")) != 0)
+        if (const auto type = server.GetVarValueFloat(server.GetGameConVar("GAME_GAMETYPE"));
+            type != float(GAMETYPE_SINGLE) && type != float(GAMETYPE_CUSTOM))
         {
-            error = "Player entry supports fresh single-player sessions only";
+            error = "Player entry supports fresh single-player and custom sessions only";
             return false;
         }
         // Preflight before creating original objects. Keep inspection usable on

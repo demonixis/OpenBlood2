@@ -1714,3 +1714,12 @@ Gideon algorithms. [Contracts](../contracts/enhanced_gideon_contracts.md) and
 [source hashes](sources/all_levels_enhanced_gideon_sources.json) record selective
 reuse, original quirks and checked service boundaries. Registration retains the
 original AI_Mgr parent; the C++ helper inheritance shares implementation only.
+
+## Menu Credits entry (2026-10-20)
+
+The retail Credits row now performs the original `MenuCredits` world request
+(`Credits`, GAMETYPE_CUSTOM, medium difficulty, current character), and the client
+shell records the original END/CREDITS roll flag. No original code is copied beyond
+these rules; the CCredits text overlay is not imported. See the
+[contracts](../contracts/menu_contracts.md#credits-entry), the
+[report](reports/menu_credits.md) and the [source ledger](sources/menu_credits_sources.json).

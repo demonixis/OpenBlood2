@@ -1,4 +1,6 @@
 #pragma once
+#include "game/game_settings.h"
+#include "game/menu.h"
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
@@ -39,5 +41,29 @@ namespace OpenBlood2
         if (waiting_for_player(game, diagnostic_simulation))
             return game.objects.finish_frame(); // Explicit editor removals still drain; no clock/update advance.
         return game.step(seconds);
+    }
+
+    struct MenuWorldStart
+    {
+        const char* world = nullptr;
+        DBYTE difficulty = DIFFICULTY_MEDIUM, character = 0, game_type = GAMETYPE_SINGLE;
+    };
+    // Original MenuNewGame/MenuCredits world requests for a NewGame/Credits menu command.
+    // MenuCredits (outside a world) is StartNewGame("Credits", GAMETYPE_CUSTOM, DIFFICULTY_MEDIUM)
+    // with the current configured character: it never calls SetCharacterInfo, so the last
+    // entered profile (Caleb before any game) is kept.
+    inline MenuWorldStart menu_world_start(const GameSession& game, const MenuCommand& command,
+                                           const char* first_level)
+    {
+        if (command.action == MenuAction::Credits)
+            return {"Credits", DIFFICULTY_MEDIUM, game.client_shell.entry_profile.character, GAMETYPE_CUSTOM};
+        return {first_level, DBYTE(command.difficulty), DBYTE(command.story ? 0 : command.character),
+                GAMETYPE_SINGLE};
+    }
+    inline bool start_menu_world(std::unique_ptr<GameSession>& game, const MenuWorldStart& start,
+                                 std::string& error)
+    {
+        return GameSession::start_new_game(game, start.world ? start.world : "", start.difficulty, start.character,
+                                           error, false, start.game_type);
     }
 } // namespace OpenBlood2

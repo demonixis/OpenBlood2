@@ -75,6 +75,16 @@ namespace
         menu.back();
         CHECK(!menu.active && menu.take_command().action == MenuAction::Resume);
         menu.open(false);
+        CHECK(menu.items[3].string_id == IDS_MENU_MAIN_CREDITS && menu.enabled(menu.items[3]));
+        menu.selected = 3;
+        menu.activate();
+        CHECK(menu.page == MenuPage::Main && menu.take_command().action == MenuAction::Credits);
+        menu.open(true);
+        CHECK(!menu.enabled(menu.items[3])); // In-world "lame" text credits are not ported.
+        menu.selected = 3;
+        menu.activate();
+        CHECK(menu.take_command().action == MenuAction::None);
+        menu.open(false);
         menu.selected = 4;
         menu.activate();
         CHECK(menu.page == MenuPage::Quit && menu.selected == 1);
@@ -294,6 +304,62 @@ namespace
         CHECK(!audio.ambient);
         return true;
     }
+    // Menu Credits -> original MenuCredits world request -> custom-type entry into the credits world.
+    bool credits(const std::filesystem::path& content)
+    {
+        std::string error;
+        Config config;
+        config.data_dir = content;
+        auto game = std::make_unique<GameSession>();
+        CHECK(game->resources.mount_game(config, error) && game->initialize());
+        Menu menu;
+        menu.open(false);
+        menu.selected = 3;
+        menu.activate();
+        auto command = menu.take_command();
+        CHECK(command.action == MenuAction::Credits);
+        auto start = menu_world_start(*game, command, "01_SubwayA");
+        CHECK(std::string_view(start.world) == "Credits" && start.difficulty == DIFFICULTY_MEDIUM &&
+              start.character == 0 && start.game_type == GAMETYPE_CUSTOM);
+        CHECK(start_menu_world(game, start, error));
+        CHECK(game->world_path == "worlds/credits.dat" && game->client_shell.m_bInWorld &&
+              game->client_shell.m_bRollCredits);
+        CHECK(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_GAMETYPE")) == GAMETYPE_CUSTOM);
+        CHECK(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_DIFFICULTY")) == DIFFICULTY_MEDIUM);
+        CHECK(game->startup.accepted && game->startup.player_entered && game->startup.unknown == 0 &&
+              game->startup.failed == 0);
+        const auto time = game->objects.time();
+        for (int i = 0; i < 300; ++i)
+            CHECK(step_app_session(*game, 1. / 60));
+        CHECK(game->objects.time() > time + 4.9 && game->client_shell.m_bInWorld);
+        auto* player = game->server_shell.Player(game->local_client);
+        CHECK(player && !player->m_damage.IsDead());
+        // Original Esc in the credits world opens the in-world main menu; Resume returns to it.
+        menu.open(true, true);
+        CHECK(menu.active && menu.page == MenuPage::Main && !menu.enabled(menu.items[3]));
+        menu.back();
+        CHECK(!menu.active && menu.take_command().action == MenuAction::Resume);
+        // The Credits request keeps the current configured character (no SetCharacterInfo).
+        CHECK(GameSession::start_new_game(game, "01_SubwayA", 1, 2, error));
+        CHECK(!game->client_shell.m_bRollCredits);
+        start = menu_world_start(*game, command, "01_SubwayA");
+        CHECK(start.character == 2);
+        // Failures are explicit and retain the current session.
+        auto* previous = game.get();
+        CHECK(!GameSession::start_new_game(game, "Credits", 1, 0, error, false, GAMETYPE_BLOODBATH) &&
+              !error.empty() && game.get() == previous);
+        start.world = "missing-credits-world";
+        CHECK(!start_menu_world(game, start, error) && !error.empty() && game.get() == previous);
+        WorldMessage message;
+        WorldRequest request;
+        CHECK(original_world_request("Credits", GAMETYPE_CUSTOM, LOADTYPE_NEW_LEVEL, 1, message));
+        CHECK(!parse_world_request(message, request, error));
+        CHECK(original_world_request("Credits", GAMETYPE_CUSTOM, LOADTYPE_NEW_GAME, 1, message));
+        CHECK(parse_world_request(message, request, error) && request.filename == "worlds/credits.dat");
+        CHECK(start_menu_world(game, menu_world_start(*game, command, "01_SubwayA"), error));
+        CHECK(game->client_shell.m_bRollCredits && game->server_shell.Player(game->local_client)->m_nCharacter == 2);
+        return true;
+    }
     bool profiles(const std::filesystem::path& content)
     {
         std::string error;
@@ -452,6 +518,8 @@ int main(int argc, char** argv)
         return 2;
     if (mode == "profiles")
         return profiles(path_from_utf8(argv[2])) ? 0 : 1;
+    if (mode == "credits")
+        return credits(path_from_utf8(argv[2])) ? 0 : 1;
     if (mode == "session")
         return session(path_from_utf8(argv[2])) ? 0 : 1;
     return artwork(path_from_utf8(argv[2]), mode == "gpu", argc > 3 ? path_from_utf8(argv[3]) : std::filesystem::path{})

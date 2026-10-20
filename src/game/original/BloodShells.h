@@ -84,6 +84,9 @@ class CBloodClientShell
     bool OnEnterWorld(HCLIENT, bool restored = false);
     bool restored_entry = false;
     OpenBlood2::PlayerInit entry_profile;
+    // Original PreLoadWorld END/CREDITS test, evaluated at entry from the normalized
+    // world path. The CCredits text overlay it would roll is not ported.
+    bool m_bRollCredits = false;
     void OnExitWorld();
     bool OnMessage(const OpenBlood2::PlayerEvent&, CBloodServerShell&);
     bool Update();

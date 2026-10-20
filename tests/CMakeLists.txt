@@ -2549,6 +2549,8 @@ if(BLOOD2_TEST_DATA_DIR)
 endif()
 
 if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME menus.credits COMMAND menu_tests credits "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(menus.credits PROPERTIES LABELS "headless;private;menus" TIMEOUT 180 ENVIRONMENT "SDL_AUDIODRIVER=dummy")
     add_test(NAME menus.profiles COMMAND menu_tests profiles "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(menus.profiles PROPERTIES LABELS "headless;private;menus" TIMEOUT 180)
 endif()
