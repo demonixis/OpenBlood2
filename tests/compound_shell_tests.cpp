@@ -138,6 +138,38 @@ namespace
             }
             CHECK(g.objects.remove(door) && g.objects.finish_frame());
         }
+        // An NPC centered on a closed shelf's top face must be lifted clear
+        // before the downward ray; contained-center sweeps deliberately stay solid.
+        auto shelf = g.objects.create(g.objects.find_class("Door"), {}, Creation::World,
+                                      {{"Name", std::string("compound")}, {"BoxPhysics", false}});
+        ObjectCreateStruct state;
+        state.m_Pos = {2, 4, 2};
+        state.m_Flags = FLAG_SOLID;
+        auto npc = g.objects.create(g.objects.find_class("AI_Mgr"), state);
+        DVector small{.5f, .5f, .5f};
+        CHECK(shelf && npc && g.server.SetObjectDims(npc, &small) == DE_OK);
+        auto model = std::make_shared<Model>();
+        model->animations.resize(1);
+        model->animations[0].dimensions = small;
+        g.objects.get(npc)->model = model;
+        CHECK(g.server.MoveObjectToGround(npc) == DE_OK);
+        auto* actor = g.objects.get(npc);
+        CHECK(actor && actor->placement_nudges == 1 && std::abs(actor->state.m_Pos.y - 4.501f) < .002f);
+        CHECK(actor->dimensions.y == .5f);
+        CHECK(g.objects.remove(npc) && g.objects.remove(shelf) && g.objects.finish_frame());
+        // BoxPhysics does not need a closed polygon volume: its real collision
+        // representation is the bounded box. A container still requires closure.
+        auto open = test_brush::box("open_box", {20, 0, 20}, {24, 4, 24});
+        open.polygons.pop_back();
+        g.world.models.push_back(open);
+        auto box = g.objects.create(g.objects.find_class("Door"), {}, Creation::World,
+                                    {{"Name", std::string("open_box")}, {"BoxPhysics", true}});
+        CHECK(box && g.objects.get(box)->world_model->boundary_only);
+        CollisionHit hit;
+        CHECK(sweep_object(*g.objects.get(box), {22, 10, 22}, {22, 0, 22}, small, hit) == CollisionQuery::Hit);
+        CHECK(std::abs(hit.point.y - 4.5f) < .01f);
+        CHECK(!g.objects.create(g.objects.find_class("VolumeBrush"), {}, Creation::World,
+                                {{"Name", std::string("open_box")}, {"ShowSurface", false}}));
         CHECK(g.unload_world() && g.server.message_count() == 0 && g.server.string_count() == 0);
         std::cout << "Ground rays use actual polygon pieces/gaps and authored box bounds independently of pivot\n";
         return true;

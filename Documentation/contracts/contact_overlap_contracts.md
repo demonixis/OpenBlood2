@@ -131,3 +131,29 @@ clearance, and bounded by the existing per-axis budgets. An object with neither
 solid nor gravity flags remains ineligible. Dimensions and simulation collision
 semantics are unchanged. services.start_departure verifies the nonsolid floor
 case, following integration and refusal for a nonphysical object.
+
+## Floor-edge and world-model initial placement
+
+Train Station SoulDrudge0 is centered at (-1984,256,-4800) on a primary-world
+floor edge. Nearest-axis corrections alternate between adjoining triangles and
+fail their existing budget. After those atomic attempts fail, initial placement
+may try a vertical lift of one Y half extent plus .001. The complete body at
+that candidate and the center's upward route must both be clear; only then does
+the position commit. The following original ground-drop query supplies support.
+This is bounded replacement placement, not continuous depenetration or retail
+physics parity. The old horizontal budget is unchanged.
+
+Two Train Station BoneLeech centers are exactly on shelf2's top face (Y=64).
+The closed shell correctly classifies their centers as inside; the ordinary
+MoveObject query must keep refusing that start. Initial NPC separation now also
+considers world-model face-adjacent candidates using actual bounds centers.
+For these models, horizontal displacement is capped at the actor's smaller
+horizontal diameter and vertical displacement at its Y half extent plus .01.
+The nearest eligible candidate must clear the full scene; its route must clear
+everything except the already-overlapped owner shell. No shelf moves or changes
+shape. Ordinary models/characters retain their previous candidate policies.
+
+A synthetic compound-shell regression checks a diagnostic actor on the top
+face, dimensions, correction count and subsequent ground height. The real
+Train Station three-difficulty smoke test requires all authored actors to
+initialize and remain healthy after simulation.

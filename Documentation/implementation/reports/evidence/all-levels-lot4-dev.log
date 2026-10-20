@@ -1,0 +1,137 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start    3: objects.builtin_model
+ 1/61 Test    #3: objects.builtin_model ..............   Passed    0.00 sec
+      Start    4: objects.original_objects
+ 2/61 Test    #4: objects.original_objects ...........   Passed    0.00 sec
+      Start    5: objects.nested_creation
+ 3/61 Test    #5: objects.nested_creation ............   Passed    0.00 sec
+      Start    6: objects.reasons_properties
+ 4/61 Test    #6: objects.reasons_properties .........   Passed    0.00 sec
+      Start    7: objects.scheduling
+ 5/61 Test    #7: objects.scheduling .................   Passed    0.00 sec
+      Start    8: objects.deferred_removal
+ 6/61 Test    #8: objects.deferred_removal ...........   Passed    0.00 sec
+      Start    9: objects.aggregate_dispatch
+ 7/61 Test    #9: objects.aggregate_dispatch .........   Passed    0.00 sec
+      Start   10: objects.handles_selection
+ 8/61 Test   #10: objects.handles_selection ..........   Passed    0.00 sec
+      Start   11: objects.links_lists
+ 9/61 Test   #11: objects.links_lists ................   Passed    0.00 sec
+      Start   12: objects.messages_strings
+10/61 Test   #12: objects.messages_strings ...........   Passed    0.00 sec
+      Start   13: objects.message_churn
+11/61 Test   #13: objects.message_churn ..............   Passed    0.10 sec
+      Start   14: objects.message_limit
+12/61 Test   #14: objects.message_limit ..............   Passed    0.02 sec
+      Start   15: objects.unsupported_teardown
+13/61 Test   #15: objects.unsupported_teardown .......   Passed    0.00 sec
+      Start   16: objects.creation_failures
+14/61 Test   #16: objects.creation_failures ..........   Passed    0.00 sec
+      Start   83: services.model_reader
+15/61 Test   #83: services.model_reader ..............   Passed    0.00 sec
+      Start   84: services.model_rejection
+16/61 Test   #84: services.model_rejection ...........   Passed    0.01 sec
+      Start   85: services.animation_events
+17/61 Test   #85: services.animation_events ..........   Passed    0.00 sec
+      Start   86: services.model_callbacks
+18/61 Test   #86: services.model_callbacks ...........   Passed    0.00 sec
+      Start   87: services.collision_queries
+19/61 Test   #87: services.collision_queries .........   Passed    0.00 sec
+      Start   88: services.start_departure
+20/61 Test   #88: services.start_departure ...........   Passed    0.00 sec
+      Start   89: services.collision_traversal
+21/61 Test   #89: services.collision_traversal .......   Passed    0.00 sec
+      Start   90: services.movement_contacts
+22/61 Test   #90: services.movement_contacts .........   Passed    0.00 sec
+      Start   91: services.contact_overlap
+23/61 Test   #91: services.contact_overlap ...........   Passed    0.02 sec
+      Start   92: services.placement_queries
+24/61 Test   #92: services.placement_queries .........   Passed    0.00 sec
+      Start   93: services.placement_service
+25/61 Test   #93: services.placement_service .........   Passed    0.00 sec
+      Start   94: services.original_services
+26/61 Test   #94: services.original_services .........   Passed    0.00 sec
+      Start   95: services.private
+27/61 Test   #95: services.private ...................   Passed    0.22 sec
+      Start   96: services.elevator_entry
+28/61 Test   #96: services.elevator_entry ............   Passed    0.08 sec
+      Start  134: compound_shell.geometry
+29/61 Test  #134: compound_shell.geometry ............   Passed    0.00 sec
+      Start  135: compound_shell.malformed
+30/61 Test  #135: compound_shell.malformed ...........   Passed    0.00 sec
+      Start  136: compound_shell.lifetime
+31/61 Test  #136: compound_shell.lifetime ............   Passed    0.00 sec
+      Start  137: compound_shell.ground
+32/61 Test  #137: compound_shell.ground ..............   Passed    0.00 sec
+      Start  138: compound_shell.private
+33/61 Test  #138: compound_shell.private .............   Passed    0.39 sec
+      Start  139: containers.geometry
+34/61 Test  #139: containers.geometry ................   Passed    0.00 sec
+      Start  140: containers.concave
+35/61 Test  #140: containers.concave .................   Passed    0.00 sec
+      Start  141: containers.membership
+36/61 Test  #141: containers.membership ..............   Passed    0.01 sec
+      Start  142: containers.builtin
+37/61 Test  #142: containers.builtin .................   Passed    0.00 sec
+      Start  143: containers.lifetime
+38/61 Test  #143: containers.lifetime ................   Passed    0.00 sec
+      Start  144: containers.index_lifetime
+39/61 Test  #144: containers.index_lifetime ..........   Passed    0.01 sec
+      Start  145: containers.index_callbacks
+40/61 Test  #145: containers.index_callbacks .........   Passed    0.00 sec
+      Start  146: containers.physics
+41/61 Test  #146: containers.physics .................   Passed    0.00 sec
+      Start  147: containers.swimming
+42/61 Test  #147: containers.swimming ................   Passed    0.01 sec
+      Start  148: containers.surface
+43/61 Test  #148: containers.surface .................   Passed    0.01 sec
+      Start  149: containers.ladders
+44/61 Test  #149: containers.ladders .................   Passed    0.01 sec
+      Start  150: containers.air_damage
+45/61 Test  #150: containers.air_damage ..............   Passed    0.01 sec
+      Start  151: containers.specialized_defaults
+46/61 Test  #151: containers.specialized_defaults ....   Passed    0.01 sec
+      Start  152: containers.conveyor_motion
+47/61 Test  #152: containers.conveyor_motion .........   Passed    0.01 sec
+      Start  153: containers.conveyor_bodies
+48/61 Test  #153: containers.conveyor_bodies .........   Passed    0.00 sec
+      Start  154: containers.specialized_damage
+49/61 Test  #154: containers.specialized_damage ......   Passed    0.00 sec
+      Start  155: containers.freefall_motion
+50/61 Test  #155: containers.freefall_motion .........   Passed    0.01 sec
+      Start  156: containers.specialized_private
+51/61 Test  #156: containers.specialized_private .....   Passed    1.06 sec
+      Start  157: containers.private
+52/61 Test  #157: containers.private .................   Passed    1.09 sec
+      Start  195: brushes.state
+53/61 Test  #195: brushes.state ......................   Passed    0.00 sec
+      Start  196: brushes.spin
+54/61 Test  #196: brushes.spin .......................   Passed    0.00 sec
+      Start  197: brushes.geometry
+55/61 Test  #197: brushes.geometry ...................   Passed    0.00 sec
+      Start  198: brushes.limits
+56/61 Test  #198: brushes.limits .....................   Passed    0.00 sec
+      Start  199: brushes.transport
+57/61 Test  #199: brushes.transport ..................   Passed    0.00 sec
+      Start  200: brushes.destruction
+58/61 Test  #200: brushes.destruction ................   Passed    0.00 sec
+      Start  201: brushes.lifetime
+59/61 Test  #201: brushes.lifetime ...................   Passed    0.00 sec
+      Start  202: brushes.catalog
+60/61 Test  #202: brushes.catalog ....................   Passed    1.16 sec
+      Start 1119: reported_levels.12_train_station
+61/61 Test #1119: reported_levels.12_train_station ...   Passed    4.00 sec
+
+100% tests passed, 0 tests failed out of 61
+
+Label Time Summary:
+brushes         =   1.18 sec*proc (8 tests)
+campaign        =   4.00 sec*proc (1 test)
+containers      =   2.64 sec*proc (24 tests)
+headless        =   8.33 sec*proc (61 tests)
+objects         =   0.16 sec*proc (14 tests)
+private         =   4.00 sec*proc (6 tests)
+private-data    =   4.00 sec*proc (1 test)
+services        =   0.35 sec*proc (14 tests)
+
+Total Test time (real) =   8.37 sec

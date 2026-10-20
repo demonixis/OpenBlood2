@@ -64,8 +64,10 @@ and the property byte offset. Bridge has two such preprocessor lights.
 Non-box world-model bodies use authored triangle boundaries even when their
 stored BSP planes are stale, extending the existing dynamic polygon-body path
 to static bodies such as Entrance's barb3. Open boundaries are not converted to
-closed volumes. BoxPhysics and container volumes retain strict planar/closed
-validation, and invalid coordinates/indices remain errors.
+closed volumes. The complete-level continuation now uses those validated
+triangles for BoxPhysics models too: their collision still uses their authored
+box bounds and needs no closed polygon volume. Container volumes retain strict
+planar/closed validation; invalid coordinates/indices remain errors.
 
 Sky portal polygons never sample their authored ordinary texture: the mesh
 builder now avoids loading it. Bridge's two sky faces name the absent `Default`

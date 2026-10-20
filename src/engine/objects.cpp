@@ -412,8 +412,10 @@ namespace OpenBlood2
                         ++object->world_model_candidates;
                     }
             auto shape = std::make_shared<ContainerShape>();
-            const bool polygon_body = state.m_ObjectType == OT_WORLDMODEL && !(state.m_Flags & FLAG_BOXPHYSICS);
-            if (!model || !error.empty() || !shape->build(*model, state.m_Rotation, error, polygon_body))
+            // Solid world models use authored surface geometry or explicit box
+            // bounds. Closed-volume topology is required only for containers.
+            const bool world_body = state.m_ObjectType == OT_WORLDMODEL;
+            if (!model || !error.empty() || !shape->build(*model, state.m_Rotation, error, world_body))
             {
                 contexts_.pop_back();
                 remove(handle);

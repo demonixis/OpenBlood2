@@ -136,3 +136,33 @@ Further diagnosis: Area15 contains only Multiplayer=true start markers; its
 single-player startup rejection is distinct from collision failure. Train Station
 has two BoneLeech centers exactly on shelf2's top (Y=64), and SoulDrudge0 starts
 in a primary-world wedge. These remain the next placement work.
+
+## Iteration 4: Train Station and box-model topology
+
+Train Station now passes admission, simulation and runtime recheck at all three
+difficulties. Initial placement handles the SoulDrudge's floor-edge intersection
+and the two BoneLeech shelf-face starts with bounded, checked corrections.
+
+BoxPhysics world models use validated authored triangles for retained geometry
+and their existing AABB for collision; requiring a closed polygon volume for
+that representation was unnecessary. Abandoned Buildings' helloyou3 and
+Condemned's Buildings now create. Containers remain closed/planar and malformed
+coordinates/indices still fail. The private brush catalog gains exactly one
+created CDestructableBrush (2490 created / 38 rejected), with its malformed stored
+plane still counted. Tests verify both box collision and strict volume rejection.
+
+The exact missing-resource ledger also records: Sprite0's
+spritetextures\redlight1.spr, Temple's empty DetailSprite Filename with authored
+name sprites\redlight1.spr, Office's modelsworldobjects\urinal2.abc, and sounds
+ambient/chantloop2.wav, ambient/neonlight1.wavt and ambient/neonlight2.wavt. Each
+requires the specific class/property/path, observed failure category and actual
+resource absence. No file is substituted. These omissions remain inspector rows.
+Bloodkeep and Condemned now reach player entry but have no solo start marker;
+they still fail the current solo entry test.
+
+Validation: the 61 focused services, compound-shell, brush, container, object and
+Train Station tests pass in [Dev](evidence/all-levels-lot4-dev.log) and
+[ASan/UBSan with leak detection](evidence/all-levels-lot4-sanitizers.log).
+The [Release map test](evidence/all-levels-lot4-release.log) passes.
+[Release GPU opening](evidence/all-levels-train-gpu.log) renders three frames
+on the NVIDIA RTX 3060 and exits 0 with dummy audio.

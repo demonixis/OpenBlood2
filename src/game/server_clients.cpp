@@ -281,7 +281,22 @@ namespace OpenBlood2
                 position = vector_add(position, correction);
             }
         }
-        return DE_ERROR; // Neither attempt commits a partial correction.
+        // A marker exactly on a floor edge can make the nearest-axis solve
+        // alternate between the adjacent triangles. Try the bounded vertical
+        // escape as well, without crossing another surface with the center.
+        // The following ground ray determines the actual supported height.
+        auto lifted = vector_add(origin, {0, half.y + .001f, 0});
+        CollisionHit clearance, route;
+        if (collision->sweep(lifted, lifted, half, clearance) == CollisionQuery::Miss &&
+            collision->sweep(origin, lifted, {}, route, 0, StartOverlap::Leave) == CollisionQuery::Miss)
+        {
+            if (TeleportObject(h, &lifted) != DE_OK)
+                return DE_ERROR;
+            r->placement_nudge = vector_subtract(lifted, origin);
+            ++r->placement_nudges;
+            return DE_OK;
+        }
+        return DE_ERROR; // No partial correction commits.
     }
 
     DRESULT ServerAdapter::MoveObjectToGround(HOBJECT h)
@@ -320,10 +335,10 @@ namespace OpenBlood2
                 contact.start_solid && contact.object)
             {
                 const auto* other = objects_.get(contact.object);
-                if (other && (other->character_body || other->state.m_ObjectType == OT_MODEL) && !other->world_model)
+                if (other && (other->character_body || other->state.m_ObjectType == OT_MODEL || other->world_model))
                 {
                     const auto combined = vector_add(r->dimensions, other->dimensions);
-                    const auto center = other->state.m_Pos;
+                    const auto center = object_bounds_center(*other);
                     std::vector<DVector> candidates{{center.x - combined.x - .001f, origin.y, origin.z},
                                                     {center.x + combined.x + .001f, origin.y, origin.z},
                                                     {origin.x, origin.y, center.z - combined.z - .001f},
@@ -346,7 +361,15 @@ namespace OpenBlood2
                     for (auto candidate : candidates)
                     {
                         CollisionHit hit;
-                        if (distance(candidate) > limit * limit ||
+                        const auto delta = vector_subtract(candidate, origin);
+                        // Shell interiors have no unique escape normal. Use the
+                        // nearest clear face-adjacent candidate, bounded by the
+                        // actor's dimensions rather than a potentially huge BSP.
+                        const bool shell_limit =
+                            other->world_model &&
+                            (std::hypot(delta.x, delta.z) > 2 * std::min(r->dimensions.x, r->dimensions.z) + .01f ||
+                             std::abs(delta.y) > r->dimensions.y + .01f);
+                        if (shell_limit || distance(candidate) > limit * limit ||
                             sweep_scene(h, candidate, candidate, r->dimensions, hit, ids) != CollisionQuery::Miss ||
                             sweep_scene(h, origin, candidate, r->dimensions, hit, ids, other->handle, .01,
                                         StartOverlap::Leave) != CollisionQuery::Miss)

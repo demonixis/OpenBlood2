@@ -1,0 +1,12 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1231: reported_levels.12_train_station
+1/1 Test #1231: reported_levels.12_train_station ...   Passed    3.15 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+campaign        =   3.15 sec*proc (1 test)
+headless        =   3.15 sec*proc (1 test)
+private-data    =   3.15 sec*proc (1 test)
+
+Total Test time (real) =   3.17 sec

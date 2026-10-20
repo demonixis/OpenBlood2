@@ -1,5 +1,11 @@
 # Blood2 Project Instructions
 
+The [complete-level placement continuation](Documentation/implementation/reports/all_level_loading.md) adds bounded
+initial floor-edge lifts and NPC escape from an overlapping world-model shell.
+Runtime collision remains strict. BoxPhysics world models now accept validated
+open/stale-plane triangle meshes while retaining box collision; closed/planar
+validation remains required for containers. Exact absent-resource rows remain visible.
+
 The complete-level continuation now preserves the original AI invalid-ordinal
 no-op: keep verified current playback on first request, reset it on repetition,
 and expose retained requests. This supersedes the earlier blanket invalid-AI-clip

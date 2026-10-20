@@ -146,8 +146,12 @@ namespace
         CHECK(static_mesh && g.objects.get(static_mesh)->world_model->off_plane_faces > 0);
         CHECK(g.server.IntersectSegment({0, 50, -50}, {0, 50, 50}, nullptr, hit) == SegmentResult::Hit &&
               hit.object == static_mesh);
-        CHECK(!g.objects.create(g.objects.find_class("CDestructableBrush"), {}, Creation::World,
-                                {{"Name", std::string("stale-plane")}, {"BoxPhysics", true}}));
+        CHECK(g.objects.remove(static_mesh) && g.objects.finish_frame());
+        auto box_mesh = g.objects.create(g.objects.find_class("CDestructableBrush"), {}, Creation::World,
+                                         {{"Name", std::string("stale-plane")}, {"BoxPhysics", true}});
+        CHECK(box_mesh && g.objects.get(box_mesh)->world_model->off_plane_faces > 0);
+        CHECK(g.server.IntersectSegment({0, 50, -50}, {0, 50, 50}, nullptr, hit) == SegmentResult::Hit &&
+              hit.object == box_mesh);
         CHECK(!g.objects.create(g.objects.find_class("Water"), {}, Creation::World,
                                 {{"Name", std::string("stale-plane")}}));
         return true;
@@ -350,7 +354,7 @@ namespace
                     if (r->world_model->boundary_only)
                     {
                         ++count.boundary;
-                        CHECK(r->body_properties.polygon_bounds &&
+                        CHECK(((r->state.m_Flags & FLAG_BOXPHYSICS) || r->body_properties.polygon_bounds) &&
                               (r->world_model->open_edges || r->world_model->shared_edges));
                     }
                     else if (r->world_model->shared_edges)
@@ -433,12 +437,12 @@ namespace
             std::cout << name << "=" << n << '\n';
         CHECK(unreadable == 0 && counts["RotatingBrush"].created == 137 && counts["RotatingBrush"].rejected == 1 &&
               counts["RotatingBrush"].moved == 137 && counts["RotatingBrush"].filtered == 0 &&
-              counts["CDestructableBrush"].created == 2489 && counts["CDestructableBrush"].rejected == 39 &&
+              counts["CDestructableBrush"].created == 2490 && counts["CDestructableBrush"].rejected == 38 &&
               counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 50 &&
               counts["CDestructableBrush"].detonated == 50 && counts["CDestructableBrush"].spawned == 74 &&
               counts["CDestructableBrush"].compound == 3 && counts["CDestructableBrush"].dynamic == 138 &&
-              counts["CDestructableBrush"].polygon == 29 && counts["CDestructableBrush"].boundary == 1);
-        CHECK(failures["CDestructableBrush/shell"] == 1 && !failures.contains("CDestructableBrush/schema") &&
+              counts["CDestructableBrush"].polygon == 29 && counts["CDestructableBrush"].boundary == 2);
+        CHECK(!failures.contains("CDestructableBrush/shell") && !failures.contains("CDestructableBrush/schema") &&
               !failures.contains("CDestructableBrush/ambiguous") && failures["CDestructableBrush/missing"] == 37 &&
               !failures.contains("CDestructableBrush/polygon dynamics") && failures["CDestructableBrush/spawn"] == 1 &&
               counts["CDestructableBrush"].absent_spawns == 2 && !failures.contains("RotatingBrush/ambiguous"));
