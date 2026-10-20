@@ -515,7 +515,10 @@ save containing an Unsupported class is refused with its name.
 6, 7, 8, 9, 10, 11, 12, 13 → 14
 ```
 
-## Open decisions
+## Decisions
+
+The user accepted all seven recommendations below on 2026-10-20. They are
+binding for the implementation lots; the alternatives are kept for history only.
 
 1. **Save location.** The recommendation is the per-user preferences directory
    (`SDL_GetPrefPath("OpenBlood2", "Blood2")`), under `saves/retail/`:
