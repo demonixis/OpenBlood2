@@ -221,6 +221,7 @@ namespace OpenBlood2
         Objects& operator=(const Objects&) = delete;
         bool register_class(const ClassInfo& type);
         HCLASS find_class(std::string_view name) const;
+        std::vector<HCLASS> classes() const; // Registered classes in case-insensitive name order.
         bool knows(HCLASS type) const;
         static bool is_kind_of(HCLASS type, HCLASS parent);
         HOBJECT create(HCLASS type, ObjectCreateStruct state = {}, Creation reason = Creation::Runtime,

@@ -78,8 +78,11 @@ bool ClientLightFX::InitialUpdate()
     start_time = g_pServerDE->GetTime();
     settings.intensity.phase *= 3.14159265358979323846f / 180;
     settings.radius.phase *= 3.14159265358979323846f / 180;
-    if (on)
-        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | 1u | 8u);
+    // The original marks only a light that starts on (USRFLG_VISIBLE | USRFLG_SAVEABLE), so an
+    // initially-off light vanished from a restore. Decision-4 departure (save_load_contracts
+    // lot 4): every light is saveable; until its payload lands a save naming it is refused.
+    g_pServerDE->SetObjectUserFlags(m_hObject,
+                                    g_pServerDE->GetObjectUserFlags(m_hObject) | (on ? 1u : 0u) | USRFLG_SAVEABLE);
     return g_pServerDE->PublishLightEffect(m_hObject, settings);
 }
 DDWORD ClientLightFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)

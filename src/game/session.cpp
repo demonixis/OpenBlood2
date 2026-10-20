@@ -39,6 +39,8 @@ namespace OpenBlood2
                 return "Omitted: absent original class";
             case EntryState::MissingResource:
                 return "Omitted: missing authored resource";
+            case EntryState::SavedState:
+                return "Restored from the save";
             case EntryState::Failed:
                 return "Creation failed";
         }
@@ -63,9 +65,29 @@ namespace OpenBlood2
             return objects.fail(ObjectError::Busy, error);
         }
         WorldRequest request;
+        return decode_world_request(message, request, error) && load_request(request, error);
+    }
+    bool GameSession::load_saved_world(const WorldRequest& request, std::string& error)
+    {
+        if (request.load_type != LOADTYPE_RESTORESAVE)
+        {
+            error = "A saved-world load requires LOADTYPE_RESTORESAVE";
+            return false;
+        }
+        return load_request(request, error);
+    }
+    bool GameSession::load_request(const WorldRequest& request, std::string& error)
+    {
+        if (objects.busy())
+        {
+            error = "World replacement during a callback is forbidden";
+            return objects.fail(ObjectError::Busy, error);
+        }
+        // Original LoadWorld without LOADWORLD_LOADWORLDOBJECTS, then RestoreGame (save/load lot 4).
+        const bool restore = request.load_type == LOADTYPE_RESTORESAVE;
         PreparedWorld next;
         // Structural CPU preparation is shared with read-only destination inspection.
-        if (!decode_world_request(message, request, error) || !prepare_world(request, resources, next, error))
+        if (!prepare_world(request, resources, next, error))
             return false;
         if (!unload_world())
         {
@@ -83,11 +105,25 @@ namespace OpenBlood2
         server_shell.PreStartWorld();
         if (resources.find("models/characters/caleb.abc"))
             models.load("models/characters/caleb.abc", preview_model, preview_error);
-        server.set_game_settings(request.difficulty, request.game_type);
-        trace = {"Client StartNewWorld load-command excerpt -> CMSG_LOADWORLD (108)",
-                 "Server LoadWorld read-order excerpt -> fresh single-player settings",
+        if (!restore)
+            server.set_game_settings(request.difficulty, request.game_type);
+        // The saved console, then the clock, generator, global force and world-time origin:
+        // after unload_world's reset (generator seed 1, origin, sky) and before the first
+        // always-load object, which therefore starts from them (D9, D10).
+        else if (!server.restore_image_state(SaveStoreSlot::Current, true, error))
+        {
+            error = "Saved console and clock: " + error;
+            server.trace_enabled = false;
+            unload_world();
+            return false;
+        }
+        trace = {restore ? "Client load-command excerpt -> CMSG_LOADWORLD (108), LOADTYPE_RESTORESAVE"
+                         : "Client StartNewWorld load-command excerpt -> CMSG_LOADWORLD (108)",
+                 restore ? "Server LoadWorld restore branch -> saved console and clock before any object"
+                         : "Server LoadWorld read-order excerpt -> fresh single-player settings",
                  "REZ exact-path resolution -> DAT v56 structural validation",
-                 "World properties -> original MID_PRECREATE / MID_INITIALUPDATE"};
+                 restore ? "CF_ALWAYSLOAD world properties -> original MID_PRECREATE / MID_INITIALUPDATE"
+                         : "World properties -> original MID_PRECREATE / MID_INITIALUPDATE"};
         for (const auto& source : world.objects)
         {
             WorldEntry entry;
@@ -104,6 +140,14 @@ namespace OpenBlood2
             {
                 entry.state = EntryState::AbsentOriginalClass;
                 entry.detail = "No original base-game class registration; loader skips this source row";
+            }
+            else if (auto type = objects.find_class(source.class_name);
+                     type && restore && save_support(type) != SaveSupport::AlwaysLoad)
+            {
+                // A restore loads only CF_ALWAYSLOAD rows; this object comes from the save or stays gone.
+                entry.state = EntryState::SavedState;
+                entry.detail = std::string("Not CF_ALWAYSLOAD (") + save_support_name(save_support(type)) +
+                               "): restored from the save or absent";
             }
             else if (auto type = objects.find_class(source.class_name))
             {
@@ -317,6 +361,24 @@ namespace OpenBlood2
                         entry.detail = "NPC placement against the completed world failed";
                         ai->RuntimeFailure(entry.detail);
                     }
+        if (restore)
+        {
+            // RestoreGame immediately: no simulation step, and no deferred removal pending.
+            if (objects.pending_count() || !server_shell.RestoreGame(SAVETYPE_CURRENT))
+            {
+                error = objects.pending_count() ? "Deferred removals pending after the always-load objects"
+                                                : "RestoreObjects: " + server.last_restore.error;
+                server.trace_enabled = false;
+                unload_world();
+                return false;
+            }
+            // Original LoadWorld after RestoreGame: no start point, revisit or autosave.
+            server.SetGameConVar("GAME_GOTOSTARTPOINT", "0");
+            server.SetGameConVar("GAME_REVISITING", "0");
+            server.SetGameConVar("GAME_DOAUTOSAVE", "0");
+            trace.push_back("Server RestoreGame -> RestoreObjects(Current.sav, 0, RESTORETIME): " +
+                            std::to_string(server.last_restore.records) + " records");
+        }
         if (!server_shell.PostStartWorld())
         {
             error = "Original shell path snapshot failed: " + server_shell.paths.error();

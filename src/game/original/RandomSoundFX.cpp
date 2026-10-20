@@ -55,8 +55,15 @@ DDWORD RandomSoundFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         if ((reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP) && !ReadProp())
             return 0;
     }
-    else if (message == MID_INITIALUPDATE && on)
-        ScheduleWait();
+    else if (message == MID_INITIALUPDATE)
+    {
+        // The original never marks RandomSoundFX saveable, so it vanished from a restore.
+        // Decision-4 departure (save_load_contracts lot 4): it is saveable; until its payload
+        // lands a save naming it is refused.
+        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | USRFLG_SAVEABLE);
+        if (on)
+            ScheduleWait();
+    }
     else if (message == MID_UPDATE && !Update())
         g_pServerDE->RemoveObject(m_hObject);
     return B2BaseClass::EngineMessageFn(message, data, reason);

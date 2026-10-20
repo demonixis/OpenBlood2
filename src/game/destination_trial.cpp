@@ -105,6 +105,8 @@ namespace OpenBlood2
                     case EntryState::Failed:
                         ++next.failed;
                         break;
+                    case EntryState::SavedState: // Restore mode only; a rehearsal loads every row.
+                        break;
                 }
                 next.entries.push_back(std::move(row));
             }

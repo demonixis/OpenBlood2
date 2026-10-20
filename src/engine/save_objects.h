@@ -1,6 +1,7 @@
 #pragma once
 #include "engine/objects.h"
 #include "engine/save_file.h"
+#include "engine/save_fingerprint.h"
 #include <array>
 #include <cstdint>
 #include <optional>
@@ -115,6 +116,11 @@ namespace OpenBlood2
     // saved one: the returned deadline d satisfies remaining_delay(clock, d) == remaining.
     double remaining_delay(double clock, double deadline);
     double restored_deadline(double clock, double remaining);
+
+    // The build's class schema for the fingerprint check (lot 4): every registered class
+    // declared Original with a payload version. AlwaysLoad, NotSaved and Unsupported classes
+    // never appear in OBJS, so they are not part of it.
+    SaveClassSchema save_class_schema(const Objects&);
 
     // The original's three logical save files (BloodServerShell.cpp: Save\Current\Current.sav,
     // Auto.sav and the level-change Keep.sav). Lot 6 maps them to slot files.

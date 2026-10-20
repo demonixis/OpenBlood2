@@ -54,6 +54,18 @@ foreach(case codec deadlines roundtrip order dispatch phases purity failures sto
     set_tests_properties(save_objects.${case} PROPERTIES LABELS "headless;objects;save" TIMEOUT 120)
 endforeach()
 
+add_executable(save_session_tests save_session_tests.cpp)
+target_link_libraries(save_session_tests PRIVATE blood2_game)
+blood2_project_options(save_session_tests)
+foreach(case declarations marking refusals promotion order console failures)
+    add_test(NAME save_session.${case} COMMAND save_session_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/save-session-${case}")
+    set_tests_properties(save_session.${case} PROPERTIES LABELS "headless;objects;save" TIMEOUT 120)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME save_session.private COMMAND save_session_tests private "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(save_session.private PROPERTIES LABELS "private;headless;save" TIMEOUT 300)
+endif()
+
 add_executable(save_file_tests save_file_tests.cpp)
 target_link_libraries(save_file_tests PRIVATE engine)
 blood2_project_options(save_file_tests)

@@ -31,6 +31,48 @@ bool CBloodServerShell::PostStartWorld()
     world_started = true;
     return true;
 }
+namespace
+{
+    // g_szSavePath + g_szCurrentSaveFile / g_szAutoSaveFile.
+    const char* save_path(DBYTE bySaveType)
+    {
+        return bySaveType == SAVETYPE_CURRENT ? "Save\\Current\\Current.sav"
+               : bySaveType == SAVETYPE_AUTO  ? "Save\\Current\\Auto.sav"
+                                              : nullptr;
+    }
+} // namespace
+bool CBloodServerShell::SaveGame(DBYTE bySaveType, bool bSavePlayers, bool bSaveConsole)
+{
+    const char* szSavePath = save_path(bySaveType);
+    if (!szSavePath)
+        return false;
+    // Make a list of savable objects, active then inactive.
+    ObjectList* pObjectList = server_.CreateObjectList();
+    if (!pObjectList)
+        return false;
+    const HCLASS hPlayer = bSavePlayers ? nullptr : server_.GetClass("CPlayerObj"); // Original IsPlayer.
+    const auto add = [&](HOBJECT hObj)
+    {
+        // Can this object be saved?
+        if ((server_.GetObjectUserFlags(hObj) & USRFLG_SAVEABLE) &&
+            (bSavePlayers || !server_.IsKindOf(server_.GetObjectClass(hObj), hPlayer)))
+            if (ObjectLink* ol = server_.AddObjectToList(pObjectList, hObj))
+                ol->m_hObject = hObj;
+    };
+    for (HOBJECT hObj = server_.GetNextObject(nullptr); hObj; hObj = server_.GetNextObject(hObj))
+        add(hObj);
+    for (HOBJECT hObj = server_.GetNextInactiveObject(nullptr); hObj; hObj = server_.GetNextInactiveObject(hObj))
+        add(hObj);
+    const DDWORD dwSaveFlags = bSaveConsole ? SAVEOBJECTS_SAVEGAMECONSOLE | SAVEOBJECTS_SAVEPORTALS : 0;
+    const bool bRet = server_.SaveObjects(szSavePath, pObjectList, 0, dwSaveFlags) == DE_OK;
+    server_.RelinquishList(pObjectList);
+    return bRet;
+}
+bool CBloodServerShell::RestoreGame(DBYTE bySaveType)
+{
+    const char* szSavePath = save_path(bySaveType);
+    return szSavePath && server_.RestoreObjects(szSavePath, 0, RESTOREOBJECTS_RESTORETIME) == DE_OK;
+}
 CPlayerObj* CBloodServerShell::Player(HCLIENT client)
 {
     auto object = server_.GetClientUserData(client);

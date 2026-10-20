@@ -299,6 +299,14 @@ namespace OpenBlood2
         const auto it = classes_.find(name);
         return it == classes_.end() ? nullptr : it->second;
     }
+    std::vector<HCLASS> Objects::classes() const
+    {
+        std::vector<HCLASS> out;
+        out.reserve(classes_.size());
+        for (const auto& [name, type] : classes_)
+            out.push_back(type);
+        return out;
+    }
     bool Objects::knows(HCLASS type) const
     {
         return std::any_of(classes_.begin(), classes_.end(), [type](const auto& p) { return p.second == type; });

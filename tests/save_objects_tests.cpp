@@ -943,12 +943,14 @@ namespace
               report.refused[1] == "SaveNotSaved (NotSaved)" && report.refused[2] == "SaveUnsupported (Unsupported)");
         CHECK(report.error.find("SaveUnsupported") != std::string::npos);
         CHECK(*g.server.save_store.find(SaveStoreSlot::Current) == previous); // Previous image kept.
-        // An original class keeps the Unsupported default until its lot declares it.
+        // An original class keeps the Unsupported default until its lot declares it; lot 4
+        // declared the CF_ALWAYSLOAD ones, which are skipped.
         CHECK(save_support(g.objects.find_class("CPlayerObj")) == SaveSupport::Unsupported);
+        auto trigger = g.objects.create(g.objects.find_class("Trigger"), {}, Creation::World, {});
         auto spot = g.objects.create(g.objects.find_class("CameraSpot"), {}, Creation::World, {});
-        std::vector<HOBJECT> original{spot, b};
-        CHECK(spot && !save(g, original, report) &&
-              report.refused == std::vector<std::string>{"CameraSpot (Unsupported)"});
+        std::vector<HOBJECT> original{trigger, spot, b};
+        CHECK(trigger && spot && !save(g, original, report) &&
+              report.refused == std::vector<std::string>{"Trigger (Unsupported)"} && report.always_load == 1);
         // A stale handle in the list is an explicit refusal.
         CHECK(g.objects.remove(u) && g.objects.finish_frame());
         std::vector<HOBJECT> stale{b, u};
@@ -1063,9 +1065,12 @@ namespace
             CHECK(authored && authored_time == clock.time);
             hooks.initial = nullptr;
             CHECK(!g.server.restore_image_state(SaveStoreSlot::Current, true, error));
+            g.server.SetGameConVar("PhaseVar", "authored"); // What WorldProperties' precreate does.
             RestoreObjectsReport report;
             CHECK(g.server.restore_objects(current, 0, RESTOREOBJECTS_RESTORETIME, report));
-            CHECK(!report.clock_restored && !report.console_restored && report.records == 1);
+            // The saved console wins again over the always-load objects (lot 4); the clock stays.
+            CHECK(!report.clock_restored && report.console_restored && report.records == 1);
+            CHECK(std::string(g.server.GetVarValueString(g.server.GetGameConVar("PhaseVar"))) == "saved");
             CHECK(g.objects.get(report.objects[0])->due == clock.time + 2 && g.objects.get(authored));
         }
         GameSession g;

@@ -5,6 +5,9 @@
 namespace OpenBlood2
 {
     inline constexpr DBYTE CMSG_LOADWORLD = 108, LOADTYPE_NEW_GAME = 1, LOADTYPE_NEW_LEVEL = 2;
+    // Original SharedDefs.h restore type. Only GameSession::load_game builds it; the message
+    // parser still refuses it (the menus and file slots are save/load lot 6).
+    inline constexpr DBYTE LOADTYPE_RESTORESAVE = 3;
     struct WorldRequest
     {
         std::string filename;
@@ -21,6 +24,7 @@ namespace OpenBlood2
         MissingWorldModel,   // Engine creation rejected; source row retained, no runtime instance.
         AbsentOriginalClass, // Named, source-audited retired class; never a registered class.
         MissingResource,     // Known invalid authored references retained without a runtime instance.
+        SavedState,          // Restore mode: not CF_ALWAYSLOAD; the object comes from the save or is gone.
         Failed
     };
     const char* entry_state_name(EntryState state);

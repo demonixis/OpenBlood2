@@ -512,6 +512,23 @@ namespace OpenBlood2
     };
 
     bool register_original_classes(Objects& objects);
+    // An in-memory saved game (save_load_contracts lot 4): the normalized world path, the
+    // game-data fingerprint taken with it and the SaveObjects image of Current.sav. Lot 6
+    // wraps it in META and a slot file.
+    struct GameSave
+    {
+        std::string world_path;
+        SaveFingerprint fingerprint;
+        SaveImage image;
+    };
+    struct GameLoadReport : WorldValidation
+    {
+        std::uint64_t attempts = 0, committed = 0, rejected = 0, source_revision = 0, destination_revision = 0;
+        std::uint64_t source_store_revision = 0, destination_store_revision = 0;
+        std::string source_world, world, stage, error; // `stage` names the step that refused.
+        bool world_loaded = false, restored = false, cleanup_complete = false, source_retained = true;
+        std::uint32_t records = 0; // Restored OBJS records.
+    };
     class GameSession
     {
       public:
@@ -556,7 +573,24 @@ namespace OpenBlood2
                                    DBYTE game_type = 0);
         bool rehearse_destination(const WorldMessage&, std::string_view start, std::string& error);
         bool inspect_destination(const WorldMessage&, std::string_view start, std::string& error);
+        // Saves the bound idle session through the original shell SaveGame (Current.sav,
+        // players and console). Refused, naming the classes, when a saveable object's class
+        // has no save support or a supported class's object is not marked USRFLG_SAVEABLE.
+        bool save_game(GameSave&, std::string& error);
+        std::uint64_t game_saves = 0; // Successful save_game calls.
+        GameLoadReport game_load;
+        // Loads `save` into a candidate session and promotes it exactly like NEW_LEVEL; any
+        // failure destroys the candidate under its own adapter and leaves `current` unchanged.
+        // Called only at an owning frame boundary. `extra_classes` are registered in the
+        // candidate after the original classes (tests and tools; the game passes none).
+        static bool load_game(std::unique_ptr<GameSession>& current, const GameSave& save, std::string& error,
+                              std::span<const ClassInfo* const> extra_classes = {});
         bool load_world(const WorldMessage& message, std::string& error);
+        // Restore mode (LOADTYPE_RESTORESAVE): only CF_ALWAYSLOAD rows are created, every other
+        // row is SavedState. The saved console and clock are applied after the world reset and
+        // before those rows; RestoreGame then runs RestoreObjects with no step in between.
+        bool load_saved_world(const WorldRequest& request, std::string& error);
+        bool load_request(const WorldRequest& request, std::string& error);
         bool request_world(std::string_view name, std::string& error);
         bool run_world(std::string& error);
         bool enter_player(std::string& error);

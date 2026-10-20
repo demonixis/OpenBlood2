@@ -20,8 +20,12 @@ namespace OpenBlood2
         error.clear();
         std::string normalized;
         const bool custom = request.game_type == GAMETYPE_CUSTOM && request.load_type == LOADTYPE_NEW_GAME;
-        if ((request.game_type != GAMETYPE_SINGLE && !custom) || request.difficulty > 3 ||
-            (request.load_type != LOADTYPE_NEW_GAME && request.load_type != LOADTYPE_NEW_LEVEL) ||
+        // A restore keeps the saved single-player game type (save_load_contracts "Scope").
+        const bool restore = request.load_type == LOADTYPE_RESTORESAVE &&
+                             (request.game_type == GAMETYPE_SINGLE || request.game_type == GAMETYPE_ACTION ||
+                              request.game_type == GAMETYPE_CUSTOM);
+        if ((request.game_type != GAMETYPE_SINGLE && !custom && !restore) || request.difficulty > 3 ||
+            (request.load_type != LOADTYPE_NEW_GAME && request.load_type != LOADTYPE_NEW_LEVEL && !restore) ||
             !resource_path(request.filename, normalized) || normalized != request.filename ||
             !normalized.starts_with("worlds/") || !normalized.ends_with(".dat"))
         {

@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-20",
+  "scope": "Save/load lot 4: save-support declarations, USRFLG_SAVEABLE marking, the shell SaveGame/RestoreGame, the restore-mode world and the GameSession::save_game/load_game candidate transaction. New OpenBlood2 code written from the save/load contract and its audit; the references below were consulted for flags, names, values and ordering only. No original or reference-tree implementation was imported beyond the selective SaveGame/RestoreGame shell excerpts recorded in the provenance ledger.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/BloodServerShell.cpp",
+      "source_sha256": "c431dfea17da8c3100ac3921e03d9bfe88c2d639cf7cba0f7763834de5681e1a",
+      "purpose": "LoadWorld restore branch (no LOADWORLD_LOADWORLDOBJECTS, RestoreGame after LoadWorld, GAME_GOTOSTARTPOINT/REVISITING/DOAUTOSAVE afterwards), SaveGame (USRFLG_SAVEABLE, GetNextObject then GetNextInactiveObject, players, SAVEGAMECONSOLE | SAVEPORTALS) and RestoreGame (RESTORETIME); the order that makes the saved console win over WorldProperties."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/WorldProperties.cpp",
+      "source_sha256": "6777df8f1e7d27100568f17a82a37f7bb2094d8a924a6063d0afe0b098a46d22",
+      "purpose": "CF_ALWAYSLOAD; console variables and SetGlobalForce set in MID_PRECREATE (the only SetGlobalForce caller in the object DLL)."
+    },
+    {
+      "source": "sources/lithtech/runtime/server/src/game_serialize.cpp",
+      "source_sha256": "f0d9b69077e9d99037c252882b118238a58a004f0a943106afdac633d82893f8",
+      "purpose": "Later-runtime corroboration: the save header holds clocks and the console but no global force; sm_RestoreConsoleVars runs inside RestoreObjects, after the world objects exist. Not a 1998 trace."
+    },
+    {
+      "source": "sources/lithtech/Blood2/AppHeaders/serverobj_de.h",
+      "source_sha256": "f065e20774eaac58a135c7920d14acb2dc2d1b2bb224be869c912758771b1d9a",
+      "purpose": "CF_ALWAYSLOAD = 1<<3, inherited by subclasses, never saved."
+    },
+    {
+      "source": "sources/lithtech/Blood2/AppHeaders/server_de.h",
+      "source_sha256": "3b61477e2c14f331f0847ae6cbe48e2a93b6e25444bb7956c83c00f71d409275",
+      "purpose": "GetNextInactiveObject signature."
+    },
+    {
+      "source": "sources/lithtech/Blood2/AppHeaders/engineobjects.c",
+      "source_sha256": "70730e7e8aa704de5c6ddfa40194227832260812f951a49fd76e7735b530f75f",
+      "purpose": "Engine built-ins declared CF_ALWAYSLOAD (Model, WorldModel, Container, Sprite, Sound, StartPoint, DemoSkyWorldModel, SkyPointer, FogSphere)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/Shared/ClientServerShared.h",
+      "source_sha256": "7c7cc762788dac33785d88cbae32f56489d35c731e753ef25baa3cc60e644606",
+      "purpose": "USRFLG_SAVEABLE = 1<<3."
+    },
+    {
+      "source": "sources/lithtech/Blood2/Shared/SharedDefs.h",
+      "source_sha256": "24c3d2752c18bf884afa0f376a129e68d0885b13da93410253e69db46d549423",
+      "purpose": "LOADTYPE_RESTORESAVE = 3, SAVETYPE_AUTO = 0, SAVETYPE_CURRENT = 1."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ClientLightFX.cpp",
+      "source_sha256": "4610ac78791d766785dbcfe4d8893ce74d5474e408f45606b2a4a2cbe095b2cb",
+      "purpose": "USRFLG_VISIBLE | USRFLG_SAVEABLE only for a light that starts on (the decision-4 departure marks every light)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/RandomSoundFX.cpp",
+      "source_sha256": "f91b9ba5740be333c686cbcbdebe52dfc5bc9f0abedd5043b2ba2578a1b3bc9e",
+      "purpose": "Never marked USRFLG_SAVEABLE although it has Save/Load (the decision-4 departure marks it)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Door.cpp",
+      "source_sha256": "790e77cd68450b4dd49b853931c987055aa65f7f859b57465fc80a8e650cfcb9",
+      "purpose": "InitialUpdate ORs USRFLG_SAVEABLE into the existing user flags."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Trigger.cpp",
+      "source_sha256": "c6cb75d4154c4c03c4166c96de6aecba68303750c5b6b89cb8c78ba5c6704596",
+      "purpose": "InitialUpdate ORs USRFLG_SAVEABLE into the existing user flags."
+    }
+  ]
+}

@@ -160,7 +160,8 @@ namespace
         auto a = create(g, "ClientLightFX", {{"LifeTime", .2f}});
         auto b = create(g, "ClientLightFX", {{"LifeTime", .2f}, {"LightSwitch", false}});
         CHECK(a && b);
-        CHECK(!g.objects.get(b)->scheduled && !(g.objects.get(b)->user_flags & 9));
+        // Off: not visible, but saveable (save/load decision-4 departure; the original left it unmarked).
+        CHECK(!g.objects.get(b)->scheduled && (g.objects.get(b)->user_flags & 9) == USRFLG_SAVEABLE);
         CHECK(command(g, a, "OFF") && command(g, b, "ON") && !g.objects.get(b)->scheduled);
         CHECK(g.step(.6) && !g.objects.get(a) && g.objects.get(b) && g.server.GetLightEffect(b)->visible);
         CHECK(g.step(.6) && g.objects.get(b));

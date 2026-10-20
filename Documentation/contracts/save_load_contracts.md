@@ -1,13 +1,15 @@
 # Save and load
 
 Status: **design contract for roadmap task 3.3. Lots 1 (save-message primitives), 2
-(container and fingerprint) and 3 (engine records and the clock) are implemented; see
-their evidence ([lot 1](../implementation/reports/save_load_messages.md),
+(container and fingerprint), 3 (engine records and the clock) and 4 (restore-mode world
+and candidate transaction) are implemented; see their evidence
+([lot 1](../implementation/reports/save_load_messages.md),
 [lot 2](../implementation/reports/save_load_container.md),
-[lot 3](../implementation/reports/save_load_records.md)). `SaveObjects` and
-`RestoreObjects` work over an in-memory store with synthetic classes; every original
-class is still Unsupported, so no save or load reaches the game yet. The other lots are
-pending.** The Save and Load screens stay disabled until the lots below land. The
+[lot 3](../implementation/reports/save_load_records.md),
+[lot 4](../implementation/reports/save_load_session.md)). `GameSession::save_game` and
+`load_game` save and load in memory through a candidate session; every original class is
+AlwaysLoad, NotSaved or Unsupported, so a save of a real game is refused by name, and no
+save reaches the game or a file yet. The other lots are pending.** The Save and Load screens stay disabled until the lots below land. The
 [audit](../implementation/save_load_audit/readme.md) is the evidence for every
 original rule cited here; its [source ledger](../implementation/sources/save_load_audit_sources.json)
 records the audited files. Read [level replacement](level_change_contracts.md),
@@ -250,7 +252,9 @@ engine-record capture and application.
   exists; lot 4 runs it after the restore-mode load's world-time reset and before the
   first always-load object. `RestoreObjects` runs it itself on an empty registry. With
   objects present, `RESTOREOBJECTS_RESTORETIME` requires the saved clock to be current
-  (restored and not advanced) and leaves CONS alone; without it the clock is kept.
+  (restored and not advanced); without it the clock is kept. With objects present the saved
+  CONS is applied again, so it wins over what the always-load objects set
+  ([lot 4](#implemented-restore-mode-world-and-transaction-lot-4)).
 - **Logical store.** The original paths `Save\Current\Current.sav`, `Auto.sav` and
   `Keep.sav` (case and separator insensitive) name the three images of the adapter's
   `SaveStore`. An image holds dwParam, flags, CONS (only with
@@ -267,7 +271,8 @@ engine-record capture and application.
   listed follow in link-creation and attachment-creation order.
 - **Save support.** `ClassInfo::save` and `payload_version` hold the declaration;
   AlwaysLoad is inherited like `CF_ALWAYSLOAD`. Every class defaults to Unsupported;
-  lot 4 declares the registered classes.
+  lot 4 declared the registered classes
+  ([lot 4](#implemented-restore-mode-world-and-transaction-lot-4)).
 - **Purity.** While `MID_SAVEOBJECT` runs, the registry refuses creation, removal,
   scheduling, links, attachments, stepping and nested message dispatch, and
   `trace_service` admits only a reviewed set: the message primitives, strings and
@@ -598,6 +603,109 @@ A failure at any step from 2 to 12 destroys the candidate under its own adapter.
 It then resumes the source's globals and binding and reports the error. The
 source session's objects, identities, clocks, voices and revision are unchanged.
 Process-wide counters (message, audio and effect IDs) are never rewound.
+
+### Implemented restore-mode world and transaction (lot 4)
+
+`GameSession::save_game` and `GameSession::load_game` (`src/game/saved_game.cpp`) work on an
+in-memory `GameSave`: the normalized world path, the fingerprint, and the `SaveObjects` image
+of `Current.sav`. Lot 6 wraps it in META and a slot file; nothing in the game calls them yet.
+
+- **Save support.** `ClassInfo::save` is the declaration. AlwaysLoad is the original
+  `CF_ALWAYSLOAD` and is inherited.
+  - AlwaysLoad: StartPoint, GameStartPoint, PathPoint, Key, SmellHint, ExitHint,
+    WorldProperties, CameraSpot, ParticleSystem, PolyGrid and SparksObj, and the engine's
+    Model, Container, Sprite, Sound, DemoSkyWorldModel and SkyPointer. Script, LightFX,
+    WreckingBall, SoccerGoal, WorldModel and FogSphere are not registered, and no shipped
+    world places them.
+  - NotSaved (the original never marks them saveable and loses them on a restore): BaseClass,
+    B2BaseClass, CClientSFX, CClientSplatFX, CGib, CHandWeaponModel, FlagObject, FlagStand
+    and NagaCeilingDebris.
+  - Every other registered class is Unsupported. The build's class schema
+    (`save_class_schema`, the Original classes with their payload versions) is therefore
+    empty until a class lot declares one.
+- **Marking.** The ports set `USRFLG_SAVEABLE` where the 25 original files do. Door and
+  Trigger now add it to the existing user flags, as the original does, instead of replacing
+  them. Two decision-4 departures mark what the original left unmarked: every light of the
+  ClientLightFX family (the original marks only a light that starts on) and RandomSoundFX.
+  Until lot 10 supplies their payloads, a save that includes them is refused by name; they
+  are never silently lost.
+- **Save list.** The original shell `SaveGame` lists every `USRFLG_SAVEABLE` object, first
+  through `GetNextObject`, then through `GetNextInactiveObject`. The latter is the original
+  inactive enumeration, now a bounded service. Players are included. It then calls
+  `SaveObjects(Current.sav, list, 0, SAVEGAMECONSOLE | SAVEPORTALS)`. `RestoreGame` calls
+  `RestoreObjects(Current.sav, 0, RESTORETIME)`.
+- **save_game admission.**
+  - The session must be bound, outside callbacks, with a loaded world, no pending level
+    change and no live message or deferred removal.
+  - The game type must be single-player (SINGLE, ACTION or CUSTOM; D12) and the edition retail.
+  - A live object whose class is Original or Unsupported but lacks `USRFLG_SAVEABLE` refuses
+    the save by name. The shell's list would otherwise drop it silently.
+  - The fingerprint is built before `SaveGame`, so a refused save leaves the store unchanged.
+  - The player is not required yet (lot 5). CPlayerObj is Unsupported, so a world with a
+    player is refused by name.
+- **Restore-mode world.** `load_saved_world` takes `LOADTYPE_RESTORESAVE` (3, the original
+  value) with the saved game type and difficulty. The message parser still refuses that load
+  type.
+  1. The DAT and collision are prepared as usual, then the world unload resets the generator
+     (seed 1), the world-time origin, the sky and the effects.
+  2. CONS, then CLCK, come from the candidate's `Current` image (`restore_image_state`). The
+     always-load rows therefore start from the saved clock, origin and generator, and the
+     saved difficulty and game type filter them.
+  3. Only rows whose class is AlwaysLoad are created. Every other registered row is
+     `SavedState`, which startup accounting counts as covered. A non-always-load row whose BSP
+     is missing is also SavedState: it was never created, so no save can hold it.
+     Unregistered, editor-only and absent classes keep their usual meaning.
+  4. The always-load frame is finished. A deferred removal still pending then refuses the
+     load.
+  5. The shell's `RestoreGame` runs immediately, with no simulation step in between.
+  6. `GAME_GOTOSTARTPOINT`, `GAME_REVISITING` and `GAME_DOAUTOSAVE` are set to 0. Then
+     `PostStartWorld` runs and the music catalog is rebuilt from the restored console.
+- **Console and global force.** This settles the open question from lot 3.
+  - The original `LoadWorld` creates the always-load objects first; `RestoreGame` then calls
+    `RestoreObjects`, which restores the saved console. In the later runtime this is
+    `sm_RestoreConsoleVars`, inside RestoreObjects. The saved console therefore wins over what
+    WorldProperties sets at precreate. `RestoreObjects` applies CONS again when objects
+    already exist, and rolls it back on failure.
+  - The original never saves the global force: the later runtime's save header holds only
+    the clocks and the console. Only WorldProperties sets it, so its authored value stands.
+    CLCK's force is applied before the objects and WorldProperties then overrides it, as in
+    the original. A world without WorldProperties keeps the saved force.
+  - Always-load objects that draw random numbers draw from the restored generator (D10). A
+    save right after a load therefore differs in CLCK only by the generator, and in CONS only
+    by the three shell variables above. OBJS, LINK and ATCH are byte-identical.
+- **load_game.** It runs at an owning frame boundary on the bound session, which may have no
+  world. The stages, as `game_load.stage` names them:
+  1. *admission*: no pending level change, world revisions not exhausted, the retail
+     edition, a normalized world DAT path, a full save (dwParam 0) whose console holds a
+     single-player game type and a difficulty of 0–3, and a fingerprint class list equal to
+     the image's.
+  2. *fingerprint*: `check_fingerprint` against the installation and the build's schema (the
+     original classes plus any extra classes).
+  3. Isolation, exactly as NEW_LEVEL: the seven list/count pairs, the active camera, the five
+     AI table owners, the CTF state and the binding.
+  4. *candidate*: a new session with a copy of the resource index and its own copy of the
+     source's `SaveStore`; the loaded image becomes its `Current`. The source's store is not
+     touched (D2).
+  5. *world* and *restore*: the restore-mode world above.
+  6. *player*: a record with the local-client flag is refused, because the restored-client
+     association is lot 5. A candidate is never promoted with an unattached player.
+  7. *validation*: `check_world_initialization` (dispositions and unavailable services), NPC
+     runtime failures, no pending level change or live message, music errors, and the strict
+     presentation preflight.
+  8. *audio*, then promotion as NEW_LEVEL. The source's queued audio is cleared and its output
+     transferred; this is the last step that can fail. The source is destroyed under its own
+     adapter, and the candidate is bound with `world_revision` one above the source's.
+
+  A failure at stage 4 or later destroys the candidate under its own adapter, then resumes the
+  source's globals and binding. The source's objects, identities, clock, generator, console,
+  voices, store, lists and revision are unchanged. The extra-class parameter registers test or
+  tool classes in the candidate; the game passes none. On success the caller clears UI
+  selections, queued commands and input ownership, and excludes the preparation time from the
+  next delta, as after a NEW_LEVEL commit (lot 6 wires this).
+- **Real worlds.** 50 of the 58 mounted worlds bind their SkyPointers to Door or
+  CDestructableBrush objects, which only a save can supply. Until lot 8, their
+  always-load-only restore fails the sky preflight. SubwayA, SteamTunnels, SubwayB, SubwayC
+  and PowerStation restore from an always-load-only image, then save and load again.
 
 ## Restored and regenerated state
 

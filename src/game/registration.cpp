@@ -97,6 +97,12 @@ namespace OpenBlood2
         {
             return std::make_unique<T>();
         }
+        // Save support (save_load_contracts lot 4). AlwaysLoad is the original CF_ALWAYSLOAD
+        // (inherited): the registered game classes of the original list and the engine
+        // built-ins, rebuilt from the DAT on a restore. NotSaved: the original never marks the
+        // class USRFLG_SAVEABLE and a restore loses it (bases, gibs, transient effects, CTF
+        // flags). Every other class stays Unsupported until its lot supplies Original bodies.
+        //
         // Original registration defaults. Optional BaseClass reader properties are
         // declared without injecting values that would override ObjectCreateStruct.
         const ClassInfo base{"BaseClass",
@@ -119,7 +125,8 @@ namespace OpenBlood2
                               // Retired editor flag on older DAT rows (BB_BloodArena, BB_Bodies,
                               // BB_Midgard). No original class declares or reads it: B2BaseClass reads
                               // TypeActionMode. Like the engine prop list, keep it unread, never defaulted.
-                              {"TypeAction", false, false}}};
+                              {"TypeAction", false, false}},
+                             SaveSupport::NotSaved};
         const ClassInfo sky_model{"DemoSkyWorldModel",
                                   &base,
                                   construct<DemoSkyWorldModel>,
@@ -128,22 +135,27 @@ namespace OpenBlood2
                                    {"Index", std::int32_t(0)},
                                    {"InnerPercentX", .1f},
                                    {"InnerPercentY", .1f},
-                                   {"InnerPercentZ", .1f}}};
-        const ClassInfo sky_pointer{"SkyPointer", &base, construct<SkyPointer>, []
+                                   {"InnerPercentZ", .1f}},
+                                  SaveSupport::AlwaysLoad};
+        const ClassInfo sky_pointer{"SkyPointer", &base, construct<SkyPointer>,
+                                    []
                                     {
                                         auto p = sky_model.properties;
                                         p.push_back({"SkyObjectName", std::string{}, true, 98});
                                         return p;
-                                    }()};
+                                    }(),
+                                    SaveSupport::AlwaysLoad};
         const ClassInfo builtin_model{
             "Model",
             &base,
             construct<BuiltinModel>,
-            {{"Filename", std::string{}}, {"Skin", std::string{}}, {"Flags", std::int32_t(FLAG_VISIBLE)}}};
+            {{"Filename", std::string{}}, {"Skin", std::string{}}, {"Flags", std::int32_t(FLAG_VISIBLE)}},
+            SaveSupport::AlwaysLoad};
         const ClassInfo builtin_container{"Container",
                                           &base,
                                           construct<BuiltinContainer>,
-                                          {{"Flags", std::int32_t(FLAG_VISIBLE)}, {"ContainerCode", std::int32_t(0)}}};
+                                          {{"Flags", std::int32_t(FLAG_VISIBLE)}, {"ContainerCode", std::int32_t(0)}},
+                                          SaveSupport::AlwaysLoad};
         const ClassInfo builtin_sprite{"Sprite",
                                        &base,
                                        construct<BuiltinSprite>,
@@ -151,7 +163,8 @@ namespace OpenBlood2
                                         {"Flags", std::int32_t(FLAG_VISIBLE)},
                                         {"Scale", DVector{1, 1, 1}},
                                         {"Color", DVector{255, 255, 255}},
-                                        {"Alpha", 1.0f}}};
+                                        {"Alpha", 1.0f}},
+                                       SaveSupport::AlwaysLoad};
         const ClassInfo shockwave_projectile{
             "CBehemothShockwaveProjectile", &base, construct<CBehemothShockwaveProjectile>, {}};
         const ClassInfo remote{"CRemoteBomb", &base, construct<CRemoteBomb>, {}};
@@ -179,7 +192,8 @@ namespace OpenBlood2
             "CNagaSpikeProjectile", &base, construct<CNagaSpikeProjectile>, {}};
         const ClassInfo campaign_CNagaDebrisProjectile{
             "CNagaDebrisProjectile", &base, construct<CNagaDebrisProjectile>, {}};
-        const ClassInfo campaign_NagaCeilingDebris{"NagaCeilingDebris", &base, construct<NagaCeilingDebris>, {}};
+        const ClassInfo campaign_NagaCeilingDebris{
+            "NagaCeilingDebris", &base, construct<NagaCeilingDebris>, {}, SaveSupport::NotSaved};
         const ClassInfo campaign_CGroundStrikeProjectile{
             "CGroundStrikeProjectile", &base, construct<CGroundStrikeProjectile>, {}};
         const ClassInfo campaign_CShockwaveProjectile{
@@ -191,7 +205,7 @@ namespace OpenBlood2
             "CNapalmAltProjectile", &base, construct<CNapalmAltProjectile>, {}};
         const ClassInfo campaign_CNapalmFireball{"CNapalmFireball", &base, construct<CNapalmFireball>, {}};
         const ClassInfo howitzer_shell{"CHowitzerShell", &base, construct<CHowitzerShell>, {}};
-        const ClassInfo hand_model{"CHandWeaponModel", &base, construct<CHandWeaponModel>, {}};
+        const ClassInfo hand_model{"CHandWeaponModel", &base, construct<CHandWeaponModel>, {}, SaveSupport::NotSaved};
         const ClassInfo b2base{
             "B2BaseClass",
             &base,
@@ -208,7 +222,8 @@ namespace OpenBlood2
                 {"TypeCTF", true},
                 {"TypeCoop", true},
                 {"DifficultyInsane", true, false} // Read by original code, absent from its class registration.
-            }};
+            },
+            SaveSupport::NotSaved};
         // Original BEGIN_CLASS(CGib): destructable aggregate plus world-file Init props.
         const ClassInfo gib{"CGib",
                             &b2base,
@@ -226,7 +241,8 @@ namespace OpenBlood2
                              {"InitAnim", std::string{}},
                              {"HitPoints", 20.0f},
                              {"ObjectMass", 10.0f},
-                             {"Kickable", true}}};
+                             {"Kickable", true}},
+                            SaveSupport::NotSaved};
         const ClassInfo corpse{"CCorpse", &b2base, construct<CCorpse>, {}};
         const ClassInfo camera_object{"CameraObj",
                                       &b2base,
@@ -298,7 +314,8 @@ namespace OpenBlood2
                                {"InnerRadius", 10.0f},
                                {"Volume", std::int32_t(100)},
                                {"Ambient", true},
-                               {"FileStream", false}}};
+                               {"FileStream", false}},
+                              SaveSupport::AlwaysLoad};
         const ClassInfo sound_fx{"SoundFX",
                                  &b2base,
                                  construct<SoundFX>,
@@ -346,8 +363,9 @@ namespace OpenBlood2
                                    {"BaseKeyName", std::string{}},
                                    {"StartActive", false},
                                    {"Looping", false}}};
-        const ClassInfo client_sfx{"CClientSFX", &b2base, construct<CClientSFX>, {}};
-        const ClassInfo client_splat{"CClientSplatFX", &client_sfx, construct<CClientSplatFX>, {}};
+        const ClassInfo client_sfx{"CClientSFX", &b2base, construct<CClientSFX>, {}, SaveSupport::NotSaved};
+        const ClassInfo client_splat{
+            "CClientSplatFX", &client_sfx, construct<CClientSplatFX>, {}, SaveSupport::NotSaved};
         const ClassInfo particle_stream{"CClientParticleStreamSFX",
                                         &client_sfx,
                                         construct<CClientParticleStreamSFX>,
@@ -477,20 +495,22 @@ namespace OpenBlood2
             &client_light,
             construct<GlowingLight>,
             {{"IntensityWaveform", std::int32_t(5)}, {"RadiusWaveform", std::int32_t(5)}}};
-        const ClassInfo start{"StartPoint", &base, construct<StartPoint>, {}};
+        const ClassInfo start{"StartPoint", &base, construct<StartPoint>, {}, SaveSupport::AlwaysLoad};
         const ClassInfo game_start{"GameStartPoint",
                                    &start,
                                    construct<GameStartPoint>,
                                    {{"Multiplayer", false},
                                     {"TriggerTarget", std::string{}},
                                     {"TriggerMessage", std::string{}},
-                                    {"TeamID", std::int32_t(0)}}};
+                                    {"TeamID", std::int32_t(0)}},
+                                   SaveSupport::AlwaysLoad};
         const ClassInfo path{"PathPoint",
                              &b2base,
                              construct<PathPoint>,
-                             {{"ActionTarget", std::string{}}, {"ActionMessage", std::string{}}}};
-        const ClassInfo exit_hint{"ExitHint", &b2base, construct<ExitHint>, {}};
-        const ClassInfo smell{"SmellHint", &b2base, construct<SmellHint>, {}};
+                             {{"ActionTarget", std::string{}}, {"ActionMessage", std::string{}}},
+                             SaveSupport::AlwaysLoad};
+        const ClassInfo exit_hint{"ExitHint", &b2base, construct<ExitHint>, {}, SaveSupport::AlwaysLoad};
+        const ClassInfo smell{"SmellHint", &b2base, construct<SmellHint>, {}, SaveSupport::AlwaysLoad};
         const ClassInfo character{"CBaseCharacter", &b2base, construct<CBaseCharacter>, {}};
         template <class T, AI_Mgr::NPCType Type> std::unique_ptr<BaseClass> construct_npc()
         {
@@ -636,11 +656,13 @@ namespace OpenBlood2
         const ClassInfo flag_object{"FlagObject",
                                     &b2base,
                                     construct<FlagObject>,
-                                    {{"ObjectName", std::string("CTF_Flag")}, {"TeamID", std::int32_t(0)}}};
+                                    {{"ObjectName", std::string("CTF_Flag")}, {"TeamID", std::int32_t(0)}},
+                                    SaveSupport::NotSaved};
         const ClassInfo flag_stand{"FlagStand",
                                    &b2base,
                                    construct<FlagStand>,
-                                   {{"ObjectName", std::string("CTF_FlagStand")}, {"TeamID", std::int32_t(0)}}};
+                                   {{"ObjectName", std::string("CTF_FlagStand")}, {"TeamID", std::int32_t(0)}},
+                                   SaveSupport::NotSaved};
         const ClassInfo sparks_obj{"SparksObj",
                                    &b2base,
                                    construct<SparksObj>,
@@ -653,7 +675,8 @@ namespace OpenBlood2
                                     {"DelaySecsMin", .5f},
                                     {"DelaySecsMax", 2.0f},
                                     {"MaxSecs", 0.0f},
-                                    {"SparkSound", std::string("Sounds\\lightpop2.wav")}}};
+                                    {"SparkSound", std::string("Sounds\\lightpop2.wav")}},
+                                   SaveSupport::AlwaysLoad};
         const ClassInfo later_Behemoth{
             "Behemoth",
             &ai_manager,
@@ -842,7 +865,8 @@ namespace OpenBlood2
              {"PanSkyScaleX", 10.0f},
              {"PanSkyScaleZ", 10.0f},
              {"Gravity", DVector{0, -2000, 0}},
-             {"SoftSky", std::string("textures\\environmentmaps\\clouds\\clouds"), true, 499}}};
+             {"SoftSky", std::string("textures\\environmentmaps\\clouds\\clouds"), true, 499}},
+            SaveSupport::AlwaysLoad};
         const ClassInfo particle_system{"ParticleSystem",
                                         &client_sfx,
                                         construct<ParticleSystem>,
@@ -860,7 +884,8 @@ namespace OpenBlood2
                                          {"RotationVelocity", 0.f},
                                          {"TextureName", std::string("SpecialFX\\ParticleTextures\\particle.dtx")},
                                          {"Color1", DVector{255, 255, 255}},
-                                         {"Color2", DVector{255, 0, 0}}}};
+                                         {"Color2", DVector{255, 0, 0}}},
+                                        SaveSupport::AlwaysLoad};
         const ClassInfo polygrid{"PolyGrid",
                                  &client_sfx,
                                  construct<PolyGrid>,
@@ -883,7 +908,8 @@ namespace OpenBlood2
                                   {"Ring1Rate", std::int32_t(50)},
                                   {"Ring2Rate", std::int32_t(10)},
                                   {"Ring3Rate", std::int32_t(30)},
-                                  {"Ring4Rate", std::int32_t(20)}}};
+                                  {"Ring4Rate", std::int32_t(20)}},
+                                 SaveSupport::AlwaysLoad};
         const ClassInfo volume{"VolumeBrush",
                                &b2base,
                                construct<VolumeBrush>,
@@ -1234,7 +1260,7 @@ namespace OpenBlood2
                                        {"RotationAngles", DVector{}},
                                        {"BoxPhysics", false},
                                        {"PushPlayerBack", true}}};
-        const ClassInfo camera{"CameraSpot", &b2base, construct<CameraSpot>, {}};
+        const ClassInfo camera{"CameraSpot", &b2base, construct<CameraSpot>, {}, SaveSupport::AlwaysLoad};
         const ClassInfo conveyor{"Conveyor",
                                  &volume,
                                  construct<Conveyor>,
@@ -1290,7 +1316,8 @@ namespace OpenBlood2
                              {"LoopSound", false},
                              {"MessageTarget", std::string{}},
                              {"MessageName", std::string{}},
-                             {"BPrintMessage", std::string{}}}};
+                             {"BPrintMessage", std::string{}}},
+                            SaveSupport::AlwaysLoad};
     } // namespace
     bool register_original_classes(Objects& objects)
     {

@@ -1797,3 +1797,20 @@ handling previously in `server_adapter.cpp` moved there unchanged in behavior. S
 the [contract](../contracts/save_load_contracts.md#implemented-primitives-lot-1), the
 [evidence](reports/save_load_messages.md) and the
 [source ledger](sources/save_load_messages_sources.json).
+
+## Restore-mode world and candidate transaction (2026-10-20)
+
+Save/load lot 4 adds selective ports of the original `ObjectDLL/BloodServerShell.cpp`
+`SaveGame` and `RestoreGame` to `game/original/BloodShells.cpp`: the `USRFLG_SAVEABLE`
+list over `GetNextObject`/`GetNextInactiveObject` (players included), the save and
+restore flags and the `Save\Current` file names, over the in-memory store. The
+restore-branch order of `LoadWorld` (no world objects, `RestoreGame`, then the three
+shell variables) is reproduced in `GameSession::load_request`. `GetNextInactiveObject`
+is the original `server_de.h` declaration; `USRFLG_SAVEABLE`, `LOADTYPE_RESTORESAVE` and
+`SAVETYPE_*` keep their original values. In the existing ports, Door and Trigger now OR
+`USRFLG_SAVEABLE` as their originals do, and ClientLightFX and RandomSoundFX carry the
+recorded decision-4 marking departures. The save-support declarations, `save_game`,
+`load_game` and the candidate transaction are replacement engine code. See the
+[contract](../contracts/save_load_contracts.md#implemented-restore-mode-world-and-transaction-lot-4),
+the [evidence](reports/save_load_session.md) and the
+[source ledger](sources/save_load_session_sources.json).

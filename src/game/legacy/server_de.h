@@ -78,6 +78,8 @@ namespace OpenBlood2
 // Original SaveObjects/RestoreObjects flags (1998 server_de.h).
 inline constexpr DDWORD RESTOREOBJECTS_RESTORETIME = 1;
 inline constexpr DDWORD SAVEOBJECTS_SAVEGAMECONSOLE = 1, SAVEOBJECTS_SAVEPORTALS = 2;
+// Original Shared/ClientServerShared.h: the server shell's SaveGame lists objects with this user flag.
+inline constexpr DDWORD USRFLG_SAVEABLE = 1u << 3;
 class PathMgr;
 class ServerDE : public CSBase
 {
@@ -220,6 +222,7 @@ class ServerDE : public CSBase
     DRESULT (*SetObjectDims)(HOBJECT, DVector*) = nullptr;
     void (*SetObjectUserFlags)(HOBJECT, DDWORD) = nullptr;
     HOBJECT (*GetNextObject)(HOBJECT) = nullptr;
+    HOBJECT (*GetNextInactiveObject)(HOBJECT) = nullptr;
     char* (*GetObjectName)(HOBJECT) = nullptr;
     DRESULT (*GetObjectPos)(HOBJECT, DVector*) = nullptr;
     DRESULT (*GetObjectRotation)(HOBJECT, DRotation*) = nullptr;

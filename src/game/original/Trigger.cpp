@@ -228,7 +228,8 @@ DDWORD Trigger::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
     {
         g_pServerDE->SetObjectDims(m_hObject, &dims);
         g_pServerDE->SetObjectFlags(m_hObject, FLAG_TOUCH_NOTIFY);
-        g_pServerDE->SetObjectUserFlags(m_hObject, 1u << 3);
+        // Mark this object as savable.
+        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | USRFLG_SAVEABLE);
         g_pServerDE->SetNextUpdate(m_hObject, 0);
     }
     else if (message == MID_TOUCHNOTIFY)

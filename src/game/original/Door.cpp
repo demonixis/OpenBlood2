@@ -277,7 +277,8 @@ DDWORD Door::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         }
         SetClosed(false);
         g_pServerDE->SetNextUpdate(m_hObject, .01f);
-        g_pServerDE->SetObjectUserFlags(m_hObject, 1u << 3);
+        // Mark this object as savable.
+        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | USRFLG_SAVEABLE);
     }
     if (message == MID_UPDATE)
     {

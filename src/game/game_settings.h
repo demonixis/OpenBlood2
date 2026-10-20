@@ -13,6 +13,11 @@ enum GameType
     GAMETYPE_ACTION,
     GAMETYPE_CUSTOM
 };
+enum SaveType
+{
+    SAVETYPE_AUTO = 0,
+    SAVETYPE_CURRENT
+};
 enum Difficulty
 {
     DIFFICULTY_EASY = 0,

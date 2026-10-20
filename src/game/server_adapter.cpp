@@ -163,6 +163,16 @@ namespace OpenBlood2
                 next = objects.next_alive(next);
             return next;
         };
+        GetNextInactiveObject = [](HOBJECT previous) -> HOBJECT
+        {
+            active().trace_service("GetNextInactiveObject");
+            auto& objects = active().objects_;
+            // The complement of GetNextObject: together they visit every live object once.
+            auto next = objects.next_alive(previous);
+            while (next && objects.get(next)->activity == OBJSTATE_ACTIVE)
+                next = objects.next_alive(next);
+            return next;
+        };
         SetObjectDims = [](HOBJECT h, DVector* dims) -> DRESULT
         {
             active().trace_service("SetObjectDims");

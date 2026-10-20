@@ -11,7 +11,8 @@
 
 // Original SaveObjects/RestoreObjects over the in-memory logical store: engine records,
 // clock, creation-order save list, two-pass restore and save purity (save_load_contracts,
-// lot 3). The restore-mode world and the candidate session transaction are lot 4.
+// lot 3). The restore-mode world (session.cpp) and the candidate session transaction
+// (saved_game.cpp) are lot 4.
 namespace OpenBlood2
 {
     namespace
@@ -20,7 +21,7 @@ namespace OpenBlood2
         // Services a MID_SAVEOBJECT callback may use: the message primitives, strings and
         // read-only queries. Everything else, including unknown names, fails the save.
         // Strictly ascending; save_objects.purity checks the order and the catalogue.
-        constexpr std::array<std::string_view, 82> pure_services{
+        constexpr std::array<std::string_view, 83> pure_services{
             "AlignRotation",
             "CompareStringsUpper",
             "CopyString",
@@ -46,6 +47,7 @@ namespace OpenBlood2
             "GetModelNodeHideStatus",
             "GetModelNodeTransform",
             "GetModelPlaybackState",
+            "GetNextInactiveObject",
             "GetNextObject",
             "GetObjectClass",
             "GetObjectColor",
@@ -591,7 +593,7 @@ namespace OpenBlood2
         // the restore-mode world was created after they were restored.
         struct Previous
         {
-            bool applied = false;
+            bool clock = false, console = false;
             double time = 0, frame_time = 0, world_origin = 0;
             DVector gravity{};
             std::minstd_rand random;
@@ -600,17 +602,32 @@ namespace OpenBlood2
         const bool restore_time = (flags & RESTOREOBJECTS_RESTORETIME) != 0;
         if (!objects_.record_count())
         {
-            previous = {true,    objects_.time(), objects_.frame_time(), world_time_origin_,
-                        gravity, random_,         variables_};
+            previous = {true,    true,    objects_.time(), objects_.frame_time(), world_time_origin_,
+                        gravity, random_, variables_};
             std::string why;
             if (!restore_image_state(slot, restore_time, why))
                 return failed(why);
             report.console_restored = image->console_saved;
             report.clock_restored = restore_time;
         }
-        else if (restore_time && (objects_.time() != clock.time || objects_.frame_time() != clock.frame_time))
-            return failed("RESTORETIME with existing objects requires the saved clock to be current: restore it "
-                          "before creating the restore-mode world");
+        else
+        {
+            if (restore_time && (objects_.time() != clock.time || objects_.frame_time() != clock.frame_time))
+                return failed("RESTORETIME with existing objects requires the saved clock to be current: restore "
+                              "it before creating the restore-mode world");
+            // The saved console still wins over what always-load objects set at creation
+            // (WorldProperties): the original restores it inside RestoreObjects, after
+            // LoadWorld created them (save_load_contracts lot 4). The global force is not
+            // reapplied: the original never saves it, so WorldProperties' authored value stands.
+            if (image->console_saved)
+            {
+                previous.console = true;
+                previous.variables = variables_;
+                for (const auto& variable : image->console)
+                    variables_[variable.name].text = variable.value;
+                report.console_restored = true;
+            }
+        }
 
         const auto before = objects_.snapshot();
         auto rollback = [&](std::string why)
@@ -630,13 +647,16 @@ namespace OpenBlood2
                 if (!objects_.finish_frame() || !removed)
                     break;
             }
-            if (previous.applied)
+            if (previous.clock)
             {
                 if (!objects_.restore_clock(previous.time, previous.frame_time))
                     why += "; the previous clock could not be reinstated";
                 world_time_origin_ = previous.world_origin;
                 gravity = previous.gravity;
                 random_ = previous.random;
+            }
+            if (previous.console)
+            {
                 for (auto it = variables_.begin(); it != variables_.end();)
                     if (!previous.variables.contains(it->first))
                         it = variables_.erase(it);

@@ -674,6 +674,15 @@ namespace OpenBlood2
         return sum;
     }
 
+    SaveClassSchema save_class_schema(const Objects& objects)
+    {
+        SaveClassSchema schema;
+        for (auto type : objects.classes())
+            if (save_support(type) == SaveSupport::Original && type->payload_version)
+                schema.emplace(type->name, type->payload_version);
+        return schema;
+    }
+
     const char* save_store_slot_name(SaveStoreSlot slot)
     {
         switch (slot)

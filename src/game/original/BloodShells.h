@@ -33,6 +33,10 @@ class CBloodServerShell
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerItemCommand&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerDetonate&);
     void Update(float);
+    // Original SaveGame/RestoreGame over the in-memory logical store. The caller owns the
+    // frame boundary and the candidate session (GameSession::save_game/load_game).
+    bool SaveGame(DBYTE bySaveType, bool bSavePlayers, bool bSaveConsole);
+    bool RestoreGame(DBYTE bySaveType);
     CPlayerObj* Player(HCLIENT);
     bool CapturePlayerInventory(HCLIENT);
     struct InventoryCapture
