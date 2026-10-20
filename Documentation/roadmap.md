@@ -84,22 +84,48 @@ renderer remains the reference and stays selectable after M5.
 
 ## M5 — optional PBR
 
-Port the approach of the earlier Blood II project (its
-`assets/blood2/config/materials.json`). That project is a donor, never a build
-dependency. The work:
+Donor: NoMadEngine `6d91073` (2026-01-22). It is an inspiration, never a build
+dependency. What it actually provides:
 
-- A versioned JSON manifest maps original textures to albedo, normal,
-  roughness/metalness and emissive maps.
-- Texture packs stay external, like the commercial data.
-- A PBR shading path uses the existing lightmaps and static lights.
-- A Display option switches between PBR and the original look.
-- Missing or invalid bindings fall back to the original material and report it.
+- `assets/blood2/config/materials.json`: 10 material classes (roughness,
+  metallic, specular). 28 case-insensitive patterns map texture paths to a
+  class, and the first match wins.
+- A rule that classifies surfaces from words in the texture name: water,
+  glass, lava, sky, clip and invisible. Each class sets alpha and material
+  values.
+- No normal, roughness or emissive maps. Bump comes from screen derivatives
+  of albedo luminance, and lava only imitates glow through specular.
+- Lighting is Blinn-Phong with roughness mapped to shininess, so it is not a
+  GGX/Cook-Torrance model.
+- OpenGL/GLSL only, so none of its shaders can be used as they are in the
+  HLSL/SDL_GPU pipeline.
+- Its matcher splits a pattern at the first `*` only. Patterns with two
+  stars, such as `SKINS/*SKIN*`, therefore never match. Do not copy this.
+
+| # | Task |
+| --- | --- |
+| 5.0 | Measure the donor patterns against the retail texture catalogue (world DATs, ABC skins, sprites). List what is covered, what is missed and what is ambiguous. |
+| 5.1 | Versioned JSON manifest: classes plus wildcard patterns, exact per-texture overrides and optional maps (normal, roughness/metal, AO, emissive). Bounded parsing with explicit errors. Texture packs stay external. |
+| 5.2 | Emissive identification: DAT fullbright/SURF_BRIGHT faces, the donor's lava/fluid classes, manifest entries and emissive maps. This is the input for M6 bloom. |
+| 5.3 | GGX/Cook-Torrance HLSL path on the existing lightmaps, static lights and model lighting. Normal maps where they exist, and an optional derivative bump otherwise. Regenerate all SPIR-V/MSL artifacts together. |
+| 5.4 | Display option to switch between PBR and the original renderer. The original renderer keeps its current pixel output, checked by the GPU readback tests. |
+| 5.5 | Material inspection (resolved class, maps, emissive flag) and fallback reporting for missing or invalid bindings. |
 
 ## M6 — post-processing
 
-Bloom driven by PBR emissive maps, then GTAO and SSR, with tonemapping and a
-quality setting per effect. Every effect can be turned off, and the original
-renderer path keeps its current output.
+The donor has a GL post stack: a threshold bloom (downsample, Kawase blur,
+upsample), SSAO (not GTAO), SSR, SSGI and motion blur, plus an "uber" pass
+with ACES tonemapping, FXAA, sharpening, vignette and color grading. These
+are design references only. The target:
+
+- An HDR scene target.
+- Bloom driven by the emissive mask from 5.2 instead of a luminance threshold
+  alone.
+- GTAO, then SSR.
+- Tonemapping and anti-aliasing.
+- A quality setting per effect, and every effect can be turned off.
+
+The original renderer path keeps its current output.
 
 ## M8 — VR on Quest
 
