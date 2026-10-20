@@ -118,3 +118,16 @@ physics at the reported delta and three seconds of subsequent session updates.
 failure beyond the correction budget. See the [retake evidence](../implementation/reports/demo_retakes.md).
 The service coverage catalog classifies this checked four-correction implementation
 as bounded; session traces still reject unknown and unavailable services.
+
+## Nonsolid gravity pickups
+
+The same bounded initial primary-world correction now accepts FLAG_GRAVITY
+objects as well as FLAG_SOLID objects. PickupObject sets gravity and touch flags
+without solidity, yet its later integration still collides with primary geometry.
+Midgard's NecroWardPU0 starts 10.6571 units through floor polygon 449; previously
+its ground helper left it embedded and the first representable gravity step
+failed. Correction is still confined to initial placement, committed only after
+clearance, and bounded by the existing per-axis budgets. An object with neither
+solid nor gravity flags remains ineligible. Dimensions and simulation collision
+semantics are unchanged. services.start_departure verifies the nonsolid floor
+case, following integration and refusal for a nonphysical object.

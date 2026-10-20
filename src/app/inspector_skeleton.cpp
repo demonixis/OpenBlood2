@@ -666,6 +666,8 @@ namespace OpenBlood2
                         ai.animation_requested_dims.y, ai.animation_requested_dims.z);
             ImGui::Text("Blocked resizes with continued animation %llu | last call blocked: %s",
                         (unsigned long long)ai.animation_resize_blocks, ai.animation_blocked ? "yes" : "no");
+            ImGui::Text("Invalid source clip retained current playback: %s | requests %llu",
+                        ai.animation_clip_retained ? "yes" : "no", (unsigned long long)ai.retained_clip_requests);
             DVector actual_dims;
             game.server.GetObjectDims(ai.m_hObject, &actual_dims);
             ImGui::Text("Physical half extents %.2f %.2f %.2f", actual_dims.x, actual_dims.y, actual_dims.z);

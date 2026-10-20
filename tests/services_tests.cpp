@@ -360,8 +360,9 @@ namespace
             const auto begin = static_cast<std::uint32_t>(corridor.points.size());
             for (auto p : {DVector{x, 0, -100}, DVector{x, 0, 100}, DVector{x, 10, 100}, DVector{x, 10, -100}})
                 corridor.points.push_back(p);
-            corridor.polygons.push_back({0, {std::uint16_t(begin), std::uint16_t(begin + 1),
-                                              std::uint16_t(begin + 2), std::uint16_t(begin + 3)}});
+            corridor.polygons.push_back(
+                {0,
+                 {std::uint16_t(begin), std::uint16_t(begin + 1), std::uint16_t(begin + 2), std::uint16_t(begin + 3)}});
         };
         add_wall(3);
         CHECK(g.collision.build(corridor, error));
@@ -375,6 +376,19 @@ namespace
         r->state.m_Pos = {0, 5, 0};
         CHECK(g.server.ResolveInitialWorldOverlap(h) == DE_ERROR && r->state.m_Pos.x == 0 && r->state.m_Pos.y == 5 &&
               r->placement_nudges == 3 && r->velocity.y == 500);
+        // Gravity pickups are nonsolid but still collide with the primary world.
+        // An authored floor overlap must be resolved before their first integration.
+        CHECK(g.collision.build(cabin_model(), error));
+        r->state.m_Flags = FLAG_GRAVITY;
+        r->state.m_Pos = {0, 1, 0};
+        r->velocity = {};
+        CHECK(g.server.MoveObjectToGround(h) == DE_OK && r->placement_nudges == 4);
+        CHECK(std::abs(r->state.m_Pos.y - 2.001f) < .001f && r->dimensions.y == 2);
+        CHECK(g.server.advance_physics(.0001) && g.server.advance_physics(1. / 60));
+        CHECK(r->state.m_Pos.y >= 2 && r->placement_nudges == 4);
+        r->state.m_Flags = 0;
+        r->state.m_Pos.y = 1;
+        CHECK(g.server.ResolveInitialWorldOverlap(h) == DE_INVALIDPARAMS && r->state.m_Pos.y == 1);
         return true;
     }
     bool collision_traversal()

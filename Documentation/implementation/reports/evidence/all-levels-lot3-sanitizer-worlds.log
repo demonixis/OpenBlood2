@@ -1,0 +1,14 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 1114: reported_levels.11_slaughter_house
+1/2 Test #1114: reported_levels.11_slaughter_house ...   Passed  249.15 sec
+    Start 1115: reported_levels.multi/bb_midgard
+2/2 Test #1115: reported_levels.multi/bb_midgard .....   Passed   18.93 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+campaign        = 268.08 sec*proc (2 tests)
+headless        = 268.08 sec*proc (2 tests)
+private-data    = 268.08 sec*proc (2 tests)
+
+Total Test time (real) = 268.09 sec

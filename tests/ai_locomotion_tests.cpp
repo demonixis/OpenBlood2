@@ -168,7 +168,9 @@ namespace
             a->Metacmd = 1;
             auto table = std::make_shared<CAnim_Sound>();
             table->m_nAnim_ROLL_RIGHT = no_animation;
-            CHECK(a->InitStatics(table) && !a->MC_Roll_Right());
+            const auto playing = r->animation.animation;
+            CHECK(a->InitStatics(table) && a->MC_Roll_Right() && a->animation_clip_retained);
+            CHECK(r->animation.animation == playing);
             CHECK(g.objects.remove(a->m_hObject) && !a->MC_Roll_Left() && g.objects.finish_frame());
         }
         return true;
@@ -312,7 +314,8 @@ namespace
         CHECK(a->MC_Run() && !a->m_bAnimating && a->Metacmd == 8 && near(r->velocity.z, 0));
         auto table = std::make_shared<CAnim_Sound>();
         table->m_nAnim_RUN[TYPE_PISTOL] = 9999;
-        CHECK(a->InitStatics(table) && !a->MC_Run() && !a->animation_blocked);
+        CHECK(a->InitStatics(table) && a->MC_Run() && !a->animation_blocked && a->animation_clip_retained);
+        CHECK(r->animation.animation == 9 + TYPE_PISTOL && near(r->velocity.z, 60));
         return true;
     }
     bool physics(const char*)
@@ -514,13 +517,15 @@ namespace
                                   : command == 2 ? table->m_nAnim_FIRE_WALK[TYPE_PISTOL]
                                                  : table->m_nAnim_FIRE_RUN[TYPE_PISTOL];
                 a->m_bAnimating = false;
+                const auto playing = r->animation.animation;
                 const bool ok = command == 0   ? a->MC_Walk()
                                 : command == 1 ? a->MC_Run()
                                 : command == 2 ? a->MC_Fire_Walk()
                                                : a->MC_Fire_Run();
-                CHECK(ok == (clip < r->model->animations.size()));
-                CHECK(!ok || r->animation.animation == clip);
-                std::cout << name << " command=" << command << " clip=" << clip << " available=" << ok << "\n";
+                const bool present = clip < r->model->animations.size();
+                CHECK(ok && a->animation_clip_retained == !present);
+                CHECK(r->animation.animation == (present ? clip : playing));
+                std::cout << name << " command=" << command << " clip=" << clip << " available=" << present << "\n";
             }
             CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame());
         }

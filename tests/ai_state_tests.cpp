@@ -228,7 +228,14 @@ namespace
         CHECK(r->animation.time == 0 && r->dimensions.y == 8); // Same-clip reset does not retry the resize.
         a->m_vScale = {-1, 1, 1};
         CHECK(!a->SetAnimation(3));
-        CHECK(!a->SetAnimation(UINT32_MAX) && a->m_nCurAnimation == 2);
+        CHECK(g.server.advance_models(.025));
+        CHECK(a->SetAnimation(UINT32_MAX) && a->m_nCurAnimation == UINT32_MAX && a->animation_clip_retained);
+        CHECK(r->animation.animation == 2 && near(r->animation.time, 25.f) && near(r->dimensions.y, 8));
+        CHECK(a->SetAnimation(UINT32_MAX) && r->animation.time == 0 && a->retained_clip_requests == 2);
+        const auto saved_model = r->model;
+        r->model.reset();
+        CHECK(!a->SetAnimation(2) && !a->animation_clip_retained);
+        r->model = saved_model;
         CHECK(setup(g)); // Remove ceiling; a different valid clip can resize normally again.
         a->m_vScale = {3, 3, 3};
         CHECK(a->SetAnimation(3) && !a->animation_blocked && near(r->dimensions.y, 12));
@@ -442,7 +449,9 @@ namespace
             {
                 a->m_bAnimating = false;
                 const bool present = table->m_nAnim_SPECIAL[i] < r->model->animations.size();
-                CHECK(a->MC_Special(i) == present);
+                const auto playing = r->animation.animation;
+                CHECK(a->MC_Special(i) && a->animation_clip_retained == !present);
+                CHECK(r->animation.animation == (present ? table->m_nAnim_SPECIAL[i] : playing));
                 if (present)
                 {
                     ++tables;

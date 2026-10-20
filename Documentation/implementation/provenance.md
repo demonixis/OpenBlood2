@@ -1586,3 +1586,13 @@ si_DoObjectRotation; it does not resize a model or move riders.
 PowerupPickups.cpp imports the original RevenantPU constructor (type 8, amount 30,
 resource 316); PlayerObj.cpp AddPowerup's absence of a Revenant branch is preserved.
 See the [complete audit backlog](reports/all_level_loading.md).
+
+## Original AI invalid-animation no-op (2026-10-20)
+
+Original AI_Mgr.cpp:1950–1977 ignores SetModelAnimation failure and retains the
+requested ordinal; same-ordinal repetition resets actual playback. Later
+lithtech/runtime/model/src/animtracker.cpp trk_SetCurAnim returns before mutation
+when the index is out of range. shared/src/modellt_impl.cpp SetCurAnim and
+server/src/serverde_impl.cpp SetModelAnimation preserve that no-op. The AI port
+now checks valid current playback before applying these source rules. No missing
+clip is supplied, and no source table or commercial resource is changed.

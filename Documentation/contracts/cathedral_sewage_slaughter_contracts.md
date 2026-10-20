@@ -65,9 +65,10 @@ checked message delivery protect callbacks that remove objects.
 Unimplemented emitter/light/particle recipes remain explicit effect diagnostics,
 including Zealot staff/ground trails and DeathRay rotating rings. Combat success
 does not claim those effects rendered. Source Naga screen shake is also unavailable.
-Existing unrelated NPC animation refusals remain visible: Slaughter House's
-CivilianAI0 can request an absent clip and suspend. Missing animations are not
-silently mapped to clip zero; full scripted traversal is unverified.
+The [animation contracts](ai_animation_clearance_contracts.md#invalid-requested-animation-ordinals)
+now preserve the original invalid-ordinal no-op for Slaughter House's CivilianAI0.
+Its missing request remains inspectable; no clip-zero mapping is used. Full
+scripted traversal is unverified.
 
 ## Loading and shared engine rules
 

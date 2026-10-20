@@ -83,10 +83,14 @@ bool AI_Mgr::SetAnimation(DDWORD clip)
     state_error.clear();
     requested_animation = clip;
     animation_blocked = false;
+    animation_clip_retained = false;
     auto* server = GetServerDE();
     std::string name;
-    if (!server || !server->IsObjectAlive(m_hObject) || !server->GetModelAnimationName(m_hObject, clip, name))
+    if (!server || !server->IsObjectAlive(m_hObject))
         return StateFailure("AI animation model/clip unavailable");
+    const bool retained = !server->GetModelAnimationName(m_hObject, clip, name);
+    if (retained && !server->GetModelAnimationName(m_hObject, server->GetModelAnimation(m_hObject), name))
+        return StateFailure("AI animation model/current clip unavailable");
     if (clip == m_nCurAnimation)
     {
         if (server->ResetModelAnimation(m_hObject) != DE_OK)
@@ -114,11 +118,18 @@ bool AI_Mgr::SetAnimation(DDWORD clip)
                 return StateFailure("AI retained animation dimensions unavailable");
             ++animation_resize_blocks;
         }
-        server->SetModelAnimation(m_hObject, clip); // Validated above, no callbacks.
+        // Original SetAnimation ignores the engine's invalid-index no-op and
+        // remembers the requested ordinal. Repeating it resets the actual clip
+        // above; the first request leaves that clip and its clock unchanged.
+        // Missing model/current playback remains a service failure.
+        if (!retained)
+            server->SetModelAnimation(m_hObject, clip); // Validated above, no callbacks.
         m_vDims = dimensions;
         m_nCurAnimation = clip;
     }
     ++animation_starts;
+    animation_clip_retained = retained;
+    retained_clip_requests += retained;
     return true;
 }
 bool AI_Mgr::AnimationCommand(DDWORD clip, int command)

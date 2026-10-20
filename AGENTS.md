@@ -1,5 +1,11 @@
 # Blood2 Project Instructions
 
+The complete-level continuation now preserves the original AI invalid-ordinal
+no-op: keep verified current playback on first request, reset it on repetition,
+and expose retained requests. This supersedes the earlier blanket invalid-AI-clip
+refusal; missing models/current playback still fail. Initial bounded world
+separation also covers nonsolid gravity pickups, without relaxing runtime collision.
+
 The [complete mounted-level audit](Documentation/implementation/reports/all_level_loading.md) tracks the separately requested
 loading continuation. RotatingModel reuses original rotation rules with an
 ordinary model pose and unchanged physics extents. RevenantPU preserves the

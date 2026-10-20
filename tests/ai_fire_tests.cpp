@@ -290,7 +290,8 @@ namespace
         a->Metacmd = 1;
         auto bad = std::make_shared<CAnim_Sound>();
         bad->m_nAnim_FIRE_RUN[TYPE_PISTOL] = UINT32_MAX;
-        CHECK(a->InitStatics(bad) && !a->Script_Fire_Run() && a->m_nState != AI_Mgr::StateCrawlUnder);
+        CHECK(a->InitStatics(bad) && a->Script_Fire_Run() && a->animation_clip_retained &&
+              a->m_nState != AI_Mgr::StateCrawlUnder);
         CHECK(g.objects.remove(a->m_hObject) && !a->Script_Fire_Run() && g.objects.finish_frame());
         return true;
     }
@@ -594,7 +595,9 @@ namespace
         auto table = std::make_shared<CAnim_Sound>();
         table->m_nAnim_FIRE_STAND[TYPE_PISTOL] = UINT32_MAX;
         CHECK(a->InitStatics(table));
-        CHECK(!a->MC_Fire_Stand() && !a->animation_blocked && a->m_nState == state);
+        CHECK(a->MC_Fire_Stand() && !a->animation_blocked && a->m_nState == state && a->animation_clip_retained);
+        CHECK(r->animation.animation == 0 && r->dimensions.y == 1);
+        a->m_bAnimating = false;
         table->m_nAnim_FIRE_STAND[TYPE_PISTOL] = 0;
         CHECK(a->MC_Fire_Stand());
         a->Metacmd = std::numeric_limits<int>::max();
@@ -681,7 +684,9 @@ namespace
             CHECK(table->SetAnimationIndexes(a->m_hObject) && a->InitStatics(table));
             const auto clip = table->m_nAnim_FIRE_STAND[TYPE_PISTOL];
             const bool present = clip < r->model->animations.size();
-            CHECK(a->MC_Fire_Stand() == present);
+            const auto playing = r->animation.animation;
+            CHECK(a->MC_Fire_Stand() && a->animation_clip_retained == !present);
+            CHECK(r->animation.animation == (present ? clip : playing));
             std::cout << name << " pistol clip=" << clip << " available=" << present;
             if (present)
             {

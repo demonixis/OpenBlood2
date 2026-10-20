@@ -94,7 +94,7 @@ namespace
                                       << " state=" << ai->m_nState << " metacmd=" << ai->Metacmd << '\n';
                 return false;
             }
-            std::cout << world << " difficulty=" << unsigned(difficulty) << " passed\n";
+            std::cout << world << " difficulty=" << unsigned(difficulty) << " passed" << std::endl;
         }
         const bool clean = game->unload_world() && game->objects.snapshot().empty() && !game->server.string_count() &&
                            !game->server.message_count() && !game->server.list_count();

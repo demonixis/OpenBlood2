@@ -1,0 +1,136 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start   70: services.model_reader
+ 1/58 Test   #70: services.model_reader ................   Passed    0.02 sec
+      Start   71: services.model_rejection
+ 2/58 Test   #71: services.model_rejection .............   Passed    0.48 sec
+      Start   72: services.animation_events
+ 3/58 Test   #72: services.animation_events ............   Passed    0.04 sec
+      Start   73: services.model_callbacks
+ 4/58 Test   #73: services.model_callbacks .............   Passed    0.03 sec
+      Start   74: services.collision_queries
+ 5/58 Test   #74: services.collision_queries ...........   Passed    0.02 sec
+      Start   75: services.start_departure
+ 6/58 Test   #75: services.start_departure .............   Passed    0.03 sec
+      Start   76: services.collision_traversal
+ 7/58 Test   #76: services.collision_traversal .........   Passed    0.14 sec
+      Start   77: services.movement_contacts
+ 8/58 Test   #77: services.movement_contacts ...........   Passed    0.02 sec
+      Start   78: services.contact_overlap
+ 9/58 Test   #78: services.contact_overlap .............   Passed    0.61 sec
+      Start   79: services.placement_queries
+10/58 Test   #79: services.placement_queries ...........   Passed    0.04 sec
+      Start   80: services.placement_service
+11/58 Test   #80: services.placement_service ...........   Passed    0.02 sec
+      Start   81: services.original_services
+12/58 Test   #81: services.original_services ...........   Passed    0.03 sec
+      Start   82: services.private
+13/58 Test   #82: services.private .....................   Passed    5.78 sec
+      Start   83: services.elevator_entry
+14/58 Test   #83: services.elevator_entry ..............   Passed    2.05 sec
+      Start  415: ai_state.symbols
+15/58 Test  #415: ai_state.symbols .....................   Passed    0.02 sec
+      Start  416: ai_state.transitions
+16/58 Test  #416: ai_state.transitions .................   Passed    0.03 sec
+      Start  417: ai_state.commands
+17/58 Test  #417: ai_state.commands ....................   Passed    0.03 sec
+      Start  418: ai_state.resize
+18/58 Test  #418: ai_state.resize ......................   Passed    0.03 sec
+      Start  419: ai_state.decisions
+19/58 Test  #419: ai_state.decisions ...................   Passed    0.03 sec
+      Start  420: ai_state.civilian
+20/58 Test  #420: ai_state.civilian ....................   Passed    0.03 sec
+      Start  421: ai_state.dispatch
+21/58 Test  #421: ai_state.dispatch ....................   Passed    0.03 sec
+      Start  422: ai_state.failures
+22/58 Test  #422: ai_state.failures ....................   Passed    0.02 sec
+      Start  423: ai_state.lifetime
+23/58 Test  #423: ai_state.lifetime ....................   Passed    0.04 sec
+      Start  424: ai_state.catalog
+24/58 Test  #424: ai_state.catalog .....................   Passed    1.06 sec
+      Start  425: ai_state.subway
+25/58 Test  #425: ai_state.subway ......................   Passed   38.59 sec
+      Start  426: ai_fire.selection
+26/58 Test  #426: ai_fire.selection ....................   Passed    0.02 sec
+      Start  427: ai_fire.clearance
+27/58 Test  #427: ai_fire.clearance ....................   Passed    0.02 sec
+      Start  428: ai_fire.filters
+28/58 Test  #428: ai_fire.filters ......................   Passed    0.03 sec
+      Start  429: ai_fire.head
+29/58 Test  #429: ai_fire.head .........................   Passed    0.03 sec
+      Start  430: ai_fire.aim
+30/58 Test  #430: ai_fire.aim ..........................   Passed    0.02 sec
+      Start  431: ai_fire.keys
+31/58 Test  #431: ai_fire.keys .........................   Passed    0.02 sec
+      Start  432: ai_fire.cadence
+32/58 Test  #432: ai_fire.cadence ......................   Passed    0.02 sec
+      Start  433: ai_fire.recovery
+33/58 Test  #433: ai_fire.recovery .....................   Passed    0.02 sec
+      Start  434: ai_fire.failures
+34/58 Test  #434: ai_fire.failures .....................   Passed    0.02 sec
+      Start  435: ai_fire.lifetime
+35/58 Test  #435: ai_fire.lifetime .....................   Passed    0.03 sec
+      Start  436: ai_fire.script_stand
+36/58 Test  #436: ai_fire.script_stand .................   Passed    0.02 sec
+      Start  437: ai_fire.script_moving
+37/58 Test  #437: ai_fire.script_moving ................   Passed    0.03 sec
+      Start  438: ai_fire.script_refusal
+38/58 Test  #438: ai_fire.script_refusal ...............   Passed    0.03 sec
+      Start  439: ai_fire.script_lifetime
+39/58 Test  #439: ai_fire.script_lifetime ..............   Passed    0.03 sec
+      Start  440: ai_fire.script_routes
+40/58 Test  #440: ai_fire.script_routes ................   Passed    0.02 sec
+      Start  441: ai_fire.catalog
+41/58 Test  #441: ai_fire.catalog ......................   Passed    0.93 sec
+      Start  442: ai_fire.subway
+42/58 Test  #442: ai_fire.subway .......................   Passed   13.42 sec
+      Start  443: ai_fire.script_private
+43/58 Test  #443: ai_fire.script_private ...............   Passed   25.30 sec
+      Start  484: ai_locomotion.dodge
+44/58 Test  #484: ai_locomotion.dodge ..................   Passed    0.06 sec
+      Start  485: ai_locomotion.rolls
+45/58 Test  #485: ai_locomotion.rolls ..................   Passed    0.05 sec
+      Start  486: ai_locomotion.obstruction
+46/58 Test  #486: ai_locomotion.obstruction ............   Passed    0.05 sec
+      Start  487: ai_locomotion.rays
+47/58 Test  #487: ai_locomotion.rays ...................   Passed    0.04 sec
+      Start  488: ai_locomotion.navigate
+48/58 Test  #488: ai_locomotion.navigate ...............   Passed    0.03 sec
+      Start  489: ai_locomotion.ledges
+49/58 Test  #489: ai_locomotion.ledges .................   Passed    0.03 sec
+      Start  490: ai_locomotion.walking
+50/58 Test  #490: ai_locomotion.walking ................   Passed    0.03 sec
+      Start  491: ai_locomotion.physics
+51/58 Test  #491: ai_locomotion.physics ................   Passed    0.03 sec
+      Start  492: ai_locomotion.moving_fire
+52/58 Test  #492: ai_locomotion.moving_fire ............   Passed    0.03 sec
+      Start  493: ai_locomotion.keys
+53/58 Test  #493: ai_locomotion.keys ...................   Passed    0.03 sec
+      Start  494: ai_locomotion.lifetime
+54/58 Test  #494: ai_locomotion.lifetime ...............   Passed    0.04 sec
+      Start  495: ai_locomotion.attacks
+55/58 Test  #495: ai_locomotion.attacks ................   Passed    0.03 sec
+      Start  496: ai_locomotion.catalog
+56/58 Test  #496: ai_locomotion.catalog ................   Passed    1.19 sec
+      Start 1114: reported_levels.11_slaughter_house
+57/58 Test #1114: reported_levels.11_slaughter_house ...***Timeout 180.13 sec
+
+      Start 1115: reported_levels.multi/bb_midgard
+58/58 Test #1115: reported_levels.multi/bb_midgard .....   Passed   19.39 sec
+
+98% tests passed, 1 tests failed out of 58
+
+Label Time Summary:
+ai_fire          =  40.03 sec*proc (18 tests)
+ai_locomotion    =   1.64 sec*proc (13 tests)
+ai_state         =  39.91 sec*proc (11 tests)
+campaign         = 199.52 sec*proc (2 tests)
+headless         = 290.42 sec*proc (58 tests)
+private          =  88.32 sec*proc (8 tests)
+private-data     = 199.52 sec*proc (2 tests)
+services         =   9.32 sec*proc (14 tests)
+
+Total Test time (real) = 290.46 sec
+
+The following tests FAILED:
+	1114 - reported_levels.11_slaughter_house (Timeout)      campaign headless private-data
+Errors while running CTest

@@ -351,7 +351,9 @@ class AI_Mgr : public CBaseCharacter
     std::uint64_t state_changes = 0, state_dispatches = 0, state_failures = 0;
     std::uint64_t animation_starts = 0, animation_finishes = 0;
     std::uint64_t animation_resize_blocks = 0; // Clip continued; physical bounds were retained.
-    DVector animation_requested_dims{};        // Last different-clip resize request, before collision.
+    std::uint64_t retained_clip_requests = 0;
+    bool animation_clip_retained = false;
+    DVector animation_requested_dims{}; // Last different-clip resize request, before collision.
     int requested_state = StateIdle, dispatched_state = StateIdle, animation_choice = -1;
     DDWORD requested_animation = UINT32_MAX;
     std::string state_error;

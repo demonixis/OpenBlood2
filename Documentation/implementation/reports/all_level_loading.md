@@ -103,3 +103,36 @@ The same 24 tests pass under Clang ASan/UBSan with leak detection enabled:
 [Cabana admission](evidence/all-levels-cabana.log) passes all three difficulties;
 [GPU opening](evidence/all-levels-cabana-gpu.log) renders three frames on the
 NVIDIA RTX 3060 and exits 0 (SDL dummy audio). Dev inspector application builds.
+
+## Iteration 3: Slaughter House and Midgard
+
+Slaughter House now follows the original ignored invalid-ordinal request with
+verified current animation playback, source dimension/clock behavior and visible
+retained-request counters. Midgard's initially embedded nonsolid gravity pickup
+uses the same bounded primary-world placement as solid bodies. Neither fix
+relaxes later collision or supplies missing animations. Both worlds pass all
+three difficulties and the final runtime check. The focused 56 service and
+AI state/locomotion/fire regressions pass in Dev.
+
+The [second exhaustive audit](evidence/all-levels-audit-02.log) passes **35 / 58**
+worlds and fails **23 / 58**. This includes the three newly passing worlds
+Cabana, Slaughter House and Midgard; the original baseline table remains above.
+
+- [Dev regressions](evidence/all-levels-lot3-dev.log): 56/56.
+- [Initial sanitizer run](evidence/all-levels-lot3-sanitizers-initial.log):
+  the 56 service/AI cases and Midgard pass; Slaughter House times out at 180 s.
+  This timeout is retained as a failed run, not a sanitizer success.
+- [Sanitizer map rerun](evidence/all-levels-lot3-sanitizer-worlds.log): both
+  maps pass with ASan/UBSan and leak detection. Instrumented Debug map tests
+  now have a 600 s timeout; all three difficulties and simulation steps are
+  unchanged. The rerun takes 268 s total. Progress flushes after each difficulty.
+- [Release map tests](evidence/all-levels-lot3-release.log): all three pass.
+  Inspector Dev and inspector-free Release applications build.
+- Release GPU opening renders three frames and exits 0 for
+  [Slaughter House](evidence/all-levels-slaughter-gpu.log) and
+  [Midgard](evidence/all-levels-midgard-gpu.log), NVIDIA RTX 3060, dummy audio.
+
+Further diagnosis: Area15 contains only Multiplayer=true start markers; its
+single-player startup rejection is distinct from collision failure. Train Station
+has two BoneLeech centers exactly on shelf2's top (Y=64), and SoulDrudge0 starts
+in a primary-world wedge. These remain the next placement work.

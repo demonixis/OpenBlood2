@@ -228,7 +228,7 @@ namespace OpenBlood2
         auto* r = objects_.get(h);
         if (!r || r->life != Life::Alive || r->attachment || r->world_model || r->container() || !collision ||
             !collision_ready || !physics_vector(r->dimensions) || r->dimensions.x <= 0 || r->dimensions.y <= 0 ||
-            r->dimensions.z <= 0 || !(r->state.m_Flags & FLAG_SOLID))
+            r->dimensions.z <= 0 || !(r->state.m_Flags & (FLAG_SOLID | FLAG_GRAVITY)))
             return DE_INVALIDPARAMS;
         const auto half = r->dimensions;
         // Separate horizontal/vertical budgets admit a ceiling plus its sloped trim.
@@ -299,7 +299,7 @@ namespace OpenBlood2
         const auto below = DVector{r->state.m_Pos.x, r->state.m_Pos.y - 1, r->state.m_Pos.z};
         // Only when the descent itself starts blocked: overlaps it leaves (a ceiling) keep the
         // ordinary path, which lowers the body out of them.
-        if ((r->state.m_Flags & FLAG_SOLID) && physics_vector(r->dimensions) &&
+        if ((r->state.m_Flags & (FLAG_SOLID | FLAG_GRAVITY)) && physics_vector(r->dimensions) &&
             collision->sweep(r->state.m_Pos, below, r->dimensions, descent, 0.01, StartOverlap::Leave) ==
                 CollisionQuery::Hit &&
             descent.start_solid)
