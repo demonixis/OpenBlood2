@@ -9,6 +9,8 @@ and candidate transaction) and 5 (player and client) are implemented; see their 
 [lot 4](../implementation/reports/save_load_session.md),
 [lot 5](../implementation/reports/save_load_player.md)). Lot 8 (movers and brushes,
 [evidence](../implementation/reports/save_load_movers.md)) declares its 18 classes Original.
+Lot 7 (world logic, [evidence](../implementation/reports/save_load_world_logic.md)) declares its
+10 classes Original.
 Lot 6 (slots, Quick and Restart, menus, [evidence](../implementation/reports/save_load_slots.md))
 writes and reads the slot, quick and level-entry files and enables the Save and Load screens,
 F5/F6 and the death Load menu. `GameSession::save_game` and `load_game` save and load through a
@@ -968,8 +970,8 @@ payload version 1; their `PRECREATE_SAVEGAME` refusals are gone.
   creation, so it is saved as false.
 - **Losses kept.** Door and Rotating busy loops, the destructible model's sliding loop and
   every one-shot are not restarted; TripLaser restarts its loop in Load, as the original does.
-  Destroyed objects stay gone. A door's self-spawned Trigger is saved by reference, so such a
-  door is refused (Trigger, lot 7) until the trigger lot lands.
+  Destroyed objects stay gone. A door's self-spawned Trigger is saved by reference; since
+  [lot 7](#implemented-world-logic-lot-7) the Trigger is saved with it.
 - **Departures.** Decision 4: the original VolumeBrush forgets `m_hPlayerClass` on a restore
   and routes the player through the non-player branch; the port's engine marks the player in
   `ContainerPhysics`, so a restored volume keeps recognizing it. The saved container code is
@@ -985,6 +987,61 @@ payload version 1; their `PRECREATE_SAVEGAME` refusals are gone.
   again at its first update, which the engine treats as no change. All 50 sky worlds restore
   their lot-8 objects through `load_game` with no sky failure. No sky world is restorable whole
   yet: each still holds classes of lots 5, 7, 9, 10 or 11 (see the evidence).
+
+### Implemented world logic (lot 7)
+
+The original Save/Load bodies of Trigger with BigTrigger and ToggleTrigger, ExitTrigger,
+ObjectivesTrigger, ConversationTrigger, CinematicTrigger, Spawner, KeyFramer with its KeyData
+blocks, and CameraObj. The 10 registered classes are Original with payload version 1; their
+`PRECREATE_SAVEGAME` refusals are gone, and self-triggered doors save with their Trigger.
+
+- **Byte order.** A subclass writes its block before Trigger's: ToggleTrigger's off messages and
+  state, ExitTrigger's world, start point and exit type, ObjectivesTrigger's resource, title and
+  text, ConversationTrigger's eight waves, character, count, cursor and flags. BigTrigger has
+  no block. KeyFramer writes its timeline, the byte key count, every KeyData block, the current,
+  position-1 and position-2 keys as float-encoded indices (−1 for NULL), then one offset and
+  rotation pair per key, then the port tail below. Empty strings are the original NULL HSTRING.
+- **Restore branches.** `PRECREATE_SAVEGAME` reads no property. CameraObj's PostPropRead still
+  runs, forcing its flags and a 0.001 s first update. `INITIALUPDATE_SAVEGAME` skips the
+  initialization; CameraObj still joins the camera list. Loads decode and check every field
+  against the class's property bounds before changing a member; a refusal goes through
+  `RejectPayload`. KeyFramer's key types must match their strings, and its indices the states
+  the port's sequencing can reach.
+- **Clocks.** Trigger's delay start and CameraObj's deactivation time are relative (`t −
+  GetTime()`) and restore to the same saved difference. KeyFramer's elapsed time and key times
+  are relative by nature. A trigger waiting on a delayed send, a reset, a toggle, a cinematic
+  delay, a spawner and a path all resume from the restored next-update deadline.
+- **KeyFramer.** A restored controller never collects its keys again: the always-load Keys it
+  consumed come back with the restore-mode world and stay inert. As in the original, its
+  target list is not saved: the next update rebuilds it by name and links each target again
+  (an existing link is kept). Targets take the saved offsets in list order. Until then a save
+  writes the loaded offsets unchanged. A controller saved before its first update collects the
+  reloaded keys then. More than 255 keys refuses the save: the original byte count desynchronized.
+  A target that was not there at the save gets a zero offset. The retained key sound is never
+  saved: a restored path starts silent, like the original.
+- **CameraObj.** Load publishes the camera effect again from the restored values, which the
+  original engine replayed from the saved special-effect message. Then the original Load tail,
+  `SetActive`, recomputes `g_hActiveCamera` and the schedule. An active listener camera
+  therefore restores as the active camera and the client's camera view. The tracked target is a
+  LoadSave reference; the engine restores the interlink.
+- **Door.** A self-spawned Trigger is a saved Trigger. The door's Load checks the reference's
+  class and gives the Trigger back its owning door, which is port state outside the original
+  block.
+- **Original behavior kept.** CinematicTrigger never saves its voice: one saved while a cue
+  plays restarts that cue at the restored update, sending its message again. ObjectivesTrigger
+  does not save its sound. A timed active camera restarts its full ActiveTime. Trigger's last
+  sender is not saved.
+- **Departures.** Decision 4, two player-visible losses:
+  - The original Spawner reschedules on every initial update from the constructor's
+    StartActive (false), so a running spawner stopped after a restore. Its
+    `INITIALUPDATE_SAVEGAME` now keeps the restored schedule.
+  - The original saves one offset per key, not per target. A target past the key count read
+    uninitialized storage after a restore. SubwayA, SubwayB and SubwayC move twelve tunnel
+    lights on a two-key `sublight` path, so ten of them would jump. A port tail after the
+    original offsets carries a `u32` count (≤ 256) and the remaining targets' offsets.
+- **Expected re-save rewrites.** CameraObj only: the forced flags, the schedule (0.01 s active,
+  none inactive) and, for a timed active camera, the deactivation time. Every other OBJS, LINK
+  and ATCH byte of these classes is identical after a load.
 
 ## Restored and regenerated state
 

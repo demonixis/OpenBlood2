@@ -1,7 +1,7 @@
 #pragma once
 #include "Trigger.h"
 
-// Selected original ExitTrigger callbacks; save/load stays unsupported.
+// Selected original ExitTrigger callbacks; Save/Load follow the original block (save/load lot 7).
 class ExitTrigger : public Trigger
 {
   public:
@@ -17,4 +17,8 @@ class ExitTrigger : public Trigger
     {
         SendMessages();
     }
+
+  private:
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };

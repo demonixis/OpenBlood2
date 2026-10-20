@@ -67,7 +67,9 @@ namespace
         CHECK(command(g, h, "ON") && !f->active);
         CHECK(g.step(.01) && f->initialized && !f->error.empty());
         CHECK(!g.objects.get(h)->scheduled && f->keys.empty());
-        CHECK(!g.objects.create(g.objects.find_class("KeyFramer"), {}, Creation::Restore));
+        // Save/load lot 7: a savegame precreate reads no property and skips InitialUpdate.
+        const auto restored = g.objects.create(g.objects.find_class("KeyFramer"), {}, Creation::Restore);
+        CHECK(restored && framer(g, restored)->object_name.empty() && !g.objects.get(restored)->scheduled);
         auto string = g.objects.create_props(g.objects.find_class("KeyFramer"), {},
                                              "ObjectName target; BaseKeyName k; StartActive true");
         CHECK(string && framer(g, string)->object_name.empty() && !framer(g, string)->start_active);

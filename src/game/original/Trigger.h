@@ -41,6 +41,8 @@ class Trigger : public B2BaseClass
     virtual void SendMessage(unsigned, const std::string&);
 
   private:
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
     bool ReadProp();
     bool ValidateSender(HOBJECT);
     void Activate(HOBJECT, bool touch);
@@ -60,4 +62,8 @@ class ToggleTrigger : public Trigger
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
     void SendMessages() override;
+
+  private:
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };

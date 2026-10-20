@@ -55,7 +55,10 @@ namespace
         CHECK(create(g, {{"EndEpisode", true}, {"SubWorld", true}})->exit.type == WorldExitType::Subworld);
         CHECK(create(g, {{"EndOfEpisode", true}, {"SubWorld", true}})->exit.type == WorldExitType::Episode);
         CHECK(!create(g, {{"NextWorld", std::string(101, 'x')}}));
-        CHECK(!g.objects.create(g.objects.find_class("ExitTrigger"), {}, Creation::Restore));
+        // Save/load lot 7: a savegame precreate reads no property and skips InitialUpdate; the
+        // engine record and the original Load supply the state.
+        const auto restored = g.objects.create(g.objects.find_class("ExitTrigger"), {}, Creation::Restore);
+        CHECK(restored && !(g.server.GetObjectUserFlags(restored) & USRFLG_SAVEABLE));
         return true;
     }
     bool delayed(const std::filesystem::path& root)

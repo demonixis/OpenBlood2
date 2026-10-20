@@ -1,5 +1,6 @@
 // Selected original ObjectDLL/CinematicTrigger.cpp; owned cues and checked audio handles.
 #include "CinematicTrigger.h"
+#include "SaveFields.h"
 #include "engine/objects.h"
 #include "trigger_helpers.h"
 #include <cmath>
@@ -35,12 +36,16 @@ DDWORD CinematicTrigger::EngineMessageFn(DDWORD message, void* data, DFLOAT reas
 {
     if (message == MID_PRECREATE)
     {
-        if (!data || reason == 3)
+        if (!data)
             return 0;
         if ((reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP) && !ReadProp())
             return 0;
     }
-    else if (message == MID_INITIALUPDATE)
+    else if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
+    else if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME)
     {
         g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3));
         g_pServerDE->SetNextUpdate(m_hObject, 0);
@@ -138,4 +143,46 @@ void CinematicTrigger::StartSound()
     ++starts;
     if (!sound)
         ++failures; // Original retries on next update, resending its cue message.
+}
+void CinematicTrigger::Save(HMESSAGEWRITE h)
+{
+    // Original CinematicTrigger.cpp:463-480. The current voice is never saved: a trigger saved
+    // while a cue plays restarts that cue, resending its message, at the restored update
+    // (preserved original behavior).
+    namespace F = save_fields;
+    auto* s = g_pServerDE;
+    s->WriteToMessageByte(h, static_cast<DBYTE>(current));
+    for (const auto& cue : cues)
+    {
+        s->WriteToMessageFloat(h, cue.delay);
+        F::write_string(h, cue.sound);
+        F::write_string(h, cue.speaker);
+        F::write_string(h, cue.target);
+        F::write_string(h, cue.message);
+    }
+}
+void CinematicTrigger::Load(HMESSAGEREAD h)
+{
+    // Original CinematicTrigger.cpp:489-505, with ReadProp's delay bounds.
+    namespace F = save_fields;
+    auto* s = g_pServerDE;
+    const DBYTE cursor = s->ReadFromMessageByte(h);
+    std::array<Cue, 10> saved;
+    bool ok = true, valid = cursor <= saved.size();
+    for (auto& cue : saved)
+    {
+        cue.delay = s->ReadFromMessageFloat(h);
+        for (auto* text : {&cue.sound, &cue.speaker, &cue.target, &cue.message})
+            ok = F::read_string(h, *text) && ok;
+        valid = valid && F::finite(cue.delay) && cue.delay >= 0;
+    }
+    if (!ok)
+        return;
+    if (!valid)
+    {
+        s->RejectPayload(h, "cinematic block holds values the port cannot represent");
+        return;
+    }
+    cues = std::move(saved);
+    current = cursor;
 }

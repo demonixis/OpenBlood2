@@ -45,6 +45,9 @@ class CameraObj : public B2BaseClass
   private:
     bool ReadProp();
     void InitialUpdate();
+    bool Publish();
     void Update();
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };
 extern HOBJECT g_hActiveCamera;

@@ -18,7 +18,8 @@ contracts with the [source selections](../implementation/sources/m2_keyframer_so
 KeyFramer retains original ObjectName/BaseKeyName/StartActive/Looping defaults,
 world-only property reads, B2BaseClass filtering/callback forwarding, saveable user
 bit and delayed first initialization. Runtime/string-created controllers keep
-source defaults; restore is rejected. Save/load and sound caching remain absent.
+source defaults. Save/Load follow the original block ([save/load lot 7](save_load_contracts.md#implemented-world-logic-lot-7)); sound caching
+remains absent.
 The first update snapshots exact-name targets and collects BaseKeyName0, 1, 2,
 ... until the first missing number. It selects the first live Key-derived match,
 skipping same-named objects of other classes. A duplicate or a key after a gap

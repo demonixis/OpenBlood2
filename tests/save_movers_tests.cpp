@@ -787,20 +787,11 @@ namespace
         return true;
     }
 
-    // Refusals: a self-triggered door names its Trigger (lot 7); a corrupt payload fails the
-    // restore by class name and rolls back every created record.
+    // Refusals: a corrupt payload fails the restore by class name and rolls back every created
+    // record. A self-triggered door saves with its Trigger since lot 7 (save_world_logic.doors).
     bool refusals()
     {
         SaveImage image;
-        {
-            GameSession g;
-            CHECK(setup(g, door_models()));
-            auto d = door(g, {{"SelfTrigger", true}});
-            CHECK(d && get<Door>(g, d)->trigger);
-            std::string error;
-            CHECK(!save(g, image, &error) && error.find("Trigger (Unsupported)") != std::string::npos);
-            std::cout << "self-trigger door: " << error << '\n';
-        }
         {
             GameSession a;
             CHECK(setup(a, door_models()));

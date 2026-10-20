@@ -435,13 +435,20 @@ void Door::Load(HMESSAGEREAD h)
         return;
     for (float value : {saved_speed, saved_dist, wait, closing, saved_open_time, radius, delay})
         ok = ok && F::finite(value);
+    // A self-spawned trigger is a saved Trigger (lot 7); any other referenced class is refused.
+    auto* spawned = saved_trigger ? dynamic_cast<Trigger*>(s->HandleToObject(saved_trigger)) : nullptr;
     if (!ok || flags > 15 || saved_state < Closed || saved_state > Opening || wave > 3 || delay < 0 || radius < 0 ||
-        !physics_vector(dir) || !physics_vector(dims) || !physics_vector(open) || !physics_vector(closed))
+        !physics_vector(dir) || !physics_vector(dims) || !physics_vector(open) || !physics_vector(closed) ||
+        (saved_trigger && !spawned))
     {
         s->RejectPayload(h, "door block holds values the port cannot represent");
         return;
     }
     trigger = saved_trigger;
+    // The owning door is port state of the spawned trigger, not part of the original Trigger
+    // block: the door restores it. The engine restores their interlink after every Load.
+    if (spawned)
+        spawned->owner_door = m_hObject;
     self_trigger = flags & self_trigger_flag;
     trigger_closed = flags & trigger_closed_flag;
     start_open = flags & start_open_flag;

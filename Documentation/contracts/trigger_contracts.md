@@ -161,6 +161,7 @@ pickup and is separate from original rules. Simulation also runs without ImGui.
 
 Inspector TRIGGER is a direct test command, not the original 82-unit player USE
 ray, now connected alongside RotatingDoor by [interaction_contracts.md](interaction_contracts.md).
-Complete AI, audio/localized feedback, save/restore and full gameplay remain pending.
+Complete AI, audio/localized feedback and full gameplay remain pending. Trigger, BigTrigger and
+ToggleTrigger Save/Load follow the original blocks ([save/load lot 7](save_load_contracts.md#implemented-world-logic-lot-7)).
 Original B2BaseClass difficulty/game-type filtering now carries an inspection
 marker so initial-update removals are reported as filtered, not creation failures.

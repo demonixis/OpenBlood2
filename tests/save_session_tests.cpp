@@ -535,7 +535,18 @@ namespace
                                              "TripLaser",
                                              "VolumeBrush",
                                              "Water",
-                                             "WorldModelDebris"};
+                                             "WorldModelDebris",
+                                             // Lot 7: world logic.
+                                             "BigTrigger",
+                                             "CameraObj",
+                                             "CinematicTrigger",
+                                             "ConversationTrigger",
+                                             "ExitTrigger",
+                                             "KeyFramer",
+                                             "ObjectivesTrigger",
+                                             "Spawner",
+                                             "ToggleTrigger",
+                                             "Trigger"};
         std::size_t unsupported = 0;
         for (auto type : g.objects.classes())
         {
@@ -628,9 +639,10 @@ namespace
         GameSave save;
         const auto before = g.server.save_store.revision();
         CHECK(!g.save_game(save, error) && contains(error, "SaveObjects: listed classes cannot be saved"));
-        for (auto name : {"BigTrigger (Unsupported)", "CClientExplosionSFX (Unsupported)", "CinematicTrigger",
-                          "ClientLightFX", "KeyFramer", "RandomSoundFX", "SoundFX", "Spawner", "Trigger (Unsupported)"})
+        for (auto name : {"CClientExplosionSFX (Unsupported)", "ClientLightFX", "RandomSoundFX", "SoundFX"})
             CHECK(contains(error, name));
+        for (auto name : {"BigTrigger", "CinematicTrigger", "KeyFramer", "Spawner", "Trigger ("}) // Lot 7.
+            CHECK(error.find(name) == std::string::npos);
         CHECK(error.find("PathPoint") == std::string::npos && error.find("BaseClass") == std::string::npos);
         CHECK(g.server.save_store.revision() == before && !g.server.save_store.find(SaveStoreSlot::Current));
         // A saveable class's object without the marking is refused by name instead of being dropped.
@@ -642,6 +654,7 @@ namespace
         g.server.SetObjectUserFlags(unmarked, 0);
         CHECK(!g.save_game(save, error) && contains(error, "not marked USRFLG_SAVEABLE: Trigger") &&
               error.find("SaveObjects") == std::string::npos);
+        g.server.SetObjectUserFlags(unmarked, USRFLG_SAVEABLE); // Trigger is Original since lot 7.
         // Without any Unsupported object, a marked NotSaved object still refuses by name. The
         // player (Original since lot 5) and its unsaved children stay.
         for (auto id : g.objects.snapshot())

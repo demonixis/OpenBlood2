@@ -1,5 +1,6 @@
 // Original ObjectDLL/ConversationTrigger.cpp; owned values and typed broadcast.
 #include "ConversationTrigger.h"
+#include "SaveFields.h"
 DDWORD ConversationTrigger::EngineMessageFn(DDWORD m, void* data, DFLOAT reason)
 {
     if (m == MID_PRECREATE && (reason == 1 || reason == 2))
@@ -25,6 +26,10 @@ DDWORD ConversationTrigger::EngineMessageFn(DDWORD m, void* data, DFLOAT reason)
         if (g_pServerDE->GetPropGeneric("CharacterType", &p) == DE_OK)
             character = static_cast<DBYTE>(static_cast<std::uint32_t>(p.m_Long));
     }
+    if (m == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (m == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
     return Trigger::EngineMessageFn(m, data, reason);
 }
 void ConversationTrigger::SendMessages()
@@ -55,4 +60,46 @@ void ConversationTrigger::SendMessages()
         else if (loop)
             current = 0;
     }
+}
+void ConversationTrigger::Save(HMESSAGEWRITE h)
+{
+    // Original ConversationTrigger.cpp:315-330.
+    namespace F = OpenBlood2::save_fields;
+    auto* s = g_pServerDE;
+    for (const auto& wave : waves)
+        F::write_string(h, wave);
+    s->WriteToMessageByte(h, character);
+    s->WriteToMessageByte(h, static_cast<DBYTE>(count));
+    s->WriteToMessageByte(h, static_cast<DBYTE>(current));
+    s->WriteToMessageByte(h, repeat_last);
+    s->WriteToMessageByte(h, loop);
+}
+void ConversationTrigger::Load(HMESSAGEREAD h)
+{
+    // Original ConversationTrigger.cpp:341-356, with ReadProp's bounds: at most eight messages,
+    // 199-byte wave names, and a cursor at most one past the last message.
+    namespace F = OpenBlood2::save_fields;
+    auto* s = g_pServerDE;
+    std::array<std::string, 8> saved;
+    bool ok = true;
+    for (auto& wave : saved)
+        ok = F::read_string(h, wave, 199) && ok;
+    const DBYTE type = s->ReadFromMessageByte(h), messages = s->ReadFromMessageByte(h),
+                cursor = s->ReadFromMessageByte(h);
+    bool repeat = false, loops = false;
+    ok = F::read_bool(h, repeat) && ok;
+    ok = F::read_bool(h, loops) && ok;
+    if (!ok)
+        return;
+    if (messages > saved.size() || cursor > messages)
+    {
+        s->RejectPayload(h, "saved conversation cursor is outside its eight messages");
+        return;
+    }
+    waves = std::move(saved);
+    character = type;
+    count = messages;
+    current = cursor;
+    repeat_last = repeat;
+    loop = loops;
 }

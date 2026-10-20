@@ -47,7 +47,8 @@ object movement, so it can precede the current rendered pose by one session step
 Missing WAVs, invalid radii and voice/cache budgets remain explicit failures.
 No basename search or fabricated sound is added for missing authored references.
 Playback remains dry: requested reverb and priority are metadata, with no acoustic
-occlusion or priority arbitration. Print presentation, full save/restore and the
+occlusion or priority arbitration. The retained sound is never saved; a restored controller
+starts silent ([save/load lot 7](save_load_contracts.md#implemented-world-logic-lot-7)). Print presentation and the
 remaining M2 acceptance gate are separate work.
 
 ## Checks and scope

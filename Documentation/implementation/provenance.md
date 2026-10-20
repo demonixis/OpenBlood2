@@ -1832,6 +1832,22 @@ code). See the
 the [evidence](reports/save_load_movers.md) and the
 [source ledger](sources/save_load_movers_sources.json).
 
+## World logic save/load (2026-10-20)
+
+Save/load lot 7 adds selective ports of the original `Save`/`Load` bodies and their
+`MID_SAVEOBJECT`/`MID_LOADOBJECT` dispatch from `ObjectDLL/Trigger.cpp` (Trigger and
+ToggleTrigger), `ExitTrigger.cpp`, `ObjectivesTrigger.cpp`, `ConversationTrigger.cpp`,
+`CinematicTrigger.cpp`, `Spawner.cpp`, `KeyFramer.cpp`, `KeyData.cpp` and `CameraObj.cpp`:
+field order and widths, relative clocks, KeyFramer's byte key count, float-encoded key
+indices and per-key offset array, CameraObj's PostPropRead and `SetActive` Load tail, and the
+skipped `INITIALUPDATE_SAVEGAME` work. The port maps the fields onto its typed members,
+decodes and checks every block before changing a member, rebuilds KeyFramer's target list by
+name as the original `BuildObjectList` does, republishes the camera effect, restores a
+self-spawned Trigger's owning door, and records one departure (a running Spawner keeps its
+schedule). See the [contract](../contracts/save_load_contracts.md#implemented-world-logic-lot-7),
+the [evidence](reports/save_load_world_logic.md) and the
+[source ledger](sources/save_load_world_logic_sources.json).
+
 ## Enhanced renderer (2026-10-20)
 
 The physically based shaders (`engine/shaders/pbr.frag.hlsl`), the material manifest

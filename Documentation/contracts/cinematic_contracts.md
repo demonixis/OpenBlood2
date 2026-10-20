@@ -37,7 +37,8 @@ engine behavior, not verified retail parity. Named lists always release, fixing 
 source's early-return leak. After a synchronous cue message, pending owners cannot
 start audio. Destruction remains deferred. Values own strings; stale monotonic
 64-bit voice IDs never resolve after removal/reload or in a later mixer instance.
-Restore and save/load are unavailable. Invalid delays (nonfinite, negative or over
+Save/Load follow the original block ([save/load lot 7](save_load_contracts.md#implemented-world-logic-lot-7)); a cue playing at the save restarts and
+resends its message, as in the original. Invalid delays (nonfinite, negative or over
 1,000,000 seconds) reject precreate. These are deliberate validation adaptations.
 
 ## Resource and output service

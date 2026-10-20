@@ -10,7 +10,8 @@ M2 remains incomplete. See [source selections](../implementation/sources/m2_obje
 locks, active-command guard and scheduling. Its original defaults disable touch,
 AI, ordinary-object and trigger-relay activation; players remain enabled. The
 original title/text, resource number and sound properties are retained. Both
-world and string-property creation read them; unsupported restore still rejects.
+world and string-property creation read them. Save/Load follow the original block
+([save/load lot 7](save_load_contracts.md#implemented-world-logic-lot-7)); the sound is not saved, as in the original.
 
 Its SendMessages override sends a single objective broadcast only when **both**
 authored title and text are nonempty, even for a nonzero ResourceNum. It does not

@@ -58,7 +58,8 @@ Timing moved from the source Draw method into the client simulation update so it
 continues with Dear ImGui hidden or compiled out. This is an explicit adaptation.
 The [player VoiceMgr continuation](player_voice_contracts.md) now connects the
 source StopAll/SetNextPlayTime arbitration to actual retained player speech.
-Original portrait/font HUD drawing and full save/restore remain pending. Safe
+Original portrait/font HUD drawing remains pending; Save/Load follow the original block
+([save/load lot 7](save_load_contracts.md#implemented-world-logic-lot-7)). Safe
 NEW_LEVEL is covered by the later [transition contract](level_change_contracts.md).
 
 ## Inspection and external-data evidence

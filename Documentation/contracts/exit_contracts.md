@@ -39,7 +39,7 @@ registered ExitTrigger must never count as a completed level exit or M2 completi
   activation, with player/relay activation enabled and zero reset time. With zero
   reset it remains inactive after activation unless explicitly rearmed.
 - Copy `NextWorld` and `StartPointName` before parent precreate; the default start
-  name is `start`. Save/restored construction remains rejected.
+  name is `start`. Save/Load follow the original block ([save/load lot 7](save_load_contracts.md#implemented-world-logic-lot-7)).
 - Preserve the source spelling mismatch: registration declares `EndEpisode`, but
   ReadProp reads `EndOfEpisode`. No alias fixes this. The latter is accepted as an
   optional, non-defaulted property because the source reads it (as with the existing

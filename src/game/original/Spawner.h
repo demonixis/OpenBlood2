@@ -2,8 +2,8 @@
 #include "B2BaseClass.h"
 #include "engine/audio.h"
 #include <string>
-// Selected original ObjectDLL/Spawner. Save/load and the rift client FX remain
-// unavailable; see spawner_contracts.md.
+// Selected original ObjectDLL/Spawner; the rift client FX remains unavailable. See
+// spawner_contracts.md. Save/Load follow the original block (save_load_contracts lot 7).
 class Spawner : public B2BaseClass
 {
   public:
@@ -28,4 +28,6 @@ class Spawner : public B2BaseClass
     bool ReadProp();
     void Update();
     bool SpawnObject(HOBJECT sender);
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };

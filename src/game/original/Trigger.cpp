@@ -1,4 +1,5 @@
 #include "Trigger.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
 #include "game/game_settings.h"
 #include "trigger_helpers.h"
@@ -223,8 +224,18 @@ void Trigger::Update()
 DDWORD Trigger::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
     if (message == MID_PRECREATE)
-        return B2BaseClass::EngineMessageFn(message, data, reason) && reason != 3 && ReadProp();
-    if (message == MID_INITIALUPDATE)
+    {
+        // Original: properties are read for world files and string creation only; a saved
+        // trigger keeps the precreate the engine record supplies.
+        const auto accepted = B2BaseClass::EngineMessageFn(message, data, reason);
+        return accepted && (reason == PRECREATE_SAVEGAME || ReadProp());
+    }
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
+    // Original InitialUpdate (dims, touch notify, marking, schedule) is skipped for a savegame.
+    if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME)
     {
         g_pServerDE->SetObjectDims(m_hObject, &dims);
         g_pServerDE->SetObjectFlags(m_hObject, FLAG_TOUCH_NOTIFY);
@@ -279,7 +290,12 @@ DDWORD Trigger::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD rea
 }
 DDWORD ToggleTrigger::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
-    if (message == MID_PRECREATE)
+    // Derived block first, then Trigger's (original dispatch order).
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
+    else if (message == MID_PRECREATE && reason != PRECREATE_SAVEGAME)
     {
         bool_prop("StartOn", on);
         for (unsigned i = 0; i < slots.size(); ++i)
@@ -292,4 +308,133 @@ void ToggleTrigger::SendMessages()
     for (unsigned i = 0; i < slots.size(); ++i)
         SendMessage(i, on ? slots[i].off_message : slots[i].message);
     on = !on;
+}
+namespace
+{
+    namespace F = OpenBlood2::save_fields;
+    bool read_strings(HMESSAGEREAD h, std::initializer_list<std::string*> out)
+    {
+        bool ok = true;
+        for (auto* text : out)
+            ok = F::read_string(h, *text) && ok;
+        return ok;
+    }
+} // namespace
+void Trigger::Save(HMESSAGEWRITE h)
+{
+    // Original Trigger.cpp:1046-1090. m_hLastSender and the reentrancy guard are not saved; the
+    // owning door of a self-spawned trigger is port state that Door::Load restores.
+    auto* s = g_pServerDE;
+    const float now = s->GetTime();
+    s->WriteToMessageByte(h, active);
+    s->WriteToMessageVector(h, &dims);
+    s->WriteToMessageFloat(h, reset_time);
+    F::write_string(h, activation_sound);
+    s->WriteToMessageFloat(h, sound_radius);
+    for (const auto& slot : slots)
+    {
+        F::write_string(h, slot.target);
+        F::write_string(h, slot.message);
+        s->WriteToMessageFloat(h, slot.delay);
+        s->WriteToMessageByte(h, slot.pending);
+    }
+    s->WriteToMessageFloat(h, max_delay);
+    s->WriteToMessageFloat(h, delay_start - now);
+    for (bool value :
+         {touch_activate, player_activate, ai_activate, object_activate, relay_activate, named_activate, locked})
+        s->WriteToMessageByte(h, value);
+    s->WriteToMessageDWord(h, activation_count);
+    s->WriteToMessageDWord(h, current_activation);
+    F::write_string(h, locked_message);
+    F::write_string(h, locked_sound);
+    F::write_string(h, unlocked_message);
+    F::write_string(h, unlocked_sound);
+    F::write_string(h, key_name);
+    F::write_string(h, activation_name);
+}
+void Trigger::Load(HMESSAGEREAD h)
+{
+    // Original Trigger.cpp:1099-1141, decoded and checked before any member changes. Pending
+    // delayed sends resume from the relative delay start and the restored schedule.
+    auto* s = g_pServerDE;
+    bool saved_active = false;
+    bool ok = F::read_bool(h, saved_active);
+    DVector saved_dims{};
+    s->ReadFromMessageVector(h, &saved_dims);
+    const float reset = s->ReadFromMessageFloat(h);
+    std::string sound;
+    ok = F::read_string(h, sound) && ok;
+    const float radius = s->ReadFromMessageFloat(h);
+    std::array<Slot, 10> saved;
+    for (unsigned i = 0; i < saved.size(); ++i)
+    {
+        auto& slot = saved[i];
+        slot.off_message = slots[i].off_message; // ToggleTrigger's block, read first.
+        ok = read_strings(h, {&slot.target, &slot.message}) && ok;
+        slot.delay = s->ReadFromMessageFloat(h);
+        ok = F::read_bool(h, slot.pending) && ok;
+    }
+    const float max = s->ReadFromMessageFloat(h);
+    const float start = s->ReadFromMessageFloat(h);
+    bool flags[7]{};
+    for (bool& value : flags)
+        ok = F::read_bool(h, value) && ok;
+    const DDWORD count = s->ReadFromMessageDWord(h), current = s->ReadFromMessageDWord(h);
+    std::string text[6];
+    ok = read_strings(h, {&text[0], &text[1], &text[2], &text[3], &text[4], &text[5]}) && ok;
+    if (!ok)
+        return;
+    ok = OpenBlood2::physics_vector(saved_dims) && saved_dims.x >= 0 && saved_dims.y >= 0 && saved_dims.z >= 0 &&
+         std::isfinite(reset) && F::finite(radius) && radius >= 0 && F::finite(max) && F::finite(start, 1e9f);
+    for (const auto& slot : saved)
+        ok = ok && F::finite(slot.delay);
+    if (!ok)
+    {
+        s->RejectPayload(h, "trigger block holds values the port cannot represent");
+        return;
+    }
+    active = saved_active;
+    dims = saved_dims;
+    reset_time = reset;
+    activation_sound = std::move(sound);
+    sound_radius = radius;
+    slots = std::move(saved);
+    max_delay = max;
+    delay_start = F::restored_time(start, s->GetTime());
+    touch_activate = flags[0];
+    player_activate = flags[1];
+    ai_activate = flags[2];
+    object_activate = flags[3];
+    relay_activate = flags[4];
+    named_activate = flags[5];
+    locked = flags[6];
+    activation_count = count;
+    current_activation = current;
+    locked_message = std::move(text[0]);
+    locked_sound = std::move(text[1]);
+    unlocked_message = std::move(text[2]);
+    unlocked_sound = std::move(text[3]);
+    key_name = std::move(text[4]);
+    activation_name = std::move(text[5]);
+}
+void ToggleTrigger::Save(HMESSAGEWRITE h)
+{
+    // Original Trigger.cpp:1305-1316.
+    for (const auto& slot : slots)
+        F::write_string(h, slot.off_message);
+    g_pServerDE->WriteToMessageByte(h, on);
+}
+void ToggleTrigger::Load(HMESSAGEREAD h)
+{
+    // Original Trigger.cpp:1327-1337.
+    std::array<std::string, 10> off;
+    bool ok = true;
+    for (auto& text : off)
+        ok = F::read_string(h, text) && ok;
+    bool saved_on = false;
+    if (!F::read_bool(h, saved_on) || !ok)
+        return;
+    for (unsigned i = 0; i < slots.size(); ++i)
+        slots[i].off_message = std::move(off[i]);
+    on = saved_on;
 }

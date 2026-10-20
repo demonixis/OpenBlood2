@@ -12,4 +12,8 @@ class ObjectivesTrigger : public Trigger
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
     void SendMessages() override;
+
+  private:
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };

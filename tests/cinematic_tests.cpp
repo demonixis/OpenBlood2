@@ -273,7 +273,9 @@ namespace
         CHECK(g.step(.01) && c->starts == 2 && c->failures == 2 &&
               c->current == 0); // No fabricated duration/advancement.
         CHECK(!cine(g, {{"Delay1", -1.0f}}));
-        CHECK(!g.objects.create(g.objects.find_class("CinematicTrigger"), {}, Creation::Restore));
+        // Save/load lot 7: a savegame precreate reads no property and skips InitialUpdate.
+        const auto restored = g.objects.create(g.objects.find_class("CinematicTrigger"), {}, Creation::Restore);
+        CHECK(restored && !(g.server.GetObjectUserFlags(restored) & USRFLG_SAVEABLE));
         g.server.set_game_settings(1, GAMETYPE_ACTION);
         auto filtered = cine(g);
         CHECK(filtered && g.objects.get(filtered)->life == Life::Pending && g.step(0) && !g.objects.get(filtered));

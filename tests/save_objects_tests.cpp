@@ -946,11 +946,11 @@ namespace
         // An original class keeps the Unsupported default until its lot declares it; lot 4
         // declared the CF_ALWAYSLOAD ones, which are skipped.
         CHECK(save_support(g.objects.find_class("CultistAI")) == SaveSupport::Unsupported);
-        auto trigger = g.objects.create(g.objects.find_class("Trigger"), {}, Creation::World, {});
+        auto pickup = g.objects.create(g.objects.find_class("HealthPU"), {}, Creation::World, {});
         auto spot = g.objects.create(g.objects.find_class("CameraSpot"), {}, Creation::World, {});
-        std::vector<HOBJECT> original{trigger, spot, b};
-        CHECK(trigger && spot && !save(g, original, report) &&
-              report.refused == std::vector<std::string>{"Trigger (Unsupported)"} && report.always_load == 1);
+        std::vector<HOBJECT> original{pickup, spot, b};
+        CHECK(pickup && spot && !save(g, original, report) &&
+              report.refused == std::vector<std::string>{"HealthPU (Unsupported)"} && report.always_load == 1);
         // A stale handle in the list is an explicit refusal.
         CHECK(g.objects.remove(u) && g.objects.finish_frame());
         std::vector<HOBJECT> stale{b, u};

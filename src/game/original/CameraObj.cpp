@@ -1,5 +1,6 @@
 // Selected original CameraObj callbacks and rules; see camera_contracts.md.
 #include "CameraObj.h"
+#include "SaveFields.h"
 #include "trigger_helpers.h"
 #include <algorithm>
 #include <cmath>
@@ -49,6 +50,17 @@ bool CameraObj::ReadProp()
 void CameraObj::InitialUpdate()
 {
     SetActive(m_bStartActive);
+    if (!Publish())
+    {
+        g_pServerDE->RemoveObject(m_hObject);
+        return;
+    }
+    g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3));
+}
+// The original SFX_CAMERA_ID message: published at initial update, and again by Load, where the
+// original engine replayed the saved special-effect message.
+bool CameraObj::Publish()
+{
     published = {m_nType, m_bPlayerMovement, m_bHidePlayer, m_bIsListener};
     // Preserve the source b2 1.0 level workaround, after path normalization.
     if (const auto var = g_pServerDE->GetGameConVar("GAME_WORLDNAME"))
@@ -65,18 +77,14 @@ void CameraObj::InitialUpdate()
             if (world.find("worlds\\") != std::string::npos)
                 published.listener = false;
         }
-    if (!g_pServerDE->PublishCameraEffect(m_hObject, published))
-    {
-        g_pServerDE->RemoveObject(m_hObject);
-        return;
-    }
-    g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3));
+    return g_pServerDE->PublishCameraEffect(m_hObject, published);
 }
 DDWORD CameraObj::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
     if (message == MID_PRECREATE)
     {
-        if (!data || !B2BaseClass::EngineMessageFn(message, data, reason) || reason == 3 ||
+        // Original PostPropRead also runs for a savegame: flags and the first update are forced.
+        if (!data || !B2BaseClass::EngineMessageFn(message, data, reason) ||
             ((reason == 1 || reason == 2) && !ReadProp()))
             return 0;
         auto& state = *static_cast<ObjectCreateStruct*>(data);
@@ -91,9 +99,15 @@ DDWORD CameraObj::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         state.m_NextUpdate = .001f;
         return 1;
     }
-    if (message == MID_INITIALUPDATE)
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
+    else if (message == MID_INITIALUPDATE)
     {
-        InitialUpdate();
+        // The list insertion runs for a savegame too; InitialUpdate does not.
+        if (reason != INITIALUPDATE_SAVEGAME)
+            InitialUpdate();
         if (!m_Link.m_pData && g_pServerDE->IsObjectAlive(m_hObject))
         {
             dl_Insert(&m_CameraHead, &m_Link);
@@ -216,4 +230,59 @@ DDWORD CameraObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD r
         }
     }
     return B2BaseClass::ObjectMessageFn(sender, message, read);
+}
+void CameraObj::Save(HMESSAGEWRITE h)
+{
+    // Original CameraObj.cpp:610-631; the camera effect itself is the engine-saved message.
+    auto* s = g_pServerDE;
+    s->WriteToMessageByte(h, m_bActive);
+    s->WriteToMessageByte(h, m_bStartActive);
+    s->WriteToMessageByte(h, m_bIsListener);
+    s->WriteToMessageByte(h, m_bPlayerMovement);
+    s->WriteToMessageByte(h, m_nType);
+    s->WriteToMessageFloat(h, m_fActiveTime);
+    s->WriteToMessageFloat(h, m_fDeactivateTime - s->GetTime());
+    s->WriteToMessageByte(h, m_bHidePlayer);
+    s->WriteToLoadSaveMessageObject(h, m_hLinkObject);
+}
+void CameraObj::Load(HMESSAGEREAD h)
+{
+    // Original CameraObj.cpp:640-658, decoded and checked first. The camera effect is published
+    // again from the restored values, then the original Load tail calls SetActive: it recomputes
+    // g_hActiveCamera and the schedule, and restarts a timed camera's full duration (preserved
+    // original quirk).
+    namespace F = save_fields;
+    auto* s = g_pServerDE;
+    bool flags[4]{};
+    bool ok = true;
+    for (bool& value : flags)
+        ok = F::read_bool(h, value) && ok;
+    const DBYTE type = s->ReadFromMessageByte(h);
+    const float active_time = s->ReadFromMessageFloat(h), deactivate = s->ReadFromMessageFloat(h);
+    bool hide = false;
+    ok = F::read_bool(h, hide) && ok;
+    HOBJECT link = nullptr;
+    s->ReadFromLoadSaveMessageObject(h, &link);
+    if (!ok)
+        return;
+    if (type > 2 || !F::finite(active_time) || !F::finite(deactivate, 1e9f) || link == m_hObject)
+    {
+        s->RejectPayload(h, "camera block holds values the port cannot represent");
+        return;
+    }
+    m_bActive = flags[0];
+    m_bStartActive = flags[1];
+    m_bIsListener = flags[2];
+    m_bPlayerMovement = flags[3];
+    m_nType = type;
+    m_fActiveTime = active_time;
+    m_fDeactivateTime = F::restored_time(deactivate, s->GetTime());
+    m_bHidePlayer = hide;
+    m_hLinkObject = link; // The engine restores the interlink after every Load.
+    if (!Publish())
+    {
+        s->RejectPayload(h, "camera effect cannot be published again");
+        return;
+    }
+    SetActive(m_bActive);
 }

@@ -23,4 +23,8 @@ class ConversationTrigger final : public Trigger
     {
         SendMessages();
     }
+
+  private:
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };

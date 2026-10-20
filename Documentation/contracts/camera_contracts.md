@@ -15,7 +15,8 @@ original defaults, world/string properties, start-active behavior, user flags,
 ON/OFF/LINK commands, source camera list and target tracking. TypeActionMode is
 false by default. The camera is a non-colliding normal object; DebugCutScene=1
 requests the original camera model/skin and exposes any resource failure.
-Restore is rejected; save/load and the unused source debug-ray FX are not ported.
+Save/Load follow the original block ([save/load lot 7](save_load_contracts.md#implemented-world-logic-lot-7)); Load publishes the camera effect again.
+The unused source debug-ray FX is not ported.
 
 ON arms a 0.01-second update and resets a positive ActiveTime deadline. Expiry uses
 strict `time > deadline`; zero and negative durations stay active indefinitely.

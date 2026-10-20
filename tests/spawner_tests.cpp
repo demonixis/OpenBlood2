@@ -96,7 +96,9 @@ namespace
         CHECK(!make(g, {{"RespawnRate", -1.0f}}));
         CHECK(!make(g, {{"SoundRadius", -5.0f}}));
         CHECK(!make(g, {{"Bogus", true}}));
-        CHECK(!make(g, {}, Creation::Restore));
+        // Save/load lot 7 (decision-4 departure): a savegame spawner keeps the restored schedule.
+        const auto restored = make(g, {}, Creation::Restore);
+        CHECK(restored && !g.objects.get(restored)->scheduled);
         // Original GenericProp/szSpawn hold MAX_GP_STRING_LEN (200) bytes; 24_AncientCity authors 141.
         const std::string padded = "HealthPU Name " + std::string(80, 'x') + ";PickupTriggerTarget " +
                                    std::string(40, 'y');

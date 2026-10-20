@@ -60,7 +60,10 @@ namespace
               !g.server.GetCameraView().object);
         CHECK(!create(g, {{"Type", std::int32_t(-1)}}) && !create(g, {{"Type", std::int32_t(3)}}));
         CHECK(!create(g, {{"ActiveTime", std::numeric_limits<float>::infinity()}}));
-        CHECK(!g.objects.create(g.objects.find_class("CameraObj"), {}, Creation::Restore));
+        // Save/load lot 7: a savegame camera joins the list but publishes nothing until its Load.
+        const auto restored = g.objects.create(g.objects.find_class("CameraObj"), {}, Creation::Restore);
+        CHECK(restored && g.server.camera_effects.size() == 1 &&
+              !(g.server.GetObjectUserFlags(restored) & USRFLG_SAVEABLE));
         CHECK(!c->Setup(3) && c->Setup(1) && c->published.type == 0 && c->m_nType == 1);
         CHECK(g.objects.clear() && CameraObj::m_dwNumCameras == 0 && g.server.camera_effects.empty() &&
               !g_hActiveCamera);

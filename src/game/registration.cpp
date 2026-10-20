@@ -254,7 +254,9 @@ namespace OpenBlood2
                                        {"StartActive", false},
                                        {"IsListener", true},
                                        {"HidePlayer", false},
-                                       {"TypeActionMode", false}}};
+                                       {"TypeActionMode", false}},
+                                      SaveSupport::Original,
+                                      1};
         const ClassInfo detail_sprite{"DetailSprite",
                                       &b2base,
                                       construct<DetailSprite>,
@@ -308,7 +310,9 @@ namespace OpenBlood2
                                  {"StartActive", false},
                                  {"RespawnCount", std::int32_t(-1)},
                                  {"RespawnRate", 1.0f},
-                                 {"CreateRiftEffect", false}}};
+                                 {"CreateRiftEffect", false}},
+                                SaveSupport::Original,
+                                1};
         const ClassInfo sound{"Sound",
                               &base,
                               construct<Sound>,
@@ -360,14 +364,18 @@ namespace OpenBlood2
                         p.push_back({name + n, std::string{}});
                 }
                 return p;
-            }()};
+            }(),
+            SaveSupport::Original,
+            1};
         const ClassInfo keyframer{"KeyFramer",
                                   &b2base,
                                   construct<KeyFramer>,
                                   {{"ObjectName", std::string{}},
                                    {"BaseKeyName", std::string{}},
                                    {"StartActive", false},
-                                   {"Looping", false}}};
+                                   {"Looping", false}},
+                                  SaveSupport::Original,
+                                  1};
         const ClassInfo client_sfx{"CClientSFX", &b2base, construct<CClientSFX>, {}, SaveSupport::NotSaved};
         const ClassInfo client_splat{
             "CClientSplatFX", &client_sfx, construct<CClientSplatFX>, {}, SaveSupport::NotSaved};
@@ -1081,7 +1089,9 @@ namespace OpenBlood2
                     properties.push_back({i == 1 ? "MessageDelay" : "MessageDelay" + n, 0.0f});
                 }
                 return properties;
-            }()};
+            }(),
+            SaveSupport::Original,
+            1};
         const ClassInfo exit_trigger{"ExitTrigger",
                                      &trigger,
                                      construct<ExitTrigger>,
@@ -1091,7 +1101,9 @@ namespace OpenBlood2
                                       {"EndOfEpisode", false, false},
                                       {"SubWorld", false},
                                       {"TouchActivate", false},
-                                      {"AIActivate", false}}};
+                                      {"AIActivate", false}},
+                                     SaveSupport::Original,
+                                     1};
         const ClassInfo objectives_trigger{
             "ObjectivesTrigger",
             &trigger,
@@ -1102,7 +1114,9 @@ namespace OpenBlood2
              {"Sound", std::string("Sounds\\Thunder.wav")},
              {"TouchActivate", false},
              {"AIActivate", false},
-             {"TriggerRelayActivate", false}}};
+             {"TriggerRelayActivate", false}},
+            SaveSupport::Original,
+            1};
         const ClassInfo conversation_trigger{
             "ConversationTrigger", &trigger, construct<ConversationTrigger>, []
             {
@@ -1114,8 +1128,10 @@ namespace OpenBlood2
                     p.push_back({std::string("WaveFile") + (i ? std::to_string(i + 1) : ""),
                                  std::string(i ? "" : "default.wav"), true, 199});
                 return p;
-            }()};
-        const ClassInfo big_trigger{"BigTrigger", &trigger, construct<BigTrigger>, {}};
+            }(),
+            SaveSupport::Original,
+            1};
+        const ClassInfo big_trigger{"BigTrigger", &trigger, construct<BigTrigger>, {}, SaveSupport::Original, 1};
         const ClassInfo toggle_trigger{"ToggleTrigger", &trigger, construct<ToggleTrigger>, []
                                        {
                                            std::vector<PropertySpec> properties{{"StartOn", false}};
@@ -1123,7 +1139,9 @@ namespace OpenBlood2
                                                properties.push_back(
                                                    {"OffMessageName" + std::to_string(i), std::string{}});
                                            return properties;
-                                       }()};
+                                       }(),
+                                       SaveSupport::Original,
+                                       1};
         const ClassInfo door{"Door",
                              &b2base,
                              construct<Door>,

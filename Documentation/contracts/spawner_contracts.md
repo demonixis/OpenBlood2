@@ -18,8 +18,8 @@ the constructor defaults, which differ from the registration: velocities
 count is a source `DDWORD`: -1 becomes 0xFFFFFFFF.
 
 Initial update schedules `RespawnRate` when StartActive, otherwise disables
-updates, and sets USRFLG_SAVEABLE. Save/restore is unavailable; restore creation
-rejects. Nonfinite or out-of-range velocities (existing physics vector bounds),
+updates, and sets USRFLG_SAVEABLE. Save/Load follow the original block ([save/load lot 7](save_load_contracts.md#implemented-world-logic-lot-7));
+a running spawner keeps its schedule after a load (decision-4 departure). Nonfinite or out-of-range velocities (existing physics vector bounds),
 SoundRadius or RespawnRate outside 0..1e6 reject creation; the source schedules
 and draws from unchecked values.
 

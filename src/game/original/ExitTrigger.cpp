@@ -1,4 +1,5 @@
 #include "ExitTrigger.h"
+#include "SaveFields.h"
 
 DDWORD ExitTrigger::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
@@ -18,6 +19,10 @@ DDWORD ExitTrigger::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
                     : subworld ? OpenBlood2::WorldExitType::Subworld
                                : OpenBlood2::WorldExitType::World;
     }
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
     return Trigger::EngineMessageFn(message, data, reason);
 }
 void ExitTrigger::SendMessages()
@@ -27,4 +32,31 @@ void ExitTrigger::SendMessages()
     last_delivery = g_pServerDE->SendWorldExit(exit, start_point);
     if (last_delivery == DE_OK)
         ++deliveries; // Queued delivery, never proof of a successful transition.
+}
+void ExitTrigger::Save(HMESSAGEWRITE h)
+{
+    // Original ExitTrigger.cpp:213-221, before the Trigger block.
+    namespace F = OpenBlood2::save_fields;
+    F::write_string(h, exit.next_world);
+    F::write_string(h, start_point);
+    g_pServerDE->WriteToMessageByte(h, static_cast<DBYTE>(exit.type));
+}
+void ExitTrigger::Load(HMESSAGEREAD h)
+{
+    // Original ExitTrigger.cpp:232-240. The exit type is one of the three ENDWORLD values.
+    namespace F = OpenBlood2::save_fields;
+    std::string world, start;
+    bool ok = F::read_string(h, world);
+    ok = F::read_string(h, start) && ok;
+    const DBYTE type = g_pServerDE->ReadFromMessageByte(h);
+    if (!ok)
+        return;
+    if (type > DBYTE(OpenBlood2::WorldExitType::Episode))
+    {
+        g_pServerDE->RejectPayload(h, "saved exit type is not an ENDWORLD value");
+        return;
+    }
+    exit.next_world = std::move(world);
+    start_point = std::move(start);
+    exit.type = static_cast<OpenBlood2::WorldExitType>(type);
 }

@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-20",
+  "scope": "Save/load lot 7: original Save/Load bodies of the world logic (Trigger, BigTrigger, ToggleTrigger, ExitTrigger, ObjectivesTrigger, ConversationTrigger, CinematicTrigger, Spawner, KeyFramer with KeyData, CameraObj), their PRECREATE_SAVEGAME and INITIALUPDATE_SAVEGAME branches and save-support declarations, and the self-triggered Door's restored Trigger. The bodies are selective ports recorded in the provenance ledger; the checks, KeyFramer's target rebuild, the camera republication and the Spawner departure are OpenBlood2 code.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Trigger.cpp",
+      "source_sha256": "c6cb75d4154c4c03c4166c96de6aecba68303750c5b6b89cb8c78ba5c6704596",
+      "purpose": "Trigger Save/Load field order (Trigger.cpp:1046-1141), the relative delay start, the WORLDFILE/STRINGPROP-only ReadProp and skipped savegame InitialUpdate (:595-645); BigTrigger without a handler; ToggleTrigger's block before Trigger's (:1244-1337)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Trigger.h",
+      "source_sha256": "8602de026cfb0bb9bb0d511a84450c3e04fe3de1e3ada223255312429467b29c",
+      "purpose": "MAX_TRIGGER_MESSAGES and the unsaved m_hLastSender/m_bSending members."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ExitTrigger.cpp",
+      "source_sha256": "70350829d00135294983ef6622191aa224c1ef602f379063f19f3f3f9a93025d",
+      "purpose": "ExitTrigger block (ExitTrigger.cpp:213-240) and the ENDWORLD exit types set by ReadProp."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ObjectivesTrigger.cpp",
+      "source_sha256": "4ba3f9dbc530a7efefdd0e0d717c73a7d3097e9eee4545d8c764ad350a5919ba",
+      "purpose": "ObjectivesTrigger block (ObjectivesTrigger.cpp:220-247) and the unsaved m_hstrSound."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ConversationTrigger.cpp",
+      "source_sha256": "1716b9e29cd61e48d0c91fc39acc69969cd2c2dc14c660d7fcf8a71d377943f7",
+      "purpose": "ConversationTrigger block (ConversationTrigger.cpp:315-356), CT_MAXMESSAGES and the byte count and cursor."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/CinematicTrigger.cpp",
+      "source_sha256": "bdced10225c2b9868af90fba6c4504a84642bd37a0edb793f4d11c5873641971",
+      "purpose": "CinematicTrigger block (CinematicTrigger.cpp:463-505), the savegame-skipped initial update and the unsaved m_hCurSound whose absence restarts the current cue (Update :209-253, StartSound :373-418)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Spawner.cpp",
+      "source_sha256": "9b42ecccd37302dcfe53db45fad529adca65ecc61f9963b49f595eb88e802ffd",
+      "purpose": "Spawner block (Spawner.cpp:429-476), the WORLDFILE-only ReadProp and the unconditional initial update (:97-110) that stops a running spawner after a restore (decision-4 departure)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/KeyFramer.cpp",
+      "source_sha256": "38629579968ef3923f70f3439896987c366009947587b3d28e821b1bc0c724f7",
+      "purpose": "KeyFramer block (KeyFramer.cpp:714-845): byte key count, float-encoded current/position indices, the per-key offset loop; BuildObjectList rebuilding the unsaved object list with new links (:274-298); GoActive, ProcessKey's position-key pairing and the unsaved key sound."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/KeyFramer.h",
+      "source_sha256": "a0107569dee6f52d798f626b1656b6f2fc51b84af3e86528fd2c48ac3c54242f",
+      "purpose": "m_pOffsets/m_pRotations as CDynArray members indexed by controlled object."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/KeyData.cpp",
+      "source_sha256": "f90e51dfb589103ad544fac4c4cc5ae4a96a766d2686af7f965ae2b0af5b81a1",
+      "purpose": "KeyData block (KeyData.cpp:121-165) and Copy's key types (target and message only as a pair)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/KeyData.h",
+      "source_sha256": "f87c8d09bec8f943fd8e99166327ddbf55974fc8cbe1ee86d09a1942b302d253",
+      "purpose": "POSITION_KEY, SOUND_KEY, MESSAGE_KEY and BPRINT_KEY values."
+    },
+    {
+      "source": "sources/lithtech/Blood2/Shared/DynArray.h",
+      "source_sha256": "9cbaadd15df86dcd0be8e120a5ff95f89e6ef0ea573796e6bc051b737768d4e0",
+      "purpose": "CDynArray::operator[] growing with uninitialized storage: a KeyFramer target past the saved key count reads an undefined offset in the original."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/CameraObj.cpp",
+      "source_sha256": "a7a796f5a7d046ecc3ddf41e6bed9cb908265e0656b0653a20cd1937b6504a3c",
+      "purpose": "CameraObj block (CameraObj.cpp:610-658), PostPropRead on every precreate (:205-232), the camera-list insertion for a savegame, the engine-saved SFX_CAMERA_ID message and the SetActive Load tail restarting a timed camera."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Door.cpp",
+      "source_sha256": "790e77cd68450b4dd49b853931c987055aa65f7f859b57465fc80a8e650cfcb9",
+      "purpose": "The self-spawned trigger saved as a LoadSave reference and linked to its door (SpawnTrigger)."
+    },
+    {
+      "source": "Documentation/implementation/save_load_audit/world_objects.md",
+      "purpose": "Audit sections 1-3, 7, 20 and 27 used as the field-order and quirk inventory."
+    }
+  ]
+}

@@ -2,7 +2,8 @@
 #include "B2BaseClass.h"
 #include "KeyData.h"
 #include <vector>
-// Selected source rules; bounded storage and diagnostics: keyframer_contracts.md.
+// Selected source rules; bounded storage and diagnostics: keyframer_contracts.md. Save/Load follow
+// the original block (save_load_contracts lot 7).
 class KeyFramer : public B2BaseClass
 {
   public:
@@ -47,9 +48,18 @@ class KeyFramer : public B2BaseClass
 
   private:
     bool BuildKeyList();
+    void RestoreTargets();
     void ProcessKey(const KeyData&);
     void Update();
-    std::size_t position1 = 0, position2 = 0;
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
+    // Original m_pPosition1/m_pPosition2 as key indices, -1 for NULL. `cursor` is the
+    // original m_pCurKey being set (GoActive), so `next` is meaningful.
+    std::ptrdiff_t position1 = -1, position2 = -1;
+    bool cursor = false;
     std::uint64_t revision = 0;
-    bool have_positions = false;
+    // A restored controller rebuilds its target list by name at its next update, as the
+    // original rebuilt m_pObjectList; until then the saved offsets are kept verbatim.
+    bool rebuild_targets = false;
+    std::vector<std::pair<DVector, DRotation>> saved_offsets;
 };

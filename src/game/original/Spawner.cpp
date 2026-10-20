@@ -1,6 +1,7 @@
 // Selected original ObjectDLL/Spawner.cpp class; the global helper lives in
 // spawn_object.cpp. See spawner_contracts.md.
 #include "Spawner.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
 #include "game/key_messages.h"
 #include "game/pickup_messages.h"
@@ -42,12 +43,9 @@ DDWORD Spawner::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
     switch (message)
     {
         case MID_PRECREATE:
-            if (!data || reason == PRECREATE_SAVEGAME)
-            {
-                error = "Spawner save restoration is not implemented";
+            if (!data)
                 return 0;
-            }
-            // Source reads properties for world files only, not string creation.
+            // Source reads properties for world files only, not string creation or a savegame.
             if (reason == PRECREATE_WORLDFILE && !ReadProp())
             {
                 error = "Spawner velocity, sound radius or respawn rate outside the supported range";
@@ -55,8 +53,22 @@ DDWORD Spawner::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
             }
             break;
         case MID_INITIALUPDATE:
+            // Decision-4 departure (save_load_contracts lot 7): the original runs this for a
+            // savegame too, rescheduling from the constructor's StartActive = FALSE, so a running
+            // spawner stopped after a restore. The restored schedule is kept instead; the engine
+            // record already restores the marking.
+            if (reason == INITIALUPDATE_SAVEGAME)
+                break;
             g_pServerDE->SetNextUpdate(m_hObject, m_bStartActive ? m_fRespawnRate : 0.0f);
             g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3));
+            break;
+        case MID_SAVEOBJECT:
+            if (data)
+                Save(*static_cast<HMESSAGEWRITE*>(data));
+            break;
+        case MID_LOADOBJECT:
+            if (data)
+                Load(*static_cast<HMESSAGEREAD*>(data));
             break;
         case MID_UPDATE:
             Update();
@@ -182,4 +194,58 @@ bool Spawner::SpawnObject(HOBJECT sender)
     error = report.child ? std::string{} : report.outcome;
     server->RecordSpawn(report);
     return true;
+}
+
+void Spawner::Save(HMESSAGEWRITE h)
+{
+    // Original Spawner.cpp:429-447.
+    namespace F = save_fields;
+    auto* s = g_pServerDE;
+    F::write_string(h, m_hstrSound);
+    F::write_string(h, m_hstrSpawnObject);
+    s->WriteToMessageVector(h, &m_vMinVelocity);
+    s->WriteToMessageVector(h, &m_vMaxVelocity);
+    s->WriteToMessageFloat(h, m_fSoundRadius);
+    s->WriteToMessageFloat(h, m_fRespawnRate);
+    s->WriteToMessageByte(h, m_bUseTriggerObjPos);
+    s->WriteToMessageByte(h, m_bStartActive);
+    s->WriteToMessageByte(h, m_bCreateRiftEffect);
+    s->WriteToMessageDWord(h, m_dwRespawnCount);
+}
+
+void Spawner::Load(HMESSAGEREAD h)
+{
+    // Original Spawner.cpp:458-476, checked with ReadProp's bounds before any member changes.
+    namespace F = save_fields;
+    auto* s = g_pServerDE;
+    std::string sound, spawn;
+    bool ok = F::read_string(h, sound);
+    ok = F::read_string(h, spawn) && ok;
+    DVector low{}, high{};
+    s->ReadFromMessageVector(h, &low);
+    s->ReadFromMessageVector(h, &high);
+    const float radius = s->ReadFromMessageFloat(h), rate = s->ReadFromMessageFloat(h);
+    bool trigger_pos = false, start_active = false, rift = false;
+    ok = F::read_bool(h, trigger_pos) && ok;
+    ok = F::read_bool(h, start_active) && ok;
+    ok = F::read_bool(h, rift) && ok;
+    const DDWORD count = s->ReadFromMessageDWord(h);
+    if (!ok)
+        return;
+    if (!physics_vector(low) || !physics_vector(high) || !F::finite(radius) || radius < 0 || !F::finite(rate) ||
+        rate < 0)
+    {
+        s->RejectPayload(h, "spawner block holds values the port cannot represent");
+        return;
+    }
+    m_hstrSound = std::move(sound);
+    m_hstrSpawnObject = std::move(spawn);
+    m_vMinVelocity = low;
+    m_vMaxVelocity = high;
+    m_fSoundRadius = radius;
+    m_fRespawnRate = rate;
+    m_bUseTriggerObjPos = trigger_pos;
+    m_bStartActive = start_active;
+    m_bCreateRiftEffect = rift;
+    m_dwRespawnCount = count;
 }

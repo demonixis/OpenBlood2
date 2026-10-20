@@ -124,7 +124,7 @@ The same simulation and smoke commands run without Dear ImGui.
 keys and LOCK/UNLOCK relay need the original Trigger implementation. LOCK is
 not fabricated as a direct Door lock: the source forwards it to its child.
 Audio requests are not played; portal state does not alter visibility.
-Save/Load follow the original blocks ([save/load lot 8](save_load_contracts.md#implemented-movers-and-brushes-lot-8)). Automatic deactivation, RotatingDoor/RotatingBrush, trains/path
+Save/Load follow the original blocks ([save/load lot 8](save_load_contracts.md#implemented-movers-and-brushes-lot-8)); a self-spawned Trigger saves with its door since [save/load lot 7](save_load_contracts.md#implemented-world-logic-lot-7). Automatic deactivation, RotatingDoor/RotatingBrush, trains/path
 controllers, rotating rider transport, crushing and full gameplay remain pending.
 
 [Door audio](door_audio_contracts.md) now supersedes request-only busy/stop playback above. Portal and crushing limitations are unchanged.

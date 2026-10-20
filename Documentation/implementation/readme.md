@@ -16,6 +16,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 | Save/load lot 5 (player and client) | [Report](reports/save_load_player.md) / [source ledger](sources/save_load_player_sources.json) |
 | Save/load lot 8 (movers and brushes) | [Report](reports/save_load_movers.md) / [source ledger](sources/save_load_movers_sources.json) |
 | Save/load lot 6 (slots, Quick and Restart, menus) | [Report](reports/save_load_slots.md) / [source ledger](sources/save_load_slots_sources.json) |
+| Save/load lot 7 (world logic) | [Report](reports/save_load_world_logic.md) / [source ledger](sources/save_load_world_logic_sources.json) |
 | Source selections, commits and hashes | [Source ledgers](sources/readme.md) |
 | M0 / M1 validation | [M0](reports/m0.md) / [M1](reports/m1.md) |
 | M2 criterion matrix and GPU reservation | [Acceptance](reports/m2_acceptance.md) |

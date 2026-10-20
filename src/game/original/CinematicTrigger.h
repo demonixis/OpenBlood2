@@ -27,4 +27,6 @@ class CinematicTrigger : public B2BaseClass
     bool Update();
     void StartSound();
     HOBJECT PlayedBy(const std::string&);
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };
