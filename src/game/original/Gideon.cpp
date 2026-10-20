@@ -33,12 +33,13 @@ bool Gideon::PublishHealth(float fraction)
 }
 DDWORD Gideon::EngineMessageFn(DDWORD message, void* data, DFLOAT value)
 {
-    if (npc_type != NPCType::Gideon)
+    if (npc_type != NPCType::Gideon && npc_type != NPCType::EnhancedGideon)
         return AI_Mgr::EngineMessageFn(message, data, value);
     if (message == MID_INITIALUPDATE)
     {
         // Source subclass InitialUpdate precedes base health/difficulty initialization.
-        m_fFullHealth = m_damage.m_fHitPoints;
+        if (npc_type == NPCType::Gideon)
+            m_fFullHealth = m_damage.m_fHitPoints;
         m_bCreateHealth = true;
     }
     if (message == MID_UPDATE && RuntimeReady() && m_bCreateHealth)
@@ -63,7 +64,7 @@ DDWORD Gideon::EngineMessageFn(DDWORD message, void* data, DFLOAT value)
 }
 bool Gideon::OnAcceptedDamage()
 {
-    if (npc_type != NPCType::Gideon)
+    if (npc_type != NPCType::Gideon && npc_type != NPCType::EnhancedGideon)
         return true;
     // One accepted typed damage application, then Gideon, then base AI reaction.
     // The source forwards the same consumed reader twice without ResetRead; never
@@ -76,7 +77,7 @@ bool Gideon::OnAcceptedDamage()
     }
     if (!PublishHealth(m_damage.m_fHitPoints / m_fFullHealth))
         return false;
-    if (m_damage.m_fLastDamageAmount > 20)
+    if (npc_type == NPCType::Gideon && m_damage.m_fLastDamageAmount > 20)
     {
         ++damage_specials;
         return SetNewState(StateSpecial1);
@@ -127,6 +128,8 @@ bool Gideon::ComputeState(int value)
 
 bool Gideon::MC_Fire_Stand()
 {
+    if (m_bNoFire)
+        return SetNewState(StatePassive);
     state_error.clear();
     auto* s = GetServerDE();
     const auto* table = AnimSound();
@@ -198,6 +201,11 @@ bool Gideon::MagicPowerup()
     ++powerup_calls;
     powerup_effect = 0;
     powerup_error.clear();
+    if (m_bNoFire)
+    {
+        ++suppressed_powerups;
+        return true; // Original void method silently does no work.
+    }
     auto* s = GetServerDE();
     if (!s || !s->IsObjectAlive(m_hObject))
     {
@@ -226,8 +234,8 @@ bool Gideon::MC_Extra(std::string_view text)
         return false;
     }
     m_szFireNode = text;
-    if (Fire())
-        return true;
+    if (Fire() || fire_result == FireResult::Blocked)
+        return true; // Source extra-key dispatch ignores intentional no-fire.
     ai_key_error = fire_error;
     return false;
 }
@@ -250,6 +258,12 @@ bool Gideon::Fire(bool alternate)
     auto* s = GetServerDE();
     if (!s || !s->IsObjectAlive(m_hObject) || (GetTarget() && !s->IsObjectAlive(GetTarget())))
         return fail(FireResult::Invalid, "Gideon fire owner/target unavailable");
+    if (m_bNoFire)
+    {
+        fire_result = FireResult::Blocked;
+        ++suppressed_shots;
+        return false;
+    }
     auto* weapon = m_InventoryMgr.CurrentWeapon();
     if (!weapon)
         return fail(FireResult::Unavailable, "Gideon has no current weapon");
@@ -505,6 +519,14 @@ bool Gideon::AI_STATE_AttackClose()
         return false;
     if (!GetTarget())
         return SetNewState(StateSearchVisual);
+    if (m_bNoFire)
+        return SetNewState(StatePassive);
+    if (npc_type == NPCType::EnhancedGideon)
+    {
+        if (!MC_FaceTarget())
+            return false;
+        --Metacmd;
+    }
     switch (Metacmd)
     {
         case 1:
@@ -514,9 +536,12 @@ bool Gideon::AI_STATE_AttackClose()
                 return false;
             if (m_fStimuli[0] <= m_fSeeingDist * .90f || m_nCurMetacmd == 7)
                 return MC_Fire_Stand();
-            if (!MC_FaceTarget())
-                return false;
-            --Metacmd;
+            if (npc_type != NPCType::EnhancedGideon)
+            {
+                if (!MC_FaceTarget())
+                    return false;
+                --Metacmd;
+            }
             if (m_fStimuli[0] > m_fSeeingDist * .40) // Original double literal.
                 return SetNewState(StateSpecial1);
             return MC_Walk();
@@ -542,6 +567,8 @@ bool Gideon::AI_STATE_AttackFar()
         return false;
     if (!GetTarget())
         return SetNewState(StateSearchVisual);
+    if (m_bNoFire)
+        return SetNewState(StatePassive);
     if (!AttackReady(true))
         return false;
     switch (Metacmd)

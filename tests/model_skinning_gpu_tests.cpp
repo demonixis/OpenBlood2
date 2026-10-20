@@ -239,10 +239,12 @@ int main(int argc, char** argv)
         CHECK(game.resources.mount_game(config, error));
         std::size_t compared = 0, filled = 0, differing = 0;
         int max_delta = 0;
+        const bool enhanced = argc == 4 && std::string_view(argv[3]) == "enhanced";
         const bool ishmael = argc == 4 && std::string_view(argv[3]) == "ishmael";
         const bool chosen = argc == 4 && std::string_view(argv[3]) == "chosen";
-        const auto worlds = chosen || ishmael ? std::vector<const char*>{"end", "24b_arena"}
-                                              : std::vector<const char*>{"01_SubwayA", "02_CityHub"};
+        const auto worlds = enhanced            ? std::vector<const char*>{"23_rooftop"}
+                            : chosen || ishmael ? std::vector<const char*>{"end", "24b_arena"}
+                                                : std::vector<const char*>{"01_SubwayA", "02_CityHub"};
         for (const auto* world : worlds)
         {
             CHECK(game.request_world(world, error));
@@ -259,6 +261,8 @@ int main(int argc, char** argv)
                     std::string_view(r->state.m_Filename) != "Models/Characters/ophelia.abc")
                     continue;
                 if (ishmael && std::string_view(r->state.m_Filename) != "Models/Characters/ishmael.abc")
+                    continue;
+                if (enhanced && std::string_view(r->state.m_SkinName) != "Skins/Enemies/GideonE.dtx")
                     continue;
                 seen.push_back(probe.entries[i].label);
                 const auto& clip = r->model->animations[r->animation.animation];
@@ -298,7 +302,7 @@ int main(int argc, char** argv)
         std::cout << "Retail CPU/GPU skinning equivalence: " << compared << " distinct assets at three clip times, "
                   << filled << " filled pixels, " << differing << " differing by more than 1, max delta " << max_delta
                   << '\n';
-        CHECK(ishmael ? compared == 2 : chosen ? compared == 4 : compared >= 10);
+        CHECK(enhanced ? compared == 1 : ishmael ? compared == 2 : chosen ? compared == 4 : compared >= 10);
     }
     gpu_renderer.clear_geometry();
     cpu_renderer.clear_geometry();

@@ -189,6 +189,10 @@ namespace
         missing->m_nAnim_WALK[TYPE_PISTOL] = 9999;
         CHECK(a->InitStatics(missing));
         a->m_nInjuredLeg = 0;
+        const auto actual_clip = r->animation.animation;
+        CHECK(a->Script_Walk() && a->animation_clip_retained && r->animation.animation == actual_clip);
+        a->m_bAnimating = false;
+        r->model.reset();
         CHECK(!a->Script_Walk() && !a->script_motion_error.empty());
         return true;
     }
@@ -463,7 +467,10 @@ namespace
                                 : mode == 2 ? table->m_nAnim_WALK_INJURED_LLEG_PISTOL
                                             : table->m_nAnim_WALK_INJURED_RLEG_PISTOL;
                 const bool present = clip < r->model->animations.size();
-                CHECK((mode == 1 ? a->Script_Run() : a->Script_Walk()) == present);
+                const auto previous = r->animation.animation;
+                CHECK(mode == 1 ? a->Script_Run() : a->Script_Walk());
+                CHECK(a->animation_clip_retained == !present);
+                CHECK(r->animation.animation == (present ? clip : previous));
                 std::cout << name << " mode=" << mode << " clip=" << clip << " available=" << present << '\n';
             }
             CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame());

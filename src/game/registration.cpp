@@ -24,6 +24,7 @@
 #include "game/original/DetailSprite.h"
 #include "game/original/Door.h"
 #include "game/original/DrudgeLord.h"
+#include "game/original/EnhancedGideon.h"
 #include "game/original/ExitHint.h"
 #include "game/original/ExitTrigger.h"
 #include "game/original/Fanatic.h"
@@ -778,6 +779,11 @@ namespace OpenBlood2
             &ai_manager,
             construct_npc<Gideon, AI_Mgr::NPCType::Gideon>,
             {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}}};
+        const ClassInfo enhanced_gideon{
+            "EnhancedGideon",
+            &ai_manager,
+            construct_npc<EnhancedGideon, AI_Mgr::NPCType::EnhancedGideon>,
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}}};
         const ClassInfo player{"CPlayerObj", &character, construct<CPlayerObj>, {}};
         const ClassInfo world_properties{
             "WorldProperties",
@@ -1294,7 +1300,8 @@ namespace OpenBlood2
                objects.register_class(later_TheHandAI) && objects.register_class(skull_projectile) &&
                objects.register_class(campaign_Thief) && objects.register_class(campaign_Naga) &&
                objects.register_class(campaign_ZealotAI) && objects.register_class(cultist) &&
-               objects.register_class(civilian) && objects.register_class(gideon) && objects.register_class(fanatic) &&
+               objects.register_class(civilian) && objects.register_class(gideon) &&
+               objects.register_class(enhanced_gideon) && objects.register_class(fanatic) &&
                objects.register_class(prophet) && objects.register_class(bone_leech) &&
                objects.register_class(drudge_lord) && objects.register_class(soul_drudge) &&
                objects.register_class(shikari) && objects.register_class(mad_scientist) &&

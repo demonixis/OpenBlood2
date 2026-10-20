@@ -7,6 +7,8 @@
 class Gideon : public AI_Mgr
 {
   public:
+    bool m_bNoFire = false; // EnhancedGideon script suppression only.
+    std::uint64_t suppressed_shots = 0, suppressed_powerups = 0;
     float m_fFullHealth = 0, boss_health_fraction = 0;
     bool m_bCreateHealth = true;
     std::uint64_t health_requests = 0, health_deliveries = 0, health_no_client = 0, damage_specials = 0;

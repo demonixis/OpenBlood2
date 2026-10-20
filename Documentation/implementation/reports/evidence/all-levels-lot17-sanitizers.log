@@ -1,0 +1,134 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  466: ai_follow.velocity
+ 1/59 Test  #466: ai_follow.velocity ...............   Passed    0.02 sec
+      Start  467: ai_follow.locomotion
+ 2/59 Test  #467: ai_follow.locomotion .............   Passed    0.03 sec
+      Start  468: ai_follow.follow
+ 3/59 Test  #468: ai_follow.follow .................   Passed    0.02 sec
+      Start  469: ai_follow.cached
+ 4/59 Test  #469: ai_follow.cached .................   Passed    0.02 sec
+      Start  470: ai_follow.moveto
+ 5/59 Test  #470: ai_follow.moveto .................   Passed    0.02 sec
+      Start  471: ai_follow.actions
+ 6/59 Test  #471: ai_follow.actions ................   Passed    0.02 sec
+      Start  472: ai_follow.lifetime
+ 7/59 Test  #472: ai_follow.lifetime ...............   Passed    0.03 sec
+      Start  473: ai_follow.failures
+ 8/59 Test  #473: ai_follow.failures ...............   Passed    0.02 sec
+      Start  474: ai_follow.physics
+ 9/59 Test  #474: ai_follow.physics ................   Passed    0.04 sec
+      Start  475: ai_follow.catalog
+10/59 Test  #475: ai_follow.catalog ................   Passed    0.95 sec
+      Start  476: ai_follow.subway
+11/59 Test  #476: ai_follow.subway .................   Passed    5.28 sec
+      Start  477: ai_script.parsing
+12/59 Test  #477: ai_script.parsing ................   Passed    0.02 sec
+      Start  478: ai_script.sequencing
+13/59 Test  #478: ai_script.sequencing .............   Passed    0.02 sec
+      Start  479: ai_script.waiting
+14/59 Test  #479: ai_script.waiting ................   Passed    0.02 sec
+      Start  480: ai_script.animations
+15/59 Test  #480: ai_script.animations .............   Passed    0.02 sec
+      Start  481: ai_script.state_target
+16/59 Test  #481: ai_script.state_target ...........   Passed    0.02 sec
+      Start  482: ai_script.movement
+17/59 Test  #482: ai_script.movement ...............   Passed    0.03 sec
+      Start  483: ai_script.lifetime
+18/59 Test  #483: ai_script.lifetime ...............   Passed    0.03 sec
+      Start  484: ai_script.audio
+19/59 Test  #484: ai_script.audio ..................   Passed    0.04 sec
+      Start  485: ai_script.catalog
+20/59 Test  #485: ai_script.catalog ................   Passed    3.29 sec
+      Start  709: gideon_combat.decisions
+21/59 Test  #709: gideon_combat.decisions ..........   Passed    0.03 sec
+      Start  710: gideon_combat.shield
+22/59 Test  #710: gideon_combat.shield .............   Passed    0.03 sec
+      Start  711: gideon_combat.choices
+23/59 Test  #711: gideon_combat.choices ............   Passed    0.03 sec
+      Start  712: gideon_combat.aim
+24/59 Test  #712: gideon_combat.aim ................   Passed    0.03 sec
+      Start  713: gideon_combat.keys
+25/59 Test  #713: gideon_combat.keys ...............   Passed    0.03 sec
+      Start  714: gideon_combat.failures
+26/59 Test  #714: gideon_combat.failures ...........   Passed    0.03 sec
+      Start  715: gideon_combat.lifetime
+27/59 Test  #715: gideon_combat.lifetime ...........   Passed    0.03 sec
+      Start  716: gideon_combat.private
+28/59 Test  #716: gideon_combat.private ............   Passed    0.85 sec
+      Start  717: gideon_teleport.colors
+29/59 Test  #717: gideon_teleport.colors ...........   Passed    0.03 sec
+      Start  718: gideon_teleport.fade
+30/59 Test  #718: gideon_teleport.fade .............   Passed    0.03 sec
+      Start  719: gideon_teleport.teleport
+31/59 Test  #719: gideon_teleport.teleport .........   Passed    0.03 sec
+      Start  720: gideon_teleport.special
+32/59 Test  #720: gideon_teleport.special ..........   Passed    0.02 sec
+      Start  721: gideon_teleport.obstruction
+33/59 Test  #721: gideon_teleport.obstruction ......   Passed    0.02 sec
+      Start  722: gideon_teleport.lifetime
+34/59 Test  #722: gideon_teleport.lifetime .........   Passed    0.02 sec
+      Start  723: gideon_teleport.presentation
+35/59 Test  #723: gideon_teleport.presentation .....   Passed    0.02 sec
+      Start  724: gideon_teleport.private
+36/59 Test  #724: gideon_teleport.private ..........   Passed    0.63 sec
+      Start  725: gideon_attack.dodge
+37/59 Test  #725: gideon_attack.dodge ..............   Passed    0.03 sec
+      Start  726: gideon_attack.cached
+38/59 Test  #726: gideon_attack.cached .............   Passed    0.02 sec
+      Start  727: gideon_attack.taunt
+39/59 Test  #727: gideon_attack.taunt ..............   Passed    0.03 sec
+      Start  728: gideon_attack.close
+40/59 Test  #728: gideon_attack.close ..............   Passed    0.03 sec
+      Start  729: gideon_attack.far
+41/59 Test  #729: gideon_attack.far ................   Passed    0.03 sec
+      Start  730: gideon_attack.failures
+42/59 Test  #730: gideon_attack.failures ...........   Passed    0.03 sec
+      Start  731: gideon_attack.lifetime
+43/59 Test  #731: gideon_attack.lifetime ...........   Passed    0.02 sec
+      Start  732: gideon_attack.private
+44/59 Test  #732: gideon_attack.private ............   Passed    0.81 sec
+      Start  733: gideon_runtime.defaults
+45/59 Test  #733: gideon_runtime.defaults ..........   Passed    0.03 sec
+      Start  734: gideon_runtime.health
+46/59 Test  #734: gideon_runtime.health ............   Passed    0.03 sec
+      Start  735: gideon_runtime.client
+47/59 Test  #735: gideon_runtime.client ............   Passed    0.04 sec
+      Start  736: gideon_runtime.damage
+48/59 Test  #736: gideon_runtime.damage ............   Passed    0.03 sec
+      Start  737: gideon_runtime.lifetime
+49/59 Test  #737: gideon_runtime.lifetime ..........   Passed    0.04 sec
+      Start  738: gideon_runtime.profile
+50/59 Test  #738: gideon_runtime.profile ...........   Passed    1.13 sec
+      Start  739: gideon_runtime.subway
+51/59 Test  #739: gideon_runtime.subway ............   Passed   42.88 sec
+      Start  740: gideon_runtime.arena
+52/59 Test  #740: gideon_runtime.arena .............   Passed    0.72 sec
+      Start 1174: ai_script.end_private
+53/59 Test #1174: ai_script.end_private ............   Passed    6.87 sec
+      Start 1175: enhanced_gideon.profiles
+54/59 Test #1175: enhanced_gideon.profiles .........   Passed    1.13 sec
+      Start 1176: enhanced_gideon.scripts
+55/59 Test #1176: enhanced_gideon.scripts ..........   Passed    0.38 sec
+      Start 1177: enhanced_gideon.locomotion
+56/59 Test #1177: enhanced_gideon.locomotion .......   Passed    0.38 sec
+      Start 1178: enhanced_gideon.combat
+57/59 Test #1178: enhanced_gideon.combat ...........   Passed    0.39 sec
+      Start 1179: enhanced_gideon.keys
+58/59 Test #1179: enhanced_gideon.keys .............   Passed    0.41 sec
+      Start 1180: enhanced_gideon.worlds
+59/59 Test #1180: enhanced_gideon.worlds ...........   Passed    5.38 sec
+
+100% tests passed, 0 tests failed out of 59
+
+Label Time Summary:
+ai_follow          =   6.47 sec*proc (11 tests)
+ai_script          =  10.38 sec*proc (10 tests)
+enhanced_gideon    =   8.07 sec*proc (6 tests)
+gideon_attack      =   0.99 sec*proc (8 tests)
+gideon_combat      =   1.03 sec*proc (8 tests)
+gideon_runtime     =  44.92 sec*proc (8 tests)
+gideon_teleport    =   0.81 sec*proc (8 tests)
+headless           =  72.68 sec*proc (59 tests)
+private            =  71.51 sec*proc (16 tests)
+
+Total Test time (real) =  72.71 sec

@@ -209,7 +209,15 @@ namespace
         CHECK(a->InitStatics(table));
         CHECK(g.step(60) && g.step(1));
         a->m_damage.SetArmorPoints(0);
-        CHECK(!a->MC_Fire_Stand() && !a->m_bAnimating && a->shield_grants == 1 && a->m_damage.m_fArmorPoints == 100);
+        auto* r = g.objects.get(a->m_hObject);
+        const auto clip = r->animation.animation;
+        CHECK(a->MC_Fire_Stand() && a->m_bAnimating && a->shield_grants == 1 && a->m_damage.m_fArmorPoints == 100);
+        CHECK(a->animation_clip_retained && r->animation.animation == clip);
+        a->m_bAnimating = false;
+        const auto model = r->model;
+        r->model.reset();
+        CHECK(!a->MC_Fire_Stand() && !a->m_bAnimating);
+        r->model = model;
         a->m_InventoryMgr.ClearWeapons();
         CHECK(!a->Fire() && a->fire_result == FireResult::Unavailable);
         a->m_fLastShield = -100;

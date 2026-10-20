@@ -1,0 +1,31 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1184: enhanced_gideon.profiles
+1/6 Test #1184: enhanced_gideon.profiles .........***Failed    0.02 sec
+profiles:66: g.objects.advance(.002) && a->health_requests == count && old->health_requests > count
+
+    Start 1185: enhanced_gideon.scripts
+2/6 Test #1185: enhanced_gideon.scripts ..........   Passed    0.02 sec
+    Start 1186: enhanced_gideon.locomotion
+3/6 Test #1186: enhanced_gideon.locomotion .......   Passed    0.02 sec
+    Start 1187: enhanced_gideon.combat
+4/6 Test #1187: enhanced_gideon.combat ...........***Failed    0.02 sec
+combat:148: a->AI_STATE_AttackClose() && a->m_bAnimating && a->m_nCurMetacmd == 7
+
+    Start 1188: enhanced_gideon.keys
+5/6 Test #1188: enhanced_gideon.keys .............   Passed    0.02 sec
+    Start 1189: enhanced_gideon.worlds
+6/6 Test #1189: enhanced_gideon.worlds ...........   Passed    0.13 sec
+
+67% tests passed, 2 tests failed out of 6
+
+Label Time Summary:
+enhanced_gideon    =   0.22 sec*proc (6 tests)
+headless           =   0.22 sec*proc (6 tests)
+private            =   0.22 sec*proc (6 tests)
+
+Total Test time (real) =   0.24 sec
+
+The following tests FAILED:
+	1184 - enhanced_gideon.profiles (Failed)                 enhanced_gideon headless private
+	1187 - enhanced_gideon.combat (Failed)                   enhanced_gideon headless private
+Errors while running CTest

@@ -220,6 +220,10 @@ bool AI_Mgr::UpdateScriptCommand(PathMgr& paths)
 }
 bool AI_Mgr::AI_STATE_Script(PathMgr& paths)
 {
+    return RunScriptState(paths, nullptr);
+}
+bool AI_Mgr::RunScriptState(PathMgr& paths, bool* suppress_fire)
+{
     if (script_busy)
         return ScriptFailure("Reentrant script update rejected");
     if (script_outcome == ScriptOutcome::Failed)
@@ -234,12 +238,17 @@ bool AI_Mgr::AI_STATE_Script(PathMgr& paths)
         return true; // The enclosing AI_Update would dispatch the new state.
     }
     Busy busy(script_busy);
+    if (suppress_fire)
+        *suppress_fire = true;
     ++script_updates;
     script_outcome = ScriptOutcome::Running;
     if (m_bUpdateScriptCmd && !UpdateScriptCommand(paths))
         return false;
     if (script_outcome == ScriptOutcome::Failed || !server->IsObjectAlive(m_hObject))
         return ScriptFailure("Script owner removed or command failed during selection");
+    // EnhancedGideon restores gravity after selecting the command, before dispatch.
+    if (suppress_fire)
+        server->SetObjectFlags(m_hObject, server->GetObjectFlags(m_hObject) | FLAG_GRAVITY);
     switch (script_current.command)
     {
         case ScriptCommand::SetMovement:
@@ -269,6 +278,8 @@ bool AI_Mgr::AI_STATE_Script(PathMgr& paths)
         }
         case ScriptCommand::PlayAnimationLooping: // Intentionally absent in the original switch.
         case ScriptCommand::Done:
+            if (suppress_fire)
+                *suppress_fire = false;
             if (!FinishScript())
                 return false;
             script_outcome = ScriptOutcome::Completed;

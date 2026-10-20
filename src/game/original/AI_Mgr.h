@@ -123,13 +123,14 @@ class AI_Mgr : public CBaseCharacter
         Ophelia,
         OpheliaREV,
         Ishmael,
-        IshmaelREV
+        IshmaelREV,
+        EnhancedGideon
     };
     static void ResetRuntimeTables();
     // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet, SoulDrudge, Shikari,
     // MadScientist, BoneLeech, DrudgeLord, Thief, Naga, Zealot, Behemoth, Priest, Shroud, Hand, Caleb,
     // Gabriella/REV, Ophelia/REV and Ishmael/REV (six independent original static tables).
-    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 26>;
+    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 27>;
     // Original WeaponStrToInt prefixes; false for a matched family not integrated here.
     static bool WeaponStrToInt(std::string_view, DBYTE&);
     static void ExchangeRuntimeTables(RuntimeTables&);
@@ -261,8 +262,8 @@ class AI_Mgr : public CBaseCharacter
     std::uint64_t navigation_updates = 0, navigation_arrivals = 0, navigation_failures = 0;
     std::string navigation_error;
     bool navigation_plan_failed = false;
-    bool MC_Walk();
-    bool MC_Run();
+    virtual bool MC_Walk();
+    virtual bool MC_Run();
     bool MC_Fire_Walk();
     bool MC_Fire_Run();
     bool CheckObstructed(DVector direction, float speed, bool&);
@@ -459,7 +460,7 @@ class AI_Mgr : public CBaseCharacter
     // Diagnostic callers can prepare scripts separately; production triggers
     // prepare them and force the original immediate AI_Update.
     bool PrepareScript(std::string_view);
-    bool AI_STATE_Script(PathMgr&);
+    virtual bool AI_STATE_Script(PathMgr&);
     std::span<const ScriptInstruction> ScriptCommands() const
     {
         return script_commands;
@@ -540,6 +541,8 @@ class AI_Mgr : public CBaseCharacter
     std::string ai_key, ai_key_error, ai_sound_resource;
 
   protected:
+    bool RunScriptState(PathMgr&, bool* suppress_fire);
+    virtual bool ScriptLocomotion(bool run);
     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
     virtual bool OnAcceptedDamage()
     {
@@ -587,7 +590,7 @@ class AI_Mgr : public CBaseCharacter
     PathList script_path;
     bool MotionFailure(const char*);
     bool MotionReady();
-    bool ScriptLocomotion(bool run);
+
     bool ScriptFire(ScriptFireMode, bool& engaged);
     bool FaceScriptPoint(DVector);
     bool DeliverPathAction(const PathListData&);

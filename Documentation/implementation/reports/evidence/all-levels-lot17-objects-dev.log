@@ -1,0 +1,43 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start  3: objects.builtin_model
+ 1/17 Test  #3: objects.builtin_model ............   Passed    0.00 sec
+      Start  4: objects.original_objects
+ 2/17 Test  #4: objects.original_objects .........   Passed    0.00 sec
+      Start  5: objects.nested_creation
+ 3/17 Test  #5: objects.nested_creation ..........   Passed    0.00 sec
+      Start  6: objects.reasons_properties
+ 4/17 Test  #6: objects.reasons_properties .......   Passed    0.00 sec
+      Start  7: objects.scheduling
+ 5/17 Test  #7: objects.scheduling ...............   Passed    0.00 sec
+      Start  8: objects.deferred_removal
+ 6/17 Test  #8: objects.deferred_removal .........   Passed    0.00 sec
+      Start  9: objects.aggregate_dispatch
+ 7/17 Test  #9: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start 10: objects.handles_selection
+ 8/17 Test #10: objects.handles_selection ........   Passed    0.00 sec
+      Start 11: objects.links_lists
+ 9/17 Test #11: objects.links_lists ..............   Passed    0.00 sec
+      Start 12: objects.messages_strings
+10/17 Test #12: objects.messages_strings .........   Passed    0.00 sec
+      Start 13: objects.message_churn
+11/17 Test #13: objects.message_churn ............   Passed    0.10 sec
+      Start 14: objects.message_limit
+12/17 Test #14: objects.message_limit ............   Passed    0.02 sec
+      Start 15: objects.unsupported_teardown
+13/17 Test #15: objects.unsupported_teardown .....   Passed    0.00 sec
+      Start 16: objects.creation_failures
+14/17 Test #16: objects.creation_failures ........   Passed    0.00 sec
+      Start 17: object_snapshots.membership
+15/17 Test #17: object_snapshots.membership ......   Passed    0.00 sec
+      Start 18: object_snapshots.callbacks
+16/17 Test #18: object_snapshots.callbacks .......   Passed    0.00 sec
+      Start 19: object_snapshots.churn
+17/17 Test #19: object_snapshots.churn ...........   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 17
+
+Label Time Summary:
+headless    =   0.15 sec*proc (17 tests)
+objects     =   0.15 sec*proc (17 tests)
+
+Total Test time (real) =   0.18 sec

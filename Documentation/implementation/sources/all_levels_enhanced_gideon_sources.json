@@ -1,0 +1,25 @@
+{
+  "selection": "Original EnhancedGideon profile, lifecycle, combat, no-fire script and movement; equivalent methods shared with Gideon",
+  "sources": [
+    {
+      "path": "sources/blood2/ObjectDLL/EnhancedGideon.cpp",
+      "sha256": "ab2dd42aae9322bf749079cb1197345b8cff2854704076fcd8429757980cef89"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/EnhancedGideon.h",
+      "sha256": "8ca234f05ae9425ee970c72c156114a3095dc65cb73a715c858ed99fd26b3051"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
+      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350"
+    }
+  ]
+}

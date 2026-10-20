@@ -9,9 +9,9 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 16: **51 / 58 pass, 7 / 58 fail**
-([audit 14](evidence/all-levels-audit-14.log)). Remaining worlds:
-Rooftop, Ancient City, Ancient One and the four CTF maps. Initial-entry and three-second simulation
+Current verified opening gate after iteration 17: **52 / 58 pass, 6 / 58 fail**
+([audit 15](evidence/all-levels-audit-15.log)). Remaining worlds:
+Ancient City, Ancient One and the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
 the initial baseline; iteration records explain resolved and newly exposed blockers.
 
@@ -652,3 +652,43 @@ and verifies runtime readiness and cleanup at all three difficulties.
 The [Release application](evidence/all-levels-end-gpu.log) opens End and renders
 three frames on NVIDIA RTX 3060. Both applications build; graphics pipelines and
 dependencies are unchanged. This is entry/simulation coverage, not full traversal.
+
+## Iteration 17: original EnhancedGideon
+
+[EnhancedGideon](../../contracts/enhanced_gideon_contracts.md) now has its original
+profile, independent animation/sound table, actual skin, health publication,
+combat/teleport and scripted locomotion. Equivalent Gideon methods are shared;
+Enhanced-specific no-fire, gravity, health capture and facing branches remain
+explicit. [Audit 15](evidence/all-levels-audit-15.log) passes **52 / 58**, fails
+**6 / 58**. Rooftop passes all three difficulties and simulation. Ancient City
+now has only UndeadGideon unsupported; AncientOne/Tentacle and four CTF maps remain.
+
+[59 selected Dev checks](evidence/all-levels-lot17-dev.log) and the same
+[59 Clang Debug ASan/UBSan checks](evidence/all-levels-lot17-sanitizers.log) pass.
+They exercise six new Enhanced cases plus ordinary Gideon combat, attack,
+teleport, lifecycle, and shared script/path behavior. The End regression was
+then rebuilt against the new library and [passes again](evidence/all-levels-lot17-end-dev.log).
+[17 object-contract checks](evidence/all-levels-lot17-objects-dev.log) also pass.
+The freshly rebuilt End case and all 17 object checks also
+[pass under sanitizers](evidence/all-levels-lot17-objects-sanitizers.log).
+
+The [first fixture run](evidence/all-levels-lot17-initial.log) assumed a second
+health update before its scheduler deadline and invoked close facing without a
+sampled target. [Diagnosis](evidence/all-levels-lot17-second.log) separated these
+fixture prerequisites; explicit callbacks and RefreshTargetPosition fix them.
+The [wider initial run](evidence/all-levels-lot17-old-fixtures.log) also found four
+old missing-ordinal assertions, superseded by iteration 3's original retained-clip
+behavior. Those tests now verify retained real playback, physical velocity and
+shield state, and separately reject a truly missing model. No production failure
+is suppressed to satisfy these fixtures.
+
+[Seven Release tests](evidence/all-levels-lot17-release.log) pass, including
+[GPU readback](evidence/all-levels-lot17-release-details.log) of the real Enhanced
+model/skin at three animation times: 7,710 filled pixels, zero CPU/GPU differences.
+The saved capture was visually inspected. [Rooftop application opening](evidence/all-levels-rooftop-gpu.log)
+renders three Release frames on NVIDIA RTX 3060 and exits successfully. Dev
+inspector and inspector-free Release applications build. Graphics pipelines and
+dependencies are unchanged. Entry/simulation coverage is not full boss/campaign
+traversal, network play or a new milestone acceptance.
+
+![EnhancedGideon](evidence/all-levels-enhanced-gideon.png)

@@ -1,0 +1,129 @@
+Start testing: Oct 20 13:18 CEST
+----------------------------------------------------------
+1304/1310 Testing: enhanced_gideon.profiles
+1304/1310 Test: enhanced_gideon.profiles
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/enhanced_gideon_tests" "profiles" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"enhanced_gideon.profiles" start time: Oct 20 13:18 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"enhanced_gideon.profiles" end time: Oct 20 13:18 CEST
+"enhanced_gideon.profiles" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1305/1310 Testing: enhanced_gideon.scripts
+1305/1310 Test: enhanced_gideon.scripts
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/enhanced_gideon_tests" "scripts" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"enhanced_gideon.scripts" start time: Oct 20 13:18 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"enhanced_gideon.scripts" end time: Oct 20 13:18 CEST
+"enhanced_gideon.scripts" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1306/1310 Testing: enhanced_gideon.locomotion
+1306/1310 Test: enhanced_gideon.locomotion
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/enhanced_gideon_tests" "locomotion" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"enhanced_gideon.locomotion" start time: Oct 20 13:18 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"enhanced_gideon.locomotion" end time: Oct 20 13:18 CEST
+"enhanced_gideon.locomotion" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1307/1310 Testing: enhanced_gideon.combat
+1307/1310 Test: enhanced_gideon.combat
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/enhanced_gideon_tests" "combat" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"enhanced_gideon.combat" start time: Oct 20 13:18 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"enhanced_gideon.combat" end time: Oct 20 13:18 CEST
+"enhanced_gideon.combat" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1308/1310 Testing: enhanced_gideon.keys
+1308/1310 Test: enhanced_gideon.keys
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/enhanced_gideon_tests" "keys" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"enhanced_gideon.keys" start time: Oct 20 13:18 CEST
+Output:
+----------------------------------------------------------
+EnhancedGideon real animation-key shots=1
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"enhanced_gideon.keys" end time: Oct 20 13:18 CEST
+"enhanced_gideon.keys" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1309/1310 Testing: enhanced_gideon.worlds
+1309/1310 Test: enhanced_gideon.worlds
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/enhanced_gideon_tests" "worlds" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"enhanced_gideon.worlds" start time: Oct 20 13:18 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"enhanced_gideon.worlds" end time: Oct 20 13:18 CEST
+"enhanced_gideon.worlds" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1310/1310 Testing: gpu.enhanced_gideon
+1310/1310 Test: gpu.enhanced_gideon
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/model_skinning_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/enhanced-gideon" "/home/yann/.steam/steam/steamapps/common/Blood II" "enhanced"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.enhanced_gideon" start time: Oct 20 13:18 CEST
+Output:
+----------------------------------------------------------
+Synthetic mask 0 time 0: 3365/3365 filled, 0 differing, max delta 0
+Synthetic mask 0 time 37.5: 3489/3489 filled, 0 differing, max delta 0
+Synthetic mask 0 time 100: 3421/3421 filled, 0 differing, max delta 0
+Synthetic mask 1 time 0: 1737/1737 filled, 0 differing, max delta 0
+Synthetic mask 1 time 37.5: 1929/1929 filled, 0 differing, max delta 0
+Synthetic mask 1 time 100: 1987/1987 filled, 0 differing, max delta 0
+Synthetic mask 2 time 0: 1526/1526 filled, 0 differing, max delta 0
+Synthetic mask 2 time 37.5: 1412/1412 filled, 0 differing, max delta 0
+Synthetic mask 2 time 100: 1103/1103 filled, 0 differing, max delta 0
+Retail CPU/GPU skinning equivalence: 1 distinct assets at three clip times, 7710 filled pixels, 0 differing by more than 1, max delta 0
+GPU skinning matches CPU posing, deformation, scale, hidden faces and instance transforms
+<end of output>
+Test time =   0.62 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.enhanced_gideon" end time: Oct 20 13:18 CEST
+"gpu.enhanced_gideon" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 20 13:18 CEST
+
+enhanced_gideon =   0.87 sec*proc
+
+gpu =   0.62 sec*proc
+
+headless =   0.25 sec*proc
+
+private =   0.87 sec*proc
+

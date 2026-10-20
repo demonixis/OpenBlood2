@@ -1,0 +1,25 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1304: enhanced_gideon.profiles
+1/7 Test #1304: enhanced_gideon.profiles .........   Passed    0.04 sec
+    Start 1305: enhanced_gideon.scripts
+2/7 Test #1305: enhanced_gideon.scripts ..........   Passed    0.02 sec
+    Start 1306: enhanced_gideon.locomotion
+3/7 Test #1306: enhanced_gideon.locomotion .......   Passed    0.02 sec
+    Start 1307: enhanced_gideon.combat
+4/7 Test #1307: enhanced_gideon.combat ...........   Passed    0.02 sec
+    Start 1308: enhanced_gideon.keys
+5/7 Test #1308: enhanced_gideon.keys .............   Passed    0.02 sec
+    Start 1309: enhanced_gideon.worlds
+6/7 Test #1309: enhanced_gideon.worlds ...........   Passed    0.13 sec
+    Start 1310: gpu.enhanced_gideon
+7/7 Test #1310: gpu.enhanced_gideon ..............   Passed    0.62 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+enhanced_gideon    =   0.87 sec*proc (7 tests)
+gpu                =   0.62 sec*proc (1 test)
+headless           =   0.25 sec*proc (6 tests)
+private            =   0.87 sec*proc (7 tests)
+
+Total Test time (real) =   0.89 sec

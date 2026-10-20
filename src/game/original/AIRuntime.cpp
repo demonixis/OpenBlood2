@@ -302,13 +302,17 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         npc_armor = 0;
         npc_weapons[0] = "HAND_SQUEEZE";
     }
-    if (type == NPCType::Gideon)
+    if (type == NPCType::Gideon || type == NPCType::EnhancedGideon)
     {
         m_fHearingDist = 0;
         m_fSeeingDist = m_fSensingDist = 10000;
         m_bCabal = false;
-        npc_hp = 4000;
-        npc_armor = 200;
+        const bool enhanced = type == NPCType::EnhancedGideon;
+        npc_hp = enhanced ? 9000 : 4000;
+        npc_armor = enhanced ? 0 : 200;
+        m_fWalkSpeed = enhanced ? 175 : 75;
+        m_fRunSpeed = enhanced ? 380 : 180;
+        m_fRollSpeed = enhanced ? 200 : 3.5f;
         npc_weapons = {"GIDEON_SHIELD", "ENERGY_BLAST", "NAGA_BLAST", "GIDEON_WIND", "NONE"};
         m_damage.apply_damage_physics = false;
     }
@@ -416,10 +420,10 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         model = "Models/Enemies/" + name + ".abc";
         skin = "Skins/Enemies/" + name + ".dtx";
     }
-    else if (npc_type == NPCType::Gideon)
+    else if (npc_type == NPCType::Gideon || npc_type == NPCType::EnhancedGideon)
     {
         model = "Models/Enemies/gideon.abc";
-        skin = "Skins/Enemies/gideon.dtx";
+        skin = npc_type == NPCType::EnhancedGideon ? "Skins/Enemies/GideonE.dtx" : "Skins/Enemies/gideon.dtx";
     }
     else if (npc_type == NPCType::Fanatic || npc_type == NPCType::Prophet)
     {
@@ -527,7 +531,8 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
         return RuntimeFailure("Invalid or repeated NPC initialization");
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
-    const auto group = npc_type == NPCType::Ishmael        ? 24
+    const auto group = npc_type == NPCType::EnhancedGideon ? 26
+                       : npc_type == NPCType::Ishmael      ? 24
                        : npc_type == NPCType::IshmaelREV   ? 25
                        : npc_type == NPCType::Gabriella    ? 20
                        : npc_type == NPCType::GabriellaREV ? 21
@@ -610,19 +615,20 @@ bool AI_Mgr::RuntimeInitialize(int reason)
                  : npc_type == NPCType::Zealot                                           ? "sounds/enemies/Zealot"
                  : npc_type == NPCType::BoneLeech                                        ? "sounds/enemies/boneleech"
                  : npc_type == NPCType::DrudgeLord                                       ? "sounds/enemies/drudgelord"
-                 : npc_type == NPCType::Gideon                                           ? "sounds/enemies/Gideon"
-                 : npc_type == NPCType::Fanatic                                          ? "sounds/enemies/fanatic"
-                 : npc_type == NPCType::Prophet                                          ? "sounds/enemies/Prophet"
-                 : npc_type == NPCType::SoulDrudge                                       ? "sounds/enemies/souldrudge"
-                 : npc_type == NPCType::Shikari                                          ? "sounds/enemies/shikari"
-                 : npc_type == NPCType::MadScientist                                     ? "sounds/enemies/madscientist"
-                 : male_group                                                            ? "sounds/enemies/m_cultist"
-                                                                                         : "sounds/enemies/f_cultist"))
+                 : npc_type == NPCType::EnhancedGideon ? "sounds/enemies/EnhancedGideon"
+                 : npc_type == NPCType::Gideon         ? "sounds/enemies/Gideon"
+                 : npc_type == NPCType::Fanatic        ? "sounds/enemies/fanatic"
+                 : npc_type == NPCType::Prophet        ? "sounds/enemies/Prophet"
+                 : npc_type == NPCType::SoulDrudge     ? "sounds/enemies/souldrudge"
+                 : npc_type == NPCType::Shikari        ? "sounds/enemies/shikari"
+                 : npc_type == NPCType::MadScientist   ? "sounds/enemies/madscientist"
+                 : male_group                          ? "sounds/enemies/m_cultist"
+                                                       : "sounds/enemies/f_cultist"))
         return RuntimeFailure("NPC shared animation table initialization failed: " + table_error);
     auto table = tables[group];
     if (!InitStatics(table) || !m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
         return RuntimeFailure("NPC aggregates unavailable");
-    m_InventoryMgr.SetStrength(npc_type == NPCType::Gideon ? 10 : 5);
+    m_InventoryMgr.SetStrength((npc_type == NPCType::Gideon || npc_type == NPCType::EnhancedGideon) ? 10 : 5);
     // Original weapon IDs are sparse (Gideon's loadout reaches 42). Track the
     // at-most-five requested IDs, not an array sized for player-only weapons.
     std::array<DBYTE, 5> obtained{};
@@ -701,7 +707,8 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         return RuntimeFailure("NPC initial model dimensions/scale/animation failed: " + state_error);
     s->SetNextUpdate(m_hObject, .001f);
     m_bSetShutdown = false;
-    if (reason == INITIALUPDATE_WORLDFILE && npc_type != NPCType::Gideon && npc_type != NPCType::DrudgePriest)
+    if (reason == INITIALUPDATE_WORLDFILE && npc_type != NPCType::Gideon && npc_type != NPCType::EnhancedGideon &&
+        npc_type != NPCType::DrudgePriest)
     {
         const auto result = s->MoveObjectToGround(m_hObject);
         // Original AI_Mgr ignores a ground-ray miss: retain a clear authored body
@@ -715,7 +722,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     // spawned boxes can straddle authored walls too (Demo_01 spawn101). Separate
     // them once before simulation, without ground dropping or changing launch velocity.
     if ((reason != INITIALUPDATE_WORLDFILE || npc_type == NPCType::DrudgePriest) && npc_type != NPCType::Gideon &&
-        s->ResolveInitialWorldOverlap(m_hObject) != DE_OK)
+        npc_type != NPCType::EnhancedGideon && s->ResolveInitialWorldOverlap(m_hObject) != DE_OK)
         return RuntimeFailure("NPC spawned world-overlap placement failed");
     m_fLastUpdate = s->GetTime();
     m_damage.ai_body_hits = npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief ||

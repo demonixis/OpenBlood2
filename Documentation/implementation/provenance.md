@@ -1705,3 +1705,12 @@ ChangeObjectDimensions trivial rejection corroborates avoiding collision work.
 and [source hashes](sources/all_levels_end_sources.json) distinguish this exact
 equality adaptation from retail physics parity. No script, asset or game rule is
 substituted.
+
+### Complete-level continuation: EnhancedGideon
+
+The original EnhancedGideon profile, independent table, health timing, no-fire
+script, locomotion and close-facing differences extend the existing equivalent
+Gideon algorithms. [Contracts](../contracts/enhanced_gideon_contracts.md) and
+[source hashes](sources/all_levels_enhanced_gideon_sources.json) record selective
+reuse, original quirks and checked service boundaries. Registration retains the
+original AI_Mgr parent; the C++ helper inheritance shares implementation only.

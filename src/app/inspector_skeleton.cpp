@@ -622,7 +622,9 @@ namespace OpenBlood2
             boss && ImGui::CollapsingHeader("Original Gideon combat actions", ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Text("Driver: %s",
-                        boss->npc_type == AI_Mgr::NPCType::Gideon ? "production AI_Update" : "diagnostic actor");
+                        boss->npc_type == AI_Mgr::NPCType::Gideon || boss->npc_type == AI_Mgr::NPCType::EnhancedGideon
+                            ? "production AI_Update"
+                            : "diagnostic actor");
             ImGui::Text("Health %.3f / captured %.3f | raw ratio %.3f | create-health %s", boss->m_damage.m_fHitPoints,
                         boss->m_fFullHealth, boss->boss_health_fraction, boss->m_bCreateHealth ? "yes" : "no");
             ImGui::Text("Health requests %llu | queued %llu | no audience %llu | result %d | damage specials %llu",
@@ -632,7 +634,12 @@ namespace OpenBlood2
             if (!boss->health_error.empty())
                 ImGui::TextWrapped("%s", boss->health_error.c_str());
             ImGui::TextWrapped(
-                "Captured health precedes base AI initialization. Raw ratios outside (0,1) hide the client bar.");
+                boss->npc_type == AI_Mgr::NPCType::EnhancedGideon
+                    ? "EnhancedGideon captures health at its first scheduled update."
+                    : "Gideon captures health before base initialization; raw ratios outside (0,1) hide the bar.");
+            ImGui::Text("Script no-fire %s | suppressed shots %llu | suppressed powerups %llu",
+                        boss->m_bNoFire ? "yes" : "no", (unsigned long long)boss->suppressed_shots,
+                        (unsigned long long)boss->suppressed_powerups);
             ImGui::Text("Node %s | selected weapon %u | chance draw %d", boss->m_szFireNode.c_str(),
                         boss->selected_weapon, boss->attack_roll);
             ImGui::Text("Armor %.2f | grants %llu | last shield %.3f / interval %.3f | last panic %.3f",

@@ -188,7 +188,14 @@ namespace
         CHECK(a);
         auto* r = g.objects.get(a->m_hObject);
         a->AnimSound()->m_nAnim_DODGE_LEFT = UINT32_MAX;
-        CHECK(!a->MC_Dodge_Left() && !a->m_bAnimating && near(r->velocity, {}));
+        const auto clip = r->animation.animation;
+        CHECK(a->MC_Dodge_Left() && a->m_bAnimating && a->animation_clip_retained && r->animation.animation == clip);
+        CHECK(near(r->velocity, vector_scale(a->m_MoveObj.GetRightVector(), -a->m_fRollSpeed)));
+        a->m_bAnimating = false;
+        const auto model = r->model;
+        r->model.reset();
+        CHECK(!a->MC_Dodge_Left() && !a->m_bAnimating);
+        r->model = model;
         CHECK(a->MC_Dodge_Right());
         a->Metacmd = std::numeric_limits<int>::max();
         CHECK(g.step(.5) && g.step(.5));
