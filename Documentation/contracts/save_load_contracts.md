@@ -14,6 +14,8 @@ Lot 7 (world logic, [evidence](../implementation/reports/save_load_world_logic.m
 Lot 13 (native state, [evidence](../implementation/reports/save_load_native.md)) checks the
 engine classes, sky and PolyGrid republication, VoiceMgr and CommLink across a load, and
 refuses CTF saves by name.
+Lot 11 (AI core, [evidence](../implementation/reports/save_load_ai.md)) declares the 17 AI_Mgr
+NPC classes and CCorpse Original.
 Lot 6 (slots, Quick and Restart, menus, [evidence](../implementation/reports/save_load_slots.md))
 writes and reads the slot, quick and level-entry files and enables the Save and Load screens,
 F5/F6 and the death Load menu. `GameSession::save_game` and `load_game` save and load through a
@@ -1107,6 +1109,90 @@ no payload and no class declaration.
   - `load_game` refuses an image whose console holds the CTF game type at admission
     (`CTF saves cannot be loaded`).
   - The explicit local inspection of the four CTF maps is therefore never saveable.
+
+### Implemented AI core (lot 11)
+
+AI_Mgr's original Save/Load block (`AI_Mgr.cpp:6759-6938`), its script command list and path list,
+the CultistAI, CivilianAI, Fanatic and CCorpse blocks, and every AI_Mgr-only subclass (ShikariAI,
+SoulDrudge, MadScientistAI, Behemoth, Prophet, DrudgeLord, GabriellaAI/REV, OpheliaAI/REV,
+IshmaelAI/REV, CalebAI, DeathShroud) save and load (`src/game/original/AISave.cpp`). The 18
+registered classes are Original with payload version 1; their `PRECREATE_SAVEGAME` refusal is
+gone. AI_Mgr itself is never placed and stays Unsupported. The bosses and special enemies are
+lot 12.
+
+- **Byte order.** The most derived class, AI_Mgr, CBaseCharacter (0 bytes), then lot 5's
+  aggregates (CMovement with its own owner, CInventoryMgr, CDestructable). Load inserts the faction
+  link (`InsertMe`) after AI_Mgr's block and before the aggregates, as the original does. Class
+  blocks: CultistAI the gender byte, CivilianAI `male | labtech << 1 | scared << 2`, Fanatic the
+  raw fuse clock; CCorpse its 18 hit spheres, the constructor mass (200) and hit points (50), the
+  sound directory as a String and the limb-loss byte, before its CDestructable block. The other
+  subclasses write nothing.
+- **AI_Mgr block.** The 48 original fields in the original order and widths:
+  - targets, positions, states, the six stimuli, dodge flags and the three trigger strings;
+  - the four perception distances (hearing, smelling, sensing, seeing) and four speeds;
+  - relative `m_fTimeStart`/`m_fLoadTimeStart`, corpse type, reload time, animating, Metacmd and
+    the current command, flags, block flags, shutdown, raw `m_fLastUpdate`, injured leg,
+    `m_hEnemyAttach`, scale, raw `m_fLastLedgeCheck`, current animation and dimensions;
+  - the script index as a float, the raw wait deadline, script flags, movement, the update flag,
+    the current command, the command list (float count) and the path list (float count, the
+    constructor's `m_bDeleteElements` 0, then position, name, action target and message).
+
+  Fields the port never sets are written as the original's constant values and must match on
+  load: AI_Mgr's `m_bJumping` (only the unported `MC_Fire_Jump` sets it), `m_bStartFire` and
+  `m_hEnemyAttach` for a class that never attaches. Unknown script names keep the original DONE
+  mapping and load with the canonical name. Script arguments are at most 49 bytes.
+- **OpenBlood2 tail** (after the path list), the port state that the original keeps in links or
+  loses, as LoadSave references and bytes: attacker memory, smell cursor, sought ammunition
+  pickup, pending self-removal, the target and tracked-position flags, the failed-plan latch, the
+  script and motion outcomes, and a runtime failure with its text. A suspended actor therefore
+  stays suspended; a script resumes its current command.
+- **Restore branches.** `PRECREATE_SAVEGAME` reads no property and draws no random number; the
+  engine record's model and skin apply (D13). `INITIALUPDATE_SAVEGAME` runs the original
+  subclass statics and AI_Mgr's inventory and damage `Init`, then stops: no weapons, health,
+  flags, faction lists, scale, animation, schedule or ground placement. Cultist and Civilian
+  bind their gender table in Load, where the saved gender is known; DeathShroud restarts its loop
+  and the Prophet obtains its melee weapon (replaced by the inventory Load), as the original
+  initial updates do on every path. The SoulDrudge constructor's weapon draw now runs at the
+  start of a fresh precreate, so a restore consumes no gameplay random number (D10).
+- **Checks before change.** Every field is decoded, then checked: states, finite vectors and
+  clocks, distances and speeds in 0..10⁷, booleans 0 or 1, positive scale, script movement,
+  command types and a script index inside its list, no self reference, a smell cursor that is a
+  SmellHint. Then members change. Counts stay readable after an earlier refusal, so the refusal
+  names the first bad field.
+- **References.** Target, tracked object, enemy attachment and the tail's identities are LoadSave
+  references: anything outside the save list (always-load SmellHints, ExitHints and PathPoints,
+  unsaved FX sources) reads back as NULL, as in the original. The target's inter-object link comes
+  back with LINK. Script paths are owned snapshots, so a restored script needs no PathPoint
+  identity.
+- **Clocks.** `m_fTimeStart` and `m_fLoadTimeStart` are relative (lot 8's inverse); the script
+  wait deadline, Fanatic's fuse and the ledge clock are raw absolute, valid because a full restore
+  keeps the clock.
+- **Losses kept.** As the original: `m_fWaitForIdleTime`/`m_bHasTargeted` (the 120 s idle guard),
+  `m_szAIState` and the other init-only properties, the AIShared strafing state, the fire and
+  smoke sources of a burning death or corpse, the current voice and every one-shot. Fanatic's
+  smoke source is recreated by its Load and republished by the next update; the NPC's held weapon
+  model is rebuilt by its first update.
+- **Departures.**
+  - Decision 4 (listed): the original Load adds `GetTime()` to the raw `m_fLastLedgeCheck`,
+    which suppresses every ledge check for about the saved game time. The port loads it raw.
+  - Decision 4 (found in this lot, player-visible): the attacker memory (the port's checked
+    replacement of the damage aggregate's linked `m_hLastDamager`) is restored, so an NPC hit just
+    before a save still retaliates; and a pending self-removal is kept (AI_Mgr's `m_bRemoveMe`,
+    CCorpse's `m_bDead`), so a save between a corpse transfer or a gib and the removal does not
+    bring back a second corpse or a gibbed one.
+  - Structural: the port's shared tables must never be poisoned by another model (ai_runtime), so
+    Cultist and Civilian skip the original's constructor-default male table pass in
+    `INITIALUPDATE_SAVEGAME`; the port's CDestructable has no animation pointer to leave stale.
+- **Expected re-save rewrites.** AI_Mgr's Load adds `GetTime()` to the raw `m_fLastUpdate`
+  (original quirk, benign: the first update's desync test is false once); CCorpse's PostPropRead
+  restores its constant flags. Every other byte of these classes is identical after a load.
+- **Damage block.** An NPC's precreate admits an authored destruction spawn that fails
+  validation (its death spawns nothing): 14_SubwayC's Prophet asks for `LifeSeedPU` and
+  16_Bridge's Fanatic for `BullettammoPU`. CDestructable's block now carries such a request for
+  an AI_Mgr owner instead of refusing the save; every other owner still refused it at creation.
+- **Real worlds.** 35 of the 58 worlds hold lot-11 NPCs; all of them restore every supported
+  object through `load_game` and the NPCs keep running. No lot-11 class blocks a world any more;
+  each world is still blocked by classes of lots 9, 10 or 12 (the evidence lists them).
 
 ## Restored and regenerated state
 

@@ -290,3 +290,42 @@ bool Fanatic::Detonate()
     m_bRemoveMe = true;
     return true;
 }
+
+void Fanatic::SaveSubclass(HMESSAGEWRITE h)
+{
+    g_pServerDE->WriteToMessageFloat(h, m_fStartTime); // Raw absolute: valid under the restored clock.
+}
+void Fanatic::LoadSubclass(HMESSAGEREAD h)
+{
+    auto* s = GetServerDE();
+    const float start = s->ReadFromMessageFloat(h);
+    if (!std::isfinite(start))
+    {
+        s->RejectPayload(h, "Fanatic Load: fuse clock is not finite");
+        return;
+    }
+    if (start)
+    {
+        // The smoke source is an unsaved BaseClass; the original recreates it at torso_extra1 and
+        // lets the next update publish the smoke and attach it again.
+        ObjectCreateStruct state;
+        state.m_ObjectType = OT_NORMAL;
+        state.m_NextUpdate = .01f;
+        state.m_Flags = FLAG_FORCECLIENTUPDATE;
+        if (s->QueryModelNodeTransform(m_hObject, "torso_extra1", &state.m_Pos, &state.m_Rotation) !=
+            ServerDE::NodeQuery::Found)
+        {
+            s->RejectPayload(h, "Fanatic Load: torso_extra1 transform unavailable");
+            return;
+        }
+        auto* smoke = s->CreateObject(s->GetClass("BaseClass"), &state);
+        if (!smoke)
+        {
+            s->RejectPayload(h, "Fanatic Load: smoke source creation failed");
+            return;
+        }
+        m_hSmokeSource = smoke->m_hObject;
+        m_bStartSmoke = true;
+    }
+    m_fStartTime = start;
+}

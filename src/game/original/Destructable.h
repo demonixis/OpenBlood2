@@ -35,6 +35,16 @@ class CDestructable : public Aggregate
     {
         last_damager_ = nullptr;
     }
+    // Save/load lot 11: the raw identity for a pure save (no stale clearing), and the AI's restored
+    // attacker memory, applied after this block's Load cleared it.
+    HOBJECT LastDamagerIdentity() const
+    {
+        return last_damager_;
+    }
+    void RestoreLastDamager(HOBJECT attacker)
+    {
+        last_damager_ = attacker;
+    }
     void CalculateResistance(DBYTE);
     bool Heal(float);
     bool MegaHeal(float);

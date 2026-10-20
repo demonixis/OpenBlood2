@@ -100,3 +100,9 @@ The [burning death/dismemberment continuation](death_effect_contracts.md) supers
 blanket fire/gib/corpse-damage omissions for its selected original paths. Real
 flame/smoke particles, burned corpses, runtime limbs and flesh models now run with
 inspection. Blood-spurt/splat FX, generic gib/save services and full M2 remain open.
+
+[Save/load lot 11](save_load_contracts.md#implemented-ai-core-lot-11) supersedes the corpse
+save refusal: CCorpse saves and loads its original block (hit spheres, sound directory, limb
+loss) before its damage block, keeps PostPropRead's flags on a restore and skips initial
+update. Burning and smoke sources are lost, as in the original; a gibbed corpse still removes
+itself.

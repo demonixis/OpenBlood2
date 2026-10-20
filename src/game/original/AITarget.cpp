@@ -159,6 +159,25 @@ DDWORD AI_Mgr::EngineMessageFn(DDWORD message, void* data, DFLOAT value)
         tracked_position_valid = false;
         ++tracked_invalidations;
     }
+    // Original byte order: the most derived class, AI_Mgr, CBaseCharacter (0 bytes), then the
+    // aggregates (CMovement, CInventoryMgr, CDestructable). Load inserts the faction link first.
+    if (message == MID_SAVEOBJECT && data)
+    {
+        const auto h = *static_cast<HMESSAGEWRITE*>(data);
+        SaveSubclass(h);
+        Save(h, static_cast<DDWORD>(value));
+    }
+    if (message == MID_LOADOBJECT && data)
+    {
+        const auto h = *static_cast<HMESSAGEREAD*>(data);
+        LoadSubclass(h);
+        Load(h, static_cast<DDWORD>(value));
+        if (!InsertMe())
+            GetServerDE()->RejectPayload(h, "AI_Mgr Load: faction registration failed");
+        const auto result = CBaseCharacter::EngineMessageFn(message, data, value);
+        AfterLoad(h);
+        return result;
+    }
     return CBaseCharacter::EngineMessageFn(message, data, value);
 }
 

@@ -31,6 +31,7 @@ Runtime test logs and measurements belong in the
 - [Save/load slots and menus](save_load_slots_sources.json): lot 6 slot, quick and Restart rules, Load/Save menu rows, F5/F6 and death to the Load menu.
 - [Save/load world logic](save_load_world_logic_sources.json): lot 7 Save/Load bodies of the triggers, Spawner, KeyFramer/KeyData and CameraObj.
 - [Save/load native state](save_load_native_sources.json): lot 13 engine class flags, PolyGrid/VolumeBrush surfaces, the VoiceMgr reset and CommLink on a load, and the multiplayer save guard.
+- [Save/load AI core](save_load_ai_sources.json): lot 11 AI_Mgr, script and path lists, CultistAI, CivilianAI, Fanatic, CCorpse and the AI_Mgr-only subclasses.
 
 - [Original music asset preparation](m2_music_asset_sources.json)
 

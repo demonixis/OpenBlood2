@@ -72,6 +72,20 @@ namespace
                                              {"ANCIENTONE_BEAM", 0, false},
                                              {"ANCIENTONE_TENTACLE", 0, false},
                                              {"SKULL", WEAP_SKULL, true}};
+    float type_mass(AI_Mgr::NPCType type)
+    {
+        using T = AI_Mgr::NPCType;
+        return type == T::UndeadGideon                                          ? 3000
+               : type == T::BoneLeech || type == T::Thief || type == T::TheHand ? 125
+                                                                                : 250;
+    }
+    // Shipped nonhumanoid models without head/neck nodes use the explicit body-damage policy.
+    bool body_hits(AI_Mgr::NPCType type)
+    {
+        using T = AI_Mgr::NPCType;
+        return type == T::AncientOne || type == T::AncientOneTentacle || type == T::BoneLeech || type == T::Thief ||
+               type == T::TheHand || type == T::DeathShroud || type == T::Naga;
+    }
 } // namespace
 bool AI_Mgr::WeaponStrToInt(std::string_view name, DBYTE& id)
 {
@@ -127,7 +141,8 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
     }
     if (type == NPCType::SoulDrudge)
     {
-        // Original SoulDrudge constructor; its weapon is drawn here, before the skin.
+        // Original SoulDrudge constructor. Its weapon draw runs at the start of precreate
+        // (RuntimePrecreate), before the skin, so a restore draws nothing.
         m_fHearingDist = m_fSeeingDist = 1000;
         m_fSensingDist = 100;
         m_fWalkSpeed = 60;
@@ -136,10 +151,6 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         m_bCabal = false;
         npc_hp = 120;
         npc_armor = 0;
-        int weapon = 1;
-        if (!GetServerDE()->RandomInt(1, 3, weapon))
-            configure_error = "SoulDrudge weapon RNG failed";
-        npc_weapons[0] = weapon == 1 ? "SOUL_CROWBAR" : weapon == 2 ? "SOUL_AXE" : "SOUL_PIPE";
     }
     if (type == NPCType::Shikari)
     {
@@ -371,11 +382,26 @@ bool AI_Mgr::RuntimeFailure(std::string_view why)
 }
 bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
 {
-    if (!state || reason == PRECREATE_SAVEGAME)
-        return RuntimeFailure("NPC save restoration is not implemented");
+    if (!state)
+        return RuntimeFailure("NPC precreate requires a creation structure");
+    if (reason == PRECREATE_SAVEGAME)
+    {
+        // Original PRECREATE_SAVEGAME: no property, no PostPropRead and no random draw. The engine
+        // record's model and skin (D13) and every saved field come back afterwards.
+        state->m_ObjectType = OT_MODEL;
+        return true;
+    }
     if (!configure_error.empty())
         return RuntimeFailure(configure_error);
     auto* s = GetServerDE();
+    if (npc_type == NPCType::SoulDrudge)
+    {
+        // Original SoulDrudge constructor draw, before any property (AIWeapon1 still overrides it).
+        int weapon = 1;
+        if (!s->RandomInt(1, 3, weapon))
+            return RuntimeFailure("SoulDrudge weapon RNG failed");
+        npc_weapons[0] = weapon == 1 ? "SOUL_CROWBAR" : weapon == 2 ? "SOUL_AXE" : "SOUL_PIPE";
+    }
     GenericProp prop;
     if (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP)
     {
@@ -573,11 +599,17 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
     SAFE_STRCPY(state->m_SkinName, skin.c_str());
     return true;
 }
-bool AI_Mgr::RuntimeInitialize(int reason)
+// The original subclass InitialUpdate (and Cultist/Civilian Load) table setup: the first
+// instance of a class/gender builds the shared table, then InitStatics binds it.
+bool AI_Mgr::InitializeSharedTable(std::string& error)
 {
+    error.clear();
     auto* s = GetServerDE();
-    if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
-        return RuntimeFailure("Invalid or repeated NPC initialization");
+    if (!s || !s->IsObjectAlive(m_hObject))
+    {
+        error = "NPC shared table requires a live owner";
+        return false;
+    }
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
     const auto group = npc_type == NPCType::AncientOne           ? 28
                        : npc_type == NPCType::AncientOneTentacle ? 29
@@ -648,9 +680,15 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     {
         // Preserve BOTH independent source branches, including female LabTech.
         if ((npc_male || npc_labtech) && !initialize_table(2, npc_male || !tables[2], "sounds/enemies/civilian"))
-            return RuntimeFailure("NPC male animation table initialization failed");
+        {
+            error = "NPC male animation table initialization failed";
+            return false;
+        }
         if (!npc_male && !initialize_table(3, !tables[3], "sounds/enemies/f_civ"))
-            return RuntimeFailure("NPC female animation table initialization failed");
+        {
+            error = "NPC female animation table initialization failed";
+            return false;
+        }
     }
     else if (!initialize_table(
                  group, !tables[group],
@@ -679,9 +717,28 @@ bool AI_Mgr::RuntimeInitialize(int reason)
                  : npc_type == NPCType::MadScientist       ? "sounds/enemies/madscientist"
                  : male_group                              ? "sounds/enemies/m_cultist"
                                                            : "sounds/enemies/f_cultist"))
-        return RuntimeFailure("NPC shared animation table initialization failed: " + table_error);
-    auto table = tables[group];
-    if (!InitStatics(table) || !m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
+    {
+        error = "NPC shared animation table initialization failed: " + table_error;
+        return false;
+    }
+    if (!InitStatics(tables[group]))
+    {
+        error = "NPC shared animation table unavailable";
+        return false;
+    }
+    return true;
+}
+bool AI_Mgr::RuntimeInitialize(int reason)
+{
+    if (reason == INITIALUPDATE_SAVEGAME)
+        return RestoreInitialize();
+    auto* s = GetServerDE();
+    if (runtime_initialized || !s->IsObjectAlive(m_hObject))
+        return RuntimeFailure("Invalid or repeated NPC initialization");
+    std::string table_error;
+    if (!InitializeSharedTable(table_error))
+        return RuntimeFailure(table_error);
+    if (!m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
         return RuntimeFailure("NPC aggregates unavailable");
     m_InventoryMgr.SetStrength((npc_type == NPCType::Gideon || npc_type == NPCType::EnhancedGideon) ? 10 : 5);
     // Original weapon IDs are sparse (Gideon's loadout reaches 42). Track the
@@ -736,9 +793,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = hp;
     m_damage.SetArmorPoints(npc_armor * difficulty);
     m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = npc_armor * difficulty;
-    m_fAIMass = npc_type == NPCType::UndeadGideon                                                              ? 3000
-                : npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief || npc_type == NPCType::TheHand ? 125
-                                                                                                               : 250;
+    m_fAIMass = type_mass(npc_type);
     m_damage.m_fMass = m_fAIMass;
     if (!s->ConfigureCharacterBody(m_hObject, m_damage.m_fMass, 5 + m_damage.m_fMass * 10 / 500))
         return RuntimeFailure("NPC mass/friction configuration failed");
@@ -785,10 +840,32 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         npc_type != NPCType::EnhancedGideon && s->ResolveInitialWorldOverlap(m_hObject) != DE_OK)
         return RuntimeFailure("NPC spawned world-overlap placement failed");
     m_fLastUpdate = s->GetTime();
-    m_damage.ai_body_hits = npc_type == NPCType::AncientOne || npc_type == NPCType::AncientOneTentacle ||
-                            npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief ||
-                            npc_type == NPCType::TheHand || npc_type == NPCType::DeathShroud ||
-                            npc_type == NPCType::Naga;
+    m_damage.ai_body_hits = body_hits(npc_type);
+    m_damage.ai_hit_localization = !m_damage.ai_body_hits;
+    runtime_initialized = true;
+    return true;
+}
+bool AI_Mgr::RestoreInitialize()
+{
+    auto* s = GetServerDE();
+    DVector dims;
+    if (runtime_initialized || !s->IsObjectAlive(m_hObject) || s->GetModelAnimUserDims(m_hObject, &dims, 0) != DE_OK)
+        return RuntimeFailure("NPC restore initialization requires a live model, once");
+    // Original INITIALUPDATE_SAVEGAME: the subclass binds its statics, AI_Mgr initializes the
+    // inventory and damage owners, then returns before weapons, health, flags, faction lists,
+    // scale, animation, scheduling and ground placement. Load restores the rest. Cultist and
+    // Civilian bind their gender table in Load, where the saved gender is known: the original
+    // ran this step with the constructor's male default (save_load_contracts lot 11).
+    if (npc_type != NPCType::Cultist && npc_type != NPCType::Civilian)
+    {
+        std::string error;
+        if (!InitializeSharedTable(error))
+            return RuntimeFailure(error);
+    }
+    if (!m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
+        return RuntimeFailure("NPC aggregates unavailable");
+    m_fAIMass = type_mass(npc_type); // Constructor values; the saved body keeps the engine mass.
+    m_damage.ai_body_hits = body_hits(npc_type);
     m_damage.ai_hit_localization = !m_damage.ai_body_hits;
     runtime_initialized = true;
     return true;

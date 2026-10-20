@@ -12,6 +12,7 @@
 #include "game/original/Spawner.h"
 #include "game/original/Trigger.h"
 #include "player_fixture.h"
+#include "save_ai_fixture.h"
 #include <bit>
 #include <functional>
 #include <iostream>
@@ -147,11 +148,18 @@ namespace
     }
     // The original rewrites listed by save_load_contracts lot 7: CameraObj's PostPropRead forces
     // its flags and Load's SetActive its schedule (0.01 s active, none inactive) and a timed
-    // camera's full duration; lot 5's player rewrites.
+    // camera's full duration; lot 5's player rewrites; lot 11's NPC m_fLastUpdate and CCorpse flags.
     void listed_rewrites(std::vector<SaveEngineRecord>& records)
     {
         for (auto& r : records)
-            if (r.class_name == "CameraObj")
+            if (save_ai::is_ai(r.class_name))
+            {
+                if (const auto at = save_ai::last_update_offset(r.class_name, r.payload); at != std::size_t(-1))
+                    std::fill_n(r.payload.begin() + std::ptrdiff_t(at), 4, std::uint8_t(0));
+            }
+            else if (r.class_name == "CCorpse")
+                r.flags = FLAG_VISIBLE | FLAG_RAYHIT | FLAG_GRAVITY | FLAG_MODELKEYS | FLAG_REMOVEIFOUTSIDE;
+            else if (r.class_name == "CameraObj")
             {
                 r.update_remaining = 0;
                 r.flags &= FLAG_FORCECLIENTUPDATE | FLAG_FULLPOSITIONRES | FLAG_GOTHRUWORLD;

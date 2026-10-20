@@ -944,8 +944,9 @@ namespace
         CHECK(report.error.find("SaveUnsupported") != std::string::npos);
         CHECK(*g.server.save_store.find(SaveStoreSlot::Current) == previous); // Previous image kept.
         // An original class keeps the Unsupported default until its lot declares it; lot 4
-        // declared the CF_ALWAYSLOAD ones, which are skipped.
-        CHECK(save_support(g.objects.find_class("CultistAI")) == SaveSupport::Unsupported);
+        // declared the CF_ALWAYSLOAD ones, which are skipped. AI_Mgr is never placed (lot 11
+        // declares its subclasses only).
+        CHECK(save_support(g.objects.find_class("AI_Mgr")) == SaveSupport::Unsupported);
         auto pickup = g.objects.create(g.objects.find_class("HealthPU"), {}, Creation::World, {});
         auto spot = g.objects.create(g.objects.find_class("CameraSpot"), {}, Creation::World, {});
         std::vector<HOBJECT> original{pickup, spot, b};

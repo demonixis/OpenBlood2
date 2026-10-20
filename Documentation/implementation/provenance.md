@@ -1890,3 +1890,18 @@ replacement code over the lot 2 container; no original source text was copied. S
 [contract](../contracts/save_load_contracts.md#implemented-slots-quick-and-restart-lot-6),
 the [evidence](reports/save_load_slots.md) and the
 [source ledger](sources/save_load_slots_sources.json).
+
+## AI core save/load (2026-10-21)
+
+Save/load lot 11 adds selective ports of the original Save/Load bodies of
+`ObjectDLL/AI_Mgr.cpp` (`AI_Mgr::Save`/`Load`, `InsertMe` at `MID_LOADOBJECT`), `AIScriptList.h`
+(`AISCRIPTCMD` and `CAIScriptList`), `PathList.h` with `PathListData.cpp`, `CultistAI.cpp`,
+`CivilianAI.cpp`, `Fanatic.cpp` and `corpse.cpp`: their field order, call types, float counts and
+constant fields, and the Load side effects (gender tables, Fanatic's smoke source, the original
+`m_fLastUpdate` quirk), over the port's existing members. The `INITIALUPDATE_SAVEGAME` branches
+follow the original subclass and AI_Mgr initial updates. The OpenBlood2 tail of the AI_Mgr block,
+the checks before change, the ledge-clock and pending-removal departures and the NPC destruction
+spawn rule in the damage block are replacement code. See the
+[contract](../contracts/save_load_contracts.md#implemented-ai-core-lot-11),
+the [evidence](reports/save_load_ai.md) and the
+[source ledger](sources/save_load_ai_sources.json).

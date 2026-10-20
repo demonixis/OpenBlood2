@@ -1,0 +1,146 @@
+{
+  "date": "2026-10-21",
+  "scope": "Save/load lot 11: original Save/Load bodies of AI_Mgr (with its script command and path lists), CultistAI, CivilianAI, Fanatic and CCorpse, the PRECREATE_SAVEGAME and INITIALUPDATE_SAVEGAME branches of every AI_Mgr-only subclass and their save-support declarations. The bodies are selective ports recorded in the provenance ledger; the port tail, the checks, the departures and the NPC destruction-spawn rule are OpenBlood2 code.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/AI_Mgr.cpp",
+      "source_sha256": "7275c3a4f9374926e0a5e7cce4d533ae59ea558027bda1448b223a283e66fb09",
+      "purpose": "AI_Mgr::Save/Load (AI_Mgr.cpp:6759-6938): the 48 fields, their order and widths, relative m_fTimeStart/m_fLoadTimeStart, the raw m_fLastUpdate and m_fLastLedgeCheck read back with +GetTime(), the float script index and wait deadline; MID_LOADOBJECT then InsertMe (743-746); INITIALUPDATE_SAVEGAME's early return after the inventory and damage Init (2022-2141); the jump helper that alone sets m_bJumping (3166-3195) and the never-assigned m_bStartFire; MID_DEAD's m_bRemoveMe (5471-5515)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/AI_Mgr.h",
+      "source_sha256": "4b24e8a59c8e56808fce297aea43496bef0d0baa52f288ecf72f75adff619070",
+      "purpose": "AI_Mgr members, the unsaved state (m_fWaitForIdleTime, m_bHasTargeted, m_hCurSmell, m_hFireSource, m_bRemoveMe) and the script/path list members."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/AIScriptList.h",
+      "source_sha256": "93f8175f27ab9df7c50528b37cbdf064317f7a9e5af62501b7b43e79091c0e37",
+      "purpose": "AISCRIPTCMD Save/Load (command byte, NULL HString for empty args, 50-byte args) and CAIScriptList's float count."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PathList.h",
+      "source_sha256": "88905cd26238bc40bb9ba630c07a10a4bde0e136c0837b5f03512e2aac64165e",
+      "purpose": "PathList Save/Load: float count, m_bDeleteElements byte, then each PathListData."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PathListData.cpp",
+      "source_sha256": "389c71708f7b6bf3c05ffec0e1e843c1eff0d6dea45a863e03caacbb70bd76f1",
+      "purpose": "PathListData Save/Load (85-115): position, name, action target and message."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PathMgr.cpp",
+      "source_sha256": "b4e9b5475c664b3878074134d6fdb38f1a02c4bc04a94bdde197752cf34038ef",
+      "purpose": "GetPath clears and refills the caller's list; AI_Mgr's list is Init(DFALSE)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/CultistAI.cpp",
+      "source_sha256": "ffb973d7fd476978c4cf0cf71c0d702f6c5ed795161e410b215773687a2b703b",
+      "purpose": "CultistAI Save/Load (589-655): the gender byte, the add-on skin derivation from the model filenames, the first-instance table setup and InitStatics; InitialUpdate on every path with the constructor's male default (200-260)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/CivilianAI.cpp",
+      "source_sha256": "f7f9692709396236e5fd6c0c050152d789a531011e51d1be93a2cfec7e1df863",
+      "purpose": "CivilianAI Save/Load (657-699): the packed byte and the table setup with its precedence; the authored m_szAIState read by ComputeState."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Fanatic.cpp",
+      "source_sha256": "9e2e3f7d19771994fa1c9647df073306e34d317f80ac9e8b5ed9009bcf26c327",
+      "purpose": "Fanatic Save/Load (743-779): the raw m_fStartTime and the smoke source recreated at torso_extra1."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/corpse.cpp",
+      "source_sha256": "58fd31f4d3a10fb8d5b503155fce10272d1a179069ebdef81f34ce48765a728d",
+      "purpose": "CCorpse Save/Load (703-741), PostPropRead's flags on every precreate (241-247), InitialUpdate skipped on a savegame, the unsaved burn and smoke sources."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/corpse.h",
+      "source_sha256": "8da95d6e45685439a645db757150fcb7592415eae5de920dce2bba286ad9b23f",
+      "purpose": "CCorpse constructor mass 200 and hit points 50."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Destructable.cpp",
+      "source_sha256": "c0d8b72b729e806a6ca8f0e44a57054aef30e20c4d75b745df29f97fb36199ca",
+      "purpose": "The unsaved, linked m_hLastDamager and the spawn string written regardless of its class."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/DeathShroud.cpp",
+      "source_sha256": "05c42383f9629ea9ffe4df1dadc041788a3fc251358cea2c88eee5d00c35344f",
+      "purpose": "InitialUpdate on every path restarts the loop and sets the scale after the base."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/prophet.cpp",
+      "source_sha256": "2c1a51b01ee1ef386108bf27793a7ae0016e5f5d05b52ec1e45bfd69921e753c",
+      "purpose": "InitialUpdate calls the base then obtains the melee weapon on every path."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/SoulDrudge.cpp",
+      "source_sha256": "3c1593b8e995828e112085f720ba894a234b6882d1819987bd36f33b717d59ec",
+      "purpose": "Constructor weapon draw and the statics-only savegame initial update."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ShikariAI.cpp",
+      "source_sha256": "5a70ff5a222170945669818163b5587276cb7cd74faf07c91a1483f98b74f442",
+      "purpose": "No Save/Load; statics on every initial update."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/MadScientistAI.cpp",
+      "source_sha256": "8701cde3f9da498ea9dc83b7bf145435326459f35120f8b6eaf120076fd52ca2",
+      "purpose": "No Save/Load; statics on every initial update."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/behemoth.cpp",
+      "source_sha256": "5bbcb529c4bf0041f9a30dc3a92cc36f95f9b6f70bc1294dd89029209c7dca49",
+      "purpose": "No Save/Load; statics on every initial update."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/DrudgeLord.cpp",
+      "source_sha256": "9257a2daa41f55fe11cc4d4ec94ed8064ceffec8cfe03a4829dd6da2a2e74bf5",
+      "purpose": "No Save/Load; statics on every initial update."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GabriellaAI.cpp",
+      "source_sha256": "3777393628ce3765dd7469340ed0a4059203cb624e3b2961b5a88f40bc19a729",
+      "purpose": "No Save/Load; precreate rewrites the same model and skin; FirstUpdate binds the statics on every initial update."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GabriellaREV.cpp",
+      "source_sha256": "79c1f2410468719ae62ca2d6383726ebeb1470ea3154cf793bb9835b580b15ee",
+      "purpose": "As GabriellaAI."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/OpheliaAI.cpp",
+      "source_sha256": "e7c13da4e0aaf1701671176851ec1181e948974bf78d07869309ee1935577408",
+      "purpose": "As GabriellaAI."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/OpheliaREV.cpp",
+      "source_sha256": "ed986c23ae069c890d4e74b29adc658c836b9623e5c7e25f98668fa883b756ff",
+      "purpose": "As GabriellaAI."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/IshmaelAI.cpp",
+      "source_sha256": "5e0d7127ccc6a772f4f06c1eaa700b339321f10f23a391bb2d3324b0197ee7fe",
+      "purpose": "As GabriellaAI."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/IshmaelREV.cpp",
+      "source_sha256": "54c3e0d4058a7bfb532bb0549b8541a6f2d40a2b7d4a076637bad76d9437e937",
+      "purpose": "As GabriellaAI."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/CalebAI.cpp",
+      "source_sha256": "075bb156937a4086c9481def8f210f2cb95d398e2deed1cf1f82a51d8f9654e9",
+      "purpose": "As GabriellaAI."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ObjectDLL.dsp",
+      "source_sha256": "18c5f120f166b052897981099441a8faf18942ab9980e82889b54ea0fa3f2063",
+      "purpose": "_ADD_ON and _ADDON defined together (165, 192): the add-on skin derivation in CultistAI::Load."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "93056622f9f083f11447a471ecae6f115b7dc3937daf7d251d2396724f3d2003",
+      "purpose": "The unsaved m_fNextPingTime (observed in the continuation tests, lot 5's player)."
+    }
+  ]
+}

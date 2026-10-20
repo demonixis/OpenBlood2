@@ -24,6 +24,11 @@ class CultistAI : public AI_Mgr
     float attack_distance = 0, attack_height = 0, attack_threshold = 0;
     std::uint64_t attack_updates = 0;
 
+  protected:
+    // Original CultistAI::Save/Load (CultistAI.cpp:589-647): the gender byte.
+    void SaveSubclass(HMESSAGEWRITE) override;
+    void LoadSubclass(HMESSAGEREAD) override;
+
   private:
     bool Attack(bool far);
 };

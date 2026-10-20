@@ -18,6 +18,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 | Save/load lot 6 (slots, Quick and Restart, menus) | [Report](reports/save_load_slots.md) / [source ledger](sources/save_load_slots_sources.json) |
 | Save/load lot 7 (world logic) | [Report](reports/save_load_world_logic.md) / [source ledger](sources/save_load_world_logic_sources.json) |
 | Save/load lot 13 (native state) | [Report](reports/save_load_native.md) / [source ledger](sources/save_load_native_sources.json) |
+| Save/load lot 11 (AI core) | [Report](reports/save_load_ai.md) / [source ledger](sources/save_load_ai_sources.json) |
 | Source selections, commits and hashes | [Source ledgers](sources/readme.md) |
 | M0 / M1 validation | [M0](reports/m0.md) / [M1](reports/m1.md) |
 | M2 criterion matrix and GPU reservation | [Acceptance](reports/m2_acceptance.md) |

@@ -1,5 +1,6 @@
 // Original CultistAI.cpp:269-332; see ai_state_contracts.md.
 #include "CultistAI.h"
+#include "SaveFields.h"
 #include <cmath>
 
 bool CultistAI::ComputeState(int value)
@@ -42,4 +43,45 @@ bool CultistAI::ComputeState(int value)
     if (m_fStimuli[5] < .5f || m_fStimuli[0] <= .5f || height > m_vDims.y)
         return SetNewState(StateAttackFar);
     return SetNewState(StateAttackClose);
+}
+
+// Original CultistAI::Save/Load. The add-on Load derives the clown and robe skins from the model
+// filenames, then builds the gender table if this is its first instance and binds it. The port's
+// restored initial update leaves this to Load (save_load_contracts lot 11).
+void CultistAI::SaveSubclass(HMESSAGEWRITE h)
+{
+    g_pServerDE->WriteToMessageByte(h, npc_male);
+}
+void CultistAI::LoadSubclass(HMESSAGEREAD h)
+{
+    auto* s = GetServerDE();
+    bool male = true;
+    if (!OpenBlood2::save_fields::read_bool(h, male))
+        return;
+    std::string model, skin;
+    if (!s->GetModelFilenames(m_hObject, model, skin))
+    {
+        s->RejectPayload(h, "CultistAI Load: model filenames unavailable");
+        return;
+    }
+    for (auto& c : skin)
+        if (c >= 'a' && c <= 'z')
+            c = char(c - 'a' + 'A');
+    const bool clown = skin.find("M_CULTIST4") != skin.npos || skin.find("M_CULTIST5") != skin.npos ||
+                       skin.find("M_CULTIST6") != skin.npos;
+    if (skin.find("OLDSCHOOL") != skin.npos)
+    {
+        s->RejectPayload(h, "CultistAI Load: add-on robe Cultist initialization is not integrated");
+        return;
+    }
+    if (clown && !male)
+    {
+        s->RejectPayload(h, "CultistAI Load: a clown skin always carries the male flag");
+        return;
+    }
+    npc_male = male;
+    npc_clown = clown;
+    std::string error;
+    if (!InitializeSharedTable(error))
+        s->RejectPayload(h, "CultistAI Load: " + error);
 }

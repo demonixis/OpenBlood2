@@ -22,4 +22,9 @@ class CivilianAI : public AI_Mgr
     bool ComputeState(int stimulus = -1) override;
     bool AI_STATE_Idle() override;
     bool AI_STATE_Special(int) override;
+
+  protected:
+    // Original CivilianAI::Save/Load (CivilianAI.cpp:657-699): the packed gender/labtech/scared byte.
+    void SaveSubclass(HMESSAGEWRITE) override;
+    void LoadSubclass(HMESSAGEREAD) override;
 };

@@ -89,3 +89,8 @@ Save/load lot 8 writes these values in the original `CDestructable` byte layout,
 two `0xCECECECE` markers, for any Original owner. [Save/load lot 5](save_load_contracts.md#implemented-player-and-client-lot-5)
 saves the player through it; the typed Load's associated-player refusal does not apply there,
 because a restored player has no client during its Load.
+
+Save/load lot 11: an NPC's precreate admits an authored destruction spawn that fails validation
+(14_SubwayC `LifeSeedPU`, 16_Bridge `BullettammoPU`; its death spawns nothing). The block carries
+such a request for an AI_Mgr owner and restores `spawn_valid` with the precreate rule; every
+other owner still refuses it, because its creation already did.

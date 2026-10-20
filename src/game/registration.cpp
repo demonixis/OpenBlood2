@@ -244,7 +244,7 @@ namespace OpenBlood2
                              {"ObjectMass", 10.0f},
                              {"Kickable", true}},
                             SaveSupport::NotSaved};
-        const ClassInfo corpse{"CCorpse", &b2base, construct<CCorpse>, {}};
+        const ClassInfo corpse{"CCorpse", &b2base, construct<CCorpse>, {}, SaveSupport::Original, 1};
         const ClassInfo camera_object{"CameraObj",
                                       &b2base,
                                       construct<CameraObj>,
@@ -620,28 +620,36 @@ namespace OpenBlood2
                                            {{"AIState", std::string("PASSIVE"), true, 31},
                                             {"AIWeapon1", std::string("MINIGUN"), true, 31},
                                             {"AIWeapon2", std::string("NAPALM"), true, 31},
-                                            {"Dims", DVector{12, 46, 12}}}};
+                                            {"Dims", DVector{12, 46, 12}}},
+                                           SaveSupport::Original,
+                                           1};
         const ClassInfo chosen_GabriellaREV{"GabriellaREV",
                                             &ai_manager,
                                             construct_npc<GabriellaREV, AI_Mgr::NPCType::GabriellaREV>,
                                             {{"AIState", std::string("PASSIVE"), true, 31},
                                              {"AIWeapon1", std::string("MINIGUN"), true, 31},
                                              {"AIWeapon2", std::string("NAPALM"), true, 31},
-                                             {"Dims", DVector{12, 46, 12}}}};
+                                             {"Dims", DVector{12, 46, 12}}},
+                                            SaveSupport::Original,
+                                            1};
         const ClassInfo chosen_OpheliaAI{"OpheliaAI",
                                          &ai_manager,
                                          construct_npc<OpheliaAI, AI_Mgr::NPCType::Ophelia>,
                                          {{"AIState", std::string("PASSIVE"), true, 31},
                                           {"AIWeapon1", std::string("TESLA"), true, 31},
                                           {"AIWeapon2", std::string("SNIPER"), true, 31},
-                                          {"Dims", DVector{12, 46, 12}}}};
+                                          {"Dims", DVector{12, 46, 12}}},
+                                         SaveSupport::Original,
+                                         1};
         const ClassInfo chosen_OpheliaREV{"OpheliaREV",
                                           &ai_manager,
                                           construct_npc<OpheliaREV, AI_Mgr::NPCType::OpheliaREV>,
                                           {{"AIState", std::string("PASSIVE"), true, 31},
                                            {"AIWeapon1", std::string("TESLA"), true, 31},
                                            {"AIWeapon2", std::string("SNIPER"), true, 31},
-                                           {"Dims", DVector{12, 46, 12}}}};
+                                           {"Dims", DVector{12, 46, 12}}},
+                                          SaveSupport::Original,
+                                          1};
         const ClassInfo chosen_IshmaelAI{"IshmaelAI",
                                          &ai_manager,
                                          construct_npc<IshmaelAI, AI_Mgr::NPCType::Ishmael>,
@@ -649,7 +657,9 @@ namespace OpenBlood2
                                           {"AIWeapon1", std::string("ORB"), true, 31},
                                           {"AIWeapon2", std::string("HEAL"), true, 31},
                                           {"AIWeapon3", std::string("SHOCKWAVE"), true, 31},
-                                          {"Dims", DVector{12, 39, 12}}}};
+                                          {"Dims", DVector{12, 39, 12}}},
+                                         SaveSupport::Original,
+                                         1};
         const ClassInfo chosen_IshmaelREV{"IshmaelREV",
                                           &ai_manager,
                                           construct_npc<IshmaelREV, AI_Mgr::NPCType::IshmaelREV>,
@@ -657,7 +667,9 @@ namespace OpenBlood2
                                            {"AIWeapon1", std::string("ORB"), true, 31},
                                            {"AIWeapon2", std::string("HEAL"), true, 31},
                                            {"AIWeapon3", std::string("SHOCKWAVE"), true, 31},
-                                           {"Dims", DVector{12, 39, 12}}}};
+                                           {"Dims", DVector{12, 39, 12}}},
+                                          SaveSupport::Original,
+                                          1};
         const ClassInfo caleb_ai{"CalebAI",
                                  &ai_manager,
                                  construct_npc<CalebAI, AI_Mgr::NPCType::Caleb>,
@@ -665,7 +677,9 @@ namespace OpenBlood2
                                   {"RandomHitPoints", 0.0f},
                                   {"ArmorPoints", 0.0f},
                                   {"AIState", std::string("IDLE"), true, 31},
-                                  {"AIWeapon", std::string("NONE")}}};
+                                  {"AIWeapon", std::string("NONE")}},
+                                 SaveSupport::Original,
+                                 1};
         const ClassInfo flag_object{"FlagObject",
                                     &b2base,
                                     construct<FlagObject>,
@@ -694,7 +708,9 @@ namespace OpenBlood2
             "Behemoth",
             &ai_manager,
             construct_npc<Behemoth, AI_Mgr::NPCType::Behemoth>,
-            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{37, 52, 31}}}};
+            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{37, 52, 31}}},
+            SaveSupport::Original,
+            1};
         const ClassInfo later_DrudgePriest{
             "DrudgePriest",
             &ai_manager,
@@ -704,7 +720,9 @@ namespace OpenBlood2
             "DeathShroud",
             &ai_manager,
             construct_npc<DeathShroud, AI_Mgr::NPCType::DeathShroud>,
-            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{20, 48, 20}}}};
+            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{20, 48, 20}}},
+            SaveSupport::Original,
+            1};
         const ClassInfo later_TheHandAI{
             "TheHandAI",
             &ai_manager,
@@ -739,7 +757,9 @@ namespace OpenBlood2
                                  {"Male", true},
                                  {"Dims", DVector{19, 41, 14}},
                                  {"ClownSkin", false},
-                                 {"RobeSkin", false}}};
+                                 {"RobeSkin", false}},
+                                SaveSupport::Original,
+                                1};
         const ClassInfo civilian{"CivilianAI",
                                  &ai_manager,
                                  construct_npc<CivilianAI, AI_Mgr::NPCType::Civilian>,
@@ -750,7 +770,9 @@ namespace OpenBlood2
                                   {"LabTech", false},
                                   {"Scared", false},
                                   {"Dims", DVector{21, 37, 21}},
-                                  {"SororitySkin", false}}};
+                                  {"SororitySkin", false}},
+                                 SaveSupport::Original,
+                                 1};
         const ClassInfo fanatic{"Fanatic",
                                 &ai_manager,
                                 construct_npc<Fanatic, AI_Mgr::NPCType::Fanatic>,
@@ -769,7 +791,9 @@ namespace OpenBlood2
                                  {"Charges", 120.0f},
                                  {"Fuel", 100.0f},
                                  {"Proximity_Bombs", 25.0f},
-                                 {"Dims", DVector{21, 38, 19}}}};
+                                 {"Dims", DVector{21, 38, 19}}},
+                                SaveSupport::Original,
+                                1};
         // Original class registrations: RandomHitPoints, AIState and hidden Dims.
         const ClassInfo bone_leech{
             "BoneLeech",
@@ -780,18 +804,24 @@ namespace OpenBlood2
             "DrudgeLord",
             &ai_manager,
             construct_npc<DrudgeLord, AI_Mgr::NPCType::DrudgeLord>,
-            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{31, 51, 25}}}};
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{31, 51, 25}}},
+            SaveSupport::Original,
+            1};
         const ClassInfo soul_drudge{
             "SoulDrudge",
             &ai_manager,
             construct_npc<SoulDrudge, AI_Mgr::NPCType::SoulDrudge>,
-            {{"RandomHitPoints", 50.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{21, 36, 18}}}};
+            {{"RandomHitPoints", 50.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{21, 36, 18}}},
+            SaveSupport::Original,
+            1};
         // Original BEGIN_CLASS(ShikariAI): RandomHitPoints, AIState and hidden Dims only.
         const ClassInfo shikari{
             "ShikariAI",
             &ai_manager,
             construct_npc<ShikariAI, AI_Mgr::NPCType::Shikari>,
-            {{"RandomHitPoints", 50.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{19, 30, 24}}}};
+            {{"RandomHitPoints", 50.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{19, 30, 24}}},
+            SaveSupport::Original,
+            1};
         // Original BEGIN_CLASS(MadScientistAI). AI_Mgr::ReadProp never reads HitPoints,
         // ArmorPoints or the digitless AIWeapon: constructor values apply.
         const ClassInfo mad_scientist{"MadScientistAI",
@@ -801,7 +831,9 @@ namespace OpenBlood2
                                        {"RandomHitPoints", 0.0f},
                                        {"ArmorPoints", 0.0f},
                                        {"AIState", std::string("IDLE"), true, 31},
-                                       {"AIWeapon", std::string("NONE"), true, 31}}};
+                                       {"AIWeapon", std::string("NONE"), true, 31}},
+                                      SaveSupport::Original,
+                                      1};
         const ClassInfo prophet{"Prophet",
                                 &ai_manager,
                                 construct_npc<Prophet, AI_Mgr::NPCType::Prophet>,
@@ -821,7 +853,9 @@ namespace OpenBlood2
                                  {"Cells", 600.0f},
                                  {"Charges", 400.0f},
                                  {"Fuel", 200.0f},
-                                 {"Dims", DVector{19, 43, 15}}}};
+                                 {"Dims", DVector{19, 43, 15}}},
+                                SaveSupport::Original,
+                                1};
         const ClassInfo gideon{
             "Gideon",
             &ai_manager,

@@ -102,3 +102,26 @@ DDWORD CivilianAI::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
     }
     return result;
 }
+
+// Original CivilianAI::Save/Load: male | labtech << 1 | scared << 2, then the gender table setup
+// with its original precedence (every male refreshes the shared male table).
+void CivilianAI::SaveSubclass(HMESSAGEWRITE h)
+{
+    g_pServerDE->WriteToMessageByte(h, DBYTE(npc_male | (npc_labtech << 1) | (m_bScared << 2)));
+}
+void CivilianAI::LoadSubclass(HMESSAGEREAD h)
+{
+    auto* s = GetServerDE();
+    const DBYTE values = s->ReadFromMessageByte(h);
+    if (values > 7)
+    {
+        s->RejectPayload(h, "CivilianAI Load: unknown flag bits");
+        return;
+    }
+    npc_male = values & 1;
+    npc_labtech = (values & 2) != 0;
+    m_bScared = (values & 4) != 0;
+    std::string error;
+    if (!InitializeSharedTable(error))
+        s->RejectPayload(h, "CivilianAI Load: " + error);
+}

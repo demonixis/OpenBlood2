@@ -3,6 +3,7 @@
 #include "ClientSplatFX.h"
 #include "Gib.h"
 #include "PlayerObj.h"
+#include "SaveFields.h"
 #include "Sparam.h"
 #include "engine/collision.h"
 #include "game/game_settings.h"
@@ -73,15 +74,23 @@ DDWORD CCorpse::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
     {
         auto result = B2BaseClass::EngineMessageFn(message, data, reason);
         auto* state = static_cast<ObjectCreateStruct*>(data);
-        // This hidden class is created by AI_Mgr; authored/string/save corpses
-        // require separate validation rather than accepting a partial template.
-        if (!result || !state || reason != PRECREATE_NORMAL || !state->m_Filename[0])
+        // This hidden class is created by AI_Mgr or restored from a save; authored and string
+        // corpses require separate validation rather than accepting a partial template.
+        if (!result || !state || (reason != PRECREATE_NORMAL && reason != PRECREATE_SAVEGAME) || !state->m_Filename[0])
             return 0;
         state->m_ObjectType = OT_MODEL;
+        // Original PostPropRead runs for every reason: a restore also gets these flags back.
         state->m_Flags = FLAG_VISIBLE | FLAG_RAYHIT | FLAG_GRAVITY | FLAG_MODELKEYS | FLAG_REMOVEIFOUTSIDE;
         return result;
     }
-    if (message == MID_INITIALUPDATE)
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
+    // Original INITIALUPDATE_SAVEGAME skips InitialUpdate: no damage Init (the damage block binds its
+    // owner from its Load), no hit spheres (Load restores them), and the engine record keeps the
+    // body, user flags and schedule.
+    else if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME)
     {
         DVector dims;
         if (!m_damage.Init(m_hObject) || s->GetModelAnimUserDims(m_hObject, &dims, 0) != DE_OK ||
@@ -430,4 +439,54 @@ bool CCorpse::HandleDamage(const Damage& hit)
         }
     }
     return true;
+}
+
+namespace
+{
+    constexpr float corpse_mass = 200, corpse_hit_points = 50; // Original constructor values.
+}
+void CCorpse::Save(HMESSAGEWRITE h)
+{
+    auto* s = GetServerDE();
+    if (!initialized || !configured || !error.empty() || !measurements.hit_spheres_valid)
+    {
+        s->RejectPayload(h, "CCorpse Save: the corpse setup did not complete" + (error.empty() ? "" : ": " + error));
+        return;
+    }
+    for (float radius : measurements.m_fHitSpheres)
+        s->WriteToMessageFloat(h, radius);
+    s->WriteToMessageFloat(h, corpse_mass);
+    s->WriteToMessageFloat(h, corpse_hit_points);
+    s->WriteToMessageString(h, sound_root.c_str());
+    s->WriteToMessageByte(h, limb_loss);
+    s->WriteToMessageByte(h, dead); // OpenBlood2 tail: a gibbed corpse still removes itself.
+}
+void CCorpse::Load(HMESSAGEREAD h)
+{
+    auto* s = GetServerDE();
+    std::array<float, NUM_STD_NODES> spheres{};
+    bool ok = true;
+    for (auto& radius : spheres)
+    {
+        radius = s->ReadFromMessageFloat(h);
+        ok = ok && std::isfinite(radius) && radius >= 0 && radius <= 1e6f;
+    }
+    ok = s->ReadFromMessageFloat(h) == corpse_mass && ok;
+    ok = s->ReadFromMessageFloat(h) == corpse_hit_points && ok;
+    char root[256]; // m_szSoundDir; the original copy into it is unchecked.
+    ok = s->ReadFromMessageStringBuffer(h, root, sizeof(root)) == DE_OK && ok;
+    bool limbs = true, removing = false;
+    ok = save_fields::read_bool(h, limbs) && ok;
+    ok = save_fields::read_bool(h, removing) && ok;
+    if (!ok || !measurements.SetSoundRoot(root))
+    {
+        s->RejectPayload(h, "CCorpse Load: hit sphere, constant, sound directory or flag rejected");
+        return;
+    }
+    measurements.m_fHitSpheres = spheres;
+    measurements.hit_spheres_valid = true;
+    sound_root = root;
+    limb_loss = limbs;
+    dead = removing;
+    initialized = configured = true;
 }

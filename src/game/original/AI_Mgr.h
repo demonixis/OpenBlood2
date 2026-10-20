@@ -156,6 +156,11 @@ class AI_Mgr : public CBaseCharacter
     std::uint64_t runtime_updates = 0, runtime_failures = 0, runtime_camera_pauses = 0, runtime_desyncs = 0;
     std::uint64_t runtime_target_losses = 0;
     bool RuntimeFailure(std::string_view);
+    // Save/load lot 11: the original AI_Mgr::Save/Load block (AI_Mgr.cpp:6759-6938), then the
+    // port's checked tail (AISave.cpp, save_load_contracts.md).
+    void Save(HMESSAGEWRITE, DDWORD);
+    void Load(HMESSAGEREAD, DDWORD);
+    std::uint64_t restored_loads = 0; // Inspection: loads that committed the AI block.
 
     ~AI_Mgr() override;
     bool InsertMe();
@@ -544,6 +549,25 @@ class AI_Mgr : public CBaseCharacter
     std::string ai_key, ai_key_error, ai_sound_resource;
 
   protected:
+    // Original most-derived Save/Load bodies, written before AI_Mgr's block (save/load lot 11).
+    virtual void SaveSubclass(HMESSAGEWRITE) {}
+    virtual void LoadSubclass(HMESSAGEREAD) {}
+    // Runs after AI_Mgr's block, InsertMe and the aggregates (the original Thief/BoneLeech/TheHand
+    // post-processing point). The base applies the port tail's attacker memory.
+    virtual void AfterLoad(HMESSAGEREAD);
+    // AI_Mgr::m_hEnemyAttach. Only attaching classes hold one; others save NULL and refuse a
+    // non-NULL value on load.
+    virtual HOBJECT SavedEnemyAttach() const
+    {
+        return nullptr;
+    }
+    virtual bool AcceptsEnemyAttach() const
+    {
+        return false;
+    }
+    HOBJECT loaded_enemy_attach = nullptr;
+    // The class/gender shared table and InitStatics, shared by fresh and restored initialization.
+    bool InitializeSharedTable(std::string& error);
     bool RunScriptState(PathMgr&, bool* suppress_fire);
     virtual bool ScriptLocomotion(bool run);
     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
@@ -564,6 +588,8 @@ class AI_Mgr : public CBaseCharacter
   private:
     bool RuntimePrecreate(ObjectCreateStruct*, int);
     bool RuntimeInitialize(int);
+    bool RestoreInitialize(); // Original INITIALUPDATE_SAVEGAME: statics and aggregate owners only.
+    HOBJECT loaded_attacker = nullptr;
     bool RuntimeUpdateStep();
     bool runtime_busy = false;
     bool locomotion_busy = false;

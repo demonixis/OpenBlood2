@@ -38,6 +38,11 @@ class CCorpse : public B2BaseClass
     std::uint64_t pool_event = 0;
     std::string pool_error;
 
+    // Original CCorpse::Save/Load (corpse.cpp:703-741), before the CDestructable block, then the
+    // port's pending-removal byte (save_load_contracts lot 11).
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
+
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;

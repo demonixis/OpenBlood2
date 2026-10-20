@@ -152,3 +152,9 @@ The [Naga weapon continuation](naga_weapon_contracts.md) extends the supported N
 The [wind/shockwave continuation](wind_weapon_contracts.md) extends the runtime-only projectile subset with OT_NORMAL scale metadata and the original type20 model/light recipe. Earlier type/resource restrictions are superseded only for this bounded subset; production Gideon and M2 remain incomplete.
 
 The [Gideon combat continuation](gideon_combat_contracts.md) supersedes the selected-method omissions for boss decisions, shield armor, node firing and extra-key powerup. Production boss lifecycle remains unavailable. Sparse supported NPC weapon IDs now use value-based duplicate suppression.
+
+[Save/load lot 11](save_load_contracts.md#implemented-ai-core-lot-11) supersedes the NPC
+`PRECREATE_SAVEGAME` refusal for the AI_Mgr-only classes. A restore reads no property and draws
+no random number; its initial update binds the shared table (Cultist and Civilian in Load) and
+the inventory and damage owners, and requires the restored model. Fresh initialization is
+unchanged; a restored actor that was suspended stays suspended.

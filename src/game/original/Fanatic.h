@@ -33,6 +33,10 @@ class Fanatic : public AI_Mgr
 
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+    // Original Fanatic::Save/Load (Fanatic.cpp:743-779): the raw fuse clock; a lit Load recreates the
+    // smoke source.
+    void SaveSubclass(HMESSAGEWRITE) override;
+    void LoadSubclass(HMESSAGEREAD) override;
 
   private:
     bool Kamikaze();

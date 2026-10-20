@@ -1,5 +1,6 @@
 // Original Destructable.cpp:1134-1245. Typed owned values replace packet reads;
 // validation precedes mutation, and no old object/attacker identity is serialized.
+#include "AI_Mgr.h"
 #include "Destructable.h"
 #include "PlayerObj.h"
 #include "SaveFields.h"
@@ -64,7 +65,10 @@ bool CDestructable::Save(OpenBlood2::DestructableState& output, std::string& err
 {
     error.clear();
     auto* server = BaseClass::GetServerDE();
-    if (!server || !server->IsObjectAlive(m_hObject) || handling_damage || !spawn_valid)
+    // AI_Mgr's precreate admits an unvalidated authored request (its death then spawns nothing),
+    // so an NPC's block carries it (save/load lot 11); every other owner refused it at creation.
+    const bool ai = server && dynamic_cast<const AI_Mgr*>(server->HandleToObject(m_hObject));
+    if (!server || !server->IsObjectAlive(m_hObject) || handling_damage || (!spawn_valid && !ai))
     {
         error = "Damage save requires a live owner, valid spawn and no active damage callback";
         return false;
@@ -119,9 +123,11 @@ bool CDestructable::Load(const OpenBlood2::DestructableState& state, std::string
     }
     if (!valid(state, error))
         return false;
-    // The precreate rule: a class absent from the original stays an accepted no-op spawn.
-    if (!state.spawn_object.empty() && !SpawnClassAbsentFromOriginal(state.spawn_object) &&
-        !server->ValidateSpawnObject(state.spawn_object))
+    // The precreate rule: a class absent from the original stays an accepted no-op spawn. An NPC
+    // keeps an unvalidated request, as its creation did (spawn_valid stays false).
+    const bool spawn = state.spawn_object.empty() || SpawnClassAbsentFromOriginal(state.spawn_object) ||
+                       server->ValidateSpawnObject(state.spawn_object);
+    if (!spawn && !dynamic_cast<AI_Mgr*>(server->HandleToObject(m_hObject)))
     {
         error = "Saved destruction spawn is unavailable";
         return false;
@@ -150,7 +156,7 @@ bool CDestructable::Load(const OpenBlood2::DestructableState& state, std::string
     death_message = state.death_message;
     spawn_object = state.spawn_object;
     spawn_velocity = state.spawn_velocity;
-    spawn_valid = true;
+    spawn_valid = spawn;
     m_bGodMode = state.god_mode;
     trigger_only = state.trigger_only;
     m_fDeathDelay = state.death_delay;
