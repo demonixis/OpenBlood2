@@ -1,0 +1,21 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1029: gpu.sparks_private
+1/4 Test #1029: gpu.sparks_private ...............   Passed    2.64 sec
+    Start 1232: reported_levels.credits
+2/4 Test #1232: reported_levels.credits ..........   Passed    0.14 sec
+    Start 1261: world_actors.sparks
+3/4 Test #1261: world_actors.sparks ..............   Passed    0.02 sec
+    Start 1262: world_actors.caleb
+4/4 Test #1262: world_actors.caleb ...............   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+campaign        =   0.18 sec*proc (3 tests)
+gpu             =   2.64 sec*proc (1 test)
+headless        =   0.18 sec*proc (3 tests)
+private         =   2.64 sec*proc (1 test)
+private-data    =   0.18 sec*proc (3 tests)
+sparks          =   2.64 sec*proc (1 test)
+
+Total Test time (real) =   2.84 sec

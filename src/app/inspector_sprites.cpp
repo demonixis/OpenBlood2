@@ -1,5 +1,6 @@
 #include "game/original/BuiltinSprite.h"
 #include "game/original/DetailSprite.h"
+#include "game/original/SparksObj.h"
 #include "inspector.h"
 #include <algorithm>
 #include <imgui.h>
@@ -304,16 +305,27 @@ namespace OpenBlood2
 {
     void Inspector::draw_sparks(const GameSession& game)
     {
-        if (!ImGui::CollapsingHeader("Original impact sparks / blood burst"))
+        if (!ImGui::CollapsingHeader("Original sparks / blood burst"))
             return;
+        for (auto id : game.objects.snapshot())
+            if (const auto* r = game.objects.get(id))
+                if (const auto* emitter = dynamic_cast<const SparksObj*>(r->game.get()))
+                {
+                    ImGui::Text("Emitter %s | on %d | bursts %llu | next delay %.3f | max seconds %.3f",
+                                r->state.m_Name, emitter->on, (unsigned long long)emitter->bursts, emitter->next_delay,
+                                emitter->max_seconds);
+                    ImGui::Text("On clock %.3f | burst clock %.3f | commands %llu", emitter->on_time,
+                                emitter->start_time, (unsigned long long)emitter->commands);
+                    ImGui::TextWrapped("%s %s", emitter->error.c_str(), emitter->sound_error.c_str());
+                }
         const auto& store = game.server.sparks;
         ImGui::Text("Systems %zu / 128 | particles %zu / 16384 | started %llu / retired %llu / failed %llu",
                     store.active.size(), store.live_particles(), (unsigned long long)store.started,
                     (unsigned long long)store.retired, (unsigned long long)store.failed);
-        ImGui::TextWrapped(
-            "One original burst, outgoing component bounds, gravity -150. Detached; particles have no collision. Empty "
-            "systems are reclaimed after duration; shared SFX eviction is unavailable. %s",
-            store.update_error.c_str());
+        ImGui::TextWrapped("One original burst, outgoing component bounds; recipe-specific gravity. Detached; "
+                           "particles have no collision. Empty "
+                           "systems are reclaimed after duration; shared SFX eviction is unavailable. %s",
+                           store.update_error.c_str());
         for (const auto& fx : store.active)
         {
             ImGui::PushID(static_cast<int>(fx.id));
@@ -324,6 +336,7 @@ namespace OpenBlood2
                             fx.alpha);
                 ImGui::Text("Velocity min %.3f %.3f %.3f / max %.3f %.3f %.3f", fx.min_velocity.x, fx.min_velocity.y,
                             fx.min_velocity.z, fx.max_velocity.x, fx.max_velocity.y, fx.max_velocity.z);
+                ImGui::Text("Gravity %.1f", fx.settings.gravity);
                 ImGui::Text("Duration %.2f | emission radius %.2f | draw radius %.2f / 640 | updates %llu",
                             fx.settings.duration, fx.settings.emission_radius, fx.settings.radius,
                             (unsigned long long)fx.updates);

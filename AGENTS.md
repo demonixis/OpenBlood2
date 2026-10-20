@@ -1,5 +1,10 @@
 # Blood2 Project Instructions
 
+The [CalebAI/SparksObj continuation](Documentation/contracts/world_actor_contracts.md) adds original Caleb defaults/shared
+AI tables and real world sparks/audio requests. Preserve source Type-lookup,
+zero-origin particle, strict timing and OFF-clock quirks. The missing authored
+lightpop2.wav remains visible; no replacement sound is supplied.
+
 The [Fields Minefield continuation](Documentation/contracts/minefield_contracts.md) preserves original self-attributed
 Death damage, airborne-player and Hidden exceptions, and actual grenade FX/audio.
 Keep generic container-code validation, no radial damage, checked support and

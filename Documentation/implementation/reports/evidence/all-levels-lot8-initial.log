@@ -1,0 +1,80 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start  539: ai_runtime.ammo_receive
+ 1/29 Test  #539: ai_runtime.ammo_receive ..........   Passed    0.00 sec
+      Start  540: ai_runtime.ammo_search
+ 2/29 Test  #540: ai_runtime.ammo_search ...........   Passed    0.00 sec
+      Start  541: ai_runtime.activation
+ 3/29 Test  #541: ai_runtime.activation ............   Passed    0.00 sec
+      Start  542: ai_runtime.animation_clearance
+ 4/29 Test  #542: ai_runtime.animation_clearance ...   Passed    0.00 sec
+      Start  543: ai_runtime.visibility
+ 5/29 Test  #543: ai_runtime.visibility ............   Passed    0.00 sec
+      Start  544: ai_runtime.visibility_filter
+ 6/29 Test  #544: ai_runtime.visibility_filter .....   Passed    0.00 sec
+      Start  545: ai_runtime.visibility_atomic
+ 7/29 Test  #545: ai_runtime.visibility_atomic .....   Passed    0.00 sec
+      Start  546: ai_runtime.lifetime
+ 8/29 Test  #546: ai_runtime.lifetime ..............   Passed    0.00 sec
+      Start  547: ai_runtime.targets
+ 9/29 Test  #547: ai_runtime.targets ...............   Passed    0.00 sec
+      Start  548: ai_runtime.tracking
+10/29 Test  #548: ai_runtime.tracking ..............   Passed    0.00 sec
+      Start  549: ai_runtime.camera
+11/29 Test  #549: ai_runtime.camera ................   Passed    0.00 sec
+      Start  550: ai_runtime.spatial
+12/29 Test  #550: ai_runtime.spatial ...............   Passed    0.00 sec
+      Start  551: ai_runtime.triggers
+13/29 Test  #551: ai_runtime.triggers ..............   Passed    0.00 sec
+      Start  552: ai_runtime.body
+14/29 Test  #552: ai_runtime.body ..................   Passed    0.00 sec
+      Start  553: ai_runtime.missing
+15/29 Test  #553: ai_runtime.missing ...............   Passed    0.00 sec
+      Start  554: ai_runtime.catalog
+16/29 Test  #554: ai_runtime.catalog ...............   Passed    0.04 sec
+      Start  555: ai_runtime.failures
+17/29 Test  #555: ai_runtime.failures ..............   Passed    0.02 sec
+      Start  556: ai_runtime.subway
+18/29 Test  #556: ai_runtime.subway ................   Passed    0.79 sec
+      Start  557: ai_runtime.arena
+19/29 Test  #557: ai_runtime.arena .................   Passed    0.06 sec
+      Start  558: ai_runtime.sparse_weapons
+20/29 Test  #558: ai_runtime.sparse_weapons ........   Passed    0.02 sec
+      Start  559: ai_runtime.clearance_private
+21/29 Test  #559: ai_runtime.clearance_private .....   Passed    3.06 sec
+      Start  560: ai_runtime.ammo_private
+22/29 Test  #560: ai_runtime.ammo_private ..........   Passed    0.04 sec
+      Start  927: sparks.formulas
+23/29 Test  #927: sparks.formulas ..................   Passed    0.00 sec
+      Start  928: sparks.selection
+24/29 Test  #928: sparks.selection .................   Passed    0.00 sec
+      Start  929: sparks.failures
+25/29 Test  #929: sparks.failures ..................   Passed    0.00 sec
+      Start  930: sparks.private
+26/29 Test  #930: sparks.private ...................   Passed    0.15 sec
+      Start 1120: reported_levels.credits
+27/29 Test #1120: reported_levels.credits ..........   Passed    0.14 sec
+      Start 1148: world_actors.sparks
+28/29 Test #1148: world_actors.sparks ..............***Failed    0.01 sec
+45: g.objects.advance(.011) && s->bursts == 1 && s->effect && s->voice
+
+      Start 1149: world_actors.caleb
+29/29 Test #1149: world_actors.caleb ...............***Failed    0.02 sec
+109: a && b && a->runtime_initialized && !a->runtime_failed
+
+
+93% tests passed, 2 tests failed out of 29
+
+Label Time Summary:
+ai_runtime      =   4.05 sec*proc (22 tests)
+campaign        =   0.17 sec*proc (3 tests)
+headless        =   4.38 sec*proc (29 tests)
+private         =   4.17 sec*proc (8 tests)
+private-data    =   0.17 sec*proc (3 tests)
+sparks          =   0.16 sec*proc (4 tests)
+
+Total Test time (real) =   4.40 sec
+
+The following tests FAILED:
+	1148 - world_actors.sparks (Failed)                      campaign headless private-data
+	1149 - world_actors.caleb (Failed)                       campaign headless private-data
+Errors while running CTest

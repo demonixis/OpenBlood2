@@ -174,6 +174,16 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         npc_weapons[0] = leech ? "BONELEECH_SUCK" : "SOUL_HOOK";
         npc_weapons[1] = leech ? "NONE" : "FIREBALL";
     }
+    if (type == NPCType::Caleb)
+    {
+        m_fHearingDist = 0;
+        m_fSeeingDist = 1000;
+        m_fRollSpeed = 3.5f;
+        m_dwFlags = 0;
+        m_bCabal = false;
+        npc_hp = 30;
+        npc_armor = 0;
+    }
     if (type == NPCType::MadScientist)
     {
         // Original MadScientistAI constructor; roll/jump keep the AI_Mgr defaults.
@@ -388,6 +398,11 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         model = "Models/Enemies/" + name + ".abc";
         skin = "Skins/Enemies/" + name + ".dtx";
     }
+    else if (npc_type == NPCType::Caleb)
+    {
+        model = "Models/Characters/caleb.abc";
+        skin = "Skins/Characters/caleb1.dtx";
+    }
     else if (npc_type == NPCType::MadScientist)
     {
         model = "Models/Enemies/madscientist.abc";
@@ -468,7 +483,8 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
         return RuntimeFailure("Invalid or repeated NPC initialization");
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
-    const auto group = npc_type == NPCType::Behemoth       ? 15
+    const auto group = npc_type == NPCType::Caleb          ? 19
+                       : npc_type == NPCType::Behemoth     ? 15
                        : npc_type == NPCType::DrudgePriest ? 16
                        : npc_type == NPCType::DeathShroud  ? 17
                        : npc_type == NPCType::TheHand      ? 18
@@ -530,7 +546,8 @@ bool AI_Mgr::RuntimeInitialize(int reason)
             return RuntimeFailure("NPC female animation table initialization failed");
     }
     else if (!initialize_table(group, !tables[group],
-                               npc_type == NPCType::Behemoth       ? "sounds/enemies/Behemoth"
+                               npc_type == NPCType::Caleb          ? "sounds/chosen/caleb"
+                               : npc_type == NPCType::Behemoth     ? "sounds/enemies/Behemoth"
                                : npc_type == NPCType::DrudgePriest ? "sounds/enemies/drudgepriest"
                                : npc_type == NPCType::DeathShroud  ? "sounds/enemies/DeathShroud"
                                : npc_type == NPCType::TheHand      ? "sounds/enemies/TheHand"

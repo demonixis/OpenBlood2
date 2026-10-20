@@ -1,0 +1,34 @@
+{
+  "selection": "Caleb constructor/model/table; SparksObj and CClientSparksSFX transport recipes",
+  "files": [
+    {
+      "path": "sources/blood2/ObjectDLL/CalebAI.cpp",
+      "sha256": "831ce8d94f51692af59149acec5974fed1ee3af0fdf587bc4031c5ca569b45bd"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/CalebAI.h",
+      "sha256": "270ad2a6450bfe0ae034729595dd47d7d5b440950a341cd6061edc91301b3b82"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/SparksObj.cpp",
+      "sha256": "89b2e6d5c77879c31e425fcec1dbbc02954ca9abc78216e06d0b60fa172ae49b"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/SparksObj.h",
+      "sha256": "702ff85abb20634d72c49c9956cfd0b065d6f7b98e8840b28398fe8ff768579a"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ClientSparksSFX.cpp",
+      "sha256": "2246abbeb7938459a9e4ee53734fe6fe274b85ed81b5efbdd7d27f31b178fa40"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ClientSparksSFX.h",
+      "sha256": "d67f9e08dae94078d4a24a6c3b71b79ca308b96efa0af89db180ffb225d9a20e"
+    }
+  ],
+  "corroboration": {
+    "path": "sources/lithtech/runtime/server/src/serverde_impl.cpp",
+    "sha256": "5e1973f36bea781f23f99d7e0bb32ddb474ebf83c142c6877b15c157ba2fd53f",
+    "selection": "si_GetPropLongInt checks PT_LONGINT; later-engine corroboration, not a 1998 executable trace"
+  }
+}

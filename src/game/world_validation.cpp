@@ -2,6 +2,7 @@
 #include "engine/world_view.h"
 #include "game/original/Minefield.h"
 #include "game/original/SkyObjects.h"
+#include "game/original/SparksObj.h"
 #include "game/server_adapter.h"
 #include <set>
 
@@ -37,6 +38,15 @@ namespace OpenBlood2
                 if (const auto* mine = dynamic_cast<const Minefield*>(r->game.get()); mine && !mine->error.empty())
                 {
                     error = "Minefield " + std::string(r->state.m_Name) + ": " + mine->error;
+                    return false;
+                }
+        for (auto id : game.objects.snapshot())
+            if (const auto* r = game.objects.get(id); r && r->life == Life::Alive)
+                if (const auto* emitter = dynamic_cast<const SparksObj*>(r->game.get());
+                    emitter && (!emitter->error.empty() || !emitter->sound_error.empty()))
+                {
+                    error = "SparksObj " + std::string(r->state.m_Name) + ": " + emitter->error + " " +
+                            emitter->sound_error;
                     return false;
                 }
         report.unavailable_services.clear();

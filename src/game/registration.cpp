@@ -4,6 +4,7 @@
 #include "game/original/BugSprayProjectile.h"
 #include "game/original/BuiltinModel.h"
 #include "game/original/BuiltinSprite.h"
+#include "game/original/CalebAI.h"
 #include "game/original/CameraObj.h"
 #include "game/original/CameraSpot.h"
 #include "game/original/CampaignProjectiles.h"
@@ -59,6 +60,7 @@
 #include "game/original/SoulDrudge.h"
 #include "game/original/Sound.h"
 #include "game/original/SoundFX.h"
+#include "game/original/SparksObj.h"
 #include "game/original/Spawner.h"
 #include "game/original/Tchernotronic.h"
 #include "game/original/TeslaProjectile.h"
@@ -503,6 +505,27 @@ namespace OpenBlood2
                     p.push_back({"AIWeapon" + std::to_string(i), std::string{}, false, 31});
                 return p;
             }()};
+        const ClassInfo caleb_ai{"CalebAI",
+                                 &ai_manager,
+                                 construct_npc<CalebAI, AI_Mgr::NPCType::Caleb>,
+                                 {{"HitPoints", 30.0f},
+                                  {"RandomHitPoints", 0.0f},
+                                  {"ArmorPoints", 0.0f},
+                                  {"AIState", std::string("IDLE"), true, 31},
+                                  {"AIWeapon", std::string("NONE")}}};
+        const ClassInfo sparks_obj{"SparksObj",
+                                   &b2base,
+                                   construct<SparksObj>,
+                                   {{"SparkSwitch", true},
+                                    {"Type", std::int32_t(0)},
+                                    {"SparkCountMin", 10.0f},
+                                    {"SparkCountMax", 30.0f},
+                                    {"SparkDuration", .4f},
+                                    {"SparkEmissionRadius", .7f},
+                                    {"DelaySecsMin", .5f},
+                                    {"DelaySecsMax", 2.0f},
+                                    {"MaxSecs", 0.0f},
+                                    {"SparkSound", std::string("Sounds\\lightpop2.wav")}}};
         const ClassInfo later_Behemoth{
             "Behemoth",
             &ai_manager,
@@ -1143,7 +1166,8 @@ namespace OpenBlood2
                objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(exit_hint) && objects.register_class(character) &&
-               objects.register_class(ai_manager) && objects.register_class(later_Behemoth) &&
+               objects.register_class(ai_manager) && objects.register_class(caleb_ai) &&
+               objects.register_class(sparks_obj) && objects.register_class(later_Behemoth) &&
                objects.register_class(later_DrudgePriest) && objects.register_class(later_DeathShroud) &&
                objects.register_class(later_TheHandAI) && objects.register_class(skull_projectile) &&
                objects.register_class(campaign_Thief) && objects.register_class(campaign_Naga) &&

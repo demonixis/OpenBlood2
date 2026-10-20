@@ -1,0 +1,100 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start    3: objects.builtin_model
+ 1/43 Test    #3: objects.builtin_model ............   Passed    0.00 sec
+      Start    4: objects.original_objects
+ 2/43 Test    #4: objects.original_objects .........   Passed    0.00 sec
+      Start    5: objects.nested_creation
+ 3/43 Test    #5: objects.nested_creation ..........   Passed    0.00 sec
+      Start    6: objects.reasons_properties
+ 4/43 Test    #6: objects.reasons_properties .......   Passed    0.00 sec
+      Start    7: objects.scheduling
+ 5/43 Test    #7: objects.scheduling ...............   Passed    0.00 sec
+      Start    8: objects.deferred_removal
+ 6/43 Test    #8: objects.deferred_removal .........   Passed    0.00 sec
+      Start    9: objects.aggregate_dispatch
+ 7/43 Test    #9: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start   10: objects.handles_selection
+ 8/43 Test   #10: objects.handles_selection ........   Passed    0.00 sec
+      Start   11: objects.links_lists
+ 9/43 Test   #11: objects.links_lists ..............   Passed    0.00 sec
+      Start   12: objects.messages_strings
+10/43 Test   #12: objects.messages_strings .........   Passed    0.00 sec
+      Start   13: objects.message_churn
+11/43 Test   #13: objects.message_churn ............   Passed    0.11 sec
+      Start   14: objects.message_limit
+12/43 Test   #14: objects.message_limit ............   Passed    0.03 sec
+      Start   15: objects.unsupported_teardown
+13/43 Test   #15: objects.unsupported_teardown .....   Passed    0.01 sec
+      Start   16: objects.creation_failures
+14/43 Test   #16: objects.creation_failures ........   Passed    0.00 sec
+      Start  539: ai_runtime.ammo_receive
+15/43 Test  #539: ai_runtime.ammo_receive ..........   Passed    0.00 sec
+      Start  540: ai_runtime.ammo_search
+16/43 Test  #540: ai_runtime.ammo_search ...........   Passed    0.00 sec
+      Start  541: ai_runtime.activation
+17/43 Test  #541: ai_runtime.activation ............   Passed    0.00 sec
+      Start  542: ai_runtime.animation_clearance
+18/43 Test  #542: ai_runtime.animation_clearance ...   Passed    0.00 sec
+      Start  543: ai_runtime.visibility
+19/43 Test  #543: ai_runtime.visibility ............   Passed    0.00 sec
+      Start  544: ai_runtime.visibility_filter
+20/43 Test  #544: ai_runtime.visibility_filter .....   Passed    0.00 sec
+      Start  545: ai_runtime.visibility_atomic
+21/43 Test  #545: ai_runtime.visibility_atomic .....   Passed    0.00 sec
+      Start  546: ai_runtime.lifetime
+22/43 Test  #546: ai_runtime.lifetime ..............   Passed    0.00 sec
+      Start  547: ai_runtime.targets
+23/43 Test  #547: ai_runtime.targets ...............   Passed    0.00 sec
+      Start  548: ai_runtime.tracking
+24/43 Test  #548: ai_runtime.tracking ..............   Passed    0.00 sec
+      Start  549: ai_runtime.camera
+25/43 Test  #549: ai_runtime.camera ................   Passed    0.00 sec
+      Start  550: ai_runtime.spatial
+26/43 Test  #550: ai_runtime.spatial ...............   Passed    0.00 sec
+      Start  551: ai_runtime.triggers
+27/43 Test  #551: ai_runtime.triggers ..............   Passed    0.00 sec
+      Start  552: ai_runtime.body
+28/43 Test  #552: ai_runtime.body ..................   Passed    0.00 sec
+      Start  553: ai_runtime.missing
+29/43 Test  #553: ai_runtime.missing ...............   Passed    0.00 sec
+      Start  554: ai_runtime.catalog
+30/43 Test  #554: ai_runtime.catalog ...............   Passed    0.05 sec
+      Start  555: ai_runtime.failures
+31/43 Test  #555: ai_runtime.failures ..............   Passed    0.02 sec
+      Start  556: ai_runtime.subway
+32/43 Test  #556: ai_runtime.subway ................   Passed    0.90 sec
+      Start  557: ai_runtime.arena
+33/43 Test  #557: ai_runtime.arena .................   Passed    0.10 sec
+      Start  558: ai_runtime.sparse_weapons
+34/43 Test  #558: ai_runtime.sparse_weapons ........   Passed    0.03 sec
+      Start  559: ai_runtime.clearance_private
+35/43 Test  #559: ai_runtime.clearance_private .....   Passed    5.70 sec
+      Start  560: ai_runtime.ammo_private
+36/43 Test  #560: ai_runtime.ammo_private ..........   Passed    0.06 sec
+      Start  927: sparks.formulas
+37/43 Test  #927: sparks.formulas ..................   Passed    0.00 sec
+      Start  928: sparks.selection
+38/43 Test  #928: sparks.selection .................   Passed    0.00 sec
+      Start  929: sparks.failures
+39/43 Test  #929: sparks.failures ..................   Passed    0.00 sec
+      Start  930: sparks.private
+40/43 Test  #930: sparks.private ...................   Passed    0.20 sec
+      Start 1120: reported_levels.credits
+41/43 Test #1120: reported_levels.credits ..........   Passed    0.27 sec
+      Start 1148: world_actors.sparks
+42/43 Test #1148: world_actors.sparks ..............   Passed    0.03 sec
+      Start 1149: world_actors.caleb
+43/43 Test #1149: world_actors.caleb ...............   Passed    0.04 sec
+
+100% tests passed, 0 tests failed out of 43
+
+Label Time Summary:
+ai_runtime      =   6.91 sec*proc (22 tests)
+campaign        =   0.34 sec*proc (3 tests)
+headless        =   7.64 sec*proc (43 tests)
+objects         =   0.18 sec*proc (14 tests)
+private         =   7.07 sec*proc (8 tests)
+private-data    =   0.34 sec*proc (3 tests)
+sparks          =   0.21 sec*proc (4 tests)
+
+Total Test time (real) =   7.67 sec

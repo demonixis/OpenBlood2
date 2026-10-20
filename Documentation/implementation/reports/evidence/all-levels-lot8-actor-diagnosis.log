@@ -1,0 +1,25 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1148: world_actors.sparks
+1/2 Test #1148: world_actors.sparks ..............***Failed    0.01 sec
+Spark bursts=1  Missing or oversized sound resource
+47: s->bursts == 1 && s->effect && s->voice
+
+    Start 1149: world_actors.caleb
+2/2 Test #1149: world_actors.caleb ...............***Failed    0.02 sec
+Caleb initialized=0 NPC initial model dimensions/scale/animation failed: AI animation resize unavailable or invalid
+113: a && b && a->runtime_initialized && !a->runtime_failed
+
+
+0% tests passed, 2 tests failed out of 2
+
+Label Time Summary:
+campaign        =   0.03 sec*proc (2 tests)
+headless        =   0.03 sec*proc (2 tests)
+private-data    =   0.03 sec*proc (2 tests)
+
+Total Test time (real) =   0.04 sec
+
+The following tests FAILED:
+	1148 - world_actors.sparks (Failed)                      campaign headless private-data
+	1149 - world_actors.caleb (Failed)                       campaign headless private-data
+Errors while running CTest

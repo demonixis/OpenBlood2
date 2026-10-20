@@ -9,10 +9,10 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 7: **43 / 58 pass, 15 / 58 fail**
-([audit 5](evidence/all-levels-audit-05.log)). Remaining worlds: Abandoned Buildings,
+Current verified opening gate after iteration 8: **44 / 58 pass, 14 / 58 fail**
+([audit 6](evidence/all-levels-audit-06.log)). Remaining worlds: Abandoned Buildings,
 Temple, Power Station, Laboratory, Office, Rooftop, Ancient City, Arena, Ancient One,
-Credits, End and the four CTF maps. Initial-entry and three-second simulation
+End and the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
 the initial baseline; iteration records explain resolved and newly exposed blockers.
 
@@ -270,3 +270,33 @@ failed runs remain retained, separate from the passing reruns.
 **15 / 58**. The remaining implementation queue is unchanged except Fields is
 resolved. This validates local level entry and short simulation, not complete
 traversal, CTF/network play or global M3 acceptance.
+
+## Iteration 8: Caleb and authored spark emitters
+
+[CalebAI and SparksObj](../../contracts/world_actor_contracts.md) now execute
+original setup/rules through the existing AI and particle/audio services. Credits
+passes all three difficulties and short simulation. Sparks preserve strict clocks,
+case-sensitive prefixes, byte-count truncation, Type lookup and zero-origin quirks.
+Their components remain real detached particle systems and decoded sound requests.
+
+[Audit 6](evidence/all-levels-audit-06.log) passes **44 / 58**, fails **14 / 58**.
+Power Station now reaches CVBC's failed sound request in addition to missing
+lightning support: its exact authored `Sounds\lightpop2.wav` is absent.
+[Authored properties](evidence/all-levels-power-sparks-properties.log) were dumped
+with the earlier diagnostic binary, so its class-registration labels are historical.
+No sound replacement is made.
+
+Validation: [43 Dev regressions](evidence/all-levels-lot8-dev.log) and
+[43 ASan/UBSan/leak regressions](evidence/all-levels-lot8-sanitizers.log) pass.
+[Release tests](evidence/all-levels-lot8-release.log) pass both new behavior cases,
+Credits and the existing actual-particle GPU readback test.
+[Credits direct GPU opening](evidence/all-levels-credits-gpu.log) renders three
+frames and exits 0 on NVIDIA RTX 3060 with dummy audio. Both applications build;
+pre-existing PlayerVoice.cpp float/enum comparison warnings remain.
+
+The [initial run](evidence/all-levels-lot8-initial.log) passes 27/29 cases.
+[Diagnosis](evidence/all-levels-lot8-actor-diagnosis.log) identifies the absent
+default spark sound and a missing collision world in the isolated Caleb fixture.
+The sound test now authors an explicitly present sound; the Caleb fixture installs
+a floor. Production defaults and strict animation/resize checks were preserved.
+These initial failures remain distinct from the passing reruns.

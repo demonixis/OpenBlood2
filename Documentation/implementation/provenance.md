@@ -1616,3 +1616,12 @@ self-attributed Death messages and existing grenade component/audio services.
 [contracts](../contracts/minefield_contracts.md) retain the Hidden exception,
 player support exception, Code=8 metadata and no radius damage. No dependency,
 commercial asset or reference-source changes.
+
+## CalebAI and world SparksObj
+
+Selected original CalebAI initialization now uses the shared checked AI_Mgr path;
+SparksObj and CClientSparksSFX recipes use actual existing particle/audio services.
+[Contracts](../contracts/world_actor_contracts.md) and
+[source hashes](sources/all_levels_world_actor_sources.json) preserve the boolean
+property lookup and zero-position packet quirks. No original files, assets or
+dependencies changed. Missing lightpop2.wav remains explicitly unresolved.
