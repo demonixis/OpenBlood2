@@ -4,7 +4,8 @@ namespace OpenBlood2
 {
     std::uint64_t ServerAdapter::PublishWarpGate(HOBJECT owner, const WarpGateSettings& settings, std::string& error)
     {
-        trace_service("PublishWarpGate");
+        if (!trace_service("PublishWarpGate"))
+            return 0;
         if (!client_resources || !objects_.sprites)
         {
             error = "Warp resources unavailable";
@@ -14,7 +15,8 @@ namespace OpenBlood2
     }
     std::uint64_t ServerAdapter::PublishLightning(HOBJECT source, const LightningSettings& settings, std::string& error)
     {
-        trace_service("PublishLightning");
+        if (!trace_service("PublishLightning"))
+            return 0;
         if (!IsObjectAlive(source) || !client_resources)
         {
             error = "Lightning owner/resources unavailable";
@@ -25,7 +27,8 @@ namespace OpenBlood2
 
     std::uint64_t ServerAdapter::PublishSparks(HOBJECT source, const SparkSettings& settings, std::string& error)
     {
-        trace_service("PublishSparks");
+        if (!trace_service("PublishSparks"))
+            return 0;
         error.clear();
         if (!IsObjectAlive(source) || !client_resources)
         {
@@ -37,7 +40,8 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishClientBloodSplat(const BloodSplatSettings& settings, std::string_view source,
                                                          std::string& error)
     {
-        trace_service("PublishClientBloodSplat");
+        if (!trace_service("PublishClientBloodSplat"))
+            return 0;
         error.clear();
         if (!objects_.sprites)
         {
@@ -49,7 +53,8 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishClientBloodSpurt(const BloodSpurtSettings& settings, std::string_view source,
                                                          bool immediate, std::string& error)
     {
-        trace_service("PublishClientBloodSpurt");
+        if (!trace_service("PublishClientBloodSpurt"))
+            return 0;
         error.clear();
         if (!client_resources)
         {
@@ -61,7 +66,8 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishBloodSpurt(HOBJECT source, const BloodSpurtSettings& settings,
                                                    std::string& error)
     {
-        trace_service("PublishBloodSpurt");
+        if (!trace_service("PublishBloodSpurt"))
+            return 0;
         error.clear();
         if (!IsObjectAlive(source))
         {
@@ -73,7 +79,8 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishBloodSplat(HOBJECT source, const BloodSplatSettings& settings,
                                                    std::string& error)
     {
-        trace_service("PublishBloodSplat");
+        if (!trace_service("PublishBloodSplat"))
+            return 0;
         error.clear();
         if (!IsObjectAlive(source) || !objects_.sprites)
         {
@@ -85,7 +92,8 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishFleshGibs(HOBJECT owner, DVector pos, DVector dir, DVector dims, float scale,
                                                   unsigned count, std::string& error)
     {
-        trace_service("PublishFleshGibs");
+        if (!trace_service("PublishFleshGibs"))
+            return 0;
         if (!client_resources || !objects_.models)
         {
             error = "Flesh-gib resources unavailable";
@@ -96,7 +104,8 @@ namespace OpenBlood2
     }
     std::uint64_t ServerAdapter::PublishPolyGrid(HOBJECT owner, const PolyGridSettings& settings, std::string& error)
     {
-        trace_service("PublishPolyGrid");
+        if (!trace_service("PublishPolyGrid"))
+            return 0;
         if (!objects_.sprites)
         {
             error = "PolyGrid sprite store unavailable";
@@ -110,19 +119,22 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishParticleStream(HOBJECT owner, const ParticleStreamSettings& settings,
                                                        std::string& error)
     {
-        trace_service("PublishParticleStream");
+        if (!trace_service("PublishParticleStream"))
+            return 0;
         return particle_streams.publish(owner, settings, *this, client_resources, objects_.time(), error);
     }
     std::uint64_t ServerAdapter::PublishObjectParticles(HOBJECT owner, unsigned type, std::string& error,
                                                         float lifetime_scale)
     {
-        trace_service("PublishObjectParticles");
+        if (!trace_service("PublishObjectParticles"))
+            return 0;
         return object_particles.publish(owner, type, *this, client_resources, objects_.time(), error, lifetime_scale);
     }
     std::uint64_t ServerAdapter::PublishLaserBeam(HOBJECT source, DVector from, DVector to, std::string& error,
                                                   DBYTE type)
     {
-        trace_service("PublishLaserBeam");
+        if (!trace_service("PublishLaserBeam"))
+            return 0;
         if (!IsObjectAlive(source) || !objects_.models || !client_resources)
         {
             error = "Laser source/model resources unavailable";
@@ -134,7 +146,8 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishWeaponSprites(HOBJECT source, const WeaponSpriteSettings& settings,
                                                       std::string& error)
     {
-        trace_service("PublishWeaponSprites");
+        if (!trace_service("PublishWeaponSprites"))
+            return 0;
         if (!IsObjectAlive(source) || !objects_.sprites)
         {
             error = "Weapon sprite source/store unavailable";
@@ -148,7 +161,8 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishExplosionFragments(HOBJECT source, DDWORD type, DVector pos, DVector normal,
                                                            std::string& error)
     {
-        trace_service("PublishExplosionFragments");
+        if (!trace_service("PublishExplosionFragments"))
+            return 0;
         if (!IsObjectAlive(source) || !objects_.models || !client_resources)
         {
             error = "Explosion fragment source/resources unavailable";
@@ -160,7 +174,8 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishExplosionFlames(HOBJECT source, DDWORD type, DVector position, DVector normal,
                                                         std::string& error)
     {
-        trace_service("PublishExplosionFlames");
+        if (!trace_service("PublishExplosionFlames"))
+            return 0;
         if (!IsObjectAlive(source) || !client_resources)
         {
             error = "Explosion flame source/resources unavailable";
@@ -172,7 +187,8 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishExplosionRings(HOBJECT source, DDWORD type, DVector position, DVector normal,
                                                        std::string& error)
     {
-        trace_service("PublishExplosionRings");
+        if (!trace_service("PublishExplosionRings"))
+            return 0;
         if (!IsObjectAlive(source) || !client_resources)
         {
             error = "Explosion ring source/resources unavailable";
@@ -184,7 +200,8 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishExplosionLights(HOBJECT source, DDWORD type, DVector position, DVector normal,
                                                         std::string& error)
     {
-        trace_service("PublishExplosionLights");
+        if (!trace_service("PublishExplosionLights"))
+            return 0;
         if (!IsObjectAlive(source))
         {
             error = "Explosion light source unavailable";
@@ -195,7 +212,8 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishExplosionModels(HOBJECT source, DDWORD type, DVector position, DVector normal,
                                                         std::string& error)
     {
-        trace_service("PublishExplosionModels");
+        if (!trace_service("PublishExplosionModels"))
+            return 0;
         if (!IsObjectAlive(source) || !objects_.models || !client_resources)
         {
             error = "Explosion source/model resources unavailable";
@@ -207,7 +225,8 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishExplosionSprites(HOBJECT source, DDWORD type, DVector position, DVector normal,
                                                          std::string& error)
     {
-        trace_service("PublishExplosionSprites");
+        if (!trace_service("PublishExplosionSprites"))
+            return 0;
         if (!IsObjectAlive(source) || !objects_.sprites)
         {
             error = "Explosion source or sprite store unavailable";

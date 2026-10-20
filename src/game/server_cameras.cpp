@@ -18,7 +18,8 @@ namespace OpenBlood2
     }
     bool ServerAdapter::PublishCameraEffect(HOBJECT h, const CameraSettings& settings)
     {
-        trace_service("PublishCameraEffect");
+        if (!trace_service("PublishCameraEffect"))
+            return false;
         if (!IsObjectAlive(h) || !dynamic_cast<CameraObj*>(objects_.get(h)->game.get()) || settings.type > 2 ||
             camera_effects.size() >= 4096 ||
             std::any_of(camera_effects.begin(), camera_effects.end(), [h](const auto& c) { return c.object == h; }))
@@ -29,7 +30,8 @@ namespace OpenBlood2
     }
     void ServerAdapter::RemoveCameraEffect(HOBJECT h)
     {
-        trace_service("RemoveCameraEffect");
+        if (!trace_service("RemoveCameraEffect"))
+            return;
         std::erase_if(camera_effects, [h](const auto& c) { return c.object == h; });
     }
     CameraView ServerAdapter::GetCameraView()

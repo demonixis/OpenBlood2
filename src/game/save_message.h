@@ -62,6 +62,37 @@ namespace OpenBlood2
         std::uint32_t null_references = 0; // NULL, stale, pending or outside the list.
         std::uint32_t plain_objects = 0;   // Plain object writes/reads stored as NULL (D7).
         std::uint32_t nested = 0;          // Nested messages written or read.
+        std::uint32_t impure = 0;          // Services refused by the save purity check.
         std::string error;                 // First latched failure; empty on success.
+    };
+
+    // Per-class aggregate of one SaveObjects/RestoreObjects call (D7 counts plain-object NULLs per class).
+    struct SaveClassCount
+    {
+        std::string name;
+        std::uint32_t records = 0, references = 0, null_references = 0, plain_objects = 0;
+        std::size_t bytes = 0;
+    };
+    // Owned report values; handles are checked, non-reused session tokens.
+    struct SaveObjectsReport
+    {
+        std::string file; // Logical store name.
+        std::uint32_t listed = 0, saved = 0, always_load = 0, pending = 0, duplicates = 0;
+        std::uint32_t links = 0, attachments = 0;
+        std::vector<SaveClassCount> classes;
+        std::vector<std::string> refused; // "Class (support)" for listed classes that cannot be saved.
+        SavePayloadReport failed;         // The failing dispatch, if any.
+        std::string error;
+    };
+    struct RestoreObjectsReport
+    {
+        std::string file;
+        std::uint32_t records = 0, links = 0, existing_links = 0, attachments = 0, existing_attachments = 0;
+        bool console_restored = false, clock_restored = false;
+        std::vector<HOBJECT> objects; // Record order.
+        HOBJECT local_client = nullptr;
+        std::vector<SaveClassCount> classes;
+        SavePayloadReport failed;
+        std::string error;
     };
 } // namespace OpenBlood2

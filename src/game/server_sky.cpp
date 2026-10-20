@@ -3,7 +3,8 @@ namespace OpenBlood2
 {
     bool ServerAdapter::SetSkyDefinition(const SkyDefinition& d)
     {
-        trace_service("SetSkyDefinition");
+        if (!trace_service("SetSkyDefinition"))
+            return false;
         if (sky.set(d))
             return true;
         ReportSkyFailure(sky.error);
@@ -11,7 +12,8 @@ namespace OpenBlood2
     }
     bool ServerAdapter::AddSkyObject(HOBJECT h, unsigned index)
     {
-        trace_service("AddSkyObject");
+        if (!trace_service("AddSkyObject"))
+            return false;
         if (sky.add(objects_, h, index))
             return true;
         ReportSkyFailure(sky.error);

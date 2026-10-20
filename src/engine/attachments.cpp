@@ -8,6 +8,11 @@ namespace OpenBlood2
     {
         if (out)
             *out = 0;
+        if (pure_)
+        {
+            refuse_impure("CreateAttachment");
+            return DE_ERROR;
+        }
         auto* p = get(parent);
         auto* c = get(child);
         if (!out || !p || !c || p == c || p->life != Life::Alive || c->life != Life::Alive || !offset || !rotation ||
@@ -63,6 +68,11 @@ namespace OpenBlood2
     }
     DRESULT Objects::detach(HATTACHMENT id)
     {
+        if (pure_)
+        {
+            refuse_impure("RemoveAttachment");
+            return DE_ERROR;
+        }
         auto it = attachments_.find(id);
         if (it == attachments_.end())
             return DE_NOTFOUND;

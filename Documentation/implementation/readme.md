@@ -11,6 +11,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 | Save/load audit (original classes, shells, LithTech engine, OpenBlood2 map) | [Audit](save_load_audit/readme.md) / [contract](../contracts/save_load_contracts.md) / [source ledger](sources/save_load_audit_sources.json) |
 | Save/load lot 1 (save-message primitives) | [Report](reports/save_load_messages.md) / [source ledger](sources/save_load_messages_sources.json) |
 | Save/load lot 2 (container and fingerprint) | [Report](reports/save_load_container.md) / [source ledger](sources/save_load_container_sources.json) |
+| Save/load lot 3 (engine records and the clock) | [Report](reports/save_load_records.md) / [source ledger](sources/save_load_records_sources.json) |
 | Source selections, commits and hashes | [Source ledgers](sources/readme.md) |
 | M0 / M1 validation | [M0](reports/m0.md) / [M1](reports/m1.md) |
 | M2 criterion matrix and GPU reservation | [Acceptance](reports/m2_acceptance.md) |

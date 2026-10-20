@@ -227,7 +227,8 @@ namespace OpenBlood2
         };
         SetObjectState = [](HOBJECT h, int state)
         {
-            active().trace_service("SetObjectState");
+            if (!active().trace_service("SetObjectState"))
+                return;
             auto& o = active().objects_;
             auto* r = o.get(h);
             if (!r || r->life != Life::Alive || state < 0 ||
@@ -414,15 +415,28 @@ namespace OpenBlood2
             active().trace_service("BreakInterObjectLink");
             active().objects_.unlink(a, b);
         };
-        SaveObjects = [](const char*, ObjectList*, DDWORD, DDWORD) -> DRESULT
+        SaveObjects = [](const char* file, ObjectList* list, DDWORD param, DDWORD flags) -> DRESULT
         {
-            active().trace_service("SaveObjects");
-            return active().unsupported("SaveObjects");
+            auto& a = active();
+            if (!a.trace_service("SaveObjects"))
+                return DE_ERROR;
+            if (!file || (list && !a.lists_.contains(list)))
+                return DE_INVALIDPARAMS;
+            std::vector<HOBJECT> handles;
+            for (auto* link = list ? list->m_pFirstLink : nullptr; link; link = link->m_pNext)
+                handles.push_back(link->m_hObject);
+            SaveObjectsReport report;
+            return a.save_objects(file, handles, param, flags, report) ? DE_OK : DE_ERROR;
         };
-        RestoreObjects = [](const char*, DDWORD, DDWORD) -> DRESULT
+        RestoreObjects = [](const char* file, DDWORD param, DDWORD flags) -> DRESULT
         {
-            active().trace_service("RestoreObjects");
-            return active().unsupported("RestoreObjects");
+            auto& a = active();
+            if (!a.trace_service("RestoreObjects"))
+                return DE_ERROR;
+            if (!file)
+                return DE_INVALIDPARAMS;
+            RestoreObjectsReport report;
+            return a.restore_objects(file, param, flags, report) ? DE_OK : DE_ERROR;
         };
     }
     bool ServerAdapter::bind()

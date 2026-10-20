@@ -18,6 +18,9 @@ namespace OpenBlood2
         bool set(const SkyDefinition&);
         bool add(const Objects&, HOBJECT, unsigned);
         bool remove(const Objects&, HOBJECT);
+        // Save restore: INSKY membership, and the slot when the object still held one
+        // (slot >= 30 means none). An existing registration keeps its place.
+        bool restore(const Objects&, HOBJECT, unsigned slot);
         bool validate(const Objects&, HOBJECT, unsigned, std::string&) const;
         bool draws(const World&, const WorldMesh&, const Objects&, DVector eye, std::vector<WorldDraw>&,
                    DVector& sky_eye, std::string&) const;

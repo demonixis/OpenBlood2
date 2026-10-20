@@ -64,6 +64,30 @@ namespace OpenBlood2
         ++additions;
         return true;
     }
+    bool SkyState::restore(const Objects& store, HOBJECT h, unsigned slot)
+    {
+        std::string failure;
+        if (!validate(store, h, slot < objects.size() ? slot : 0, failure))
+        {
+            error = std::move(failure);
+            return false;
+        }
+        const auto id = store.get(h)->id;
+        std::erase_if(registered,
+                      [&](auto entry)
+                      {
+                          const auto* r = store.get(entry);
+                          return !r || r->life != Life::Alive;
+                      });
+        if (std::find(registered.begin(), registered.end(), id) == registered.end())
+        {
+            registered.push_back(id);
+            ++additions;
+        }
+        if (slot < objects.size())
+            objects[slot] = id;
+        return true;
+    }
     bool SkyState::remove(const Objects& store, HOBJECT h)
     {
         const auto* r = store.get(h);

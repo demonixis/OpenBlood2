@@ -69,7 +69,8 @@ namespace OpenBlood2
     }
     DRESULT ServerAdapter::SendToClient(HCLIENT client, const PlayerEvent& event)
     {
-        trace_service("SendToClient");
+        if (!trace_service("SendToClient"))
+            return DE_ERROR;
         if (!GetClientUserData(client))
             return DE_INVALIDPARAMS;
         const bool valid = std::visit(
@@ -141,7 +142,8 @@ namespace OpenBlood2
     }
     DRESULT ServerAdapter::SendBossHealth(const BossHealth& value)
     {
-        trace_service("SendBossHealth");
+        if (!trace_service("SendBossHealth"))
+            return DE_ERROR;
         if (!std::isfinite(value.fraction))
             return DE_INVALIDPARAMS;
         for (const auto& [client, state] : clients_)

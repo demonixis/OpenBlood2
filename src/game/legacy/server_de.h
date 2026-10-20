@@ -75,6 +75,9 @@ namespace OpenBlood2
     struct PolyGridSettings;
     struct SkyDefinition;
 } // namespace OpenBlood2
+// Original SaveObjects/RestoreObjects flags (1998 server_de.h).
+inline constexpr DDWORD RESTOREOBJECTS_RESTORETIME = 1;
+inline constexpr DDWORD SAVEOBJECTS_SAVEGAMECONSOLE = 1, SAVEOBJECTS_SAVEPORTALS = 2;
 class PathMgr;
 class ServerDE : public CSBase
 {
@@ -266,6 +269,8 @@ class ServerDE : public CSBase
     void (*RelinquishList)(ObjectList*) = nullptr;
     DRESULT (*CreateInterObjectLink)(HOBJECT, HOBJECT) = nullptr;
     void (*BreakInterObjectLink)(HOBJECT, HOBJECT) = nullptr;
+    // Over the in-memory logical store (Save\Current\Current.sav, Auto.sav, Keep.sav);
+    // see save_load_contracts "Implementation plan", lot 3.
     DRESULT (*SaveObjects)(const char*, ObjectList*, DDWORD, DDWORD) = nullptr;
     DRESULT (*RestoreObjects)(const char*, DDWORD, DDWORD) = nullptr;
     virtual HMESSAGEWRITE StartMessageToObject(LPBASECLASS, HOBJECT, DDWORD) = 0;

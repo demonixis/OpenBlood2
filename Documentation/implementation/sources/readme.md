@@ -24,6 +24,7 @@ Runtime test logs and measurements belong in the
 - [Save/load audit](save_load_audit_sources.json): read-only audit of original and later-LithTech save/restore code; no import.
 - [Save-message primitives](save_load_messages_sources.json): lot 1 CSBase declarations and Save/Load call patterns; no implementation imported.
 - [Save/load container](save_load_container_sources.json): lot 2 container and fingerprint; new code, no original source read or imported.
+- [Save/load engine records](save_load_records_sources.json): lot 3 SaveObjects/RestoreObjects; original file names and flags consulted, no implementation imported.
 
 - [Original music asset preparation](m2_music_asset_sources.json)
 

@@ -634,7 +634,8 @@ namespace OpenBlood2
     }
     HMESSAGEWRITE ServerAdapter::StartMessageToObject(LPBASECLASS sender, HOBJECT receiver, DDWORD id)
     {
-        trace_service("StartMessageToObject");
+        if (!trace_service("StartMessageToObject"))
+            return nullptr;
         auto* r = objects_.get(receiver);
         HOBJECT from = sender ? objects_.handle_of(sender) : nullptr;
         if (!r || r->life != Life::Alive || (sender && !from))
@@ -701,13 +702,28 @@ namespace OpenBlood2
             return false;
         }
         messages_.at(h).borrowed = true; // The callback cannot release or route its writer.
+        // Purity (save_load_contracts "Save sequence" 5): the registry refuses creation,
+        // removal, scheduling, links, attachments and nested dispatch; trace_service
+        // refuses every other service outside the pure set.
+        const auto refusals = objects_.pure_refusals();
+        if (!objects_.begin_pure_callback())
+        {
+            messages_.erase(h);
+            ++message_stats.released;
+            report.error = "Save payload purity scope refused";
+            return false;
+        }
         payload_ = PayloadDispatch{h, false, &index, &report};
         HMESSAGEWRITE argument = h;
         const bool delivered = objects_.engine_message(object, MID_SAVEOBJECT, &argument, static_cast<float>(param));
         payload_.reset();
+        objects_.end_pure_callback();
         const auto it = messages_.find(h);
         auto& m = it->second;
-        const bool ok = delivered && !m.bad;
+        const bool pure = objects_.pure_refusals() == refusals;
+        if (!pure && report.error.empty())
+            report.error = "MID_SAVEOBJECT purity: " + objects_.first_pure_refusal() + " refused";
+        const bool ok = delivered && !m.bad && pure;
         if (ok)
         {
             bytes = std::move(m.bytes);

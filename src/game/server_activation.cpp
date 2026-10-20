@@ -30,7 +30,8 @@ namespace OpenBlood2
     }
     bool ServerAdapter::SetDeactivationTime(HOBJECT h, float seconds)
     {
-        trace_service("SetDeactivationTime");
+        if (!trace_service("SetDeactivationTime"))
+            return false;
         auto* r = objects_.get(h);
         if (!r || r->life != Life::Alive || !std::isfinite(seconds) || seconds < 0 || seconds > 1e6f)
             return false;
@@ -43,7 +44,8 @@ namespace OpenBlood2
     }
     bool ServerAdapter::PingObjects(HOBJECT observer)
     {
-        trace_service("PingObjects");
+        if (!trace_service("PingObjects"))
+            return false;
         auto* source = objects_.get(observer);
         if (!source || source->life != Life::Alive || !collision || !collision_ready)
             return false;

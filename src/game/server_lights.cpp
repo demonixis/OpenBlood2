@@ -6,7 +6,8 @@ namespace OpenBlood2
 {
     bool ServerAdapter::RandomFloat(float low, float high, float& value)
     {
-        trace_service("RandomFloat");
+        if (!trace_service("RandomFloat"))
+            return false;
         if (!std::isfinite(low) || !std::isfinite(high) || low > high || std::abs(low) > 1e6f || std::abs(high) > 1e6f)
             return false;
         value = low + (high - low) * static_cast<float>(random_() - random_.min()) /
@@ -15,7 +16,8 @@ namespace OpenBlood2
     }
     bool ServerAdapter::PublishLightEffect(HOBJECT h, const LightSettings& settings)
     {
-        trace_service("PublishLightEffect");
+        if (!trace_service("PublishLightEffect"))
+            return false;
         if (!IsObjectAlive(h) || !dynamic_cast<ClientLightFX*>(objects_.get(h)->game.get()) ||
             light_effects.size() >= 4096 ||
             std::any_of(light_effects.begin(), light_effects.end(), [h](const auto& l) { return l.source == h; }))
@@ -28,7 +30,8 @@ namespace OpenBlood2
     }
     void ServerAdapter::RemoveLightEffect(HOBJECT h)
     {
-        trace_service("RemoveLightEffect");
+        if (!trace_service("RemoveLightEffect"))
+            return;
         std::erase_if(light_effects, [h](const auto& l) { return l.source == h; });
     }
     const CLightFX* ServerAdapter::GetLightEffect(HOBJECT h) const

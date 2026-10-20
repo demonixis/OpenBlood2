@@ -41,8 +41,8 @@ namespace
         {
             if (definition.boundary == ServiceBoundary::Interface)
                 CHECK(listed.insert(std::string(definition.name)).second);
-            const bool unavailable = definition.name == "SaveObjects" || definition.name == "RestoreObjects";
-            CHECK(definition.support == (unavailable ? ServiceSupport::Unavailable : ServiceSupport::Bounded));
+            // SaveObjects/RestoreObjects became bounded in save/load lot 3.
+            CHECK(definition.support == ServiceSupport::Bounded);
         }
         CHECK(listed == declared);
         std::string source = read(root / "src/game/server_adapter.h");
@@ -97,7 +97,7 @@ namespace
         const auto empty = s.service_calls;
         auto rows = service_coverage(empty);
         CHECK(rows.size() == service_catalog().size());
-        CHECK(find(rows, "SaveObjects")->support == ServiceSupport::Unavailable && !find(rows, "SaveObjects")->calls);
+        CHECK(find(rows, "SaveObjects")->support == ServiceSupport::Bounded && !find(rows, "SaveObjects")->calls);
         CHECK(find(rows, "GetPathManager")->support == ServiceSupport::Bounded && !find(rows, "GetPathManager")->calls);
         CHECK(s.GetPathManager() && s.service_calls == empty); // Inspection outside a traced scope.
         {
@@ -107,8 +107,14 @@ namespace
             CHECK(s.SetVelocity(nullptr, &velocity) != DE_OK); // Counted attempt, not success.
             {
                 ServiceTraceScope nested(s.trace_enabled);
+                // Not an original save file: refused, but not an unavailable service.
                 CHECK(s.SaveObjects("unused", nullptr, 0, 0) == DE_ERROR);
                 CHECK(s.RestoreObjects("unused", 0, 0) == DE_ERROR);
+                // Plain object references outside saves remain unavailable services.
+                auto message = s.StartHMessageWrite();
+                CHECK(s.WriteToMessageObject(message, nullptr) == DE_ERROR);
+                CHECK(!s.ReadFromMessageObject(message));
+                s.EndHMessageWrite(message);
                 s.EndHMessageRead(nullptr);
             }
             CHECK(s.trace_enabled);
@@ -221,9 +227,11 @@ namespace
         CHECK(game->objects.snapshot().empty() && !game->server.string_count() && !game->server.message_count() &&
               !game->server.list_count() && !game->server.client_count());
         // Deliberate failure probe after the accepted session trace, with no world loaded.
-        std::cout << "Reset probe: deliberate SaveObjects refusal outside the loaded session\n";
-        CHECK(game->server.SaveObjects("unused", nullptr, 0, 0) == DE_ERROR);
-        CHECK(!game->server.unavailable_history.empty());
+        std::cout << "Reset probe: deliberate plain object write outside a save\n";
+        auto probe = game->server.StartHMessageWrite();
+        CHECK(game->server.WriteToMessageObject(probe, nullptr) == DE_ERROR);
+        game->server.EndHMessageWrite(probe);
+        CHECK(!game->server.unavailable_history.empty() && !game->server.message_count());
         CHECK(game->request_world("01_SubwayA", error));
         CHECK(!game->server.service_calls.contains("ConnectClient") &&
               !game->server.service_calls.contains("DisconnectClient"));

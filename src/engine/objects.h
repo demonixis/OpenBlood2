@@ -41,13 +41,27 @@ namespace OpenBlood2
         bool defaulted = true;
         std::size_t max_string = MAX_CS_FILENAME_LEN;
     };
+    // Save support declared per registered class (save_load_contracts "Engine and game
+    // responsibilities"). AlwaysLoad is inherited, like the original CF_ALWAYSLOAD.
+    enum class SaveSupport : std::uint8_t
+    {
+        Unsupported, // A save that would include it is refused, naming the class.
+        Original,    // Original Save/Load bodies with a payload version (>= 1).
+        AlwaysLoad,  // Rebuilt from the DAT; never saved, references to it read NULL.
+        NotSaved     // Not saveable in the original and lost on restore.
+    };
     struct ClassInfo
     {
         std::string name;
         HCLASS parent;
         std::unique_ptr<BaseClass> (*construct)();
         std::vector<PropertySpec> properties;
+        SaveSupport save = SaveSupport::Unsupported;
+        std::uint32_t payload_version = 0; // Changes whenever an Original class's byte layout changes.
     };
+    // The class's own declaration, or AlwaysLoad when an ancestor declares it.
+    SaveSupport save_support(HCLASS type);
+    const char* save_support_name(SaveSupport);
     enum class Creation : unsigned
     {
         Runtime,
@@ -115,6 +129,9 @@ namespace OpenBlood2
     {
         ObjectId id;
         HOBJECT handle = nullptr;
+        // Creation order within this registry. Handles are append-only, so it also orders
+        // records whose slots were reused; save lists follow it (save_load_contracts D8).
+        std::uint32_t creation = 0;
         HCLASS type = nullptr;
         std::unique_ptr<BaseClass> game;
         ObjectCreateStruct state;
@@ -182,6 +199,16 @@ namespace OpenBlood2
         std::shared_ptr<const ContainerShape> container_; // Binding and index membership change together.
     };
 
+    // Restore-mode creation (save_load_contracts "Load sequence", pass 1). The saved
+    // next-update delay keeps double precision unless precreate changed the float value
+    // it received in ObjectCreateStruct::m_NextUpdate; initial update may still replace it.
+    struct RestoreCreation
+    {
+        bool scheduled = false;
+        double remaining = 0;     // Seconds; zero for an overdue deadline.
+        DRotation basis{};        // World models: authored basis the base shell is built with.
+    };
+
     class Objects
     {
       public:
@@ -198,6 +225,40 @@ namespace OpenBlood2
         static bool is_kind_of(HCLASS type, HCLASS parent);
         HOBJECT create(HCLASS type, ObjectCreateStruct state = {}, Creation reason = Creation::Runtime,
                        const Properties& properties = {});
+        // Creation::Restore with the saved delay and world-model basis. No properties are read.
+        HOBJECT create_restored(HCLASS type, ObjectCreateStruct state, const RestoreCreation& restore);
+        // Sets the clock of an empty, idle registry (RESTOREOBJECTS_RESTORETIME, D9): no
+        // record, deferred removal or callback may exist, so no deadline is rebased.
+        bool restore_clock(double time, double frame_time);
+        // While a MID_SAVEOBJECT callback runs, creation, removal, scheduling, links,
+        // attachments, stepping and nested message dispatch are refused and counted.
+        bool begin_pure_callback();
+        void end_pure_callback();
+        bool pure_callback() const
+        {
+            return pure_;
+        }
+        std::uint64_t pure_refusals() const
+        {
+            return pure_refusals_;
+        }
+        const std::string& first_pure_refusal() const
+        {
+            return pure_refusal_;
+        }
+        std::size_t pending_count() const
+        {
+            return pending_.size();
+        }
+        std::size_t handle_count() const
+        {
+            return handles_.size();
+        }
+        // Owner/target pairs in link-creation order.
+        const std::vector<std::pair<HOBJECT, HOBJECT>>& links() const
+        {
+            return links_;
+        }
         ObjectError validate_properties(HCLASS, const Properties&, std::string&) const;
         bool parse_properties(HCLASS, std::string_view, Properties&);
         HOBJECT create_props(HCLASS type, ObjectCreateStruct state, std::string_view text);
@@ -285,7 +346,12 @@ namespace OpenBlood2
         double time_ = 0, frame_time_ = 0;
         unsigned callback_depth_ = 0;
         bool advancing_ = false, finishing_ = false, clearing_ = false;
+        bool pure_ = false;
+        std::uint64_t pure_refusals_ = 0;
+        std::string pure_refusal_;
         DDWORD dispatch(ObjectRecord& record, DDWORD id, void* data, float reason);
+        HOBJECT create_object(HCLASS, ObjectCreateStruct, Creation, const Properties&, const RestoreCreation*);
+        bool refuse_impure(const char* operation);
     };
 
     struct ObjectSelection

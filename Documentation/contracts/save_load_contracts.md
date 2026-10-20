@@ -1,11 +1,13 @@
 # Save and load
 
-Status: **design contract for roadmap task 3.3. Lots 1 (save-message primitives) and 2
-(container and fingerprint) are implemented; see their evidence
-([lot 1](../implementation/reports/save_load_messages.md),
-[lot 2](../implementation/reports/save_load_container.md)). No save or load reaches the
-game yet; the other lots are pending.** The Save and Load screens stay disabled until the
-lots below land. The
+Status: **design contract for roadmap task 3.3. Lots 1 (save-message primitives), 2
+(container and fingerprint) and 3 (engine records and the clock) are implemented; see
+their evidence ([lot 1](../implementation/reports/save_load_messages.md),
+[lot 2](../implementation/reports/save_load_container.md),
+[lot 3](../implementation/reports/save_load_records.md)). `SaveObjects` and
+`RestoreObjects` work over an in-memory store with synthetic classes; every original
+class is still Unsupported, so no save or load reaches the game yet. The other lots are
+pending.** The Save and Load screens stay disabled until the lots below land. The
 [audit](../implementation/save_load_audit/readme.md) is the evidence for every
 original rule cited here; its [source ledger](../implementation/sources/save_load_audit_sources.json)
 records the audited files. Read [level replacement](level_change_contracts.md),
@@ -181,7 +183,8 @@ mapped onto `ObjectRecord`:
 - name, filename and skin;
 - container code;
 - for world and container models, the BSP name and the resolved model index (it
-  must equal the first same-named model in file order);
+  must equal the first same-named model in file order), plus the authored basis
+  rotation the base shell is built with (a container's equals its rotation);
 - colour and alpha, collision dimensions;
 - velocity, acceleration, mass, friction, the body properties and blocking
   priority;
@@ -202,6 +205,106 @@ Derived state is not saved and is rebuilt:
 
 Positions must be finite and rotations unit within the existing ±0.001
 tolerance; delays must be finite and nonnegative.
+
+### Implemented engine records (lot 3)
+
+`src/engine/save_objects.*` encodes the CLCK, OBJS, LINK and ATCH payloads;
+`src/game/server_saves.cpp` implements `SaveObjects`, `RestoreObjects` and the
+engine-record capture and application.
+
+- **Encodings.** Little-endian; floats are raw binary32/binary64 bits; booleans are one
+  byte, exactly 0 or 1; strings are a `u32` length without terminator.
+  - CLCK (40 bytes): binary64 time, frame time and world-time origin, 3 × binary32
+    global force, `u32` generator state (1–2147483646). The origin lies in 0..time.
+  - OBJS: `u32` count (≤ 65,536), then per record: class name (1–64), `u16` type
+    (OT_NORMAL, MODEL, WORLDMODEL, SPRITE, LIGHT or CONTAINER), `u32` flags and user
+    flags, position, rotation (x, y, z, w), scale, name, filename and skin (≤ 100 each),
+    `u16` container code, `u32` BSP model index (`0xFFFFFFFF` unless a world or container
+    model) and its basis rotation (identity otherwise), colour and alpha (0..1),
+    dimensions (≥ 0), velocity, acceleration, `u8` body kind (world, character or model,
+    at most one), binary32 mass and friction, pushable, rotating-debris and
+    polygon-bounds bytes, `u8` blocking priority, `u32` activity (with state 3 and
+    automatic deactivation needing a positive period), automatic-deactivation byte,
+    binary64 period (≤ 10⁶ s) and remaining time to deactivation, scheduled byte,
+    binary64 remaining update delay (zero when unscheduled; both delays ≤ 10⁹ s),
+    `u32` animation, binary64 animation milliseconds, looping, done and first bytes,
+    hidden nodes (`u32` count ≤ 4,096 of 0/1 bytes), binary64 sprite milliseconds,
+    `u32` sprite frame (< 4,096), has-frame byte, INSKY byte, `u32` sky slot (0–29, or
+    `0xFFFFFFFF`; a slot needs INSKY), local-client byte (at most one record), then the
+    game payload (`u32` length ≤ 64 KiB).
+  - LINK: `u32` count, then owner and target indices; distinct ends, no duplicate.
+  - ATCH: `u32` count, then parent and child indices, node name (≤ 100), offset and
+    rotation; a child is attached at most once.
+
+  Each decoder checks every length against its bound and the remaining bytes, rejects
+  trailing bytes and changes its output only on success.
+- **Delays.** A deadline is saved as `max(0, deadline − clock)`: an update that fell due
+  while its object was inactive is saved as zero and runs at the next active step,
+  as before. The restored deadline is chosen among `clock + remaining` and its nearest
+  neighbours so that it yields the same remaining delay again; a save taken right after
+  a full restore therefore reproduces the bytes. `MID_PRECREATE(3)` receives the
+  delay as the float `m_NextUpdate`; the engine keeps the double value unless precreate
+  changed that float, and a `SetNextUpdate` in initial update still wins.
+- **Clock.** `Objects::restore_clock` works only on an empty, idle registry, so no
+  deadline is rebased. `restore_image_state` applies CONS, then CLCK, before any object
+  exists; lot 4 runs it after the restore-mode load's world-time reset and before the
+  first always-load object. `RestoreObjects` runs it itself on an empty registry. With
+  objects present, `RESTOREOBJECTS_RESTORETIME` requires the saved clock to be current
+  (restored and not advanced) and leaves CONS alone; without it the clock is kept.
+- **Logical store.** The original paths `Save\Current\Current.sav`, `Auto.sav` and
+  `Keep.sav` (case and separator insensitive) name the three images of the adapter's
+  `SaveStore`. An image holds dwParam, flags, CONS (only with
+  `SAVEOBJECTS_SAVEGAMECONSOLE`, within the CONS bounds), the class schema and the four
+  encoded payloads. It is replaced whole on success and kept on any failure, and it
+  survives world unload. `SAVEOBJECTS_SAVEPORTALS` is accepted and has nothing to save.
+  dwParam is 0 or 1; other flags are refused.
+- **Save list.** `SaveObjects` writes each listed Alive object once, in creation order
+  (`ObjectRecord::creation`; handles are append-only, so this also orders reused
+  slots). It skips pending objects and AlwaysLoad classes, including subclasses. A
+  stale handle, or a listed NotSaved, Unsupported or versionless Original class,
+  refuses the whole save before any dispatch and names the classes: a listed NotSaved
+  object would otherwise lose state silently. Links and attachments whose ends are both
+  listed follow in link-creation and attachment-creation order.
+- **Save support.** `ClassInfo::save` and `payload_version` hold the declaration;
+  AlwaysLoad is inherited like `CF_ALWAYSLOAD`. Every class defaults to Unsupported;
+  lot 4 declares the registered classes.
+- **Purity.** While `MID_SAVEOBJECT` runs, the registry refuses creation, removal,
+  scheduling, links, attachments, stepping and nested message dispatch, and
+  `trace_service` admits only a reviewed set: the message primitives, strings and
+  read-only queries. Every other service, including an unknown name, fails the save.
+  Message sends, activity changes, audio, effect publication, sky changes and
+  gameplay random draws also refuse to act; any other impure call (a setter, for
+  example) still fails the save but is not undone. After the last record, the record
+  count, handles, links, attachments, strings, lists, voices, clock and generator must
+  be unchanged and live messages must not grow, or the save fails. Releasing an owned
+  reader stays allowed: the original player Save consumes its pending client blob. Attachment refresh during a position
+  query stays allowed: it recomputes the same pose.
+- **Restore.** The whole image is decoded and checked before anything changes: every
+  class registered, Original, with the schema's payload version; the schema naming
+  exactly the classes present; world and container models binding the same first
+  same-named model in this world; a container's basis equal to its rotation; no sky slot
+  held twice. Then pass 1 (`Objects::create_restored`, the engine overwrite), the index
+  table, pass 2 and links and attachments, as in the [load sequence](#load-sequence).
+  The overwrite covers user flags, dimensions, colour, physics, animation and hidden
+  nodes (checked against the restored model), the sprite track (checked against the
+  restored sprite), activity and deactivation, position and sky membership.
+  - A world model's base shell is rebuilt at the saved basis; a saved rotation is posed
+    once about the BSP origin, before initial update, and the saved translation is then
+    the usual offset. A container must stay at its BSP origin.
+  - The local-client record is reported, not associated: lot 5 attaches the client.
+  - An existing link, or an existing attachment of the same parent and child, is kept.
+    Any other attachment goes through the engine's attachment rules.
+  - Deferred removals requested by Loads stay for the owner's frame end.
+- **Restore failure.** No deferred removal may be pending when a restore starts. On a
+  failure after objects exist, every record the restore created is removed and
+  reclaimed, including children its callbacks created (bounded rounds). The clock,
+  generator, global force, world-time origin and console variables are reinstated if
+  this call changed them. Effects of original callbacks on objects or adapter state
+  that existed before (a detached voice, a removed always-load object) are covered by
+  lot 4's candidate destruction, not here.
+- **Services.** `SaveObjects` and `RestoreObjects` are bounded services; a refusal is
+  an object diagnostic and a report (`last_save`, `last_restore`), not an unavailable
+  service.
 
 ### Message primitives
 

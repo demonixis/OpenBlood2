@@ -2,6 +2,7 @@
 #include "engine/collision.h"
 #include "engine/model_store.h"
 #include "engine/objects.h"
+#include "engine/save_objects.h"
 #include "engine/sky.h"
 #include "engine/string_resources.h"
 #include "game/blood_splats.h"
@@ -280,7 +281,10 @@ namespace OpenBlood2
             ++unavailable_history[reason];
         }
         bool trace_enabled = false;
-        void trace_service(const char* name)
+        // Every service implementation enters here. Inside a MID_SAVEOBJECT dispatch a
+        // service outside the pure set fails the save and returns false; services that
+        // would create, send, schedule, change activity, play or publish then refuse.
+        bool trace_service(const char* name)
         {
             if (trace_enabled)
             {
@@ -290,6 +294,9 @@ namespace OpenBlood2
                 else
                     ++service_calls[name];
             }
+            if (payload_ && !payload_->load) [[unlikely]]
+                return save_service_allowed(name);
+            return true;
         }
         std::size_t string_count() const
         {
@@ -352,6 +359,20 @@ namespace OpenBlood2
         {
             return payload_.has_value();
         }
+        // Original SaveObjects/RestoreObjects over the in-memory logical store
+        // (save_load_contracts lot 3). `file` is an original Save\Current\*.sav path.
+        bool save_objects(std::string_view file, std::span<const HOBJECT> list, DDWORD param, DDWORD flags,
+                          SaveObjectsReport&);
+        bool restore_objects(std::string_view file, DDWORD param, DDWORD flags, RestoreObjectsReport&);
+        // The pre-object phase of a restore: CONS, then CLCK when `restore_time`, on an
+        // empty registry (D9). RestoreObjects runs it itself when no object exists yet.
+        bool restore_image_state(SaveStoreSlot, bool restore_time, std::string& error);
+        static bool save_store_slot(std::string_view file, SaveStoreSlot&);
+        SaveClock save_clock() const;
+        SaveStore save_store;                // Survives world unload; never cleared by reset_world_time.
+        SaveObjectsReport last_save;          // Owned inspection values of the latest call.
+        RestoreObjectsReport last_restore;
+        std::uint64_t saves = 0, restores = 0; // Successful calls, adapter lifetime.
         HMESSAGEWRITE StartMessageToObject(LPBASECLASS, HOBJECT, DDWORD) override;
         DRESULT EndMessage(HMESSAGEWRITE) override;
         bool GetObjectColor(HOBJECT, DVector&, float&) override;
@@ -413,7 +434,7 @@ namespace OpenBlood2
         };
         std::vector<std::unique_ptr<ClientHandle>> client_tokens_;
         std::unordered_map<HCLIENT, Client> clients_;
-        std::map<std::string, ConsoleVariable, CaseLess> variables_{{"GAME_DIFFICULTY", {"1"}},
+        std::map<std::string, ::ConsoleVariable, CaseLess> variables_{{"GAME_DIFFICULTY", {"1"}},
                                                                     {"GAME_GAMETYPE", {"0"}}};
         void initialize_model_services();
         void initialize_physics_services();
@@ -473,6 +494,10 @@ namespace OpenBlood2
         std::optional<PayloadDispatch> payload_; // Active only during one save/load dispatch.
         PayloadDispatch* payload(HMESSAGEWRITE, bool load);
         bool dispatch_ready(HOBJECT, SavePayloadReport&);
+        bool save_service_allowed(const char* name);
+        bool capture_save_record(const ObjectRecord&, SaveEngineRecord&, std::string&) const;
+        bool apply_save_record(HOBJECT, const SaveEngineRecord&, std::string&);
+        bool apply_save_clock(const SaveClock&, std::string&);
         MessageHandle create_message();
         void latch(Message&, const std::string& detail);
         bool reject(Message&, ObjectError, std::string detail);

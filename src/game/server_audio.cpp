@@ -3,7 +3,8 @@ namespace OpenBlood2
 {
     SoundId ServerAdapter::PlayObjectLoopSound(HOBJECT owner, const SoundRequest& request, std::string& error)
     {
-        trace_service("PlayObjectLoopSound");
+        if (!trace_service("PlayObjectLoopSound"))
+            return 0;
         if (!IsObjectAlive(owner) || !client_resources || request.speaker != owner ||
             request.space != SoundSpace::Spatial || !request.loop)
         {
@@ -17,7 +18,8 @@ namespace OpenBlood2
     SoundId ServerAdapter::PlayCharacterSound(HOBJECT object, const SoundRequest& request, bool retain,
                                               std::string& error)
     {
-        trace_service("PlayCharacterSound");
+        if (!trace_service("PlayCharacterSound"))
+            return 0;
         if (!IsObjectAlive(object) || !client_resources || request.speaker != object ||
             request.space != SoundSpace::Spatial || request.loop)
         {
@@ -33,7 +35,8 @@ namespace OpenBlood2
     }
     SoundId ServerAdapter::PlayCinematicSound(HOBJECT owner, const SoundRequest& request, std::string& error)
     {
-        trace_service("PlayCinematicSound");
+        if (!trace_service("PlayCinematicSound"))
+            return 0;
         if (!IsObjectAlive(owner) || !client_resources || request.space == SoundSpace::Ambient ||
             (request.space == SoundSpace::Local && request.speaker) ||
             (request.space != SoundSpace::Local && !IsObjectAlive(request.speaker)))
@@ -48,7 +51,8 @@ namespace OpenBlood2
     }
     SoundId ServerAdapter::PlayClientSound(const SoundRequest& request, DVector position, std::string& error)
     {
-        trace_service("PlayClientSound");
+        if (!trace_service("PlayClientSound"))
+            return 0;
         if (!client_resources || request.speaker || request.loop || request.streaming ||
             request.space != SoundSpace::Spatial)
         {
@@ -65,7 +69,8 @@ namespace OpenBlood2
     }
     SoundId ServerAdapter::PlaySoundAt(HOBJECT owner, const SoundRequest& request, DVector position, std::string& error)
     {
-        trace_service("PlaySoundAt");
+        if (!trace_service("PlaySoundAt"))
+            return 0;
         if (!IsObjectAlive(owner) || !client_resources || request.speaker || request.space == SoundSpace::Local)
         {
             error = "Fixed sound requires a live owner and ambient/spatial request without attachment";
@@ -75,7 +80,8 @@ namespace OpenBlood2
     }
     SoundId ServerAdapter::PlayLocalSound(HOBJECT source, const SoundRequest& request, std::string& error)
     {
-        trace_service("PlayLocalSound");
+        if (!trace_service("PlayLocalSound"))
+            return 0;
         if (!IsObjectAlive(source) || !client_resources || request.speaker || request.space != SoundSpace::Local ||
             request.loop || request.streaming)
         {
@@ -90,7 +96,8 @@ namespace OpenBlood2
     SoundId ServerAdapter::PlayDetachedSound(HOBJECT source, const SoundRequest& request, DVector position,
                                              std::string& error)
     {
-        trace_service("PlayDetachedSound");
+        if (!trace_service("PlayDetachedSound"))
+            return 0;
         if (request.loop || request.space != SoundSpace::Spatial)
         {
             error = "Detached sound requires a non-looping spatial request";
@@ -104,7 +111,8 @@ namespace OpenBlood2
     SoundId ServerAdapter::PlayWorldSound(HOBJECT source, const SoundRequest& request, bool file_stream,
                                           std::string& error)
     {
-        trace_service("PlayWorldSound");
+        if (!trace_service("PlayWorldSound"))
+            return 0;
         if (!IsObjectAlive(source) || !client_resources || request.speaker || request.space == SoundSpace::Local ||
             !request.loop)
         {
@@ -123,7 +131,8 @@ namespace OpenBlood2
     }
     bool ServerAdapter::RandomInt(int low, int high, int& value)
     {
-        trace_service("RandomInt");
+        if (!trace_service("RandomInt"))
+            return false;
         if (low > high)
             return false;
         value = std::uniform_int_distribution<int>(low, high)(random_);
@@ -150,7 +159,8 @@ namespace OpenBlood2
     }
     bool ServerAdapter::KillSound(SoundId id)
     {
-        trace_service("KillSound");
+        if (!trace_service("KillSound"))
+            return false;
         return audio.kill(id);
     }
     bool ServerAdapter::advance_audio(double seconds, DVector listener, DRotation rotation)

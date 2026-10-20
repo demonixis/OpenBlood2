@@ -1,9 +1,11 @@
 #include "engine/objects.h"
 #include "engine/container.h"
 #include "engine/model_store.h"
+#include "engine/save_objects.h"
 #include <algorithm>
 #include <charconv>
 #include <cmath>
+#include <cstring>
 #include <limits>
 #include <locale>
 #include <sstream>
@@ -148,6 +150,28 @@ namespace OpenBlood2
                 return "Pending removal";
             case Life::Destroying:
                 return "Destroying";
+        }
+        return "Unknown";
+    }
+    SaveSupport save_support(HCLASS type)
+    {
+        for (auto parent = type; parent; parent = parent->parent)
+            if (parent->save == SaveSupport::AlwaysLoad)
+                return SaveSupport::AlwaysLoad;
+        return type ? type->save : SaveSupport::Unsupported;
+    }
+    const char* save_support_name(SaveSupport value)
+    {
+        switch (value)
+        {
+            case SaveSupport::Unsupported:
+                return "Unsupported";
+            case SaveSupport::Original:
+                return "Original";
+            case SaveSupport::AlwaysLoad:
+                return "AlwaysLoad";
+            case SaveSupport::NotSaved:
+                return "NotSaved";
         }
         return "Unknown";
     }
@@ -317,8 +341,53 @@ namespace OpenBlood2
         }
         return ObjectError::None;
     }
+    bool Objects::refuse_impure(const char* operation)
+    {
+        ++pure_refusals_;
+        if (pure_refusal_.empty())
+            pure_refusal_ = operation;
+        return fail(ObjectError::Busy, std::string("Save callback purity: ") + operation + " refused");
+    }
+    bool Objects::begin_pure_callback()
+    {
+        if (pure_ || busy())
+            return fail(ObjectError::Busy, "Pure save callback scope requires an idle registry");
+        pure_ = true;
+        pure_refusal_.clear();
+        return true;
+    }
+    void Objects::end_pure_callback()
+    {
+        pure_ = false;
+    }
+    bool Objects::restore_clock(double time, double frame_time)
+    {
+        if (busy() || pure_)
+            return fail(ObjectError::Busy, "Clock restore rejected inside a callback or frame");
+        if (!records_.empty() || !pending_.empty())
+            return fail(ObjectError::Busy, "Clock restore requires an empty registry");
+        if (!std::isfinite(time) || time < 0 || !std::isfinite(frame_time) || frame_time < 0)
+            return fail(ObjectError::InvalidTime, "Invalid restored simulation clock");
+        time_ = time;
+        frame_time_ = frame_time;
+        return true;
+    }
     HOBJECT Objects::create(HCLASS type, ObjectCreateStruct state, Creation reason, const Properties& properties)
     {
+        return create_object(type, std::move(state), reason, properties, nullptr);
+    }
+    HOBJECT Objects::create_restored(HCLASS type, ObjectCreateStruct state, const RestoreCreation& restore)
+    {
+        return create_object(type, std::move(state), Creation::Restore, {}, &restore);
+    }
+    HOBJECT Objects::create_object(HCLASS type, ObjectCreateStruct state, Creation reason,
+                                   const Properties& properties, const RestoreCreation* restore)
+    {
+        if (pure_)
+        {
+            refuse_impure("CreateObject");
+            return nullptr;
+        }
         if (!knows(type))
         {
             fail(ObjectError::UnknownClass, "Create: unregistered class");
@@ -345,12 +414,14 @@ namespace OpenBlood2
             fail(ObjectError::InvalidProperty, "Invalid creation structure/reason");
             return nullptr;
         }
+        const float requested_update = state.m_NextUpdate;
         std::uint32_t index = 0;
         while (index < slots_.size() && slots_[index].object)
             ++index;
         if (index == slots_.size())
             slots_.emplace_back();
         record->id = {index, slots_[index].generation};
+        record->creation = static_cast<std::uint32_t>(handles_.size());
         handles_.push_back(std::make_unique<DObject>(DObject{record->id}));
         HOBJECT handle = handles_.back().get();
         record->handle = handle;
@@ -415,7 +486,9 @@ namespace OpenBlood2
             // Solid world models use authored surface geometry or explicit box
             // bounds. Closed-volume topology is required only for containers.
             const bool world_body = state.m_ObjectType == OT_WORLDMODEL;
-            if (!model || !error.empty() || !shape->build(*model, state.m_Rotation, error, world_body))
+            // A restored world model rebuilds its base shell at the saved authored basis.
+            const auto basis = restore && world_body ? restore->basis : state.m_Rotation;
+            if (!model || !error.empty() || !shape->build(*model, basis, error, world_body))
             {
                 contexts_.pop_back();
                 remove(handle);
@@ -441,9 +514,29 @@ namespace OpenBlood2
             }
             else
             {
+                object->world_model_base = shape;
+                object->world_model_basis = basis;
                 object->world_model = std::move(shape);
-                object->world_model_base = object->world_model;
-                object->world_model_basis = object->state.m_Rotation;
+                const auto rotated = !(state.m_Rotation.m_Vec.x == basis.m_Vec.x &&
+                                       state.m_Rotation.m_Vec.y == basis.m_Vec.y &&
+                                       state.m_Rotation.m_Vec.z == basis.m_Vec.z &&
+                                       state.m_Rotation.m_Spin == basis.m_Spin);
+                if (restore && rotated)
+                {
+                    // Pose the saved rotation once about the BSP origin, as a rotation
+                    // move does; the engine record then sets the saved translation.
+                    auto posed = std::make_shared<ContainerShape>(*object->world_model_base);
+                    if (!posed->transform(multiply_rotation(state.m_Rotation, inverse_rotation(basis)),
+                                          object->world_model_base->origin))
+                    {
+                        contexts_.pop_back();
+                        remove(handle);
+                        fail(ObjectError::Unsupported,
+                             std::string(state.m_Name) + ": invalid restored world-model pose");
+                        return nullptr;
+                    }
+                    object->world_model = std::move(posed);
+                }
             }
         }
         if (state.m_ObjectType == OT_SPRITE)
@@ -472,7 +565,14 @@ namespace OpenBlood2
         if (object->life != Life::Pending)
         {
             object->life = Life::Alive;
-            set_next_update(handle, state.m_NextUpdate);
+            if (restore && std::memcmp(&requested_update, &state.m_NextUpdate, sizeof(float)) == 0)
+            {
+                // Keep the double-precision saved delay; precreate did not change it.
+                object->scheduled = restore->scheduled;
+                object->due = restore->scheduled ? restored_deadline(time_, restore->remaining) : 0;
+            }
+            else
+                set_next_update(handle, state.m_NextUpdate);
             dispatch(*object, MID_INITIALUPDATE, nullptr, static_cast<float>(reason));
         }
         contexts_.pop_back();
@@ -641,6 +741,8 @@ namespace OpenBlood2
     }
     bool Objects::remove(HOBJECT h)
     {
+        if (pure_)
+            return refuse_impure("RemoveObject");
         auto* record = get(h);
         if (!record)
             return fail(ObjectError::InvalidHandle, "RemoveObject: invalid/stale handle");
@@ -665,6 +767,8 @@ namespace OpenBlood2
     }
     bool Objects::set_next_update(HOBJECT h, float delay)
     {
+        if (pure_)
+            return refuse_impure("SetNextUpdate");
         auto* record = get(h);
         if (!record)
             return fail(ObjectError::InvalidHandle, "SetNextUpdate: invalid/stale handle");
@@ -678,6 +782,8 @@ namespace OpenBlood2
     }
     bool Objects::advance(double seconds)
     {
+        if (pure_)
+            return refuse_impure("Simulation step");
         if (advancing_ || finishing_ || callback_depth_)
             return fail(ObjectError::Busy, "Reentrant simulation step rejected");
         if (!std::isfinite(seconds) || seconds < 0 || !std::isfinite(time_ + seconds))
@@ -713,6 +819,8 @@ namespace OpenBlood2
     }
     bool Objects::finish_frame()
     {
+        if (pure_)
+            return refuse_impure("Deferred destruction");
         if (callback_depth_ || advancing_ || finishing_)
             return fail(ObjectError::Busy, "Destruction attempted inside a callback/frame");
         finishing_ = true;
@@ -755,6 +863,8 @@ namespace OpenBlood2
     }
     bool Objects::clear()
     {
+        if (pure_)
+            return refuse_impure("World teardown");
         if (callback_depth_ || finishing_ || advancing_)
             return fail(ObjectError::Busy, "Reentrant world teardown rejected");
         clearing_ = true;
@@ -767,6 +877,8 @@ namespace OpenBlood2
     }
     bool Objects::message(HOBJECT receiver, HOBJECT sender, DDWORD id, HMESSAGEREAD read)
     {
+        if (pure_)
+            return refuse_impure("Object message");
         auto* r = get(receiver);
         if (!r || r->life != Life::Alive || (sender && !get(sender)))
             return fail(ObjectError::InvalidHandle, "Message receiver/sender is invalid or pending removal");
@@ -779,6 +891,8 @@ namespace OpenBlood2
     }
     bool Objects::engine_message(HOBJECT receiver, DDWORD id, void* data, float value)
     {
+        if (pure_ && callback_depth_)
+            return refuse_impure("Engine message");
         auto* r = get(receiver);
         if (!r || r->life != Life::Alive)
             return fail(ObjectError::InvalidHandle, "Engine event receiver is invalid or pending removal");
@@ -791,6 +905,8 @@ namespace OpenBlood2
     }
     bool Objects::link(HOBJECT owner, HOBJECT target)
     {
+        if (pure_)
+            return refuse_impure("CreateInterObjectLink");
         const auto* a = get(owner);
         const auto* b = get(target);
         if (!a || !b || owner == target || a->life != Life::Alive || b->life != Life::Alive)
@@ -802,6 +918,11 @@ namespace OpenBlood2
     }
     void Objects::unlink(HOBJECT owner, HOBJECT target)
     {
+        if (pure_)
+        {
+            refuse_impure("BreakInterObjectLink");
+            return;
+        }
         std::erase(links_, std::pair{owner, target});
     }
     std::size_t Objects::link_count(HOBJECT owner) const

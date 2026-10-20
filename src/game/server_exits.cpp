@@ -4,7 +4,8 @@ namespace OpenBlood2
 {
     DRESULT ServerAdapter::SendWorldExit(const WorldExit& exit, const std::string& start_point)
     {
-        trace_service("SendWorldExit");
+        if (!trace_service("SendWorldExit"))
+            return DE_ERROR;
         if (!session_shell || start_point.size() > 100 || start_point.find('\0') != std::string::npos ||
             exit.next_world.size() > 100 || exit.next_world.find('\0') != std::string::npos ||
             static_cast<DBYTE>(exit.type) > static_cast<DBYTE>(WorldExitType::Episode))

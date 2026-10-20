@@ -3,7 +3,8 @@ namespace OpenBlood2
 {
     DRESULT ServerAdapter::SendConversation(const Conversation& value)
     {
-        trace_service("SendConversation");
+        if (!trace_service("SendConversation"))
+            return DE_ERROR;
         for (const auto& [client, state] : clients_)
         {
             (void)state;
@@ -14,7 +15,8 @@ namespace OpenBlood2
     }
     DRESULT ServerAdapter::SendObjectives(const MissionObjectives& value)
     {
-        trace_service("SendObjectives");
+        if (!trace_service("SendObjectives"))
+            return DE_ERROR;
         // Original null-client broadcast, bounded to the supported local client.
         for (const auto& [client, state] : clients_)
         {

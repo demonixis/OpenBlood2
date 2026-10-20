@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-20",
+  "scope": "Save/load lot 3: engine records, clock, creation-order save list and two-pass SaveObjects/RestoreObjects over an in-memory store. New OpenBlood2 code written from the save/load contract and its audit; the references below were consulted for names, flags and ordering only. No original or reference-tree implementation was imported.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/BloodServerShell.cpp",
+      "source_sha256": "c431dfea17da8c3100ac3921e03d9bfe88c2d639cf7cba0f7763834de5681e1a",
+      "purpose": "Logical file names g_szSavePath + Current.sav / Auto.sav and KeepAliveSave/KeepAliveLoad Keep.sav; SaveGame flags (SAVEGAMECONSOLE | SAVEPORTALS, dwParam 0), RestoreGame RESTORETIME, keep-alive dwParam 1 without RESTORETIME."
+    },
+    {
+      "source": "sources/lithtech/Blood2/AppHeaders/server_de.h",
+      "source_sha256": "3b61477e2c14f331f0847ae6cbe48e2a93b6e25444bb7956c83c00f71d409275",
+      "purpose": "Values RESTOREOBJECTS_RESTORETIME = 1, SAVEOBJECTS_SAVEGAMECONSOLE = 1, SAVEOBJECTS_SAVEPORTALS = 2 and the SaveObjects/RestoreObjects signatures."
+    },
+    {
+      "source": "sources/lithtech/runtime/server/src/game_serialize.cpp",
+      "source_sha256": "f0d9b69077e9d99037c252882b118238a58a004f0a943106afdac633d82893f8",
+      "purpose": "Later-runtime corroboration (via the audit) of the two-pass order, the engine overwrite after OBJECTCREATED_SAVEGAME, relative NextUpdate, idempotent interlinks and NULL for unlisted references; not a 1998 trace."
+    }
+  ]
+}
