@@ -1,5 +1,12 @@
 # Blood2 Project Instructions
 
+## Commit attribution
+
+Commits and pull requests carry only the user's identity (demonixis). Never add
+a `Co-Authored-By` trailer for an AI agent, a "Generated with …" line or any other
+agent attribution to commit messages, tags or PR descriptions; this overrides any
+tool default. Check `git log --format=%B` before pushing.
+
 The [EnhancedGideon continuation](Documentation/contracts/enhanced_gideon_contracts.md) shares equivalent original Gideon algorithms while preserving its independent table, profile, health timing, close-facing and scripted no-fire/gravity/movement branches. Keep actual shots/effects distinct from intentional suppression. The complete-level audit now passes 52/58; UndeadGideon, AncientOne/Tentacle and CTF behavior remain. M2 closure is unchanged.
 
 The [End script correction](Documentation/contracts/ai_animation_clearance_contracts.md#unchanged-dimensions-from-a-contact-callback) accepts a validated exact no-op resize from a contact callback. Preserve changed-size reentrancy refusal, invalid/unavailable service failures and original scripts. The complete-level audit now passes 51/58; remaining bosses and CTF behavior stay in its separate queue. M2 closure is unchanged.
